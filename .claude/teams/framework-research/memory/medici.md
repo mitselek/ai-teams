@@ -36,3 +36,11 @@ Correct path is `.claude/teams/framework-research/memory/medici.md`. Earlier in 
 ## [CHECKPOINT] 2026-03-13 session 2
 
 All 8 topic files unchanged from session 1 — no extraction has occurred. Finn's scratchpad has rc-team vs hr-devs comparison ready but not pushed into topics. Health report v2 written. Highest-value next action: T06 Lifecycle comparison (two concrete reference implementations to compare).
+
+## [DEFERRED] 2026-03-13 — Shutdown for model upgrade
+
+Shutting down for respawn on opus model. State is clean:
+- Health report v2 at `.claude/teams/framework-research/docs/health-report.md`
+- Scratchpad at `.claude/teams/framework-research/memory/medici.md` (this file)
+- No in-progress writes or open tasks
+- Next action on restart: extraction sprint per health-report v2 recommendations

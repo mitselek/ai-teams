@@ -30,7 +30,7 @@ Understand the gap before proposing a solution.
 
 Define the specialist:
 
-- **Name & personality** — fits the team culture
+- **Name & lore** — every agent MUST have a name rooted in classical literature or historical figures, with a short memorable nickname for team chat. The lore entry connects the origin to the agent's role. Study existing team members for the pattern (Celestina from de Rojas, Marcela from Cervantes, Finn from Irish/Nordic tradition, Medici from the Renaissance, Volta from physics). Propose 2-3 name options with lore rationale.
 - **Scope** — what they may and may not do
 - **Permissions** — read/write boundaries, tool restrictions
 - **Model tier** — opus for judgment-heavy, sonnet for volume, haiku for parallel lookups

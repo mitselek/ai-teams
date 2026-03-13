@@ -2,6 +2,8 @@
 
 *Agent Resources Manager, framework-research team*
 
+[GOTCHA] Scratchpad path is `.claude/teams/framework-research/memory/celes.md` — NOT `memory/celes.md` at repo root.
+
 ---
 
 ## Domain Mental Model (from topics/01–08)
@@ -54,6 +56,7 @@
 | Observability | Metrics, cost tracking, anomaly detection | Observability Designer |
 
 [DECISION] These are conceptual gaps, not confirmed hires. Team-lead decides which to pursue.
+[DECISION] Lifecycle Engineer hire approved (2026-03-13). Designed as "Volta" (Alessandro Volta — battery/cycle lore). Prompt at `prompts/volta.md`. Model: sonnet. Roster entry prepared for team-lead to merge.
 
 ---
 
@@ -66,5 +69,11 @@
 [PATTERN] The `spawn_member.sh` evolution (away from Agent tool) shows the framework maturing to respect model-tier correctness. Role design must account for model cost.
 
 [GOTCHA] Topics 01–08 all have "open questions" that are genuinely unresolved — not placeholders. Specialist roles in this team should help close those questions, not assume they're already answered.
+
+## Session Closing State (2026-03-13)
+
+[LEARNED] Naming standard broadened: classical literature AND historical figures both accepted. Volta (Alessandro Volta) approved by PO.
+[DEFERRED] Protocol Designer role — second priority hire after Volta is onboarded and dogfooded.
+[WARNING] Repeated message delivery confusion this session — team-lead received the same message as "not yet sent" multiple times. May be inbox rendering lag. Next Celes should be aware: if team-lead asks for something already sent, resend the full content rather than just pointing to a prior message.
 
 (*FR:Celes*)

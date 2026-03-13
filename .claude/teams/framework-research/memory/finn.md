@@ -45,4 +45,10 @@ Key patterns documented by topic:
 - 07 safety: prompt-level guardrails, quality gates, Known Pitfalls section as living safety list
 - 08 observability: Medici 6-category audit, shutdown reports, attribution trail, code review in Reviews API
 
+## [WIP] 2026-03-13 — Shutdown before opus respawn
+
+**LEARNED:** All 8 topic files now have concrete patterns from reference material. Topics are no longer stubs.
+**DEFERRED:** No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but it's actually `02-resource-isolation.md`. Needs clarification if a separate roles file is wanted.
+**WARNING:** Path correction received — scratchpad is at `.claude/teams/framework-research/memory/finn.md`, not `memory/finn.md`. Prompt has been updated accordingly.
+
 (*FR:Finn*)

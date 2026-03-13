@@ -13,7 +13,7 @@
     {
       "name": "finn",
       "agentType": "general-purpose",
-      "model": "claude-sonnet-4-6",
+      "model": "claude-opus-4-6",
       "color": "black",
       "prompt": "prompts/finn.md",
       "lore": {
@@ -25,7 +25,7 @@
     {
       "name": "medici",
       "agentType": "general-purpose",
-      "model": "claude-sonnet-4-6",
+      "model": "claude-opus-4-6",
       "color": "magenta",
       "prompt": "prompts/medici.md",
       "lore": {
@@ -37,13 +37,25 @@
     {
       "name": "celes",
       "agentType": "general-purpose",
-      "model": "claude-sonnet-4-6",
+      "model": "claude-opus-4-6",
       "color": "cyan",
       "prompt": "prompts/celes.md",
       "lore": {
         "fullName": "Celestina Marcela",
         "origin": "Classical Spanish literature — Celestina from Fernando de Rojas' La Celestina (1499), the matchmaker; Marcela from Cervantes' Don Quixote, the independent judge",
         "significance": "An Agent Resources Manager who matches problems to specialists (Celestina) and holds firm on role quality (Marcela)"
+      }
+    },
+    {
+      "name": "volta",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "blue",
+      "prompt": "prompts/volta.md",
+      "lore": {
+        "fullName": "Alessandro Volta",
+        "origin": "Italian physicist (1745–1827), inventor of the electric battery — first reliable energy storage and release across cycles",
+        "significance": "A lifecycle engineer who ensures each team session starts clean, runs reliably, and hands off state intact to the next cycle"
       }
     }
   ]
