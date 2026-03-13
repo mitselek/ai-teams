@@ -27,15 +27,43 @@ cd <team-config-repo> && git pull
 ### Phase 2: Clean
 
 **Precondition:** Sync complete. Team lead has read the roster and common-prompt (to know what to expect).
-**Action:** Three sub-steps, strictly ordered:
+**Action:** Four sub-steps, strictly ordered:
 
 ```
-2a. Backup inboxes (if stale team dir exists)
-2b. Kill zombie agent processes (tmux panes, background daemons)
-2c. Remove stale team directory
+2.0. Diagnose team dir state
+2a.  Backup inboxes (if stale team dir exists)
+2b.  Kill zombie agent processes (tmux panes, background daemons)
+2c.  Remove stale team directory
 ```
 
-**Reference implementation:**
+#### Phase 2.0: Diagnose (*FR:Volta* — amendment from restart test 2026-03-13)
+
+Before touching the filesystem, classify the starting scenario. This costs one `ls` and eliminates the diagnostic uncertainty of "why is the state this way?"
+
+```bash
+TEAM_DIR="$HOME/.claude/teams/<team-name>"
+
+if [ -d "$TEAM_DIR/inboxes" ]; then
+  echo "WARM RESTART — stale team dir with inboxes (normal)"
+elif [ -d "$TEAM_DIR" ]; then
+  echo "PARTIAL STATE — stale team dir, no inboxes (TeamDelete was called or inboxes never created)"
+elif ls -d "$HOME/.claude/teams/<team-name>"-* 2>/dev/null | head -1 >/dev/null; then
+  echo "MISCREATION — team dir exists under wrong name (prior TeamCreate without clean)"
+else
+  echo "COLD START — no prior state (first ever, different machine, or dir cleaned externally)"
+fi
+```
+
+| Scenario | Meaning | What 2a–2c do |
+|---|---|---|
+| WARM RESTART | Normal session resumption | 2a backs up inboxes, 2c removes dir |
+| PARTIAL STATE | Inboxes lost — TeamDelete was called or previous session crashed before inbox creation | 2a is a no-op (no inboxes), 2c removes dir |
+| COLD START | No prior team state exists on this machine | 2a, 2b, 2c are all no-ops — proceed through them anyway |
+| MISCREATION | TeamCreate ran against an existing dir, generated a suffixed name | 2c removes the wrong-name dir |
+
+All four scenarios converge to the same outcome: `$TEAM_DIR` does not exist, inboxes (if any) are backed up. The diagnosis is informational — it tells the team lead what happened, not what to do differently. **Always run 2a–2c regardless of scenario** — they are idempotent and safe on empty state.
+
+**Reference implementation (sub-steps 2a–2c):**
 
 ```bash
 TEAM_DIR="$HOME/.claude/teams/<team-name>"
@@ -53,9 +81,10 @@ fi
 rm -rf "$TEAM_DIR"
 ```
 
-**Expected outcome:** `$TEAM_DIR` does not exist. Inboxes are in `/tmp/`.
+**Expected outcome:** `$TEAM_DIR` does not exist. Inboxes are in `/tmp/` (if they existed). Team lead knows which scenario was encountered.
 **Failure if skipped:**
 
+- Skip 2.0 → team lead wastes a round-trip investigating why the dir is/isn't there
 - Skip 2a → inboxes lost → agents lose cross-session message history
 - Skip 2b → zombie processes hold TTY → new spawn may fail or create invisible agents
 - Skip 2c → `TeamCreate` generates a random name (e.g. `cloudflare-builders-a7f3`) → inbox routing breaks, all `SendMessage` calls fail silently
@@ -139,7 +168,23 @@ The key insight from operational experience: the team directory must survive shu
 ### Phase 2: Notify
 
 **Precondition:** Halt declared.
-**Action:** Send shutdown request to all agents (broadcast or one-by-one).
+**Action:** Two sub-steps:
+
+#### 2a. Create task-list-snapshot (*FR:Volta* — amendment from restart test 2026-03-13)
+
+**Before** sending shutdown to agents, team lead creates `memory/task-list-snapshot.md`. This is when the lead has the best picture of task state — all agents still alive, tasks fresh in context. By Phase 4 (Persist), the lead's context is near limit and this step gets forgotten.
+
+```bash
+# Dump current task state — raw format, no synthesis needed
+# TaskList output → memory/task-list-snapshot.md
+# Include: task ID, status, assignee, one-line description, blockers
+```
+
+**Rationale for timing:** The previous protocol placed the snapshot in Shutdown Phase 4 (Persist). Field testing showed this is the worst possible timing — the team lead is the last agent standing, executing a multi-step git sequence, with context near limit. Moving it to Phase 2 (before agents shut down) means the lead can even ask agents for status updates to improve snapshot accuracy.
+
+#### 2b. Send shutdown requests
+
+Send shutdown request to all agents (broadcast or one-by-one).
 
 Each agent, on receiving shutdown:
 
@@ -150,7 +195,7 @@ Each agent, on receiving shutdown:
    - `[WARNING]` — risk or blocker for next session
 3. Approve the shutdown
 
-**Expected outcome:** All agents have saved state and sent closing messages.
+**Expected outcome:** Task snapshot created. All agents have saved state and sent closing messages.
 
 ### Phase 3: Collect
 
@@ -165,13 +210,11 @@ Each agent, on receiving shutdown:
 
 ### Phase 4: Persist
 
-**Precondition:** All agents terminated.
+**Precondition:** All agents terminated. Task snapshot already created (Phase 2a).
 **Action:** Save session state to version control.
 
 ```bash
-# Save task list snapshot (team lead's responsibility)
-# Export current tasks to memory/task-list-snapshot.md
-
+# Task snapshot was created in Shutdown Phase 2a — just commit it here
 # Commit all memory files
 git add .claude/teams/<team-name>/memory/
 git commit -m "chore: save team scratchpads and task list"
@@ -213,8 +256,9 @@ Before spawning agent `<name>`:
 
 | Spawning path | Gate implementation |
 |---|---|
-| `spawn_member.sh` | Built-in: `jq` check on config.json, exits with error if duplicate found |
-| Agent tool (local) | Team lead must check config.json manually before calling Agent tool |
+| `spawn_member.sh` (RC/tmux) | Built-in: `jq` check on config.json, exits with error if duplicate found |
+| `spawn_local.sh` + Agent tool (local) | Built-in: `jq` check on config.json, exits with error if duplicate found |
+| Agent tool alone (local, no script) | Team lead must check config.json manually before calling Agent tool |
 | Raw `claude` CLI | Not permitted (no gate possible) |
 
 ### Failure mode
@@ -229,7 +273,7 @@ Spawning without the gate creates `<name>-2` entries in `config.json`. Effects:
 
 The team lead's context window fills up over a long session. By the time a second spawn is needed, the lead has forgotten that the agent already exists. The fix is structural: the gate must be in the spawning mechanism (script), not in the lead's memory.
 
-**Recommendation for framework:** Spawn tooling should refuse duplicates at the infrastructure level. The Agent tool itself should check `config.json` and reject duplicate names. Until that is implemented, `spawn_member.sh` is the only spawning path with a built-in gate.
+**Recommendation for framework:** Spawn tooling should refuse duplicates at the infrastructure level. The Agent tool itself should check `config.json` and reject duplicate names. Until that is implemented, `spawn_member.sh` (RC/tmux) and `spawn_local.sh` (local) provide built-in gates. Teams using the Agent tool without a wrapper script must rely on team lead discipline — a known failure mode.
 
 ---
 
@@ -243,11 +287,11 @@ Three spawning paths exist. Each is correct in exactly one context. Using the wr
 
 ```
 Is the team running on a remote machine via tmux (RC)?
-  YES → Does the roster define model/color per agent?
-    YES → spawn_member.sh (reads roster, spawns in tmux pane)
-    NO  → spawn_member.sh (still preferred — manages pane lifecycle)
+  YES → spawn_member.sh (reads roster, spawns in tmux pane)
   NO → Is it a local Claude Code session?
-    YES → Agent tool (with run_in_background: true)
+    YES → Does spawn_local.sh exist for this team?
+      YES → spawn_local.sh (duplicate gate + prompt assembly) → Agent tool
+      NO  → Agent tool directly (team lead must check duplicates and compose prompt manually)
     NO  → Not a supported configuration
 ```
 
@@ -273,20 +317,89 @@ Is the team running on a remote machine via tmux (RC)?
 ### Path 2: Agent tool (local teams)
 
 **When:** Local Claude Code sessions without tmux.
-**How:** `Agent(name="<name>", prompt="...", run_in_background: true)`
-**Does NOT read:** roster.json (ignores model settings — all agents get session default model)
+**How:** `Agent(name="<name>", model="<model>", prompt="...", run_in_background: true)`
+**Reads:** Nothing automatically — team lead must supply model, prompt, and name as parameters.
 **Produces:** Background agent process, config.json entry
 
 **Advantages:**
 
 - Works without tmux
 - Simple — no shell script needed
+- Supports per-agent model selection via `model` parameter (e.g., `model: "opus"`)
 
 **Disadvantages:**
 
-- Ignores roster model — cannot assign opus to architect and sonnet to researcher
 - No built-in duplicate gate — team lead must check config.json manually
+- No prompt file loading — team lead must read prompt file and pass content inline
 - `run_in_background: true` is MANDATORY — foreground blocks team lead from receiving messages
+
+### Path 2.5: `spawn_local.sh` + Agent tool (local teams, automated) (*FR:Volta* — amendment from restart test 2026-03-13)
+
+**When:** Local Claude Code sessions where the team has a roster and prompt files.
+**How:** Team lead runs `spawn_local.sh` to get the duplicate check and assembled prompt, then passes the output to the Agent tool.
+**Reads:** roster.json (model, name validation), config.json (duplicate check), prompts/<name>.md (prompt content)
+**Produces:** Validated prompt text on stdout. Agent tool spawns the process.
+
+**Reference implementation:**
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+# spawn_local.sh <team-name> <agent-name>
+# For local Claude Code sessions. Validates and outputs spawn parameters.
+# Team lead uses the output with the Agent tool.
+
+TEAM_NAME="${1:?Usage: spawn_local.sh <team-name> <agent-name>}"
+AGENT_NAME="${2:?Usage: spawn_local.sh <team-name> <agent-name>}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEAM_DIR="$SCRIPT_DIR/$TEAM_NAME"
+CONFIG="$HOME/.claude/teams/$TEAM_NAME/config.json"
+ROSTER="$TEAM_DIR/roster.json"
+
+# Validate prerequisites
+[[ -f "$CONFIG" ]] || { echo "ERROR: $CONFIG not found. Run TeamCreate first." >&2; exit 1; }
+[[ -f "$ROSTER" ]] || { echo "ERROR: $ROSTER not found." >&2; exit 1; }
+
+# Duplicate gate
+if jq -e ".members[] | select(.name == \"$AGENT_NAME\")" "$CONFIG" >/dev/null 2>&1; then
+  echo "ERROR: $AGENT_NAME already registered in config.json. Use SendMessage instead." >&2
+  exit 1
+fi
+
+# Read roster entry
+ROSTER_ENTRY=$(jq -r ".members[] | select(.name == \"$AGENT_NAME\")" "$ROSTER")
+[[ -n "$ROSTER_ENTRY" ]] || { echo "ERROR: $AGENT_NAME not found in roster." >&2; exit 1; }
+
+MODEL=$(echo "$ROSTER_ENTRY" | jq -r '.model')
+
+# Compose prompt
+PROMPT=""
+if [[ -f "$TEAM_DIR/prompts/$AGENT_NAME.md" ]]; then
+  PROMPT=$(cat "$TEAM_DIR/prompts/$AGENT_NAME.md")
+fi
+
+echo "--- spawn_local output ---"
+echo "agent: $AGENT_NAME"
+echo "model: $MODEL"
+echo "prompt_file: $TEAM_DIR/prompts/$AGENT_NAME.md"
+echo "---"
+echo "$PROMPT"
+```
+
+**Advantages over raw Agent tool:**
+
+| Capability | Agent tool alone | spawn_local.sh + Agent tool |
+|---|---|---|
+| Duplicate gate | Manual (team lead remembers) | Structural (script exits with error) |
+| Prompt assembly | Manual (team lead reads + pastes) | Automatic (script reads prompt file) |
+| Model from roster | Manual (team lead looks up roster) | Automatic (script reads roster) |
+| Roster validation | None | Agent name validated against roster |
+
+**Disadvantages:**
+
+- Requires shell execution before Agent tool call (two-step process)
+- Team lead must still manually invoke the Agent tool with the script's output
+- No tmux pane management (agent not visible as separate terminal)
 
 ### Path 3: Raw `claude` CLI
 
@@ -369,10 +482,12 @@ Files with defined owners and purpose:
 ### Task Snapshots
 
 **Location:** `memory/task-list-snapshot.md`
-**Owner:** Team lead (exported during shutdown Phase 4)
+**Owner:** Team lead (created during Shutdown Phase 2a, committed during Phase 4)
 **Purpose:** Next session's team lead can see what was in progress, what was completed, what was blocked.
 
-**Format:** Simple markdown list with status, assignee, and blockers.
+**Format:** Simple markdown list with status, assignee, and blockers. Raw TaskList dump is sufficient — no synthesis required. Reduce activation energy to near zero.
+
+**Why Phase 2a, not Phase 4:** Field testing (2026-03-13 restart) showed that placing the snapshot in Phase 4 (Persist) causes it to be forgotten — the team lead is cognitively loaded and executing a multi-step git sequence. Phase 2a is when the lead has the best task picture: all agents still alive, tasks fresh in context.
 
 ---
 
@@ -451,9 +566,12 @@ Same pattern, adds: dashboard startup (node server + browser kiosk), `spawn_memb
 
 **Evolution:** rc-team originally used the Agent tool. hr-devs replaced it with `spawn_member.sh`.
 
-**Why:** Agent tool ignores roster model settings — all agents get default model, wasting expensive opus tokens. `spawn_member.sh` reads roster JSON for model, color, session ID.
+**Why (RC/tmux teams):** `spawn_member.sh` reads roster JSON for model, color, session ID, manages tmux panes, and has a built-in duplicate gate. The Agent tool lacks tmux integration and prompt file loading.
 
-**Rule:** NEVER spawn via Agent tool. NEVER use raw `claude` CLI (runs in background without tmux pane — agent invisible to user).
+**Correction (2026-03-13):** The Agent tool DOES support per-agent model selection via the `model` parameter. The original claim that it "ignores roster model settings" was incorrect. The remaining gaps for local teams are: no duplicate gate, no prompt file loading. See Path 2.5 (`spawn_local.sh`) for the local equivalent.
+
+**Rule (RC/tmux):** Use `spawn_member.sh`. NEVER use raw `claude` CLI (runs in background without tmux pane — agent invisible to user).
+**Rule (local):** Use `spawn_local.sh` + Agent tool when available. Raw Agent tool is acceptable but lacks structural safeguards.
 
 **Spawn order matters:** Finn first (wait for intro report, user confirmation) → Marcus (wait, confirm) → Tess + Sven (parallel) → Dag (if needed).
 
@@ -529,7 +647,7 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 
 1. **Inbox backup atomicity** — The backup-rm-create-restore sequence is not atomic. If the process crashes between Phase 2c (remove) and Phase 4 (restore), inboxes in `/tmp/` may be orphaned. A filesystem-level rename (swap old dir with new) would be safer, but TeamCreate requires the directory to not exist.
 
-2. **Agent tool duplicate gate** — The Agent tool (used in local teams) has no built-in duplicate check. Should the framework provide a wrapper script for local teams equivalent to `spawn_member.sh`?
+2. ~~**Agent tool duplicate gate**~~ → Resolved by `spawn_local.sh` (Path 2.5). Local teams now have a wrapper script with built-in duplicate gate and prompt assembly. (*FR:Volta* — resolved 2026-03-13)
 
 3. **Daemon agent shutdown protocol** — Should non-Claude agents implement `shutdown_request`/`shutdown_response` in their polling loop, or is kill-process sufficient?
 

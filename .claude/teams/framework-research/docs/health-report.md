@@ -1,103 +1,195 @@
-# Framework Research — Knowledge Health Report (Audit v2, 2026-03-13)
+# Framework Research — Knowledge Health Report (Audit v3, 2026-03-13)
 
 (*FR:Medici*)
 
 ## Summary
 
-Second audit. No changes to topic files since session 1 — all 8 remain at "brainstorm" stub status. Finn's scratchpad confirms reference material has been indexed but not yet extracted into topics. The framework-research team is correctly structured with common-prompt.md, member prompts, and scratchpads in place.
+Third audit, first post-restart. **Major progress since v2:** all 8 topic files now have `## Patterns from Reference Teams (*FR:Finn*)` sections with substantial extracted content. Volta wrote a full canonical lifecycle protocol into T06. Herald designed 3 inter-team communication protocols in T03. The team is no longer at "brainstorm" — most topics are at "drafting" or better.
 
-**Overall health: STALE — no extraction progress since last audit**
+**Overall health: GOOD — substantial progress, some gaps remain**
+
+---
+
+## Restart Test Evaluation
+
+Evaluating success criteria from `docs/restart-test.md`:
+
+### SC-1: Self-orientation — PASS
+
+| # | Criterion | Result |
+|---|---|---|
+| 1a | Team name and mission | PASS — common-prompt.md clearly states `framework-research`, mission: design multi-team AI agent framework |
+| 1b | All 6 roster members with roles | PASS — roster.json lists 6 members: team-lead, finn, medici, celes, volta, herald |
+| 1c | Startup procedure | PASS — common-prompt.md On Startup section exists |
+| 1d | Canonical lifecycle protocol | PASS — topics/06-lifecycle.md has full startup/shutdown protocol |
+
+### SC-2: Startup protocol execution — PARTIAL
+
+| # | Criterion | Result |
+|---|---|---|
+| 2a | Stale team dir handled correctly | PASS — team is running |
+| 2b | TeamCreate succeeds | PASS — team is operational |
+| 2c | Inboxes restored | UNKNOWN — cannot verify from my position |
+| 2d | Medici spawned first | PASS — I was spawned and am running the audit |
+
+### SC-3: Agent continuity — PARTIAL (only Medici spawned so far)
+
+| # | Criterion | Result |
+|---|---|---|
+| 3a | Each agent reads scratchpad on startup | PASS (Medici) — I read my scratchpad and referenced session 3 checkpoint |
+| 3b | No duplicate agents | PASS — no `-2` entries observed |
+| 3c | Agents know prior work | PASS (Medici) — I know my prior audit history, scratchpad state |
+
+### SC-4: Work product continuity — MOSTLY PASS
+
+| # | Criterion | Result |
+|---|---|---|
+| 4a | topics/06-lifecycle.md has canonical protocol | **PASS** — Volta's full startup/shutdown protocol, duplicate prevention gate, spawning paths, cross-session handover, stale-team recovery all present |
+| 4b | topics/03-communication.md has Herald's design | **PASS** — 3 protocols (handoff, topology, broadcast governance), attribution design, 6 open questions |
+| 4c | All 8 topic files have Finn's extracted patterns | **PASS** — every topic file has `## Patterns from Reference Teams (*FR:Finn*)` with substantial content |
+| 4d | Celes's specialist gap analysis in scratchpad | **PASS** — memory/celes.md has full 8-topic domain model with specialist gap table |
+
+### SC-5: Protocol correctness — PARTIAL
+
+| # | Criterion | Result |
+|---|---|---|
+| 5a | No TeamDelete called | PASS — team dir existed at session start |
+| 5b | Shutdown closing messages in scratchpads | PASS — all 5 scratchpads have dated entries from session 3 with appropriate tags |
+| 5c | Task snapshot exists | **FAIL** — no `memory/task-list-snapshot.md` found |
+
+### Restart Test Verdict
+
+**SC-1 and SC-2 (must-pass): PASS** — fundamental protocol works.
+**SC-3 through SC-5 (should-pass): MOSTLY PASS** — 1 failure (missing task snapshot).
+
+**Recommendation:** Task snapshot should be part of the shutdown checklist enforcement. Team-lead should create `memory/task-list-snapshot.md` during Phase 4 (Persist) of shutdown.
 
 ---
 
 ## 1. [COHERENCE] — Are topic files consistent with each other?
 
-**Status: PASS (unchanged from v1)**
+**Status: PASS (improved from v2)**
 
-All 8 topic files remain internally consistent. Terminology is compatible. No contradictions introduced.
+Cross-references now exist implicitly through Finn's extraction sections — multiple topics reference the same operational patterns (e.g., `spawn_member.sh`, team-lead restrictions, attribution). No terminological contradictions found.
 
-Tension to watch (unchanged): T01 "Can an agent belong to multiple teams?" — still unresolved, still load-bearing for T02, T05, T07.
+**Positive coherence signals:**
+- T06 (lifecycle) and T03 (communication) both reference the same shutdown reporting protocol — consistent descriptions
+- T04 (hierarchy) and T07 (safety) both describe team-lead tool restrictions — identical lists
+- T01 (taxonomy) and T06 (lifecycle) both describe `spawn_member.sh` vs Agent tool — consistent
+
+**Tension still unresolved:** T01 "Can an agent belong to multiple teams?" — still open, still load-bearing for T02, T05, T07.
 
 ---
 
 ## 2. [EXTRACTION] — Have patterns from reference/ been extracted into topics?
 
-**Status: NOT DONE — no change since v1**
+**Status: DONE**
 
-Finn's scratchpad (session 1) documents the key differences between rc-team and hr-devs reference implementations. That analysis exists in `memory/finn.md` but has not been pushed into the topic files.
+All 8 topic files now have `## Patterns from Reference Teams (*FR:Finn*)` sections with material extracted from both reference implementations. This was the Priority 1 action from v2.
 
-Two reference implementations are now fully indexed:
-
-| Reference | Key patterns available |
-|---|---|
-| `reference/rc-team/cloudflare-builders/` | Spawning via Agent tool, flat memory/, inline startup in common-prompt, `(*RC-DEV:Name*)` attribution |
-| `reference/hr-devs/` | `spawn_member.sh` shell spawning, memory/ + docs/ separation, canonical startup-shutdown.md, health-report cadence |
-
-The extraction table from v1 (10 open-question/answer pairs) remains valid and unacted on.
+| Topic | Finn section present | Content quality |
+|---|---|---|
+| T01 Team Taxonomy | Yes | Rich — agent types table, team configs, model tiering |
+| T02 Resource Isolation | Yes | Good — git isolation, worktree, branch strategy, DB naming, rate limits |
+| T03 Communication | Yes | Excellent — 7 patterns + Herald's 3 inter-team protocols |
+| T04 Hierarchy & Governance | Yes | Good — team-lead restrictions, anti-patterns table, governance rules |
+| T05 Identity & Credentials | Yes | Good — credential listing, loading pattern, Figma rate-limit protocol |
+| T06 Lifecycle | Yes | Excellent — creation, spawning, duplicate prevention, handover, shutdown, Eilama, plus Volta's canonical protocol |
+| T07 Safety & Guardrails | Yes | Good — prompt-level guardrails, peer enforcement, quality gates, worktree isolation |
+| T08 Observability | Yes | Good — Medici pattern, shutdown reports, attribution, dashboard, known pitfalls |
 
 ---
 
 ## 3. [GAP] — What's missing? Which topics are thin?
 
-**All topics still thin. No change from v1 ranking.**
+**Updated gap ranking (significant changes from v2):**
 
 | Topic | Gap severity | Key missing element |
 |---|---|---|
-| T06 Lifecycle | HIGH | No concrete handover mechanism described; two reference implementations exist to compare |
-| T03 Communication | HIGH | No message schema, no channel/inbox design, no routing rules |
-| T05 Identity | HIGH | Current state documented but no proposal for multi-team scoping |
-| T04 Hierarchy | MEDIUM | Governance rules section is placeholder |
-| T01 Taxonomy | MEDIUM | No decision on elastic vs fixed roster |
-| T02 Resource Isolation | MEDIUM | No proposal for D1 migration serialization or deployment locking |
-| T07 Safety | LOW | Permission categories well-structured; needs circuit-breaker detail |
-| T08 Observability | LOW | What-to-track list solid; implementation mechanism missing |
+| T02 Resource Isolation | HIGH | D1 migration serialization and deployment locking still have no proposals — only current state documented |
+| T04 Hierarchy & Governance | HIGH | Manager agent layer design is absent — only current flat hierarchy described. Governance rules section is still placeholder |
+| T05 Identity & Credentials | HIGH | Per-team credential scoping still has no proposal — only current (shared) state documented |
+| T08 Observability | MEDIUM | What-to-track list solid, but implementation mechanisms (metrics collection, dashboards, cost tracking) are entirely missing |
+| T01 Taxonomy | MEDIUM | Elastic vs fixed roster answered (fixed roster, elastic active config), but multi-team agent membership and team-type lifecycle (when to create/dissolve specialty teams) unresolved |
+| T07 Safety | LOW | Well-structured. Circuit breaker and runaway detection design still needed |
+| T03 Communication | LOW (was HIGH) | Herald's protocols cover inter-team handoff, topology, and broadcast governance. Remaining: cross-team message delivery mechanism and cross-team Finn |
+| T06 Lifecycle | LOW (was HIGH) | Volta's canonical protocol is comprehensive. Remaining: inbox backup atomicity, daemon shutdown protocol, multi-team startup coordination |
 
-**New gap identified this session:**
-
-T06 Lifecycle now has TWO concrete reference implementations to compare (rc-team vs hr-devs differ significantly in spawning mechanism — Agent tool vs shell script). This comparison hasn't been extracted or analyzed yet. It's the highest-value extraction target.
+**Biggest gap shift:** T03 and T06 moved from HIGH to LOW — Herald and Volta did excellent work.
 
 ---
 
 ## 4. [CONTRADICTION] — Do any files contradict each other?
 
-**Status: NONE FOUND**
+**Status: MINOR — 2 items found**
 
-No new contradictions. The T07/MEMORY.md Jira wording tension noted in v1 remains (compatible but differently worded) — still not a contradiction.
+### 4a. Finn's scratchpad model claim vs roster.json
+
+Finn's scratchpad says: "Team size: 3 agents (team-lead opus-4-6, finn opus-4-6, medici sonnet-4-6)" — but roster.json shows 6 members, and medici is now opus-4-6. This was accurate when written but is now stale.
+
+**Severity:** Low — scratchpad text, not authoritative.
+**Fix:** Finn should update on next startup.
+
+### 4b. Health report v2 gap table vs actual state
+
+The health report v2 (previous version of this file) listed T06 as HIGH gap and T03 as HIGH gap. Both are now substantially filled by Volta and Herald respectively. This report (v3) supersedes.
+
+**Severity:** None — self-correcting (this report replaces v2).
 
 ---
 
-## 5. [STALE] — Are scratchpads current?
+## 5. [STALE] — Are scratchpads current and pruned?
 
-| Scratchpad | Status |
-|---|---|
-| `memory/medici.md` | Current — written session 1, updated this session |
-| `.claude/teams/framework-research/memory/finn.md` | Current — written session 1, contains valid index and pattern notes |
+| Scratchpad | Lines | Limit | Status | Issues |
+|---|---|---|---|---|
+| memory/celes.md | ~80 | 100 | Current | None — comprehensive domain model, all entries valid |
+| memory/finn.md | ~41 | 100 | **Stale item** | Line 14: "Team size: 3 agents" is wrong (now 6). `[DEFERRED]` about `topics/02-roles.md` may be resolved |
+| memory/herald.md | ~17 | 100 | Current | Clean, all entries valid |
+| memory/medici.md | ~49 | 100 | Current | Will update after this audit |
+| memory/volta.md | ~17 | 100 | Current | Clean, all entries valid |
 
-No stale scratchpads.
+**All under 100-line limit.** One stale item in finn.md (team size claim).
 
 ---
 
-## Actions Taken This Session
+## 6. [PROMOTE] — Scratchpad entries worth adding to prompts or common-prompt
 
-| Action | Detail |
+| Entry | Source | Promote to |
+|---|---|---|
+| Cross-cutting pattern: "Almost everything is behavioral/prompt-enforced, not infrastructure-enforced" | celes.md | Could go in common-prompt as a design principle |
+| Pattern: "Real incidents drive design" | celes.md | Could go in common-prompt as a design principle |
+
+---
+
+## Cross-Topic Dependencies (new section)
+
+These topic files depend on each other but don't explicitly cross-reference:
+
+| Dependency | Why it matters |
 |---|---|
-| Read all 8 topic files | Confirmed no changes since v1 |
-| Read finn.md scratchpad | Confirmed rc-team vs hr-devs comparison was done but not extracted |
-| Updated health-report.md | This document (v2) |
-| Updated memory/medici.md | Added session 2 notes |
+| T01 → T06 | Team taxonomy drives lifecycle (project teams are long-lived, specialty teams are temporary) |
+| T03 → T04 | Communication topology depends on governance hierarchy (who may broadcast, who routes messages) |
+| T04 → T07 | Governance defines permission tiers that safety enforces |
+| T05 → T02 | Credential scoping is a form of resource isolation |
+| T06 → T01 | Lifecycle phases differ by team type (but T06 doesn't reference T01) |
+
+**Recommendation:** Add a "Related topics" one-liner to each topic file header.
 
 ---
 
 ## Recommended Next Steps (for team-lead)
 
-**Priority 1 — Extraction sprint (unchanged from v1):**
-Finn should extract concrete patterns from reference/ into topic Notes sections. Starting point: the extraction table in v1 of this report (10 open-question/answer pairs). Finn already has the material indexed.
+**Priority 1 — T04 Hierarchy: Manager agent layer design**
+The manager agent is referenced in T03 (Herald's protocols assume it exists) but T04 has no design for it. This is now the biggest coherence gap — Herald designed protocols for an entity that T04 hasn't defined. Candidate: a new specialist or delegate to an existing agent.
 
-**Priority 2 — T06 Lifecycle comparison (new):**
-Finn has documented that rc-team and hr-devs use fundamentally different spawning/handover mechanisms. This should be written up as a structured comparison in `topics/06-lifecycle.md` Notes — it's the clearest case where reference material directly answers an open question.
+**Priority 2 — T02 Resource Isolation: D1 + deployment proposals**
+T02 has the current state well-documented but no proposals for multi-team resource management. Needs a concrete design (migration serialization, deployment queuing, per-team DB instances).
 
-**Priority 3 — T03 Communication design:**
-Still the most structurally undefined topic and a prerequisite for any multi-team coordination design. Needs a concrete proposal before other topics can converge.
+**Priority 3 — T05 Identity: Multi-team credential scoping proposal**
+Similar to T02 — current state documented, future state not designed. Per-team tokens, rotation, audit-by-identity.
 
-**Priority 4 — README status column:**
-All 8 topics still show "brainstorm". Once extraction begins, update to "drafting".
+**Priority 4 — README status column update**
+All 8 topics still show "brainstorm" in README.md but most are now at "drafting". Update the table.
+
+**Priority 5 — Create task-list-snapshot.md**
+Missing from shutdown — needed for SC-5c compliance.

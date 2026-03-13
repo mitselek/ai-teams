@@ -24,12 +24,16 @@ Following the canonical protocol from `topics/06-lifecycle.md`, Shutdown Phases 
 Team-lead announces shutdown. No new tasks delegated.
 
 ### Phase 2: Notify
-Send shutdown_request to each active agent. Each agent must:
+**2a. Create task-list-snapshot** (BEFORE sending shutdown requests):
+- Dump TaskList output to `memory/task-list-snapshot.md`
+- This is when the lead has the best picture of task state — all agents still alive
+
+**2b. Send shutdown requests** to each active agent. Each agent must:
 1. Write final state to scratchpad (`[WIP]` or `[CHECKPOINT]`)
 2. Send closing message: `[LEARNED]`, `[DEFERRED]`, `[WARNING]` (1 bullet each, max)
 3. Approve shutdown
 
-**Active agents in this session:** finn, celes, volta, herald, medici (check which are actually running — some may have been shut down already during model upgrades)
+**Active agents in this session:** check which are actually running before sending shutdown
 
 ### Phase 3: Collect
 Wait for `teammate_terminated` from each agent. Do NOT proceed on `shutdown_approved` alone.
@@ -67,10 +71,11 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 
 | # | Criterion | How to verify | Pass/Fail |
 |---|---|---|---|
-| 2a | Stale team dir handled correctly | Phase 2 (Clean) completes without error | |
-| 2b | TeamCreate succeeds with correct name | `config.json` exists with `leadSessionId` | |
-| 2c | Inboxes restored (if backup existed) | `inboxes/` dir exists after Phase 4 | |
-| 2d | Medici spawned first | Medici sends health report before other agents spawn | |
+| 2a | Phase 2.0 Diagnose executed | Team lead identified scenario (WARM RESTART / PARTIAL STATE / COLD START / MISCREATION) before cleaning | |
+| 2b | Stale team dir handled correctly | Phase 2 (Clean) completes without error | |
+| 2c | TeamCreate succeeds with correct name | `config.json` exists with `leadSessionId` | |
+| 2d | Inboxes restored (if backup existed) | `inboxes/` dir exists after Phase 4 | |
+| 2e | Medici spawned first | Medici sends health report before other agents spawn | |
 
 ### SC-3: Agent continuity (after spawning)
 
@@ -84,7 +89,7 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 
 | # | Criterion | How to verify | Pass/Fail |
 |---|---|---|---|
-| 4a | topics/06-lifecycle.md contains canonical protocol | Read file — Volta's startup/shutdown protocol is present | |
+| 4a | topics/06-lifecycle.md contains canonical protocol + amendments | Read file — Volta's protocol present, plus Phase 2.0 Diagnose, Shutdown Phase 2a snapshot timing, and Path 2.5 spawn_local.sh | |
 | 4b | topics/03-communication.md contains Herald's inter-team design | Read file — Herald's routing/topology/broadcast design is present | |
 | 4c | All 8 topic files have Finn's extracted patterns | Each file has `## Patterns from Reference Teams (*FR:Finn*)` section | |
 | 4d | Celes's specialist gap analysis is in her scratchpad | memory/celes.md has 8-topic domain model | |
@@ -95,7 +100,7 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 |---|---|---|---|
 | 5a | No TeamDelete was called | Team dir exists on disk at session start | |
 | 5b | Shutdown closing messages were received | Check scratchpads for `[LEARNED]`/`[DEFERRED]`/`[WARNING]` entries dated today | |
-| 5c | Task snapshot exists | memory/task-list-snapshot.md or equivalent persisted by team-lead | |
+| 5c | Task snapshot exists | memory/task-list-snapshot.md persisted by team-lead (created during Shutdown Phase 2a, before agent shutdown) | |
 
 ## Where These Criteria Live
 

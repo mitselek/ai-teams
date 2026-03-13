@@ -1,48 +1,40 @@
 # Medici — Knowledge Health Checker Scratchpad
 
-## [LEARNED] 2026-03-13 — Initial audit (session 1)
+## [CHECKPOINT] 2026-03-13 session 4 — Restart test audit
 
-This is a brand-new research repo, not the cloudflare-builders operational team. No memory/ or .claude/ dirs existed on startup — created them.
+Post-restart audit (v3) completed. Restart test evaluated — SC-1 and SC-2 PASS (must-pass), SC-3-5 mostly pass with 1 failure (missing task-list-snapshot.md).
 
-Repo structure: README.md + 8 topic files + reference/ (cloudflare-builders RC team artifacts).
+Major progress since v2: all 8 topics now have Finn's extracted patterns. Volta wrote canonical lifecycle protocol (T06). Herald wrote 3 inter-team communication protocols (T03). Team advanced from "brainstorm" to "drafting" on most topics.
 
-## [PATTERN] Topic file template is uniform but thin
+## [PATTERN] Topic maturity ranking (post-extraction)
 
-All 8 topic files follow identical structure: Open Questions + sparse Knowns + empty Notes. This is intentional for a brainstorm phase, but the "Notes" section is unused in all 8 files. Signals no synthesis has happened yet.
+- **T06 Lifecycle** — most mature (canonical protocol + reference patterns)
+- **T03 Communication** — strong (3 inter-team protocols + intra-team patterns)
+- **T01 Taxonomy** — solid (agent types, team configs, model tiering)
+- **T04 Hierarchy** — partial (current state good, manager agent layer missing)
+- **T07 Safety** — solid (permission categories + prompt-level guardrail patterns)
+- **T02 Resource Isolation** — partial (current state, no proposals)
+- **T05 Identity** — partial (current state, no proposals)
+- **T08 Observability** — partial (patterns documented, no implementation design)
 
-## [GAP] No cross-topic linking
+## [GAP] Biggest coherence gap
 
-Topics have zero cross-references to each other despite clear dependencies:
-- T01 (taxonomy) drives T02 (isolation) and T05 (identity)
-- T04 (hierarchy) is the missing link between T03 (communication) and T07 (safety)
-- T06 (lifecycle) needs T04 (governance) to answer who approves creation/shutdown
+T03 (Herald's protocols) assumes a manager agent exists. T04 has no manager agent design. This is a cross-topic dependency that needs closing.
 
-## [GAP] Reference material not extracted
+## [LEARNED] Restart test reveals task-list-snapshot gap
 
-reference/rc-team/cloudflare-builders/ contains rich concrete patterns (common-prompt.md ~226 lines, scratchpads, health-report.md) that directly answer many Open Questions in the topic files. No extraction has happened yet.
-
-## [PATTERN] Attribution rule differs from cloudflare-builders
-
-This team uses `(*FR:Medici*)` not `(*RC-DEV:medici*)`. Prompt is clear on this.
-
-## [DECISION] health-report location
-
-Output goes to `.claude/teams/framework-research/docs/health-report.md`. Created that directory.
+Shutdown Phase 4 (Persist) didn't produce a task-list-snapshot.md. This is SC-5c failure. Should be added to the shutdown checklist enforcement.
 
 ## [GOTCHA] Scratchpad path
 
-Correct path is `.claude/teams/framework-research/memory/medici.md`. Earlier in session 2 I erroneously wrote to `memory/medici.md` (repo root) — that file has since been removed. Always use the full `.claude/teams/...` path.
+Correct path: `.claude/teams/framework-research/memory/medici.md`. Always use full `.claude/teams/...` path.
 
-## [CHECKPOINT] 2026-03-13 session 2
+## [CHECKPOINT] 2026-03-13 session 4 — Shutdown
 
-All 8 topic files unchanged from session 1 — no extraction has occurred. Finn's scratchpad has rc-team vs hr-devs comparison ready but not pushed into topics. Health report v2 written. Highest-value next action: T06 Lifecycle comparison (two concrete reference implementations to compare).
+- [LEARNED] Restart test protocol works — SC-1/SC-2 pass cleanly, the persisted state (scratchpads, topic files, prompts, roster) is sufficient for cold restart self-orientation.
+- [DEFERRED] T04 manager agent layer design — Herald's T03 protocols depend on it, highest-priority coherence gap for next session.
+- [WARNING] task-list-snapshot.md was not created during prior shutdown — team-lead must add this to Phase 4 (Persist) checklist.
 
-## [CHECKPOINT] 2026-03-13 session 3 — Restart test shutdown
+Health report v3 written. No WIP. Clean shutdown.
 
-Respawned on opus model. No new work done this session — checked in and received immediate shutdown order (planned restart test).
-
-State remains clean:
-- Health report v2 at `.claude/teams/framework-research/docs/health-report.md` — still current
-- All 8 topic files unchanged — still at brainstorm-stub level
-- No in-progress writes or open tasks
-- Next action on restart: extraction sprint per health-report v2 recommendations (priority 1: move Finn's reference patterns into topic Notes sections)
+(*FR:Medici*)
