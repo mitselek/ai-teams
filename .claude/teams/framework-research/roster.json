@@ -1,0 +1,27 @@
+{
+  "name": "framework-research",
+  "description": "Research team designing the multi-team AI agent framework for Eesti Raudtee. Studies existing team patterns, identifies risks, and evolves the framework design.",
+  "commonPromptFile": "common-prompt.md",
+  "members": [
+    {
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "model": "claude-opus-4-6",
+      "prompt": "prompts/team-lead.md"
+    },
+    {
+      "name": "finn",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "black",
+      "prompt": "prompts/finn.md"
+    },
+    {
+      "name": "medici",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "magenta",
+      "prompt": "prompts/medici.md"
+    }
+  ]
+}
