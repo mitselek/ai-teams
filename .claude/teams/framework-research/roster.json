@@ -57,6 +57,18 @@
         "origin": "Italian physicist (1745–1827), inventor of the electric battery — first reliable energy storage and release across cycles",
         "significance": "A lifecycle engineer who ensures each team session starts clean, runs reliably, and hands off state intact to the next cycle"
       }
+    },
+    {
+      "name": "herald",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "green",
+      "prompt": "prompts/herald.md",
+      "lore": {
+        "fullName": "Hermes Trismegistus",
+        "origin": "Syncretic Greco-Egyptian figure — Hermes the messenger merged with Thoth the record-keeper; authored the protocols of divine communication",
+        "significance": "A protocol designer who defines the rules by which autonomous teams hand off work, coordinate resources, and communicate at scale"
+      }
     }
   ]
 }
