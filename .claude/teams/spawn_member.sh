@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
-# Reads roster, registers in config.json, spawns in tmux pane.
+# Usage: spawn_member.sh [--target-pane %XX] <team-name> <agent-name> [tmux-session]
+# Reads roster from the team directory, registers in config.json, spawns in tmux pane.
 
 # Parse --target-pane option
 TARGET_PANE=""
@@ -11,16 +11,18 @@ if [[ "${1:-}" == "--target-pane" ]]; then
   shift 2
 fi
 
-AGENT_NAME="${1:?Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]}"
-TMUX_SESSION="${2:-RC-DEV}"
+TEAM_NAME="${1:?Usage: spawn_member.sh [--target-pane %XX] <team-name> <agent-name> [tmux-session]}"
+AGENT_NAME="${2:?Usage: spawn_member.sh [--target-pane %XX] <team-name> <agent-name> [tmux-session]}"
+TMUX_SESSION="${3:-RC-DEV}"
 
-TEAM_NAME="framework-research"
-TEAM_DIR="$HOME/.claude/teams/$TEAM_NAME"
-CONFIG="$TEAM_DIR/config.json"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROSTER="$SCRIPT_DIR/roster.json"
+TEAM_DIR="$SCRIPT_DIR/$TEAM_NAME"
+TEAM_STATE="$HOME/.claude/teams/$TEAM_NAME"
+CONFIG="$TEAM_STATE/config.json"
+ROSTER="$TEAM_DIR/roster.json"
 
 # Validate prerequisites
+[[ -d "$TEAM_DIR" ]] || { echo "ERROR: Team directory $TEAM_DIR not found."; exit 1; }
 [[ -f "$CONFIG" ]] || { echo "ERROR: $CONFIG not found. Run TeamCreate first."; exit 1; }
 [[ -f "$ROSTER" ]] || { echo "ERROR: $ROSTER not found."; exit 1; }
 
@@ -47,11 +49,15 @@ COLOR=$(echo "$ROSTER_ENTRY" | jq -r '.color // "gray"')
 AGENT_TYPE=$(echo "$ROSTER_ENTRY" | jq -r '.agentType // "general-purpose"')
 
 # Read prompt from dedicated file (prompts/<name>.md)
-PROMPTS_DIR="$SCRIPT_DIR/prompts"
 PROMPT_FILE=""
-if [[ -f "$PROMPTS_DIR/$AGENT_NAME.md" ]]; then
-  PROMPT_FILE="$PROMPTS_DIR/$AGENT_NAME.md"
+if [[ -f "$TEAM_DIR/prompts/$AGENT_NAME.md" ]]; then
+  PROMPT_FILE="$TEAM_DIR/prompts/$AGENT_NAME.md"
 fi
+
+# Read workDir from roster (expand $HOME)
+WORK_DIR=$(jq -r '.workDir // ""' "$ROSTER")
+WORK_DIR="${WORK_DIR/\$HOME/$HOME}"
+[[ -n "$WORK_DIR" ]] || { echo "ERROR: workDir not set in roster.json"; exit 1; }
 
 # Read leadSessionId
 LEAD_SESSION_ID=$(jq -r '.leadSessionId' "$CONFIG")
@@ -62,7 +68,10 @@ SPAWN_SCRIPT=$(mktemp /tmp/spawn-cmd-XXXXXX.sh)
   echo '#!/usr/bin/env bash'
   echo 'export CLAUDECODE=1'
   echo 'export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1'
-  echo 'export NODE_EXTRA_CA_CERTS=/home/dev/.claude/custom_certs.pem'
+  # RC-specific: only set cert path if the file exists
+  if [[ -f "$HOME/.claude/custom_certs.pem" ]]; then
+    echo "export NODE_EXTRA_CA_CERTS=$HOME/.claude/custom_certs.pem"
+  fi
   if [[ -n "$PROMPT_FILE" ]]; then
     echo "PROMPT=\"\$(cat '$PROMPT_FILE')\""
   fi
@@ -77,9 +86,6 @@ SPAWN_SCRIPT=$(mktemp /tmp/spawn-cmd-XXXXXX.sh)
   echo
 } > "$SPAWN_SCRIPT"
 chmod +x "$SPAWN_SCRIPT"
-
-# Working directory for this team
-WORK_DIR="$HOME/github/mitselek-ai-teams"
 
 if [[ -n "$TARGET_PANE" ]]; then
   TMUX_PANE_ID="$TARGET_PANE"
@@ -112,5 +118,5 @@ jq --arg name "$AGENT_NAME" \
      subscriptions: []
    }]' "$CONFIG" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "$CONFIG"
 
-echo "Spawned $AGENT_NAME in pane $TMUX_PANE_ID"
+echo "Spawned $AGENT_NAME ($TEAM_NAME) in pane $TMUX_PANE_ID"
 echo "Done."
