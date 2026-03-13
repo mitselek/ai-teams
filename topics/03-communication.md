@@ -13,21 +13,25 @@ How teams communicate with each other and with humans.
 ## Communication Patterns
 
 ### Human → Team
+
 - Direct task assignment
 - Priority changes, blockers
 - Feedback and corrections
 
 ### Team → Human
+
 - Status updates
 - Decisions needing approval
 - Blockers and escalations
 
 ### Team → Team
+
 - Work handoff (e.g., dev team → QA team)
 - Resource coordination (e.g., "I'm deploying, hold off")
 - Knowledge sharing (e.g., "found a pattern you should know about")
 
 ### Broadcast
+
 - Merge freezes
 - Incident response
 - Architecture decisions
@@ -63,6 +67,7 @@ Both teams have a dashboard mechanism: `add-doc-to-dashboard.sh <file> [title]`.
 ### Shutdown protocol: ordered, confirmed
 
 Communication at shutdown follows a strict sequence:
+
 1. Team-lead stops all new work
 2. Sends shutdown to all agents (broadcast or one-by-one)
 3. Waits for confirmation from each

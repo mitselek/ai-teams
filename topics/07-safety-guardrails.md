@@ -13,6 +13,7 @@ Blast radius limits, permissions, and safety mechanisms.
 ## Permission Categories
 
 ### Never (no team can do this)
+
 - Force push to main/production
 - Delete production databases
 - Send external emails without human review
@@ -20,17 +21,20 @@ Blast radius limits, permissions, and safety mechanisms.
 - Access other teams' credentials
 
 ### Human approval required
+
 - Production deployments
 - Database migrations on production
 - External API integrations (new)
 - Creating/modifying Jira issues (per current policy)
 
 ### Team lead can approve
+
 - PR merges to develop
 - Dev environment deployments
 - Seed data changes on dev
 
 ### Any agent can do
+
 - Read code, run tests
 - Create branches, make commits
 - Create GitHub issues
@@ -56,6 +60,7 @@ Both reference teams implement safety primarily through agent prompts, not infra
 The strictest guardrails are on the team-lead (highest-privilege coordinator):
 
 **Hard forbidden:**
+
 - Edit/Write on source code (.ts, .svelte, .js, .sql, .css, .json config)
 - Running builds, tests, deployments
 - `git add/commit/push`
@@ -72,6 +77,7 @@ Teammates are instructed to message the team-lead with a reminder if they observ
 ### Pre-commit quality gates
 
 Before any PR creation, agents must pass:
+
 - `npm run tests`
 - `npm run check`
 - `npm run lint`
@@ -85,6 +91,7 @@ Common-prompt (both teams): `Never force-push or reset without team-lead approva
 ### Known Pitfalls section as safety documentation
 
 Both common-prompts include a `## Known Pitfalls` section with concrete failure modes discovered in practice:
+
 - `$app/paths` in `.server.ts` causes CI failures
 - `gray-matter` YAML date coercion bug
 - `~/.claude/.env` values must be quoted

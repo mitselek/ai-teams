@@ -13,16 +13,19 @@ Types and organization of AI agent teams.
 ## Known Team Types
 
 ### Project teams (e.g., current RC cloudflare-builders)
+
 - Dedicated to a single project/repo
 - Full-stack capability (frontend, backend, DB, tests)
 - Long-lived, persistent across sessions
 
 ### Function teams (per dev-toolkit#40)
+
 - Cross-project, organized by function
 - Examples: QA team, Code Review team, Security team
 - Spun up on-demand or persistent?
 
 ### Specialty teams
+
 - Narrow expertise: data migration, compliance, performance
 - Likely temporary — engaged per task
 
@@ -33,10 +36,12 @@ Types and organization of AI agent teams.
 ### Team composition in practice
 
 **rc-team (cloudflare-builders) — 11 agents:**
+
 - team-lead (opus-4-6), sven (frontend), dag (database), tess (testing), piper (CI/CD), harmony (integration/auth), alex (APEX migration), marcus (code review, opus-4-6), finn (research, sonnet), arvo (requirements), medici (health audit)
 - Includes a project-specific specialist (alex) for APEX migration — added and can be removed when that workstream ends
 
 **hr-devs — 9 agents:**
+
 - team-lead, sven, dag, tess, marcus, finn, arvo, medici, eilama (local LLM scaffolding)
 - Removed: piper (CI/CD), harmony (integration/auth), alex (APEX)
 - Added: eilama (local Ollama daemon, not a Claude agent — code boilerplate factory)
@@ -45,6 +50,7 @@ Types and organization of AI agent teams.
 ### Roster is machine-readable
 
 Both teams define membership in `roster.json` — name, model tier, agentType, prompt file path, color. This enables:
+
 - `spawn_member.sh` to auto-read model/color without hardcoding
 - Team-lead to check "is X registered?" before spawning
 
@@ -68,6 +74,7 @@ Senior roles (team-lead, marcus/code review, sven/frontend) use opus-4-6 in hr-d
 ### Team configurations are named presets
 
 Both teams define named spawn configurations:
+
 - **"full"** — story work: finn + marcus + tess + sven (+ dag if needed)
 - **"full-review"** (hr-devs only) — adds arvo for AC verification
 - **"lite"** — quick fix: finn + sven only

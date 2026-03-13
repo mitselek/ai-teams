@@ -13,20 +13,24 @@ How teams avoid stepping on each other's work.
 ## Resources to Isolate
 
 ### Git
+
 - Branch naming conventions per team?
 - Worktree isolation (already used for parallel agents)
 - PR ownership — which team owns which PR?
 
 ### Database (D1)
+
 - Migrations — serialized? per-team dev databases?
 - Seed data — team-specific or shared?
 - Remote dev DB — single shared instance, conflict risk
 
 ### Deployments
+
 - One Cloudflare project, multiple teams deploying — queue? locks?
 - Environment separation (dev, staging, production)
 
 ### External APIs
+
 - GitHub API rate limits (5000/hr per token)
 - Jira API limits
 - Dynamics 365 API limits
@@ -38,6 +42,7 @@ How teams avoid stepping on each other's work.
 ### Git isolation — single shared workspace, serialized ownership
 
 Both teams share **one git working directory**. Isolation is behavioral, not structural:
+
 - Only one agent owns git operations at a time (the agent creating the PR)
 - Team-lead is read-only during implementation — delegates, never touches files
 - Agents coordinate before `git checkout` by messaging team-lead, who alerts others
@@ -59,6 +64,7 @@ The MEMORY.md for the workspace (`dev-toolkit`) notes: use `isolation: "worktree
 ### DB isolation: naming convention
 
 D1 database names are environment-scoped:
+
 - dev: `conversations-dev`
 - production: `conversations`
 
@@ -67,6 +73,7 @@ No per-team databases in current practice — single dev DB shared. Migration co
 ### Rate limits: known but unmanaged
 
 Current state: all agents share:
+
 - Single `CLOUDFLARE_API_TOKEN` (same on local and RC)
 - Single GitHub token (PAT or OAuth)
 - Jira credentials in `~/.claude/.env`

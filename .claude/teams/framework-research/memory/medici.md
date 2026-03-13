@@ -29,6 +29,10 @@ This team uses `(*FR:Medici*)` not `(*RC-DEV:medici*)`. Prompt is clear on this.
 
 Output goes to `.claude/teams/framework-research/docs/health-report.md`. Created that directory.
 
+## [GOTCHA] Scratchpad path
+
+Correct path is `.claude/teams/framework-research/memory/medici.md`. Earlier in session 2 I erroneously wrote to `memory/medici.md` (repo root) — that file has since been removed. Always use the full `.claude/teams/...` path.
+
 ## [CHECKPOINT] 2026-03-13 session 2
 
 All 8 topic files unchanged from session 1 — no extraction has occurred. Finn's scratchpad has rc-team vs hr-devs comparison ready but not pushed into topics. Health report v2 written. Highest-value next action: T06 Lifecycle comparison (two concrete reference implementations to compare).

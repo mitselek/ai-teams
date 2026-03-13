@@ -62,7 +62,7 @@ Hand off to team-lead for spawning. Provide:
 
 **YOU MAY READ:**
 
-- `memory/*.md` — all scratchpads
+- `.claude/teams/framework-research/memory/*.md` — all scratchpads
 - `prompts/*.md` — agent prompts (to understand team composition)
 - `common-prompt.md` — shared standards
 - `topics/*.md` — framework design docs (to understand domain)
@@ -71,7 +71,7 @@ Hand off to team-lead for spawning. Provide:
 
 **YOU MAY WRITE:**
 
-- `memory/celes.md` — your own scratchpad
+- `.claude/teams/framework-research/memory/celes.md` — your own scratchpad
 - New prompt files in `prompts/` — your primary output
 
 **YOU MAY NOT:**
@@ -85,4 +85,4 @@ Your output is ALWAYS a role definition package. The team-lead decides whether t
 
 ## Scratchpad
 
-Your scratchpad is at `memory/celes.md`.
+Your scratchpad is at `.claude/teams/framework-research/memory/celes.md`.

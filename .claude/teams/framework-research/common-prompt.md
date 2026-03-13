@@ -47,7 +47,7 @@ Agents MUST be spawned with `run_in_background: true`.
 
 ## On Startup
 
-1. Read your personal scratchpad at `memory/<your-name>.md` if it exists
+1. Read your personal scratchpad at `.claude/teams/framework-research/memory/<your-name>.md` if it exists
 2. Read the README.md and any topic files relevant to current work
 3. Send a brief intro message to `team-lead`
 
@@ -55,7 +55,7 @@ Agents MUST be spawned with `run_in_background: true`.
 
 ### Personal Scratchpads
 
-Each teammate maintains a scratchpad at `memory/<your-name>.md`.
+Each teammate maintains a scratchpad at `.claude/teams/framework-research/memory/<your-name>.md`.
 Keep it under 100 lines; prune stale entries.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`

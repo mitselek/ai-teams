@@ -31,6 +31,7 @@ Authentication scoping and secret access per team.
 ### Current state: shared credentials, single env file
 
 All credentials live in `~/.claude/.env` (on both local and RC machines):
+
 - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` — same token, both environments
 - `ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` — Jira
 - `FIGMA_PAT` — Figma personal access token
@@ -41,6 +42,7 @@ No per-team credential scoping. All agents on all teams share the same credentia
 ### Credential loading pattern
 
 Agents source the env file before API calls:
+
 ```bash
 source ~/.claude/.env
 curl -s -u "$ATLASSIAN_EMAIL:$ATLASSIAN_API_TOKEN" "$ATLASSIAN_BASE_URL/rest/api/3/..."
@@ -51,6 +53,7 @@ curl -s -u "$ATLASSIAN_EMAIL:$ATLASSIAN_API_TOKEN" "$ATLASSIAN_BASE_URL/rest/api
 ### Figma PAT: rate-limit scoping drives access discipline
 
 The most concrete example of credential scoping pressure: Figma PAT is a View/Collab seat with only 6 Tier 1 requests per month. Recovery from 429 can take days. This produced a strict access protocol:
+
 - Prefer local screenshots over API calls
 - Batch all node IDs, make minimal calls
 - Cache responses to /tmp

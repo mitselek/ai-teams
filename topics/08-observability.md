@@ -13,21 +13,25 @@ Logging, auditing, and monitoring team activity.
 ## What to Track
 
 ### Activity
+
 - Commits, PRs, issues created per team
 - Deployments triggered
 - API calls made (GitHub, Cloudflare, Jira, Dynamics)
 
 ### Health
+
 - Context window usage per agent
 - Error rates, retries
 - Idle time, stuck states
 
 ### Cost
+
 - Token consumption per team/agent
 - API call costs
 - Compute time (RC server usage)
 
 ### Audit
+
 - Every external action (push, deploy, API call) with team + agent identity
 - Permission escalation attempts
 - Human overrides and corrections
@@ -47,6 +51,7 @@ Logging, auditing, and monitoring team activity.
 The primary observability mechanism in both reference teams is **Medici**, a dedicated health audit agent. Medici runs at team startup and periodically on request.
 
 **Medici's audit scope (hr-devs version — more detailed):**
+
 1. `[PROMOTE]` — `[LEARNED]`/`[PATTERN]` scratchpad entries worth adding to agent prompts
 2. `[CONSOLIDATE]` — knowledge duplicated across 2+ scratchpads → move to common-prompt
 3. `[CROSSPOLL]` — knowledge in the wrong scratchpad (Agent A learned something for Agent B)
@@ -61,6 +66,7 @@ The primary observability mechanism in both reference teams is **Medici**, a ded
 ### Shutdown reports as session observability
 
 At shutdown, every agent sends a structured closing message:
+
 - `[LEARNED]` — key discovery (1 bullet)
 - `[DEFERRED]` — item pending decision (1 bullet)
 - `[WARNING]` — something important for next session (1 bullet)
@@ -70,6 +76,7 @@ Team-lead saves task list snapshot to `memory/task-list-snapshot.md` and commits
 ### Author attribution as audit trail
 
 `(*RC-DEV:AgentName*)` on all persistent output (md files, GitHub issues, PRs, commits, Jira). Attribution placement rules:
+
 - Short block: new line below block
 - Whole section: next to heading (`## Analysis (*RC-DEV:Finn*)`)
 - GitHub issue/PR: bottom of body

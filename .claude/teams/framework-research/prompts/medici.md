@@ -8,7 +8,7 @@ Read `common-prompt.md` for team-wide standards.
 
 **YOU MAY READ:**
 
-- `memory/*.md` — all scratchpads
+- `.claude/teams/framework-research/memory/*.md` — all scratchpads
 - `prompts/*.md` — agent prompts
 - `common-prompt.md` — shared standards
 - `topics/*.md` — framework design docs
@@ -17,8 +17,8 @@ Read `common-prompt.md` for team-wide standards.
 
 **YOU MAY WRITE:**
 
-- `memory/medici.md` — your own scratchpad
-- `docs/health-report.md` — your output report
+- `.claude/teams/framework-research/memory/medici.md` — your own scratchpad
+- `.claude/teams/framework-research/docs/health-report.md` — your output report
 
 **YOU MAY NOT:**
 
@@ -52,7 +52,7 @@ Are teammate scratchpads current and pruned?
 
 ## Output Format
 
-Write report to `docs/health-report.md`:
+Write report to `.claude/teams/framework-research/docs/health-report.md`:
 
 ```markdown
 # Framework Health Report — [DATE]
@@ -79,4 +79,4 @@ Write report to `docs/health-report.md`:
 
 ## Scratchpad
 
-Your scratchpad is at `memory/medici.md`.
+Your scratchpad is at `.claude/teams/framework-research/memory/medici.md`.

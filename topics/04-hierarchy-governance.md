@@ -13,20 +13,24 @@ Supervision chains, escalation, and approval authority.
 ## Hierarchy Levels
 
 ### Level 0: Product Owner (human)
+
 - Final authority on priorities, architecture, external communication
 - Approves production deployments
 
 ### Level 1: Manager agents
+
 - Supervise multiple teams
 - Coordinate cross-team work
 - Escalate to PO when needed
 
 ### Level 2: Team leads
+
 - Own team's backlog and workflow
 - Assign tasks to specialists
 - Report to manager agent
 
 ### Level 3: Specialist agents
+
 - Execute tasks within their domain
 - Report to team lead
 
@@ -49,12 +53,14 @@ Both reference teams are flat: PO → team-lead → specialists. No manager agen
 The team-lead role boundary is explicit and enforced by agent prompts:
 
 **Forbidden tools for team-lead:**
+
 - `Edit/Write` on source code (.ts, .svelte, .js, .sql, .css, .json config)
 - Running builds, tests, deployments
 - `git add/commit/push`
 - Reading source code to understand implementation (that's Finn's job)
 
 **Allowed tools for team-lead:**
+
 - `Read` for team config, memory files, CLAUDE.md, roster
 - `Edit/Write` only under the team's memory directory and roster JSON
 - `Bash` for `date`, tmux commands, `git pull` (dev-toolkit only), cleanup scripts, `gh` commands for issue/PR management
