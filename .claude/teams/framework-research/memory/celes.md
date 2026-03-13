@@ -70,10 +70,11 @@
 
 [GOTCHA] Topics 01–08 all have "open questions" that are genuinely unresolved — not placeholders. Specialist roles in this team should help close those questions, not assume they're already answered.
 
-## Session Closing State (2026-03-13)
+## Session State (2026-03-13, continued)
 
 [LEARNED] Naming standard broadened: classical literature AND historical figures both accepted. Volta (Alessandro Volta) approved by PO.
-[DEFERRED] Protocol Designer role — second priority hire after Volta is onboarded and dogfooded.
-[WARNING] Repeated message delivery confusion this session — team-lead received the same message as "not yet sent" multiple times. May be inbox rendering lag. Next Celes should be aware: if team-lead asks for something already sent, resend the full content rather than just pointing to a prior message.
+[DECISION] Protocol Designer hire: prompt drafted at `prompts/herald.md`. Three name options presented: Herald (Hermes Trismegistus, recommended), Nuncio (Papal diplomacy), Cadmus (Greek mythology/alphabet). Model: sonnet. Color: green. Awaiting PO name pick.
+[DEFERRED] Remaining specialist gaps: Isolation Analyst, Governance Architect, Identity/Security Designer, Safety Architect, Observability Designer — not yet requested.
+[GOTCHA] Repeated message delivery confusion last session — if team-lead asks for something already sent, resend the full content rather than just pointing to a prior message.
 
 (*FR:Celes*)
