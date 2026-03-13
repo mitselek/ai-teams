@@ -1,40 +1,43 @@
 # Medici — Knowledge Health Checker Scratchpad
 
-## [CHECKPOINT] 2026-03-13 session 4 — Restart test audit
+## [CHECKPOINT] 2026-03-13 session 5 — Audit v4
 
-Post-restart audit (v3) completed. Restart test evaluated — SC-1 and SC-2 PASS (must-pass), SC-3-5 mostly pass with 1 failure (missing task-list-snapshot.md).
+Cold start audit completed. No regressions from v3. Key changes:
 
-Major progress since v2: all 8 topics now have Finn's extracted patterns. Volta wrote canonical lifecycle protocol (T06). Herald wrote 3 inter-team communication protocols (T03). Team advanced from "brainstorm" to "drafting" on most topics.
+- SC-5c (task-list-snapshot) now PASSES — file created during session 4 shutdown
+- finn.md "Team size: 3" stale claim persists (2 audits running)
+- README.md still shows "brainstorm" for all topics (2 audits running)
+- No new topic content since v3 — gap ranking unchanged
 
-## [PATTERN] Topic maturity ranking (post-extraction)
+## [PATTERN] Topic maturity ranking (stable since v3)
 
-- **T06 Lifecycle** — most mature (canonical protocol + reference patterns)
+- **T06 Lifecycle** — most mature (canonical protocol + 3 amendments + restart test)
 - **T03 Communication** — strong (3 inter-team protocols + intra-team patterns)
 - **T01 Taxonomy** — solid (agent types, team configs, model tiering)
-- **T04 Hierarchy** — partial (current state good, manager agent layer missing)
+- **T04 Hierarchy** — partial (current state good, manager agent layer missing) — BLOCKING for T03
 - **T07 Safety** — solid (permission categories + prompt-level guardrail patterns)
 - **T02 Resource Isolation** — partial (current state, no proposals)
 - **T05 Identity** — partial (current state, no proposals)
 - **T08 Observability** — partial (patterns documented, no implementation design)
 
-## [GAP] Biggest coherence gap
+## [GAP] Biggest coherence gap (unchanged)
 
-T03 (Herald's protocols) assumes a manager agent exists. T04 has no manager agent design. This is a cross-topic dependency that needs closing.
+T03 (Herald's protocols) assumes manager agent exists. T04 has no manager agent design. This is the single blocking cross-topic dependency.
 
-## [LEARNED] Restart test reveals task-list-snapshot gap
+## [LEARNED] Audit cadence observation
 
-Shutdown Phase 4 (Persist) didn't produce a task-list-snapshot.md. This is SC-5c failure. Should be added to the shutdown checklist enforcement.
+v3→v4 delta is small because no specialist work happened between sessions on the HIGH-gap topics. The audit pattern works well for catching drift and stale items, but the team needs active topic work (not just audits) to close gaps.
 
 ## [GOTCHA] Scratchpad path
 
 Correct path: `.claude/teams/framework-research/memory/medici.md`. Always use full `.claude/teams/...` path.
 
-## [CHECKPOINT] 2026-03-13 session 4 — Shutdown
+## [CHECKPOINT] 2026-03-13 session 5 — Shutdown
 
-- [LEARNED] Restart test protocol works — SC-1/SC-2 pass cleanly, the persisted state (scratchpads, topic files, prompts, roster) is sufficient for cold restart self-orientation.
-- [DEFERRED] T04 manager agent layer design — Herald's T03 protocols depend on it, highest-priority coherence gap for next session.
-- [WARNING] task-list-snapshot.md was not created during prior shutdown — team-lead must add this to Phase 4 (Persist) checklist.
+- [LEARNED] Audit v3→v4 delta is small when no specialist work happens between sessions — audits catch drift but don't close gaps.
+- [DEFERRED] T04 manager agent layer design remains the top priority blocking coherence gap.
+- [WARNING] finn.md stale claim and README status column have persisted across 2 audits — risk of becoming permanently stale if not addressed.
 
-Health report v3 written. No WIP. Clean shutdown.
+Health report v4 written. No WIP. Clean shutdown.
 
 (*FR:Medici*)

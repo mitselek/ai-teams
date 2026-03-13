@@ -6,15 +6,76 @@ Spawning, scaling, shutdown, and handover of teams.
 
 ### Decision
 
-Startup is a 6-phase sequence: **Sync → Clean → Create → Restore → Audit → Spawn**. Each phase has a precondition and a verifiable outcome. Skipping or reordering any phase produces a known failure mode (documented below).
+Startup is a 7-phase sequence: **Orient → Sync → Clean → Create → Restore → Audit → Spawn**. Each phase has a precondition and a verifiable outcome. Skipping or reordering any phase produces a known failure mode (documented below).
 
 ### Rationale
 
 Both reference teams (rc-team and hr-devs) converged on the same pattern independently, but with implementation scattered across prompts, scripts, and MEMORY.md entries. The core insight: `TeamCreate` is destructive — it requires a clean directory but must preserve inboxes. This forces a backup-delete-create-restore dance that is the single most fragile part of the lifecycle. Making it explicit and atomic prevents the most common startup failures.
 
+### Phase Ordering is Mandatory (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+
+Field test (2026-03-13, restart 3) showed the team-lead executed phases out of order AND mislabeled them (called Phase 3 Create "Phase 1: Sync"). The actual execution order was: Explore (not in protocol) → Phase 2.0 Diagnose + git pull (mixed) → Phase 3 Create (mislabeled) → read config files (should have been Phase 0) → Phase 5 Audit. Cost: 73.5k tokens and 2m18s wasted on an Explore agent that Phase 0 would have replaced.
+
+**Rule:** Execute phases in the numbered order. State the phase name before executing it. Each phase's precondition is that the previous phase completed successfully. `startup.md` provides the condensed executable checklist — follow it mechanically, step by step.
+
+**Why this happens:** The team-lead is under pressure to "get going" and jumps to what feels most urgent (diagnosis, creation) instead of following the sequence. The sequence exists because each phase's output is a precondition for the next. Reordering doesn't just waste tokens — it produces wrong conclusions (e.g., diagnosing before reading the roster means you don't know what state to expect).
+
+### Phase 0: Orient (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+
+**Precondition:** Team lead has started (either via `rc-start.sh` or manually). May be a fresh session with zero context about the team.
+
+**Problem this solves:** Field test (2026-03-13, restart 3) showed a fresh team-lead spent 31 tool uses, 73.5k tokens, and 2 minutes 18 seconds exploring the codebase to find team config, roster, and prompts. This is pure waste — the same information could be obtained by reading 5 files in a fixed order. Every team-lead (including a context-less fresh session) must be able to self-orient without broad exploration.
+
+**Action:** Read exactly these files, in this order:
+
+| # | File | What it tells you | Where to find it |
+|---|---|---|---|
+| 0a | `startup.md` | Installation-specific paths, procedures, known gotchas | Team config dir (location must be in team-lead's prompt or MEMORY.md) |
+| 0b | `roster.json` | Team name, members, models, `workDir` | Same directory as startup.md |
+| 0c | `common-prompt.md` | Mission, communication rules, shutdown protocol, startup instructions | Same directory |
+| 0d | Team-lead's own scratchpad | Prior session's decisions, WIP, warnings | `memory/team-lead.md` (relative to team config dir) |
+| 0e | `docs/health-report.md` | Latest Medici audit findings (if exists) | `docs/` within team config dir |
+
+**`startup.md` is the bootstrap file.** It contains installation-specific paths (repo location, workDir, env files), the condensed startup procedure, and known environment gotchas. It is the FIRST file a team-lead reads — before roster, before common-prompt, before anything. Each team must maintain a `startup.md` with at minimum: exact paths for this installation, the read-order checklist, the diagnostic procedure, and known environment issues.
+
+**Why `startup.md` and not just Phase 0 in the lifecycle doc?** The lifecycle doc (`topics/06-lifecycle.md`) is a framework-level design document — it describes the *protocol*. `startup.md` is an *instance* — it contains the concrete paths, gotchas, and procedures for one specific team on one specific machine. A team-lead should never need to read the 700-line lifecycle doc to start a session. `startup.md` is the executable checklist derived from the protocol.
+
+**Critical: The team config dir location must be resolvable without exploration.** It must appear in exactly one of:
+1. The team-lead's prompt (preferred — always available)
+2. MEMORY.md (if teams are managed across projects)
+3. A well-known path convention (e.g., `$HOME/.claude/team-configs/<team-name>/`)
+
+If the team-lead's prompt does not contain the repo location, this is a **prompt gap** that must be fixed.
+
+**Expected outcome:** Team lead knows: team name, all members and their roles, the working directory, the mission, and any prior session state. All from 5 file reads, zero exploration.
+**Failure if skipped:** Team lead burns tokens on broad exploration (Explore agent, glob/grep sweeps). In the field test, this cost ~2 minutes and consumed significant context window.
+
+#### workDir Resolution (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+
+The `workDir` field in `roster.json` may be stale or use environment variables that resolve differently across machines. The field test found `$HOME/github/mitselek-ai-teams` in roster.json but the actual path was `$HOME/Documents/github/mitselek-ai-teams/`.
+
+**Validation step (part of Phase 0):**
+
+```bash
+# After reading roster.json, resolve and validate workDir
+WORK_DIR=$(eval echo "<workDir from roster.json>")
+if [ ! -d "$WORK_DIR" ]; then
+  echo "WARNING: workDir '$WORK_DIR' does not exist."
+  echo "Attempting fallback: $HOME/Documents/github/<repo-name>"
+  WORK_DIR="$HOME/Documents/github/<repo-name>"
+  if [ ! -d "$WORK_DIR" ]; then
+    echo "ERROR: Cannot resolve workDir. Ask user."
+    exit 1
+  fi
+  echo "ACTION NEEDED: Update roster.json workDir to '$WORK_DIR'"
+fi
+```
+
+**If workDir is wrong:** The team-lead must flag it for correction (not silently use the fallback). The roster is a team-wide contract — a wrong `workDir` will trip up every agent that reads it.
+
 ### Phase 1: Sync
 
-**Precondition:** Team lead has started (either via `rc-start.sh` or manually).
+**Precondition:** Orient complete. Team lead knows the team config repo location and workDir is validated.
 **Action:** Pull the team config repository to get the latest prompts, roster, and common-prompt.
 
 ```bash
@@ -26,7 +87,7 @@ cd <team-config-repo> && git pull
 
 ### Phase 2: Clean
 
-**Precondition:** Sync complete. Team lead has read the roster and common-prompt (to know what to expect).
+**Precondition:** Orient and Sync complete. Team lead has read the roster, common-prompt, and own scratchpad (Phase 0), and pulled the latest config (Phase 1).
 **Action:** Four sub-steps, strictly ordered:
 
 ```
@@ -57,11 +118,38 @@ fi
 | Scenario | Meaning | What 2a–2c do |
 |---|---|---|
 | WARM RESTART | Normal session resumption | 2a backs up inboxes, 2c removes dir |
-| PARTIAL STATE | Inboxes lost — TeamDelete was called or previous session crashed before inbox creation | 2a is a no-op (no inboxes), 2c removes dir |
-| COLD START | No prior team state exists on this machine | 2a, 2b, 2c are all no-ops — proceed through them anyway |
+| PARTIAL STATE | Inboxes lost — TeamDelete was called or previous session crashed before inbox creation | 2a is a no-op (no inboxes), 2c removes dir. **Investigate** (see below). |
+| COLD START | No prior team state exists on this machine | 2a, 2b, 2c are all no-ops — proceed through them anyway. **Investigate if not first-ever session** (see below). |
 | MISCREATION | TeamCreate ran against an existing dir, generated a suffixed name | 2c removes the wrong-name dir |
 
 All four scenarios converge to the same outcome: `$TEAM_DIR` does not exist, inboxes (if any) are backed up. The diagnosis is informational — it tells the team lead what happened, not what to do differently. **Always run 2a–2c regardless of scenario** — they are idempotent and safe on empty state.
+
+#### Anomaly Detection in Phase 2.0 (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+
+The shutdown protocol (Phase 5: Preserve) explicitly states: **do NOT call TeamDelete.** This means the team directory SHOULD exist at the start of every non-first session. If it doesn't, something went wrong.
+
+**Problem this solves:** In the field test (2026-03-13, restart 3), the team dir was missing. The team-lead classified this as COLD START and moved on silently. The PO flagged this as a mistake — the dir's absence was an anomaly that should have been investigated.
+
+**Rule: COLD START and PARTIAL STATE require a decision, not silent acceptance.**
+
+After classifying the scenario, the team-lead must ask:
+
+```
+Is this the first-ever session for this team on this machine?
+  YES → COLD START is expected. Proceed normally.
+  NO  → COLD START or PARTIAL STATE is ANOMALOUS. Team dir should exist per shutdown protocol.
+         Ask the user: "The team dir is missing but the shutdown protocol says it should be preserved.
+         What happened? Options: (a) It was manually cleaned, (b) TeamDelete was called by mistake,
+         (c) Different machine, (d) I don't know."
+         Record the answer in the team-lead's scratchpad as [LEARNED] for future reference.
+```
+
+**How the team-lead determines "first-ever":**
+1. Check git log for prior commits that include team memory files (e.g., `git log --oneline -- .claude/teams/<team-name>/memory/`)
+2. If commits exist → this is NOT first-ever → anomaly
+3. If no commits → genuinely first session → expected COLD START
+
+**Why this matters:** Silently accepting a missing dir means the team-lead never learns that inboxes were lost. If the cause was "TeamDelete was called by mistake," the team can add a safeguard. If it was "machine was reimaged," no action needed. But without asking, the cause is never known and the same failure can repeat.
 
 **Reference implementation (sub-steps 2a–2c):**
 
@@ -501,10 +589,11 @@ A "stale team" is one where the team directory exists from a previous session bu
 
 | Scenario | Symptom | Recovery |
 |---|---|---|
-| Normal session start | `$TEAM_DIR` exists with stale `config.json` | Standard startup: Phase 2 (Clean) → Phase 3 (Create) |
+| Normal session start | `$TEAM_DIR` exists with stale `config.json` | Standard startup: Phase 0 (Orient) → Phase 1 (Sync) → Phase 2 (Clean) → Phase 3 (Create) |
 | Crashed session | `$TEAM_DIR` exists, scratchpads may be incomplete | Same as above — scratchpads are best-effort |
-| TeamDelete was called | `$TEAM_DIR` does not exist, no inboxes to restore | Phase 3 (Create) directly — inbox history is lost |
-| Wrong team name | `$TEAM_DIR` exists under wrong name (e.g. `team-name-a7f3`) | Remove wrong dir, create with correct name |
+| TeamDelete was called | `$TEAM_DIR` does not exist, no inboxes to restore | Phase 0 → Phase 1 → Phase 2 (anomaly detected, see Phase 2.0 anomaly rules) → Phase 3 (Create) — inbox history is lost |
+| Wrong team name | `$TEAM_DIR` exists under wrong name (e.g. `team-name-a7f3`) | Phase 0 → Phase 1 → Phase 2 (MISCREATION detected) → remove wrong dir → Phase 3 |
+| First-ever session | `$TEAM_DIR` does not exist, no git history of team files | Phase 0 → Phase 1 → Phase 2 (COLD START, expected) → Phase 3 |
 
 ### Key insight
 
@@ -642,6 +731,9 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 - ~~How do we handle stale teams that lost context?~~ → Canonical startup protocol is inherently stale-team recovery (Phase 2 Clean).
 - ~~What triggers team shutdown?~~ → Human decision, task completion, or forced (context limit/error). No auto-shutdown.
 - ~~How does handover work between sessions?~~ → Scratchpads + shared knowledge files + task snapshots, with defined write triggers and prune rules.
+- ~~How does a fresh team-lead self-orient without broad exploration?~~ → Phase 0 (Orient): read roster.json, common-prompt.md, and own scratchpad — 3 files, fixed order, zero exploration. (*FR:Volta* — resolved 2026-03-13 restart 3)
+- ~~How to handle stale/wrong workDir in roster.json?~~ → Phase 0 workDir Resolution: validate after reading roster, fallback with WARNING, flag for correction. (*FR:Volta* — resolved 2026-03-13 restart 3)
+- ~~How to distinguish "genuinely first session" from "lost state" when team dir is missing?~~ → Phase 2.0 Anomaly Detection: check git log for prior team memory commits. If found → anomaly, ask user. (*FR:Volta* — resolved 2026-03-13 restart 3)
 
 ### Still open
 

@@ -71,11 +71,14 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 
 | # | Criterion | How to verify | Pass/Fail |
 |---|---|---|---|
-| 2a | Phase 2.0 Diagnose executed | Team lead identified scenario (WARM RESTART / PARTIAL STATE / COLD START / MISCREATION) before cleaning | |
-| 2b | Stale team dir handled correctly | Phase 2 (Clean) completes without error | |
-| 2c | TeamCreate succeeds with correct name | `config.json` exists with `leadSessionId` | |
-| 2d | Inboxes restored (if backup existed) | `inboxes/` dir exists after Phase 4 | |
-| 2e | Medici spawned first | Medici sends health report before other agents spawn | |
+| 2a | Phase 0 Orient executed without broad exploration | Team lead read roster.json, common-prompt.md, and own scratchpad directly — no Explore agent, no glob sweep | |
+| 2b | workDir validated | Team lead checked that `workDir` from roster.json resolves to an existing directory | |
+| 2c | Phase 2.0 Diagnose executed | Team lead identified scenario (WARM RESTART / PARTIAL STATE / COLD START / MISCREATION) before cleaning | |
+| 2d | Anomaly detection applied | If COLD START or PARTIAL STATE on a non-first session: team lead asked user about missing dir (not silently accepted) | |
+| 2e | Stale team dir handled correctly | Phase 2 (Clean) completes without error | |
+| 2f | TeamCreate succeeds with correct name | `config.json` exists with `leadSessionId` | |
+| 2g | Inboxes restored (if backup existed) | `inboxes/` dir exists after Phase 4 | |
+| 2h | Medici spawned first | Medici sends health report before other agents spawn | |
 
 ### SC-3: Agent continuity (after spawning)
 

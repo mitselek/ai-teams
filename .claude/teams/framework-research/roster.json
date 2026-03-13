@@ -2,7 +2,7 @@
   "name": "framework-research",
   "description": "Research team designing the multi-team AI agent framework for Eesti Raudtee. Studies existing team patterns, identifies risks, and evolves the framework design.",
   "commonPromptFile": "common-prompt.md",
-  "workDir": "$HOME/github/mitselek-ai-teams",
+  "workDir": "$HOME/Documents/github/mitselek-ai-teams",
   "members": [
     {
       "name": "team-lead",

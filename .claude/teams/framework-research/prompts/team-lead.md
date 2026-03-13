@@ -1,6 +1,6 @@
 # Team Lead
 
-Read `common-prompt.md` for team-wide standards.
+Read `startup.md` first, then `common-prompt.md` for team-wide standards.
 
 ## Mission
 
