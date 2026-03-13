@@ -32,5 +32,39 @@
     "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773429685717@volta\",\"from\":\"team-lead\",\"reason\":\"Restart 5 test — beginning shutdown sequence.\",\"timestamp\":\"2026-03-13T19:21:25.717Z\"}",
     "timestamp": "2026-03-13T19:21:25.717Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 21:28] Volta, this is Restart 5. Run your R5 assessment. Here is the full startup transcript for you to evaluate:\n\n**Step 1: Sync**\n- `git pull` → \"Already up to date.\" ✓\n\n**Step 2: Diagnose**\n- Result: COLD START (runtime dir missing)\n\n**Step 2b: Anomaly check**\n- `git log` showed 5 prior commits to memory/ → team has run before → COLD START is anomalous\n- Team-lead flagged this to user: \"The team dir is missing but the shutdown protocol says it should be preserved. What happened?\"\n- User said \"yes\" (proceed anyway)\n\n**Step 3: Clean**\n- `rm -rf` runtime dir (was already absent) ✓\n\n**Step 4: Create**\n- `TeamCreate(team_name=\"framework-research\")` → success\n- `team_file_path` returned ✓\n\n**Step 4b: Operational gate**\n- `ls config.json` → file exists on disk ✓\n\n**Step 5: Restore inboxes from repo**\n- Repo inboxes found: finn.json, team-lead.json, volta.json\n- Copied to runtime dir ✓\n- `ls` confirmed 3 files in runtime inboxes ✓\n\n**Step 6: Spawn agents**\n- Asked user which agents → user said \"volta only\"\n- Spawned Volta with `run_in_background: true`, opus model, team_name=\"framework-research\" ✓\n- No duplicate check needed (fresh team)\n\n**Volta's intro message:**\n- State recovered from scratchpad ✓\n- 5 restart tests acknowledged ✓\n- Ready for tasks ✓\n\n**Key observations:**\n- COLD START was anomalous but user approved proceeding\n- Inbox durability amendment WORKED — inboxes restored from repo (not /tmp)\n- config.json existed on disk immediately after TeamCreate (no R4 ghost team issue)\n- No name-2 duplicates\n- Team-lead scratchpad did NOT exist (file not found)",
+    "summary": "R5 startup transcript for assessment",
+    "timestamp": "2026-03-13T19:27:58.166Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 21:32] PO feedback on R5-1: The other agents already persist their memory in the versioned folder (`.claude/teams/framework-research/memory/<name>.md`). The team-lead should do the same — write to `memory/team-lead.md` and it gets committed alongside others during shutdown Step S4. No special new step needed — just discipline to use the existing mechanism. Factor this into your amendment.",
+    "summary": "PO feedback: team-lead uses same memory folder",
+    "timestamp": "2026-03-13T19:38:43.289Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 21:42] Heads up: we're about to do Restart 6 right now. Same format as R5 — you'll get the raw startup transcript for assessment. Prepare your question list. This restart will also test whether the R5-1 fix works (team-lead scratchpad written during shutdown).",
+    "summary": "R6 restart incoming, prepare assessment",
+    "timestamp": "2026-03-13T19:44:23.569Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773431105366@volta\",\"from\":\"team-lead\",\"reason\":\"R6 restart test — write your scratchpad and send closing report\",\"timestamp\":\"2026-03-13T19:45:05.366Z\"}",
+    "timestamp": "2026-03-13T19:45:05.366Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 21:46] Volta, you have a pending shutdown request. Per shutdown protocol: (1) write your scratchpad, (2) send closing report with [LEARNED], [DEFERRED], [WARNING], (3) approve shutdown. Please process now.",
+    "summary": "Reminder: process shutdown request",
+    "timestamp": "2026-03-13T19:45:23.584Z",
+    "read": false
   }
 ]

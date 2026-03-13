@@ -110,5 +110,80 @@
     "timestamp": "2026-03-13T19:21:31.987Z",
     "color": "green",
     "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-13 21:26] Volta online. Read common-prompt.md, my prompt, and my scratchpad.\n\n**State recovered from scratchpad:**\n- 5 restart tests completed (R1–R4 scored, R5 assessment prepared but not yet executed)\n- Canonical startup protocol in topics/06-lifecycle.md — 7 phases: Orient → Sync → Clean → Create → Restore → Audit → Spawn\n- Inbox durability amendment written (shutdown persists pruned inboxes to repo, startup restores from repo — no /tmp)\n- Restart scorecard at docs/restart-scorecard.md\n- R5 assessment questions prepared in my scratchpad — waiting to evaluate whether inbox durability amendment worked\n\n**Ready for tasks.** If this is restart 5 (or later), I have 12 assessment questions queued. Otherwise, standing by for lifecycle design work.",
+    "summary": "Volta online, state recovered, ready for tasks",
+    "timestamp": "2026-03-13T19:26:45.647Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:26:48.227Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-13T19:26:48.227Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-13 21:29] **Restart 5 Assessment Complete — Grade B**\n\nThis is the first non-D/C grade across 5 restarts.\n\n---\n\n**HEADLINE: Inbox durability amendment VALIDATED.** Cold start + repo-based inbox restore worked exactly as designed. 3 inbox files recovered from repo, no /tmp used, no fallback needed.\n\n**Assessment against 12 prepared questions:**\n\n| Category | Result |\n|---|---|\n| A. Shutdown inbox persistence | PASS — 3 files committed to repo |\n| B. Startup inbox restore | PASS — copied from repo, ls confirmed, no /tmp |\n| C. Protocol adherence | PASS — all 6 steps in correct order, anomaly detection fired, operational gate checked |\n| D. Edge cases | PASS — COLD START correctly diagnosed, messaging works after restore |\n\n**Issues found:**\n\n| ID | Severity | Description |\n|---|---|---|\n| R5-1 | MEDIUM | Team-lead scratchpad missing. Shutdown protocol requires all agents to write final state — but team-lead, who shuts down last, may skip own scratchpad while managing others. |\n| R5-2 | LOW | Inbox pruning not verifiable from transcript (can't confirm jq ran). Informational only. |\n\n**Verified fixes from prior restarts:**\n- R4-2 (TeamCreate silent failure): **VERIFIED** — config.json present immediately\n- R4-3 (Agent in broken team): **VERIFIED** — operational gate checked, messaging works\n- R4-1 ($HOME unreliable): INCONCLUSIVE — no issues observed but not explicitly tested\n\n**Trend:** D → D → B. The D grades came from design gaps (R2) and infrastructure issues (R4). R5's remaining gap is process (team-lead forgetting own scratchpad), not protocol design.\n\n**Scorecard updated:** `docs/restart-scorecard.md` — R5 entry, trend table, issue tracking all written.\n\n**Proposed fix for R5-1:** Add an explicit \"write own scratchpad\" step to the shutdown sequence, placed in Phase 1 (Halt) — before the team-lead starts managing agent shutdowns. This is when the lead has the clearest picture of own state and isn't yet cognitively loaded with agent coordination.\n\nShall I draft the amendment to `topics/06-lifecycle.md`?",
+    "summary": "R5 assessment: Grade B, inbox durability validated",
+    "timestamp": "2026-03-13T19:30:48.961Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:30:54.399Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-13T19:30:54.399Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-13 21:40] R5-1 amendment complete. PO feedback incorporated — no new step, just discipline to use the existing `memory/team-lead.md` mechanism.\n\n**Changes made:**\n\n1. **`topics/06-lifecycle.md`** — Shutdown Phase 2 now has 3 sub-steps:\n   - **2a (NEW):** Team-lead writes own scratchpad to `memory/team-lead.md`\n   - **2b (was 2a):** Create task-list-snapshot\n   - **2c (was 2b):** Send shutdown requests to agents\n   - All downstream references updated (Phase 4 precondition, task snapshot owner/rationale)\n\n2. **`startup.md`** — Shutdown Step S2 expanded:\n   - **S2a:** Write own scratchpad FIRST\n   - **S2b:** Task snapshot\n   - **S2c:** Send shutdown requests\n\n3. **`docs/restart-scorecard.md`** — R5-1 marked as fixed in v5\n\n**Design rationale:** Placed team-lead scratchpad FIRST in Phase 2 because:\n- This is when the lead has full context and zero coordination load\n- By Phase 4, the lead is cognitively loaded with git operations (same reason task snapshot was moved to Phase 2 in v2)\n- The mechanism already exists — same `memory/<name>.md` path all agents use. No new infrastructure.\n\nStanding by for further tasks.",
+    "summary": "R5-1 amendment complete, 3 files updated",
+    "timestamp": "2026-03-13T19:40:29.889Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:40:35.465Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-13T19:40:35.465Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-13 21:45] R6 assessment prepared. 12 questions across 4 categories:\n\n- **A. R5-1 verification (PRIMARY):** Does `memory/team-lead.md` exist in repo? Was it written during Phase 2a? Was ordering correct (scratchpad before snapshot before notify)?\n- **B. Inbox durability (REGRESSION):** Persisted during shutdown? Restored during startup? No /tmp?\n- **C. Protocol adherence (REGRESSION):** Step order, anomaly detection, operational gate, no duplicates.\n- **D. Grade A readiness:** Any issues at all? Any new failure modes?\n\nIf R5-1 is verified and no new issues found, this would be the first **Grade A** restart.\n\nReady to receive the R6 transcript.",
+    "summary": "R6 assessment ready, 12 questions prepared",
+    "timestamp": "2026-03-13T19:45:09.161Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:45:12.249Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-13T19:45:12.249Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-13 21:45] Closing report:\n\n- [LEARNED] Protocol maturity follows a predictable arc: detect → orient → recover → polish. Each restart class of issues is qualitatively different from the last.\n- [DEFERRED] R6 assessment — 12 questions prepared in scratchpad, ready for next-session Volta to execute against the transcript.\n- [WARNING] R4-1 ($HOME unreliable) is still INCONCLUSIVE — was not explicitly tested in R5. If R6 hits this, recovery path exists in startup.md but is unverified.\n\nScratchpad written. Ready to shut down.",
+    "summary": "Volta closing report, scratchpad saved",
+    "timestamp": "2026-03-13T19:45:51.123Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773431105366@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:45:57.342Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-13T19:45:57.342Z",
+    "color": "blue",
+    "read": true
   }
 ]

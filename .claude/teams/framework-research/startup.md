@@ -148,14 +148,18 @@ Ask the user which agents to spawn. Do NOT auto-spawn any agent (including Medic
 
 Stop accepting new work. Let agents finish current tasks.
 
-### Step S2: Task snapshot + shutdown requests
+### Step S2: Own scratchpad + task snapshot + shutdown requests
+
+**S2a. Write your own scratchpad FIRST** — before task snapshot or agent shutdown. Write to `memory/team-lead.md` with tags: `[DECISION]`, `[WIP]`, `[DEFERRED]`, `[LEARNED]`, `[WARNING]`. You have the clearest picture of your own state right now — by S4 you'll be cognitively loaded with git operations.
+
+**S2b. Task snapshot:**
 
 ```bash
 # Create task snapshot BEFORE sending shutdown — this is when you have the best picture
 # TaskList output → memory/task-list-snapshot.md
 ```
 
-Then send shutdown requests to all agents. Wait for each agent's closing report (`[LEARNED]`, `[DEFERRED]`, `[WARNING]`).
+**S2c.** Send shutdown requests to all agents. Wait for each agent's closing report (`[LEARNED]`, `[DEFERRED]`, `[WARNING]`).
 
 ### Step S3: Collect
 

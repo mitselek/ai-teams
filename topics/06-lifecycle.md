@@ -344,9 +344,17 @@ The key insight from operational experience: the team directory must survive shu
 ### Phase 2: Notify
 
 **Precondition:** Halt declared.
-**Action:** Two sub-steps:
+**Action:** Three sub-steps:
 
-#### 2a. Create task-list-snapshot (*FR:Volta* — amendment from restart test 2026-03-13)
+#### 2a. Team-lead writes own scratchpad (*FR:Volta* — amendment from restart 5, 2026-03-13)
+
+**Before** creating the task snapshot or sending shutdown requests, the team-lead writes their own state to `memory/team-lead.md`. Tags: `[DECISION]`, `[WIP]`, `[DEFERRED]`, `[LEARNED]`, `[WARNING]`.
+
+**Why this step exists and why it comes first:** Field observation (R5, 2026-03-13): team-lead scratchpad was missing after shutdown. The team-lead manages everyone else's shutdown (task snapshot, agent notifications, waiting for termination, git commit) and runs out of cognitive budget for own state. By the time Phase 4 (Persist) runs, the lead's context is near limit and own scratchpad is forgotten. Placing this FIRST in Phase 2 — when the lead still has full context and no coordination load — prevents this.
+
+**The mechanism already exists** — all agents persist to `memory/<name>.md` in the repo dir. Team-lead simply uses the same path (`memory/team-lead.md`). No new infrastructure needed.
+
+#### 2b. Create task-list-snapshot (*FR:Volta* — amendment from restart test 2026-03-13)
 
 **Before** sending shutdown to agents, team lead creates `memory/task-list-snapshot.md`. This is when the lead has the best picture of task state — all agents still alive, tasks fresh in context. By Phase 4 (Persist), the lead's context is near limit and this step gets forgotten.
 
@@ -358,7 +366,7 @@ The key insight from operational experience: the team directory must survive shu
 
 **Rationale for timing:** The previous protocol placed the snapshot in Shutdown Phase 4 (Persist). Field testing showed this is the worst possible timing — the team lead is the last agent standing, executing a multi-step git sequence, with context near limit. Moving it to Phase 2 (before agents shut down) means the lead can even ask agents for status updates to improve snapshot accuracy.
 
-#### 2b. Send shutdown requests
+#### 2c. Send shutdown requests
 
 Send shutdown request to all agents (broadcast or one-by-one).
 
@@ -371,7 +379,7 @@ Each agent, on receiving shutdown:
    - `[WARNING]` — risk or blocker for next session
 3. Approve the shutdown
 
-**Expected outcome:** Task snapshot created. All agents have saved state and sent closing messages.
+**Expected outcome:** Team-lead scratchpad written (2a), task snapshot created (2b), all agents have saved state and sent closing messages (2c).
 
 ### Phase 3: Collect
 
@@ -386,7 +394,7 @@ Each agent, on receiving shutdown:
 
 ### Phase 4: Persist (*FR:Volta* — amended 2026-03-13, inbox durability)
 
-**Precondition:** All agents terminated. Task snapshot already created (Phase 2a).
+**Precondition:** All agents terminated. Task snapshot already created (Phase 2b).
 **Action:** Copy inboxes from runtime dir to repo, then commit all session state to version control.
 
 #### Phase 4a: Persist inboxes to repo (*FR:Volta* — 2026-03-13)
@@ -696,12 +704,12 @@ Files with defined owners and purpose:
 ### Task Snapshots
 
 **Location:** `memory/task-list-snapshot.md`
-**Owner:** Team lead (created during Shutdown Phase 2a, committed during Phase 4)
+**Owner:** Team lead (created during Shutdown Phase 2b, committed during Phase 4)
 **Purpose:** Next session's team lead can see what was in progress, what was completed, what was blocked.
 
 **Format:** Simple markdown list with status, assignee, and blockers. Raw TaskList dump is sufficient — no synthesis required. Reduce activation energy to near zero.
 
-**Why Phase 2a, not Phase 4:** Field testing (2026-03-13 restart) showed that placing the snapshot in Phase 4 (Persist) causes it to be forgotten — the team lead is cognitively loaded and executing a multi-step git sequence. Phase 2a is when the lead has the best task picture: all agents still alive, tasks fresh in context.
+**Why Phase 2b, not Phase 4:** Field testing (2026-03-13 restart) showed that placing the snapshot in Phase 4 (Persist) causes it to be forgotten — the team lead is cognitively loaded and executing a multi-step git sequence. Phase 2b is when the lead has the best task picture: all agents still alive, tasks fresh in context.
 
 ---
 

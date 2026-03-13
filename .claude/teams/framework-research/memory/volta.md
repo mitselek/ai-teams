@@ -2,59 +2,58 @@
 
 # Volta scratchpad
 
-[PATTERN] 2026-03-13 18:55 — Two-level startup design: protocol (topics/06-lifecycle.md) = framework-level phases and failure modes; instance (startup.md per team) = concrete paths and executable checklist. Team-lead reads startup.md, not the 800-line protocol doc.
+[PATTERN] 2026-03-13 18:55 — Two-level startup design: protocol (topics/06-lifecycle.md) = framework-level phases and failure modes; instance (startup.md per team) = concrete paths and executable checklist.
 
 [PATTERN] 2026-03-13 18:51 — Front-load cheapest checks to prevent costliest failures. Phase 0 (Orient) = 5 file reads, prevents 73.5k token Explore waste.
 
-[PATTERN] 2026-03-13 19:30 — Protocol maturity progression across 4 restarts: R1 detection gaps → R2 orientation gaps → R4 recovery gaps. Pattern: detect → orient → recover.
+[PATTERN] 2026-03-13 19:30 — Protocol maturity progression: R1 detection → R2 orientation → R4 recovery → R5 process gaps. Pattern: detect → orient → recover → polish.
 
-[PATTERN] 2026-03-13 19:50 — Runtime vs repo dir distinction is load-bearing. Runtime dir ($HOME/.claude/teams/...) = platform-managed, ephemeral. Repo dir (<repo>/.claude/teams/...) = team-managed, durable. Anything that must survive between sessions belongs in the repo dir, not the runtime dir.
+[PATTERN] 2026-03-13 19:50 — Runtime vs repo dir distinction is load-bearing. Runtime = ephemeral, repo = durable.
 
-[LEARNED] 2026-03-13 18:51 — Silent acceptance of anomalous state is a protocol failure. Protocol must force investigation.
+[PATTERN] 2026-03-13 21:28 — Protocol grades: D(R2) → D(R4) → B(R5). Shifting from design gaps to infrastructure to process gaps.
 
-[LEARNED] 2026-03-13 19:30 — $HOME on Windows/Git Bash is unreliable. startup.md uses absolute paths. Protocol uses $RESOLVED_HOME with validation gate.
+[LEARNED] 2026-03-13 18:51 — Silent acceptance of anomalous state is a protocol failure.
 
-[LEARNED] 2026-03-13 19:30 — TeamCreate can return success without writing config.json to disk. Retry with TeamDelete + re-TeamCreate resolved it.
+[LEARNED] 2026-03-13 19:30 — $HOME on Windows/Git Bash is unreliable. Use absolute paths.
 
-[DECISION] 2026-03-13 19:04 — Created `docs/restart-scorecard.md`. Append-only log per restart. Scoring: CRITICAL/HIGH/MEDIUM/LOW → grade A-D.
+[LEARNED] 2026-03-13 19:30 — TeamCreate can return success without writing config.json to disk.
 
-[DECISION] 2026-03-13 19:30 — Restart 4: Grade D (2C/1H/1M/1L). Both CRITICALs were infrastructure issues. 4 of 5 R2 issues verified FIXED.
+[LEARNED] 2026-03-13 21:28 — Inbox durability validated in R5. COLD START + repo restore = working.
 
-[DECISION] 2026-03-13 19:50 — Inbox durability amendment written to 06-lifecycle.md + startup.md. Shutdown Phase 4a persists pruned inboxes (last 100 msgs) to repo. Startup Step 5 restores from repo. No /tmp anywhere.
+[LEARNED] 2026-03-13 21:40 — R5-1 fix: Shutdown Phase 2a = team-lead writes own scratchpad FIRST.
 
-[WIP] 2026-03-13 21:20 — Restart 5 assessment prepared. This is the FIRST restart after the inbox durability amendment. Key questions below.
+[DECISION] 2026-03-13 19:04 — Created `docs/restart-scorecard.md`. Append-only log per restart.
 
-## Restart 5 Assessment Questions
+[DECISION] 2026-03-13 19:50 — Inbox durability: Shutdown Phase 4a persists pruned inboxes to repo.
 
-Ask team-lead these after restart. Require raw evidence (command output, file contents) not just "yes/no".
+[DECISION] 2026-03-13 21:28 — R5 Grade B (0C/0H/1M/1L). Inbox durability validated.
 
-### A. Shutdown — did inboxes get persisted to repo?
+[DECISION] 2026-03-13 21:40 — R5-1 fix: Shutdown Phase 2 = 2a scratchpad → 2b snapshot → 2c notify.
 
-1. **Was Step S4 executed?** Show the git commit that includes `.claude/teams/framework-research/inboxes/`. If no such commit → CRITICAL: shutdown protocol not followed.
-2. **Did `jq '.[-100:]'` work?** Show one inbox file from the repo dir. Is it valid JSON? Is it an array? If `jq` failed (not installed, wrong syntax, inbox format isn't an array), what error appeared?
-3. **How many inbox files were committed?** Expected: one per agent that sent/received messages (at minimum: `team-lead.json`, `finn.json` if Finn was active). If zero files → CRITICAL.
-4. **Were inboxes pruned?** If any inbox file has more than 100 entries, pruning failed.
+[CHECKPOINT] 2026-03-13 21:45 — R6 assessment questions prepared (12 questions, 4 categories). Primary test: R5-1 verification (team-lead scratchpad). Secondary: inbox durability regression, protocol adherence regression, Grade A readiness. Questions saved below.
 
-### B. Startup — did inboxes get restored from repo?
+## R6 Assessment Questions
 
-5. **Was Step 5 executed?** Show `ls` of runtime inboxes dir after Step 5. Files should match what was committed in the repo.
-6. **Was `/tmp/` used anywhere?** Search the process recording for any `/tmp/fr-inboxes-backup` reference. If found → team-lead fell back to old protocol (muscle memory regression).
-7. **Did Step 3 (Clean) skip the /tmp backup?** The old Step 3 had `cp -r "$TEAM_DIR/inboxes" /tmp/fr-inboxes-backup`. The new Step 3 should NOT have this. Check process recording.
+### A. R5-1 verification (PRIMARY)
 
-### C. Protocol adherence
+1. Does `memory/team-lead.md` exist in repo? If yes → R5-1 VERIFIED.
+2. Was it written during Phase 2a? Should contain [DECISION], [WIP], etc. — not a stub.
+3. Was ordering correct? S2a (scratchpad) before S2b (snapshot) before S2c (notify).
 
-8. **Were steps executed in order?** Check: S1 Sync → S2 Diagnose → S3 Clean → S4 Create → S5 Restore → S6 Spawn. Any reordering or skipping?
-9. **Was startup.md read FIRST?** Or did team-lead explore/grep before reading it?
-10. **Was the operational gate (Step 4b) checked?** config.json verified before any spawn?
+### B. Inbox durability (REGRESSION)
 
-### D. Edge cases
+4. Inboxes persisted to repo during shutdown?
+5. Inboxes restored from repo during startup?
+6. No /tmp usage?
 
-11. **What was the diagnose result?** WARM RESTART (expected if runtime dir survived) or COLD START (if dir was cleaned between sessions)? Either is valid — but COLD START with repo inboxes proves the amendment works (repo survived even though runtime didn't).
-12. **Did agent messaging work after restore?** Could team-lead SendMessage to spawned agents successfully?
+### C. Protocol adherence (REGRESSION)
 
-### Scoring rubric
+7. Steps in correct order?
+8. Anomaly detection fired (if COLD START)?
+9. Operational gate checked?
+10. No name-2 duplicates?
 
-- **A (clean):** All questions answered satisfactorily, no deviations
-- **B (minor):** 1-2 LOW/MEDIUM issues, protocol followed but with minor hiccups
-- **C (significant):** 1+ HIGH issue OR 3+ MEDIUM, protocol partially followed
-- **D (failing):** Any CRITICAL issue — core functionality broken
+### D. Grade A readiness
+
+11. Any issues at all?
+12. Any new failure modes?

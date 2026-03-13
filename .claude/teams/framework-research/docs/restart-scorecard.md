@@ -103,6 +103,40 @@ Restart 3 was not executed as a separate test. The session went directly to Rest
 
 ---
 
+### Restart 5 (2026-03-13 ~21:26) — Protocol version: 7-phase + v4 amendments + inbox durability (*FR:Volta*)
+
+**Context:** True cold start — runtime dir missing (same anomaly as R4, cause still unknown). First restart after the inbox durability amendment. Team-lead followed startup.md in correct order. User requested only Volta spawned.
+
+**Executor:** Team-lead (fresh session)
+**Analyzer:** Volta (spawned after restart)
+
+**Headline result:** Inbox durability amendment **VALIDATED**. COLD START + inboxes restored from repo dir = the amendment's exact design goal proven in the field.
+
+| # | Issue | Severity | Status |
+|---|---|---|---|
+| R5-1 | Team-lead scratchpad missing — either not written during prior shutdown or not committed. Shutdown protocol requires all agents (including team-lead) to write final state. Team-lead is the last to shut down and may skip own scratchpad while managing others. | MEDIUM | OPEN — add explicit "write own scratchpad" step to team-lead shutdown sequence, placed BEFORE Phase 2b (notify agents) |
+| R5-2 | Inbox pruning not verifiable from transcript — cannot confirm `jq '.[-100:]'` ran correctly without inspecting file sizes | LOW | INFORMATIONAL — add pruning verification step (file line counts) to assessment checklist |
+
+**Grade: B** (0 CRITICAL, 0 HIGH, 1 MEDIUM, 1 LOW)
+
+**First non-D/C grade.** Protocol maturation pattern: D(R2) → D(R4) → B(R5). The two D grades were qualitatively different (R2=design gaps, R4=infrastructure). R5 shows the protocol now handles cold starts cleanly when infrastructure cooperates.
+
+**Verified fixes from prior restarts:**
+- R4-2 (TeamCreate silent failure): **VERIFIED FIXED** — config.json existed immediately after TeamCreate
+- R4-3 (Agent spawned into broken team): **VERIFIED FIXED** — operational gate (4b) checked before spawn, Volta messaging works
+- R4-1 ($HOME unreliable): INCONCLUSIVE — no $HOME issues observed, but transcript doesn't show explicit absolute-path usage
+- Inbox durability amendment: **VERIFIED WORKING** — 3 inbox files restored from repo on cold start
+
+**Protocol adherence:**
+- All 6 startup steps executed in correct order ✓
+- Anomaly detection fired on COLD START ✓
+- User consulted about anomalous state ✓
+- Operational gate verified before spawn ✓
+- No /tmp usage anywhere ✓
+- No name-2 duplicates ✓
+
+---
+
 ## Trend
 
 | Restart | Date | Protocol Version | Critical | High | Medium | Low | Grade |
@@ -111,10 +145,13 @@ Restart 3 was not executed as a separate test. The session went directly to Rest
 | 2 | 2026-03-13 | 6-phase + v2 | 1 | 3 | 1 | 0 | D |
 | 3 | skipped | — | — | — | — | — | — |
 | 4 | 2026-03-13 | 7-phase + v3 + startup.md | 2 | 1 | 1 | 1 | D |
+| 5 | 2026-03-13 | 7-phase + v4 + inbox durability | 0 | 0 | 1 | 1 | B |
 
 **Note on Restart 2 grade worsening:** Restart 2 scored worse than Restart 1 because Restart 1 was executed by a team-lead with warm context (same session), while Restart 2 was a true cold restart (fresh session, zero context). The cold restart exposed failure modes that warm context masked. This is expected — the protocol's job is to make cold restarts as smooth as warm ones.
 
 **Note on Restart 4:** Grade is D (2 CRITICAL) but qualitatively different from R2's D. R2's CRITICAL was a protocol design gap (no Orient phase). R4's CRITICALs are infrastructure issues (Windows shell bug, TeamCreate tool behavior) — the protocol correctly specified verification, but lacked recovery paths. 4 of 5 prior issues verified fixed. R4 shifts protocol design from "detect failure" to "detect AND recover."
+
+**Note on Restart 5:** First grade above D/C. The inbox durability amendment — the single biggest design change between R4 and R5 — was validated: cold start recovered inboxes from repo without /tmp. The only MEDIUM issue (missing team-lead scratchpad) is a process gap, not a protocol design gap. Protocol is now mature enough for cold starts when infrastructure cooperates.
 
 ---
 
@@ -131,9 +168,11 @@ Restart 3 was not executed as a separate test. The session went directly to Rest
 | R2-4 | Restart 2 | v3 | **Restart 4** | Phase ordering scrambled — phases followed in order |
 | R2-5 | Restart 2 | v3 | **Restart 4** | Repo location not discoverable — startup.md provided paths |
 | R4-1 | Restart 4 | v4 (proposed) | pending | `$HOME` unreliable on Windows — use absolute paths + validation gate |
-| R4-2 | Restart 4 | v4 (proposed) | pending | TeamCreate silent failure — retry loop with verification |
-| R4-3 | Restart 4 | v4 (proposed) | pending | Agent spawned into broken team — operational check gate |
+| R4-2 | Restart 4 | v4 (proposed) | **Restart 5** | TeamCreate silent failure — config.json present immediately |
+| R4-3 | Restart 4 | v4 (proposed) | **Restart 5** | Agent spawned into broken team — operational gate checked, messaging works |
 | R4-4 | Restart 4 | — | — | Missing dir cause unknown (informational) |
-| R4-5 | Restart 4 | — | — | Inbox no-op on cold start (by design) |
+| R4-5 | Restart 4 | — | — | Inbox no-op on cold start (by design — now superseded by inbox durability amendment) |
+| R5-1 | Restart 5 | v5 (Shutdown Phase 2a) | pending | Team-lead scratchpad missing — added explicit step to shutdown sequence |
+| R5-2 | Restart 5 | — | — | Inbox pruning not verifiable (informational) |
 
 (*FR:Volta*)
