@@ -1,0 +1,90 @@
+{
+  "name": "cloudflare-builders",
+  "description": "Multi-application development team building on the Cloudflare + SvelteKit stack (Pages, Workers, D1, R2, KV). Covers frontend, backend, database, CI/CD, and architecture across Eesti Raudtee projects.",
+  "commonPromptFile": "common-prompt.md",
+  "members": [
+    {
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "model": "claude-opus-4-6",
+      "prompt": "prompts/team-lead.md"
+    },
+    {
+      "name": "sven",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "green",
+      "prompt": "prompts/sven.md"
+    },
+    {
+      "name": "dag",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "yellow",
+      "prompt": "prompts/dag.md"
+    },
+    {
+      "name": "tess",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "purple",
+      "prompt": "prompts/tess.md"
+    },
+    {
+      "name": "piper",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "orange",
+      "prompt": "prompts/piper.md"
+    },
+    {
+      "name": "harmony",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "pink",
+      "prompt": "prompts/harmony.md"
+    },
+    {
+      "name": "alex",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "cyan",
+      "prompt": "prompts/alex.md"
+    },
+    {
+      "name": "marcus",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "blue",
+      "prompt": "prompts/marcus.md"
+    },
+    {
+      "name": "finn",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "black",
+      "prompt": "prompts/finn.md"
+    },
+    {
+      "name": "arvo",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "red",
+      "prompt": "prompts/arvo.md"
+    },
+    {
+      "name": "medici",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "magenta",
+      "prompt": "../prompts/medici.md"
+    },
+    {
+      "name": "eilama",
+      "agentType": "code-specialist",
+      "model": "ollama:codellama:13b-instruct",
+      "color": "yellow",
+      "backendType": "daemon"
+    }
+  ]
+}
