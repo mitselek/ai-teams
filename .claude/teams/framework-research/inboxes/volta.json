@@ -1,0 +1,36 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 19:47] Volta, we observed something important about inbox lifecycle today. Here's what we found:\n\n**Observation 1: Inboxes are created lazily, not by TeamCreate.**\n- After TeamCreate, the runtime dir (`~/.claude/teams/framework-research/`) contained only `config.json` — no `inboxes/` dir.\n- The `inboxes/` dir appeared only after Finn was spawned and sent his first message.\n\n**Observation 2: Inboxes persist after agent shutdown.**\n- After Finn received shutdown_request, sent his closing report, and terminated, the inbox files (`finn.json`, `team-lead.json`) remained intact with all messages including the closing report.\n\n**Observation 3: Current protocol has a gap.**\n- The shutdown protocol does NOT backup inboxes. Backup only happens at Step 3 of the NEXT session's startup.\n- If the runtime dir disappears between sessions (reboot, manual cleanup), all closing reports — including [LEARNED], [DEFERRED], [WARNING] — are lost.\n- This is exactly what happened today: COLD START, no inboxes to recover, despite prior sessions existing (5 commits in memory/).\n\n**Proposed redesign:**\nAdd inbox backup as the LAST step of shutdown, after all `teammate_terminated` confirmations are received. This ensures closing reports are captured. Key design question: backup to repo (durable, survives reboots) vs /tmp (current approach, fragile).\n\nPlease analyze this and propose an amendment to the shutdown protocol in 06-lifecycle.md.",
+    "summary": "Inbox lifecycle findings and shutdown redesign task",
+    "timestamp": "2026-03-13T17:47:29.977Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 19:50] Good analysis. Two points of feedback from PO before you write:\n\n**1. Inbox pruning is mandatory, not optional.**\nOn shutdown, the durable inbox preservation script should only copy the last 100 messages per inbox file. This prevents unbounded growth, especially for larger teams like cloudflare-builders (11 agents). Make this part of the design, not an open question.\n\n**2. Drop the /tmp fallback from startup restore.**\nThe PO doesn't understand why we'd have a /tmp fallback path. If we're persisting inboxes to the repo on shutdown, the repo IS the source of truth. The startup restore priority should be:\n1. Repo inboxes (durable)\n2. No inboxes (cold start)\n\nNo /tmp in the chain. Simplify.\n\nRevise your proposal with these two changes, then write to 06-lifecycle.md.",
+    "summary": "PO feedback: mandatory pruning, drop /tmp fallback",
+    "timestamp": "2026-03-13T17:52:48.453Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 19:56] Good work. Go ahead and update startup.md as well — make the executable checklist match the new protocol. Repo is the source of truth for inboxes, no /tmp anywhere.",
+    "summary": "Update startup.md to match new protocol",
+    "timestamp": "2026-03-13T19:18:01.790Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-13 21:20] Volta, we're about to do a restart test. After the restart, I'll spawn you again and report the raw process recording of what happened during the restart.\n\nYour task before shutdown: **prepare a list of assessment questions** that you will ask me (team-lead) after the restart to verify whether everything went according to the updated protocol. Save these questions to your scratchpad so they survive the restart.\n\nThink about what could go wrong, what the new protocol changes (repo-based inbox restore, no /tmp), and what evidence you'd want to see. Then approve shutdown.",
+    "summary": "Prepare restart assessment questions, then shutdown",
+    "timestamp": "2026-03-13T19:20:14.803Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773429685717@volta\",\"from\":\"team-lead\",\"reason\":\"Restart 5 test — beginning shutdown sequence.\",\"timestamp\":\"2026-03-13T19:21:25.717Z\"}",
+    "timestamp": "2026-03-13T19:21:25.717Z",
+    "read": true
+  }
+]

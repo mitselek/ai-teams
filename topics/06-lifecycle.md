@@ -97,18 +97,48 @@ cd <team-config-repo> && git pull
 2c.  Remove stale team directory
 ```
 
-#### Phase 2.0: Diagnose (*FR:Volta* — amendment from restart test 2026-03-13)
+#### Phase 2.0a: Validate `$HOME` (*FR:Volta* — amendment from restart 4, 2026-03-13)
+
+**Problem this solves:** Restart 4 field test revealed that `$HOME` resolves to an EMPTY STRING in some bash invocations on Windows/Git Bash. The diagnose script then checks `/.claude/teams/framework-research` (root path) instead of the correct user path. Other bash calls in the same session resolved `$HOME` correctly. Shell initialization is inconsistent across bash invocations on this platform.
+
+**Rule: Never use `$HOME` directly in path construction. Always resolve it first and validate.**
+
+```bash
+# Resolve HOME — do NOT trust $HOME on Windows/Git Bash
+RESOLVED_HOME="$HOME"
+if [ -z "$RESOLVED_HOME" ] || [ "$RESOLVED_HOME" = "/" ]; then
+  # Fallback: use /c/Users/<username> pattern (MSYS2/Git Bash)
+  RESOLVED_HOME="/c/Users/$(whoami)"
+fi
+
+# Validate
+if [ ! -d "$RESOLVED_HOME" ]; then
+  echo "FATAL: Cannot resolve home directory. HOME='$HOME', fallback='$RESOLVED_HOME'"
+  echo "Manual intervention required."
+  exit 1
+fi
+
+TEAM_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
+echo "Using TEAM_DIR=$TEAM_DIR"
+```
+
+**Why not just use absolute paths everywhere?** Absolute paths solve the immediate problem but create a new one: `startup.md` and protocol scripts become machine-specific. The `$HOME` validation gate is the correct fix because it keeps scripts portable while defending against the platform bug. However, `startup.md` (which IS machine-specific) SHOULD use absolute paths — it's the one place where portability doesn't matter.
+
+**Impact on all subsequent phases:** Every bash script in Phases 2-4 that references `$HOME` must use `$RESOLVED_HOME` instead, or must run this validation first. The reference implementations below are updated accordingly.
+
+#### Phase 2.0b: Diagnose (*FR:Volta* — amended in restart 4, 2026-03-13)
 
 Before touching the filesystem, classify the starting scenario. This costs one `ls` and eliminates the diagnostic uncertainty of "why is the state this way?"
 
-```bash
-TEAM_DIR="$HOME/.claude/teams/<team-name>"
+**Precondition:** `$RESOLVED_HOME` is validated (Phase 2.0a). `$TEAM_DIR` is set.
 
+```bash
+# TEAM_DIR was set in Phase 2.0a — do NOT re-derive from $HOME
 if [ -d "$TEAM_DIR/inboxes" ]; then
   echo "WARM RESTART — stale team dir with inboxes (normal)"
 elif [ -d "$TEAM_DIR" ]; then
   echo "PARTIAL STATE — stale team dir, no inboxes (TeamDelete was called or inboxes never created)"
-elif ls -d "$HOME/.claude/teams/<team-name>"-* 2>/dev/null | head -1 >/dev/null; then
+elif ls -d "$RESOLVED_HOME/.claude/teams/<team-name>"-* 2>/dev/null | head -1 >/dev/null; then
   echo "MISCREATION — team dir exists under wrong name (prior TeamCreate without clean)"
 else
   echo "COLD START — no prior state (first ever, different machine, or dir cleaned externally)"
@@ -154,12 +184,11 @@ Is this the first-ever session for this team on this machine?
 **Reference implementation (sub-steps 2a–2c):**
 
 ```bash
-TEAM_DIR="$HOME/.claude/teams/<team-name>"
+# TEAM_DIR was set in Phase 2.0a ($HOME validation) — do NOT re-derive from $HOME
 
-# 2a — preserve inbox state for cross-session continuity
-if [ -d "$TEAM_DIR/inboxes" ]; then
-  cp -r "$TEAM_DIR/inboxes" /tmp/<team-name>-inboxes-backup
-fi
+# 2a — no-op (inbox backup removed — see amendment below)
+# Inboxes are now persisted to the repo during Shutdown Phase 4a.
+# The runtime dir's inboxes are stale copies — safe to discard with the dir in 2c.
 
 # 2b — kill zombies (RC: kill all non-%0 panes; local: N/A)
 # RC-specific: tmux kill-pane for each agent pane
@@ -169,7 +198,9 @@ fi
 rm -rf "$TEAM_DIR"
 ```
 
-**Expected outcome:** `$TEAM_DIR` does not exist. Inboxes are in `/tmp/` (if they existed). Team lead knows which scenario was encountered.
+**Expected outcome:** `$TEAM_DIR` does not exist. Team lead knows which scenario was encountered.
+
+**Amendment (*FR:Volta* — 2026-03-13, inbox durability):** Sub-step 2a previously copied runtime inboxes to `/tmp/` for restoration in Startup Phase 4. This created a fragile two-hop chain: runtime dir → `/tmp/` → new runtime dir. Both hops are ephemeral. Shutdown Phase 4a now persists inboxes directly to the repo (durable). Sub-step 2a is no longer needed — the repo copy is the source of truth. The `/tmp/` backup is removed entirely to avoid a confusing fallback chain.
 **Failure if skipped:**
 
 - Skip 2.0 → team lead wastes a round-trip investigating why the dir is/isn't there
@@ -180,35 +211,92 @@ rm -rf "$TEAM_DIR"
 ### Phase 3: Create
 
 **Precondition:** `$TEAM_DIR` does not exist. Inboxes backed up.
-**Action:** `TeamCreate(team_name="<team-name>")`
+**Action:** `TeamCreate(team_name="<team-name>")` with post-creation verification and retry.
 
 **Expected outcome:** Fresh `$TEAM_DIR` exists with `config.json` containing `leadSessionId`. No `inboxes/` subdirectory (TeamCreate does not create it).
 **Failure if skipped:** No team context → all agent spawning and messaging fails.
 
 **Critical invariant:** The `leadSessionId` in `config.json` must match the current session. A stale `leadSessionId` from a previous session breaks agent-to-lead messaging. This is why TeamCreate must run fresh each session — it generates a new `leadSessionId`.
 
-### Phase 4: Restore
+#### Phase 3 Verification and Retry (*FR:Volta* — amendment from restart 4, 2026-03-13)
+
+**Problem this solves:** Restart 4 revealed that TeamCreate can return success (`team_file_path` + `leadAgentId`) but `config.json` does NOT exist on disk. The team appears created but is non-functional — agent spawning silently fails. The previous protocol said "verify config.json exists" but had no recovery path when verification failed.
+
+**Rule: TeamCreate is not complete until config.json is verified on disk. If verification fails, retry with TeamDelete + TeamCreate (max 2 attempts).**
+
+```
+1. TeamCreate(team_name="<team-name>")
+2. Verify: does config.json exist?
+   - Check: ls "$TEAM_DIR/config.json" (or Read the file)
+   - YES → Phase 3 complete. Proceed to Phase 4.
+   - NO  → TeamCreate silently failed. Go to step 3.
+3. Recovery attempt (max 1 retry):
+   a. TeamDelete(team_name="<team-name>")  — clean up phantom state
+   b. TeamCreate(team_name="<team-name>")  — fresh attempt
+   c. Verify config.json again
+   - YES → Phase 3 complete.
+   - NO  → FATAL: TeamCreate is broken. Stop startup. Report to user:
+           "TeamCreate succeeded twice but config.json does not exist on disk.
+            This is a platform/tool bug. Cannot proceed."
+```
+
+**Why TeamDelete before retry:** The first TeamCreate may have registered internal state (the tool returned `leadAgentId`) even though it didn't write config.json. A second TeamCreate without TeamDelete may say "Already leading team" but still not fix the disk state. TeamDelete clears the phantom internal state.
+
+**Why max 2 attempts:** If the tool is fundamentally broken (disk permission issue, path bug), retrying indefinitely wastes time. Two attempts distinguish "transient glitch" from "systematic failure."
+
+**CRITICAL: Do NOT spawn any agents until Phase 3 verification passes.** In Restart 4, Medici was spawned after the first (broken) TeamCreate — the spawn returned "success" but the team was non-functional. The agent was wasted. Phase 3 verification is a hard gate for all subsequent phases.
+
+### Phase 4: Restore (*FR:Volta* — amended 2026-03-13, inbox durability)
 
 **Precondition:** TeamCreate succeeded. `config.json` exists with fresh `leadSessionId`.
-**Action:** Restore inboxes from backup.
+**Action:** Restore inboxes from repo (durable copy persisted during prior session's Shutdown Phase 4a).
 
 ```bash
-BACKUP="/tmp/<team-name>-inboxes-backup"
-if [ -d "$BACKUP" ]; then
+TEAM_CONFIG_DIR="<team-config-repo>/.claude/teams/<team-name>"
+# TEAM_DIR is the runtime dir, set in Phase 2.0a
+
+if [ -d "$TEAM_CONFIG_DIR/inboxes" ]; then
   mkdir -p "$TEAM_DIR/inboxes"
-  cp -r "$BACKUP"/* "$TEAM_DIR/inboxes/"
-  rm -rf "$BACKUP"
+  cp -r "$TEAM_CONFIG_DIR/inboxes/"* "$TEAM_DIR/inboxes/"
 fi
 ```
 
-**Expected outcome:** `$TEAM_DIR/inboxes/` exists with prior session messages. Stale `read: true` messages are harmless.
+**Restore source:** The repo dir (`$TEAM_CONFIG_DIR/inboxes/`) is the sole source of truth. There is no `/tmp/` fallback. If the repo has no inboxes (first-ever session or inboxes were never committed), this step is a no-op — equivalent to a cold start for inbox state.
+
+**Expected outcome:** `$TEAM_DIR/inboxes/` exists with prior session messages (pruned to last 100 per file). Stale `read: true` messages are harmless.
 **Failure if skipped:** No inboxes dir → first SendMessage to any agent fails or creates messages in wrong location.
 
 **Why `mkdir -p` is required:** TeamCreate does NOT create the `inboxes/` subdirectory. Without it, the `cp` command fails silently or writes to the wrong path.
 
+#### Phase 4b: Team Operational Check (*FR:Volta* — amendment from restart 4, 2026-03-13)
+
+**Problem this solves:** In Restart 4, Medici was spawned after a TeamCreate that returned success but was non-functional (no config.json on disk). The spawn returned "success" but the agent couldn't communicate. The Phase 3 verification (config.json check) should catch this, but if it's somehow bypassed or if there are other failure modes beyond config.json, spawning into a broken team wastes an agent.
+
+**Rule: Before spawning ANY agent (including Medici in Phase 5), verify the team is operational.**
+
+Operational check (after Phase 4 Restore, before Phase 5 Audit):
+
+```
+1. Verify config.json exists and is readable:
+   - Read "$TEAM_DIR/config.json"
+   - Check: contains "leadSessionId" field
+   - If FAIL → STOP. Do not proceed to Phase 5. Re-run Phase 3.
+
+2. Verify inboxes dir exists:
+   - ls "$TEAM_DIR/inboxes/" (may be empty — that's OK)
+   - If dir missing → mkdir -p "$TEAM_DIR/inboxes"
+
+3. State check summary (log, don't act):
+   - "Team <name> operational: config.json OK, inboxes dir exists, ready for agent spawn"
+```
+
+**Why this is separate from Phase 3 verification:** Phase 3 verifies that TeamCreate wrote config.json. Phase 4b verifies that the entire team infrastructure (config + inboxes) is ready for agents AFTER the restore step. It's a final gate — the last check before committing resources (agent spawns cost tokens).
+
+**Failure mode if skipped:** Agent spawned into broken team → spawn appears to succeed → agent can't send/receive messages → health report never arrives → team-lead waits indefinitely or diagnoses the wrong problem.
+
 ### Phase 5: Audit
 
-**Precondition:** Team is created with inboxes restored.
+**Precondition:** Team operational check passed (Phase 4b). Config.json exists with `leadSessionId`, inboxes dir exists.
 **Action:** Spawn Medici (health auditor) first, before any other agents.
 
 Medici reads all scratchpads, prompts, and common-prompt, then reports:
@@ -296,30 +384,68 @@ Each agent, on receiving shutdown:
 
 **Expected outcome:** All agent processes terminated. Team lead is the only active process.
 
-### Phase 4: Persist
+### Phase 4: Persist (*FR:Volta* — amended 2026-03-13, inbox durability)
 
 **Precondition:** All agents terminated. Task snapshot already created (Phase 2a).
-**Action:** Save session state to version control.
+**Action:** Copy inboxes from runtime dir to repo, then commit all session state to version control.
+
+#### Phase 4a: Persist inboxes to repo (*FR:Volta* — 2026-03-13)
+
+**Problem this solves:** The previous protocol relied on the runtime dir (`$HOME/.claude/teams/...`) surviving between sessions. Phase 5 (Preserve) said "do NOT call TeamDelete" to keep inboxes alive. But the runtime dir is ephemeral — reboots, manual cleanup, or OS temp cleanup can destroy it. Field observation (2026-03-13): COLD START despite 5 prior commits in memory/. All closing reports from the previous session were lost because they existed only in the runtime dir's inboxes.
+
+**Key insight: there are TWO `.claude/teams/<team-name>/` directories:**
+
+| Directory | Location | Owner | Durability |
+|---|---|---|---|
+| Runtime dir | `$HOME/.claude/teams/<team-name>/` | Platform (TeamCreate) | Ephemeral — survives only until dir is removed |
+| Repo dir | `<team-config-repo>/.claude/teams/<team-name>/` | Team (git-tracked) | Durable — survives reboots, available on any clone |
+
+Scratchpads live in the repo dir and are already committed. Inboxes live in the runtime dir and were NOT committed — this was the gap. The fix: copy inboxes from runtime to repo during shutdown, making them durable.
+
+**Rule: On shutdown, copy pruned inboxes from runtime dir to repo dir. The repo is the sole source of truth for inbox restore.**
 
 ```bash
-# Task snapshot was created in Shutdown Phase 2a — just commit it here
-# Commit all memory files
+# Phase 4a: Persist inboxes
+TEAM_CONFIG_DIR="<team-config-repo>/.claude/teams/<team-name>"
+RUNTIME_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
+
+if [ -d "$RUNTIME_DIR/inboxes" ]; then
+  mkdir -p "$TEAM_CONFIG_DIR/inboxes"
+  # Copy with pruning: keep only the last 100 messages per inbox file
+  for inbox_file in "$RUNTIME_DIR/inboxes/"*.json; do
+    [ -f "$inbox_file" ] || continue
+    filename=$(basename "$inbox_file")
+    # jq: keep last 100 array elements (messages are stored as JSON arrays)
+    jq '.[-100:]' "$inbox_file" > "$TEAM_CONFIG_DIR/inboxes/$filename"
+  done
+fi
+```
+
+**Pruning rule (mandatory):** Each inbox file is truncated to the last 100 messages during the copy. This prevents unbounded growth — a team with 11 agents (like cloudflare-builders) would otherwise accumulate thousands of messages across sessions. 100 messages per agent captures the full closing sequence and recent conversation context. Older messages are not needed for cross-session continuity.
+
+**Why prune during shutdown, not startup:** The team lead's context is freshest at shutdown Phase 4 — all work is done, the commit sequence is mechanical. Deferring pruning to startup adds complexity to an already fragile sequence. Prune once, commit clean.
+
+#### Phase 4b: Commit all session state
+
+```bash
+# Commit scratchpads + task snapshot + inboxes in one atomic commit
 git add .claude/teams/<team-name>/memory/
-git commit -m "chore: save team scratchpads and task list"
+git add .claude/teams/<team-name>/inboxes/
+git commit -m "chore: save team state (scratchpads, tasks, inboxes)"
 git push
 ```
 
-**Expected outcome:** All scratchpads and task snapshots are committed and pushed.
-**Failure if skipped:** Next session has no scratchpad state — agents restart with amnesia.
+**Expected outcome:** All scratchpads, task snapshots, and pruned inboxes are committed and pushed.
+**Failure if skipped:** Next session has no scratchpad state and no inbox history — agents restart with amnesia, closing reports lost.
 
 ### Phase 5: Preserve
 
 **Precondition:** Persist complete.
 **Action:** Do nothing. Specifically: **do NOT call TeamDelete**. The team directory remains on disk.
 
-**Expected outcome:** `$TEAM_DIR` still exists with `config.json`, `inboxes/`, and all memory files. Next session's Phase 2 (Clean) will handle the stale directory correctly.
+**Expected outcome:** `$TEAM_DIR` still exists with `config.json`, `inboxes/`, and all memory files. The runtime dir is now a convenience (faster startup if it survives) but NOT the source of truth — the repo has the durable copy.
 
-**Failure if violated (TeamDelete called):** Inboxes destroyed → next session has no message history to restore → agents lose cross-session context.
+**Failure if violated (TeamDelete called):** Runtime dir destroyed. Impact is reduced compared to pre-amendment: inboxes are now in the repo. But `config.json` loss still forces a full TeamCreate cycle on next startup. Rule stands: do NOT call TeamDelete.
 
 ---
 
@@ -734,10 +860,15 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 - ~~How does a fresh team-lead self-orient without broad exploration?~~ → Phase 0 (Orient): read roster.json, common-prompt.md, and own scratchpad — 3 files, fixed order, zero exploration. (*FR:Volta* — resolved 2026-03-13 restart 3)
 - ~~How to handle stale/wrong workDir in roster.json?~~ → Phase 0 workDir Resolution: validate after reading roster, fallback with WARNING, flag for correction. (*FR:Volta* — resolved 2026-03-13 restart 3)
 - ~~How to distinguish "genuinely first session" from "lost state" when team dir is missing?~~ → Phase 2.0 Anomaly Detection: check git log for prior team memory commits. If found → anomaly, ask user. (*FR:Volta* — resolved 2026-03-13 restart 3)
+- ~~What if `$HOME` is unreliable on the host platform?~~ → Phase 2.0a: validate `$HOME` before use, fallback to `whoami`-based path. `startup.md` uses absolute paths — it is machine-specific by design. (*FR:Volta* — resolved 2026-03-13 restart 4)
+- ~~What if TeamCreate succeeds but config.json doesn't exist on disk?~~ → Phase 3 Verification and Retry: verify config.json after TeamCreate, retry with TeamDelete + TeamCreate (max 2 attempts), hard gate before any spawn. (*FR:Volta* — resolved 2026-03-13 restart 4)
+- ~~What if agents are spawned into a non-functional team?~~ → Phase 3 verification is a hard gate for all subsequent phases. No agent spawn (including Medici in Phase 5) until config.json is confirmed on disk. (*FR:Volta* — resolved 2026-03-13 restart 4)
+- ~~What if the runtime dir disappears between sessions and inboxes are lost?~~ → Shutdown Phase 4a persists pruned inboxes (last 100 messages per file) to the repo. Startup Phase 4 restores from repo, not `/tmp/`. Repo is the sole source of truth. (*FR:Volta* — resolved 2026-03-13)
+- ~~Inbox backup atomicity~~ → Eliminated by removing the `/tmp/` hop. Inboxes go directly from runtime dir to repo during shutdown. No intermediate ephemeral state. (*FR:Volta* — resolved 2026-03-13)
 
 ### Still open
 
-1. **Inbox backup atomicity** — The backup-rm-create-restore sequence is not atomic. If the process crashes between Phase 2c (remove) and Phase 4 (restore), inboxes in `/tmp/` may be orphaned. A filesystem-level rename (swap old dir with new) would be safer, but TeamCreate requires the directory to not exist.
+1. ~~**Inbox backup atomicity**~~ → Resolved by durable inbox persistence (Shutdown Phase 4a). Inboxes are now committed to the repo during shutdown. The fragile `/tmp/` hop is eliminated — the repo copy survives reboots, crashes, and manual cleanup. The startup restore reads from the repo, not `/tmp/`. (*FR:Volta* — resolved 2026-03-13)
 
 2. ~~**Agent tool duplicate gate**~~ → Resolved by `spawn_local.sh` (Path 2.5). Local teams now have a wrapper script with built-in duplicate gate and prompt assembly. (*FR:Volta* — resolved 2026-03-13)
 
@@ -748,3 +879,9 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 5. **Multi-team startup coordination** — When tens of teams exist, do they start independently or is there an orchestrator that sequences team startups? (Connects to T04-hierarchy.)
 
 6. **Can teams self-replicate or split?** — Not addressed. May be needed for scaling patterns. (Connects to T01-taxonomy.)
+
+7. **`$HOME` reliability across platforms** — Windows/Git Bash has inconsistent `$HOME` resolution across bash invocations within the same session. Phase 2.0a adds a validation gate, but the root cause (shell initialization inconsistency) is not understood. Does this affect other env vars? Does it happen on macOS/Linux? (*FR:Volta* — discovered restart 4, 2026-03-13)
+
+8. **TeamCreate silent failure** — TeamCreate can return success but not write config.json to disk. Phase 3 now has a retry loop, but the root cause is unknown. Is this a race condition? A permissions issue? Does it correlate with the `$HOME` bug? (*FR:Volta* — discovered restart 4, 2026-03-13)
+
+9. **Inbox size thresholds** — The 100-message-per-file pruning limit (Shutdown Phase 4a) is a reasonable default for research teams with short sessions. For production teams with long sessions and many agents, the right threshold may be different. Should this be configurable per team (in roster.json)? What is the actual size of 100 messages in JSON — does it stay under reasonable git commit sizes? (*FR:Volta* — 2026-03-13)

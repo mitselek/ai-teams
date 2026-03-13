@@ -34,6 +34,11 @@ Topics covered: taxonomy, isolation, communication, hierarchy, identity, lifecyc
 - No new research tasks assigned in this session
 - Shutdown for planned restart test
 
+## [CHECKPOINT] 2026-03-13 — Session 4
+
+- Spawned on opus-4-6, startup completed, no tasks assigned
+- Immediate shutdown requested by team-lead
+
 ## [DEFERRED] Open question
 
 No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but file is `02-resource-isolation.md`. Clarify if a separate roles file is wanted.
