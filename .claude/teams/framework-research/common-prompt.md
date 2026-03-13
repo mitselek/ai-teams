@@ -3,7 +3,7 @@
 ## Team
 
 - **Team name:** `framework-research`
-- **Members:** team-lead, finn (research coordinator), medici (knowledge health)
+- **Members:** team-lead, finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer)
 - **Mission:** Design a multi-team AI agent framework that scales to tens of teams
 
 ## Workspace
@@ -50,6 +50,7 @@ Agents MUST be spawned with `run_in_background: true`.
 1. Read your personal scratchpad at `.claude/teams/framework-research/memory/<your-name>.md` if it exists
 2. Read the README.md and any topic files relevant to current work
 3. Send a brief intro message to `team-lead`
+4. If this is a restart test, read `.claude/teams/framework-research/docs/restart-test.md` and verify success criteria
 
 ## Team Memory
 

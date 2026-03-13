@@ -1,54 +1,41 @@
 # Finn's Scratchpad — framework-research
 
-## [INDEX] 2026-03-13 — Session 1 startup
-
-**Reference material available:**
+## [INDEX] 2026-03-13 — Reference material
 
 - `reference/rc-team/cloudflare-builders/` — original RC team (11 agents, rc-oriented, tmux/SSH based)
   - common-prompt.md, eilama-concept.md, 11 agent prompts, 10 memory files
 - `reference/hr-devs/` — evolved project team (9 agents, local + RC hybrid)
   - common-prompt.md, eilama-concept.md, 9 agent prompts, 7 memory files
-  - docs/: startup-shutdown.md (canonical), tmux-layouts.md, api-contracts.md, architecture-decisions.md, health-report.md, test-gaps.md
+  - docs/: startup-shutdown.md, tmux-layouts.md, api-contracts.md, architecture-decisions.md, health-report.md, test-gaps.md
   - spawn_member.sh (shell-based spawning, reads roster)
-- `topics/` — 8 design topic files, all at "brainstorm" status (stubs only)
+- `topics/` — 8 design topic files, all populated with patterns
 - `README.md` — mission overview, topic table, context
 
-**Team size:** 3 agents (team-lead opus-4-6, finn sonnet-4-6, medici sonnet-4-6)
+**Team size:** 3 agents (team-lead opus-4-6, finn opus-4-6, medici sonnet-4-6)
 
-## [PATTERN] 2026-03-13 — Key differences between rc-team and hr-devs
+## [PATTERN] Key differences between rc-team and hr-devs
 
-1. **Spawning mechanism:** rc-team uses Agent tool; hr-devs uses `spawn_member.sh` (shell, reads roster, spawns into named tmux panes)
-2. **Memory layout:** rc-team: single `memory/` flat; hr-devs: `memory/` (scratchpads) + `docs/` (shared knowledge) — cleaner separation
-3. **Startup procedure:** hr-devs has canonical `docs/startup-shutdown.md`; rc-team has it inline in common-prompt.md
-4. **Medici role:** both teams have Medici (health auditor), hr-devs version has more detailed audit checklist (6 categories vs implied)
-5. **Attribution prefix:** rc-team uses `(*RC-DEV:Name*)`; hr-devs inherits same prefix (not yet updated to `(*HR-DEV:Name*)`)
+1. **Spawning:** rc-team uses Agent tool; hr-devs uses `spawn_member.sh` (shell, reads roster)
+2. **Memory layout:** rc-team: flat `memory/`; hr-devs: `memory/` + `docs/` — cleaner separation
+3. **Startup:** hr-devs has canonical `docs/startup-shutdown.md`; rc-team inlines in common-prompt.md
+4. **Medici:** hr-devs has more detailed audit checklist (6 categories vs implied)
+5. **Attribution:** rc-team `(*RC-DEV:Name*)`; hr-devs same (not yet updated)
 
-## [PATTERN] 2026-03-13 — Finn's role across both teams
+## [CHECKPOINT] 2026-03-13 — All 8 topics populated
 
-- Read-only except own scratchpad + delegated topic files
-- Spawns haiku subagents for parallel data gathering (rc-team memory shows this in practice)
-- Acts as research broker — saves other agents' tokens on exploration
-- Never writes code, never creates external issues without explicit instruction
+All 8 topics have `## Patterns from Reference Teams (*FR:Finn*)` sections.
+Sources: both common-prompts, both rosters, both team-lead prompts, both finn prompts, hr-devs medici/sven/dag/arvo prompts, startup-shutdown.md, eilama-concept.md.
 
-## [CHECKPOINT] 2026-03-13 — Session 2: Patterns extracted to all 8 topic files
+Topics covered: taxonomy, isolation, communication, hierarchy, identity, lifecycle, safety, observability.
 
-All 8 topics now have `## Patterns from Reference Teams (*FR:Finn*)` sections.
-Sources read: both common-prompts, both rosters, both team-lead prompts, both finn prompts, hr-devs medici prompt, hr-devs sven/dag/arvo prompts, startup-shutdown.md, eilama-concept.md.
+## [CHECKPOINT] 2026-03-13 — Session 3 (opus respawn)
 
-Key patterns documented by topic:
-- 01 taxonomy: roster structure, model tiering, non-Claude agents (eilama), named config presets
-- 02 isolation: serialized git ownership, worktree isolation, branch strategy, Figma rate-limit protocol
-- 03 communication: timestamped messages, Finn broker pattern, attribution rules, dashboard, shutdown report format
-- 04 hierarchy: 2-level flat hierarchy, team-lead restrictions, peer policing, Jira human-gated
-- 05 identity: shared ~/.claude/.env, honor-based attribution, no escalation path, no per-team isolation
-- 06 lifecycle: human-initiated creation, medici-first, shell-script spawning evolution, scratchpad tags, TeamDelete forbidden
-- 07 safety: prompt-level guardrails, quality gates, Known Pitfalls section as living safety list
-- 08 observability: Medici 6-category audit, shutdown reports, attribution trail, code review in Reviews API
+- Respawned on opus-4-6 (was sonnet-4-6)
+- No new research tasks assigned in this session
+- Shutdown for planned restart test
 
-## [WIP] 2026-03-13 — Shutdown before opus respawn
+## [DEFERRED] Open question
 
-**LEARNED:** All 8 topic files now have concrete patterns from reference material. Topics are no longer stubs.
-**DEFERRED:** No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but it's actually `02-resource-isolation.md`. Needs clarification if a separate roles file is wanted.
-**WARNING:** Path correction received — scratchpad is at `.claude/teams/framework-research/memory/finn.md`, not `memory/finn.md`. Prompt has been updated accordingly.
+No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but file is `02-resource-isolation.md`. Clarify if a separate roles file is wanted.
 
 (*FR:Finn*)

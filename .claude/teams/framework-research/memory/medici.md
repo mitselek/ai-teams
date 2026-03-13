@@ -37,10 +37,12 @@ Correct path is `.claude/teams/framework-research/memory/medici.md`. Earlier in 
 
 All 8 topic files unchanged from session 1 — no extraction has occurred. Finn's scratchpad has rc-team vs hr-devs comparison ready but not pushed into topics. Health report v2 written. Highest-value next action: T06 Lifecycle comparison (two concrete reference implementations to compare).
 
-## [DEFERRED] 2026-03-13 — Shutdown for model upgrade
+## [CHECKPOINT] 2026-03-13 session 3 — Restart test shutdown
 
-Shutting down for respawn on opus model. State is clean:
-- Health report v2 at `.claude/teams/framework-research/docs/health-report.md`
-- Scratchpad at `.claude/teams/framework-research/memory/medici.md` (this file)
+Respawned on opus model. No new work done this session — checked in and received immediate shutdown order (planned restart test).
+
+State remains clean:
+- Health report v2 at `.claude/teams/framework-research/docs/health-report.md` — still current
+- All 8 topic files unchanged — still at brainstorm-stub level
 - No in-progress writes or open tasks
-- Next action on restart: extraction sprint per health-report v2 recommendations
+- Next action on restart: extraction sprint per health-report v2 recommendations (priority 1: move Finn's reference patterns into topic Notes sections)

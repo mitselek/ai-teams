@@ -11,3 +11,7 @@
 [PATTERN] 2026-03-13 18:00 — Inbox preservation is the single most fragile lifecycle operation. TeamCreate requires empty dir but inboxes must survive. Framework improvement: TeamCreate should accept an --preserve-inboxes flag or handle this internally.
 
 [LEARNED] 2026-03-13 18:00 — hr-devs is strictly more mature than rc-team: externalised startup doc, spawn_member.sh with duplicate gate, layout system. rc-team has startup inline in team-lead prompt with no built-in duplicate protection.
+
+[DECISION] 2026-03-13 18:14 — Designed restart test plan at `docs/restart-test.md`. 5 success criteria groups (15 individual checks): self-orientation, startup execution, agent continuity, work product continuity, protocol correctness. SC-1 and SC-2 are must-pass; SC-3-5 are should-pass.
+
+[CHECKPOINT] 2026-03-13 18:17 — Session complete. Both deliverables done: (1) canonical lifecycle protocol in `topics/06-lifecycle.md`, (2) restart test plan in `docs/restart-test.md`. No WIP. Clean shutdown.
