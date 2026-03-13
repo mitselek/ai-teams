@@ -1,0 +1,8 @@
+{
+  "name": "lite",
+  "description": "Lead left 50%, finn right 50%",
+  "columns": [
+    { "width": "50%", "panes": ["team-lead"] },
+    { "width": "50%", "panes": ["finn"] }
+  ]
+}

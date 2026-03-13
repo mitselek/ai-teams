@@ -1,0 +1,69 @@
+{
+  "name": "hr-devs",
+  "description": "Specialized development team for the Eesti Raudtee HR platform (conversations app). SvelteKit + Cloudflare D1 stack.",
+  "commonPromptFile": "common-prompt.md",
+  "members": [
+    {
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "model": "claude-opus-4-6",
+      "prompt": "prompts/team-lead.md"
+    },
+    {
+      "name": "sven",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "green",
+      "prompt": "prompts/sven.md"
+    },
+    {
+      "name": "dag",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "yellow",
+      "prompt": "prompts/dag.md"
+    },
+    {
+      "name": "tess",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "purple",
+      "prompt": "prompts/tess.md"
+    },
+    {
+      "name": "marcus",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "blue",
+      "prompt": "prompts/marcus.md"
+    },
+    {
+      "name": "finn",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "black",
+      "prompt": "prompts/finn.md"
+    },
+    {
+      "name": "arvo",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "red",
+      "prompt": "prompts/arvo.md"
+    },
+    {
+      "name": "medici",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "magenta",
+      "prompt": "prompts/medici.md"
+    },
+    {
+      "name": "eilama",
+      "agentType": "code-specialist",
+      "model": "ollama:codellama:13b-instruct",
+      "color": "yellow",
+      "backendType": "daemon"
+    }
+  ]
+}

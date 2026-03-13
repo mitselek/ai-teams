@@ -1,0 +1,8 @@
+{
+  "name": "default",
+  "description": "Finn + lead left 30%, others right 70%",
+  "columns": [
+    { "width": "30%", "panes": ["finn", "team-lead"] },
+    { "width": "70%", "panes": ["others"] }
+  ]
+}
