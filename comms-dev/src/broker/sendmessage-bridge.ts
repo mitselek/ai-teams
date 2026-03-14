@@ -78,7 +78,9 @@ export class SendMessageBridge {
 
   start(): void {
     if (this.timer) return;
-    this.timer = setInterval(() => void this.poll(), POLL_INTERVAL_MS);
+    this.timer = setInterval(() => {
+      this.poll().catch(err => this.safeError('[bridge] Unexpected poll error:', err));
+    }, POLL_INTERVAL_MS);
     this.timer.unref?.();
     console.log(`[bridge] Watching broker inbox: ${this.opts.brokerInboxDir}`);
   }
@@ -96,6 +98,10 @@ export class SendMessageBridge {
     try {
       files = fs.readdirSync(this.opts.brokerInboxDir)
         .filter(f => f.endsWith('.json') && !f.endsWith('.tmp'))
+        // Only process broker message files (UUID-named), not agent inbox files
+        // Agent inbox files are named <agent-name>.json (e.g. team-lead.json)
+        // Broker message files contain hyphens in UUID format
+        .filter(f => f.includes('-'))
         .map(f => path.join(this.opts.brokerInboxDir, f));
     } catch {
       return; // Directory doesn't exist yet — wait
@@ -113,7 +119,12 @@ export class SendMessageBridge {
       let message: Message;
       try {
         const raw = fs.readFileSync(filePath, 'utf8');
-        message = JSON.parse(raw) as Message;
+        const parsed = JSON.parse(raw);
+        // Validate it looks like a Message envelope (not an agent inbox array)
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !parsed.id || !parsed.to || !parsed.from) {
+          continue; // Not a message envelope — skip
+        }
+        message = parsed as Message;
       } catch {
         continue; // Malformed or already consumed
       }
@@ -124,8 +135,18 @@ export class SendMessageBridge {
         fs.unlinkSync(filePath);
         this.seen.delete(filePath); // Allow re-delivery if broker re-queues
       } catch (err) {
-        (this.opts.onError ?? console.error)('[bridge] Delivery failed:', err);
+        this.safeError('[bridge] Delivery failed:', err);
       }
+    }
+  }
+
+  /** Call onError without letting it propagate — bridge errors must never crash the broker. */
+  private safeError(msg: string, err: unknown): void {
+    const combined = new Error(`${msg} ${err instanceof Error ? err.message : String(err)}`);
+    try {
+      (this.opts.onError ?? console.error)(combined);
+    } catch {
+      console.error(msg, err);
     }
   }
 
