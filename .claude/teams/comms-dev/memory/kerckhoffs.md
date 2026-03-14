@@ -1,39 +1,54 @@
 # Kerckhoffs Scratchpad
 <!-- (*CD:Kerckhoffs*) -->
 
-## State: COMPLETE
+## [CHECKPOINT] 2026-03-14 — End of session
 
-## [CHECKPOINT] 2026-03-14 — Session Complete
+**Test suite: 203 passing, 8 test files** (v1 complete)
 
-**Test suite: 180 passed | 0 failed | 6 todo (e2e stubs)**
+### Test files owned
+| File | Tests |
+|---|---|
+| `tests/transport/frame.test.ts` | 19 |
+| `tests/transport/envelope.test.ts` | 17 |
+| `tests/transport/server.test.ts` | 28 (HMAC, timestamp replay, UNREACHABLE) |
+| `tests/crypto/crypto.test.ts` | 60 |
+| `tests/discovery/discovery.test.ts` | 18 |
+| `tests/broker/broker.test.ts` | 38 |
+| `tests/integration/e2e.test.ts` | 6 (full pipeline) |
+| `tests/integration/sendmessage-glue.test.ts` | 14 (InboxWatcher) |
+| `tests/broker/sendmessage-bridge.test.ts` | 9 (7 RED — Babbage implementing #25) |
 
-### Files written
+### Security findings
+- **Issue #2** (HIGH): `stableStringify` fix — `from`/`to` were serialised as `{}`, sender spoofing bypass.
+- **#24** (BUG): InboxWatcher deleted file on handler throw → message loss. Fixed.
+- **#25** (BUG): SendMessageBridge `seen` set unbounded. RED tests written, Babbage implementing.
 
-| File | Tests | Coverage |
-|---|---|---|
-| `tests/transport/frame.test.ts` | 19 | encodeFrame, FrameDecoder (fragmentation, multi-frame, oversized, malformed JSON) |
-| `tests/transport/envelope.test.ts` | 17 | Message structure, checksum algorithm, AckBody |
-| `tests/transport/server.test.ts` | 28 | UDS connection, validation, HMAC mode, timestamp replay, oversized, disconnect |
-| `tests/crypto/crypto.test.ts` | 60 | deriveKey, encrypt/decrypt, nonce, AAD, tamper, malformed, checksum, loadPsk, known-answer vectors, CryptoProvider adapter |
-| `tests/discovery/discovery.test.ts` | 18 | register, heartbeat, deregister, read, cleanStale, concurrent locks, stale lock auto-break |
-| `tests/broker/broker.test.ts` | 38 | buildMessage, computeChecksum (plain+HMAC), MessageStore dedup, InboxDelivery |
-| `tests/helpers/` | — | frame.ts, net.ts, registry.ts, fixtures.ts |
+## [DECISION] v2 QA strategy (Cloudflare DO relay)
 
-### Security findings filed
+Three layers: Unit (Miniflare `@cloudflare/vitest-pool-workers`) → Integration (Miniflare in-process) → Acceptance (wrangler dev / staging).
 
-- **GitHub Issue #2** (HIGH): `JSON.stringify(rest, sortedKeys)` dropped nested object contents — `from`/`to` serialised as `{}`, allowing sender spoofing without checksum invalidation. Fixed by Babbage with `stableStringify`.
+**Playwright required** — Web Crypto browser-specific behavior (Safari ITP, `verify()` false-vs-throw) can't be tested in Node.
 
-### [LEARNED] Key patterns
+**Security bar:** CSP no `unsafe-inline`, DOMPurify on message bodies, private key `extractable:false` in IndexedDB, bearer tokens only, `from.team` bound to authenticated connection (not envelope).
 
-- `JSON.stringify(obj, arrayReplacer)` filters nested keys entirely — always use `stableStringify` for canonical hashing of nested objects
-- `UDSServer` v2 uses inline `drainBuffer` (async), no longer delegates to `FrameDecoder` — test `makeValidMessage` must use `buildMessage` (not hand-rolled checksum)
-- HMAC mode: server/builder both accept `integrityKey?: Buffer`; without it they fall back to plain SHA-256 (dev mode only)
-- Timestamp replay window: 300s; checked before checksum — malformed timestamps caught first
+## [DECISION] Protocol blockers for relay spec
 
-### [DEFERRED] 6 e2e integration tests (tests/integration/e2e.test.ts)
+1. Durability: in-memory queue OR DO Storage? Determines crash test design.
+2. AAD must include `conversation_id` — Vigenere sign-off needed.
+3. Silent TTL expiry breaks at-least-once — relay must notify sender.
 
-Need fully-wired broker daemon running with shared socket. Blocked on Babbage completing daemon integration. Stubs are in place.
+## [LEARNED] DO hibernation — highest risk
 
-### [GOTCHA] ESM + require()
+`getWebSockets(tag)` rebuild after hibernation = silent drop if wrong. First test to write. `setInterval` doesn't survive — use DO Alarm.
 
-Project uses `"type": "module"` — `require()` doesn't work in test files. Use `await import()` or top-level `import` statements.
+## [DEFERRED] Task #25 GREEN
+
+Verify `seenSize()`, `maxSeenSize`, eviction, `stop()` clear — all 9 tests pass.
+
+## [PATTERN] TDD flow (active from 2026-03-14)
+
+Kerckhoffs writes RED → `[COORDINATION]` to implementer → GREEN → Kerckhoffs verifies + edge cases.
+
+## [GOTCHA] ESM — no require()
+
+`"type":"module"` in package.json. Use top-level imports or `await import()`.
