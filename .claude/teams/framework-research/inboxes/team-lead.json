@@ -109,6 +109,183 @@
     "summary": "Third confirmation: watcher assessment already sent",
     "timestamp": "2026-03-14T08:42:56.776Z",
     "color": "blue",
-    "read": false
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:42:58.632Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T08:42:58.632Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:43:04.129Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T08:43:04.129Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:43:07.300Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T08:43:07.301Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 10:50] Analysis complete. Recommendation: **06-lifecycle.md**, not 02 or a new topic.\n\n**What containerization actually solves:**\n\nThe problem statement is: \"team-lead's conversational memory (`~/.claude/`) is lost between sessions.\" Our current scripts preserve scratchpads (repo-versioned) and inboxes (persist/restore scripts). But Claude's auto-memory system writes to `~/.claude/` — this includes conversation context, learned preferences, and model-level state that our scripts don't touch. A container with a persistent volume for `~/.claude/` would preserve ALL of this across sessions.\n\n**Why 06-lifecycle, not 02-isolation:**\n\n1. **The problem is temporal, not spatial.** Containerization here isn't about preventing teams from stepping on each other (02's concern). It's about preserving state across the start→run→stop→start cycle — that's lifecycle by definition.\n\n2. **02-resource-isolation asks \"how do teams avoid collisions?\"** Its open questions are about branch conflicts, DB migrations, API rate limits — all multi-team spatial concerns. A single-team container doesn't address any of these.\n\n3. **06-lifecycle already covers the state preservation gap.** The startup/shutdown protocol, inbox durability, scratchpad persistence — containerization is the next evolution of this same concern. It belongs in the same topic as a \"Level 3: full environment preservation\" approach, after Level 1 (scratchpads) and Level 2 (inbox scripts).\n\n**Where it fits in 06-lifecycle:**\n\nAdd a new section: \"State Preservation Tiers\"\n- **Tier 1: Scratchpads** — agent-written, repo-versioned, survives everything. Limited to what agents explicitly save.\n- **Tier 2: Inbox scripts** — restore/persist pair, repo-versioned. Captures message history.\n- **Tier 3: Container persistence** — Docker volume for `~/.claude/`. Captures Claude's auto-memory, conversation state, learned preferences. Full environment fidelity.\n\n**Failure modes of Tier 3:**\n- Volume corruption → total state loss (vs Tier 1-2 where repo is always the fallback)\n- Container image drift → \"works on my container\" divergence\n- Resource cost → running N containers for N teams, volumes accumulate\n- Opacity — Claude's auto-memory format is undocumented, we can't inspect/prune/merge it the way we can with scratchpads\n\n**Does NOT warrant a new topic.** Containerization is an implementation mechanism for lifecycle state preservation. If we later need containers for multi-team isolation (separate networks, resource limits, credential scoping), THAT would be a 02-isolation concern — but that's a different use case from the one PO described.",
+    "summary": "Containerized team design belongs in 06-lifecycle",
+    "timestamp": "2026-03-14T08:50:29.116Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:50:32.123Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T08:50:32.123Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 10:50] Celes reporting — intake assessment for the Docker containerization task.\n\n## The Problem\n\nPreserve team-lead's root memory (`~/.claude/` auto-memory) across sessions by running the framework-research team inside a Docker container. This is an infrastructure/DevOps task, not a pure research question.\n\n## Roster Gap Analysis\n\nI reviewed all six current members against this task:\n\n| Member | Could they do it? | Why / why not |\n|---|---|---|\n| **Finn** | No — research coordinator, not infra | Would research Docker patterns but can't design the container |\n| **Medici** | No — knowledge health auditor | Wrong domain entirely |\n| **Celes** (me) | No — I design roles, not containers | |\n| **Volta** | Partial overlap — lifecycle engineer | Understands startup/shutdown sequences, state handover, and cross-session persistence. But his scope is *design docs*, not Dockerfiles or container architecture. He could articulate *what state needs to survive* but not *how to containerize it*. |\n| **Herald** | No — protocol designer | Communication protocols, not infrastructure |\n\n## Assessment: New Specialist Needed\n\n**Volta has the closest adjacency** — lifecycle and state persistence are his domain. But the containerization task requires competencies none of our members have:\n\n1. **Dockerfile/Compose authoring** — layer optimization, volume mounts, bind mounts for `~/.claude/`\n2. **Container lifecycle** — how to start/stop containers without losing state, named volumes vs bind mounts\n3. **Claude Code in Docker** — specific constraints of running Claude CLI tools inside a container (auth, MCP servers, git access, SSH keys)\n4. **Development workflow integration** — the container must feel seamless to the PO, not add friction\n\n## Recommendation: Hire a Containerization Specialist\n\nI propose a new team member. Here's my initial role sculpt:\n\n- **Name concept:** **Brunel** — Isambard Kingdom Brunel (1806–1859), the Victorian engineer who built tunnels, bridges, and ships. He containerized people and cargo for transport across environments. Perfect metaphor for containerizing agent teams.\n- **Scope:** Design and document the Docker container setup for preserving team-lead memory. Write Dockerfile, docker-compose.yml, and usage documentation. May write shell scripts for container management.\n- **Permissions:** Read all team files. Write: own scratchpad, a new `topics/09-containerization.md` or similar, and Docker config files at repo root.\n- **Model tier:** **Sonnet** — this is execution-heavy (writing configs, testing patterns) rather than judgment-heavy. Sonnet is sufficient and cost-efficient.\n- **Collaboration:** Should consult Volta on lifecycle requirements (what state must survive) before designing the container.\n\n## Next Steps\n\nIf you approve the direction, I'll:\n1. Complete the full prompt draft for Brunel\n2. Prepare the roster.json entry\n3. Send both back for your review\n\nAwaiting your go/no-go.\n\n(*FR:Celes*)",
+    "summary": "Docker containerization intake assessment and new hire recommendation",
+    "timestamp": "2026-03-14T08:51:22.561Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T08:51:26.711Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T08:51:26.711Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 11:01] Brunel prompt and roster entry ready.\n\n## Prompt\n\nWritten to `prompts/brunel.md`. Key design decisions:\n\n- **Lore:** Isambard Kingdom Brunel — Victorian engineer of tunnels, ships, railways. \"Containment and transport\" is the metaphor.\n- **Personality:** Builder-pragmatist, state-obsessed, integration-first. Writes working configs, not essays.\n- **Scope:** Container architecture, Dockerfiles, docker-compose, shell scripts, usage docs.\n- **Write perms:** Own scratchpad, `topics/06-lifecycle.md` (container sections only, Volta coordination), Docker config files at repo root (`Dockerfile`, `docker-compose.yml`, `.dockerignore`), container management scripts.\n- **Read perms:** All team files, reference teams, topic files.\n- **Restrictions:** No git, no other topic files, no prompts/roster edits, no non-container sections of 06-lifecycle.md.\n- **Workflow:** Consults Volta on lifecycle requirements before designing. Reports back after every task.\n\n## Roster Entry\n\nAdd this to the `members` array in `roster.json`:\n\n```json\n{\n  \"name\": \"brunel\",\n  \"agentType\": \"general-purpose\",\n  \"model\": \"claude-sonnet-4-6\",\n  \"color\": \"yellow\",\n  \"prompt\": \"prompts/brunel.md\",\n  \"lore\": {\n    \"fullName\": \"Isambard Kingdom Brunel\",\n    \"origin\": \"Victorian engineer (1806–1859) — builder of the Thames Tunnel, Great Western Railway, and SS Great Britain; pioneered containment and transport across hostile environments\",\n    \"significance\": \"A containerization engineer who designs the shell that preserves agent team state across sessions, hosts, and restarts\"\n  }\n}\n```\n\n## common-prompt.md Update\n\nThe members list in common-prompt.md line 7 should be updated to include:\n\n```\nbrunel (containerization engineer)\n```\n\nBoth deliverables ready for your review and merge.\n\n(*FR:Celes*)",
+    "summary": "Brunel prompt and roster entry delivered",
+    "timestamp": "2026-03-14T09:02:17.178Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:02:21.553Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:02:21.553Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 11:04] Celes — coordination model assessment for Volta + Brunel.\n\n## 1. The Conflict Risk\n\nBoth agents have write access to `06-lifecycle.md`. Since they can't lock files or see each other's edits in real-time, simultaneous writes will cause one to silently overwrite the other. This isn't hypothetical — it's the default failure mode for two agents writing the same file.\n\n## 2. Recommended Coordination Model: Section Ownership\n\n**Don't share the file — partition it.**\n\n| Section | Owner | Other agent's role |\n|---|---|---|\n| Startup/shutdown sequences | Volta | Brunel reads, proposes changes via SendMessage |\n| Duplicate prevention | Volta | Brunel reads |\n| Cross-session handover | Volta | Brunel reads, contributes container persistence findings via SendMessage |\n| Spawning paths | Volta | Brunel reads |\n| **Container architecture** | **Brunel** | Volta reads, proposes changes via SendMessage |\n| **Volume/mount strategy** | **Brunel** | Volta reads |\n| **Container lifecycle (start/stop/resume)** | **Brunel** | Volta reads, reviews for lifecycle consistency |\n\n**Rule:** Each agent owns their sections. The other agent sends proposed edits via SendMessage to the owner, who integrates them. Never both writing at the same time.\n\n## 3. Scope Boundary Adjustment\n\nThe current boundary is correct but under-specified. I recommend making it explicit in both prompts:\n\n**Add to Volta's prompt:**\n> Container-related lifecycle (Docker start/stop, volume persistence) is Brunel's domain. If your lifecycle design has container implications, send requirements to Brunel via SendMessage rather than writing container sections yourself.\n\n**Add to Brunel's prompt** (already partially there, but sharpen):\n> Non-container lifecycle (startup sequences, duplicate prevention, spawning paths) is Volta's domain. If your container design affects the startup/shutdown protocol, send proposed changes to Volta via SendMessage rather than editing his sections.\n\n## 4. Process Recommendation: Handshake Protocol\n\nFor tasks that cross the boundary (and they will), use a simple handshake:\n\n1. **Requester** sends a structured message: `[COORDINATION] Topic: X. My finding: Y. Proposed change to your section: Z. Please review.`\n2. **Owner** reviews, integrates (or pushes back), and confirms: `[COORDINATION] Integrated / Modified / Rejected with reason.`\n3. Neither agent edits the other's section directly.\n\nThis adds one message round-trip per cross-boundary change — minimal overhead, zero conflict risk.\n\n## 5. What I'd Change in the Prompts\n\nIf you approve, I can update both `prompts/volta.md` and `prompts/brunel.md` with:\n- Explicit section ownership table\n- The `[COORDINATION]` handshake protocol\n- A \"do not write to the other agent's sections\" rule\n\nThis is a prompt-level behavioral constraint — consistent with the framework's overall approach (behavioral, not infrastructure enforcement).\n\n(*FR:Celes*)",
+    "summary": "Volta-Brunel coordination model: section ownership + handshake",
+    "timestamp": "2026-03-14T09:04:52.634Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:04:57.280Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:04:57.280Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:05:52.185Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Container state paths, $HOME handling, lifecycle gotchas\"}",
+    "timestamp": "2026-03-14T09:05:52.185Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 11:08] Both prompts updated. Here's what changed:\n\n**`prompts/volta.md`** — added after Scope Restrictions:\n- Write permission narrowed: \"your sections only\" (was: general write access)\n- New \"YOU MAY NOT\" rule: cannot edit container-related sections\n- New \"Coordination with Brunel\" section with section ownership table + handshake protocol\n\n**`prompts/brunel.md`** — added after Scope Restrictions:\n- Write permission clarified: \"your sections only\"\n- New \"Coordination with Volta\" section with identical ownership table + handshake protocol (mirrored perspective)\n\nBoth prompts now contain the same ownership table and `[COORDINATION]` handshake protocol, written from each agent's perspective. The rule is symmetric: neither edits the other's sections, both use SendMessage for cross-boundary proposals.\n\nBrunel prompt + roster entry + coordination model — all three deliverables complete.\n\n(*FR:Celes*)",
+    "summary": "Both prompts updated with coordination rules",
+    "timestamp": "2026-03-14T09:08:28.761Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:08:32.660Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:08:32.660Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:11] Brunel reporting — container setup implemented and tested.\n\n**Deliverables:**\n- `Dockerfile` — Ubuntu 24.04 + git + jq + openssh-client + gosu; handles GID/UID 1000 collision with Ubuntu base image\n- `docker-compose.yml` — named volume for `~/.claude/`, bind mounts for repo + Claude binary + SSH + gitconfig\n- `entrypoint.sh` — runs as root, fixes volume ownership on first run, drops to user via gosu (preserves env vars)\n- `session-start.sh` / `session-stop.sh` — one command each\n- `memory/brunel.md` — scratchpad with decisions, gotchas, patterns\n- `topics/06-lifecycle.md` — new \"Container Lifecycle\" section added\n\n**Tested and verified:**\n- Build succeeds\n- Container runs as correct user (uid=1000/michelek)\n- `claude --version` works inside container\n- Git identity and repo access work\n- `~/.claude/` volume persists across `docker stop`/`start` (test file survived two container cycles)\n- Lifecycle scripts work (restore-inboxes.sh correctly errors when TeamCreate hasn't run — expected)\n- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set\n\n**Design choice that matters:** `$HOME` inside container = `/home/michelek` (same as host). This means all existing lifecycle scripts work unchanged — no path modifications needed.\n\n**Key gotcha discovered:** Docker names volumes owned by root on creation. entrypoint.sh fixes this transparently via `chown` + `gosu`.\n\n**Deferred (not blocking):**\n- SSH agent forwarding for `git push` over SSH (HTTPS credentials cover common case)\n- MCP server connectivity (none currently configured)\n\n[LEARNED] Named Docker volumes solve the auto-memory loss problem cleanly. The only friction was the first-run ownership issue, which is a standard Docker pattern solved by gosu entrypoint.",
+    "summary": "Container setup complete — volume persistence tested and working",
+    "timestamp": "2026-03-14T09:11:34.953Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:11:53.184Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] Brunel consulting Volta on container state paths\"}",
+    "timestamp": "2026-03-14T09:11:53.184Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:12:09.848Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:12:09.848Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:12:12.048Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] All Volta's gotchas addressed in implementation\"}",
+    "timestamp": "2026-03-14T09:12:12.048Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:15] Parandus tehtud.\n\n**Lahendus:** `session-start.sh` ekspordib `REPO_PATH=\"$SCRIPT_DIR\"` (mis on `git rev-parse`-ekvivalent — skript on alati repo juures). `docker-compose.yml` kasutab `${REPO_PATH}` nii `source`, `target` kui `working_dir` jaoks.\n\n**Testitud:** `docker compose config` näitab õiget tee — `/home/michelek/Documents/github/mitselek/ai-teams`. Teisel masinal resolviks see automaatselt selle masina teele.\n\n**Miks mitte `.env` fail:** `.env` on staatiline — peaks käsitsi muutma iga masina jaoks. Env var `session-start.sh`-ist on dünaamiline ja portatiivne.\n\n**Täiendavalt:** `session-stop.sh` saab nüüd ka samad ekspordid, et töötaks standalone kutsudes.",
+    "summary": "REPO_PATH fix done — portable across machines",
+    "timestamp": "2026-03-14T09:15:30.542Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:15:32.945Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:15:32.945Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 11:15] Celes — scope assessment: Brunel vs separate DevOps expert.\n\n## What Brunel Already Covers\n\nLooking at Brunel's current responsibilities:\n\n| DevOps concern | Covered by Brunel? |\n|---|---|\n| Dockerfile authoring | Yes — core responsibility #1 |\n| Volume strategy (bind mounts, named volumes) | Yes — core responsibility #2 |\n| Auth passthrough (tokens, SSH, API keys) | Yes — core responsibility #3 |\n| MCP server connectivity | Yes — core responsibility #4 |\n| Container start/stop lifecycle | Yes — core responsibility #5 |\n| Docker Compose config | Yes — in write permissions |\n| Developer experience / one-command workflow | Yes — core responsibility #6 |\n| Hardcoded path vs dynamic path decisions | Yes — falls under volume strategy + compose config |\n\n## What Brunel Does NOT Cover\n\n| DevOps concern | Gap? |\n|---|---|\n| **CI/CD pipelines** | Not in scope — but is this team's concern? We're a research team, not a deployment team |\n| **Container networking** (multi-container, service mesh) | Not explicit, but within reasonable scope if the compose setup needs it |\n| **Container orchestration** (Kubernetes, Swarm) | Not in scope — and shouldn't be. Single-host Docker is the use case |\n| **Image registry / distribution** | Not in scope — premature until we have a working image |\n| **Production hardening** (security scanning, resource limits) | Not in scope — research team, not production |\n\n## My Assessment: Widen Brunel's Scope Slightly, Don't Hire\n\n**Reason 1: The domain is coherent.** Docker Compose path decisions, volume strategy, networking between containers — these are all part of \"containerizing Claude Code.\" Splitting them across two agents would create coordination overhead for tightly coupled decisions.\n\n**Reason 2: The scope is bounded.** We're containerizing one thing (Claude Code team sessions) for one user (the PO) on one host. This isn't a multi-service production deployment. Brunel doesn't need a DevOps partner — he needs permission to make the infrastructure decisions that naturally arise from his core task.\n\n**Reason 3: A second infra agent would bottleneck.** Two agents making Docker decisions = constant handshake overhead. One agent who owns the full container stack = faster, cleaner decisions.\n\n## Recommended Scope Widening\n\nAdd to Brunel's Core Responsibilities:\n\n```\n7. **Compose architecture decisions** — path resolution (hardcoded vs dynamic),\n   environment variable strategy, multi-service composition if needed\n8. **Container networking** — if the setup requires multiple containers\n   (e.g., MCP servers as sidecars), design the network topology\n```\n\nThis keeps Brunel as the single owner of all container/infra decisions for this project. If we later need CI/CD or multi-host orchestration (which I doubt for a research team), that's when a separate DevOps role would be justified.\n\n## What I Would NOT Do\n\n- Hire a separate DevOps expert — overhead > value for this scope\n- Rename Brunel to \"DevOps Engineer\" — his identity is containerization, not general DevOps. The scope widening is natural extension, not role change.\n\nShall I update Brunel's prompt with the expanded responsibilities?\n\n(*FR:Celes*)",
+    "summary": "Widen Brunel scope, don't hire separate DevOps",
+    "timestamp": "2026-03-14T09:16:07.209Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:16:11.746Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:16:11.746Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 11:16] Done. Added responsibilities #7 (Compose architecture decisions) and #8 (Container networking) to `prompts/brunel.md`.\n\n(*FR:Celes*)",
+    "summary": "Brunel prompt updated with expanded scope",
+    "timestamp": "2026-03-14T09:16:53.094Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:16:57.510Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:16:57.510Z",
+    "color": "green",
+    "read": true
   }
 ]

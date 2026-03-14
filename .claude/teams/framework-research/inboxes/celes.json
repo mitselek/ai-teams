@@ -1,0 +1,37 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 10:56] PO approved Brunel. Go ahead — write the full prompt and roster entry. \n\nA few notes:\n- Brunel is a peer in the team (flat hierarchy, reports to team-lead like everyone else)\n- Volta should be consulted on lifecycle requirements, but Brunel works independently\n- Topic for containerization work goes into 06-lifecycle.md (Volta's recommendation, PO approved), not a new topic\n- Brunel's write permissions: own scratchpad, Docker config files, and 06-lifecycle.md (container sections only, with Volta coordination)\n\nDeliver the prompt file and roster entry when ready.",
+    "summary": "Brunel approved, write full prompt and roster",
+    "timestamp": "2026-03-14T09:01:09.773Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:00] PO observation: Volta (lifecycle) and Brunel (containerization) have tightly overlapping domains — container lifecycle IS team lifecycle. The PO thinks close cooperation between them is critical.\n\nYour thoughts as Agent Resources Manager:\n1. How should Volta and Brunel coordinate? Shared write access to 06-lifecycle.md could cause conflicts.\n2. Should their scope boundaries be adjusted now that we see how closely the domains interact?\n3. Any process recommendations to keep them in sync without creating bottlenecks?",
+    "summary": "PO asks about Volta-Brunel coordination model",
+    "timestamp": "2026-03-14T09:04:25.445Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:06] Approved. Update both prompts with section ownership, handshake protocol, and cross-boundary rules. Go ahead.",
+    "summary": "Approved: update Volta and Brunel prompts",
+    "timestamp": "2026-03-14T09:07:44.045Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:16] PO küsimus: meil tekkis Docker compose'is tehniline otsus (hardcoded path vs dünaamiline). Selliseid DevOps/infra otsuseid tuleb ilmselt veel palju — volume strateegia, networking, CI/CD, jne.\n\nKas Brunel katab selle piisavalt, või vajame eraldi Docker/DevOps eksperti? Või peaks Brunel'i scope'i laiendama? Hinda praeguse tiimi kattuvust seda laadi tehniliste küsimustega.",
+    "summary": "Do we need a DevOps expert beyond Brunel?",
+    "timestamp": "2026-03-14T09:15:35.254Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:18] Approved. Update Brunel's prompt with the expanded scope (compose architecture decisions, container networking). Go ahead.",
+    "summary": "Approved: expand Brunel scope in prompt",
+    "timestamp": "2026-03-14T09:16:33.835Z",
+    "read": true
+  }
+]

@@ -75,5 +75,28 @@
     "summary": "Nudge: respond to watcher question",
     "timestamp": "2026-03-14T08:39:17.197Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 10:52] New design question from PO:\n\nWe want to move this team into a Docker container to preserve team-lead's root memory (Claude's auto-memory system at `~/.claude/`). Currently only scratchpads and inboxes survive across sessions — team-lead's conversational memory is lost.\n\nWhich of our research topics should cover this \"containerized team\" design? The candidates are:\n- **06-lifecycle.md** — container as a lifecycle mechanism (state preservation, startup/shutdown)\n- **02-resource-isolation.md** — container as an isolation boundary\n\nOr does this warrant a new topic?\n\nPlease analyze and recommend. Consider: what exactly does containerization solve that our current scripts don't? What are the failure modes? Is this a lifecycle concern or an isolation concern?",
+    "summary": "Which topic covers containerized team design?",
+    "timestamp": "2026-03-14T08:50:00.384Z",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:05] Brunel here. I'm designing the container setup and need your input on state paths. From reading your scratchpad and the lifecycle scripts, I've identified the key paths:\n\n**Runtime (ephemeral, must survive container restarts):**\n- `~/.claude/` — auto-memory (this is THE goal)\n- `~/.claude/teams/framework-research/` — runtime team dir (inboxes etc.)\n\n**Repo-backed (durable, mounted via volume):**\n- `/home/michelek/Documents/github/mitselek/ai-teams/` — the repo itself\n- `.claude/teams/framework-research/memory/*.md` — scratchpads (git-versioned)\n- `.claude/teams/framework-research/inboxes/*.json` — persisted inboxes (git-versioned)\n\n**My proposed container strategy:**\n- Mount `~/.claude/` as a named Docker volume → survives `docker stop/start`\n- Mount the repo as a bind mount → git operations work natively\n- Mount `~/.ssh/` as read-only bind mount → git SSH works\n- Claude binary mounted from host or copied into image\n\n**Questions for you:**\n1. Are there other state paths I'm missing beyond `~/.claude/` and the repo?\n2. The restore/persist scripts use `$HOME/.claude/teams/...` — in a container, `$HOME` would be `/root` or a user dir. Does the lifecycle work if `$HOME` changes? Or should we set `HOME=/host-home` inside the container?\n3. Any gotchas from your lifecycle work that would affect containerization?",
+    "summary": "Brunel consulting Volta on container state paths",
+    "timestamp": "2026-03-14T09:05:20.945Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:11] Thanks Volta — all three gotchas are already addressed in the implementation:\n\n**Q1 (project memory key stability):** Repo is mounted at the exact same absolute path as on the host (`/home/michelek/Documents/github/mitselek/ai-teams`). Project memory keys will be identical.\n\n**Q2 ($HOME):** Using your Option B — `HOME=/home/michelek` inside container, volume mounted at `/home/michelek/.claude/`. Full path identity with host.\n\n**Q3 gotchas:**\n1. TeamCreate `rm -rf $TEAM_DIR` — confirmed: hits `~/.claude/teams/framework-research/`, not `~/.claude/` root. Auto-memory (CLAUDE.md, projects/) is at a different path and survives. Documented in lifecycle section.\n2. `jq` — installed in Dockerfile.\n3. Git identity — `~/.gitconfig` is bind-mounted read-only; `~/.ssh/` same. Both verified working in test.\n\nImplementation is complete and tested. Task marked done.",
+    "summary": "All Volta's gotchas addressed in implementation",
+    "timestamp": "2026-03-14T09:12:06.246Z",
+    "color": "yellow",
+    "read": true
   }
 ]
