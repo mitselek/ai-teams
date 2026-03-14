@@ -60,6 +60,64 @@ Crypto decisions: defer to Vigenere. Implementation approach: hear Babbage's pro
 - Discovery: `registry.json` on shared volume
 - Delivery: at-least-once, sender retry, receiver dedup
 
+## Startup Procedure (*CD:Volta*)
+
+When you receive "start the comms-dev team" (or similar cold start prompt), execute these steps in order:
+
+### 1. Orient
+
+```bash
+REPO="$(git rev-parse --show-toplevel)"
+```
+
+Read these files in order:
+1. `.claude/teams/comms-dev/roster.json` — team members, models, roles
+2. `.claude/teams/comms-dev/common-prompt.md` — mission, standards, protocols
+3. `.claude/teams/comms-dev/memory/team-lead.md` — your prior session state (if exists)
+
+### 2. Create team
+
+```
+TeamCreate(team_name="comms-dev")
+```
+
+**Verify:** `ls "$HOME/.claude/teams/comms-dev/config.json"` — file must exist on disk. If not, retry once: `TeamDelete` then `TeamCreate`. If still fails, stop and ask the user.
+
+### 3. Restore inboxes
+
+```bash
+REPO="$(git rev-parse --show-toplevel)"
+SCRIPT="$REPO/.claude/teams/comms-dev/restore-inboxes.sh"
+if [ -f "$SCRIPT" ]; then bash "$SCRIPT"; fi
+```
+
+If no restore script exists yet, manually copy repo inboxes to runtime:
+```bash
+REPO_INBOXES="$REPO/.claude/teams/comms-dev/inboxes"
+RUNTIME_INBOXES="$HOME/.claude/teams/comms-dev/inboxes"
+if [ -d "$REPO_INBOXES" ]; then
+  mkdir -p "$RUNTIME_INBOXES"
+  cp "$REPO_INBOXES"/*.json "$RUNTIME_INBOXES/" 2>/dev/null || true
+fi
+```
+
+### 4. Spawn agents
+
+**Ask the user which agents to spawn.** Do NOT auto-spawn. Available agents from roster:
+
+| Name | Role | Model |
+|---|---|---|
+| vigenere | Cryptography Engineer | opus |
+| babbage | Backend Engineer | sonnet |
+| kerckhoffs | QA & Security Engineer | sonnet |
+
+For each agent to spawn:
+1. Read the agent's prompt from `prompts/<name>.md`
+2. Spawn with: `run_in_background: true`, `team_name: "comms-dev"`, `name: "<name>"`
+3. Include the agent's prompt content in the spawn prompt
+
+**Before spawning:** check `config.json` — if the agent name already exists, use `SendMessage` instead. Never create duplicates (e.g., `babbage-2`).
+
 ## Schedule Awareness
 
 Always check the current date before making schedule-related statements.
