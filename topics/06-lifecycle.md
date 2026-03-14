@@ -2,7 +2,7 @@
 
 Spawning, scaling, shutdown, and handover of teams.
 
-## Canonical Startup Protocol (*FR:Volta*)
+## Canonical Startup Protocol (_FR:Volta_)
 
 ### Decision
 
@@ -12,7 +12,7 @@ Startup is a 7-phase sequence: **Orient → Sync → Clean → Create → Restor
 
 Both reference teams (rc-team and hr-devs) converged on the same pattern independently, but with implementation scattered across prompts, scripts, and MEMORY.md entries. The core insight: `TeamCreate` is destructive — it requires a clean directory but must preserve inboxes. This forces a backup-delete-create-restore dance that is the single most fragile part of the lifecycle. Making it explicit and atomic prevents the most common startup failures.
 
-### Phase Ordering is Mandatory (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+### Phase Ordering is Mandatory (_FR:Volta_ — amendment from restart test 3, 2026-03-13)
 
 Field test (2026-03-13, restart 3) showed the team-lead executed phases out of order AND mislabeled them (called Phase 3 Create "Phase 1: Sync"). The actual execution order was: Explore (not in protocol) → Phase 2.0 Diagnose + git pull (mixed) → Phase 3 Create (mislabeled) → read config files (should have been Phase 0) → Phase 5 Audit. Cost: 73.5k tokens and 2m18s wasted on an Explore agent that Phase 0 would have replaced.
 
@@ -20,7 +20,7 @@ Field test (2026-03-13, restart 3) showed the team-lead executed phases out of o
 
 **Why this happens:** The team-lead is under pressure to "get going" and jumps to what feels most urgent (diagnosis, creation) instead of following the sequence. The sequence exists because each phase's output is a precondition for the next. Reordering doesn't just waste tokens — it produces wrong conclusions (e.g., diagnosing before reading the roster means you don't know what state to expect).
 
-### Phase 0: Orient (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+### Phase 0: Orient (_FR:Volta_ — amendment from restart test 3, 2026-03-13)
 
 **Precondition:** Team lead has started (either via `rc-start.sh` or manually). May be a fresh session with zero context about the team.
 
@@ -28,19 +28,20 @@ Field test (2026-03-13, restart 3) showed the team-lead executed phases out of o
 
 **Action:** Read exactly these files, in this order:
 
-| # | File | What it tells you | Where to find it |
-|---|---|---|---|
-| 0a | `startup.md` | Installation-specific paths, procedures, known gotchas | Team config dir (location must be in team-lead's prompt or MEMORY.md) |
-| 0b | `roster.json` | Team name, members, models, `workDir` | Same directory as startup.md |
-| 0c | `common-prompt.md` | Mission, communication rules, shutdown protocol, startup instructions | Same directory |
-| 0d | Team-lead's own scratchpad | Prior session's decisions, WIP, warnings | `memory/team-lead.md` (relative to team config dir) |
-| 0e | `docs/health-report.md` | Latest Medici audit findings (if exists) | `docs/` within team config dir |
+| #   | File                       | What it tells you                                                     | Where to find it                                                      |
+| --- | -------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 0a  | `startup.md`               | Installation-specific paths, procedures, known gotchas                | Team config dir (location must be in team-lead's prompt or MEMORY.md) |
+| 0b  | `roster.json`              | Team name, members, models, `workDir`                                 | Same directory as startup.md                                          |
+| 0c  | `common-prompt.md`         | Mission, communication rules, shutdown protocol, startup instructions | Same directory                                                        |
+| 0d  | Team-lead's own scratchpad | Prior session's decisions, WIP, warnings                              | `memory/team-lead.md` (relative to team config dir)                   |
+| 0e  | `docs/health-report.md`    | Latest Medici audit findings (if exists)                              | `docs/` within team config dir                                        |
 
 **`startup.md` is the bootstrap file.** It contains installation-specific paths (repo location, workDir, env files), the condensed startup procedure, and known environment gotchas. It is the FIRST file a team-lead reads — before roster, before common-prompt, before anything. Each team must maintain a `startup.md` with at minimum: exact paths for this installation, the read-order checklist, the diagnostic procedure, and known environment issues.
 
-**Why `startup.md` and not just Phase 0 in the lifecycle doc?** The lifecycle doc (`topics/06-lifecycle.md`) is a framework-level design document — it describes the *protocol*. `startup.md` is an *instance* — it contains the concrete paths, gotchas, and procedures for one specific team on one specific machine. A team-lead should never need to read the 700-line lifecycle doc to start a session. `startup.md` is the executable checklist derived from the protocol.
+**Why `startup.md` and not just Phase 0 in the lifecycle doc?** The lifecycle doc (`topics/06-lifecycle.md`) is a framework-level design document — it describes the _protocol_. `startup.md` is an _instance_ — it contains the concrete paths, gotchas, and procedures for one specific team on one specific machine. A team-lead should never need to read the 700-line lifecycle doc to start a session. `startup.md` is the executable checklist derived from the protocol.
 
 **Critical: The team config dir location must be resolvable without exploration.** It must appear in exactly one of:
+
 1. The team-lead's prompt (preferred — always available)
 2. MEMORY.md (if teams are managed across projects)
 3. A well-known path convention (e.g., `$HOME/.claude/team-configs/<team-name>/`)
@@ -50,7 +51,7 @@ If the team-lead's prompt does not contain the repo location, this is a **prompt
 **Expected outcome:** Team lead knows: team name, all members and their roles, the working directory, the mission, and any prior session state. All from 5 file reads, zero exploration.
 **Failure if skipped:** Team lead burns tokens on broad exploration (Explore agent, glob/grep sweeps). In the field test, this cost ~2 minutes and consumed significant context window.
 
-#### workDir Resolution (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+#### workDir Resolution (_FR:Volta_ — amendment from restart test 3, 2026-03-13)
 
 The `workDir` field in `roster.json` may be stale or use environment variables that resolve differently across machines. The field test found `$HOME/github/mitselek-ai-teams` in roster.json but the actual path was `$HOME/Documents/github/mitselek-ai-teams/`.
 
@@ -97,7 +98,7 @@ cd <team-config-repo> && git pull
 2c.  Remove stale team directory
 ```
 
-#### Phase 2.0a: Validate `$HOME` (*FR:Volta* — amendment from restart 4, 2026-03-13)
+#### Phase 2.0a: Validate `$HOME` (_FR:Volta_ — amendment from restart 4, 2026-03-13)
 
 **Problem this solves:** Restart 4 field test revealed that `$HOME` resolves to an EMPTY STRING in some bash invocations on Windows/Git Bash. The diagnose script then checks `/.claude/teams/framework-research` (root path) instead of the correct user path. Other bash calls in the same session resolved `$HOME` correctly. Shell initialization is inconsistent across bash invocations on this platform.
 
@@ -126,7 +127,7 @@ echo "Using TEAM_DIR=$TEAM_DIR"
 
 **Impact on all subsequent phases:** Every bash script in Phases 2-4 that references `$HOME` must use `$RESOLVED_HOME` instead, or must run this validation first. The reference implementations below are updated accordingly.
 
-#### Phase 2.0b: Diagnose (*FR:Volta* — amended in restart 4, 2026-03-13)
+#### Phase 2.0b: Diagnose (_FR:Volta_ — amended in restart 4, 2026-03-13)
 
 Before touching the filesystem, classify the starting scenario. This costs one `ls` and eliminates the diagnostic uncertainty of "why is the state this way?"
 
@@ -145,16 +146,16 @@ else
 fi
 ```
 
-| Scenario | Meaning | What 2a–2c do |
-|---|---|---|
-| WARM RESTART | Normal session resumption | 2a backs up inboxes, 2c removes dir |
-| PARTIAL STATE | Inboxes lost — TeamDelete was called or previous session crashed before inbox creation | 2a is a no-op (no inboxes), 2c removes dir. **Investigate** (see below). |
-| COLD START | No prior team state exists on this machine | 2a, 2b, 2c are all no-ops — proceed through them anyway. **Investigate if not first-ever session** (see below). |
-| MISCREATION | TeamCreate ran against an existing dir, generated a suffixed name | 2c removes the wrong-name dir |
+| Scenario      | Meaning                                                                                | What 2a–2c do                                                                                                   |
+| ------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| WARM RESTART  | Normal session resumption                                                              | 2a backs up inboxes, 2c removes dir                                                                             |
+| PARTIAL STATE | Inboxes lost — TeamDelete was called or previous session crashed before inbox creation | 2a is a no-op (no inboxes), 2c removes dir. **Investigate** (see below).                                        |
+| COLD START    | No prior team state exists on this machine                                             | 2a, 2b, 2c are all no-ops — proceed through them anyway. **Investigate if not first-ever session** (see below). |
+| MISCREATION   | TeamCreate ran against an existing dir, generated a suffixed name                      | 2c removes the wrong-name dir                                                                                   |
 
 All four scenarios converge to the same outcome: `$TEAM_DIR` does not exist, inboxes (if any) are backed up. The diagnosis is informational — it tells the team lead what happened, not what to do differently. **Always run 2a–2c regardless of scenario** — they are idempotent and safe on empty state.
 
-#### Anomaly Detection in Phase 2.0 (*FR:Volta* — amendment from restart test 3, 2026-03-13)
+#### Anomaly Detection in Phase 2.0 (_FR:Volta_ — amendment from restart test 3, 2026-03-13)
 
 The shutdown protocol (Phase 5: Preserve) explicitly states: **do NOT call TeamDelete.** This means the team directory SHOULD exist at the start of every non-first session. If it doesn't, something went wrong.
 
@@ -175,6 +176,7 @@ Is this the first-ever session for this team on this machine?
 ```
 
 **How the team-lead determines "first-ever":**
+
 1. Check git log for prior commits that include team memory files (e.g., `git log --oneline -- .claude/teams/<team-name>/memory/`)
 2. If commits exist → this is NOT first-ever → anomaly
 3. If no commits → genuinely first session → expected COLD START
@@ -200,7 +202,7 @@ rm -rf "$TEAM_DIR"
 
 **Expected outcome:** `$TEAM_DIR` does not exist. Team lead knows which scenario was encountered.
 
-**Amendment (*FR:Volta* — 2026-03-13, inbox durability):** Sub-step 2a previously copied runtime inboxes to `/tmp/` for restoration in Startup Phase 4. This created a fragile two-hop chain: runtime dir → `/tmp/` → new runtime dir. Both hops are ephemeral. Shutdown Phase 4a now persists inboxes directly to the repo (durable). Sub-step 2a is no longer needed — the repo copy is the source of truth. The `/tmp/` backup is removed entirely to avoid a confusing fallback chain.
+**Amendment (_FR:Volta_ — 2026-03-13, inbox durability):** Sub-step 2a previously copied runtime inboxes to `/tmp/` for restoration in Startup Phase 4. This created a fragile two-hop chain: runtime dir → `/tmp/` → new runtime dir. Both hops are ephemeral. Shutdown Phase 4a now persists inboxes directly to the repo (durable). Sub-step 2a is no longer needed — the repo copy is the source of truth. The `/tmp/` backup is removed entirely to avoid a confusing fallback chain.
 **Failure if skipped:**
 
 - Skip 2.0 → team lead wastes a round-trip investigating why the dir is/isn't there
@@ -218,7 +220,7 @@ rm -rf "$TEAM_DIR"
 
 **Critical invariant:** The `leadSessionId` in `config.json` must match the current session. A stale `leadSessionId` from a previous session breaks agent-to-lead messaging. This is why TeamCreate must run fresh each session — it generates a new `leadSessionId`.
 
-#### Phase 3 Verification and Retry (*FR:Volta* — amendment from restart 4, 2026-03-13)
+#### Phase 3 Verification and Retry (_FR:Volta_ — amendment from restart 4, 2026-03-13)
 
 **Problem this solves:** Restart 4 revealed that TeamCreate can return success (`team_file_path` + `leadAgentId`) but `config.json` does NOT exist on disk. The team appears created but is non-functional — agent spawning silently fails. The previous protocol said "verify config.json exists" but had no recovery path when verification failed.
 
@@ -246,7 +248,7 @@ rm -rf "$TEAM_DIR"
 
 **CRITICAL: Do NOT spawn any agents until Phase 3 verification passes.** In Restart 4, Medici was spawned after the first (broken) TeamCreate — the spawn returned "success" but the team was non-functional. The agent was wasted. Phase 3 verification is a hard gate for all subsequent phases.
 
-### Phase 4: Restore (*FR:Volta* — amended 2026-03-13, inbox durability)
+### Phase 4: Restore (_FR:Volta_ — amended 2026-03-13, inbox durability)
 
 **Precondition:** TeamCreate succeeded. `config.json` exists with fresh `leadSessionId`.
 **Action:** Restore inboxes from repo (durable copy persisted during prior session's Shutdown Phase 4a).
@@ -268,7 +270,7 @@ fi
 
 **Why `mkdir -p` is required:** TeamCreate does NOT create the `inboxes/` subdirectory. Without it, the `cp` command fails silently or writes to the wrong path.
 
-#### Phase 4b: Team Operational Check (*FR:Volta* — amendment from restart 4, 2026-03-13)
+#### Phase 4b: Team Operational Check (_FR:Volta_ — amendment from restart 4, 2026-03-13)
 
 **Problem this solves:** In Restart 4, Medici was spawned after a TeamCreate that returned success but was non-functional (no config.json on disk). The spawn returned "success" but the agent couldn't communicate. The Phase 3 verification (config.json check) should catch this, but if it's somehow bypassed or if there are other failure modes beyond config.json, spawning into a broken team wastes an agent.
 
@@ -324,7 +326,7 @@ Medici reads all scratchpads, prompts, and common-prompt, then reports:
 
 ---
 
-## Canonical Shutdown Protocol (*FR:Volta*)
+## Canonical Shutdown Protocol (_FR:Volta_)
 
 ### Decision
 
@@ -346,7 +348,7 @@ The key insight from operational experience: the team directory must survive shu
 **Precondition:** Halt declared.
 **Action:** Three sub-steps:
 
-#### 2a. Team-lead writes own scratchpad (*FR:Volta* — amendment from restart 5, 2026-03-13)
+#### 2a. Team-lead writes own scratchpad (_FR:Volta_ — amendment from restart 5, 2026-03-13)
 
 **Before** creating the task snapshot or sending shutdown requests, the team-lead writes their own state to `memory/team-lead.md`. Tags: `[DECISION]`, `[WIP]`, `[DEFERRED]`, `[LEARNED]`, `[WARNING]`.
 
@@ -354,7 +356,7 @@ The key insight from operational experience: the team directory must survive shu
 
 **The mechanism already exists** — all agents persist to `memory/<name>.md` in the repo dir. Team-lead simply uses the same path (`memory/team-lead.md`). No new infrastructure needed.
 
-#### 2b. Create task-list-snapshot (*FR:Volta* — amendment from restart test 2026-03-13)
+#### 2b. Create task-list-snapshot (_FR:Volta_ — amendment from restart test 2026-03-13)
 
 **Before** sending shutdown to agents, team lead creates `memory/task-list-snapshot.md`. This is when the lead has the best picture of task state — all agents still alive, tasks fresh in context. By Phase 4 (Persist), the lead's context is near limit and this step gets forgotten.
 
@@ -392,21 +394,21 @@ Each agent, on receiving shutdown:
 
 **Expected outcome:** All agent processes terminated. Team lead is the only active process.
 
-### Phase 4: Persist (*FR:Volta* — amended 2026-03-13, inbox durability)
+### Phase 4: Persist (_FR:Volta_ — amended 2026-03-13, inbox durability)
 
 **Precondition:** All agents terminated. Task snapshot already created (Phase 2b).
 **Action:** Copy inboxes from runtime dir to repo, then commit all session state to version control.
 
-#### Phase 4a: Persist inboxes to repo (*FR:Volta* — 2026-03-13)
+#### Phase 4a: Persist inboxes to repo (_FR:Volta_ — 2026-03-13)
 
 **Problem this solves:** The previous protocol relied on the runtime dir (`$HOME/.claude/teams/...`) surviving between sessions. Phase 5 (Preserve) said "do NOT call TeamDelete" to keep inboxes alive. But the runtime dir is ephemeral — reboots, manual cleanup, or OS temp cleanup can destroy it. Field observation (2026-03-13): COLD START despite 5 prior commits in memory/. All closing reports from the previous session were lost because they existed only in the runtime dir's inboxes.
 
 **Key insight: there are TWO `.claude/teams/<team-name>/` directories:**
 
-| Directory | Location | Owner | Durability |
-|---|---|---|---|
-| Runtime dir | `$HOME/.claude/teams/<team-name>/` | Platform (TeamCreate) | Ephemeral — survives only until dir is removed |
-| Repo dir | `<team-config-repo>/.claude/teams/<team-name>/` | Team (git-tracked) | Durable — survives reboots, available on any clone |
+| Directory   | Location                                        | Owner                 | Durability                                         |
+| ----------- | ----------------------------------------------- | --------------------- | -------------------------------------------------- |
+| Runtime dir | `$HOME/.claude/teams/<team-name>/`              | Platform (TeamCreate) | Ephemeral — survives only until dir is removed     |
+| Repo dir    | `<team-config-repo>/.claude/teams/<team-name>/` | Team (git-tracked)    | Durable — survives reboots, available on any clone |
 
 Scratchpads live in the repo dir and are already committed. Inboxes live in the runtime dir and were NOT committed — this was the gap. The fix: copy inboxes from runtime to repo during shutdown, making them durable.
 
@@ -457,7 +459,7 @@ git push
 
 ---
 
-## Duplicate Prevention Gate (*FR:Volta*)
+## Duplicate Prevention Gate (_FR:Volta_)
 
 ### Decision
 
@@ -476,12 +478,12 @@ Before spawning agent `<name>`:
 
 ### Where the gate lives
 
-| Spawning path | Gate implementation |
-|---|---|
-| `spawn_member.sh` (RC/tmux) | Built-in: `jq` check on config.json, exits with error if duplicate found |
+| Spawning path                         | Gate implementation                                                      |
+| ------------------------------------- | ------------------------------------------------------------------------ |
+| `spawn_member.sh` (RC/tmux)           | Built-in: `jq` check on config.json, exits with error if duplicate found |
 | `spawn_local.sh` + Agent tool (local) | Built-in: `jq` check on config.json, exits with error if duplicate found |
-| Agent tool alone (local, no script) | Team lead must check config.json manually before calling Agent tool |
-| Raw `claude` CLI | Not permitted (no gate possible) |
+| Agent tool alone (local, no script)   | Team lead must check config.json manually before calling Agent tool      |
+| Raw `claude` CLI                      | Not permitted (no gate possible)                                         |
 
 ### Failure mode
 
@@ -499,7 +501,7 @@ The team lead's context window fills up over a long session. By the time a secon
 
 ---
 
-## Spawning Paths (*FR:Volta*)
+## Spawning Paths (_FR:Volta_)
 
 ### Decision
 
@@ -555,7 +557,7 @@ Is the team running on a remote machine via tmux (RC)?
 - No prompt file loading — team lead must read prompt file and pass content inline
 - `run_in_background: true` is MANDATORY — foreground blocks team lead from receiving messages
 
-### Path 2.5: `spawn_local.sh` + Agent tool (local teams, automated) (*FR:Volta* — amendment from restart test 2026-03-13)
+### Path 2.5: `spawn_local.sh` + Agent tool (local teams, automated) (_FR:Volta_ — amendment from restart test 2026-03-13)
 
 **When:** Local Claude Code sessions where the team has a roster and prompt files.
 **How:** Team lead runs `spawn_local.sh` to get the duplicate check and assembled prompt, then passes the output to the Agent tool.
@@ -610,12 +612,12 @@ echo "$PROMPT"
 
 **Advantages over raw Agent tool:**
 
-| Capability | Agent tool alone | spawn_local.sh + Agent tool |
-|---|---|---|
-| Duplicate gate | Manual (team lead remembers) | Structural (script exits with error) |
-| Prompt assembly | Manual (team lead reads + pastes) | Automatic (script reads prompt file) |
-| Model from roster | Manual (team lead looks up roster) | Automatic (script reads roster) |
-| Roster validation | None | Agent name validated against roster |
+| Capability        | Agent tool alone                   | spawn_local.sh + Agent tool          |
+| ----------------- | ---------------------------------- | ------------------------------------ |
+| Duplicate gate    | Manual (team lead remembers)       | Structural (script exits with error) |
+| Prompt assembly   | Manual (team lead reads + pastes)  | Automatic (script reads prompt file) |
+| Model from roster | Manual (team lead looks up roster) | Automatic (script reads roster)      |
+| Roster validation | None                               | Agent name validated against roster  |
 
 **Disadvantages:**
 
@@ -638,7 +640,7 @@ echo "$PROMPT"
 
 ---
 
-## Cross-Session Handover (*FR:Volta*)
+## Cross-Session Handover (_FR:Volta_)
 
 ### Decision
 
@@ -652,15 +654,15 @@ Handover state lives in three places: **scratchpads** (per-agent), **shared know
 
 #### Write triggers
 
-| Trigger | Tag | Example |
-|---|---|---|
-| Discovered something non-obvious | `[LEARNED]` | "D1 batch size limit is 100, not documented" |
-| Made a decision with rationale | `[DECISION]` | "Using sql.js instead of better-sqlite3 — binary won't build on this machine" |
-| Found a repeatable approach | `[PATTERN]` | "Svelte 5 runes: `$derived` replaces `$:` reactive statements" |
-| Mid-task checkpoint | `[CHECKPOINT]` | "3/5 tests passing, blocked on auth mock" |
-| Stopping before completion | `[WIP]` | "Branch story/47-fix-rating at commit abc123, tests red" |
-| Blocked, awaiting external input | `[DEFERRED]` | "Waiting for PO answer on AK-12 before implementing filter" |
-| Surprising pitfall | `[GOTCHA]` | "overflow-x: auto breaks position: sticky" |
+| Trigger                          | Tag            | Example                                                                       |
+| -------------------------------- | -------------- | ----------------------------------------------------------------------------- |
+| Discovered something non-obvious | `[LEARNED]`    | "D1 batch size limit is 100, not documented"                                  |
+| Made a decision with rationale   | `[DECISION]`   | "Using sql.js instead of better-sqlite3 — binary won't build on this machine" |
+| Found a repeatable approach      | `[PATTERN]`    | "Svelte 5 runes: `$derived` replaces `$:` reactive statements"                |
+| Mid-task checkpoint              | `[CHECKPOINT]` | "3/5 tests passing, blocked on auth mock"                                     |
+| Stopping before completion       | `[WIP]`        | "Branch story/47-fix-rating at commit abc123, tests red"                      |
+| Blocked, awaiting external input | `[DEFERRED]`   | "Waiting for PO answer on AK-12 before implementing filter"                   |
+| Surprising pitfall               | `[GOTCHA]`     | "overflow-x: auto breaks position: sticky"                                    |
 
 #### Save timing
 
@@ -691,12 +693,12 @@ On startup, Medici checks all scratchpads for:
 
 Files with defined owners and purpose:
 
-| File | Who writes | Purpose |
-|---|---|---|
-| `architecture-decisions.md` | Any teammate | Settled choices with rationale and date |
-| `test-gaps.md` | Tess (testing agent) | Untested areas for triage |
-| `api-contracts.md` | Frontend + backend agents | Agreed API shapes |
-| `health-report.md` | Medici | Latest health audit output |
+| File                        | Who writes                | Purpose                                 |
+| --------------------------- | ------------------------- | --------------------------------------- |
+| `architecture-decisions.md` | Any teammate              | Settled choices with rationale and date |
+| `test-gaps.md`              | Tess (testing agent)      | Untested areas for triage               |
+| `api-contracts.md`          | Frontend + backend agents | Agreed API shapes                       |
+| `health-report.md`          | Medici                    | Latest health audit output              |
 
 **Write trigger:** When a cross-cutting discovery affects multiple agents.
 **Prune trigger:** Team lead reviews on session start; Medici flags stale entries.
@@ -713,7 +715,7 @@ Files with defined owners and purpose:
 
 ---
 
-## Stale-Team Recovery (*FR:Volta*)
+## Stale-Team Recovery (_FR:Volta_)
 
 ### Decision
 
@@ -721,13 +723,13 @@ A "stale team" is one where the team directory exists from a previous session bu
 
 ### When recovery is needed
 
-| Scenario | Symptom | Recovery |
-|---|---|---|
-| Normal session start | `$TEAM_DIR` exists with stale `config.json` | Standard startup: Phase 0 (Orient) → Phase 1 (Sync) → Phase 2 (Clean) → Phase 3 (Create) |
-| Crashed session | `$TEAM_DIR` exists, scratchpads may be incomplete | Same as above — scratchpads are best-effort |
-| TeamDelete was called | `$TEAM_DIR` does not exist, no inboxes to restore | Phase 0 → Phase 1 → Phase 2 (anomaly detected, see Phase 2.0 anomaly rules) → Phase 3 (Create) — inbox history is lost |
-| Wrong team name | `$TEAM_DIR` exists under wrong name (e.g. `team-name-a7f3`) | Phase 0 → Phase 1 → Phase 2 (MISCREATION detected) → remove wrong dir → Phase 3 |
-| First-ever session | `$TEAM_DIR` does not exist, no git history of team files | Phase 0 → Phase 1 → Phase 2 (COLD START, expected) → Phase 3 |
+| Scenario              | Symptom                                                     | Recovery                                                                                                               |
+| --------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Normal session start  | `$TEAM_DIR` exists with stale `config.json`                 | Standard startup: Phase 0 (Orient) → Phase 1 (Sync) → Phase 2 (Clean) → Phase 3 (Create)                               |
+| Crashed session       | `$TEAM_DIR` exists, scratchpads may be incomplete           | Same as above — scratchpads are best-effort                                                                            |
+| TeamDelete was called | `$TEAM_DIR` does not exist, no inboxes to restore           | Phase 0 → Phase 1 → Phase 2 (anomaly detected, see Phase 2.0 anomaly rules) → Phase 3 (Create) — inbox history is lost |
+| Wrong team name       | `$TEAM_DIR` exists under wrong name (e.g. `team-name-a7f3`) | Phase 0 → Phase 1 → Phase 2 (MISCREATION detected) → remove wrong dir → Phase 3                                        |
+| First-ever session    | `$TEAM_DIR` does not exist, no git history of team files    | Phase 0 → Phase 1 → Phase 2 (COLD START, expected) → Phase 3                                                           |
 
 ### Key insight
 
@@ -735,7 +737,7 @@ There is no special "recovery" procedure. The canonical startup protocol IS the 
 
 ---
 
-## Non-Claude Agent Lifecycle (*FR:Volta*)
+## Non-Claude Agent Lifecycle (_FR:Volta_)
 
 ### Decision
 
@@ -764,7 +766,7 @@ When `backendType == "daemon"`:
 
 ---
 
-## Patterns from Reference Teams (*FR:Finn*)
+## Patterns from Reference Teams (_FR:Finn_)
 
 ### Creation: human-initiated, medici-first
 
@@ -858,27 +860,27 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 
 ---
 
-## Open Questions (*FR:Volta*)
+## Open Questions (_FR:Volta_)
 
 ### Resolved (by this design)
 
 - ~~How do we handle stale teams that lost context?~~ → Canonical startup protocol is inherently stale-team recovery (Phase 2 Clean).
 - ~~What triggers team shutdown?~~ → Human decision, task completion, or forced (context limit/error). No auto-shutdown.
 - ~~How does handover work between sessions?~~ → Scratchpads + shared knowledge files + task snapshots, with defined write triggers and prune rules.
-- ~~How does a fresh team-lead self-orient without broad exploration?~~ → Phase 0 (Orient): read roster.json, common-prompt.md, and own scratchpad — 3 files, fixed order, zero exploration. (*FR:Volta* — resolved 2026-03-13 restart 3)
-- ~~How to handle stale/wrong workDir in roster.json?~~ → Phase 0 workDir Resolution: validate after reading roster, fallback with WARNING, flag for correction. (*FR:Volta* — resolved 2026-03-13 restart 3)
-- ~~How to distinguish "genuinely first session" from "lost state" when team dir is missing?~~ → Phase 2.0 Anomaly Detection: check git log for prior team memory commits. If found → anomaly, ask user. (*FR:Volta* — resolved 2026-03-13 restart 3)
-- ~~What if `$HOME` is unreliable on the host platform?~~ → Phase 2.0a: validate `$HOME` before use, fallback to `whoami`-based path. `startup.md` uses absolute paths — it is machine-specific by design. (*FR:Volta* — resolved 2026-03-13 restart 4)
-- ~~What if TeamCreate succeeds but config.json doesn't exist on disk?~~ → Phase 3 Verification and Retry: verify config.json after TeamCreate, retry with TeamDelete + TeamCreate (max 2 attempts), hard gate before any spawn. (*FR:Volta* — resolved 2026-03-13 restart 4)
-- ~~What if agents are spawned into a non-functional team?~~ → Phase 3 verification is a hard gate for all subsequent phases. No agent spawn (including Medici in Phase 5) until config.json is confirmed on disk. (*FR:Volta* — resolved 2026-03-13 restart 4)
-- ~~What if the runtime dir disappears between sessions and inboxes are lost?~~ → Shutdown Phase 4a persists pruned inboxes (last 100 messages per file) to the repo. Startup Phase 4 restores from repo, not `/tmp/`. Repo is the sole source of truth. (*FR:Volta* — resolved 2026-03-13)
-- ~~Inbox backup atomicity~~ → Eliminated by removing the `/tmp/` hop. Inboxes go directly from runtime dir to repo during shutdown. No intermediate ephemeral state. (*FR:Volta* — resolved 2026-03-13)
+- ~~How does a fresh team-lead self-orient without broad exploration?~~ → Phase 0 (Orient): read roster.json, common-prompt.md, and own scratchpad — 3 files, fixed order, zero exploration. (_FR:Volta_ — resolved 2026-03-13 restart 3)
+- ~~How to handle stale/wrong workDir in roster.json?~~ → Phase 0 workDir Resolution: validate after reading roster, fallback with WARNING, flag for correction. (_FR:Volta_ — resolved 2026-03-13 restart 3)
+- ~~How to distinguish "genuinely first session" from "lost state" when team dir is missing?~~ → Phase 2.0 Anomaly Detection: check git log for prior team memory commits. If found → anomaly, ask user. (_FR:Volta_ — resolved 2026-03-13 restart 3)
+- ~~What if `$HOME` is unreliable on the host platform?~~ → Phase 2.0a: validate `$HOME` before use, fallback to `whoami`-based path. `startup.md` uses absolute paths — it is machine-specific by design. (_FR:Volta_ — resolved 2026-03-13 restart 4)
+- ~~What if TeamCreate succeeds but config.json doesn't exist on disk?~~ → Phase 3 Verification and Retry: verify config.json after TeamCreate, retry with TeamDelete + TeamCreate (max 2 attempts), hard gate before any spawn. (_FR:Volta_ — resolved 2026-03-13 restart 4)
+- ~~What if agents are spawned into a non-functional team?~~ → Phase 3 verification is a hard gate for all subsequent phases. No agent spawn (including Medici in Phase 5) until config.json is confirmed on disk. (_FR:Volta_ — resolved 2026-03-13 restart 4)
+- ~~What if the runtime dir disappears between sessions and inboxes are lost?~~ → Shutdown Phase 4a persists pruned inboxes (last 100 messages per file) to the repo. Startup Phase 4 restores from repo, not `/tmp/`. Repo is the sole source of truth. (_FR:Volta_ — resolved 2026-03-13)
+- ~~Inbox backup atomicity~~ → Eliminated by removing the `/tmp/` hop. Inboxes go directly from runtime dir to repo during shutdown. No intermediate ephemeral state. (_FR:Volta_ — resolved 2026-03-13)
 
 ### Still open
 
-1. ~~**Inbox backup atomicity**~~ → Resolved by durable inbox persistence (Shutdown Phase 4a). Inboxes are now committed to the repo during shutdown. The fragile `/tmp/` hop is eliminated — the repo copy survives reboots, crashes, and manual cleanup. The startup restore reads from the repo, not `/tmp/`. (*FR:Volta* — resolved 2026-03-13)
+1. ~~**Inbox backup atomicity**~~ → Resolved by durable inbox persistence (Shutdown Phase 4a). Inboxes are now committed to the repo during shutdown. The fragile `/tmp/` hop is eliminated — the repo copy survives reboots, crashes, and manual cleanup. The startup restore reads from the repo, not `/tmp/`. (_FR:Volta_ — resolved 2026-03-13)
 
-2. ~~**Agent tool duplicate gate**~~ → Resolved by `spawn_local.sh` (Path 2.5). Local teams now have a wrapper script with built-in duplicate gate and prompt assembly. (*FR:Volta* — resolved 2026-03-13)
+2. ~~**Agent tool duplicate gate**~~ → Resolved by `spawn_local.sh` (Path 2.5). Local teams now have a wrapper script with built-in duplicate gate and prompt assembly. (_FR:Volta_ — resolved 2026-03-13)
 
 3. **Daemon agent shutdown protocol** — Should non-Claude agents implement `shutdown_request`/`shutdown_response` in their polling loop, or is kill-process sufficient?
 
@@ -888,8 +890,70 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 
 6. **Can teams self-replicate or split?** — Not addressed. May be needed for scaling patterns. (Connects to T01-taxonomy.)
 
-7. **`$HOME` reliability across platforms** — Windows/Git Bash has inconsistent `$HOME` resolution across bash invocations within the same session. Phase 2.0a adds a validation gate, but the root cause (shell initialization inconsistency) is not understood. Does this affect other env vars? Does it happen on macOS/Linux? (*FR:Volta* — discovered restart 4, 2026-03-13)
+7. **`$HOME` reliability across platforms** — Windows/Git Bash has inconsistent `$HOME` resolution across bash invocations within the same session. Phase 2.0a adds a validation gate, but the root cause (shell initialization inconsistency) is not understood. Does this affect other env vars? Does it happen on macOS/Linux? (_FR:Volta_ — discovered restart 4, 2026-03-13)
 
-8. **TeamCreate silent failure** — TeamCreate can return success but not write config.json to disk. Phase 3 now has a retry loop, but the root cause is unknown. Is this a race condition? A permissions issue? Does it correlate with the `$HOME` bug? (*FR:Volta* — discovered restart 4, 2026-03-13)
+8. **TeamCreate silent failure** — TeamCreate can return success but not write config.json to disk. Phase 3 now has a retry loop, but the root cause is unknown. Is this a race condition? A permissions issue? Does it correlate with the `$HOME` bug? (_FR:Volta_ — discovered restart 4, 2026-03-13)
 
-9. **Inbox size thresholds** — The 100-message-per-file pruning limit (Shutdown Phase 4a) is a reasonable default for research teams with short sessions. For production teams with long sessions and many agents, the right threshold may be different. Should this be configurable per team (in roster.json)? What is the actual size of 100 messages in JSON — does it stay under reasonable git commit sizes? (*FR:Volta* — 2026-03-13)
+9. **Inbox size thresholds** — The 100-message-per-file pruning limit (Shutdown Phase 4a) is a reasonable default for research teams with short sessions. For production teams with long sessions and many agents, the right threshold may be different. Should this be configurable per team (in roster.json)? What is the actual size of 100 messages in JSON — does it stay under reasonable git commit sizes? (_FR:Volta_ — 2026-03-13)
+
+---
+
+## Container Lifecycle (*FR:Brunel*)
+
+### Problem
+
+Claude's auto-memory (`~/.claude/`) lives on the host filesystem. Each new shell session starts with whatever state was accumulated. When teams are run in ephemeral environments (cloud VMs, CI, shared machines), the `~/.claude/` directory is lost between sessions. The repo-versioned scratchpads and inboxes survive (via git), but the auto-memory does not.
+
+### Solution
+
+Run Claude inside a Docker container with `~/.claude/` mounted as a named Docker volume. Named volumes survive `docker stop`/`docker start` and are independent of any container lifecycle. The container is ephemeral; the volume is persistent.
+
+### Architecture
+
+| Component | Host path | Container mount | Persistence |
+|---|---|---|---|
+| Auto-memory | `~/.claude/` | Named volume `ai-teams_claude-home` | Survives restarts |
+| Repo | `~/Documents/github/mitselek/ai-teams/` | Bind mount (read-write) | Git-versioned |
+| Claude binary | `~/.local/share/claude/` | Bind mount (read-only) | Host-managed |
+| SSH keys | `~/.ssh/` | Bind mount (read-only) | Host-managed |
+| Git config | `~/.gitconfig` | Bind mount (read-only) | Host-managed |
+
+**Key constraint:** `$HOME` inside the container matches the host (`/home/michelek`). This is load-bearing — the lifecycle scripts (`restore-inboxes.sh`, `persist-inboxes.sh`) use `$HOME` to derive runtime team dir paths. No script changes are needed.
+
+### First-Run Volume Ownership Problem
+
+Docker creates named volume directories owned by root before any container user exists. If the container user is UID 1000, they cannot write to their own `~/.claude/`.
+
+**Fix:** `entrypoint.sh` runs as root, detects root ownership on `~/.claude/`, chowns it to `HOST_UID:HOST_GID`, then uses `gosu` to drop privileges and exec the user command. `gosu` (unlike `su -c`) preserves the full environment, including `ANTHROPIC_API_KEY`.
+
+### Implementation Files
+
+| File | Purpose |
+|---|---|
+| `Dockerfile` | Ubuntu 24.04 + git + jq + openssh-client + gosu; user creation matching host UID/GID |
+| `docker-compose.yml` | Volume, bind mounts, env vars, UID/GID passthrough |
+| `entrypoint.sh` | Root → ownership fix → gosu drop to user |
+| `session-start.sh` | One command to build (if needed) and start interactive session |
+| `session-stop.sh` | One command to stop containers (volume preserved); `--wipe-memory` flag for intentional wipe |
+
+### Usage
+
+```bash
+# Start a session (builds image on first run)
+./session-start.sh
+
+# Inside the container, run Claude:
+claude
+
+# Stop (from another terminal, or Ctrl+D inside container)
+./session-stop.sh
+
+# Intentionally wipe memory (irreversible):
+./session-stop.sh --wipe-memory
+```
+
+### Open Questions
+
+- **SSH agent forwarding** — `git push` over SSH requires `SSH_AUTH_SOCK` forwarding into the container. Currently, HTTPS git credentials (mounted `.git-credentials`) cover the common case. SSH forwarding is a one-line addition to `docker-compose.yml` when needed.
+- **MCP servers** — No MCP servers are currently configured. If added, they may require socket or port mounts.
+- **Multiple concurrent sessions** — The `session-start.sh` script does not prevent multiple containers from sharing the same named volume simultaneously. This is safe for `~/.claude/` (files are written by one process at a time) but should be documented.

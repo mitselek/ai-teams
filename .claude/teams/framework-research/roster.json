@@ -69,6 +69,18 @@
         "origin": "Syncretic Greco-Egyptian figure — Hermes the messenger merged with Thoth the record-keeper; authored the protocols of divine communication",
         "significance": "A protocol designer who defines the rules by which autonomous teams hand off work, coordinate resources, and communicate at scale"
       }
+    },
+    {
+      "name": "brunel",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "yellow",
+      "prompt": "prompts/brunel.md",
+      "lore": {
+        "fullName": "Isambard Kingdom Brunel",
+        "origin": "Victorian engineer (1806–1859) — builder of the Thames Tunnel, Great Western Railway, and SS Great Britain; pioneered containment and transport across hostile environments",
+        "significance": "A containerization engineer who designs the shell that preserves agent team state across sessions, hosts, and restarts"
+      }
     }
   ]
 }

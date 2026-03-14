@@ -77,4 +77,8 @@
 [DEFERRED] Remaining specialist gaps: Isolation Analyst, Governance Architect, Identity/Security Designer, Safety Architect, Observability Designer — not yet requested.
 [GOTCHA] Repeated message delivery confusion last session — if team-lead asks for something already sent, resend the full content rather than just pointing to a prior message.
 
+## Session 2026-03-14
+
+[DECISION] Brunel hire approved (2026-03-14). Designed as "Isambard Kingdom Brunel" (Victorian engineer — tunnels, ships, railways; containment and transport lore). Prompt at `prompts/brunel.md`. Model: sonnet. Color: yellow. Writes to 06-lifecycle.md (container sections), Docker config files, own scratchpad. Coordinates with Volta on lifecycle requirements.
+
 (*FR:Celes*)
