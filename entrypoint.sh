@@ -18,17 +18,21 @@ HOME_DIR="/home/ai-teams"
 CLAUDE_DIR="${HOME_DIR}/.claude"
 WORKSPACE="${HOME_DIR}/workspace"
 
-# ── Step 1: Fix ~/.claude/ volume ownership ─────────────────────────────────
+COMMS_DIR="/shared/comms"
+
+# ── Step 1: Fix volume ownership ────────────────────────────────────────────
 # Docker creates named volumes owned by root. Fix on first container start.
-if [ -d "$CLAUDE_DIR" ]; then
-    OWNER=$(stat -c '%u' "$CLAUDE_DIR")
-    if [ "$OWNER" = "0" ]; then
-        chown "${CONTAINER_UID}:${CONTAINER_GID}" "$CLAUDE_DIR"
+for DIR in "$CLAUDE_DIR" "$COMMS_DIR"; do
+    if [ -d "$DIR" ]; then
+        OWNER=$(stat -c '%u' "$DIR")
+        if [ "$OWNER" = "0" ]; then
+            chown "${CONTAINER_UID}:${CONTAINER_GID}" "$DIR"
+        fi
+    else
+        mkdir -p "$DIR"
+        chown "${CONTAINER_UID}:${CONTAINER_GID}" "$DIR"
     fi
-else
-    mkdir -p "$CLAUDE_DIR"
-    chown "${CONTAINER_UID}:${CONTAINER_GID}" "$CLAUDE_DIR"
-fi
+done
 
 # ── Step 2: Repo clone or pull ───────────────────────────────────────────────
 if [ -z "${REPO_URL:-}" ]; then

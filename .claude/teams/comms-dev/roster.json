@@ -1,0 +1,50 @@
+{
+  "name": "comms-dev",
+  "description": "Development team building a secure encrypted chat system for inter-team agent communication across Docker containers.",
+  "commonPromptFile": "common-prompt.md",
+  "workDir": "$HOME/Documents/github/mitselek/ai-teams",
+  "members": [
+    {
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "model": "claude-opus-4-6",
+      "prompt": "prompts/team-lead.md"
+    },
+    {
+      "name": "vigenere",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "red",
+      "prompt": "prompts/vigenere.md",
+      "lore": {
+        "fullName": "Blaise de Vigenere",
+        "origin": "French diplomat and cryptographer (1523–1596), inventor of the polyalphabetic Vigenere cipher — unbroken for three centuries",
+        "significance": "A cryptography engineer who ensures messages are private by design, not by hope"
+      }
+    },
+    {
+      "name": "babbage",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "blue",
+      "prompt": "prompts/babbage.md",
+      "lore": {
+        "fullName": "Charles Babbage",
+        "origin": "English mathematician and engineer (1791–1871), designer of the Analytical Engine and the man who cracked the Vigenere cipher",
+        "significance": "A backend engineer who turns protocol specs into running systems — and knows the gap between design and implementation is where bugs live"
+      }
+    },
+    {
+      "name": "kerckhoffs",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "green",
+      "prompt": "prompts/kerckhoffs.md",
+      "lore": {
+        "fullName": "Auguste Kerckhoffs",
+        "origin": "Dutch linguist and cryptographer (1835–1903), author of Kerckhoffs' principle — a system must be secure even if everything except the key is public",
+        "significance": "A QA and security engineer who assumes the attacker knows everything and validates the system still holds"
+      }
+    }
+  ]
+}

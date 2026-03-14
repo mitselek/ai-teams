@@ -357,6 +357,227 @@ Where `<TEAM-PREFIX>` is derived from the team name:
 
 ---
 
+### Protocol 4: Inter-Team Transport Specification v1 (*FR:Herald*)
+
+#### Purpose
+
+Define how messages physically travel between teams running in separate Docker containers. Protocols 1–3 define *what* to communicate; this protocol defines *how* the bytes travel.
+
+#### Architecture: Two Communication Layers
+
+```
+┌─────────────────────────────────────────────────┐
+│              Inter-Team Communication            │
+├─────────────────────┬───────────────────────────┤
+│  Operational Layer  │    Knowledge Layer        │
+│  (UDS transport)    │    (GitHub Issues)        │
+├─────────────────────┼───────────────────────────┤
+│  Handoff requests   │  Findings & discoveries   │
+│  ACKs & responses   │  Design decisions         │
+│  Heartbeats         │  Questions for other teams│
+│  Blocking alerts    │  Architecture insights    │
+│  Real-time coord    │  Session summaries        │
+├─────────────────────┼───────────────────────────┤
+│  Encrypted, fast    │  Plaintext, persistent    │
+│  Ephemeral          │  Auditable                │
+│  Container-scoped   │  Survives restarts        │
+│  Machine-to-machine │  Human-readable           │
+└─────────────────────┴───────────────────────────┘
+```
+
+**Bridge:** Operational messages tagged as `finding` or `decision` are auto-promoted to GitHub Issues by the broker.
+
+#### 4A: Operational Layer — Unix Domain Sockets
+
+##### Transport
+
+Each team runs a message broker daemon that listens on a Unix domain socket on a shared Docker volume:
+
+```
+/shared/comms/
+├── registry.json            # Team directory
+├── framework-research.sock  # Team A's listener
+└── comms-dev.sock           # Team B's listener
+```
+
+Docker compose configuration:
+
+```yaml
+volumes:
+  comms-channel:
+
+services:
+  team-a:
+    volumes:
+      - comms-channel:/shared/comms
+  team-b:
+    volumes:
+      - comms-channel:/shared/comms
+```
+
+**Why UDS over alternatives:**
+
+| Alternative | Rejection reason |
+|---|---|
+| TCP sockets | Port management, firewall config, service discovery overhead |
+| Message queue (Redis/NATS) | External infrastructure dependency |
+| Git-based | Commit-push-pull latency (seconds, not milliseconds) |
+| Filesystem polling | Race conditions, no delivery guarantee, no ordering |
+| GitHub Issues as transport | API rate limits (5000/hr), polling latency, no encryption, Issue pollution |
+
+##### Encryption
+
+**v1:** TLS-PSK (pre-shared symmetric key). Distributed via Docker secrets at container startup.
+
+```yaml
+services:
+  team-a:
+    environment:
+      - COMMS_PSK_FILE=/run/secrets/comms-psk
+    secrets:
+      - comms-psk
+
+secrets:
+  comms-psk:
+    file: ./secrets/comms-psk.key  # 256-bit random key
+```
+
+**v2 upgrade path:** X25519 keypair per team, public keys in registry, NaCl box encryption (E2E without central CA).
+
+##### Message Format
+
+JSON envelope with Markdown body. Wire format: 4-byte big-endian length prefix + JSON bytes.
+
+```json
+{
+  "version": "1",
+  "id": "msg-<uuid>",
+  "timestamp": "2026-03-14T12:03:00Z",
+  "from": {
+    "team": "framework-research",
+    "agent": "team-lead",
+    "prefix": "FR"
+  },
+  "to": {
+    "team": "comms-dev",
+    "agent": "team-lead"
+  },
+  "type": "handoff | query | response | broadcast | ack | heartbeat",
+  "priority": "blocking | high | normal | low",
+  "reply_to": "msg-<uuid> | null",
+  "body": "Markdown-formatted message content",
+  "checksum": "sha256:<hex>"
+}
+```
+
+##### Discovery
+
+`registry.json` on shared volume, maintained by each broker via file locking:
+
+```json
+{
+  "teams": {
+    "framework-research": {
+      "socket": "/shared/comms/framework-research.sock",
+      "prefix": "FR",
+      "capabilities": ["research", "protocol-design"],
+      "registered_at": "2026-03-14T12:00:00Z",
+      "heartbeat": "2026-03-14T12:03:00Z"
+    }
+  }
+}
+```
+
+**Registration flow:** Container starts → broker creates socket → acquires file lock on registry → adds entry → releases lock. Heartbeat updated every 60s. Stale entries (heartbeat > 120s) treated as offline and cleaned up.
+
+##### Delivery Guarantee
+
+At-least-once. Sender retries until ACK received. Receiver deduplicates by `msg.id`.
+
+##### Failure Modes
+
+| Failure | Detection | Recovery |
+|---|---|---|
+| Target container down | Socket file missing or connection refused | Queue locally, retry with exponential backoff (1s–30s). After 5 min: UNREACHABLE. |
+| Broker crash (container up) | No ACK within 5s | Close, retry once. If still no ACK, treat as down. |
+| Shared volume unmounted | Socket directory inaccessible | Fatal — broker exits. Container restart policy handles recovery. |
+| Message too large | Length prefix > 1MB | Reject at sender, log warning. |
+| Registry corrupted | JSON parse failure | Use cached copy, re-read after 5s. |
+| Stale registry entry | Heartbeat > 120s old | Treat as offline, remove on next write. |
+| PSK mismatch | TLS handshake failure | Log error, do not retry (config error). |
+
+##### Integration with Protocols 1–3
+
+| Protocol | Implementation |
+|---|---|
+| Protocol 1 (Handoff) | `type: "handoff"` message with same metadata fields |
+| Protocol 2 (Topology) | Hub-routed: team-leads → manager socket → target socket. Direct links: authorized socket-to-socket. |
+| Protocol 3 (Broadcast) | Manager sends to all registered sockets, filtered by `capabilities`. |
+
+##### Scale
+
+| Teams | Practical? | Notes |
+|---|---|---|
+| 2–5 | Yes | Single volume, single registry |
+| 10 | Yes | Hub-routed limits channels to O(N) |
+| 20 | Yes with care | Consider sharding volumes by domain |
+| 50+ | No | Need real message infrastructure (NATS/Redis Streams) |
+
+#### 4B: Knowledge Layer — GitHub Issues
+
+##### Purpose
+
+Persist cross-team findings, decisions, and insights as GitHub Issues in the shared repository. Provides human visibility, audit trail, and session-spanning persistence that the ephemeral UDS transport does not.
+
+##### When to Use
+
+| Use GitHub Issues | Use UDS |
+|---|---|
+| Findings and discoveries | Handoff requests and ACKs |
+| Design decisions affecting other teams | Real-time coordination |
+| Questions for other teams | Heartbeats |
+| Architecture insights | Blocking alerts |
+
+##### Issue Format
+
+```markdown
+**Team:** <team-name>
+**Agent:** <agent-name>
+**Type:** finding | decision | question | blocker
+**Affects:** <team-name> | all
+
+---
+
+<Content in markdown>
+
+(*<PREFIX>:<AgentName>*)
+```
+
+##### Label Convention
+
+- `team:<team-name>` — originating team
+- `affects:<team-name>` — target teams (one label per affected team, or `affects:all`)
+- `type:finding`, `type:decision`, `type:question`, `type:blocker`
+
+##### Tooling (built by comms-dev)
+
+- **`comms-publish`** — creates a GitHub Issue from a structured message, applies labels, handles attribution. Wraps `gh issue create`.
+- **`comms-watch`** — polls Issues with relevant `affects:` labels, delivers new findings to team-lead inbox. Wraps `gh issue list`.
+
+#### Implementation Scope for comms-dev Team
+
+The comms-dev team builds:
+
+1. **Message broker daemon** (Python or Node) — UDS listener, TLS-PSK, JSON envelope parsing, inbox delivery
+2. **`comms-send` CLI** — send operational messages without knowing transport details
+3. **`comms-publish` CLI** — create GitHub Issues with correct format and labels
+4. **`comms-watch` CLI** — poll and deliver relevant GitHub Issues
+5. **SendMessage integration glue** — bridge broker inbox with Claude Code's SendMessage system
+
+The comms-dev team does **not** build: the protocols themselves (defined here), a UI, or authentication beyond PSK.
+
+---
+
 ### Open Questions (*FR:Herald*)
 
 #### Resolved by this design
@@ -367,7 +588,7 @@ Where `<TEAM-PREFIX>` is derived from the team name:
 
 #### Still open
 
-1. **Cross-team message delivery mechanism** — Option B (hub-routed) is recommended, but the actual infrastructure for a manager agent to `SendMessage` into another team's inbox doesn't exist yet. Requires either shared filesystem convention or `SendMessage` extension.
+1. ~~**Cross-team message delivery mechanism**~~ --> Resolved by Protocol 4: UDS transport via shared Docker volume for operational messages, GitHub Issues for knowledge persistence.
 
 2. **Manager agent context budget** — The manager agent must hold context on all teams' capabilities, active handoffs, and direct link registry. At 10+ teams, this may exceed a single agent's context window. Mitigation: manager agent has its own Finn-equivalent for research, and the handoff ledger is persisted to disk.
 

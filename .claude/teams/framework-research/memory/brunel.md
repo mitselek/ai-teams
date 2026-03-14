@@ -1,5 +1,3 @@
----
-
 # Brunel scratchpad
 
 [DECISION] 2026-03-14 11:45 — Full isolation redesign (PO requirement): no host bind mounts. Repo in named volume repo-data, cloned/pulled by entrypoint. Git auth via GITHUB_TOKEN env var (HTTPS). Claude installed via npm inside image.

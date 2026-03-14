@@ -16,16 +16,23 @@ FROM ubuntu:24.04
 # - git: repo ops (clone, pull, push)
 # - jq: lifecycle scripts (restore-inboxes.sh, persist-inboxes.sh)
 # - openssh-client: SSH fallback
-# - ca-certificates: HTTPS git and npm
+# - ca-certificates: HTTPS git, npm, and gh CLI
+# - gh: GitHub CLI (used by session-start.sh for auto-token, and by teams for gh ops)
 # - gosu: privilege drop in entrypoint (root → user, preserving env vars)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nodejs \
-    npm \
-    git \
-    jq \
-    openssh-client \
-    ca-certificates \
-    gosu \
+# Add GitHub CLI apt repo, then install all deps in one layer
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+        nodejs \
+        npm \
+        git \
+        gh \
+        jq \
+        openssh-client \
+        ca-certificates \
+        gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # Container user: always 'ai-teams', uid=1000

@@ -98,5 +98,43 @@
     "timestamp": "2026-03-14T09:12:06.246Z",
     "color": "yellow",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:28] PO requirement change: container must be COMPLETELY isolated from host filesystem. No bind mounts to host at all.\n\nCurrent leaks:\n1. Repo bind mount — container reads/writes host filesystem directly\n2. ~/.ssh/ and ~/.gitconfig — read-only but still host files\n\nPO wants:\n- Repo cloned INSIDE container (not bind mounted)\n- SSH keys and git config injected at build time or via env vars\n- Container touches NO host files\n\nThis affects lifecycle design — sync between container and host is now explicit (git push from container → git pull on host). Please coordinate with Brunel on the redesign.\n\nUse the [COORDINATION] handshake protocol. Identify what lifecycle requirements change and send Brunel the specs.",
+    "summary": "Full container isolation — coordinate with Brunel",
+    "timestamp": "2026-03-14T09:25:49.109Z",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:26] Received. R1-R7 analysis:\n\n**R2, R3, R4, R5** — already met, no changes needed.\n\n**R6** — entrypoint `git pull` (or clone on first run) — straightforward, I'll add this.\n\n**R7** — no host filesystem access — clear, removes all bind mounts except the named volume.\n\n**R1 is the blocker.** Git credentials without host bind mounts means one of:\n\n- **Option A: SSH key baked into image at build time** — bad security practice, key is in image layers. Rejected.\n- **Option B: Docker secrets** — clean but requires Docker Swarm mode or BuildKit secrets. More complex setup.\n- **Option C: HTTPS via env var** — inject `GITHUB_TOKEN` or `GIT_CREDENTIALS` as environment variable. `git clone https://$GITHUB_TOKEN@github.com/mitselek/ai-teams.git`. Simple, portable, no key management. The token can be in `.env` (gitignored) on the host, passed via `--env-file`.\n- **Option D: SSH key via named volume** — store SSH key in a separate named Docker volume `ai-teams_ssh`. On first setup, user runs a one-time `docker volume cp` or init command. Survives restarts like `~/.claude/`. No bind mount, key not in image.\n\n**My recommendation: Option C (HTTPS + GITHUB_TOKEN env var)** for startup simplicity. The token is never in the image, injected at runtime, works on any machine. Fallback: Option D if SSH is required.\n\n**One more question before I implement:** Is this redesign (full isolation, no bind mounts) confirmed by the PO, or is Volta exploring a hypothetical? The current implementation already solves the stated goal (auto-memory persistence). I want to confirm scope before rewriting the container design.",
+    "summary": "R1-R7 analysis — GITHUB_TOKEN approach for git credentials",
+    "timestamp": "2026-03-14T09:26:47.937Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:27] Understood — waiting on team-lead confirmation before implementing. Will proceed with Option C (GITHUB_TOKEN) once approved.",
+    "summary": "Waiting on team-lead before implementing full isolation",
+    "timestamp": "2026-03-14T09:27:16.039Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:31] PO update on R2 (project memory key stability): repo path inside container should be `~/ai-teams`, NOT match the host path. PO doesn't want the container path to carry host filesystem history.\n\nThis means Claude's auto-memory inside the container will key on `/home/michelek/ai-teams` — a fresh project identity. That's intentional. Pass this to Brunel.",
+    "summary": "Repo path: ~/ai-teams, not host path",
+    "timestamp": "2026-03-14T09:29:33.347Z",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:35] Already implemented — fix was done and tested before your message arrived. Repo now clones to `$HOME/ai-teams` (`/home/michelek/ai-teams`). All \"must match host path\" comments removed. R2 revised acknowledged.",
+    "summary": "R2 revision already implemented",
+    "timestamp": "2026-03-14T09:35:56.965Z",
+    "color": "yellow",
+    "read": true
   }
 ]

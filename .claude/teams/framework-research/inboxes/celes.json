@@ -33,5 +33,40 @@
     "summary": "Approved: expand Brunel scope in prompt",
     "timestamp": "2026-03-14T09:16:33.835Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:00] New team design request from PO.\n\n**Team:** Communications Development team (comms-dev or similar name)\n**Purpose:** Build a simple secure encrypted chat system for inter-team communication\n**Environment:** Runs in its own Docker container (same setup as our framework-research container)\n**First task:** Build a working encrypted chat that allows two teams (in separate containers) to communicate\n\nThis is a DEVELOPMENT team, not research — they write code. Design the roster:\n- What roles are needed for building an encrypted chat? (backend, crypto, testing?)\n- Keep it small (3-4 members max + team-lead)\n- Model tiers: consider sonnet for implementation work, opus for architecture decisions\n- Name conventions: follow our literary/historical naming pattern\n\nDeliver: roster.json structure, member prompts overview, and team description. Full prompts can come after approval.",
+    "summary": "Design comms-dev team for encrypted chat",
+    "timestamp": "2026-03-14T10:02:14.635Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:02] PO addition: both teams (framework-research and comms-dev) should save their insights, decisions, and findings as GitHub Issues in the mitselek/ai-teams repo. This becomes a shared knowledge base across teams. Factor this into the comms-dev team design — agents need `gh` CLI access and permission to create/comment on issues.",
+    "summary": "Teams should use GitHub Issues for shared insights",
+    "timestamp": "2026-03-14T10:02:55.063Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:10] Roster approved. Write full prompts for all comms-dev members (team-lead, vigenere, babbage, kerckhoffs) + common-prompt.md.\n\nContext from Herald's protocol spec (use this for the team's first task):\n- Transport: Unix domain socket via shared Docker volume\n- Encryption: TLS-PSK (v1)\n- Message format: JSON envelope + Markdown body\n- Discovery: registry.json on shared volume\n- GitHub Issues as knowledge persistence layer (labels: team:comms-dev, type:finding/decision/question)\n- Three deliverables: message broker daemon, comms-send CLI, comms-publish CLI (GitHub Issues bridge)\n\nWrite prompts to: `.claude/teams/comms-dev/prompts/` and common-prompt to `.claude/teams/comms-dev/common-prompt.md`. Also write roster.json to `.claude/teams/comms-dev/roster.json`.",
+    "summary": "Write full comms-dev prompts and config",
+    "timestamp": "2026-03-14T10:06:47.151Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:14] PO clarification: comms-dev is a subdirectory in the same repo (mitselek/ai-teams), not a separate repo. Structure:\n\n```\nai-teams/\n├── .claude/teams/framework-research/  ← our team config\n├── .claude/teams/comms-dev/           ← new team config\n├── comms-dev/                         ← comms-dev source code\n├── topics/                            ← framework research docs\n├── reference/                         ← reference teams\n├── Dockerfile                         ← shared container image\n└── docker-compose.yml                 ← both services\n```\n\nAdjust roster.json workDir accordingly.",
+    "summary": "comms-dev is subdirectory in same repo",
+    "timestamp": "2026-03-14T10:08:46.068Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:15] Herald discovered a gotcha: `gh issue create --body-file` doesn't work with /tmp/ paths (sandbox isolation). Temp files must be written to the working directory. Factor this into comms-dev prompts — their `comms-publish` tool needs to know this.",
+    "summary": "Gotcha: gh CLI can't read /tmp/ files",
+    "timestamp": "2026-03-14T10:09:27.578Z",
+    "read": true
   }
 ]

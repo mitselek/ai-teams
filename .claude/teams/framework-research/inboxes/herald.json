@@ -1,0 +1,16 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:02] PO addition: both teams should save insights and findings as GitHub Issues in mitselek/ai-teams. This is a cross-team communication channel already — consider how GitHub Issues fits into your inter-team protocol design. Could Issues be the v1 transport for inter-team messages?",
+    "summary": "GitHub Issues as cross-team knowledge/transport",
+    "timestamp": "2026-03-14T10:02:57.997Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:10] Your protocol spec is approved. Two follow-up tasks:\n\n1. Save the inter-team chat protocol spec to topics/03-communication.md as a new section (inter-team transport spec v1)\n2. Create a GitHub Issue in mitselek/ai-teams with the protocol spec as a finding — this tests the knowledge layer convention you just designed. Use label `team:framework-research` and `type:finding`.",
+    "summary": "Save spec to topic + create GitHub Issue",
+    "timestamp": "2026-03-14T10:06:56.842Z",
+    "read": true
+  }
+]

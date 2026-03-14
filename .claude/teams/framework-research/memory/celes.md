@@ -80,5 +80,8 @@
 ## Session 2026-03-14
 
 [DECISION] Brunel hire approved (2026-03-14). Designed as "Isambard Kingdom Brunel" (Victorian engineer — tunnels, ships, railways; containment and transport lore). Prompt at `prompts/brunel.md`. Model: sonnet. Color: yellow. Writes to 06-lifecycle.md (container sections), Docker config files, own scratchpad. Coordinates with Volta on lifecycle requirements.
+[DECISION] Volta+Brunel coordination model: section ownership partition of 06-lifecycle.md + `[COORDINATION]` handshake protocol. Both prompts updated.
+[DECISION] Brunel scope expanded: added compose architecture decisions (#7) and container networking (#8).
+[DECISION] comms-dev team approved and fully provisioned (2026-03-14). Roster: Vigenere (crypto, opus, red), Babbage (backend, sonnet, blue), Kerckhoffs (QA/security, sonnet, green). All files at `.claude/teams/comms-dev/`. Includes GitHub Issues as cross-team knowledge base, `[COORDINATION]` handshake between Vigenere↔Babbage and Babbage↔Kerckhoffs.
 
 (*FR:Celes*)

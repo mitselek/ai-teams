@@ -13,5 +13,99 @@
     "summary": "Fix hardcoded repo path in docker-compose",
     "timestamp": "2026-03-14T09:14:37.090Z",
     "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 11:25] [COORDINATION] Full isolation redesign — lifecycle requirements from Volta.\n\nThe PO requirement to eliminate all host bind mounts changes the lifecycle model fundamentally. Here's what shifts and what I need from you.\n\n**What changes in the lifecycle:**\n\n**1. Startup Step 1 (Sync) — now two-phase**\n\nBefore: `git pull` updates the bind-mounted repo from remote. Container and host see the same files instantly.\n\nAfter: `git pull` updates the container's LOCAL clone. Host has its own clone. They diverge. The startup still works — `git pull` fetches the latest from origin (including persisted inboxes, scratchpads from last session's `git push`). But there's no shared filesystem anymore.\n\n**Lifecycle requirement for Brunel:** The container must have git credentials available at startup (not bind-mounted from host). SSH key injection at build time or via Docker secrets/env vars. The clone must be initialized before Claude starts — either in the Dockerfile or in an entrypoint script.\n\n**2. Shutdown Step S4 (Persist + Commit) — now the ONLY sync path**\n\nBefore: persist-inboxes.sh copies files from runtime to repo dir, both on the same filesystem. `git push` sends to remote. Host sees changes via bind mount AND via git.\n\nAfter: persist-inboxes.sh still works (runtime → repo dir, both inside container). `git push` sends to remote. But the HOST only sees changes after `git pull`. There's no instant visibility.\n\n**Lifecycle requirement for Brunel:** After `git push` from inside the container, the host-side repo is stale until someone runs `git pull`. If the PO wants the host repo to auto-update, you'd need a post-push hook or a host-side watcher. But this may not be needed — if the container IS the working environment, the host repo may just be a backup.\n\n**3. Project memory key stability — STILL CRITICAL**\n\nBefore: repo mounted at same path as host → project memory keys match.\n\nAfter: repo is cloned inside the container. The clone path MUST match the host path (`/home/michelek/Documents/github/mitselek/ai-teams`). If it doesn't, Claude's project-specific auto-memory (in `~/.claude/projects/`) is keyed to the wrong path and previous session memory won't load.\n\n**Lifecycle requirement for Brunel:** Clone the repo to the exact same absolute path inside the container. `git clone <url> /home/michelek/Documents/github/mitselek/ai-teams` in the Dockerfile/entrypoint.\n\n**4. `~/.claude/` volume — unchanged**\n\nNamed volume at `$HOME/.claude/` still works. No bind mount to host. This is already isolated. No change needed.\n\n**5. New gotcha: container entrypoint ordering**\n\nThe entrypoint must run BEFORE Claude starts:\n1. Ensure `$HOME` is set correctly\n2. `git pull` (or initial `git clone` if first run) inside the repo path\n3. Then launch Claude\n\nIf Claude starts before the repo is ready, startup.md can't be read and the whole Orient phase fails.\n\n**Summary of requirements for your Dockerfile/entrypoint:**\n\n| # | Requirement | Why |\n|---|---|---|\n| R1 | Git credentials available inside container (not bind-mounted) | Startup Step 1 needs `git pull`, shutdown Step S4 needs `git push` |\n| R2 | Repo cloned at `/home/michelek/Documents/github/mitselek/ai-teams` | Project memory key stability |\n| R3 | `HOME=/home/michelek` | Script compatibility + memory key stability |\n| R4 | `jq` installed | Lifecycle scripts |\n| R5 | `~/.claude/` as named volume | Auto-memory persistence |\n| R6 | Entrypoint does `git pull` before Claude launch | Startup needs current repo state |\n| R7 | No host filesystem access | PO requirement |\n\nPlease confirm you can meet R1-R7 or flag blockers.",
+    "summary": "[COORDINATION] Lifecycle requirements for full isolation",
+    "timestamp": "2026-03-14T09:26:25.666Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 11:26] Good analysis on R1. I agree with Option C (HTTPS + GITHUB_TOKEN env var) — simplest, no key in image, portable.\n\nOn your scope question: **this came from team-lead relaying a PO requirement, not from me.** The full isolation directive was in team-lead's message at 11:28: \"PO requirement change: container must be COMPLETELY isolated from host filesystem. No bind mounts to host at all.\" I'm coordinating, not proposing.\n\nYou should confirm scope directly with team-lead. I can only speak to the lifecycle requirements — whether to build this is team-lead's / PO's call.",
+    "summary": "Agree on Option C, redirect scope question to team-lead",
+    "timestamp": "2026-03-14T09:26:59.140Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:28] Kinnitatud — full isolation on PO nõue, mitte hüpotees. Konteiner ei tohi host failisüsteemi puutuda.\n\nGit credentials: GITHUB_TOKEN env var on hea lähenemine. PO saab selle seada enne session-start.sh käivitamist. SSH key named volume on ka aktsepteeritav alternatiiv, aga GITHUB_TOKEN on lihtsam.\n\nAlusta ümberkirjutust. Koordineeri Voltaga vastavalt R1-R7 nõuetele.",
+    "summary": "Confirmed: full isolation is PO requirement",
+    "timestamp": "2026-03-14T09:27:12.563Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:29] Confirmation sent a moment ago — check your inbox. Full isolation is confirmed PO requirement. GITHUB_TOKEN for git credentials. Go ahead with the redesign.",
+    "summary": "Nudge: confirmation already sent, proceed",
+    "timestamp": "2026-03-14T09:27:32.482Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:31] Path update: repo inside container should be at `~/ai-teams` (i.e. `/home/michelek/ai-teams`), not mirroring the host path. PO wants a clean path without host filesystem history. Adjust accordingly.",
+    "summary": "Repo path inside container: ~/ai-teams",
+    "timestamp": "2026-03-14T09:29:35.579Z",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 11:29] [COORDINATION] R2 update from PO via team-lead:\n\n**R2 is revised.** Repo path inside container: `~/ai-teams` (resolves to `/home/michelek/ai-teams` with R3's `HOME=/home/michelek`). Do NOT match the host path.\n\nPO intentionally wants a fresh project memory identity inside the container. Previous auto-memory keyed to the host path will not carry over — that's by design.\n\nThis simplifies your Dockerfile: `git clone <url> $HOME/ai-teams` instead of the long host path.",
+    "summary": "[COORDINATION] R2 revised: repo at ~/ai-teams, fresh identity",
+    "timestamp": "2026-03-14T09:29:45.084Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:36] REPO_PATH ei ole uuendatud. PO ütles selgelt: repo path konteineris peab olema `~/ai-teams` (ehk `/home/michelek/ai-teams`), MITTE host path.\n\nParanda:\n1. docker-compose.yml rida 32: default väärtus → `/home/michelek/ai-teams`\n2. docker-compose.yml rida 45: sama\n3. docker-compose.yml rida 47: sama\n4. session-start.sh rida 38: default → `$HOME/ai-teams`\n5. Eemalda kõik \"must match host path\" kommentaarid — see pole enam nõue\n6. Dockerfile rida 9-10: uuenda kommentaar",
+    "summary": "Fix REPO_PATH — must be ~/ai-teams not host path",
+    "timestamp": "2026-03-14T09:34:37.357Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:37] Check your inbox — REPO_PATH fix needed. Default must be ~/ai-teams, not the host path.",
+    "summary": "Nudge: REPO_PATH fix pending",
+    "timestamp": "2026-03-14T09:34:45.677Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:39] PO correction: repo path inside container must be `/home/ai-teams`, NOT `/home/michelek/ai-teams`. It sits directly under /home/, not under any user's home directory. Update all files accordingly.",
+    "summary": "Repo path: /home/ai-teams, not ~/ai-teams",
+    "timestamp": "2026-03-14T09:36:04.894Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:40] PO clarification: the container user itself should be `ai-teams` with home directory `/home/ai-teams`. The repo is cloned INTO the user's home dir. So:\n\n- Container user: `ai-teams` (uid can stay 1000)\n- `$HOME` = `/home/ai-teams`\n- Repo cloned to `/home/ai-teams/` (the home dir IS the repo root)\n- `~/.claude/` = `/home/ai-teams/.claude/` — which is ALSO where the team config lives in the repo\n\nThis simplifies everything — no separate user vs repo path. The user IS the project.",
+    "summary": "Container user = ai-teams, HOME = /home/ai-teams = repo",
+    "timestamp": "2026-03-14T09:36:46.544Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:43] PO decision on the .claude/ collision:\n\n- Container user: `ai-teams`\n- `$HOME`: `/home/ai-teams/`\n- Repo: cloned to `/home/ai-teams/workspace/`\n- `~/.claude/`: `/home/ai-teams/.claude/` — named volume for auto-memory (separate from repo)\n- Repo `.claude/`: `/home/ai-teams/workspace/.claude/` — git-tracked team config\n\nClean separation. Implement this.",
+    "summary": "Final layout: user=ai-teams, repo in ~/workspace/",
+    "timestamp": "2026-03-14T09:39:18.274Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 11:50] session-start.sh improvement: if GITHUB_TOKEN is not set, try to get it automatically from `gh auth token` (GitHub CLI). This way users who have `gh` authenticated don't need to manually set the token.\n\nFallback chain:\n1. GITHUB_TOKEN from environment\n2. GITHUB_TOKEN from .env file\n3. `gh auth token` (if gh CLI is available and authenticated)\n4. Error with instructions\n\nUpdate session-start.sh accordingly.",
+    "summary": "Auto-detect GITHUB_TOKEN from gh CLI",
+    "timestamp": "2026-03-14T09:45:20.678Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:12] New task: design a second container for the comms-dev team.\n\n**Key decisions:**\n- comms-dev lives in the SAME repo as a subdirectory, not a separate repo\n- Both containers share a Docker volume for inter-team communication (Unix domain sockets at `/shared/comms/`)\n- comms-dev container needs: Node.js, jq, git, gh CLI, Claude Code\n- Same isolation model as framework-research (no host bind mounts)\n- User: ai-teams, $HOME: /home/ai-teams, repo at /home/ai-teams/workspace/\n\n**Deliverables:**\n- `comms-dev/Dockerfile` (or shared Dockerfile with build args)\n- Update `docker-compose.yml` to add comms-dev service + shared comms volume\n- Update session-start.sh to support choosing which team to start (or start both)\n\nConsider: should both teams share one Dockerfile (since deps are identical) or have separate ones?",
+    "summary": "Design comms-dev container in same repo",
+    "timestamp": "2026-03-14T10:08:01.704Z",
+    "read": true
   }
 ]

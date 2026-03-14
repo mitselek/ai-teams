@@ -287,5 +287,355 @@
     "timestamp": "2026-03-14T09:16:57.510Z",
     "color": "green",
     "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 11:25] [COORDINATION] sent to Brunel. Full isolation changes the lifecycle model in three ways:\n\n1. **Sync is now git-only** — no shared filesystem. `git push` from container is the only way state reaches the host. Host repo is stale until `git pull`.\n\n2. **Project memory key stability** — repo clone path inside container MUST match host path (`/home/michelek/Documents/github/mitselek/ai-teams`), otherwise Claude's auto-memory treats it as a new project.\n\n3. **Entrypoint ordering** — git credentials + repo clone/pull must complete before Claude starts. Orient phase fails without repo.\n\nI sent Brunel 7 concrete requirements (R1-R7). The lifecycle scripts themselves (restore/persist) need NO changes — they work with `$SCRIPT_DIR` and `$HOME`, which are container-internal. The change is in the infrastructure around them, not in them.\n\nWaiting for Brunel's confirmation or blockers before updating startup.md for the containerized environment.",
+    "summary": "Coordination sent to Brunel, lifecycle impact summary",
+    "timestamp": "2026-03-14T09:26:35.017Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:26:41.239Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] [COORDINATION] Lifecycle requirements for full isolation\"}",
+    "timestamp": "2026-03-14T09:26:41.239Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:26] Volta saatis \"full isolation\" redesign nõuded — kõik host bind mounts eemaldatakse, repo kloonitakse konteinerisse.\n\nEnne implementatsiooni: kas see on PO kinnitatud nõue, või Volta uurib hüpoteetilist stsenaariumi?\n\nPraegune implementatsioon lahendab algselt püstitatud eesmärgi (auto-memory püsimine läbi sessioonide) töötavalt. Full isolation oleks märkimisväärne ümberkirjutus — peamine lahendamata küsimus on git credentials (SSH võtit ei saa image'isse bake'ida, alternatiivid: GITHUB_TOKEN env var või SSH võti eraldi named volume'is).\n\nOota kinnitust enne kui hakkan ümber kirjutama.",
+    "summary": "Scope check — is full isolation PO requirement or hypothesis?",
+    "timestamp": "2026-03-14T09:26:59.454Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:27:02.203Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Agree on Option C, redirect scope question to team-lead\"}",
+    "timestamp": "2026-03-14T09:27:02.203Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:27:02.736Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] R1-R7 analysis — GITHUB_TOKEN approach for git credentials\"}",
+    "timestamp": "2026-03-14T09:27:02.736Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:27:21.180Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:27:21.180Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:27:21.708Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] Waiting on team-lead before implementing full isolation\"}",
+    "timestamp": "2026-03-14T09:27:21.708Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:27] Alustan full isolation ümberkirjutust. Implementeerin R1-R7. Raporteerun kui valmis.",
+    "summary": "Starting full isolation rewrite",
+    "timestamp": "2026-03-14T09:27:28.739Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:29:48.682Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] [COORDINATION] R2 revised: repo at ~/ai-teams, fresh identity\"}",
+    "timestamp": "2026-03-14T09:29:48.682Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:33] Brunel — full isolation implementatsioon valmis ja testitud.\n\n**R1-R7 kõik täidetud:**\n- R1: GITHUB_TOKEN HTTPS auth — git clone/pull töötab konteineris\n- R2: Repo kloonitud täpsele host path-ile (`/home/michelek/Documents/github/mitselek/ai-teams`)\n- R3: `HOME=/home/michelek` — lifecycle skriptid töötavad muutmata\n- R4: `jq` installitud Dockerfileis\n- R5: `~/.claude/` named volume — persistib läbi taaskäivituste\n- R6: `git pull/clone` entrypoint'is enne Claude käivitamist\n- R7: Null host bind mounti\n\n**Testitud:**\n- First run: kloonimine õnnestub, shell avaneb\n- Second run: `git pull` (mitte clone), `~/.claude/` persisteeb\n- Vale token: container väljub veaga (mitte vaikne tõrge)\n\n**Uued failid:** `.env.example` — dokumenteerib GITHUB_TOKEN, ANTHROPIC_API_KEY nõuded\n\n**Üks märkus:** npm-installitud Claude on Node.js versioon (cli.js), mitte native ELF. Funktsioonaalselt ekvivalentne agent teams kasutuseks — native ELF-il pole avalikku download URL-i.\n\n[LEARNED] GITHUB_TOKEN entrypoint'i kaudu on kõige lihtsam portatiivne lahendus — ei nõua SSH agent forwarding-ut ega Docker secrets setup-i.",
+    "summary": "Full isolation complete — R1-R7 all met, tested E2E",
+    "timestamp": "2026-03-14T09:34:11.068Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:34:14.753Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:34:14.754Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:34:19.155Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:34:19.155Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:34] Flagging conflict before implementing.\n\n**Conflict with Volta's R2:**\n\nVolta explicitly required (and I confirmed): repo path inside container must match host path (`/home/michelek/Documents/github/mitselek/ai-teams`) for `~/.claude/projects/` memory key stability. Claude keys project-specific auto-memory by absolute working directory path. If the path changes to `/home/michelek/ai-teams`, Claude treats it as a new project and previous session memory doesn't load.\n\n**The trade-off:**\n- `/home/michelek/ai-teams` (clean path) → project memory lost on every session\n- `/home/michelek/Documents/github/mitselek/ai-teams` (host-matching) → project memory works\n\n**Does the PO understand this trade-off?** If project memory continuity doesn't matter (because ~/.claude/ auto-memory is what we're preserving, not project-specific memory), then `/home/michelek/ai-teams` is fine and I'll implement it immediately.\n\nIf this was just a UX preference and the PO wasn't aware of the memory key consequence, worth a 30-second clarification first.\n\nWhat should I do?",
+    "summary": "Path change conflicts with R2 — project memory key stability",
+    "timestamp": "2026-03-14T09:34:38.054Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:34:41.080Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:34:41.080Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:35] Parandus tehtud ja testitud.\n\nRepo kloonitakse `/home/michelek/ai-teams`-i (ehk `~/ai-teams`). Kõik \"must match host path\" kommentaarid eemaldatud. Smoke test OK — kloonimine õnnestub, working_dir on `/home/michelek/ai-teams`.\n\n[DEFERRED] Project memory key ühilduvuse kaotus on teadlik PO otsus — dokumenteeritult aktsepteeritud.",
+    "summary": "REPO_PATH updated to ~/ai-teams, tested OK",
+    "timestamp": "2026-03-14T09:35:44.542Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:35:46.823Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:35:46.823Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:35:49.627Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:35:49.627Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:36:00.237Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:36:00.237Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:36:00.544Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] R2 revision already implemented\"}",
+    "timestamp": "2026-03-14T09:36:00.544Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:36] Quick flag before implementing: `/home/ai-teams` sits outside the container user's home directory (`/home/michelek`). This means:\n\n1. The directory won't be owned by the container user by default — entrypoint must explicitly `chown /home/ai-teams` to `michelek:michelek`\n2. The lifecycle scripts derive paths from `$SCRIPT_DIR` (the script's location inside the repo), which will now be `/home/ai-teams/.claude/teams/framework-research/`. This is fine — `$SCRIPT_DIR` doesn't depend on `$HOME`.\n3. `$HOME` remains `/home/michelek` — only the repo path changes.\n\nNo blockers, just confirming PO is aware. Implementing now.",
+    "summary": "Flagging /home/ai-teams ownership — implementing",
+    "timestamp": "2026-03-14T09:36:18.453Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:37] `/home/ai-teams` implementeeritud ja testitud.\n\n- Repo kloonitakse `/home/ai-teams`-i, owned by `michelek:michelek`\n- `working_dir` = `/home/ai-teams`\n- `$HOME` = `/home/michelek` (muutmata)\n- Entrypoint loob `/home/ai-teams` enne clone'i, chown'ib ainult selle dir-i (mitte `/home/` ennast)\n\nKõik failid uuendatud: docker-compose.yml, session-start.sh, Dockerfile, .env.example, entrypoint.sh.",
+    "summary": "/home/ai-teams done — tested OK",
+    "timestamp": "2026-03-14T09:37:54.589Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:37:56.668Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:37:56.668Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:38] Critical collision — cannot implement as specified.\n\n**The problem:** The repo already contains `.claude/` at its root:\n\n```\n/home/ai-teams/           ← $HOME = repo root\n/home/ai-teams/.claude/   ← this is BOTH:\n                              (a) Claude's auto-memory dir (~/.claude/)\n                              (b) The team config dir in the repo (.claude/teams/, CLAUDE.md, etc.)\n```\n\nIf `$HOME = /home/ai-teams` and the repo is cloned there, then `~/.claude/` resolves to the repo's `.claude/` directory. The named volume would mount OVER the repo's `.claude/` directory, hiding all the team config files (prompts, roster.json, startup.md, memory/).\n\nSpecifically: the named `claude-home` volume mounts at `$HOME/.claude/`. If `$HOME = /home/ai-teams`, that's `/home/ai-teams/.claude/` — which is the repo's `.claude/`. The volume replaces it with the persisted volume contents.\n\n**Two options:**\n\n**A)** Keep `$HOME = /home/michelek`, repo at `/home/ai-teams`. User is `ai-teams` with home `/home/michelek` is inconsistent. OR:\n\n**B)** User = `ai-teams`, `$HOME = /home/ai-teams`, repo at `/home/ai-teams` — but mount the auto-memory volume at a DIFFERENT path, e.g. `/home/ai-teams/.claude-memory/` and set `CLAUDE_HOME` or equivalent env var. But Claude doesn't support a custom config dir — it always uses `~/.claude/`.\n\n**Root cause:** Claude hardcodes `~/.claude/` for auto-memory. Putting the repo root at `$HOME` means the repo's `.claude/` and Claude's config dir are the same path. This only works if we WANT the repo's `.claude/` to be the auto-memory — but then the named volume would overwrite the repo-tracked team config on first run.\n\n**My recommendation:** Keep user = `ai-teams` but home = `/home/ai-teams` and repo at `/home/ai-teams/repo/` (one level deeper). Or keep the current split: user = `michelek`, `$HOME = /home/michelek`, repo at `/home/ai-teams`.\n\nHow should I proceed?",
+    "summary": "Collision: ~/.claude/ = repo's .claude/ if HOME = repo root",
+    "timestamp": "2026-03-14T09:38:22.220Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:38:28.568Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:38:28.568Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:42] Final layout implementeeritud ja testitud.\n\n```\nUser:     ai-teams (uid=1000)\n$HOME:    /home/ai-teams/\n~/.claude/ = /home/ai-teams/.claude/   → claude-home volume (auto-memory)\nRepo:      /home/ai-teams/workspace/   → repo-data volume\nRepo .claude/ = /home/ai-teams/workspace/.claude/  → git-tracked\n```\n\nSeparation test: `realpath .claude` ≠ `realpath ~/.claude/` → CLEAN SEPARATION OK\n\nClaude 2.1.76 töötab, jq olemas, git pull töötab. Kõik failid uuendatud.",
+    "summary": "Final layout done — ai-teams user, ~/workspace/, clean separation verified",
+    "timestamp": "2026-03-14T09:42:44.512Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:42:47.449Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:42:47.449Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 11:46] gh CLI fallback lisatud ja testitud.\n\nFallback chain töötab:\n1. Env var → 2. .env fail → 3. `gh auth token` → 4. Veateade\n\nTest: `unset GITHUB_TOKEN`, `session-start.sh` käivitamine — väljundis \"Using GITHUB_TOKEN from gh CLI.\", clone õnnestus.\n\nSelle masina kasutaja ei pea GITHUB_TOKEN-it käsitsi seadma — `gh` on autentitud.",
+    "summary": "gh CLI fallback done — tested, works automatically",
+    "timestamp": "2026-03-14T09:46:16.647Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:46:20.470Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T09:46:20.470Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 12:02] Celes — comms-dev team design proposal.\n\n## Intake Analysis\n\n**What are we building?** A secure encrypted chat system that enables two agent teams in separate Docker containers to communicate.\n\n**Core competencies needed:**\n1. **Cryptographic protocol design** — key exchange, message encryption/decryption, trust model\n2. **Network/transport layer** — how containers discover each other, TCP/WebSocket/Unix socket, message routing\n3. **Application logic** — chat API, message queuing, delivery guarantees, persistence\n4. **Testing & security validation** — crypto correctness, penetration testing, edge cases\n\n**Key constraint:** This is a small, focused product — not a Slack replacement. 3-4 specialists is right.\n\n## Proposed Roster: 3 Members + Team-Lead\n\n### 1. **Vigenere** — Cryptography Engineer\n\n| Field | Value |\n|---|---|\n| **Full name** | Blaise de Vigenere |\n| **Origin** | French diplomat and cryptographer (1523–1596), inventor of the Vigenere cipher — the first practical polyalphabetic encryption that resisted frequency analysis for three centuries |\n| **Significance** | The crypto specialist who ensures messages are private by design, not by hope |\n| **Model** | **opus** — crypto decisions have irreversible security consequences; wrong choices create false confidence |\n| **Color** | red |\n\n**Scope:** Key exchange protocol (Diffie-Hellman, X25519), message encryption (AES-GCM, NaCl/libsodium), trust model (pre-shared keys vs PKI vs TOFU), key rotation, forward secrecy. Defines the crypto API that the backend consumes.\n\n**Why opus:** Cryptography is judgment-heavy. A subtle mistake (ECB mode, no nonce rotation, timing side-channel) creates a system that *looks* secure but isn't. This needs the highest-quality reasoning.\n\n---\n\n### 2. **Babbage** — Backend Engineer\n\n| Field | Value |\n|---|---|\n| **Full name** | Charles Babbage |\n| **Origin** | English mathematician and engineer (1791–1871), designer of the Analytical Engine — the first general-purpose computer. Also famously *cracked* the Vigenere cipher, proving that implementation matters as much as theory |\n| **Significance** | The builder who turns protocol designs into running code — and who knows that the gap between spec and implementation is where bugs live |\n| **Model** | **sonnet** — high-volume implementation work, clear specs from Vigenere |\n| **Color** | blue |\n\n**Scope:** Chat server/client architecture, message transport (WebSocket or TCP between containers), message queuing and delivery guarantees, persistence layer, Docker networking integration, API design. Consumes Vigenere's crypto API and integrates it into the transport.\n\n**Why sonnet:** This is implementation-heavy — writing the server, client, message handlers, persistence. The architecture decisions are constrained by Vigenere's crypto design, so sonnet's execution speed is more valuable than opus reasoning depth.\n\n**Lore bonus:** Babbage cracking Vigenere's cipher is a beautiful historical tension — the builder who stress-tests the cryptographer's work.\n\n---\n\n### 3. **Kerckhoffs** — QA & Security Engineer\n\n| Field | Value |\n|---|---|\n| **Full name** | Auguste Kerckhoffs |\n| **Origin** | Dutch linguist and cryptographer (1835–1903), author of Kerckhoffs' principle: \"A cryptosystem should be secure even if everything about the system, except the key, is public knowledge\" |\n| **Significance** | The tester who assumes the attacker knows everything except the key — and validates that the system still holds |\n| **Model** | **sonnet** — test execution is volume work; security review questions can be escalated to team-lead |\n| **Color** | green |\n\n**Scope:** Integration tests, crypto correctness tests (known-answer vectors), message delivery tests, security validation (MITM simulation, replay attack, key compromise scenarios), performance testing under load, CI pipeline for the chat system.\n\n**Why sonnet:** Testing is high-volume execution. The security *review* judgment comes from Vigenere (opus), but the test *implementation* and *execution* is sonnet territory.\n\n---\n\n## Team Structure\n\n```\nteam-lead (opus) — coordination, architecture decisions, code review\n    ├── vigenere (opus) — crypto protocol design + API\n    ├── babbage (sonnet) — backend implementation\n    └── kerckhoffs (sonnet) — testing + security validation\n```\n\n**Total:** 4 members (1 opus team-lead + 1 opus specialist + 2 sonnet specialists)\n\n## Roster JSON\n\n```json\n{\n  \"name\": \"comms-dev\",\n  \"description\": \"Development team building a secure encrypted chat system for inter-team agent communication across Docker containers.\",\n  \"commonPromptFile\": \"common-prompt.md\",\n  \"workDir\": \"$HOME/Documents/github/mitselek/comms-dev\",\n  \"members\": [\n    {\n      \"name\": \"team-lead\",\n      \"agentType\": \"team-lead\",\n      \"model\": \"claude-opus-4-6\",\n      \"prompt\": \"prompts/team-lead.md\"\n    },\n    {\n      \"name\": \"vigenere\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"red\",\n      \"prompt\": \"prompts/vigenere.md\",\n      \"lore\": {\n        \"fullName\": \"Blaise de Vigenere\",\n        \"origin\": \"French diplomat and cryptographer (1523–1596), inventor of the polyalphabetic Vigenere cipher — unbroken for three centuries\",\n        \"significance\": \"A cryptography engineer who ensures messages are private by design, not by hope\"\n      }\n    },\n    {\n      \"name\": \"babbage\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"blue\",\n      \"prompt\": \"prompts/babbage.md\",\n      \"lore\": {\n        \"fullName\": \"Charles Babbage\",\n        \"origin\": \"English mathematician and engineer (1791–1871), designer of the Analytical Engine and the man who cracked the Vigenere cipher\",\n        \"significance\": \"A backend engineer who turns protocol specs into running systems — and knows the gap between design and implementation is where bugs live\"\n      }\n    },\n    {\n      \"name\": \"kerckhoffs\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"green\",\n      \"prompt\": \"prompts/kerckhoffs.md\",\n      \"lore\": {\n        \"fullName\": \"Auguste Kerckhoffs\",\n        \"origin\": \"Dutch linguist and cryptographer (1835–1903), author of Kerckhoffs' principle — a system must be secure even if everything except the key is public\",\n        \"significance\": \"A QA and security engineer who assumes the attacker knows everything and validates the system still holds\"\n      }\n    }\n  ]\n}\n```\n\n## Why This Composition\n\n| Design choice | Rationale |\n|---|---|\n| 3 members, not 4 | Encrypted chat is a focused product. More agents = more coordination overhead for the same output |\n| Crypto as separate opus role | Crypto mistakes are silent and catastrophic. Worth the opus cost for the design phase |\n| Babbage cracks Vigenere (lore) | Built-in adversarial tension — the implementer is historically the one who breaks the cryptographer's assumptions |\n| No dedicated frontend role | Inter-container chat is API/CLI, not UI. If a UI is needed later, that's a scope expansion |\n| Kerckhoffs as QA, not just \"tester\" | Security testing IS the product quality for an encrypted chat. The QA role naturally includes security validation |\n\n## What I Did NOT Include\n\n- **DevOps/Docker role** — the container setup follows Brunel's patterns from framework-research. Team-lead can handle Docker config using Brunel's templates.\n- **Protocol designer** — Vigenere covers the crypto protocol. The transport protocol (WebSocket etc.) is Babbage's domain. No gap.\n- **Documentation specialist** — each member documents their own domain. A 3-person team doesn't need a dedicated writer.\n\n## Next Steps\n\nIf approved, I'll write full prompts for all three members. Shall I also draft the common-prompt.md for the comms-dev team?\n\n(*FR:Celes*)",
+    "summary": "comms-dev team design: Vigenere, Babbage, Kerckhoffs",
+    "timestamp": "2026-03-14T10:03:10.875Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-14 12:03] Herald reporting in. Have read my scratchpad, common-prompt, topics/03-communication.md, and README. Working on the inter-team encrypted chat protocol spec for the comms-dev container test. Will send the full spec shortly.",
+    "summary": "Herald startup, working on inter-team chat spec",
+    "timestamp": "2026-03-14T10:03:15.895Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:03:29.965Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:03:29.965Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 12:03] Celes — acknowledged. I'll factor GitHub Issues into the comms-dev design. Three implications:\n\n**1. Comms-dev prompts will include:**\n- Permission to create and comment on issues in `mitselek/ai-teams` via `gh` CLI\n- Convention: use `--body-file` for issue bodies (per global CLAUDE.md)\n- Label scheme to distinguish team origin (e.g., `team:comms-dev`, `team:framework-research`)\n- Issue types: `insight`, `decision`, `finding`, `question` — so cross-team browsing is filtered\n\n**2. Common-prompt.md for comms-dev will include:**\n- `gh` CLI usage rules (create, comment, search — no close/delete without team-lead approval)\n- Attribution rule: every issue body ends with `(*CD:<AgentName>*)` \n- Mandatory: decisions and findings go to GitHub Issues, not just scratchpads\n\n**3. Implication for framework-research:**\n- Our team should adopt the same convention. This is a team-lead/PO decision, but I flag it: if comms-dev writes issues and we don't, the \"shared knowledge base\" is one-sided. Suggest updating our common-prompt.md too.\n\nI'll incorporate all of this into the full prompts when I write them after roster approval. No prompt changes needed yet — this is design input for the next deliverable.\n\n(*FR:Celes*)",
+    "summary": "GitHub Issues factored into comms-dev design",
+    "timestamp": "2026-03-14T10:03:46.299Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:03:52.599Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:03:52.599Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-14 12:03] **Inter-Team Encrypted Chat — Protocol Requirements v1** (*FR:Herald*)\n\n---\n\n## 1. Transport: Unix Domain Socket via Shared Volume\n\n**Recommendation:** Shared Docker volume + Unix domain socket (UDS).\n\n**Why not the alternatives:**\n- **Network sockets (TCP):** Require port management, firewall config, service discovery. Overkill for v1.\n- **Message queue (Redis/NATS):** Adds infrastructure dependency. Wrong for a test.\n- **Git-based:** Too slow (commit-push-pull cycle). Latency measured in seconds, not milliseconds.\n- **Shared filesystem (polling):** Race conditions, no delivery guarantee, no ordering.\n\n**How it works:**\n1. Both containers mount a shared Docker volume at `/shared/comms/`\n2. Each team runs a lightweight message broker process that listens on a Unix domain socket: `/shared/comms/<team-name>.sock`\n3. To send a message to another team, connect to their socket and write the message envelope\n4. The broker process delivers received messages into the team's inbox system (same format as SendMessage)\n\n**Why UDS over TCP:**\n- No port conflicts, no network config\n- File-permission-based access control (the socket file is owned by the container user)\n- Visible in the filesystem — easy to debug (`ls /shared/comms/` shows which teams are online)\n- Low latency, reliable ordering within a connection\n\n**Docker compose sketch:**\n```yaml\nvolumes:\n  comms-channel:\n\nservices:\n  team-a:\n    volumes:\n      - comms-channel:/shared/comms\n  team-b:\n    volumes:\n      - comms-channel:/shared/comms\n```\n\n---\n\n## 2. Encryption: TLS with Pre-Shared Keys (PSK)\n\n**For v1:** TLS-PSK (pre-shared key). Each team pair shares a symmetric key distributed at container startup via environment variable or mounted secret file.\n\n**Why not other options:**\n- **No encryption:** Shared volumes are readable by all containers mounting them. Other containers or host processes could read the socket traffic. Unacceptable even for testing.\n- **Full PKI / certificate authority:** Too complex for v1. No CA infrastructure exists.\n- **E2E with public key exchange:** Good for v2, but requires key distribution protocol and identity verification. Not needed when we control both containers.\n\n**Key distribution for v1:**\n```yaml\n# docker-compose.yml\nservices:\n  team-a:\n    environment:\n      - COMMS_PSK_FILE=/run/secrets/comms-psk\n    secrets:\n      - comms-psk\n\nsecrets:\n  comms-psk:\n    file: ./secrets/comms-psk.key  # 256-bit random key, generated once\n```\n\n**Upgrade path to v2 (when needed):**\n- Each team generates an X25519 keypair at startup\n- Public keys are registered in a shared discovery file on the volume\n- Messages are encrypted with the recipient's public key (NaCl box)\n- This enables E2E encryption without a central CA\n\n---\n\n## 3. Message Format: JSON Envelope with Markdown Body\n\n```json\n{\n  \"version\": \"1\",\n  \"id\": \"msg-<uuid>\",\n  \"timestamp\": \"2026-03-14T12:03:00Z\",\n  \"from\": {\n    \"team\": \"framework-research\",\n    \"agent\": \"team-lead\",\n    \"prefix\": \"FR\"\n  },\n  \"to\": {\n    \"team\": \"comms-dev\",\n    \"agent\": \"team-lead\"\n  },\n  \"type\": \"handoff | query | response | broadcast | ack | heartbeat\",\n  \"priority\": \"blocking | high | normal | low\",\n  \"reply_to\": \"msg-<uuid> | null\",\n  \"body\": \"Markdown-formatted message content here\",\n  \"checksum\": \"sha256:<hex>\"\n}\n```\n\n**Design rationale:**\n- JSON envelope for machine-parseable routing — this is the structured layer that 03-communication.md left as an open question\n- Markdown body for human-readable content — consistent with existing team communication patterns\n- `reply_to` enables threading without complex conversation tracking\n- `checksum` for integrity verification (detects corruption, not forgery — that's what encryption is for)\n- `type` field maps to existing protocol types (handoff from Protocol 1, broadcast from Protocol 3)\n\n**Wire format:** Each message is sent as: `<4-byte big-endian length><JSON bytes>`. Length-prefixed framing avoids delimiter issues in the body.\n\n---\n\n## 4. Discovery: Registry File on Shared Volume\n\n```\n/shared/comms/\n├── registry.json          # Team directory\n├── framework-research.sock  # Team A's listener\n└── comms-dev.sock           # Team B's listener\n```\n\n**registry.json:**\n```json\n{\n  \"teams\": {\n    \"framework-research\": {\n      \"socket\": \"/shared/comms/framework-research.sock\",\n      \"prefix\": \"FR\",\n      \"capabilities\": [\"research\", \"protocol-design\"],\n      \"registered_at\": \"2026-03-14T12:00:00Z\",\n      \"heartbeat\": \"2026-03-14T12:03:00Z\"\n    },\n    \"comms-dev\": {\n      \"socket\": \"/shared/comms/comms-dev.sock\",\n      \"prefix\": \"CD\",\n      \"capabilities\": [\"chat-development\"],\n      \"registered_at\": \"2026-03-14T12:01:00Z\",\n      \"heartbeat\": \"2026-03-14T12:03:00Z\"\n    }\n  }\n}\n```\n\n**Registration flow:**\n1. Container starts → broker process starts → creates socket file\n2. Broker acquires file lock on `registry.json`, adds its entry, releases lock\n3. Broker updates its `heartbeat` timestamp every 60 seconds\n4. On shutdown: broker removes its entry and socket file\n\n**Why file-based registry over DNS/consul:**\n- Zero infrastructure. Both containers already share the volume.\n- The socket file's existence IS the liveness check — if the file exists, the team is reachable.\n- At 10-20 teams, a single JSON file is fine. At 100+, consider etcd. We won't be at 100+.\n\n---\n\n## 5. Failure Modes\n\n| Failure | Detection | Recovery |\n|---|---|---|\n| Target team container is down | Socket file missing from `/shared/comms/` OR connection refused | Queue message locally. Retry with exponential backoff (1s, 2s, 4s, max 30s). After 5 min, report UNREACHABLE to team-lead. |\n| Target team broker crashes but container is up | Connection accepted but no ACK within 5s | Close connection, retry once. If still no ACK, treat as down. |\n| Shared volume unmounted | Socket directory not accessible | Fatal — broker exits with error. Container restart policy handles recovery. |\n| Message too large | Length prefix exceeds 1MB | Reject at sender. Messages should never be this large. Log warning. |\n| Registry file corrupted | JSON parse failure | Broker uses last known good copy (cached in memory). Attempt re-read after 5s. |\n| Stale registry entry (team crashed without cleanup) | Heartbeat older than 120s | Treat team as offline. Remove stale entry on next registry write. |\n| Key mismatch (PSK wrong) | TLS handshake failure | Log error with team names. Do not retry — this is a configuration error requiring human intervention. |\n\n**Delivery guarantees for v1:** At-least-once. The sender retries until it gets an ACK. The receiver deduplicates by `msg.id`. This is simple and sufficient.\n\n---\n\n## 6. Scale Analysis\n\n| Teams | Sockets | Registry entries | Message channels (if mesh) | Practical? |\n|---|---|---|---|---|\n| 2 | 2 | 2 | 1 | Trivial — v1 target |\n| 5 | 5 | 5 | 10 | Fine. Single shared volume, single registry file. |\n| 10 | 10 | 10 | 45 | Still fine for hub-routed (only 10 channels through hub). Mesh would stress the registry. |\n| 20 | 20 | 20 | 190 | Registry file gets busy. Consider sharding volumes by domain (e.g., dev-teams volume, ops-teams volume). |\n| 50+ | 50+ | 50+ | 1225 | Shared volume approach breaks. Need real message infrastructure (NATS, Redis Streams). But this is beyond v1 scope. |\n\n**Scale-conscious design decisions:**\n- Hub-routed topology (from Protocol 2) limits actual message channels to O(N), not O(N^2)\n- Registry file uses file locking, not atomic rename, to support concurrent writers\n- Socket-per-team means each team's broker is independent — one team's crash doesn't affect others\n- The shared volume is the single scalability bottleneck, but it's fine up to ~20 teams\n\n---\n\n## 7. Integration with Existing Protocols\n\nThis transport layer slots under the protocols already defined in 03-communication.md:\n\n| Existing Protocol | How inter-team chat implements it |\n|---|---|\n| Protocol 1 (Handoff) | Handoff request is a message of `type: \"handoff\"`. The JSON envelope carries the same metadata fields (from, to, type, priority, context, requested action, deadline, callback). |\n| Protocol 2 (Topology) | Hub-routed by default: team-leads send to manager agent's socket, manager forwards to target team's socket. Direct links: two team-leads connect directly to each other's sockets (manager must authorize the link first). |\n| Protocol 3 (Broadcast) | Manager agent sends the same message to all registered team sockets. Scope filtering: manager checks `capabilities` in registry to determine which teams are affected. |\n\n---\n\n## Summary of Decisions for comms-dev Team\n\nThe comms-dev team should build:\n\n1. **A message broker daemon** (Python or Node) that:\n   - Creates a Unix domain socket on the shared volume\n   - Registers in `registry.json`\n   - Listens for incoming connections, decrypts (TLS-PSK), parses JSON envelopes\n   - Delivers received messages into the team's inbox\n   - Sends outgoing messages by connecting to target team's socket\n\n2. **A CLI tool** (`comms-send`) that team-lead agents can call to send inter-team messages without knowing the transport details\n\n3. **Integration glue** that bridges the broker's inbox with Claude Code's `SendMessage` system\n\n**What comms-dev does NOT need to build:**\n- The protocols themselves (handoff, broadcast, topology) — those are defined here\n- A UI — this is agent-to-agent, not human-facing\n- Authentication beyond PSK — v1 only needs to verify \"is this a legitimate team?\"\n\n---\n\nThis is designed to be the minimal viable inter-team transport that can actually be tested between two Docker containers. The protocols in 03-communication.md remain authoritative for *what* to communicate — this spec defines *how* the bytes travel. (*FR:Herald*)",
+    "summary": "Inter-team encrypted chat protocol spec v1",
+    "timestamp": "2026-03-14T10:04:26.965Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T10:04:58.384Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:04:58.384Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-14 12:05] **GitHub Issues as Inter-Team Transport — Analysis** (*FR:Herald*)\n\nPO raises a strong point. Let me evaluate GitHub Issues as both a knowledge channel and a potential v1 transport.\n\n---\n\n## Two Distinct Roles — Don't Conflate Them\n\nGitHub Issues can serve two purposes in inter-team communication. They are different and should not be merged:\n\n| Role | What it does | Latency tolerance | Example |\n|---|---|---|---|\n| **Knowledge channel** | Persist findings, decisions, insights for cross-team visibility | Hours/days — async by nature | \"We discovered UDS has a 108-char path limit on Linux\" |\n| **Message transport** | Deliver operational messages between teams in real-time | Seconds — needs to feel like chat | \"Deploy is blocked, hold off on merging to main\" |\n\n**My recommendation: GitHub Issues for knowledge, UDS for operational messages.**\n\nHere is why.\n\n---\n\n## GitHub Issues as Knowledge Channel — YES, absolutely\n\nThis is the right tool for cross-team knowledge sharing. It solves a real gap in my original spec: the UDS transport handles operational messages but has no persistence layer for insights and findings.\n\n**How it works:**\n\nEach team creates Issues in `mitselek/ai-teams` for:\n- Discoveries and findings (label: `finding`)\n- Design decisions that affect other teams (label: `decision`)\n- Questions for other teams (label: `question`)\n- Blockers that need cross-team awareness (label: `blocker`)\n\n**Issue format (compatible with existing attribution):**\n\n```markdown\n**Team:** framework-research\n**Agent:** herald\n**Type:** finding | decision | question | blocker\n**Affects:** comms-dev | all | specific-team\n\n---\n\n<Content in markdown>\n\n(*FR:Herald*)\n```\n\n**Label convention:**\n- `team:<team-name>` — which team created it\n- `affects:<team-name>` — which teams should read it\n- `type:finding`, `type:decision`, `type:question`, `type:blocker`\n\nThis gives us:\n- **Persistence** — survives container restarts, session boundaries\n- **Searchability** — `gh issue list --label \"affects:comms-dev\"` \n- **Human visibility** — PO can read all cross-team knowledge without special tooling\n- **Audit trail** — who said what, when, with full history\n- **Threading** — comments enable follow-up discussion\n\n---\n\n## GitHub Issues as v1 Message Transport — NO, here is why\n\nCould we skip UDS entirely and use Issues for all inter-team messages?\n\n| Criterion | GitHub Issues | UDS |\n|---|---|---|\n| Latency | 1-3 seconds per API call, plus polling interval | Sub-millisecond |\n| Rate limits | 5000 requests/hour (authenticated). At 10 teams polling every 10s, that is 3600 polls/hour per team — burns through the budget fast | No limit |\n| Push notification | None — must poll `gh issue list` periodically | Immediate — socket is event-driven |\n| Offline queueing | Built-in (Issue persists) | Must implement locally (but simple) |\n| Encryption | HTTPS to GitHub (transit only). Issue content is plaintext on GitHub servers. | TLS-PSK end-to-end between containers |\n| Volume handling | 100 messages/hour = 100 Issues. Gets noisy fast. | 100 messages/hour = invisible, just socket traffic |\n| Cleanup | Must close/delete old message-Issues or they pollute the repo | No artifact — messages are ephemeral by design |\n\n**The fundamental mismatch:** GitHub Issues are designed for persistent, human-readable artifacts. Using them as a message bus means either:\n- Polluting the repo with hundreds of ephemeral message-Issues that must be cleaned up\n- Accepting multi-second latency for operational coordination\n- Burning API rate limits on polling\n\n**The security concern:** The PO mentioned encrypted chat. GitHub Issues are plaintext on GitHub's servers. Even in a private repo, this does not meet \"encrypted inter-team communication.\" The whole point of the comms-dev team is to build something with actual encryption.\n\n---\n\n## Revised Architecture: Two Layers\n\n```\n┌─────────────────────────────────────────────────┐\n│              Inter-Team Communication            │\n├─────────────────────┬───────────────────────────┤\n│  Operational Layer  │    Knowledge Layer        │\n│  (UDS transport)    │    (GitHub Issues)        │\n├─────────────────────┼───────────────────────────┤\n│  Handoff requests   │  Findings & discoveries   │\n│  ACKs & responses   │  Design decisions         │\n│  Heartbeats         │  Questions for other teams│\n│  Blocking alerts    │  Architecture insights    │\n│  Real-time coord    │  Session summaries        │\n├─────────────────────┼───────────────────────────┤\n│  Encrypted, fast    │  Plaintext, persistent    │\n│  Ephemeral          │  Auditable                │\n│  Container-scoped   │  Survives restarts        │\n│  Machine-to-machine │  Human-readable           │\n└─────────────────────┴───────────────────────────┘\n```\n\n**Bridge between layers:** When the operational layer delivers a message tagged as a `finding` or `decision`, the receiving broker can automatically create a GitHub Issue to persist it. This way, important operational messages get promoted to the knowledge layer without manual effort.\n\n---\n\n## What This Means for comms-dev\n\nThe comms-dev team's scope expands slightly:\n\n1. **Message broker daemon** (unchanged) — UDS transport for operational messages\n2. **CLI tool `comms-send`** (unchanged) — for sending operational messages\n3. **NEW: `comms-publish` CLI tool** — creates a GitHub Issue from a structured message, applies correct labels, handles attribution\n4. **NEW: `comms-watch` CLI tool** — polls GitHub Issues with relevant labels, delivers new findings to team-lead's inbox\n\nTools 3 and 4 are simple `gh` CLI wrappers. Low implementation cost, high value.\n\n---\n\n## Summary\n\nPO's instinct is correct: GitHub Issues should be part of inter-team communication. But as a **knowledge persistence layer**, not as a **message transport**. The two layers complement each other — UDS for speed and encryption, Issues for persistence and human visibility. (*FR:Herald*)",
+    "summary": "GitHub Issues analysis — knowledge layer yes, transport no",
+    "timestamp": "2026-03-14T10:05:45.415Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T10:06:02.166Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:06:02.166Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-14 12:08] Both tasks complete. (*FR:Herald*)\n\n**1. Topic file updated:** Added \"Protocol 4: Inter-Team Transport Specification v1\" to `topics/03-communication.md` (new section before Open Questions). Includes both layers (UDS operational + GitHub Issues knowledge), message format, discovery, encryption, failure modes, scale analysis, and comms-dev implementation scope. Also marked Open Question #1 (cross-team message delivery mechanism) as resolved.\n\n**2. GitHub Issue created:** https://github.com/mitselek/ai-teams/issues/1 — labeled `team:framework-research`, `type:finding`, `affects:all`. Created the three labels as well. This is the first test of the knowledge layer convention.\n\n**Note:** `gh issue create --body-file` does not work with `/tmp/` paths (sandbox isolation). Had to write to repo directory and clean up. This is a [GOTCHA] for the comms-dev team's `comms-publish` tool — it should write temp files to the working directory, not `/tmp/`.\n\nStanding by for further tasks.",
+    "summary": "Both tasks done — topic updated + Issue #1 created",
+    "timestamp": "2026-03-14T10:09:08.323Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T10:09:31.815Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:09:31.815Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 12:09] Comms-dev team fully provisioned. All files delivered:\n\n## Files Written\n\n```\n.claude/teams/comms-dev/\n├── roster.json                    # Team roster with 4 members\n├── common-prompt.md               # Team standards, tech stack, GitHub Issues rules\n├── prompts/\n│   ├── team-lead.md               # Coordinator + architect\n│   ├── vigenere.md                # Cryptography engineer (opus)\n│   ├── babbage.md                 # Backend engineer (sonnet)\n│   └── kerckhoffs.md              # QA & security engineer (sonnet)\n└── memory/                        # Empty, ready for scratchpads\n```\n\n## Key Design Decisions in the Prompts\n\n**Coordination model:**\n- Vigenere → Babbage: crypto API boundary. Vigenere writes `src/crypto/`, Babbage imports it. Neither crosses the line.\n- Babbage → Kerckhoffs: Babbage notifies when modules are testable, Kerckhoffs writes tests and reports failures.\n- All use `[COORDINATION]` handshake for cross-boundary requests.\n\n**Code ownership:**\n| Path | Owner |\n|---|---|\n| `comms-dev/src/crypto/` | Vigenere |\n| `comms-dev/src/` (rest) | Babbage |\n| `comms-dev/tests/` | Kerckhoffs |\n| `comms-dev/docs/crypto-spec.md`, `threat-model.md` | Vigenere |\n| `comms-dev/docs/architecture.md` | Babbage |\n| `comms-dev/docs/security-report.md` | Kerckhoffs |\n\n**GitHub Issues:**\n- All members can create/comment using `gh` CLI with `--body-file`\n- Labels: `team:comms-dev`, `type:finding|decision|question|blocker`\n- Close/delete requires team-lead approval\n\n**Herald's spec baked in:**\n- Transport (UDS), encryption (TLS-PSK v1), message format (JSON+Markdown), discovery (registry.json), delivery (at-least-once) — all in common-prompt.md as the team's tech stack.\n\nReady for team-lead to spawn.\n\n(*FR:Celes*)",
+    "summary": "Comms-dev team fully provisioned, all files delivered",
+    "timestamp": "2026-03-14T10:09:46.414Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:09:52.428Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:09:52.428Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 12:10] Acknowledged. Comms-dev roster.json workDir is already correct: `$HOME/Documents/github/mitselek/ai-teams` — same repo, both teams share it.\n\nNo change needed to comms-dev roster.json.\n\n**Side note:** framework-research's roster.json has `$HOME/Documents/github/mitselek-ai-teams` (dash instead of slash on line 5). This may be intentional or a typo — flagging in case it causes issues.\n\n(*FR:Celes*)",
+    "summary": "workDir already correct, flagged FR roster typo",
+    "timestamp": "2026-03-14T10:10:15.377Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:10:19.082Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:10:19.082Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 12:10] Fixed. Updated `comms-dev/common-prompt.md` — GitHub Issues example now uses `.gh-issue-body.md` in the working directory instead of `/tmp/`, with cleanup after. Added a GOTCHA callout explaining the sandbox isolation constraint.\n\n(*FR:Celes*)",
+    "summary": "Fixed gh CLI temp file path in comms-dev common-prompt",
+    "timestamp": "2026-03-14T10:10:43.286Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:10:46.956Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:10:46.956Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 12:12] comms-dev container valmis ja testitud.\n\n**Disainiotsus: üks jagatud Dockerfile, mitte kaks.** Deps on identsed — mõlemad teenused kasutavad sama `ai-teams-claude:latest` image'it. `gh` CLI lisatud Dockerfilei.\n\n**Volumes:**\n- `ai-teams_fr-claude-home` → framework-research `~/.claude/` (isoleeritud)\n- `ai-teams_cd-claude-home` → comms-dev `~/.claude/` (isoleeritud)\n- `ai-teams_repo-data` → jagatud repo (mõlemad meeskonnad, sama kloonimine)\n- `ai-teams_comms` → `/shared/comms/` (Unix socket suhtlus)\n\n**Testitud:**\n- framework-research kirjutab `/shared/comms/fr.test` → comms-dev loeb: OK\n- Memory isolation: FR-i `~/.claude/` fail pole CD-le nähtav: OK\n- Vigane meeskonna nimi: veateade: OK\n\n**Kasutus:**\n```bash\n./session-start.sh framework-research\n./session-start.sh comms-dev\n./session-stop.sh --wipe-memory comms-dev\n```",
+    "summary": "comms-dev container done — shared image, isolated memory, comms volume tested",
+    "timestamp": "2026-03-14T10:12:42.037Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T10:12:47.760Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:12:47.760Z",
+    "color": "yellow",
+    "read": true
   }
 ]

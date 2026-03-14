@@ -1,51 +1,90 @@
 # Claude Code Agent Team — Docker Compose — Full Isolation (*FR:Brunel*)
 #
-# One command to start: ./session-start.sh
-# One command to stop:  ./session-stop.sh   (preserves named volumes)
+# Usage:
+#   ./session-start.sh framework-research   # start framework-research team
+#   ./session-start.sh comms-dev            # start comms-dev team
+#   ./session-start.sh                      # defaults to framework-research
+#   ./session-stop.sh                       # stop all containers, preserve volumes
 #
-# Layout inside container:
+# Container layout (both teams, same image):
 #   User:        ai-teams  (uid=1000)
 #   $HOME:       /home/ai-teams/
-#   ~/.claude/:  /home/ai-teams/.claude/    → claude-home volume (auto-memory)
-#   Repo:        /home/ai-teams/workspace/  → repo-data volume (git-tracked config)
+#   ~/.claude/:  /home/ai-teams/.claude/    → per-team named volume (auto-memory)
+#   Repo:        /home/ai-teams/workspace/  → shared named volume (same repo, both teams)
+#   Comms:       /shared/comms/             → shared volume (Unix domain sockets)
 #
 # NO bind mounts to host filesystem (PO requirement).
 
+x-team-base: &team-base
+  build:
+    context: .
+    args:
+      GIT_USER_NAME: "${GIT_USER_NAME:-mitselek}"
+      GIT_USER_EMAIL: "${GIT_USER_EMAIL:-mihkel.putrinsh@gmail.com}"
+  image: ai-teams-claude:latest
+  environment:
+    - HOME=/home/ai-teams
+    - REPO_URL=${REPO_URL:-https://github.com/mitselek/ai-teams.git}
+    - GITHUB_TOKEN=${GITHUB_TOKEN}
+    - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+  volumes:
+    # Repo: shared between both teams — same codebase, pulled once per session
+    - repo-data:/home/ai-teams/workspace
+    # Inter-team comms: Unix domain sockets at /shared/comms/
+    - comms:/shared/comms
+  working_dir: /home/ai-teams/workspace
+  stdin_open: true
+  tty: true
+
 services:
-  session:
-    build:
-      context: .
-      args:
-        GIT_USER_NAME: "${GIT_USER_NAME:-mitselek}"
-        GIT_USER_EMAIL: "${GIT_USER_EMAIL:-mihkel.putrinsh@gmail.com}"
-    image: ai-teams-claude:latest
+  framework-research:
+    <<: *team-base
+    volumes:
+      # Auto-memory: isolated per team
+      - fr-claude-home:/home/ai-teams/.claude
+      # Inherited from base (repo + comms)
+      - repo-data:/home/ai-teams/workspace
+      - comms:/shared/comms
     environment:
       - HOME=/home/ai-teams
-      # Git credentials and repo URL
       - REPO_URL=${REPO_URL:-https://github.com/mitselek/ai-teams.git}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      # Claude API key
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-      # Required for agent teams feature
       - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+      - TEAM_NAME=framework-research
+
+  comms-dev:
+    <<: *team-base
     volumes:
-      # Auto-memory: ~/.claude/ persists across container restarts
-      - claude-home:/home/ai-teams/.claude
-
-      # Repo: git clone lives here, pulled fresh at each session start
+      # Auto-memory: isolated per team
+      - cd-claude-home:/home/ai-teams/.claude
+      # Inherited from base (repo + comms)
       - repo-data:/home/ai-teams/workspace
-
-    working_dir: /home/ai-teams/workspace
-    stdin_open: true
-    tty: true
+      - comms:/shared/comms
+    environment:
+      - HOME=/home/ai-teams
+      - REPO_URL=${REPO_URL:-https://github.com/mitselek/ai-teams.git}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+      - TEAM_NAME=comms-dev
 
 volumes:
-  # ~/.claude/ — Claude auto-memory, settings, runtime team dirs
-  # Wipe only intentionally: docker volume rm ai-teams_claude-home
-  claude-home:
-    name: ai-teams_claude-home
+  # Per-team auto-memory volumes (~/.claude/)
+  # Wipe intentionally: docker volume rm ai-teams_fr-claude-home
+  fr-claude-home:
+    name: ai-teams_fr-claude-home
 
-  # Repo data — cloned at first start, pulled on subsequent starts
+  cd-claude-home:
+    name: ai-teams_cd-claude-home
+
+  # Shared repo — both teams read/write the same clone
   # Wipe to force re-clone: docker volume rm ai-teams_repo-data
   repo-data:
     name: ai-teams_repo-data
+
+  # Inter-team communication via Unix domain sockets
+  # Mounted at /shared/comms/ in both containers
+  comms:
+    name: ai-teams_comms
