@@ -89,5 +89,12 @@
     "summary": "Write scratchpad, then stand by for PO",
     "timestamp": "2026-03-14T17:34:27.334Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:38] Go ahead — draft the full Lovelace prompt for comms-dev. PO has confirmed:\n\n- Name: Lovelace\n- Tech stack: SvelteKit 2 + Svelte 5 runes, TailwindCSS 4, Cloudflare Pages (adapter-cloudflare), WebAuthn (Web Crypto API), Vitest for component tests\n- Scope: owns `comms-relay/relay-frontend/` — SvelteKit chat app, WebAuthn client flow, WSS client, reactive message stores, CSP/DOMPurify\n- Model: Sonnet\n- Coordinates with: Babbage (WSS + REST API contracts), Kerckhoffs (Playwright E2E), Vigenere (v2 browser E2E only)\n- Reference: study the RC-team's Sven prompt at `reference/rc-team/cloudflare-builders/prompts/sven.md` for the SvelteKit patterns and prompt structure\n\nDeliver:\n1. Full prompt file content (ready to save as `prompts/lovelace.md` in comms-dev's team dir)\n2. Roster entry JSON (ready to merge into comms-dev's roster.json)\n3. One-paragraph summary of why this agent exists\n\nSend the complete package to me.",
+    "summary": "Draft Lovelace prompt for comms-dev",
+    "timestamp": "2026-03-14T17:39:24.500Z",
+    "read": true
   }
 ]
