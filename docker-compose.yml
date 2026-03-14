@@ -33,6 +33,8 @@ x-team-base: &team-base
     - repo-data:/home/ai-teams/workspace
     # Inter-team comms: Unix domain sockets at /shared/comms/
     - comms:/shared/comms
+  secrets:
+    - comms-psk
   working_dir: /home/ai-teams/workspace
   stdin_open: true
   tty: true
@@ -46,6 +48,8 @@ services:
       # Inherited from base (repo + comms)
       - repo-data:/home/ai-teams/workspace
       - comms:/shared/comms
+    secrets:
+      - comms-psk
     environment:
       - HOME=/home/ai-teams
       - REPO_URL=${REPO_URL:-https://github.com/mitselek/ai-teams.git}
@@ -62,6 +66,8 @@ services:
       # Inherited from base (repo + comms)
       - repo-data:/home/ai-teams/workspace
       - comms:/shared/comms
+    secrets:
+      - comms-psk
     environment:
       - HOME=/home/ai-teams
       - REPO_URL=${REPO_URL:-https://github.com/mitselek/ai-teams.git}
@@ -88,3 +94,16 @@ volumes:
   # Mounted at /shared/comms/ in both containers
   comms:
     name: ai-teams_comms
+
+secrets:
+  # Pre-shared key for inter-team message encryption.
+  # Mounted at /run/secrets/comms-psk in both containers.
+  #
+  # To provision for a test session:
+  #   openssl rand -hex 32 > /tmp/comms-psk
+  #   COMMS_PSK_FILE=/tmp/comms-psk docker compose up
+  #
+  # Or set COMMS_PSK_FILE env var to point at an existing key file.
+  # If the file is absent, brokers start in PLAINTEXT mode (dev/CI only).
+  comms-psk:
+    file: ${COMMS_PSK_FILE:-/run/secrets/comms-psk}
