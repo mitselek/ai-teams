@@ -83,5 +83,7 @@
 [DECISION] Volta+Brunel coordination model: section ownership partition of 06-lifecycle.md + `[COORDINATION]` handshake protocol. Both prompts updated.
 [DECISION] Brunel scope expanded: added compose architecture decisions (#7) and container networking (#8).
 [DECISION] comms-dev team approved and fully provisioned (2026-03-14). Roster: Vigenere (crypto, opus, red), Babbage (backend, sonnet, blue), Kerckhoffs (QA/security, sonnet, green). All files at `.claude/teams/comms-dev/`. Includes GitHub Issues as cross-team knowledge base, `[COORDINATION]` handshake between Vigenere↔Babbage and Babbage↔Kerckhoffs.
+[GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working directory instead. Fixed in comms-dev common-prompt.md.
+[GOTCHA] framework-research roster.json line 5 has `mitselek-ai-teams` (dash) instead of `mitselek/ai-teams` (slash) — flagged to team-lead, unresolved.
 
 (*FR:Celes*)

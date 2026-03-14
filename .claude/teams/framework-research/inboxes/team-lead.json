@@ -1,69 +1,5 @@
 [
   {
-    "from": "finn",
-    "text": "[2026-03-13 19:42] Finn online. Startup complete — read common-prompt, scratchpad, README, confirmed all 8 topic files present.\n\nStatus from last session: all 8 topics have \"Patterns from Reference Teams\" sections populated. No new research tasks were assigned in session 3.\n\nStanding by for instructions.",
-    "summary": "Finn startup complete, standing by",
-    "timestamp": "2026-03-13T17:43:05.727Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-03-13 19:43] Finn closing report:\n- [LEARNED] Nothing new this session — startup only.\n- [DEFERRED] Still open: whether a separate `topics/02-roles.md` is wanted (current file is `02-resource-isolation.md`).\n- [WARNING] None.\n\nScratchpad updated. Ready to shut down.",
-    "summary": "Finn closing report before shutdown",
-    "timestamp": "2026-03-13T17:43:52.029Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 19:46] Volta online. Startup complete — read common-prompt, scratchpad (7 entries from earlier today), 06-lifecycle.md (842 lines, fully caught up), and startup.md. \n\nContext restored: 7-phase startup, 5-phase shutdown, 4 restart tests scored, 3 amendments from R4 (HOME validation, TeamCreate retry, operational gate). All open questions current.\n\nReady for today's inbox lifecycle findings.",
-    "summary": "Volta online, context restored, awaiting task",
-    "timestamp": "2026-03-13T17:47:10.695Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 19:47] Analysis complete. This is a real gap — here's my assessment and proposed amendment.\n\n## Analysis\n\n**The gap:** Shutdown Phase 4 (Persist) commits scratchpads to git but ignores inboxes. Phase 5 (Preserve) relies on the runtime dir surviving until the next session's startup Phase 2 (Clean), which backs inboxes up to `/tmp/`. There are TWO fragile links in this chain:\n\n1. **Runtime dir → next session:** Runtime dir can disappear (reboot, manual cleanup, OS temp cleanup). This is exactly what happened today — COLD START despite 5 prior commits.\n2. **`/tmp/` → Phase 4 Restore:** Even when the startup backup works, `/tmp/` is ephemeral. A crash between startup Phase 2c (rm) and Phase 4 (restore) loses inboxes permanently.\n\n**Why closing reports matter specifically:** Agents write their `[LEARNED]`/`[DEFERRED]`/`[WARNING]` to scratchpads AND send them as closing messages. The scratchpads are committed (Phase 4). But the inbox versions have richer context — the full closing report message, not just the 1-bullet scratchpad tag. More importantly, the inbox contains the ENTIRE session's message history — task delegations, status updates, decisions made in conversation. Scratchpads capture what agents chose to save; inboxes capture everything.\n\n**Key design question: backup to repo vs `/tmp/`?**\n\nStrongly recommend **repo**. Here's why:\n\n| Factor | `/tmp/` (current) | Repo (proposed) |\n|---|---|---|\n| Survives reboot | No | Yes |\n| Survives manual cleanup | No | Yes |\n| Versioned | No | Yes (git history) |\n| Available on other machines | No | Yes (after push) |\n| Size concern | None | Moderate — inboxes grow per session |\n| Privacy | Local only | Visible in repo |\n\nThe size concern is real but manageable: prune read messages older than N sessions, or store only the latest session's inboxes.\n\n## Proposed Amendment: Shutdown Phase 3b — Persist Inboxes\n\nInsert between Phase 3 (Collect) and Phase 4 (Persist). After all agents have terminated (so all closing reports are in the inbox files), but before the git commit (so they're included in the same commit).\n\n**New phase ordering:** Halt → Notify → Collect → **Persist Inboxes (3b)** → Persist → Preserve\n\nActually, cleaner: fold it INTO Phase 4. Phase 4 already does `git add .claude/teams/<team-name>/memory/` — just expand the scope:\n\n```bash\n# Phase 4: Persist (amended)\nTEAM_CONFIG_DIR=\"<team-config-repo>/.claude/teams/<team-name>\"\nRUNTIME_DIR=\"$RESOLVED_HOME/.claude/teams/<team-name>\"\n\n# Copy inboxes from runtime dir to repo (durable storage)\nif [ -d \"$RUNTIME_DIR/inboxes\" ]; then\n  mkdir -p \"$TEAM_CONFIG_DIR/inboxes\"\n  cp -r \"$RUNTIME_DIR/inboxes/\"* \"$TEAM_CONFIG_DIR/inboxes/\"\nfi\n\n# Commit all session state: scratchpads + task snapshot + inboxes\ngit add .claude/teams/<team-name>/memory/\ngit add .claude/teams/<team-name>/inboxes/\ngit commit -m \"chore: save team state (scratchpads, tasks, inboxes)\"\ngit push\n```\n\n**Key distinction:** There are TWO `.claude/teams/<team-name>/` directories:\n1. **Runtime dir** (`$HOME/.claude/teams/...`) — where TeamCreate puts config.json and where the platform writes inbox files. Ephemeral.\n2. **Repo dir** (`<repo>/.claude/teams/...`) — where we store prompts, memory, roster. Durable (git-tracked).\n\nThe amendment copies inboxes from (1) to (2) during shutdown, making them durable.\n\n**Corresponding startup amendment:** Phase 4 (Restore) should prefer the repo copy over `/tmp/`:\n\n```\nRestore priority:\n1. Repo inboxes (durable — always preferred)\n2. /tmp/ backup (fallback — from startup Phase 2a)\n3. No inboxes (COLD START)\n```\n\n**Inbox pruning rule (size management):** Only the most recent session's inboxes are committed. On the NEXT shutdown, the old inbox files are overwritten by the new session's inboxes. No accumulation.\n\n**Open question to add:** Should inboxes be `.gitignore`d with only a compressed summary committed instead? Full inbox JSON can be large for long sessions. But for now, raw files are simpler and the research team's sessions are short.\n\nReady to write the amendment to `06-lifecycle.md` on your approval.",
-    "summary": "Inbox lifecycle gap analysis and shutdown amendment proposal",
-    "timestamp": "2026-03-13T17:48:27.006Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 19:55] Amendment written to `topics/06-lifecycle.md`. Four edits made:\n\n**1. Shutdown Phase 4 — expanded** (lines ~383-440)\n- Split into Phase 4a (persist inboxes) and Phase 4b (commit)\n- Phase 4a copies inboxes from runtime dir to repo dir with `jq '.[-100:]'` pruning\n- Phase 4b commits scratchpads + task snapshot + inboxes in one atomic commit\n- Documents the runtime-dir vs repo-dir distinction explicitly\n\n**2. Startup Phase 2a — /tmp backup removed** (lines ~184-205)\n- Sub-step 2a is now a no-op with explanation\n- Added amendment note explaining why /tmp hop was eliminated\n\n**3. Startup Phase 4 — restore from repo** (lines ~262-282)\n- Source changed from `/tmp/` to repo dir\n- Explicit statement: \"sole source of truth, no fallback\"\n- Cold start (no repo inboxes) is a graceful no-op\n\n**4. Open Questions updated** (lines ~855+)\n- Q1 (inbox atomicity) resolved — no more ephemeral intermediate state\n- Two new resolved items added to the Resolved section\n- Q9 added: inbox size thresholds — should 100-message limit be configurable per team?\n\n**Not updated (needs your action):**\n- `startup.md` — the executable checklist should reflect the new restore source (repo instead of /tmp) and add the shutdown inbox persist step\n- `common-prompt.md` shutdown section (line 69-75) — brief, may not need changes since it references the protocol\n\nScratchpad updated with [DECISION] and [PATTERN] entries.",
-    "summary": "Inbox durability amendment written, 4 edits to 06-lifecycle",
-    "timestamp": "2026-03-13T17:55:25.189Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 21:18] `startup.md` updated. Three changes:\n\n**1. Step 3 (Clean)** — Removed `/tmp/` inbox backup. Comment explains why: inboxes are persisted to repo during shutdown, runtime copies are stale/disposable.\n\n**2. Step 5 (Restore)** — Changed source from `/tmp/` to repo dir. Uses absolute paths for both repo inboxes (`C:/.../mitselek-ai-teams/.claude/teams/framework-research/inboxes`) and runtime inboxes. No fallback — repo is sole source of truth.\n\n**3. New section: Shutdown Procedure (Steps S1-S5)** — Added after Startup Procedure, before Environment Notes. Five steps matching the protocol: Halt → Task snapshot + shutdown requests → Collect → Persist inboxes + commit → Preserve. Step S4 has the full bash script with `jq '.[-100:]'` pruning and atomic git commit.\n\nBoth files (`06-lifecycle.md` and `startup.md`) are now consistent. No `/tmp/` references remain in the inbox flow.",
-    "summary": "startup.md updated, 3 changes, no /tmp anywhere",
-    "timestamp": "2026-03-13T19:19:07.821Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 21:21] Restart 5 assessment questions saved to scratchpad. 12 questions across 4 categories:\n\n- **A. Shutdown** (Q1-4): Did inboxes get persisted? Did jq work? Were files pruned?\n- **B. Startup** (Q5-7): Did restore use repo? Was /tmp avoided entirely?\n- **C. Protocol adherence** (Q8-10): Step ordering, startup.md-first, operational gate\n- **D. Edge cases** (Q11-12): Diagnose classification, agent messaging after restore\n\nScoring rubric included (A-D scale, same as restart-scorecard).\n\nAlso pruned scratchpad from 41 to ~70 lines — consolidated older entries that are now fully captured in the protocol doc. Assessment questions are the bulk of the file now, which is correct for the next session's priority.\n\nClosing report:\n- [LEARNED] Runtime-to-repo inbox copy is the key new mechanism — test whether `jq` and JSON array format assumptions hold\n- [DEFERRED] None — all amendments written to both files\n- [WARNING] Muscle memory regression risk — team-lead may instinctively reach for /tmp patterns from prior 4 restarts\n\nReady for shutdown.",
-    "summary": "R5 assessment ready (12 questions), closing report, ready for shutdown",
-    "timestamp": "2026-03-13T19:21:15.794Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 21:26] Volta online. Read common-prompt.md, my prompt, and my scratchpad.\n\n**State recovered from scratchpad:**\n- 5 restart tests completed (R1–R4 scored, R5 assessment prepared but not yet executed)\n- Canonical startup protocol in topics/06-lifecycle.md — 7 phases: Orient → Sync → Clean → Create → Restore → Audit → Spawn\n- Inbox durability amendment written (shutdown persists pruned inboxes to repo, startup restores from repo — no /tmp)\n- Restart scorecard at docs/restart-scorecard.md\n- R5 assessment questions prepared in my scratchpad — waiting to evaluate whether inbox durability amendment worked\n\n**Ready for tasks.** If this is restart 5 (or later), I have 12 assessment questions queued. Otherwise, standing by for lifecycle design work.",
-    "summary": "Volta online, state recovered, ready for tasks",
-    "timestamp": "2026-03-13T19:26:45.647Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "volta",
     "text": "[2026-03-13 21:29] **Restart 5 Assessment Complete — Grade B**\n\nThis is the first non-D/C grade across 5 restarts.\n\n---\n\n**HEADLINE: Inbox durability amendment VALIDATED.** Cold start + repo-based inbox restore worked exactly as designed. 3 inbox files recovered from repo, no /tmp used, no fallback needed.\n\n**Assessment against 12 prepared questions:**\n\n| Category | Result |\n|---|---|\n| A. Shutdown inbox persistence | PASS — 3 files committed to repo |\n| B. Startup inbox restore | PASS — copied from repo, ls confirmed, no /tmp |\n| C. Protocol adherence | PASS — all 6 steps in correct order, anomaly detection fired, operational gate checked |\n| D. Edge cases | PASS — COLD START correctly diagnosed, messaging works after restore |\n\n**Issues found:**\n\n| ID | Severity | Description |\n|---|---|---|\n| R5-1 | MEDIUM | Team-lead scratchpad missing. Shutdown protocol requires all agents to write final state — but team-lead, who shuts down last, may skip own scratchpad while managing others. |\n| R5-2 | LOW | Inbox pruning not verifiable from transcript (can't confirm jq ran). Informational only. |\n\n**Verified fixes from prior restarts:**\n- R4-2 (TeamCreate silent failure): **VERIFIED** — config.json present immediately\n- R4-3 (Agent in broken team): **VERIFIED** — operational gate checked, messaging works\n- R4-1 ($HOME unreliable): INCONCLUSIVE — no issues observed but not explicitly tested\n\n**Trend:** D → D → B. The D grades came from design gaps (R2) and infrastructure issues (R4). R5's remaining gap is process (team-lead forgetting own scratchpad), not protocol design.\n\n**Scorecard updated:** `docs/restart-scorecard.md` — R5 entry, trend table, issue tracking all written.\n\n**Proposed fix for R5-1:** Add an explicit \"write own scratchpad\" step to the shutdown sequence, placed in Phase 1 (Halt) — before the team-lead starts managing agent shutdowns. This is when the lead has the clearest picture of own state and isn't yet cognitively loaded with agent coordination.\n\nShall I draft the amendment to `topics/06-lifecycle.md`?",
     "summary": "R5 assessment: Grade B, inbox durability validated",
@@ -636,6 +572,178 @@
     "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T10:12:47.760Z\",\"idleReason\":\"available\"}",
     "timestamp": "2026-03-14T10:12:47.760Z",
     "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 12:22] Done. Added startup procedure to `.claude/teams/comms-dev/prompts/team-lead.md`.\n\nFour steps: Orient (read roster, common-prompt, scratchpad) → Create (TeamCreate + config.json gate) → Restore inboxes (script or manual fallback) → Spawn (ask user, check for duplicates).\n\nKey design choices:\n- Much shorter than framework-research's startup.md — no multi-step checklist, no gotcha history, no anomaly checks. Just the essentials.\n- Uses `git rev-parse --show-toplevel` for repo path — works in the container at `/home/ai-teams/workspace/` or anywhere else.\n- Includes manual inbox restore fallback in case restore-inboxes.sh doesn't exist yet for comms-dev.\n- Attribution: `(*CD:Volta*)` on the section heading.\n\nFile: `/home/michelek/Documents/github/mitselek/ai-teams/.claude/teams/comms-dev/prompts/team-lead.md`",
+    "summary": "Comms-dev startup procedure written",
+    "timestamp": "2026-03-14T10:22:27.522Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T10:22:29.912Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T10:22:29.912Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:02] Reviewed Issue #2. Here's my assessment.\n\n**The issue is real but the scope is limited by architecture.** Kerckhoffs correctly identified that the checksum doesn't cover nested fields. But before jumping to crypto solutions, let's clarify what threat model we're actually defending against.\n\n---\n\n**Threat model analysis for our architecture:**\n\nOur transport is Unix Domain Sockets on a shared Docker volume (`/shared/comms/`). This means:\n\n1. **No network exposure.** UDS is local IPC — no remote attacker can intercept messages in transit. This eliminates most man-in-the-middle scenarios.\n\n2. **Trust boundary is the Docker host.** Anyone who can access the shared volume can read/write socket files. But they're already inside the Docker host — at that point, they can also read Docker secrets, inspect container processes, etc. The threat is not \"attacker on the network\" but \"compromised container on the same host.\"\n\n3. **Sender spoofing via checksum manipulation** requires write access to the socket. If you have socket access, you can already send arbitrary messages — you don't need to modify existing ones.\n\n---\n\n**Assessment of the three approaches:**\n\n**Option 1: Fix the checksum (recursive stable stringify)**\n\n- Kerckhoffs' remediation is correct — use recursive sort for stable serialization\n- This fixes the immediate bug: nested fields are now covered\n- **But checksums are NOT authentication.** A checksum proves integrity (message wasn't corrupted), not authenticity (message came from who it claims). Any sender can compute a valid checksum for any content, including spoofed `from` fields.\n- **Verdict:** Necessary as a bug fix regardless of which auth approach we choose. Do this now.\n\n**Option 2: Asymmetric signing (per-agent key pairs)**\n\n- Each agent gets a private key, publishes public key via shared volume or registry\n- Messages are signed with sender's private key, verified with their public key\n- Provides true authentication: only the holder of the private key can sign as that agent\n- **Trade-offs:**\n  - Key distribution: need a PKI or trusted key exchange. In Docker, keys could be per-container secrets.\n  - Key lifecycle: rotation, revocation, what happens when a container restarts with new keys?\n  - Complexity: Ed25519 signing is straightforward in Node.js (`crypto.sign`), but key management is the hard part\n  - Performance: negligible — Ed25519 is fast\n- **Verdict:** Right approach IF we need non-repudiation (proving who sent what). Overkill for v1 where all containers are trusted.\n\n**Option 3: JWT**\n\n- Messages wrapped in or accompanied by a JWT, signed with a secret or key pair\n- JWTs are just a standardized format for signed claims\n- **Trade-offs:**\n  - With symmetric secret (HMAC): equivalent to a shared checksum — any holder of the secret can forge any sender identity. Doesn't solve the spoofing problem.\n  - With asymmetric keys (RS256/ES256): equivalent to Option 2 but with JWT overhead (base64, header, claims structure). More bytes on the wire, same security properties.\n  - JWT libraries add dependencies, and JWTs are designed for HTTP bearer auth, not IPC message signing. Using them here is a paradigm mismatch.\n- **Verdict:** Wrong tool. JWT solves a different problem (stateless HTTP auth). For IPC messages, sign the envelope directly.\n\n---\n\n**My recommendation — two-phase approach:**\n\n**Phase 1 (now, v1):** Fix the checksum bug with Kerckhoffs' recursive stringify. Add the `from` identity to the HMAC input. Use TLS-PSK (already in the spec) for transport-level authentication — TLS-PSK proves the peer holds the pre-shared key, which is scoped per-team via Docker secrets. This gives us:\n- Integrity: recursive checksum covers all fields\n- Transport auth: TLS-PSK proves the connecting container holds the team's secret\n- Sufficient for trusted containers on the same host\n\n**Phase 2 (future, if needed):** If we need per-agent (not per-team) authentication or non-repudiation, add Ed25519 message signing. Each agent gets a key pair, public keys published in `registry.json`. This is the right crypto primitive — not JWT, not HMAC.\n\n**Key insight:** The PO's instinct about asymmetric keys is correct for the general case. But in our architecture (trusted containers, UDS, TLS-PSK), per-team transport auth is sufficient for v1. Per-agent signing is a v2 concern.",
+    "summary": "Issue #2 assessment: fix checksum now, defer asymmetric signing to v2",
+    "timestamp": "2026-03-14T15:02:52.589Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:02:55.318Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:02:55.318Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:06] Comms-dev delivery review complete. 1817 source lines, 2680 test lines, 190 test cases across 7 test suites. Zero runtime dependencies.\n\n---\n\n## 1. Architecture Assessment: SOLID\n\n**Module structure is clean and well-separated:**\n- `crypto/` — Vigenere's domain. Types, core implementation, provider adapter. Clear API boundary.\n- `transport/` — Babbage's domain. Framing, UDS server, UDS client. No crypto knowledge leaks in.\n- `broker/` — Wires everything together. Daemon, message store (dedup), inbox delivery, message builder.\n- `discovery/` — Registry management with advisory file locking.\n- `cli/` — Two CLIs (`comms-send`, `comms-publish`). Thin wrappers over the library layer.\n- `util/` — One utility (`stable-stringify`), correctly extracted after Issue #2.\n\n**Dependency direction is correct:** `cli → broker → transport + crypto + discovery`. No circular deps. The `CryptoProvider` interface in `types.ts` is the clean seam between Vigenere's crypto module and Babbage's transport — good separation of concerns.\n\n**The provider adapter pattern** (`crypto/provider.ts`) is well-designed: Vigenere's full `CryptoAPI` (structured `EncryptedPayload`) vs Babbage's `CryptoProvider` (raw `Buffer` in/out). Clean bridge, no leaky abstraction.\n\n## 2. Crypto Assessment: CORRECT\n\nVigenere did this right. Specifics:\n\n**Good:**\n- AES-256-GCM with random 96-bit IV per message — standard, correct\n- HKDF-SHA256 key derivation with domain separation (`comms-v1:encryption` vs `comms-v1:integrity`) — prevents key reuse, textbook correct\n- AAD binds `message.id:from.team` to ciphertext — prevents ciphertext transplant attacks\n- `timingSafeEqual` for checksum verification — prevents timing side-channel\n- PSK minimum length validation (32 bytes / 256 bits)\n- No key material in logs or error messages\n- Fail-closed: any crypto error throws, message is never delivered\n\n**One minor note:** `encrypt()`/`decrypt()` are `async` but contain no async operations (Node.js `crypto` is synchronous). Not a bug — just unnecessary `Promise` wrapping. Probably done for future-proofing if they switch to WebCrypto. Acceptable.\n\n**Issue #2 fix is integrated:** `stableStringify` recursively sorts keys at all levels. The `message-builder.ts` and `server.ts` both use it for checksum computation/verification. The broken `JSON.stringify` with array replacer is gone.\n\n## 3. Protocol Spec Alignment (Issue #1): GOOD\n\nChecking against Herald's spec point by point:\n\n| Spec requirement | Implementation | Status |\n|---|---|---|\n| UDS via shared volume `/shared/comms/` | `daemon.ts`: `socketDir` config, socket at `<team>.sock` | Match |\n| TLS-PSK encryption | AES-256-GCM with HKDF-derived keys from PSK | Match (TLS-PSK is the key model, not literal TLS) |\n| JSON envelope with specified fields | `types.ts`: `Message` interface has all 10 fields | Match |\n| 4-byte length-prefixed framing | `framing.ts`: big-endian uint32 + payload | Match |\n| `registry.json` with file locking | `registry.ts`: advisory `.lock` file, O_EXCL | Match |\n| 60s heartbeat, 120s stale cleanup | `daemon.ts`: configurable, defaults match spec | Match |\n| At-least-once delivery | `client.ts`: exponential backoff retry + `message-store.ts`: dedup by ID | Match |\n| `comms-send` CLI | `cli/comms-send.ts` | Match |\n| `comms-publish` CLI | `cli/comms-publish.ts` | Match |\n| `comms-watch` CLI | **MISSING** | Gap |\n| SendMessage integration glue | **MISSING** | Gap |\n\nTwo items from the spec are not delivered: `comms-watch` (poll GitHub Issues) and the SendMessage integration glue (bridge between UDS messages and Claude's SendMessage tool). These are likely v2 scope but worth tracking.\n\n## 4. What Stands Out\n\n**Good:**\n- **190 test cases** with security-focused e2e tests (tamper detection, replay rejection, MITM ciphertext corruption). Kerckhoffs earned his name.\n- **Zero runtime deps.** Everything is `node:crypto`, `node:net`, `node:fs`. The only devDependencies are TypeScript, tsx, vitest, and type definitions. This is remarkably disciplined for a Node.js project.\n- **Threat model is honest.** Explicitly documents what v1 does NOT defend against (impersonation, traffic analysis, forward secrecy) and the v2 path for each. No false sense of security.\n- **Atomic writes everywhere** — inbox delivery uses `.tmp` + `rename`, registry uses `.tmp` + `rename`. Correct on POSIX.\n- **Graceful degradation** — plaintext mode (no PSK) for development. The code paths are clearly marked and warned.\n\n**Concerns:**\n- **`drainBuffer` concurrency in `server.ts` (line 92):** The `void this.drainBuffer(...)` in the `data` handler creates a subtle race. If two `data` events fire before the first `drainBuffer` resolves, the second call operates on a stale `buffer` reference. The `then(remaining => buffer = remaining)` assignment happens after the first drain completes, but by then the second drain is already running with the old buffer. This could cause double-processing of frames under load. Unlikely with UDS (kernel buffers are small, data events are rare), but it's a correctness issue.\n- **Advisory file locking** (`registry.ts`): The `.lock` file approach is advisory-only. It works when all participants cooperate, but a crash between `openSync` and `releaseLock` leaves a stale lock. The stale lock detection (10s max age) mitigates this, but there's a 10-second window where no team can update the registry after a crash. Acceptable for v1.\n- **No connection limits on UDS server.** The threat model identifies socket flooding (T7) but the implementation doesn't enforce `maxConnections`. Low risk in the Docker-container-only deployment, but worth a TODO.\n- **`@types/uuid` in devDeps but `crypto.randomUUID()` used instead.** Dead dependency — can be removed.\n\n**Overall grade: A-**. This is a well-structured, correctly implemented, thoroughly tested v1 with honest security documentation. The concurrency issue in `server.ts` is the only real bug I'd flag for fix before production use.",
+    "summary": "Comms-dev architecture review: A-, one concurrency concern",
+    "timestamp": "2026-03-14T15:07:51.903Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:08:01.388Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:08:01.388Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:08] Done. Review posted as comment on Issue #2:\nhttps://github.com/mitselek/ai-teams/issues/2#issuecomment-4060693497\n\nIncludes: full architecture review (A-), crypto assessment, Issue #2 fix verification, protocol spec alignment table, concerns (drainBuffer race, missing connection limits, dead dep), and the HMAC vs asymmetric vs JWT signing analysis with v1/v2 recommendation.",
+    "summary": "Review posted to Issue #2 as comment",
+    "timestamp": "2026-03-14T15:09:47.695Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:09:52.888Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:09:52.888Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:13:32.733Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:13:32.734Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:15] Done. Two follow-up issues created:\n\n**Issue #3:** [SendMessage integration: bridge Claude agents to UDS broker](https://github.com/mitselek/ai-teams/issues/3)\n- Bridges Claude's SendMessage tool with UDS broker\n- References existing integration points: `comms-send.ts`, `inbox.ts`, `message-builder.ts`\n- Recommends thin CLI wrapper for v1, inbox polling daemon for v2\n\n**Issue #4:** [comms-watch: inbox monitor daemon for incoming inter-team messages](https://github.com/mitselek/ai-teams/issues/4)\n- Long-running process that watches inbox dir for new messages from other teams\n- Leverages existing `InboxDelivery.list()`, `.read()`, `.consume()` methods\n- Includes optional GitHub Issues polling\n- Specifies acceptance criteria: 5s detection, exactly-once processing, graceful shutdown\n\nBoth issues reference the existing codebase files, link to Issues #1 and #2, and have clear acceptance criteria. Labels: `team:comms-dev`, `enhancement`, `affects:all` (on #3).",
+    "summary": "Two follow-up issues created: #3 SendMessage bridge, #4 comms-watch",
+    "timestamp": "2026-03-14T15:16:17.827Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:16:20.764Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:16:20.764Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:29] Done. Both issues reviewed, commented, and closed.\n\n**Issue #3 (SendMessage integration):** CLOSED. Acceptance criteria met. `SendMessageBridge` correctly converts broker inbox files (per-message) to framework inbox entries (per-agent arrays). Three concerns flagged:\n1. `InboxWatcher` deletes files even when handler throws — transient error = permanent message loss\n2. `seen` set grows unboundedly\n3. `comms-watch` and `SendMessageBridge` overlap — if both run, they race on the same files\n\n**Issue #4 (comms-watch):** CLOSED. Acceptance criteria met. 500ms polling, 3 output formats, `--consume` flag, `--no-follow` mode. One gap: no SIGTERM/SIGINT handlers (unlike `sendmessage-bridge.ts` which has them).\n\n**Test quality:** 15 test cases via TDD (Kerckhoffs wrote tests first, Babbage implemented). Good coverage of lifecycle, error handling, and edge cases (late directory creation, handler throws, malformed JSON).\n\nReviews posted:\n- https://github.com/mitselek/ai-teams/issues/3#issuecomment-4060720211\n- https://github.com/mitselek/ai-teams/issues/4#issuecomment-4060720252",
+    "summary": "Issues #3 and #4 reviewed, closed with comments",
+    "timestamp": "2026-03-14T15:30:37.831Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:30:43.778Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:30:43.778Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:33] Done. Created 2 issues, grouped by severity:\n\n**Issue #5 (bug, HIGH):** [Message loss — InboxWatcher deletes on handler error + race with comms-watch](https://github.com/mitselek/ai-teams/issues/5)\n- Bug 1: Handler throws → file deleted anyway → permanent message loss\n- Bug 2: comms-watch and SendMessageBridge race on same files → double-processing or missed delivery\n- Includes suggested fixes for both\n\n**Issue #6 (enhancement, LOW):** [Operational: unbounded seen set + missing graceful shutdown](https://github.com/mitselek/ai-teams/issues/6)\n- Unbounded `seen` set in SendMessageBridge (memory growth)\n- comms-watch missing SIGTERM/SIGINT handlers (no clean shutdown)\n- Includes suggested fixes for both\n\nGrouped 4 findings into 2 issues: data-loss risks together (higher priority, same root cause area), operational concerns together (lower priority, both about long-running process hygiene).",
+    "summary": "Bug issues #5 and #6 created from review findings",
+    "timestamp": "2026-03-14T15:33:29.568Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:33:33.277Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:33:33.277Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-14 17:38] Shutdown acknowledged. Scratchpad already current. Closing notes:\n\n[LEARNED] Two-layer architecture (UDS operational + GitHub Issues knowledge) is the right separation. GitHub Issues as message transport fails on latency, rate limits, encryption, and pollution. But as a persistence layer it fills the gap UDS cannot.\n\n[DEFERRED] Cross-team Finn pattern still unresolved — lightweight cross-team queries are too heavy via full handoff protocol. May need a \"query\" message type with lighter flow in Protocol 4.\n\n[WARNING] `gh` CLI in sandbox cannot read `/tmp/` files via `--body-file`. The `comms-publish` tool must use working directory for temp files. Documented in scratchpad as [GOTCHA].",
+    "summary": "Herald closing — learned, deferred, warning",
+    "timestamp": "2026-03-14T15:38:30.646Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502697094@herald\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T15:38:35.944Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-14T15:38:35.944Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[LEARNED] The `[COORDINATION]` handshake protocol and section ownership model scales well — applied it to both Volta↔Brunel and the three comms-dev coordination pairs (Vigenere↔Babbage, Babbage↔Kerckhoffs). This is becoming a reusable pattern for any two agents sharing a file or API boundary.\n[DEFERRED] framework-research roster.json workDir typo (dash vs slash, line 5) — flagged but not fixed since I can't edit roster.json.\n[WARNING] comms-dev prompts reference `comms-dev/` source directory which doesn't exist yet — team-lead or comms-dev team-lead needs to create the initial project structure before spawning.\n\nScratchpad saved. Ready for shutdown.",
+    "summary": "Celes closing report, ready for shutdown",
+    "timestamp": "2026-03-14T15:38:40.145Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502696121@celes\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T15:38:43.210Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-14T15:38:43.210Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:38] Scratchpad saved.\n\n[LEARNED] Shared repo-data volume between two teams works cleanly — first starter clones, second gets git pull. No conflicts in sequential use.\n\n[DEFERRED] Race condition on simultaneous first start (both teams clone same volume at once) — not handled, acceptable for current sequential use pattern.\n\nReady to shut down.",
+    "summary": "State saved, ready to shut down",
+    "timestamp": "2026-03-14T15:38:58.571Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502697415@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T15:39:08.093Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-14T15:39:08.093Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:38] Closing report:\n\n- [LEARNED] GitHub Issues as cross-team feedback loop is validated — comms-dev responded to review within one delivery cycle. This pattern scales without UDS transport.\n- [DEFERRED] startup.md needs a containerized variant once Brunel's Docker setup is finalized. Current version works for bare-metal Linux only.\n- [WARNING] Issue #5 (InboxWatcher message loss) should be fixed before running inter-team comms in production — transient errors cause permanent message loss.\n\nScratchpad saved. Ready for shutdown.",
+    "summary": "Closing report: learned, deferred, warning",
+    "timestamp": "2026-03-14T15:39:41.091Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502695212@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:39:47.416Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-14T15:39:47.416Z",
+    "color": "blue",
     "read": true
   }
 ]

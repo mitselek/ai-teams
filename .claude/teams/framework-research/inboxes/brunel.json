@@ -107,5 +107,11 @@
     "summary": "Design comms-dev container in same repo",
     "timestamp": "2026-03-14T10:08:01.704Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773502697415@brunel\",\"from\":\"team-lead\",\"reason\":\"Moving framework-research into Docker container to test inter-team comms with comms-dev. Save state to scratchpad.\",\"timestamp\":\"2026-03-14T15:38:17.415Z\"}",
+    "timestamp": "2026-03-14T15:38:17.415Z",
+    "read": true
   }
 ]

@@ -1,31 +1,38 @@
 # Brunel scratchpad
 
-[DECISION] 2026-03-14 11:45 — Full isolation redesign (PO requirement): no host bind mounts. Repo in named volume repo-data, cloned/pulled by entrypoint. Git auth via GITHUB_TOKEN env var (HTTPS). Claude installed via npm inside image.
+[DECISION] 2026-03-14 11:45 — Full isolation: no host bind mounts. GITHUB_TOKEN for git auth. Claude via npm. gosu for privilege drop.
 
-[DECISION] 2026-03-14 11:45 — Two named volumes: claude-home (~/.claude/) + repo-data (git repo). Both survive docker stop/start. Wipe separately: --wipe-memory or --wipe-all flag on session-stop.sh.
+[DECISION] 2026-03-14 11:45 — Final container layout (PO confirmed):
+  User: ai-teams (uid=1000), HOME=/home/ai-teams
+  ~/.claude/ → per-team named volume (auto-memory, isolated per team)
+  Repo → /home/ai-teams/workspace/ (shared named volume, same repo both teams)
+  Comms → /shared/comms/ (shared named volume, Unix socket inter-team comms)
 
-[DECISION] 2026-03-14 11:45 — gosu for privilege drop in entrypoint.sh. Preserves full env (ANTHROPIC_API_KEY etc), no login shell overhead, no `su -c` quoting issues.
+[DECISION] 2026-03-14 12:12 — One shared Dockerfile for both teams (deps identical). gh CLI added. Both services → same ai-teams-claude:latest image. Per-team volumes: ai-teams_fr-claude-home, ai-teams_cd-claude-home.
 
-[DECISION] 2026-03-14 11:45 — $HOME inside container = /home/michelek (matches host). Load-bearing: lifecycle scripts use $HOME to derive runtime team dir. Also required for ~/.claude/projects/ memory key stability (keys are absolute paths).
+[GOTCHA] 2026-03-14 — Docker named volumes created as root. entrypoint.sh loops over ~/.claude/ and /shared/comms/, chowns both to 1000:1000 on first start.
 
-[GOTCHA] 2026-03-14 11:45 — Docker creates named volumes owned by root before any user exists. entrypoint.sh: runs as root, chowns ~/.claude/ to HOST_UID:HOST_GID, then gosu drops to user.
+[GOTCHA] 2026-03-14 — Ubuntu 24.04 has GID/UID 1000 = 'ubuntu'. Dockerfile uses groupmod -n + usermod -l to rename to 'ai-teams'.
 
-[GOTCHA] 2026-03-14 11:45 — Ubuntu 24.04 base image has GID 1000 ('ubuntu') and UID 1000. Dockerfile uses groupmod -n + usermod -l to rename rather than create fresh.
+[GOTCHA] 2026-03-14 — npm Claude = Node.js version (cli.js, ~5 packages). Host Claude = compiled ELF (no public URL). Functionally equivalent for agent teams.
 
-[GOTCHA] 2026-03-14 11:45 — npm-installed Claude is Node.js version (cli.js). Host Claude is a compiled 225MB ELF — separate distribution, no public download URL. Node.js version is functionally equivalent for agent teams.
+[GOTCHA] 2026-03-14 — Shared repo-data volume: both teams clone/pull the same volume. First team to start does the clone; second team gets git pull. Race condition if both start simultaneously — not handled, acceptable for current use.
 
-[PATTERN] 2026-03-14 11:45 — Two-volume pattern (full isolation): (1) claude-home for ~/.claude/ auto-memory, (2) repo-data for git repo. Entrypoint does git clone (first run) or git pull (subsequent). No host filesystem access.
+[PATTERN] 2026-03-14 — session-start.sh takes team name as arg: ./session-start.sh framework-research | comms-dev. Defaults to framework-research.
 
-[LEARNED] 2026-03-14 11:45 — Entrypoint ordering is load-bearing (R6): git pull/clone must complete before shell opens. If clone fails (bad GITHUB_TOKEN), container exits — correct, prevents Claude starting without repo.
+[LEARNED] 2026-03-14 — GITHUB_TOKEN fallback chain: env → .env file → gh auth token → error. gh CLI is available on host, so no manual token setup needed.
 
-[CHECKPOINT] 2026-03-14 11:45 — Full isolation implementation complete and tested:
+[CHECKPOINT] 2026-03-14 12:12 — Implementation complete and tested:
+- Dockerfile: ubuntu:24.04 + nodejs + npm + git + gh + jq + openssh + gosu
+- entrypoint.sh: fix volume ownership (loop), git clone/pull, gosu drop
+- docker-compose.yml: 2 services (framework-research, comms-dev), 4 volumes, YAML anchor for shared config
+- session-start.sh: team arg, GITHUB_TOKEN fallback, per-team memory volume name in output
+- session-stop.sh: --wipe-memory [team] / --wipe-all
+- .env.example: GITHUB_TOKEN, ANTHROPIC_API_KEY
+- Tested: clone, git pull, claude --version, memory isolation, comms volume read/write
 
-- Build: ubuntu:24.04 + nodejs + npm + git + jq + openssh + gosu
-- entrypoint.sh: root → chown ~/.claude → git clone/pull → gosu drop
-- docker-compose.yml: two named volumes, env passthrough, no bind mounts
-- session-start.sh: loads .env, validates GITHUB_TOKEN, exports vars, runs compose
-- session-stop.sh: --wipe-memory / --wipe-all options
-- .env.example: documents required vars
-- Tested E2E: clone, git log, claude --version, identity, volume persistence across 2 restarts
+[WIP] 2026-03-14 15:38 — Next: team-lead running framework-research inside Docker container to test inter-team comms with comms-dev. Container setup is ready. No outstanding Brunel tasks.
 
-[DEFERRED] 2026-03-14 11:45 — MCP server connectivity. No MCP servers currently configured. If added, may need additional ports or socket mounts in docker-compose.yml.
+[DEFERRED] 2026-03-14 — MCP server connectivity. No MCP servers configured. If added, may need ports or socket mounts.
+[DEFERRED] 2026-03-14 — SSH agent forwarding for git push over SSH. HTTPS + GITHUB_TOKEN covers current use.
+[DEFERRED] 2026-03-14 — Shared repo-data race condition on simultaneous first start. Low priority for current sequential use.

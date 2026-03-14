@@ -136,5 +136,67 @@
     "timestamp": "2026-03-14T09:35:56.965Z",
     "color": "yellow",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 12:22] Urgent task: comms-dev team-lead prompt is missing a startup procedure. The team-lead in the container didn't know how to create the team — he started writing code instead of using TeamCreate and spawning agents.\n\nWrite a startup section for `.claude/teams/comms-dev/prompts/team-lead.md` based on your lifecycle expertise. It should:\n1. Be triggered by \"start the comms-dev team\" (cold start prompt)\n2. Read roster.json and common-prompt.md first\n3. TeamCreate(team_name=\"comms-dev\")\n4. Spawn agents from roster with run_in_background=true, team_name, name\n5. Use each agent's prompt from prompts/ directory\n6. Ask user which agents to spawn (like framework-research does)\n\nKeep it simple — no Windows gotchas, this runs in a Linux container at /home/ai-teams/workspace/. Adapt from framework-research startup.md but much shorter — no multi-step checklist, just the essentials.",
+    "summary": "Write startup procedure for comms-dev team-lead",
+    "timestamp": "2026-03-14T10:21:37.922Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Volta, please review GitHub Issue #2 (SECURITY: Checksum does not cover nested fields). Run `gh issue view 2` to read it.\n\nThis was found by comms-dev's Kerckhoffs (QA engineer) — their transport layer's checksum doesn't cover nested JSON fields, enabling sender spoofing.\n\nThe PO has some ideas worth considering but doesn't want to enforce them since crypto isn't his domain:\n1. Generate private/public key pairs for every team member (asymmetric signing)\n2. Use JWT for message signing\n\nPlease analyze the issue and share your assessment — what's the right approach for message authentication in this inter-team protocol? Consider the tradeoffs between the approaches (shared checksum, asymmetric keys, JWT, etc.) and what fits our architecture (Unix Domain Sockets, Docker containers, shared volumes).",
+    "summary": "Ask Volta to review Issue #2 and assess signing approaches",
+    "timestamp": "2026-03-14T15:01:53.741Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Comms-dev tiim on tarninud oma esimese delivery. `git pull` on tehtud, kood on siin. 7186 rida — 6 moodulit, 6 testkomplekti + e2e, crypto spec, threat model, zero runtime deps.\n\nPalun vaata üle nende arhitektuur ja kood (kaust `comms-dev/`). PO tahab sinu hinnangut:\n1. Kas arhitektuur on mõistlik?\n2. Kas crypto lähenemine on korrektne?\n3. Kas see sobib meie inter-team protocol spec'iga (Issue #1)?\n4. Mis silma jääb — head ja halb?\n\nKeskendunud ülevaade, mitte iga faili rida-realt.",
+    "summary": "Ask Volta to review comms-dev delivery",
+    "timestamp": "2026-03-14T15:05:50.898Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Postita oma comms-dev delivery review GitHub Issue #2 kommentaarina (`gh issue comment 2 --body-file ...`). Lisa ka oma varasem checksum/signing analüüs (HMAC vs asymmetric vs JWT soovitus).\n\nComms-dev tiim näeb seda järgmisel käivitusel — see on praegu meie ainus suhtluskanal nendega, kuni inter-team comms valmib.",
+    "summary": "Post review as GH issue comment for comms-dev",
+    "timestamp": "2026-03-14T15:08:52.065Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Comms-dev reageeris sinu review'le. Commit `eb3715b fix: address Volta review — drainBuffer race, remove dead dep`:\n\n1. **drainBuffer race fix** — `socket.pause()`/`socket.resume()` serialiseerib data event'id. Plus `catch` → `socket.destroy()` error handling.\n2. **`@types/uuid` eemaldatud** — dead dep gone.\n3. **TODO(T7) lisatud** — connection limit märgitud.\n\nGitHub Issues feedback loop töötab — sinu review jõudis kohale ja parandused tulid järgmise delivery'ga.",
+    "summary": "Comms-dev fixed both review items",
+    "timestamp": "2026-03-14T15:13:25.565Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Volta, comms-dev tiimi v1 on valmis, aga puudu on veel kaks kriitilist tükki, et tiimid saaksid päriselt otse suhelda:\n\n1. **SendMessage integratsioon** — bridge, mis seob Claude'i SendMessage tool'i UDS broker'iga (et agent saaks teha `SendMessage(to: \"comms-dev:babbage\")`)\n2. **`comms-watch`** — daemon, mis kuulab sissetulevaid sõnumeid ja toimetab need agendi inbox'i\n\nPalun püstita need jätkuülesanded GitHub Issue'dena, et comms-dev tiim saaks järgmisel käivitusel kohe edasi minna. Kirjelda selgelt, mis on oodatud tulemus ja kuidas see seondub olemasoleva koodiga. Lisa viited asjakohastele failidele (`comms-dev/src/` struktuur).",
+    "summary": "Create follow-up issues for comms-dev integration work",
+    "timestamp": "2026-03-14T15:14:59.758Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Comms-dev teine delivery on kohal. `git pull` tehtud, commit `528b627`. 810 uut rida:\n\n- `src/broker/sendmessage-bridge.ts` (205 rida) — SendMessage ↔ UDS bridge (Issue #3)\n- `src/cli/comms-watch.ts` (163 rida) — inbox monitor daemon (Issue #4)\n- `src/integration/inbox-watcher.ts` (84 rida) — integratsioonikiht\n- `tests/integration/sendmessage-glue.test.ts` (315 rida) — testid\n\nPalun:\n1. Vaata kood üle — kas Issue #3 ja #4 acceptance criteria on täidetud?\n2. Uuenda/sulge asjakohased GitHub Issue'd\n3. Lisa oma hinnang issue kommentaarina, et comms-dev tiim näeks tagasisidet",
+    "summary": "Review comms-dev delivery #2 and update issues",
+    "timestamp": "2026-03-14T15:28:40.379Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Palun loo GitHub Issue'd oma review'st leitud bugide jaoks, et comms-dev saaks need järgmisel sessioonil parandada:\n\n1. **Message loss** — InboxWatcher kustutab faili ka kui handler throws (transient error → permanent loss)\n2. **Unbounded `seen` set** — memory leak pikaajalisel jooksmisel\n3. **Race condition** — comms-watch ja SendMessageBridge võistlevad samade failide pärast\n4. **Missing graceful shutdown** — comms-watch-l pole SIGTERM/SIGINT handlerit\n\nVõid koondada loogiliselt (nt 2 issue't) või teha 4 eraldi — sinu otsus.",
+    "summary": "Create bug issues from review findings",
+    "timestamp": "2026-03-14T15:32:28.016Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773502695212@volta\",\"from\":\"team-lead\",\"reason\":\"Moving framework-research into Docker container to test inter-team comms with comms-dev. Save state to scratchpad.\",\"timestamp\":\"2026-03-14T15:38:15.212Z\"}",
+    "timestamp": "2026-03-14T15:38:15.212Z",
+    "read": true
   }
 ]

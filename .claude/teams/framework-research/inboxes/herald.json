@@ -12,5 +12,11 @@
     "summary": "Save spec to topic + create GitHub Issue",
     "timestamp": "2026-03-14T10:06:56.842Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773502697094@herald\",\"from\":\"team-lead\",\"reason\":\"Moving framework-research into Docker container to test inter-team comms with comms-dev. Save state to scratchpad.\",\"timestamp\":\"2026-03-14T15:38:17.094Z\"}",
+    "timestamp": "2026-03-14T15:38:17.094Z",
+    "read": true
   }
 ]
