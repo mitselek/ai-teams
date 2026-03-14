@@ -24,13 +24,26 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     set -a && source "$SCRIPT_DIR/.env" && set +a
 fi
 
-# Validate required credentials
+# Resolve GITHUB_TOKEN — fallback chain:
+# 1. Already set in environment
+# 2. Loaded from .env above
+# 3. gh CLI (if available and authenticated)
 if [ -z "${GITHUB_TOKEN:-}" ]; then
-    echo "ERROR: GITHUB_TOKEN is not set."
-    echo "Set it in your environment or create $SCRIPT_DIR/.env:"
-    echo "  echo 'GITHUB_TOKEN=ghp_...' >> $SCRIPT_DIR/.env"
+    if command -v gh >/dev/null 2>&1; then
+        GITHUB_TOKEN="$(gh auth token 2>/dev/null)" || true
+        if [ -n "${GITHUB_TOKEN:-}" ]; then
+            echo "Using GITHUB_TOKEN from gh CLI."
+        fi
+    fi
+fi
+if [ -z "${GITHUB_TOKEN:-}" ]; then
+    echo "ERROR: GITHUB_TOKEN is not set. Options:"
+    echo "  1. Export it:  export GITHUB_TOKEN=ghp_..."
+    echo "  2. Add to .env file:  echo 'GITHUB_TOKEN=ghp_...' >> $SCRIPT_DIR/.env"
+    echo "  3. Authenticate gh CLI:  gh auth login"
     exit 1
 fi
+export GITHUB_TOKEN
 
 export REPO_URL="${REPO_URL:-https://github.com/mitselek/ai-teams.git}"
 
