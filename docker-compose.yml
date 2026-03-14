@@ -1,74 +1,51 @@
-# Claude Code Agent Team — Docker Compose (*FR:Brunel*)
+# Claude Code Agent Team — Docker Compose — Full Isolation (*FR:Brunel*)
 #
-# One command to start: ./session-start.sh  (sets REPO_PATH, HOST_UID/GID/USER, then runs compose)
-# One command to stop:  ./session-stop.sh   (preserves claude-home volume)
+# One command to start: ./session-start.sh
+# One command to stop:  ./session-stop.sh   (preserves named volumes)
 #
-# State that survives restarts:
-#   claude-home volume  →  ~/.claude/ (auto-memory, settings, team dirs)
-#   ai-teams bind mount →  repo (git-versioned scratchpads, inboxes)
+# Layout inside container:
+#   User:        ai-teams  (uid=1000)
+#   $HOME:       /home/ai-teams/
+#   ~/.claude/:  /home/ai-teams/.claude/    → claude-home volume (auto-memory)
+#   Repo:        /home/ai-teams/workspace/  → repo-data volume (git-tracked config)
+#
+# NO bind mounts to host filesystem (PO requirement).
 
 services:
   session:
     build:
       context: .
       args:
-        # Match host UID/GID so bind-mounted files have correct ownership
-        HOST_UID: "${HOST_UID:-1000}"
-        HOST_GID: "${HOST_GID:-1000}"
-        HOST_USER: "${HOST_USER:-michelek}"
+        GIT_USER_NAME: "${GIT_USER_NAME:-mitselek}"
+        GIT_USER_EMAIL: "${GIT_USER_EMAIL:-mihkel.putrinsh@gmail.com}"
     image: ai-teams-claude:latest
     environment:
-      - HOME=/home/${HOST_USER:-michelek}
-      # Identity passed to entrypoint.sh for gosu ownership fix
-      - HOST_USER=${HOST_USER:-michelek}
-      - HOST_UID=${HOST_UID:-1000}
-      - HOST_GID=${HOST_GID:-1000}
-      # Pass through Anthropic API key if set in host environment
+      - HOME=/home/ai-teams
+      # Git credentials and repo URL
+      - REPO_URL=${REPO_URL:-https://github.com/mitselek/ai-teams.git}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      # Claude API key
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       # Required for agent teams feature
       - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
     volumes:
-      # THE GOAL: ~/.claude/ persists across container restarts
-      - claude-home:/home/${HOST_USER:-michelek}/.claude
+      # Auto-memory: ~/.claude/ persists across container restarts
+      - claude-home:/home/ai-teams/.claude
 
-      # Repo: bind mount for live git access.
-      # REPO_PATH is set by session-start.sh (git rev-parse --show-toplevel equivalent).
-      # source and target are identical so Claude's project memory keys stay valid.
-      - type: bind
-        source: ${REPO_PATH}
-        target: ${REPO_PATH}
+      # Repo: git clone lives here, pulled fresh at each session start
+      - repo-data:/home/ai-teams/workspace
 
-      # Claude binary: bind mount from host (no install needed)
-      - type: bind
-        source: /home/${HOST_USER:-michelek}/.local/share/claude
-        target: /home/${HOST_USER:-michelek}/.local/share/claude
-        read_only: true
-
-      # Claude wrapper script in PATH
-      - type: bind
-        source: /home/${HOST_USER:-michelek}/.local/bin/claude
-        target: /home/${HOST_USER:-michelek}/.local/bin/claude
-        read_only: true
-
-      # SSH keys: for git over SSH (read-only)
-      - type: bind
-        source: /home/${HOST_USER:-michelek}/.ssh
-        target: /home/${HOST_USER:-michelek}/.ssh
-        read_only: true
-
-      # Git identity
-      - type: bind
-        source: /home/${HOST_USER:-michelek}/.gitconfig
-        target: /home/${HOST_USER:-michelek}/.gitconfig
-        read_only: true
-
-    working_dir: ${REPO_PATH}
+    working_dir: /home/ai-teams/workspace
     stdin_open: true
     tty: true
 
 volumes:
-  # Named volume for ~/.claude/ — this is what makes memory persist
-  # Docker preserves this volume across container stop/start/rm
-  # To intentionally wipe memory: docker volume rm ai-teams_claude-home
+  # ~/.claude/ — Claude auto-memory, settings, runtime team dirs
+  # Wipe only intentionally: docker volume rm ai-teams_claude-home
   claude-home:
     name: ai-teams_claude-home
+
+  # Repo data — cloned at first start, pulled on subsequent starts
+  # Wipe to force re-clone: docker volume rm ai-teams_repo-data
+  repo-data:
+    name: ai-teams_repo-data

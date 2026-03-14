@@ -1,36 +1,52 @@
 #!/usr/bin/env bash
 # session-stop.sh (*FR:Brunel*)
 #
-# Stop all running session containers and show volume status.
-# Volume 'ai-teams_claude-home' is preserved (your ~/.claude/ memory lives here).
+# Stop all running session containers. Named volumes are preserved.
 #
-# Usage: ./session-stop.sh [--wipe-memory]
-#   --wipe-memory  Also delete the claude-home volume (irreversible!)
+# Usage:
+#   ./session-stop.sh                 # stop containers, keep all volumes
+#   ./session-stop.sh --wipe-memory   # also delete claude-home volume (irreversible!)
+#   ./session-stop.sh --wipe-all      # also delete claude-home AND repo-data volumes
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WIPE_MEMORY="${1:-}"
+MODE="${1:-}"
 
-# Export vars needed by docker-compose.yml substitution
-export HOST_UID="$(id -u)"
-export HOST_GID="$(id -g)"
-export HOST_USER="$(id -un)"
-export REPO_PATH="$SCRIPT_DIR"
+# Load .env if present
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    # shellcheck disable=SC1091
+    set -a && source "$SCRIPT_DIR/.env" && set +a
+fi
+
+export REPO_URL="${REPO_URL:-https://github.com/mitselek/ai-teams.git}"
 
 echo "Stopping ai-teams session containers..."
 docker compose -f "$SCRIPT_DIR/docker-compose.yml" down
 
-if [ "$WIPE_MEMORY" = "--wipe-memory" ]; then
-  echo ""
-  echo "WARNING: Deleting claude-home volume — this wipes ~/.claude/ memory permanently."
-  read -r -p "Are you sure? (yes/no): " confirm
-  if [ "$confirm" = "yes" ]; then
-    docker volume rm ai-teams_claude-home && echo "Volume deleted."
-  else
-    echo "Aborted. Volume preserved."
-  fi
+if [ "$MODE" = "--wipe-memory" ]; then
+    echo ""
+    echo "WARNING: Deleting claude-home volume — this wipes ~/.claude/ memory permanently."
+    read -r -p "Are you sure? (yes/no): " confirm
+    if [ "$confirm" = "yes" ]; then
+        docker volume rm ai-teams_claude-home && echo "claude-home volume deleted."
+    else
+        echo "Aborted. Volume preserved."
+    fi
+elif [ "$MODE" = "--wipe-all" ]; then
+    echo ""
+    echo "WARNING: Deleting ALL volumes (claude-home + repo-data). This is irreversible."
+    read -r -p "Are you sure? (yes/no): " confirm
+    if [ "$confirm" = "yes" ]; then
+        docker volume rm ai-teams_claude-home ai-teams_repo-data && echo "All volumes deleted."
+    else
+        echo "Aborted. Volumes preserved."
+    fi
 else
-  echo ""
-  echo "Volume 'ai-teams_claude-home' preserved. Memory intact."
-  echo "To intentionally wipe: $0 --wipe-memory"
+    echo ""
+    echo "Volumes preserved:"
+    echo "  ai-teams_claude-home  (~/.claude/ auto-memory)"
+    echo "  ai-teams_repo-data    (git repo)"
+    echo ""
+    echo "To wipe memory:   $0 --wipe-memory"
+    echo "To wipe all:      $0 --wipe-all"
 fi

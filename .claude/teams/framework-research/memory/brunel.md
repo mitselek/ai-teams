@@ -2,28 +2,32 @@
 
 # Brunel scratchpad
 
-[DECISION] 2026-03-14 11:30 — Container architecture: bind-mount Claude binary from host (225MB ELF, minimal libc deps, no npm install needed). Named Docker volume for ~/.claude/. Named claude-home volume = ai-teams_claude-home.
+[DECISION] 2026-03-14 11:45 — Full isolation redesign (PO requirement): no host bind mounts. Repo in named volume repo-data, cloned/pulled by entrypoint. Git auth via GITHUB_TOKEN env var (HTTPS). Claude installed via npm inside image.
 
-[DECISION] 2026-03-14 11:30 — $HOME inside container = /home/michelek (matches host). This is load-bearing: lifecycle scripts (restore-inboxes.sh, persist-inboxes.sh) use $HOME to derive runtime team dir. No script changes needed.
+[DECISION] 2026-03-14 11:45 — Two named volumes: claude-home (~/.claude/) + repo-data (git repo). Both survive docker stop/start. Wipe separately: --wipe-memory or --wipe-all flag on session-stop.sh.
 
-[DECISION] 2026-03-14 11:30 — gosu for privilege drop in entrypoint.sh. Reasons: preserves full env (ANTHROPIC_API_KEY etc), no login shell overhead, no `su -c` quoting issues.
+[DECISION] 2026-03-14 11:45 — gosu for privilege drop in entrypoint.sh. Preserves full env (ANTHROPIC_API_KEY etc), no login shell overhead, no `su -c` quoting issues.
 
-[GOTCHA] 2026-03-14 11:30 — Docker creates named volumes owned by root before any user exists in the container. Result: first-run permission denied on ~/.claude/. Fixed via entrypoint.sh: runs as root, chowns ~/.claude/ to HOST_UID:HOST_GID, then gosu drops to user.
+[DECISION] 2026-03-14 11:45 — $HOME inside container = /home/michelek (matches host). Load-bearing: lifecycle scripts use $HOME to derive runtime team dir. Also required for ~/.claude/projects/ memory key stability (keys are absolute paths).
 
-[GOTCHA] 2026-03-14 11:30 — Ubuntu 24.04 base image already has GID 1000 (group 'ubuntu'). Dockerfile uses groupmod -n to rename existing group rather than groupadd. Same for UID 1000 (user 'ubuntu') — uses usermod -l to rename.
+[GOTCHA] 2026-03-14 11:45 — Docker creates named volumes owned by root before any user exists. entrypoint.sh: runs as root, chowns ~/.claude/ to HOST_UID:HOST_GID, then gosu drops to user.
 
-[PATTERN] 2026-03-14 11:30 — Three-mount pattern: (1) named volume for ephemeral runtime state (~/.claude/), (2) bind mount for git-versioned repo, (3) read-only bind mounts for credentials (SSH, gitconfig). Keeps durable state in git, runtime state in volume.
+[GOTCHA] 2026-03-14 11:45 — Ubuntu 24.04 base image has GID 1000 ('ubuntu') and UID 1000. Dockerfile uses groupmod -n + usermod -l to rename rather than create fresh.
 
-[LEARNED] 2026-03-14 11:30 — Claude binary is a self-contained 225MB ELF (libc, libpthread, libdl, libm only). No npm, no Node.js runtime needed in container. Mount from host: ~/.local/share/claude/ + ~/.local/bin/claude symlink.
+[GOTCHA] 2026-03-14 11:45 — npm-installed Claude is Node.js version (cli.js). Host Claude is a compiled 225MB ELF — separate distribution, no public download URL. Node.js version is functionally equivalent for agent teams.
 
-[CHECKPOINT] 2026-03-14 11:30 — Implementation complete and tested:
-- Dockerfile builds (ubuntu:24.04 + git + jq + openssh + gosu)
-- entrypoint.sh: root → chown ~/.claude → gosu to michelek
-- docker-compose.yml: volume + bind mounts + env passthrough
-- session-start.sh / session-stop.sh: one-command UX
-- Tested: identity OK, claude runs, git works, volume persists across restarts
-- NOT tested: Claude interactive session (needs TTY + ANTHROPIC_API_KEY export)
+[PATTERN] 2026-03-14 11:45 — Two-volume pattern (full isolation): (1) claude-home for ~/.claude/ auto-memory, (2) repo-data for git repo. Entrypoint does git clone (first run) or git pull (subsequent). No host filesystem access.
 
-[DEFERRED] 2026-03-14 11:30 — SSH agent forwarding. Without ssh-agent, `git push` requires HTTPS credentials (git-credentials file is mounted). SSH-based push needs `SSH_AUTH_SOCK` forwarded via docker-compose. Not implemented — HTTPS credentials file covers the common case.
+[LEARNED] 2026-03-14 11:45 — Entrypoint ordering is load-bearing (R6): git pull/clone must complete before shell opens. If clone fails (bad GITHUB_TOKEN), container exits — correct, prevents Claude starting without repo.
 
-[DEFERRED] 2026-03-14 11:30 — MCP server connectivity. No MCP servers are configured in ~/.claude/settings.json (mcpServers: {}). Container has no special MCP handling. If MCP servers are added later, they may need additional ports or socket mounts.
+[CHECKPOINT] 2026-03-14 11:45 — Full isolation implementation complete and tested:
+
+- Build: ubuntu:24.04 + nodejs + npm + git + jq + openssh + gosu
+- entrypoint.sh: root → chown ~/.claude → git clone/pull → gosu drop
+- docker-compose.yml: two named volumes, env passthrough, no bind mounts
+- session-start.sh: loads .env, validates GITHUB_TOKEN, exports vars, runs compose
+- session-stop.sh: --wipe-memory / --wipe-all options
+- .env.example: documents required vars
+- Tested E2E: clone, git log, claude --version, identity, volume persistence across 2 restarts
+
+[DEFERRED] 2026-03-14 11:45 — MCP server connectivity. No MCP servers currently configured. If added, may need additional ports or socket mounts in docker-compose.yml.

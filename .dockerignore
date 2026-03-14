@@ -1,12 +1,15 @@
 # .dockerignore (*FR:Brunel*)
 # The Docker build context is the repo root — exclude large/irrelevant paths
 
-# Runtime state (managed by volumes, not image)
+# Credentials — never include in image
+.env
+
+# Runtime state (managed by named volumes, not image)
 .claude/teams/*/inboxes/
 
-# Node / package artifacts (not present in this repo but defensive)
+# Node / package artifacts
 node_modules/
 .npm/
 
-# Git objects (large, not needed in image)
+# Git objects (large, not needed in build context)
 .git/objects/

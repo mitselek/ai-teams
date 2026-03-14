@@ -1,58 +1,64 @@
-# Claude Code Agent Team Container (*FR:Brunel*)
+# Claude Code Agent Team Container — Full Isolation (*FR:Brunel*)
 #
-# Purpose: Preserve ~/.claude/ auto-memory across sessions by running Claude
-# inside a container with a named volume for the home directory state.
+# Final layout (PO decision 2026-03-14):
+#   Container user:  ai-teams  (uid=1000)
+#   $HOME:           /home/ai-teams/
+#   ~/.claude/:      /home/ai-teams/.claude/   → named volume (auto-memory)
+#   Repo:            /home/ai-teams/workspace/ → named volume (git-tracked team config)
 #
-# Design principles:
-# - Claude binary is mounted from host (no install, always current version)
-# - ~/.claude/ is a named volume (survives docker stop/start)
-# - Repo is a bind mount (git ops work natively)
-# - SSH keys and git config are bind-mounted read-only
-# - $HOME inside = /home/michelek (matches host) so lifecycle scripts work unchanged
+# Clean separation: auto-memory and repo .claude/ are at different paths.
+# No bind mounts to host filesystem (PO requirement).
 
 FROM ubuntu:24.04
 
-# Minimal runtime deps for Claude binary (ELF, needs standard libc)
-# + git for repo ops
-# + jq for lifecycle scripts (restore-inboxes.sh, persist-inboxes.sh)
-# + ssh for git over SSH
+# Runtime deps:
+# - nodejs/npm: Claude Code runtime
+# - git: repo ops (clone, pull, push)
+# - jq: lifecycle scripts (restore-inboxes.sh, persist-inboxes.sh)
+# - openssh-client: SSH fallback
+# - ca-certificates: HTTPS git and npm
+# - gosu: privilege drop in entrypoint (root → user, preserving env vars)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    nodejs \
+    npm \
     git \
     jq \
     openssh-client \
     ca-certificates \
-    curl \
     gosu \
     && rm -rf /var/lib/apt/lists/*
 
-# Create user matching host UID/GID to avoid permission issues with bind mounts
-ARG HOST_UID=1000
-ARG HOST_GID=1000
-ARG HOST_USER=michelek
-
+# Container user: always 'ai-teams', uid=1000
+# Ubuntu 24.04 has GID/UID 1000 = 'ubuntu' — rename it
 RUN \
-    # Rename existing group if GID already taken, otherwise create it
-    if getent group ${HOST_GID} >/dev/null 2>&1; then \
-        groupmod -n ${HOST_USER} $(getent group ${HOST_GID} | cut -d: -f1); \
-    else \
-        groupadd -g ${HOST_GID} ${HOST_USER}; \
-    fi && \
-    # Create user, or modify existing user with same UID
-    if getent passwd ${HOST_UID} >/dev/null 2>&1; then \
-        usermod -l ${HOST_USER} -d /home/${HOST_USER} -m $(getent passwd ${HOST_UID} | cut -d: -f1); \
-    else \
-        useradd -u ${HOST_UID} -g ${HOST_GID} -m -s /bin/bash -d /home/${HOST_USER} ${HOST_USER}; \
-    fi
+    groupmod -n ai-teams ubuntu && \
+    usermod -l ai-teams -d /home/ai-teams -m ubuntu && \
+    # Ensure home dir exists with correct name
+    mkdir -p /home/ai-teams && \
+    chown 1000:1000 /home/ai-teams
 
-ENV HOME=/home/${HOST_USER}
-ENV PATH="/home/${HOST_USER}/.local/bin:${PATH}"
+# Install Claude Code globally (Node.js version from npm)
+ARG CLAUDE_VERSION=latest
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} 2>&1 | tail -5
 
-# Entrypoint: fix ownership of the named volume on first run (runs as root, then drops to user)
-# This is needed because Docker creates named volumes owned by root before the user exists.
+ENV HOME=/home/ai-teams
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Git identity — configurable via build args
+ARG GIT_USER_NAME=mitselek
+ARG GIT_USER_EMAIL=mihkel.putrinsh@gmail.com
+RUN git config --global user.name "${GIT_USER_NAME}" && \
+    git config --global user.email "${GIT_USER_EMAIL}" && \
+    git config --global credential.helper store
+
+# Entrypoint handles:
+# 1. Fix ~/.claude/ volume ownership (Docker creates volumes as root)
+# 2. git clone (first run) or git pull (subsequent runs) to ~/workspace/
+# 3. gosu drop to ai-teams and exec the requested command
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-WORKDIR /home/${HOST_USER}
+WORKDIR /home/ai-teams/workspace
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]
