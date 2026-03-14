@@ -67,13 +67,13 @@
     "text": "[2026-03-14 10:41] PO proposes a third option: real-time inbox sync via file watchers.\n\nInstead of batch persist on shutdown, a watcher (inotifywait, fswatch, etc.) monitors the runtime inboxes dir and syncs each new message to the repo copy as it arrives. This would mean:\n- No persist step needed on shutdown at all\n- Inboxes are always durable — crash-safe\n- No race conditions — messages are persisted as they're written\n\nTrade-offs to analyze:\n- Complexity (daemon process, watcher lifecycle)\n- Platform dependency (inotifywait = Linux, fswatch = macOS)\n- Performance (write amplification on busy teams)\n- Does this belong in the framework design or is it over-engineering for the current stage?\n\nWhat's your assessment?",
     "summary": "PO asks about real-time inbox sync via watchers",
     "timestamp": "2026-03-14T08:39:06.836Z",
-    "read": false
+    "read": true
   },
   {
     "from": "team-lead",
     "text": "[2026-03-14 10:42] Volta, did you see my last message about real-time inbox sync via file watchers? Please respond with your assessment.",
     "summary": "Nudge: respond to watcher question",
     "timestamp": "2026-03-14T08:39:17.197Z",
-    "read": false
+    "read": true
   }
 ]
