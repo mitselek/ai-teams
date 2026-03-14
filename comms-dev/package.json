@@ -1,0 +1,22 @@
+{
+  "name": "comms-dev",
+  "version": "0.1.0",
+  "description": "Secure encrypted chat system for inter-team agent communication",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "broker": "tsx src/broker/daemon.ts",
+    "comms-send": "tsx src/cli/comms-send.ts",
+    "comms-publish": "tsx src/cli/comms-publish.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "vitest": "^3.0.0",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0"
+  }
+}
