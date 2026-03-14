@@ -85,17 +85,13 @@
 [GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working directory instead.
 [GOTCHA] framework-research roster.json line 5 has `mitselek-ai-teams` (dash) instead of `mitselek/ai-teams` (slash) — flagged, unresolved.
 
-### Lovelace hire — WIP (2026-03-14)
+### Lovelace hire — DELIVERED (2026-03-14)
 
-[WIP] Frontend specialist for comms-dev team. Assessed: new hire for comms-dev, NOT a separate team.
-[DECISION] Recommended name: **Lovelace** (Ada Lovelace — wrote the human interface layer for Babbage's engine). Alternatives presented: Jacquard, Turing. Awaiting PO confirmation.
-[LEARNED] Issue #8 RFC locks tech stack: SvelteKit + WebAuthn + Playwright. comms-dev team already aligned on this (Vigenere, Babbage, Kerckhoffs all commented).
-[CHECKPOINT] Role profile ready, prompt not yet drafted. Waiting for PO go-ahead. Key specs:
-- Model: sonnet. Color: orange.
-- Owns: `comms-dev/src/frontend/` — SvelteKit app, WebAuthn client flow, WSS client, reactive stores, CSP/DOMPurify
-- Coordinates: Babbage (REST+WSS API), Kerckhoffs (Playwright E2E), Vigenere (v2 browser E2E only)
-- Testing: Vitest component/unit tests (Lovelace); Playwright browser tests (Kerckhoffs)
-- Does NOT own: relay server, crypto module, Playwright tests
-[PATTERN] cloudflare-builders reference (Sven) shows frontend specialist coexists well in full-stack team. comms-dev at 4 specialists + lead is well within proven range.
+[DECISION] Lovelace hire approved by PO. Prompt written to `.claude/teams/comms-dev/prompts/lovelace.md`. Roster entry JSON delivered to team-lead for merge.
+[DECISION] Name: Lovelace (Ada Lovelace). Model: sonnet. Color: orange. Owns: `comms-relay/relay-frontend/`.
+[DECISION] Assessment: new hire for comms-dev, NOT a separate team. Rationale: tight coupling to Babbage's relay API, same codebase, proven by cloudflare-builders pattern (Sven).
+[LEARNED] Issue #8 RFC locked tech stack: SvelteKit 2 + Svelte 5 runes + TailwindCSS 4 + WebAuthn + Playwright.
+[LEARNED] Sven's prompt (cloudflare-builders) is a good template for SvelteKit frontend agents — runes-only rules, CSS gotchas, client/server boundary.
+[DEFERRED] Roster entry merge — team-lead to add Lovelace to comms-dev roster.json.
 
 (*FR:Celes*)

@@ -276,5 +276,11 @@
     "summary": "Write scratchpad checkpoint",
     "timestamp": "2026-03-14T17:34:24.786Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773511558419@volta\",\"from\":\"team-lead\",\"reason\":\"Session ending. Please write any final state to your scratchpad and approve shutdown.\",\"timestamp\":\"2026-03-14T18:05:58.419Z\"}",
+    "timestamp": "2026-03-14T18:05:58.419Z",
+    "read": true
   }
 ]
