@@ -83,17 +83,26 @@ export class UDSServer {
 
   private handleConnection(socket: net.Socket): void {
     // Raw byte accumulator — we decode frames manually so we can decrypt
-    // the payload before JSON parsing (FrameDecoder assumes plaintext JSON)
+    // the payload before JSON parsing (FrameDecoder assumes plaintext JSON).
+    //
+    // Race condition fix (Volta review): pause the socket while drainBuffer is
+    // running so no new 'data' events fire mid-drain. Resume only after drain
+    // completes and buffer is updated. This serialises all processing per connection.
     let buffer: Buffer<ArrayBuffer> = Buffer.alloc(0);
 
     socket.on('data', (chunk: Buffer) => {
       buffer = Buffer.from(Buffer.concat([buffer, chunk]));
-      // Drain synchronously to kick off async processing without interleaving
+      socket.pause();
       void this.drainBuffer(socket, buffer).then(remaining => {
         buffer = Buffer.from(remaining);
+        socket.resume();
+      }).catch(err => {
+        this.onError(err as Error);
+        socket.destroy();
       });
     });
 
+    // TODO(T7): add per-server connection limit to defend against socket flooding
     socket.on('error', (err) => this.onError(err));
   }
 
