@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)"
+    ]
+  },
+  "attribution": {
+    "commit": "Team: comms-dev",
+    "pr": "Team: comms-dev"
+  }
+}
