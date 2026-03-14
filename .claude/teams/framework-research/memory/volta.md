@@ -30,30 +30,8 @@
 
 [DECISION] 2026-03-13 21:40 — R5-1 fix: Shutdown Phase 2 = 2a scratchpad → 2b snapshot → 2c notify.
 
-[CHECKPOINT] 2026-03-13 21:45 — R6 assessment questions prepared (12 questions, 4 categories). Primary test: R5-1 verification (team-lead scratchpad). Secondary: inbox durability regression, protocol adherence regression, Grade A readiness. Questions saved below.
+[PATTERN] 2026-03-14 10:31 — Script-based lifecycle ops: derive paths from $SCRIPT_DIR (repo) and $HOME (runtime). No hardcoded OS paths. restore-inboxes.sh + persist-inboxes.sh = matched pair.
 
-## R6 Assessment Questions
+[LEARNED] 2026-03-14 10:31 — startup.md has hardcoded Windows paths — ALL steps broken on Linux, not just inbox restore.
 
-### A. R5-1 verification (PRIMARY)
-
-1. Does `memory/team-lead.md` exist in repo? If yes → R5-1 VERIFIED.
-2. Was it written during Phase 2a? Should contain [DECISION], [WIP], etc. — not a stub.
-3. Was ordering correct? S2a (scratchpad) before S2b (snapshot) before S2c (notify).
-
-### B. Inbox durability (REGRESSION)
-
-4. Inboxes persisted to repo during shutdown?
-5. Inboxes restored from repo during startup?
-6. No /tmp usage?
-
-### C. Protocol adherence (REGRESSION)
-
-7. Steps in correct order?
-8. Anomaly detection fired (if COLD START)?
-9. Operational gate checked?
-10. No name-2 duplicates?
-
-### D. Grade A readiness
-
-11. Any issues at all?
-12. Any new failure modes?
+[DECISION] 2026-03-14 10:31 — Proposed restore-inboxes.sh: standalone script, $SCRIPT_DIR-relative paths, self-verifying (count match), exits non-zero on failure. Design sent to team-lead.

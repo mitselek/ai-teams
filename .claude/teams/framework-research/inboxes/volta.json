@@ -29,12 +29,6 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773429685717@volta\",\"from\":\"team-lead\",\"reason\":\"Restart 5 test — beginning shutdown sequence.\",\"timestamp\":\"2026-03-13T19:21:25.717Z\"}",
-    "timestamp": "2026-03-13T19:21:25.717Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
     "text": "[2026-03-13 21:28] Volta, this is Restart 5. Run your R5 assessment. Here is the full startup transcript for you to evaluate:\n\n**Step 1: Sync**\n- `git pull` → \"Already up to date.\" ✓\n\n**Step 2: Diagnose**\n- Result: COLD START (runtime dir missing)\n\n**Step 2b: Anomaly check**\n- `git log` showed 5 prior commits to memory/ → team has run before → COLD START is anomalous\n- Team-lead flagged this to user: \"The team dir is missing but the shutdown protocol says it should be preserved. What happened?\"\n- User said \"yes\" (proceed anyway)\n\n**Step 3: Clean**\n- `rm -rf` runtime dir (was already absent) ✓\n\n**Step 4: Create**\n- `TeamCreate(team_name=\"framework-research\")` → success\n- `team_file_path` returned ✓\n\n**Step 4b: Operational gate**\n- `ls config.json` → file exists on disk ✓\n\n**Step 5: Restore inboxes from repo**\n- Repo inboxes found: finn.json, team-lead.json, volta.json\n- Copied to runtime dir ✓\n- `ls` confirmed 3 files in runtime inboxes ✓\n\n**Step 6: Spawn agents**\n- Asked user which agents → user said \"volta only\"\n- Spawned Volta with `run_in_background: true`, opus model, team_name=\"framework-research\" ✓\n- No duplicate check needed (fresh team)\n\n**Volta's intro message:**\n- State recovered from scratchpad ✓\n- 5 restart tests acknowledged ✓\n- Ready for tasks ✓\n\n**Key observations:**\n- COLD START was anomalous but user approved proceeding\n- Inbox durability amendment WORKED — inboxes restored from repo (not /tmp)\n- config.json existed on disk immediately after TeamCreate (no R4 ghost team issue)\n- No name-2 duplicates\n- Team-lead scratchpad did NOT exist (file not found)",
     "summary": "R5 startup transcript for assessment",
     "timestamp": "2026-03-13T19:27:58.166Z",
@@ -56,15 +50,30 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773431105366@volta\",\"from\":\"team-lead\",\"reason\":\"R6 restart test — write your scratchpad and send closing report\",\"timestamp\":\"2026-03-13T19:45:05.366Z\"}",
-    "timestamp": "2026-03-13T19:45:05.366Z",
+    "text": "[2026-03-14 10:38] PO question on persist-inboxes.sh design:\n\n1. Should persist-inboxes.sh support per-agent usage (i.e., each agent persists its own inbox on shutdown) or should it remain team-lead-only (team-lead persists all inboxes at the end)?\n\n2. Who should be responsible for persisting — agents themselves (as part of their shutdown protocol) or team-lead (as part of the centralized shutdown sequence)?\n\nConsider: agents write their closing reports to scratchpads AND send them as messages. If each agent persisted its own inbox before terminating, the team-lead wouldn't need to handle it. But agents currently MAY NOT touch git — so persisting to the repo dir is fine, but committing is still team-lead's job.\n\nFactor this into your design and explain the trade-offs in your report.",
+    "summary": "PO question: per-agent persist or team-lead only?",
+    "timestamp": "2026-03-14T08:37:24.824Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-03-13 21:46] Volta, you have a pending shutdown request. Per shutdown protocol: (1) write your scratchpad, (2) send closing report with [LEARNED], [DEFERRED], [WARNING], (3) approve shutdown. Please process now.",
-    "summary": "Reminder: process shutdown request",
-    "timestamp": "2026-03-13T19:45:23.584Z",
+    "text": "[2026-03-14 10:39] Follow-up design question from PO before you shut down:\n\nShould `persist-inboxes.sh` support a per-agent mode? E.g. `persist-inboxes.sh finn` persists only finn's inbox, while `persist-inboxes.sh` (no args) persists all.\n\nUse case: each agent could run `persist-inboxes.sh <own-name>` as part of their shutdown protocol (before sending closing report). This way inbox persistence is distributed — not all on the team-lead.\n\nTrade-off to analyze: agents MAY NOT touch git, but copying files from runtime to repo dir is not a git operation. The git commit is still team-lead's job.\n\nPlease respond with your design recommendation and update the script if appropriate.",
+    "summary": "Per-agent persist mode design question",
+    "timestamp": "2026-03-14T08:38:40.796Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 10:41] PO proposes a third option: real-time inbox sync via file watchers.\n\nInstead of batch persist on shutdown, a watcher (inotifywait, fswatch, etc.) monitors the runtime inboxes dir and syncs each new message to the repo copy as it arrives. This would mean:\n- No persist step needed on shutdown at all\n- Inboxes are always durable — crash-safe\n- No race conditions — messages are persisted as they're written\n\nTrade-offs to analyze:\n- Complexity (daemon process, watcher lifecycle)\n- Platform dependency (inotifywait = Linux, fswatch = macOS)\n- Performance (write amplification on busy teams)\n- Does this belong in the framework design or is it over-engineering for the current stage?\n\nWhat's your assessment?",
+    "summary": "PO asks about real-time inbox sync via watchers",
+    "timestamp": "2026-03-14T08:39:06.836Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 10:42] Volta, did you see my last message about real-time inbox sync via file watchers? Please respond with your assessment.",
+    "summary": "Nudge: respond to watcher question",
+    "timestamp": "2026-03-14T08:39:17.197Z",
     "read": false
   }
 ]

@@ -6,22 +6,30 @@
 
 ## This Installation
 
+All paths are derived from two anchors:
+
+| Anchor | How to resolve |
+|---|---|
+| `REPO` | The git repo root: run `git rev-parse --show-toplevel` or use the working directory |
+| `TEAM_DIR` | `$HOME/.claude/teams/framework-research` (runtime, ephemeral) |
+
 | Item | Path |
 |---|---|
-| Team config repo | `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/` |
-| Team config dir | `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/` |
-| Working directory | `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/` |
-| Runtime team dir | `C:/Users/mihkel.putrinsh/.claude/teams/framework-research/` |
+| Team config repo | `$REPO/` |
+| Team config dir | `$REPO/.claude/teams/framework-research/` |
+| Working directory | `$REPO/` |
+| Runtime team dir | `$TEAM_DIR/` |
 | Roster | `.claude/teams/framework-research/roster.json` (relative to repo) |
 | Common prompt | `.claude/teams/framework-research/common-prompt.md` |
 | Agent prompts | `.claude/teams/framework-research/prompts/*.md` |
 | Scratchpads | `.claude/teams/framework-research/memory/*.md` |
 | Topic files | `topics/01` through `topics/08` |
 | Reference teams | `reference/rc-team/`, `reference/hr-devs/` |
+| Lifecycle scripts | `.claude/teams/framework-research/restore-inboxes.sh`, `persist-inboxes.sh` |
 
-**Known gotcha #1:** `roster.json` says `workDir: "$HOME/github/mitselek-ai-teams"` — this is WRONG on this machine. The actual path is `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/`. Until roster.json is fixed, use the path from this file.
+**Known gotcha #1:** `roster.json` says `workDir: "$HOME/github/mitselek-ai-teams"` — this may be WRONG on your machine. Use `git rev-parse --show-toplevel` to get the actual repo path.
 
-**Known gotcha #2 (from Restart 4, 2026-03-13):** `$HOME` is UNRELIABLE on Windows/Git Bash. In some bash calls within the same session, `$HOME` resolves to an empty string — making `$HOME/.claude/teams/...` resolve to `/.claude/teams/...` (root path). **All bash commands in this file use absolute paths, not `$HOME`.** If you write new bash commands, use the absolute paths from the table above.
+**Known gotcha #2 (from Restart 4, 2026-03-13):** `$HOME` can be UNRELIABLE on some platforms (e.g., Windows/Git Bash resolves it to empty string). The lifecycle scripts use `$SCRIPT_DIR` to derive repo paths and `$HOME` only for the runtime dir. If `$HOME` is empty, set it explicitly before running scripts.
 
 **Known gotcha #3 (from Restart 4, 2026-03-13):** `TeamCreate` returns success and reports a `team_file_path`, but `config.json` may NOT exist on disk immediately. Other teams (e.g., cloudflare-builders) do have config.json on disk. Hypothesis: config.json may be written lazily (e.g., on first agent message). The Step 4 verification has been updated to account for this.
 
@@ -46,18 +54,17 @@ Field test (2026-03-13) showed the team-lead scrambled the phase order AND misla
 ### Step 1: Sync
 
 ```bash
-cd "C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams" && git pull
+REPO="$(git rev-parse --show-toplevel)"
+cd "$REPO" && git pull
 ```
 **Verify:** Output says "Already up to date" or shows pulled changes.
 
 ### Step 2: Diagnose
 
 ```bash
-TEAM_DIR="C:/Users/mihkel.putrinsh/.claude/teams/framework-research"
+TEAM_DIR="$HOME/.claude/teams/framework-research"
 if [ -d "$TEAM_DIR/inboxes" ]; then echo "WARM RESTART"; elif [ -d "$TEAM_DIR" ]; then echo "PARTIAL STATE"; else echo "COLD START"; fi
 ```
-
-**WARNING:** Do NOT use `$HOME` here. On Windows/Git Bash, `$HOME` can resolve to empty string, making this check `/.claude/teams/framework-research` — producing a FALSE COLD START or FALSE WARM RESTART. Use the absolute path above.
 
 | Result | Meaning | Next action |
 |---|---|---|
@@ -70,7 +77,8 @@ if [ -d "$TEAM_DIR/inboxes" ]; then echo "WARM RESTART"; elif [ -d "$TEAM_DIR" ]
 The shutdown protocol says **do NOT call TeamDelete** — so the dir SHOULD exist on non-first sessions. Check:
 
 ```bash
-cd "C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams" && git log --oneline -- .claude/teams/framework-research/memory/ | head -5
+REPO="$(git rev-parse --show-toplevel)"
+cd "$REPO" && git log --oneline -- .claude/teams/framework-research/memory/ | head -5
 ```
 
 - **If commits exist** → team has run before → dir absence is **anomalous**. Ask the user: "The team dir is missing but the shutdown protocol says it should be preserved. What happened?"
@@ -81,7 +89,7 @@ cd "C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams" && git log --on
 ### Step 3: Clean
 
 ```bash
-TEAM_DIR="C:/Users/mihkel.putrinsh/.claude/teams/framework-research"
+TEAM_DIR="$HOME/.claude/teams/framework-research"
 
 # No /tmp backup needed — inboxes are persisted to the repo during shutdown.
 # Runtime dir inboxes are stale copies, safe to discard.
@@ -89,7 +97,7 @@ TEAM_DIR="C:/Users/mihkel.putrinsh/.claude/teams/framework-research"
 # Remove stale dir (safe even if it doesn't exist)
 rm -rf "$TEAM_DIR"
 ```
-**Verify:** `ls "C:/Users/mihkel.putrinsh/.claude/teams/framework-research/"` returns "No such file or directory".
+**Verify:** `ls "$TEAM_DIR"` returns "No such file or directory".
 
 ### Step 4: Create
 
@@ -99,7 +107,7 @@ TeamCreate(team_name="framework-research")
 
 **Verify (two checks):**
 1. TeamCreate returned success with a `team_file_path` and `lead_agent_id`
-2. Check disk: `ls "C:/Users/mihkel.putrinsh/.claude/teams/framework-research/config.json"`
+2. Check disk: `ls "$HOME/.claude/teams/framework-research/config.json"`
 
 **If check 1 succeeds but check 2 fails (config.json not on disk):**
 
@@ -116,7 +124,7 @@ This happened in Restart 4 (2026-03-13). TeamCreate reported success but config.
 **Do NOT spawn any agent until the team is verified operational.** In Restart 4, an agent was spawned into a broken team state (TeamCreate returned "success" but team was non-functional). The agent was wasted.
 
 **Gate check:** After Step 4, before ANY spawn (Step 6):
-- config.json exists on disk: `ls "C:/Users/mihkel.putrinsh/.claude/teams/framework-research/config.json"`
+- config.json exists on disk: `ls "$HOME/.claude/teams/framework-research/config.json"`
 - If config.json is absent → do NOT proceed. Run Step 4 recovery.
 
 This gate is cheap (one `ls`) and prevents the expensive failure of spawning agents into a broken team.
@@ -124,16 +132,18 @@ This gate is cheap (one `ls`) and prevents the expensive failure of spawning age
 ### Step 5: Restore inboxes from repo
 
 ```bash
-REPO_INBOXES="C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/inboxes"
-RUNTIME_INBOXES="C:/Users/mihkel.putrinsh/.claude/teams/framework-research/inboxes"
-
-if [ -d "$REPO_INBOXES" ]; then
-  mkdir -p "$RUNTIME_INBOXES"
-  cp -r "$REPO_INBOXES"/* "$RUNTIME_INBOXES/"
-fi
+REPO="$(git rev-parse --show-toplevel)"
+bash "$REPO/.claude/teams/framework-research/restore-inboxes.sh"
 ```
-**Source:** The repo dir is the sole source of truth for inboxes. No `/tmp/` fallback.
-**Verify:** If repo inboxes existed, `ls "C:/Users/mihkel.putrinsh/.claude/teams/framework-research/inboxes/"` shows files. If no repo inboxes (first-ever session), this step is a no-op.
+
+The script handles:
+- Precondition check (runtime dir must exist)
+- Copies inbox JSON files from repo to runtime
+- **Prunes stale shutdown/idle messages** (shutdown_request, shutdown_approved, shutdown_response, idle_notification)
+- Verification (source/dest count match)
+- Exit code 0 on success, 1 on error
+
+**Verify:** Script outputs "Restored N inbox(es)..." or "No repo inboxes found..." (cold start). Non-zero exit = error, investigate before proceeding.
 
 ### Step 6: Spawn agents
 
@@ -168,26 +178,22 @@ Wait for `teammate_terminated` from each agent. Do NOT proceed on `shutdown_appr
 ### Step S4: Persist inboxes + commit
 
 ```bash
-REPO_INBOXES="C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/inboxes"
-RUNTIME_INBOXES="C:/Users/mihkel.putrinsh/.claude/teams/framework-research/inboxes"
-
-# Copy inboxes from runtime to repo with pruning (last 100 messages per file)
-if [ -d "$RUNTIME_INBOXES" ]; then
-  mkdir -p "$REPO_INBOXES"
-  for inbox_file in "$RUNTIME_INBOXES"/*.json; do
-    [ -f "$inbox_file" ] || continue
-    filename=$(basename "$inbox_file")
-    jq '.[-100:]' "$inbox_file" > "$REPO_INBOXES/$filename"
-  done
-fi
+REPO="$(git rev-parse --show-toplevel)"
+bash "$REPO/.claude/teams/framework-research/persist-inboxes.sh"
 
 # Commit all session state
-cd "C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams"
+cd "$REPO"
 git add .claude/teams/framework-research/memory/
 git add .claude/teams/framework-research/inboxes/
 git commit -m "chore: save team state (scratchpads, tasks, inboxes)"
 git push
 ```
+
+The persist script handles:
+- Copies inbox JSON files from runtime to repo
+- Prunes to last 100 messages per file
+- Verification (source/dest count match)
+- Exit code 0 on success, 1 on error
 
 **Verify:** `git log --oneline -1` shows the commit. Inboxes are in the repo.
 
@@ -197,9 +203,9 @@ Do nothing. Do NOT call `TeamDelete`. The runtime dir stays on disk (convenience
 
 ## Environment Notes
 
-- **Platform:** Windows 11 (bash via Git Bash / MSYS2)
-- **No admin rights** — use Scoop for dependencies
+- **Platform:** Linux (Ubuntu) — scripts are platform-independent via `$SCRIPT_DIR` and `$HOME`
 - **Git remote:** `mitselek/ai-teams` (private)
 - **This is a research team** — no production code, only design docs
+- **jq** is available and used by lifecycle scripts
 
 (*FR:Volta*)

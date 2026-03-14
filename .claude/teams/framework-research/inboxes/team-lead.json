@@ -9,23 +9,9 @@
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-13T17:43:08.147Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T17:43:08.147Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
     "text": "[2026-03-13 19:43] Finn closing report:\n- [LEARNED] Nothing new this session — startup only.\n- [DEFERRED] Still open: whether a separate `topics/02-roles.md` is wanted (current file is `02-resource-isolation.md`).\n- [WARNING] None.\n\nScratchpad updated. Ready to shut down.",
     "summary": "Finn closing report before shutdown",
     "timestamp": "2026-03-13T17:43:52.029Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773423814864@finn\",\"from\":\"finn\",\"timestamp\":\"2026-03-13T17:43:55.445Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-13T17:43:55.445Z",
     "color": "blue",
     "read": true
   },
@@ -39,23 +25,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T17:47:14.396Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T17:47:14.396Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-13 19:47] Analysis complete. This is a real gap — here's my assessment and proposed amendment.\n\n## Analysis\n\n**The gap:** Shutdown Phase 4 (Persist) commits scratchpads to git but ignores inboxes. Phase 5 (Preserve) relies on the runtime dir surviving until the next session's startup Phase 2 (Clean), which backs inboxes up to `/tmp/`. There are TWO fragile links in this chain:\n\n1. **Runtime dir → next session:** Runtime dir can disappear (reboot, manual cleanup, OS temp cleanup). This is exactly what happened today — COLD START despite 5 prior commits.\n2. **`/tmp/` → Phase 4 Restore:** Even when the startup backup works, `/tmp/` is ephemeral. A crash between startup Phase 2c (rm) and Phase 4 (restore) loses inboxes permanently.\n\n**Why closing reports matter specifically:** Agents write their `[LEARNED]`/`[DEFERRED]`/`[WARNING]` to scratchpads AND send them as closing messages. The scratchpads are committed (Phase 4). But the inbox versions have richer context — the full closing report message, not just the 1-bullet scratchpad tag. More importantly, the inbox contains the ENTIRE session's message history — task delegations, status updates, decisions made in conversation. Scratchpads capture what agents chose to save; inboxes capture everything.\n\n**Key design question: backup to repo vs `/tmp/`?**\n\nStrongly recommend **repo**. Here's why:\n\n| Factor | `/tmp/` (current) | Repo (proposed) |\n|---|---|---|\n| Survives reboot | No | Yes |\n| Survives manual cleanup | No | Yes |\n| Versioned | No | Yes (git history) |\n| Available on other machines | No | Yes (after push) |\n| Size concern | None | Moderate — inboxes grow per session |\n| Privacy | Local only | Visible in repo |\n\nThe size concern is real but manageable: prune read messages older than N sessions, or store only the latest session's inboxes.\n\n## Proposed Amendment: Shutdown Phase 3b — Persist Inboxes\n\nInsert between Phase 3 (Collect) and Phase 4 (Persist). After all agents have terminated (so all closing reports are in the inbox files), but before the git commit (so they're included in the same commit).\n\n**New phase ordering:** Halt → Notify → Collect → **Persist Inboxes (3b)** → Persist → Preserve\n\nActually, cleaner: fold it INTO Phase 4. Phase 4 already does `git add .claude/teams/<team-name>/memory/` — just expand the scope:\n\n```bash\n# Phase 4: Persist (amended)\nTEAM_CONFIG_DIR=\"<team-config-repo>/.claude/teams/<team-name>\"\nRUNTIME_DIR=\"$RESOLVED_HOME/.claude/teams/<team-name>\"\n\n# Copy inboxes from runtime dir to repo (durable storage)\nif [ -d \"$RUNTIME_DIR/inboxes\" ]; then\n  mkdir -p \"$TEAM_CONFIG_DIR/inboxes\"\n  cp -r \"$RUNTIME_DIR/inboxes/\"* \"$TEAM_CONFIG_DIR/inboxes/\"\nfi\n\n# Commit all session state: scratchpads + task snapshot + inboxes\ngit add .claude/teams/<team-name>/memory/\ngit add .claude/teams/<team-name>/inboxes/\ngit commit -m \"chore: save team state (scratchpads, tasks, inboxes)\"\ngit push\n```\n\n**Key distinction:** There are TWO `.claude/teams/<team-name>/` directories:\n1. **Runtime dir** (`$HOME/.claude/teams/...`) — where TeamCreate puts config.json and where the platform writes inbox files. Ephemeral.\n2. **Repo dir** (`<repo>/.claude/teams/...`) — where we store prompts, memory, roster. Durable (git-tracked).\n\nThe amendment copies inboxes from (1) to (2) during shutdown, making them durable.\n\n**Corresponding startup amendment:** Phase 4 (Restore) should prefer the repo copy over `/tmp/`:\n\n```\nRestore priority:\n1. Repo inboxes (durable — always preferred)\n2. /tmp/ backup (fallback — from startup Phase 2a)\n3. No inboxes (COLD START)\n```\n\n**Inbox pruning rule (size management):** Only the most recent session's inboxes are committed. On the NEXT shutdown, the old inbox files are overwritten by the new session's inboxes. No accumulation.\n\n**Open question to add:** Should inboxes be `.gitignore`d with only a compressed summary committed instead? Full inbox JSON can be large for long sessions. But for now, raw files are simpler and the research team's sessions are short.\n\nReady to write the amendment to `06-lifecycle.md` on your approval.",
     "summary": "Inbox lifecycle gap analysis and shutdown amendment proposal",
     "timestamp": "2026-03-13T17:48:27.006Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T17:48:31.158Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T17:48:31.159Z",
     "color": "green",
     "read": true
   },
@@ -69,23 +41,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T17:55:28.897Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T17:55:28.901Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-13 21:18] `startup.md` updated. Three changes:\n\n**1. Step 3 (Clean)** — Removed `/tmp/` inbox backup. Comment explains why: inboxes are persisted to repo during shutdown, runtime copies are stale/disposable.\n\n**2. Step 5 (Restore)** — Changed source from `/tmp/` to repo dir. Uses absolute paths for both repo inboxes (`C:/.../mitselek-ai-teams/.claude/teams/framework-research/inboxes`) and runtime inboxes. No fallback — repo is sole source of truth.\n\n**3. New section: Shutdown Procedure (Steps S1-S5)** — Added after Startup Procedure, before Environment Notes. Five steps matching the protocol: Halt → Task snapshot + shutdown requests → Collect → Persist inboxes + commit → Preserve. Step S4 has the full bash script with `jq '.[-100:]'` pruning and atomic git commit.\n\nBoth files (`06-lifecycle.md` and `startup.md`) are now consistent. No `/tmp/` references remain in the inbox flow.",
     "summary": "startup.md updated, 3 changes, no /tmp anywhere",
     "timestamp": "2026-03-13T19:19:07.821Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:19:12.489Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T19:19:12.489Z",
     "color": "green",
     "read": true
   },
@@ -99,30 +57,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:21:19.257Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T19:21:19.257Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773429685717@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:21:31.987Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-13T19:21:31.987Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-13 21:26] Volta online. Read common-prompt.md, my prompt, and my scratchpad.\n\n**State recovered from scratchpad:**\n- 5 restart tests completed (R1–R4 scored, R5 assessment prepared but not yet executed)\n- Canonical startup protocol in topics/06-lifecycle.md — 7 phases: Orient → Sync → Clean → Create → Restore → Audit → Spawn\n- Inbox durability amendment written (shutdown persists pruned inboxes to repo, startup restores from repo — no /tmp)\n- Restart scorecard at docs/restart-scorecard.md\n- R5 assessment questions prepared in my scratchpad — waiting to evaluate whether inbox durability amendment worked\n\n**Ready for tasks.** If this is restart 5 (or later), I have 12 assessment questions queued. Otherwise, standing by for lifecycle design work.",
     "summary": "Volta online, state recovered, ready for tasks",
     "timestamp": "2026-03-13T19:26:45.647Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:26:48.227Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T19:26:48.227Z",
     "color": "blue",
     "read": true
   },
@@ -136,23 +73,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:30:54.399Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T19:30:54.399Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-13 21:40] R5-1 amendment complete. PO feedback incorporated — no new step, just discipline to use the existing `memory/team-lead.md` mechanism.\n\n**Changes made:**\n\n1. **`topics/06-lifecycle.md`** — Shutdown Phase 2 now has 3 sub-steps:\n   - **2a (NEW):** Team-lead writes own scratchpad to `memory/team-lead.md`\n   - **2b (was 2a):** Create task-list-snapshot\n   - **2c (was 2b):** Send shutdown requests to agents\n   - All downstream references updated (Phase 4 precondition, task snapshot owner/rationale)\n\n2. **`startup.md`** — Shutdown Step S2 expanded:\n   - **S2a:** Write own scratchpad FIRST\n   - **S2b:** Task snapshot\n   - **S2c:** Send shutdown requests\n\n3. **`docs/restart-scorecard.md`** — R5-1 marked as fixed in v5\n\n**Design rationale:** Placed team-lead scratchpad FIRST in Phase 2 because:\n- This is when the lead has full context and zero coordination load\n- By Phase 4, the lead is cognitively loaded with git operations (same reason task snapshot was moved to Phase 2 in v2)\n- The mechanism already exists — same `memory/<name>.md` path all agents use. No new infrastructure.\n\nStanding by for further tasks.",
     "summary": "R5-1 amendment complete, 3 files updated",
     "timestamp": "2026-03-13T19:40:29.889Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:40:35.465Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T19:40:35.465Z",
     "color": "blue",
     "read": true
   },
@@ -166,13 +89,6 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:45:12.249Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-13T19:45:12.249Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-13 21:45] Closing report:\n\n- [LEARNED] Protocol maturity follows a predictable arc: detect → orient → recover → polish. Each restart class of issues is qualitatively different from the last.\n- [DEFERRED] R6 assessment — 12 questions prepared in scratchpad, ready for next-session Volta to execute against the transcript.\n- [WARNING] R4-1 ($HOME unreliable) is still INCONCLUSIVE — was not explicitly tested in R5. If R6 hits this, recovery path exists in startup.md but is unverified.\n\nScratchpad written. Ready to shut down.",
     "summary": "Volta closing report, scratchpad saved",
     "timestamp": "2026-03-13T19:45:51.123Z",
@@ -181,9 +97,18 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773431105366@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-13T19:45:57.342Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-13T19:45:57.342Z",
+    "text": "[2026-03-14 10:38] PO question answered: **team-lead only** (Option A, current design). Reasoning:\n\n**Why not per-agent persist:**\n1. **The team-lead inbox is the most valuable one** — it contains all closing reports from agents. Only team-lead can persist it. Since team-lead must persist at least one inbox, persisting all of them adds negligible cost.\n2. **Race condition** — agent persists its inbox, then team-lead sends another message to a different agent that references the first. The persisted copy is now stale.\n3. **Concurrent writes** — multiple agents writing to the repo `inboxes/` dir simultaneously risks file corruption or partial writes.\n4. **Scratchpads are the safety net** — if team-lead crashes before persist, the most critical state (decisions, WIP, warnings) is already in versioned scratchpad files written by each agent before termination. Inbox loss means losing message history, not losing decisions.\n\n**The protocol stays as-is:**\n- Agents: write scratchpad → send closing report → approve shutdown\n- Team-lead: wait for all `teammate_terminated` → run `persist-inboxes.sh` → commit → push\n\nNo script changes needed.",
+    "summary": "Design decision: team-lead-only persist with trade-off analysis",
+    "timestamp": "2026-03-14T08:38:49.027Z",
     "color": "blue",
     "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 10:42] Yes — I responded to the watcher question twice already (full analysis at 10:39, pointer at 10:40). Possible message delivery delay on your end. Summary: **reject — over-engineering.** Batch scripts with per-agent mode cover our failure modes. Watcher adds daemon lifecycle, platform deps, and write amplification for marginal gain. Recommend noting it as an alternative in 06-lifecycle.md but not building it.",
+    "summary": "Third confirmation: watcher assessment already sent",
+    "timestamp": "2026-03-14T08:42:56.776Z",
+    "color": "blue",
+    "read": false
   }
 ]

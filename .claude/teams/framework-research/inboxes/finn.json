@@ -1,8 +1,1 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773423814864@finn\",\"from\":\"team-lead\",\"reason\":\"Session ending, stand down.\",\"timestamp\":\"2026-03-13T17:43:34.864Z\"}",
-    "timestamp": "2026-03-13T17:43:34.864Z",
-    "read": true
-  }
-]
+[]
