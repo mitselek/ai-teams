@@ -22,6 +22,7 @@ import { MessageStore } from './message-store.js';
 import { InboxDelivery } from './inbox.js';
 import { buildMessage } from './message-builder.js';
 import { loadPsk, deriveKey, createCryptoAPI, createCryptoProvider } from '../crypto/index.js';
+import { SendMessageBridge } from './sendmessage-bridge.js';
 import type { DerivedKeys } from '../crypto/types.js';
 import type { Message, BrokerConfig, RegistryEntry, CryptoProvider } from '../types.js';
 
@@ -81,6 +82,7 @@ class Broker {
   private readonly registry: RegistryManager;
   private readonly store: MessageStore;
   private readonly inbox: InboxDelivery;
+  private readonly bridge: SendMessageBridge;
   private readonly cryptoMaterial: CryptoMaterial | undefined;
   private readonly server: UDSServer;
   private heartbeatTimer?: ReturnType<typeof setInterval>;
@@ -91,6 +93,12 @@ class Broker {
     this.registry = new RegistryManager(config.registryPath);
     this.store = new MessageStore();
     this.inbox = new InboxDelivery(config.teamName);
+    this.bridge = new SendMessageBridge({
+      teamName: config.teamName,
+      brokerInboxDir: this.inbox.inboxPath,
+      frameworkInboxDir: this.inbox.inboxPath,
+      onError: (err) => console.error('[broker] Bridge error:', err),
+    });
     this.cryptoMaterial = loadCryptoMaterial(config.pskFile ?? DEFAULT_PSK_FILE);
 
     this.server = new UDSServer({
@@ -106,6 +114,7 @@ class Broker {
   async start(): Promise<void> {
     console.log(`[broker] Starting — team: ${this.config.teamName}`);
     this.store.start();
+    this.bridge.start();
     await this.server.listen();
     await this.registerSelf();
     this.startHeartbeat();
@@ -116,6 +125,7 @@ class Broker {
   async stop(): Promise<void> {
     console.log('[broker] Shutting down…');
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    this.bridge.stop();
     await this.registry.deregister(this.config.teamName);
     await this.server.close();
     this.store.stop();

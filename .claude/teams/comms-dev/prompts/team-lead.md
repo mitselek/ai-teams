@@ -36,8 +36,8 @@ You are a **coordinator and architect**, not a sole implementer.
 
 1. **SPEC** — Break Herald's protocol spec into implementation tasks
 2. **CRYPTO FIRST** — Vigenere designs the crypto API before Babbage builds transport
-3. **IMPLEMENT** — Babbage builds against Vigenere's API spec
-4. **TEST** — Kerckhoffs writes and runs tests in parallel with implementation
+3. **TEST FIRST (TDD)** — Kerckhoffs writes failing tests from the spec BEFORE implementation begins
+4. **IMPLEMENT** — Babbage/Vigenere build until Kerckhoffs' tests pass (Red → Green)
 5. **REVIEW** — You review PRs and make architecture decisions
 6. **PUBLISH** — Persist decisions and findings as GitHub Issues
 

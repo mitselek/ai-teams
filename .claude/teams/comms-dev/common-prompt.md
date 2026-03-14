@@ -110,6 +110,24 @@ rm .gh-issue-body.md
 - Tests are mandatory for all functionality
 - Code review happens via team-lead before merge
 - Git commits follow conventional commits: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`
+- All commits must include team attribution in the trailer: `Team: comms-dev`
+
+## Development Method: TDD (Test-Driven Development)
+
+All new functionality follows the **Red → Green → Refactor** cycle:
+
+1. **Kerckhoffs writes failing tests first** — from the spec or task description, before any implementation exists
+2. **Babbage/Vigenere implement** — write the minimum code to make the tests pass
+3. **Refactor** — clean up while keeping tests green
+
+**Workflow for new features:**
+1. Team-lead assigns a feature task
+2. Kerckhoffs reads the spec/task and writes test cases with real assertions (NOT todos)
+3. Kerckhoffs confirms tests fail (`RED`) and sends `[COORDINATION]` to the implementer with test file location
+4. Implementer writes code until tests pass (`GREEN`)
+5. Implementer sends `[COORDINATION]` back — Kerckhoffs verifies and adds edge cases if needed
+
+**Rule:** No implementation work begins until Kerckhoffs has committed failing tests for that module. The tests define the contract.
 
 ## Agent Spawning Rule
 

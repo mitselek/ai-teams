@@ -9,7 +9,8 @@
     "test:watch": "vitest",
     "broker": "tsx src/broker/daemon.ts",
     "comms-send": "tsx src/cli/comms-send.ts",
-    "comms-publish": "tsx src/cli/comms-publish.ts"
+    "comms-publish": "tsx src/cli/comms-publish.ts",
+    "comms-watch": "tsx src/cli/comms-watch.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
