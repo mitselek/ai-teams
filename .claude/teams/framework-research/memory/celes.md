@@ -79,11 +79,23 @@
 
 ## Session 2026-03-14
 
-[DECISION] Brunel hire approved (2026-03-14). Designed as "Isambard Kingdom Brunel" (Victorian engineer — tunnels, ships, railways; containment and transport lore). Prompt at `prompts/brunel.md`. Model: sonnet. Color: yellow. Writes to 06-lifecycle.md (container sections), Docker config files, own scratchpad. Coordinates with Volta on lifecycle requirements.
-[DECISION] Volta+Brunel coordination model: section ownership partition of 06-lifecycle.md + `[COORDINATION]` handshake protocol. Both prompts updated.
-[DECISION] Brunel scope expanded: added compose architecture decisions (#7) and container networking (#8).
-[DECISION] comms-dev team approved and fully provisioned (2026-03-14). Roster: Vigenere (crypto, opus, red), Babbage (backend, sonnet, blue), Kerckhoffs (QA/security, sonnet, green). All files at `.claude/teams/comms-dev/`. Includes GitHub Issues as cross-team knowledge base, `[COORDINATION]` handshake between Vigenere↔Babbage and Babbage↔Kerckhoffs.
-[GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working directory instead. Fixed in comms-dev common-prompt.md.
-[GOTCHA] framework-research roster.json line 5 has `mitselek-ai-teams` (dash) instead of `mitselek/ai-teams` (slash) — flagged to team-lead, unresolved.
+[DECISION] Brunel hire approved. Prompt at `prompts/brunel.md`. Model: sonnet. Color: yellow. Coordinates with Volta on lifecycle/containers.
+[DECISION] Volta+Brunel coordination: section ownership partition of 06-lifecycle.md + `[COORDINATION]` handshake.
+[DECISION] comms-dev team fully provisioned. Roster: Vigenere (crypto, opus, red), Babbage (backend, sonnet, blue), Kerckhoffs (QA/security, sonnet, green). All files at `.claude/teams/comms-dev/`.
+[GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working directory instead.
+[GOTCHA] framework-research roster.json line 5 has `mitselek-ai-teams` (dash) instead of `mitselek/ai-teams` (slash) — flagged, unresolved.
+
+### Lovelace hire — WIP (2026-03-14)
+
+[WIP] Frontend specialist for comms-dev team. Assessed: new hire for comms-dev, NOT a separate team.
+[DECISION] Recommended name: **Lovelace** (Ada Lovelace — wrote the human interface layer for Babbage's engine). Alternatives presented: Jacquard, Turing. Awaiting PO confirmation.
+[LEARNED] Issue #8 RFC locks tech stack: SvelteKit + WebAuthn + Playwright. comms-dev team already aligned on this (Vigenere, Babbage, Kerckhoffs all commented).
+[CHECKPOINT] Role profile ready, prompt not yet drafted. Waiting for PO go-ahead. Key specs:
+- Model: sonnet. Color: orange.
+- Owns: `comms-dev/src/frontend/` — SvelteKit app, WebAuthn client flow, WSS client, reactive stores, CSP/DOMPurify
+- Coordinates: Babbage (REST+WSS API), Kerckhoffs (Playwright E2E), Vigenere (v2 browser E2E only)
+- Testing: Vitest component/unit tests (Lovelace); Playwright browser tests (Kerckhoffs)
+- Does NOT own: relay server, crypto module, Playwright tests
+[PATTERN] cloudflare-builders reference (Sven) shows frontend specialist coexists well in full-stack team. comms-dev at 4 specialists + lead is well within proven range.
 
 (*FR:Celes*)

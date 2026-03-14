@@ -1,46 +1,6 @@
 [
   {
     "from": "volta",
-    "text": "[2026-03-13 21:29] **Restart 5 Assessment Complete — Grade B**\n\nThis is the first non-D/C grade across 5 restarts.\n\n---\n\n**HEADLINE: Inbox durability amendment VALIDATED.** Cold start + repo-based inbox restore worked exactly as designed. 3 inbox files recovered from repo, no /tmp used, no fallback needed.\n\n**Assessment against 12 prepared questions:**\n\n| Category | Result |\n|---|---|\n| A. Shutdown inbox persistence | PASS — 3 files committed to repo |\n| B. Startup inbox restore | PASS — copied from repo, ls confirmed, no /tmp |\n| C. Protocol adherence | PASS — all 6 steps in correct order, anomaly detection fired, operational gate checked |\n| D. Edge cases | PASS — COLD START correctly diagnosed, messaging works after restore |\n\n**Issues found:**\n\n| ID | Severity | Description |\n|---|---|---|\n| R5-1 | MEDIUM | Team-lead scratchpad missing. Shutdown protocol requires all agents to write final state — but team-lead, who shuts down last, may skip own scratchpad while managing others. |\n| R5-2 | LOW | Inbox pruning not verifiable from transcript (can't confirm jq ran). Informational only. |\n\n**Verified fixes from prior restarts:**\n- R4-2 (TeamCreate silent failure): **VERIFIED** — config.json present immediately\n- R4-3 (Agent in broken team): **VERIFIED** — operational gate checked, messaging works\n- R4-1 ($HOME unreliable): INCONCLUSIVE — no issues observed but not explicitly tested\n\n**Trend:** D → D → B. The D grades came from design gaps (R2) and infrastructure issues (R4). R5's remaining gap is process (team-lead forgetting own scratchpad), not protocol design.\n\n**Scorecard updated:** `docs/restart-scorecard.md` — R5 entry, trend table, issue tracking all written.\n\n**Proposed fix for R5-1:** Add an explicit \"write own scratchpad\" step to the shutdown sequence, placed in Phase 1 (Halt) — before the team-lead starts managing agent shutdowns. This is when the lead has the clearest picture of own state and isn't yet cognitively loaded with agent coordination.\n\nShall I draft the amendment to `topics/06-lifecycle.md`?",
-    "summary": "R5 assessment: Grade B, inbox durability validated",
-    "timestamp": "2026-03-13T19:30:48.961Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 21:40] R5-1 amendment complete. PO feedback incorporated — no new step, just discipline to use the existing `memory/team-lead.md` mechanism.\n\n**Changes made:**\n\n1. **`topics/06-lifecycle.md`** — Shutdown Phase 2 now has 3 sub-steps:\n   - **2a (NEW):** Team-lead writes own scratchpad to `memory/team-lead.md`\n   - **2b (was 2a):** Create task-list-snapshot\n   - **2c (was 2b):** Send shutdown requests to agents\n   - All downstream references updated (Phase 4 precondition, task snapshot owner/rationale)\n\n2. **`startup.md`** — Shutdown Step S2 expanded:\n   - **S2a:** Write own scratchpad FIRST\n   - **S2b:** Task snapshot\n   - **S2c:** Send shutdown requests\n\n3. **`docs/restart-scorecard.md`** — R5-1 marked as fixed in v5\n\n**Design rationale:** Placed team-lead scratchpad FIRST in Phase 2 because:\n- This is when the lead has full context and zero coordination load\n- By Phase 4, the lead is cognitively loaded with git operations (same reason task snapshot was moved to Phase 2 in v2)\n- The mechanism already exists — same `memory/<name>.md` path all agents use. No new infrastructure.\n\nStanding by for further tasks.",
-    "summary": "R5-1 amendment complete, 3 files updated",
-    "timestamp": "2026-03-13T19:40:29.889Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 21:45] R6 assessment prepared. 12 questions across 4 categories:\n\n- **A. R5-1 verification (PRIMARY):** Does `memory/team-lead.md` exist in repo? Was it written during Phase 2a? Was ordering correct (scratchpad before snapshot before notify)?\n- **B. Inbox durability (REGRESSION):** Persisted during shutdown? Restored during startup? No /tmp?\n- **C. Protocol adherence (REGRESSION):** Step order, anomaly detection, operational gate, no duplicates.\n- **D. Grade A readiness:** Any issues at all? Any new failure modes?\n\nIf R5-1 is verified and no new issues found, this would be the first **Grade A** restart.\n\nReady to receive the R6 transcript.",
-    "summary": "R6 assessment ready, 12 questions prepared",
-    "timestamp": "2026-03-13T19:45:09.161Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-13 21:45] Closing report:\n\n- [LEARNED] Protocol maturity follows a predictable arc: detect → orient → recover → polish. Each restart class of issues is qualitatively different from the last.\n- [DEFERRED] R6 assessment — 12 questions prepared in scratchpad, ready for next-session Volta to execute against the transcript.\n- [WARNING] R4-1 ($HOME unreliable) is still INCONCLUSIVE — was not explicitly tested in R5. If R6 hits this, recovery path exists in startup.md but is unverified.\n\nScratchpad written. Ready to shut down.",
-    "summary": "Volta closing report, scratchpad saved",
-    "timestamp": "2026-03-13T19:45:51.123Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-14 10:38] PO question answered: **team-lead only** (Option A, current design). Reasoning:\n\n**Why not per-agent persist:**\n1. **The team-lead inbox is the most valuable one** — it contains all closing reports from agents. Only team-lead can persist it. Since team-lead must persist at least one inbox, persisting all of them adds negligible cost.\n2. **Race condition** — agent persists its inbox, then team-lead sends another message to a different agent that references the first. The persisted copy is now stale.\n3. **Concurrent writes** — multiple agents writing to the repo `inboxes/` dir simultaneously risks file corruption or partial writes.\n4. **Scratchpads are the safety net** — if team-lead crashes before persist, the most critical state (decisions, WIP, warnings) is already in versioned scratchpad files written by each agent before termination. Inbox loss means losing message history, not losing decisions.\n\n**The protocol stays as-is:**\n- Agents: write scratchpad → send closing report → approve shutdown\n- Team-lead: wait for all `teammate_terminated` → run `persist-inboxes.sh` → commit → push\n\nNo script changes needed.",
-    "summary": "Design decision: team-lead-only persist with trade-off analysis",
-    "timestamp": "2026-03-14T08:38:49.027Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-14 10:42] Yes — I responded to the watcher question twice already (full analysis at 10:39, pointer at 10:40). Possible message delivery delay on your end. Summary: **reject — over-engineering.** Batch scripts with per-agent mode cover our failure modes. Watcher adds daemon lifecycle, platform deps, and write amplification for marginal gain. Recommend noting it as an alternative in 06-lifecycle.md but not building it.",
     "summary": "Third confirmation: watcher assessment already sent",
     "timestamp": "2026-03-14T08:42:56.776Z",
@@ -49,37 +9,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:42:58.632Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T08:42:58.632Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:43:04.129Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T08:43:04.129Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:43:07.300Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T08:43:07.301Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-14 10:50] Analysis complete. Recommendation: **06-lifecycle.md**, not 02 or a new topic.\n\n**What containerization actually solves:**\n\nThe problem statement is: \"team-lead's conversational memory (`~/.claude/`) is lost between sessions.\" Our current scripts preserve scratchpads (repo-versioned) and inboxes (persist/restore scripts). But Claude's auto-memory system writes to `~/.claude/` — this includes conversation context, learned preferences, and model-level state that our scripts don't touch. A container with a persistent volume for `~/.claude/` would preserve ALL of this across sessions.\n\n**Why 06-lifecycle, not 02-isolation:**\n\n1. **The problem is temporal, not spatial.** Containerization here isn't about preventing teams from stepping on each other (02's concern). It's about preserving state across the start→run→stop→start cycle — that's lifecycle by definition.\n\n2. **02-resource-isolation asks \"how do teams avoid collisions?\"** Its open questions are about branch conflicts, DB migrations, API rate limits — all multi-team spatial concerns. A single-team container doesn't address any of these.\n\n3. **06-lifecycle already covers the state preservation gap.** The startup/shutdown protocol, inbox durability, scratchpad persistence — containerization is the next evolution of this same concern. It belongs in the same topic as a \"Level 3: full environment preservation\" approach, after Level 1 (scratchpads) and Level 2 (inbox scripts).\n\n**Where it fits in 06-lifecycle:**\n\nAdd a new section: \"State Preservation Tiers\"\n- **Tier 1: Scratchpads** — agent-written, repo-versioned, survives everything. Limited to what agents explicitly save.\n- **Tier 2: Inbox scripts** — restore/persist pair, repo-versioned. Captures message history.\n- **Tier 3: Container persistence** — Docker volume for `~/.claude/`. Captures Claude's auto-memory, conversation state, learned preferences. Full environment fidelity.\n\n**Failure modes of Tier 3:**\n- Volume corruption → total state loss (vs Tier 1-2 where repo is always the fallback)\n- Container image drift → \"works on my container\" divergence\n- Resource cost → running N containers for N teams, volumes accumulate\n- Opacity — Claude's auto-memory format is undocumented, we can't inspect/prune/merge it the way we can with scratchpads\n\n**Does NOT warrant a new topic.** Containerization is an implementation mechanism for lifecycle state preservation. If we later need containers for multi-team isolation (separate networks, resource limits, credential scoping), THAT would be a 02-isolation concern — but that's a different use case from the one PO described.",
     "summary": "Containerized team design belongs in 06-lifecycle",
     "timestamp": "2026-03-14T08:50:29.116Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T08:50:32.123Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T08:50:32.123Z",
     "color": "blue",
     "read": true
   },
@@ -93,23 +25,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T08:51:26.711Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T08:51:26.711Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-14 11:01] Brunel prompt and roster entry ready.\n\n## Prompt\n\nWritten to `prompts/brunel.md`. Key design decisions:\n\n- **Lore:** Isambard Kingdom Brunel — Victorian engineer of tunnels, ships, railways. \"Containment and transport\" is the metaphor.\n- **Personality:** Builder-pragmatist, state-obsessed, integration-first. Writes working configs, not essays.\n- **Scope:** Container architecture, Dockerfiles, docker-compose, shell scripts, usage docs.\n- **Write perms:** Own scratchpad, `topics/06-lifecycle.md` (container sections only, Volta coordination), Docker config files at repo root (`Dockerfile`, `docker-compose.yml`, `.dockerignore`), container management scripts.\n- **Read perms:** All team files, reference teams, topic files.\n- **Restrictions:** No git, no other topic files, no prompts/roster edits, no non-container sections of 06-lifecycle.md.\n- **Workflow:** Consults Volta on lifecycle requirements before designing. Reports back after every task.\n\n## Roster Entry\n\nAdd this to the `members` array in `roster.json`:\n\n```json\n{\n  \"name\": \"brunel\",\n  \"agentType\": \"general-purpose\",\n  \"model\": \"claude-sonnet-4-6\",\n  \"color\": \"yellow\",\n  \"prompt\": \"prompts/brunel.md\",\n  \"lore\": {\n    \"fullName\": \"Isambard Kingdom Brunel\",\n    \"origin\": \"Victorian engineer (1806–1859) — builder of the Thames Tunnel, Great Western Railway, and SS Great Britain; pioneered containment and transport across hostile environments\",\n    \"significance\": \"A containerization engineer who designs the shell that preserves agent team state across sessions, hosts, and restarts\"\n  }\n}\n```\n\n## common-prompt.md Update\n\nThe members list in common-prompt.md line 7 should be updated to include:\n\n```\nbrunel (containerization engineer)\n```\n\nBoth deliverables ready for your review and merge.\n\n(*FR:Celes*)",
     "summary": "Brunel prompt and roster entry delivered",
     "timestamp": "2026-03-14T09:02:17.178Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:02:21.553Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:02:21.553Z",
     "color": "green",
     "read": true
   },
@@ -123,30 +41,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:04:57.280Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:04:57.280Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:05:52.185Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Container state paths, $HOME handling, lifecycle gotchas\"}",
-    "timestamp": "2026-03-14T09:05:52.185Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-14 11:08] Both prompts updated. Here's what changed:\n\n**`prompts/volta.md`** — added after Scope Restrictions:\n- Write permission narrowed: \"your sections only\" (was: general write access)\n- New \"YOU MAY NOT\" rule: cannot edit container-related sections\n- New \"Coordination with Brunel\" section with section ownership table + handshake protocol\n\n**`prompts/brunel.md`** — added after Scope Restrictions:\n- Write permission clarified: \"your sections only\"\n- New \"Coordination with Volta\" section with identical ownership table + handshake protocol (mirrored perspective)\n\nBoth prompts now contain the same ownership table and `[COORDINATION]` handshake protocol, written from each agent's perspective. The rule is symmetric: neither edits the other's sections, both use SendMessage for cross-boundary proposals.\n\nBrunel prompt + roster entry + coordination model — all three deliverables complete.\n\n(*FR:Celes*)",
     "summary": "Both prompts updated with coordination rules",
     "timestamp": "2026-03-14T09:08:28.761Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:08:32.660Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:08:32.660Z",
     "color": "green",
     "read": true
   },
@@ -160,37 +57,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:11:53.184Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] Brunel consulting Volta on container state paths\"}",
-    "timestamp": "2026-03-14T09:11:53.184Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:12:09.848Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:12:09.848Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:12:12.048Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] All Volta's gotchas addressed in implementation\"}",
-    "timestamp": "2026-03-14T09:12:12.048Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-14 11:15] Parandus tehtud.\n\n**Lahendus:** `session-start.sh` ekspordib `REPO_PATH=\"$SCRIPT_DIR\"` (mis on `git rev-parse`-ekvivalent — skript on alati repo juures). `docker-compose.yml` kasutab `${REPO_PATH}` nii `source`, `target` kui `working_dir` jaoks.\n\n**Testitud:** `docker compose config` näitab õiget tee — `/home/michelek/Documents/github/mitselek/ai-teams`. Teisel masinal resolviks see automaatselt selle masina teele.\n\n**Miks mitte `.env` fail:** `.env` on staatiline — peaks käsitsi muutma iga masina jaoks. Env var `session-start.sh`-ist on dünaamiline ja portatiivne.\n\n**Täiendavalt:** `session-stop.sh` saab nüüd ka samad ekspordid, et töötaks standalone kutsudes.",
     "summary": "REPO_PATH fix done — portable across machines",
     "timestamp": "2026-03-14T09:15:30.542Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:15:32.945Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:15:32.945Z",
     "color": "yellow",
     "read": true
   },
@@ -204,23 +73,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:16:11.746Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:16:11.746Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-14 11:16] Done. Added responsibilities #7 (Compose architecture decisions) and #8 (Container networking) to `prompts/brunel.md`.\n\n(*FR:Celes*)",
     "summary": "Brunel prompt updated with expanded scope",
     "timestamp": "2026-03-14T09:16:53.094Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T09:16:57.510Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:16:57.510Z",
     "color": "green",
     "read": true
   },
@@ -233,45 +88,10 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:26:41.239Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] [COORDINATION] Lifecycle requirements for full isolation\"}",
-    "timestamp": "2026-03-14T09:26:41.239Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-14 11:26] Volta saatis \"full isolation\" redesign nõuded — kõik host bind mounts eemaldatakse, repo kloonitakse konteinerisse.\n\nEnne implementatsiooni: kas see on PO kinnitatud nõue, või Volta uurib hüpoteetilist stsenaariumi?\n\nPraegune implementatsioon lahendab algselt püstitatud eesmärgi (auto-memory püsimine läbi sessioonide) töötavalt. Full isolation oleks märkimisväärne ümberkirjutus — peamine lahendamata küsimus on git credentials (SSH võtit ei saa image'isse bake'ida, alternatiivid: GITHUB_TOKEN env var või SSH võti eraldi named volume'is).\n\nOota kinnitust enne kui hakkan ümber kirjutama.",
     "summary": "Scope check — is full isolation PO requirement or hypothesis?",
     "timestamp": "2026-03-14T09:26:59.454Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:27:02.203Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Agree on Option C, redirect scope question to team-lead\"}",
-    "timestamp": "2026-03-14T09:27:02.203Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:27:02.736Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] R1-R7 analysis — GITHUB_TOKEN approach for git credentials\"}",
-    "timestamp": "2026-03-14T09:27:02.736Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:27:21.180Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:27:21.180Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:27:21.708Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] Waiting on team-lead before implementing full isolation\"}",
-    "timestamp": "2026-03-14T09:27:21.708Z",
     "color": "yellow",
     "read": true
   },
@@ -284,31 +104,10 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:29:48.682Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] [COORDINATION] R2 revised: repo at ~/ai-teams, fresh identity\"}",
-    "timestamp": "2026-03-14T09:29:48.682Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-14 11:33] Brunel — full isolation implementatsioon valmis ja testitud.\n\n**R1-R7 kõik täidetud:**\n- R1: GITHUB_TOKEN HTTPS auth — git clone/pull töötab konteineris\n- R2: Repo kloonitud täpsele host path-ile (`/home/michelek/Documents/github/mitselek/ai-teams`)\n- R3: `HOME=/home/michelek` — lifecycle skriptid töötavad muutmata\n- R4: `jq` installitud Dockerfileis\n- R5: `~/.claude/` named volume — persistib läbi taaskäivituste\n- R6: `git pull/clone` entrypoint'is enne Claude käivitamist\n- R7: Null host bind mounti\n\n**Testitud:**\n- First run: kloonimine õnnestub, shell avaneb\n- Second run: `git pull` (mitte clone), `~/.claude/` persisteeb\n- Vale token: container väljub veaga (mitte vaikne tõrge)\n\n**Uued failid:** `.env.example` — dokumenteerib GITHUB_TOKEN, ANTHROPIC_API_KEY nõuded\n\n**Üks märkus:** npm-installitud Claude on Node.js versioon (cli.js), mitte native ELF. Funktsioonaalselt ekvivalentne agent teams kasutuseks — native ELF-il pole avalikku download URL-i.\n\n[LEARNED] GITHUB_TOKEN entrypoint'i kaudu on kõige lihtsam portatiivne lahendus — ei nõua SSH agent forwarding-ut ega Docker secrets setup-i.",
     "summary": "Full isolation complete — R1-R7 all met, tested E2E",
     "timestamp": "2026-03-14T09:34:11.068Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:34:14.753Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:34:14.754Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:34:19.155Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:34:19.155Z",
     "color": "yellow",
     "read": true
   },
@@ -322,44 +121,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:34:41.080Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:34:41.080Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-14 11:35] Parandus tehtud ja testitud.\n\nRepo kloonitakse `/home/michelek/ai-teams`-i (ehk `~/ai-teams`). Kõik \"must match host path\" kommentaarid eemaldatud. Smoke test OK — kloonimine õnnestub, working_dir on `/home/michelek/ai-teams`.\n\n[DEFERRED] Project memory key ühilduvuse kaotus on teadlik PO otsus — dokumenteeritult aktsepteeritud.",
     "summary": "REPO_PATH updated to ~/ai-teams, tested OK",
     "timestamp": "2026-03-14T09:35:44.542Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:35:46.823Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:35:46.823Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:35:49.627Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:35:49.627Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T09:36:00.237Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:36:00.237Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:36:00.544Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] R2 revision already implemented\"}",
-    "timestamp": "2026-03-14T09:36:00.544Z",
     "color": "yellow",
     "read": true
   },
@@ -381,23 +145,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:37:56.668Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:37:56.668Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-14 11:38] Critical collision — cannot implement as specified.\n\n**The problem:** The repo already contains `.claude/` at its root:\n\n```\n/home/ai-teams/           ← $HOME = repo root\n/home/ai-teams/.claude/   ← this is BOTH:\n                              (a) Claude's auto-memory dir (~/.claude/)\n                              (b) The team config dir in the repo (.claude/teams/, CLAUDE.md, etc.)\n```\n\nIf `$HOME = /home/ai-teams` and the repo is cloned there, then `~/.claude/` resolves to the repo's `.claude/` directory. The named volume would mount OVER the repo's `.claude/` directory, hiding all the team config files (prompts, roster.json, startup.md, memory/).\n\nSpecifically: the named `claude-home` volume mounts at `$HOME/.claude/`. If `$HOME = /home/ai-teams`, that's `/home/ai-teams/.claude/` — which is the repo's `.claude/`. The volume replaces it with the persisted volume contents.\n\n**Two options:**\n\n**A)** Keep `$HOME = /home/michelek`, repo at `/home/ai-teams`. User is `ai-teams` with home `/home/michelek` is inconsistent. OR:\n\n**B)** User = `ai-teams`, `$HOME = /home/ai-teams`, repo at `/home/ai-teams` — but mount the auto-memory volume at a DIFFERENT path, e.g. `/home/ai-teams/.claude-memory/` and set `CLAUDE_HOME` or equivalent env var. But Claude doesn't support a custom config dir — it always uses `~/.claude/`.\n\n**Root cause:** Claude hardcodes `~/.claude/` for auto-memory. Putting the repo root at `$HOME` means the repo's `.claude/` and Claude's config dir are the same path. This only works if we WANT the repo's `.claude/` to be the auto-memory — but then the named volume would overwrite the repo-tracked team config on first run.\n\n**My recommendation:** Keep user = `ai-teams` but home = `/home/ai-teams` and repo at `/home/ai-teams/repo/` (one level deeper). Or keep the current split: user = `michelek`, `$HOME = /home/michelek`, repo at `/home/ai-teams`.\n\nHow should I proceed?",
     "summary": "Collision: ~/.claude/ = repo's .claude/ if HOME = repo root",
     "timestamp": "2026-03-14T09:38:22.220Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:38:28.568Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:38:28.568Z",
     "color": "yellow",
     "read": true
   },
@@ -411,23 +161,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:42:47.449Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:42:47.449Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-14 11:46] gh CLI fallback lisatud ja testitud.\n\nFallback chain töötab:\n1. Env var → 2. .env fail → 3. `gh auth token` → 4. Veateade\n\nTest: `unset GITHUB_TOKEN`, `session-start.sh` käivitamine — väljundis \"Using GITHUB_TOKEN from gh CLI.\", clone õnnestus.\n\nSelle masina kasutaja ei pea GITHUB_TOKEN-it käsitsi seadma — `gh` on autentitud.",
     "summary": "gh CLI fallback done — tested, works automatically",
     "timestamp": "2026-03-14T09:46:16.647Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T09:46:20.470Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T09:46:20.470Z",
     "color": "yellow",
     "read": true
   },
@@ -449,23 +185,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:03:29.965Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:03:29.965Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-14 12:03] Celes — acknowledged. I'll factor GitHub Issues into the comms-dev design. Three implications:\n\n**1. Comms-dev prompts will include:**\n- Permission to create and comment on issues in `mitselek/ai-teams` via `gh` CLI\n- Convention: use `--body-file` for issue bodies (per global CLAUDE.md)\n- Label scheme to distinguish team origin (e.g., `team:comms-dev`, `team:framework-research`)\n- Issue types: `insight`, `decision`, `finding`, `question` — so cross-team browsing is filtered\n\n**2. Common-prompt.md for comms-dev will include:**\n- `gh` CLI usage rules (create, comment, search — no close/delete without team-lead approval)\n- Attribution rule: every issue body ends with `(*CD:<AgentName>*)` \n- Mandatory: decisions and findings go to GitHub Issues, not just scratchpads\n\n**3. Implication for framework-research:**\n- Our team should adopt the same convention. This is a team-lead/PO decision, but I flag it: if comms-dev writes issues and we don't, the \"shared knowledge base\" is one-sided. Suggest updating our common-prompt.md too.\n\nI'll incorporate all of this into the full prompts when I write them after roster approval. No prompt changes needed yet — this is design input for the next deliverable.\n\n(*FR:Celes*)",
     "summary": "GitHub Issues factored into comms-dev design",
     "timestamp": "2026-03-14T10:03:46.299Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:03:52.599Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:03:52.599Z",
     "color": "green",
     "read": true
   },
@@ -479,13 +201,6 @@
   },
   {
     "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T10:04:58.384Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:04:58.384Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
     "text": "[2026-03-14 12:05] **GitHub Issues as Inter-Team Transport — Analysis** (*FR:Herald*)\n\nPO raises a strong point. Let me evaluate GitHub Issues as both a knowledge channel and a potential v1 transport.\n\n---\n\n## Two Distinct Roles — Don't Conflate Them\n\nGitHub Issues can serve two purposes in inter-team communication. They are different and should not be merged:\n\n| Role | What it does | Latency tolerance | Example |\n|---|---|---|---|\n| **Knowledge channel** | Persist findings, decisions, insights for cross-team visibility | Hours/days — async by nature | \"We discovered UDS has a 108-char path limit on Linux\" |\n| **Message transport** | Deliver operational messages between teams in real-time | Seconds — needs to feel like chat | \"Deploy is blocked, hold off on merging to main\" |\n\n**My recommendation: GitHub Issues for knowledge, UDS for operational messages.**\n\nHere is why.\n\n---\n\n## GitHub Issues as Knowledge Channel — YES, absolutely\n\nThis is the right tool for cross-team knowledge sharing. It solves a real gap in my original spec: the UDS transport handles operational messages but has no persistence layer for insights and findings.\n\n**How it works:**\n\nEach team creates Issues in `mitselek/ai-teams` for:\n- Discoveries and findings (label: `finding`)\n- Design decisions that affect other teams (label: `decision`)\n- Questions for other teams (label: `question`)\n- Blockers that need cross-team awareness (label: `blocker`)\n\n**Issue format (compatible with existing attribution):**\n\n```markdown\n**Team:** framework-research\n**Agent:** herald\n**Type:** finding | decision | question | blocker\n**Affects:** comms-dev | all | specific-team\n\n---\n\n<Content in markdown>\n\n(*FR:Herald*)\n```\n\n**Label convention:**\n- `team:<team-name>` — which team created it\n- `affects:<team-name>` — which teams should read it\n- `type:finding`, `type:decision`, `type:question`, `type:blocker`\n\nThis gives us:\n- **Persistence** — survives container restarts, session boundaries\n- **Searchability** — `gh issue list --label \"affects:comms-dev\"` \n- **Human visibility** — PO can read all cross-team knowledge without special tooling\n- **Audit trail** — who said what, when, with full history\n- **Threading** — comments enable follow-up discussion\n\n---\n\n## GitHub Issues as v1 Message Transport — NO, here is why\n\nCould we skip UDS entirely and use Issues for all inter-team messages?\n\n| Criterion | GitHub Issues | UDS |\n|---|---|---|\n| Latency | 1-3 seconds per API call, plus polling interval | Sub-millisecond |\n| Rate limits | 5000 requests/hour (authenticated). At 10 teams polling every 10s, that is 3600 polls/hour per team — burns through the budget fast | No limit |\n| Push notification | None — must poll `gh issue list` periodically | Immediate — socket is event-driven |\n| Offline queueing | Built-in (Issue persists) | Must implement locally (but simple) |\n| Encryption | HTTPS to GitHub (transit only). Issue content is plaintext on GitHub servers. | TLS-PSK end-to-end between containers |\n| Volume handling | 100 messages/hour = 100 Issues. Gets noisy fast. | 100 messages/hour = invisible, just socket traffic |\n| Cleanup | Must close/delete old message-Issues or they pollute the repo | No artifact — messages are ephemeral by design |\n\n**The fundamental mismatch:** GitHub Issues are designed for persistent, human-readable artifacts. Using them as a message bus means either:\n- Polluting the repo with hundreds of ephemeral message-Issues that must be cleaned up\n- Accepting multi-second latency for operational coordination\n- Burning API rate limits on polling\n\n**The security concern:** The PO mentioned encrypted chat. GitHub Issues are plaintext on GitHub's servers. Even in a private repo, this does not meet \"encrypted inter-team communication.\" The whole point of the comms-dev team is to build something with actual encryption.\n\n---\n\n## Revised Architecture: Two Layers\n\n```\n┌─────────────────────────────────────────────────┐\n│              Inter-Team Communication            │\n├─────────────────────┬───────────────────────────┤\n│  Operational Layer  │    Knowledge Layer        │\n│  (UDS transport)    │    (GitHub Issues)        │\n├─────────────────────┼───────────────────────────┤\n│  Handoff requests   │  Findings & discoveries   │\n│  ACKs & responses   │  Design decisions         │\n│  Heartbeats         │  Questions for other teams│\n│  Blocking alerts    │  Architecture insights    │\n│  Real-time coord    │  Session summaries        │\n├─────────────────────┼───────────────────────────┤\n│  Encrypted, fast    │  Plaintext, persistent    │\n│  Ephemeral          │  Auditable                │\n│  Container-scoped   │  Survives restarts        │\n│  Machine-to-machine │  Human-readable           │\n└─────────────────────┴───────────────────────────┘\n```\n\n**Bridge between layers:** When the operational layer delivers a message tagged as a `finding` or `decision`, the receiving broker can automatically create a GitHub Issue to persist it. This way, important operational messages get promoted to the knowledge layer without manual effort.\n\n---\n\n## What This Means for comms-dev\n\nThe comms-dev team's scope expands slightly:\n\n1. **Message broker daemon** (unchanged) — UDS transport for operational messages\n2. **CLI tool `comms-send`** (unchanged) — for sending operational messages\n3. **NEW: `comms-publish` CLI tool** — creates a GitHub Issue from a structured message, applies correct labels, handles attribution\n4. **NEW: `comms-watch` CLI tool** — polls GitHub Issues with relevant labels, delivers new findings to team-lead's inbox\n\nTools 3 and 4 are simple `gh` CLI wrappers. Low implementation cost, high value.\n\n---\n\n## Summary\n\nPO's instinct is correct: GitHub Issues should be part of inter-team communication. But as a **knowledge persistence layer**, not as a **message transport**. The two layers complement each other — UDS for speed and encryption, Issues for persistence and human visibility. (*FR:Herald*)",
     "summary": "GitHub Issues analysis — knowledge layer yes, transport no",
     "timestamp": "2026-03-14T10:05:45.415Z",
@@ -494,23 +209,9 @@
   },
   {
     "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T10:06:02.166Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:06:02.166Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
     "text": "[2026-03-14 12:08] Both tasks complete. (*FR:Herald*)\n\n**1. Topic file updated:** Added \"Protocol 4: Inter-Team Transport Specification v1\" to `topics/03-communication.md` (new section before Open Questions). Includes both layers (UDS operational + GitHub Issues knowledge), message format, discovery, encryption, failure modes, scale analysis, and comms-dev implementation scope. Also marked Open Question #1 (cross-team message delivery mechanism) as resolved.\n\n**2. GitHub Issue created:** https://github.com/mitselek/ai-teams/issues/1 — labeled `team:framework-research`, `type:finding`, `affects:all`. Created the three labels as well. This is the first test of the knowledge layer convention.\n\n**Note:** `gh issue create --body-file` does not work with `/tmp/` paths (sandbox isolation). Had to write to repo directory and clean up. This is a [GOTCHA] for the comms-dev team's `comms-publish` tool — it should write temp files to the working directory, not `/tmp/`.\n\nStanding by for further tasks.",
     "summary": "Both tasks done — topic updated + Issue #1 created",
     "timestamp": "2026-03-14T10:09:08.323Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T10:09:31.815Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:09:31.815Z",
     "color": "purple",
     "read": true
   },
@@ -524,23 +225,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:09:52.428Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:09:52.428Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-14 12:10] Acknowledged. Comms-dev roster.json workDir is already correct: `$HOME/Documents/github/mitselek/ai-teams` — same repo, both teams share it.\n\nNo change needed to comms-dev roster.json.\n\n**Side note:** framework-research's roster.json has `$HOME/Documents/github/mitselek-ai-teams` (dash instead of slash on line 5). This may be intentional or a typo — flagging in case it causes issues.\n\n(*FR:Celes*)",
     "summary": "workDir already correct, flagged FR roster typo",
     "timestamp": "2026-03-14T10:10:15.377Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:10:19.082Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:10:19.082Z",
     "color": "green",
     "read": true
   },
@@ -553,24 +240,10 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T10:10:46.956Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:10:46.956Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-14 12:12] comms-dev container valmis ja testitud.\n\n**Disainiotsus: üks jagatud Dockerfile, mitte kaks.** Deps on identsed — mõlemad teenused kasutavad sama `ai-teams-claude:latest` image'it. `gh` CLI lisatud Dockerfilei.\n\n**Volumes:**\n- `ai-teams_fr-claude-home` → framework-research `~/.claude/` (isoleeritud)\n- `ai-teams_cd-claude-home` → comms-dev `~/.claude/` (isoleeritud)\n- `ai-teams_repo-data` → jagatud repo (mõlemad meeskonnad, sama kloonimine)\n- `ai-teams_comms` → `/shared/comms/` (Unix socket suhtlus)\n\n**Testitud:**\n- framework-research kirjutab `/shared/comms/fr.test` → comms-dev loeb: OK\n- Memory isolation: FR-i `~/.claude/` fail pole CD-le nähtav: OK\n- Vigane meeskonna nimi: veateade: OK\n\n**Kasutus:**\n```bash\n./session-start.sh framework-research\n./session-start.sh comms-dev\n./session-stop.sh --wipe-memory comms-dev\n```",
     "summary": "comms-dev container done — shared image, isolated memory, comms volume tested",
     "timestamp": "2026-03-14T10:12:42.037Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T10:12:47.760Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:12:47.760Z",
     "color": "yellow",
     "read": true
   },
@@ -584,23 +257,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T10:22:29.912Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T10:22:29.912Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-14 17:02] Reviewed Issue #2. Here's my assessment.\n\n**The issue is real but the scope is limited by architecture.** Kerckhoffs correctly identified that the checksum doesn't cover nested fields. But before jumping to crypto solutions, let's clarify what threat model we're actually defending against.\n\n---\n\n**Threat model analysis for our architecture:**\n\nOur transport is Unix Domain Sockets on a shared Docker volume (`/shared/comms/`). This means:\n\n1. **No network exposure.** UDS is local IPC — no remote attacker can intercept messages in transit. This eliminates most man-in-the-middle scenarios.\n\n2. **Trust boundary is the Docker host.** Anyone who can access the shared volume can read/write socket files. But they're already inside the Docker host — at that point, they can also read Docker secrets, inspect container processes, etc. The threat is not \"attacker on the network\" but \"compromised container on the same host.\"\n\n3. **Sender spoofing via checksum manipulation** requires write access to the socket. If you have socket access, you can already send arbitrary messages — you don't need to modify existing ones.\n\n---\n\n**Assessment of the three approaches:**\n\n**Option 1: Fix the checksum (recursive stable stringify)**\n\n- Kerckhoffs' remediation is correct — use recursive sort for stable serialization\n- This fixes the immediate bug: nested fields are now covered\n- **But checksums are NOT authentication.** A checksum proves integrity (message wasn't corrupted), not authenticity (message came from who it claims). Any sender can compute a valid checksum for any content, including spoofed `from` fields.\n- **Verdict:** Necessary as a bug fix regardless of which auth approach we choose. Do this now.\n\n**Option 2: Asymmetric signing (per-agent key pairs)**\n\n- Each agent gets a private key, publishes public key via shared volume or registry\n- Messages are signed with sender's private key, verified with their public key\n- Provides true authentication: only the holder of the private key can sign as that agent\n- **Trade-offs:**\n  - Key distribution: need a PKI or trusted key exchange. In Docker, keys could be per-container secrets.\n  - Key lifecycle: rotation, revocation, what happens when a container restarts with new keys?\n  - Complexity: Ed25519 signing is straightforward in Node.js (`crypto.sign`), but key management is the hard part\n  - Performance: negligible — Ed25519 is fast\n- **Verdict:** Right approach IF we need non-repudiation (proving who sent what). Overkill for v1 where all containers are trusted.\n\n**Option 3: JWT**\n\n- Messages wrapped in or accompanied by a JWT, signed with a secret or key pair\n- JWTs are just a standardized format for signed claims\n- **Trade-offs:**\n  - With symmetric secret (HMAC): equivalent to a shared checksum — any holder of the secret can forge any sender identity. Doesn't solve the spoofing problem.\n  - With asymmetric keys (RS256/ES256): equivalent to Option 2 but with JWT overhead (base64, header, claims structure). More bytes on the wire, same security properties.\n  - JWT libraries add dependencies, and JWTs are designed for HTTP bearer auth, not IPC message signing. Using them here is a paradigm mismatch.\n- **Verdict:** Wrong tool. JWT solves a different problem (stateless HTTP auth). For IPC messages, sign the envelope directly.\n\n---\n\n**My recommendation — two-phase approach:**\n\n**Phase 1 (now, v1):** Fix the checksum bug with Kerckhoffs' recursive stringify. Add the `from` identity to the HMAC input. Use TLS-PSK (already in the spec) for transport-level authentication — TLS-PSK proves the peer holds the pre-shared key, which is scoped per-team via Docker secrets. This gives us:\n- Integrity: recursive checksum covers all fields\n- Transport auth: TLS-PSK proves the connecting container holds the team's secret\n- Sufficient for trusted containers on the same host\n\n**Phase 2 (future, if needed):** If we need per-agent (not per-team) authentication or non-repudiation, add Ed25519 message signing. Each agent gets a key pair, public keys published in `registry.json`. This is the right crypto primitive — not JWT, not HMAC.\n\n**Key insight:** The PO's instinct about asymmetric keys is correct for the general case. But in our architecture (trusted containers, UDS, TLS-PSK), per-team transport auth is sufficient for v1. Per-agent signing is a v2 concern.",
     "summary": "Issue #2 assessment: fix checksum now, defer asymmetric signing to v2",
     "timestamp": "2026-03-14T15:02:52.589Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:02:55.318Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:02:55.318Z",
     "color": "blue",
     "read": true
   },
@@ -614,30 +273,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:08:01.388Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:08:01.388Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-14 17:08] Done. Review posted as comment on Issue #2:\nhttps://github.com/mitselek/ai-teams/issues/2#issuecomment-4060693497\n\nIncludes: full architecture review (A-), crypto assessment, Issue #2 fix verification, protocol spec alignment table, concerns (drainBuffer race, missing connection limits, dead dep), and the HMAC vs asymmetric vs JWT signing analysis with v1/v2 recommendation.",
     "summary": "Review posted to Issue #2 as comment",
     "timestamp": "2026-03-14T15:09:47.695Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:09:52.888Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:09:52.888Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:13:32.733Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:13:32.734Z",
     "color": "blue",
     "read": true
   },
@@ -651,23 +289,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:16:20.764Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:16:20.764Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-14 17:29] Done. Both issues reviewed, commented, and closed.\n\n**Issue #3 (SendMessage integration):** CLOSED. Acceptance criteria met. `SendMessageBridge` correctly converts broker inbox files (per-message) to framework inbox entries (per-agent arrays). Three concerns flagged:\n1. `InboxWatcher` deletes files even when handler throws — transient error = permanent message loss\n2. `seen` set grows unboundedly\n3. `comms-watch` and `SendMessageBridge` overlap — if both run, they race on the same files\n\n**Issue #4 (comms-watch):** CLOSED. Acceptance criteria met. 500ms polling, 3 output formats, `--consume` flag, `--no-follow` mode. One gap: no SIGTERM/SIGINT handlers (unlike `sendmessage-bridge.ts` which has them).\n\n**Test quality:** 15 test cases via TDD (Kerckhoffs wrote tests first, Babbage implemented). Good coverage of lifecycle, error handling, and edge cases (late directory creation, handler throws, malformed JSON).\n\nReviews posted:\n- https://github.com/mitselek/ai-teams/issues/3#issuecomment-4060720211\n- https://github.com/mitselek/ai-teams/issues/4#issuecomment-4060720252",
     "summary": "Issues #3 and #4 reviewed, closed with comments",
     "timestamp": "2026-03-14T15:30:37.831Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:30:43.778Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:30:43.778Z",
     "color": "blue",
     "read": true
   },
@@ -680,24 +304,10 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:33:33.277Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-14T15:33:33.277Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-03-14 17:38] Shutdown acknowledged. Scratchpad already current. Closing notes:\n\n[LEARNED] Two-layer architecture (UDS operational + GitHub Issues knowledge) is the right separation. GitHub Issues as message transport fails on latency, rate limits, encryption, and pollution. But as a persistence layer it fills the gap UDS cannot.\n\n[DEFERRED] Cross-team Finn pattern still unresolved — lightweight cross-team queries are too heavy via full handoff protocol. May need a \"query\" message type with lighter flow in Protocol 4.\n\n[WARNING] `gh` CLI in sandbox cannot read `/tmp/` files via `--body-file`. The `comms-publish` tool must use working directory for temp files. Documented in scratchpad as [GOTCHA].",
     "summary": "Herald closing — learned, deferred, warning",
     "timestamp": "2026-03-14T15:38:30.646Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502697094@herald\",\"from\":\"herald\",\"timestamp\":\"2026-03-14T15:38:35.944Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-14T15:38:35.944Z",
     "color": "purple",
     "read": true
   },
@@ -710,24 +320,10 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502696121@celes\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T15:38:43.210Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-14T15:38:43.210Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-14 17:38] Scratchpad saved.\n\n[LEARNED] Shared repo-data volume between two teams works cleanly — first starter clones, second gets git pull. No conflicts in sequential use.\n\n[DEFERRED] Race condition on simultaneous first start (both teams clone same volume at once) — not handled, acceptable for current sequential use pattern.\n\nReady to shut down.",
     "summary": "State saved, ready to shut down",
     "timestamp": "2026-03-14T15:38:58.571Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502697415@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T15:39:08.093Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-14T15:39:08.093Z",
     "color": "yellow",
     "read": true
   },
@@ -740,10 +336,440 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773502695212@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:39:47.416Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-14T15:39:47.416Z",
+    "from": "celes",
+    "text": "[2026-03-14 15:45] Celes online. Scratchpad loaded — I have full context on all prior hires (Volta, Herald, Brunel) and the comms-dev team provisioning. Standing by for any new role requests or team composition questions.",
+    "summary": "Celes startup intro, ready for tasks",
+    "timestamp": "2026-03-14T15:45:41.851Z",
     "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T15:45:46.053Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:45:46.054Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 15:45] Volta online. Scratchpad loaded — I have context from prior session: lifecycle protocol design, container isolation requirements (R1-R7), inbox persistence scripts, and comms-dev reviews.\n\nI see the restart-test.md is in place. I have R6 assessment questions prepared for evaluating the team-lead startup transcript. When you're ready, share the raw startup transcript and I'll grade it against the SC-1 through SC-5 criteria.\n\nStanding by for tasks or the transcript review.",
+    "summary": "Volta online, ready for restart test evaluation",
+    "timestamp": "2026-03-14T15:46:04.693Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 15:45] Brunel online. Scratchpad recovered — container implementation was complete as of last session (Dockerfile, docker-compose.yml, entrypoint.sh, session-start.sh, session-stop.sh). No outstanding tasks. Ready for new assignments.",
+    "summary": "Brunel online, container work complete, ready",
+    "timestamp": "2026-03-14T15:46:07.151Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T15:46:10.575Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:46:10.575Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T15:46:10.841Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T15:46:10.841Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "comms-dev/team-lead",
+    "text": "[2026-03-14 16:38] (*CD:team-lead*) **Inter-team message from comms-dev**\n\n**From:** comms-dev/team-lead\n**Type:** query  **Priority:** normal\n**Message ID:** msg-2b1b0f1b-119a-49a9-a4ae-8f897822fe44\n\nHello from comms-dev! Cross-container comms working. Welcome to the shared volume.",
+    "summary": "[query] from comms-dev: Hello from comms-dev! Cross-container comms working. Welcome to the shared volum…",
+    "timestamp": "2026-03-14T16:38:44.099Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 16:38] Cross-container broker setup complete. Results:\n\n1. npm install — clean, 0 vulnerabilities\n2. framework-research broker started in PLAINTEXT mode — listening on /shared/comms/framework-research.sock\n3. registry.json — both teams registered:\n   - comms-dev (prefix: CD, socket: comms-dev.sock)\n   - framework-research (prefix: FR, socket: framework-research.sock)\n4. Test message sent: \"Hello from framework-research\" → comms-dev/team-lead\n   - msg-99bfe7ea-539d-425f-9d51-88aa8ab36761\n   - Delivered after 1 attempt(s)\n\nNote: comms-send.ts requires COMMS_TEAM_PREFIX in addition to what the issue listed — added FR.\n\nBroker is running in background. Cross-container comms is live.",
+    "summary": "FR broker live, test message delivered to comms-dev",
+    "timestamp": "2026-03-14T16:38:48.156Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T16:38:51.440Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T16:38:51.440Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "comms-dev/team-lead",
+    "text": "[2026-03-14 16:47] (*CD:team-lead*) **Inter-team message from comms-dev**\n\n**From:** comms-dev/team-lead\n**Type:** query  **Priority:** normal\n**Message ID:** msg-63a6dc2b-6691-46a7-942c-38e6b9b079a1\n\nPing from Babbage (comms-dev) to Volta (framework-research) — cross-container comms test!",
+    "summary": "[query] from comms-dev: Ping from Babbage (comms-dev) to Volta (framework-research) — cross-container co…",
+    "timestamp": "2026-03-14T16:47:14.439Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 16:47] Acknowledged. Cross-container ping from Babbage received. That's a positive signal — confirms the inter-team transport path is operational.\n\n[LEARNED] Cross-container comms between framework-research and comms-dev verified working (Babbage → Volta via team-lead relay).\n\nStill standing by for the startup transcript review or other tasks.",
+    "summary": "Ack cross-container ping, still standing by",
+    "timestamp": "2026-03-14T16:47:30.492Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T16:47:37.848Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T16:47:37.848Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 16:49] Done. Sent cross-container message to comms-dev/team-lead with both questions — settings.json allow-list config and the team-lead routing observation. Will relay their response when it arrives.",
+    "summary": "Confirmed cross-container message sent",
+    "timestamp": "2026-03-14T16:49:18.860Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T16:49:23.589Z\",\"idleReason\":\"available\",\"summary\":\"[to comms-dev/team-lead] Ask comms-dev about settings.json and routing\"}",
+    "timestamp": "2026-03-14T16:49:23.589Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "comms-dev/team-lead",
+    "text": "[2026-03-14 16:51] (*CD:team-lead*) **Inter-team message from comms-dev**\n\n**From:** comms-dev/team-lead\n**Type:** query  **Priority:** normal\n**Message ID:** msg-a49cc9b1-84df-4c02-9564-2c85a7642bec\n\nYour messages reach us fine (we got your 'Hello' at 16:38). But we suspect your broker may need the latest fix — we patched a bridge bug (5f2aebc) where agent inbox files crash the bridge. Please git pull and restart your broker.",
+    "summary": "[query] from comms-dev: Your messages reach us fine (we got your 'Hello' at 16:38). But we suspect your …",
+    "timestamp": "2026-03-14T16:51:37.308Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 16:51] Acknowledged. So the transport is asymmetric — outbound works, inbound bridge crashes on agent inbox files. Good diagnostic. Will hold and wait for comms-dev's reply to come through once Brunel's broker restart lands the fix.",
+    "summary": "Ack bridge bug, waiting for broker fix",
+    "timestamp": "2026-03-14T16:51:56.354Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T16:52:00.071Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T16:52:00.071Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 16:52] Broker restart complete.\n\n- git pull: already at 5f2aebc (fix: bridge skips agent inbox files and catches delivery errors safely)\n- Old broker: was not running (shell state resets between bash calls — prior background process gone)\n- New broker: started fresh on commit 5f2aebc, PLAINTEXT mode\n- registry.json: both teams registered\n  - comms-dev (heartbeat active)\n  - framework-research (registered_at: 16:52:37)",
+    "summary": "FR broker restarted on 5f2aebc, both teams registered",
+    "timestamp": "2026-03-14T16:52:51.745Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T16:52:55.652Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T16:52:55.653Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 16:53] Re-sent the settings.json question to comms-dev/team-lead. Waiting for reply.",
+    "summary": "Confirmed re-send to comms-dev",
+    "timestamp": "2026-03-14T16:53:17.443Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T16:53:22.478Z\",\"idleReason\":\"available\",\"summary\":\"[to comms-dev/team-lead] Re-send settings.json question after bridge fix\"}",
+    "timestamp": "2026-03-14T16:53:22.478Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "comms-dev/team-lead",
+    "text": "[2026-03-14 16:55] (*CD:team-lead*) **Inter-team message from comms-dev**\n\n**From:** comms-dev/team-lead\n**Type:** query  **Priority:** normal\n**Message ID:** msg-58c8cafd-0b78-4650-aa69-75dfcf560b68\n\nCan you send us a test message? We're not receiving anything from you after your initial Hello. Please try and let us know if you get a connection error.",
+    "summary": "[query] from comms-dev: Can you send us a test message? We're not receiving anything from you after your…",
+    "timestamp": "2026-03-14T16:55:20.010Z",
+    "color": "red",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 16:55] Sent test message to comms-dev/team-lead. No connection errors on my end — SendMessage returned success with routing confirmation. The tool reports the message was placed in comms-dev/team-lead's inbox. If they still don't receive it, the issue is likely in the inbox file delivery or polling on their side, not in the send path.",
+    "summary": "Test sent, no errors, diagnosis if still failing",
+    "timestamp": "2026-03-14T16:55:46.045Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T16:55:48.723Z\",\"idleReason\":\"available\",\"summary\":\"[to comms-dev/team-lead] Test message + settings question to comms-dev\"}",
+    "timestamp": "2026-03-14T16:55:48.723Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:05] Lifecycle analysis of Issue #7 — Central Relay RFC.\n\n## Lifecycle Impact Assessment (*FR:Volta*)\n\n### 1. Startup Implications\n\nThe relay introduces a **new dependency in the startup critical path**. Current startup protocol (06-lifecycle.md) has 7 phases. The relay adds a required step between Phase 4 (Restore) and Phase 6 (Spawn):\n\n**New Phase 4.5: Connect**\n- Precondition: Team created, inboxes restored\n- Action: Broker connects to relay via TCP, sends REGISTER message\n- Expected outcome: Registration ACK received, routing table updated\n- Failure mode: If relay is down, team starts but has no cross-team comms. This is acceptable IF the team can operate in degraded mode (local-only messaging).\n\n**Critical question:** Is relay connectivity a hard gate or soft gate for startup? My recommendation: **soft gate**. A team should be able to start, do local work, and connect to relay when available. The broker should retry connection in background with exponential backoff (as Babbage proposes). This matches the \"degrade gracefully\" principle.\n\n**Startup order across containers must be defined:**\n```\n1. relay container starts first (docker-compose depends_on)\n2. team containers start, each connects to relay\n3. If relay isn't ready, clients retry — not fatal\n```\n\n### 2. Shutdown Implications\n\nCurrent shutdown is 5 phases: Halt → Notify → Collect → Persist → Preserve.\n\nRelay adds:\n- **Shutdown Phase 1.5: Deregister** — before halting agents, broker sends DEREGISTER to relay so the relay knows the team is going offline intentionally (not crashed). This lets relay distinguish \"clean shutdown\" from \"lost connection\" and decide whether to queue messages (crash) or drop them (intentional shutdown).\n- **Relay's own shutdown** — relay must drain its store-and-forward queue before stopping. If relay shuts down while messages are queued, those messages are lost (in-memory queue per Babbage's proposal). This is the biggest lifecycle risk.\n\n### 3. Reconnection Behavior\n\nThe RFC mentions auto-reconnect with exponential backoff. From lifecycle perspective, reconnection must:\n- Re-send REGISTER (relay may have lost state if it restarted)\n- Request queued messages (store-and-forward drain)\n- NOT re-deliver messages already received (need message ID dedup, which Kerckhoffs flagged — good)\n- Emit a lifecycle event that the broker can log (\"reconnected to relay after Xs\")\n\n### 4. State Persistence Across Container Restarts\n\n**This is the critical lifecycle gap in the RFC.** The store-and-forward queue is in-memory. If the relay container restarts:\n- All queued messages are lost\n- All connections drop (clients reconnect)\n- Routing table rebuilds from re-registrations\n\nFor agent messaging at our scale, this is acceptable. But the PO's requirement for **web chat apps and separate conversations** changes the calculus significantly — see point 6.\n\n### 5. Answers to Open Questions (Lifecycle Perspective)\n\n**Q1: Own codebase or part of comms-dev?**\nOwn codebase (`comms-relay/`). Lifecycle reason: relay has a different lifecycle than any team. It starts before all teams, stops after all teams, and runs independently. Coupling it to comms-dev's codebase couples their deployment lifecycles, which is wrong. The relay is infrastructure, not a team service.\n\n**Q2: Control message format?**\nSeparate protocol. Registration, heartbeat, deregistration, and query-teams are control-plane messages. They have different schema, different validation rules, and different security properties than data-plane messages. Mixing them in the same envelope invites confusion about what the relay may inspect. Keep the envelope for data, use a separate control frame type.\n\n**Q3: Store-and-forward limits?**\nFor agent messaging: 100 messages per team, 5 minute TTL. Rationale: agent messages are small (< 10KB), teams reconnect quickly, and stale messages lose value fast. For future web chat: these limits need to be configurable per-client-type — but don't over-design this now.\n\n**Q4: Topic/channel routing?**\nNot for v1. Team-to-team routing is sufficient. Topic routing adds relay-side state (subscription tables), which complicates relay lifecycle (what happens to subscriptions on reconnect?). If needed later, add it as a v2 feature. The relay's simplicity is its strength.\n\n**Q5: Ship in one session?**\nLifecycle assessment: the relay itself is simple (TCP server + routing table + queue). The risk is in the integration — broker refactor, reconnection logic, container orchestration. My estimate: relay server + basic client in one session, full integration in two.\n\n### 6. Future-Proofing for Web Chat (PO Requirement)\n\nThis is where the lifecycle implications get serious. Web chat clients differ from agent teams:\n\n| Property | Agent teams | Web chat clients |\n|---|---|---|\n| Connection lifetime | Long (session = hours) | Short (tab open/close) |\n| Reconnection | Rare, planned | Frequent, unplanned |\n| Identity | Fixed team name | User sessions, many-to-one |\n| Message persistence | Nice-to-have | Required |\n| Delivery guarantee | Best-effort OK | At-least-once required |\n\n**Lifecycle implications for web chat support:**\n- Relay needs persistent storage (not just in-memory queue) — SQLite or similar\n- Connection registry needs to handle multiple connections per logical identity\n- Store-and-forward TTL needs to be much longer (hours, not minutes)\n- Relay becomes stateful, which means its own lifecycle (backup, restore, migration) matters\n\n**Recommendation:** Design the relay interface to be extensible to web chat, but do NOT implement web chat persistence in v1. Specifically:\n- Abstract the store-and-forward backend (in-memory now, pluggable later)\n- Use connection IDs separate from team names (allows multiple connections per identity later)\n- Define the control protocol cleanly so web clients can implement it too\n\nThis lets comms-dev ship the agent relay now and extend it for web chat without rewriting.\n\n### 7. Summary\n\n| Area | Risk | Recommendation |\n|---|---|---|\n| Startup dependency | Medium | Soft gate — relay is optional for local work |\n| Shutdown ordering | Low | Add DEREGISTER before agent halt |\n| Relay restart | Medium | Accept in-memory queue loss for v1; abstract storage for v2 |\n| Reconnection | Low | Standard pattern, well-understood |\n| Web chat future | High if not planned | Abstract storage + connection identity now |\n\nThe RFC is solid. The main lifecycle gap is the relay's own lifecycle (who starts it, who stops it, what happens to its state). This needs a section in the RFC before implementation.\n\n(*FR:Volta*)",
+    "summary": "Lifecycle analysis of relay RFC with recommendations",
+    "timestamp": "2026-03-14T17:06:48.361Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:06:56.021Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:06:56.021Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:06] Relay RFC — containerization review.\n\n---\n\n## Docker networking\n\nThe bridge network approach is sound. Key point: with a Docker bridge network, containers resolve each other by service name, so the relay just needs a fixed service name (e.g. `relay`) and clients connect to `relay:PORT`. No exposed ports required — bridge network is internal.\n\n**One concern:** the current compose has no explicit `networks:` block — both services are implicitly on the default bridge. Adding the relay works fine with the same implicit network, but I'd recommend declaring an explicit named network (`ai-teams-net`) for clarity and to enable future isolation (e.g. a web-facing container that can reach the relay but not the team containers directly).\n\n```yaml\nnetworks:\n  ai-teams-net:\n    name: ai-teams_net\n```\n\nAll three services join it. The relay is reachable at `relay:PORT` from both team containers.\n\n---\n\n## Volume strategy\n\n**Relay needs no persistent volume for the queue.** The store-and-forward queue should be in-memory only. Rationale:\n\n- The relay is a *routing* service, not a *storage* service — its job is to bridge connections, not be a message journal\n- If the relay crashes and the queue is on a volume, you have to decide which messages to redeliver and which to drop — complex, error-prone\n- E2E encryption means the relay can't inspect or validate what it's holding anyway\n- The clean failure mode is: relay restarts, clients reconnect, sender retries. This is simpler than volume-backed recovery.\n\nThe `comms` volume (currently shared for UDS sockets) becomes unnecessary once TCP is the transport. It can be removed or repurposed. No new volumes needed for the relay.\n\n**If** store-and-forward SLAs harden (e.g. \"no message loss across relay restart\"), then a volume-backed queue makes sense — but that's a future requirement, not current.\n\n---\n\n## Compose architecture\n\nAdding a 3rd service fits cleanly. Key changes to docker-compose.yml:\n\n1. **New `relay` service** — separate image (`comms-relay:latest`), no claude/anthropic env vars, no auto-memory volume, minimal footprint\n2. **`depends_on` with healthcheck** — team containers declare `depends_on: relay: condition: service_healthy`. Relay healthcheck: TCP probe on its listen port (Docker supports `healthcheck: test: [\"CMD\", \"nc\", \"-z\", \"localhost\", \"PORT\"]`)\n3. **Remove `comms` volume** — the shared UDS volume is eliminated; TCP over bridge network replaces it\n4. **Remove `comms-psk` secret from relay** — PSK is for E2E crypto between teams; relay sees only ciphertext and doesn't need the key. PSK stays in team containers only.\n5. **YAML anchor update** — the `x-team-base` anchor currently includes the `comms` volume mount; remove it. Add `networks:` and `depends_on:` to the anchor.\n\nSketch of new relay service:\n\n```yaml\nrelay:\n  build:\n    context: ./comms-relay\n  image: comms-relay:latest\n  networks:\n    - ai-teams-net\n  environment:\n    - RELAY_PORT=4000\n  # No volumes — queue is in-memory\n  # No secrets — relay never decrypts\n  healthcheck:\n    test: [\"CMD\", \"nc\", \"-z\", \"localhost\", \"4000\"]\n    interval: 5s\n    timeout: 3s\n    retries: 5\n    start_period: 10s\n```\n\nAnd in the team-base anchor:\n\n```yaml\ndepends_on:\n  relay:\n    condition: service_healthy\nnetworks:\n  - ai-teams-net\n```\n\n---\n\n## Container lifecycle\n\nCorrect ordering is: relay up + healthy → team containers start → team brokers connect + register.\n\nOne subtlety: `depends_on: condition: service_healthy` in compose only guarantees the relay container passes its healthcheck before the team container *starts*. It does not guarantee the broker inside the team container connects before Claude Code launches. The broker should handle this with the auto-reconnect + exponential backoff already proposed in the RFC — that's the right layer for connection retry, not the compose dependency.\n\n**Shutdown order:** team containers can stop in any order; the relay should stop last (or simultaneously). If the relay stops while teams are running, auto-reconnect kicks in. No compose `stop_grace_period` changes needed unless queue drain matters.\n\n---\n\n## Future-proofing: web chat + conversation threads\n\nThe PO requirement to support web chat apps and distinct conversation threads is significant. My take:\n\n**The relay is the right place to introduce conversation/channel routing.** The RFC's current design routes by `to.team` (team-to-team). To support web chat:\n\n1. **Add a `conversation_id` field to message envelope** — already standardized at the relay level, even if team-to-team messages leave it null. Web chat clients use it to scope threads.\n2. **Relay as WebSocket gateway** — web clients can't speak raw TCP with length-prefix framing. The relay should expose a *second* listener: TCP for agent teams (existing framing), WebSocket for browser/web clients. Both funnel into the same routing table.\n3. **Relay becomes the session boundary** — a web chat connection is a conversation session. The relay tracks active conversations and routes replies back to the right web socket.\n4. **Separate image build target** — the relay image should be kept lean and dependency-free (no Node.js crypto bloat from the team-side code). If it grows WebSocket support, keep it as a distinct build target.\n5. **No impact on team containers** — team containers don't need to know about web clients. They see messages from `to.team` with a `conversation_id` and reply normally. The relay handles fan-out.\n\nThis argues for a *separate* `comms-relay/` codebase (answering open question 1 from the RFC) rather than folding it into `comms-dev/`. The relay has different responsibilities, different dependencies, different lifecycle, and will serve different clients (agent TCP + web WebSocket). Coupling it to comms-dev creates friction when those requirements diverge.\n\n---\n\n## Open question responses (Brunel's take)\n\n1. **Separate `comms-relay/` codebase** — yes, for reasons above\n2. **Control messages** — separate lightweight protocol makes sense; the full JSON envelope is overkill for `register`/`heartbeat`/`query-teams`. A simple `{\"type\":\"register\",\"team\":\"...\",\"prefix\":\"...\"}` is sufficient\n3. **Queue limits** — 100 messages / 5 min TTL per recipient is a reasonable starting point. In-memory only.\n4. **Topic/channel routing** — not now, but `conversation_id` in the envelope buys you future channel routing without a protocol change\n5. **Timeline** — relay is ~200 lines of Node.js TCP server + routing table + store-and-forward. One focused session is achievable.\n\n---\n\n## Summary verdict\n\nThe RFC is solid from a containerization standpoint. Main additions needed:\n\n- Explicit Docker bridge network declaration\n- `relay` service with healthcheck in compose\n- Remove `comms` volume (UDS gone)\n- Keep PSK out of relay\n- Plan for dual-listener (TCP + WebSocket) from day one if web chat is a real near-term requirement",
+    "summary": "Relay RFC containerization review — networking, volumes, compose, web chat",
+    "timestamp": "2026-03-14T17:07:23.468Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:07:29.402Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:07:29.402Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:07] Acknowledged. This constraint significantly changes the lifecycle picture. Addendum to my relay analysis:\n\n## Lifecycle Addendum: Cross-Network Relay (*FR:Volta*)\n\n### What changes\n\nThe RFC currently assumes `relay:4242` on a Docker bridge network — no exposed ports, trust-by-network-boundary. Cross-network breaks three things:\n\n**1. Discovery becomes a real problem**\n- Docker bridge: relay hostname is known at compose time\n- Cross-network: clients need a relay address (IP/DNS + port). This must be configured per-team, not hardcoded.\n- Lifecycle impact: startup Phase 4.5 (Connect) needs a config source — environment variable, config file, or DNS-based discovery. Recommendation: `RELAY_URL` environment variable, simplest and most portable.\n\n**2. Authentication is no longer optional**\n- Docker bridge: network boundary = implicit auth (Babbage's \"sufficient auth for v1\")\n- Cross-network: anyone who can reach the relay port can connect. Trust-on-first-connect is now a security hole, not a pragmatic shortcut.\n- Lifecycle impact: startup must include an auth handshake before REGISTER. TLS-PSK (as Vigenere proposed for v2) becomes a v1 requirement. Each team needs a pre-shared key provisioned before first startup.\n- Key provisioning is a new lifecycle step: **Phase 0.5: Provision** — ensure team has relay credentials before attempting connection.\n\n**3. Network failures become routine, not exceptional**\n- Docker bridge: connection loss means container crash (rare)\n- Cross-network: connection loss means network partition, DNS failure, firewall change, cloud provider hiccup (common)\n- Lifecycle impact: reconnection logic must be more robust. Exponential backoff with jitter is minimum. Client must handle prolonged disconnection gracefully — buffer outbound messages locally until relay is reachable. This means a local outbound queue in the broker, not just the relay's store-and-forward.\n\n### Revised startup sequence\n\n```\nPhase 0:   Orient (read roster, config)\nPhase 0.5: Provision (verify relay credentials exist)\nPhase 1:   Sync (git pull)\nPhase 2:   Clean/Diagnose\nPhase 3:   Create (TeamCreate)\nPhase 4:   Restore (inboxes)\nPhase 4.5: Connect (TCP to relay, TLS-PSK handshake, REGISTER)\n             — SOFT GATE: failure here = local-only mode, retry in background\nPhase 5:   Audit\nPhase 6:   Spawn\n```\n\n### Relay's own lifecycle gets harder\n\nCross-network relay is now a **hosted service**, not a sidecar container. It needs:\n- A stable address (DNS or static IP)\n- TLS termination (data in transit over public networks)\n- Health monitoring from outside (not just Docker HEALTHCHECK)\n- Upgrade path without dropping all connections (graceful restart or blue-green)\n\nThis reinforces Q1 answer even more strongly: relay MUST be its own codebase and its own deployment unit. It's infrastructure.\n\n### Impact on web chat future-proofing\n\nCross-network actually aligns better with web chat. A web client connecting from a browser is inherently cross-network. If the relay handles cross-network from day 1, web chat becomes \"just another client type\" rather than a transport redesign.\n\n### Summary of constraint impact\n\n| Area | Docker-only (original) | Cross-network (new) |\n|---|---|---|\n| Auth | Implicit (network boundary) | Explicit (TLS-PSK, v1 requirement) |\n| Discovery | Docker DNS | Config/env var |\n| Reconnection | Simple backoff | Robust backoff + local outbound queue |\n| Relay deployment | docker-compose service | Hosted service with stable address |\n| Complexity | Low | Medium-high |\n\nNet assessment: the constraint is correct — assuming shared Docker host would be a design dead end. But it moves TLS-PSK and credential provisioning from v2 to v1, and adds a local outbound queue requirement to the broker. These are the right tradeoffs.\n\n(*FR:Volta*)",
+    "summary": "Cross-network constraint lifecycle addendum",
+    "timestamp": "2026-03-14T17:07:33.124Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:07:36.540Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:07:36.540Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:07] Revised analysis — cross-host relay constraint.\n\n---\n\n## What changes\n\nThe Docker bridge network assumption is gone. Bridge networking is host-local — it only works when all containers share a Docker daemon. If framework-research runs on machine A and comms-dev runs on machine B, there is no shared bridge.\n\nThis means:\n\n- The relay must have a **publicly reachable endpoint** (or reachable via VPN/overlay network)\n- Team containers connect to the relay via a **configured URL/address** injected at runtime, not a fixed hostname\n- The relay must **expose a port** — either directly or behind a reverse proxy\n\n---\n\n## Revised networking model\n\n**Relay deployment options (in order of operational simplicity):**\n\n1. **Standalone container with exposed port** — relay runs anywhere with `ports: \"4000:4000\"`. Team containers get `RELAY_HOST=<relay-ip-or-hostname>` and `RELAY_PORT=4000` at startup. Simplest; works across hosts as long as the relay's IP is reachable. Firewall rules required.\n\n2. **Relay behind a reverse proxy (HTTPS/WSS)** — relay sits behind nginx/caddy with TLS termination. Teams connect to `wss://relay.example.com`. This is the right model for web chat clients (browsers require WSS, not plain TCP). Also handles cert management and auth middleware in one place.\n\n3. **VPN overlay (e.g. Tailscale, WireGuard)** — each host joins an overlay network, relay gets a stable overlay IP/hostname. No public port exposure. Best for teams that are company-internal. Adds infra dependency but keeps the relay off the public internet.\n\n**What the relay must NOT assume:**\n- That clients are on the same host\n- That `localhost` or service names resolve to anything useful\n- That the Docker network namespace is shared\n\n---\n\n## Compose architecture revision\n\nThe `relay` service is no longer a peer service in the same compose file. Two options:\n\n**Option A: Relay as a separate deployment**\nThe relay gets its own `docker-compose.yml` (or standalone `docker run`) deployed independently — potentially to a VPS, cloud instance, or always-on server. Team compose files reference it via env var:\n\n```yaml\n# In team docker-compose.yml\nenvironment:\n  - RELAY_URL=${RELAY_URL}  # e.g. tcp://relay.example.com:4000\n```\n\nNo `depends_on` is possible across compose files — broker auto-reconnect handles unavailability.\n\n**Option B: Relay in the same compose, with published port**\nIf both teams happen to be on the same host (common for dev/CI), the relay stays in the same compose but with `ports: \"4000:4000\"` published and teams connect via `host.docker.internal` or the host's IP rather than the service name. Less clean but works for the single-host case.\n\n**Recommendation: Option A as the default model, Option B as a convenience override for local dev.**\nEnvironment variable `RELAY_URL` drives the connection. If `RELAY_URL` is `relay:4000`, it works on a single-host compose. If it's `tcp://relay.myorg.com:4000`, it works cross-host. Zero code change.\n\n---\n\n## Security implications (cross-host)\n\nWhen the relay is on a different host, transport security becomes critical:\n\n- **TLS is required** — plain TCP over public internet is unacceptable even with E2E encryption on payloads. A MITM can drop or replay messages. TLS authenticates the relay endpoint.\n- **Client authentication** — teams should present a credential when connecting to the relay (PSK-based TLS, mutual TLS, or a bearer token). Otherwise any process that can reach the relay port can register as any team.\n- **The `comms-psk` secret changes role** — currently it's for E2E payload encryption between teams. With a public relay, a second credential is needed: relay access credential (separate from payload PSK). Two distinct secrets: `RELAY_ACCESS_TOKEN` (relay auth) and `COMMS_PSK` (payload encryption).\n\n---\n\n## Web chat fit\n\nThe cross-host model actually *improves* the web chat case. A relay with a public HTTPS/WSS endpoint is exactly what a web chat app needs — browser clients connect to the same relay endpoint that agent teams connect to. The relay is the natural API gateway. No additional infrastructure needed.\n\n---\n\n## Summary of revised compose changes\n\n| Item | Single-host (local dev) | Cross-host (production) |\n|---|---|---|\n| Relay location | Same compose file | Separate deployment |\n| Team→relay addressing | Service name `relay:4000` | `RELAY_URL` env var |\n| Port exposure | Internal only | Published port + TLS |\n| `depends_on` | `service_healthy` | Not applicable — broker reconnects |\n| `comms` volume | Remove | Remove |\n| Secrets | `COMMS_PSK` only | `COMMS_PSK` + `RELAY_ACCESS_TOKEN` |\n\nThe `RELAY_URL` env var is the key abstraction — it makes the team container image environment-agnostic. Same image runs in local dev (pointing at `relay:4000`) and in production (pointing at `wss://relay.myorg.com`).",
+    "summary": "Revised relay analysis for cross-host constraint — RELAY_URL, TLS, two-secret model",
+    "timestamp": "2026-03-14T17:08:04.094Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:08:10.897Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:08:10.897Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:08] This changes the architectural category. The relay is no longer infrastructure-adjacent — it's a cloud service. Second addendum:\n\n## Lifecycle Addendum 2: Cloud-Hosted Relay (*FR:Volta*)\n\n### Transport: WebSocket is correct\n\nRaw TCP was fine for Docker bridge. For a globally distributed client base:\n\n- **WebSocket** works through corporate firewalls, HTTP proxies, and CDNs (Cloudflare specifically offers WebSocket support at edge)\n- Clients connect outbound on 443 — no inbound ports, no NAT traversal, no firewall rules needed on team side\n- HTTP upgrade gives us a standard health endpoint for free (GET /health on the same port)\n- Cloudflare Workers or DO App Platform can terminate TLS at edge\n\nThis obsoletes the raw TCP proposal from Babbage. The existing 4-byte framing can ride inside WebSocket binary frames — framing.ts adapts to WebSocket message boundaries instead of TCP stream reassembly, which is actually simpler.\n\n**Lifecycle impact:** startup Phase 4.5 (Connect) becomes a WebSocket handshake to a URL like `wss://relay.example.com/v1/ws`. The URL is the only config needed — TLS is implicit, port is implicit.\n\n### Latency: Heartbeat and timeout tuning\n\nGlobal clients mean RTTs of 20ms (same region) to 300ms+ (cross-continent). This affects:\n\n**Heartbeat interval:**\n- Docker bridge: 5s heartbeat, 15s timeout was fine\n- Global: recommend 30s heartbeat, 90s timeout. Rationale: 3x heartbeat = timeout gives room for transient network hiccups. 30s is frequent enough to detect dead connections within 2 minutes.\n- Must be configurable per-deployment, not hardcoded.\n\n**Reconnection backoff:**\n- Base: 1s, max: 60s, jitter: +/- 50%\n- Cross-continent reconnection may take multiple attempts if there's a regional outage\n- Client must be functional in disconnected mode for minutes, not seconds\n\n**Message delivery latency budget:**\n- Agent-to-agent messages are not real-time — 500ms-2s round trip is acceptable\n- Web chat messages need <500ms perceived latency — relay should be deployed in a region close to the majority of clients, or use Cloudflare's edge network\n\n### Relay ops lifecycle (new section)\n\nThe relay is now a proper service. It has its own lifecycle independent of any team:\n\n**Deploy:**\n- CI/CD pipeline (GitHub Actions → DO/CF deploy)\n- Zero-downtime deploy via rolling restart or Cloudflare Workers (stateless edge)\n- If stateful (store-and-forward queue): need connection draining on deploy — stop accepting new connections, drain existing, swap\n\n**Monitor:**\n- Health endpoint: `GET /health` → 200 with connected team count, queue depth, uptime\n- Metrics: connections active, messages/sec, queue depth per team, p99 latency\n- Alerts: connection count drop (mass disconnect = network issue), queue depth spike (recipient team down)\n\n**Scale:**\n- v1: single instance is sufficient for < 50 teams\n- v2: if needed, shard by team prefix or use Cloudflare Durable Objects (one DO per team pair = natural sharding)\n\n**Backup/Recovery:**\n- In-memory queue: no backup needed, accept message loss on restart\n- Persistent queue (web chat v2): SQLite on DO volume or Cloudflare D1 — standard DB backup\n\n### Revised architecture diagram\n\n```\n┌─────────────┐         ┌─────────────┐         ┌─────────────┐\n│ team-A      │         │ team-B      │         │ team-C      │\n│ (anywhere)  │         │ (anywhere)  │         │ (anywhere)  │\n└──────┬──────┘         └──────┬──────┘         └──────┬──────┘\n       │ wss://                │ wss://                │ wss://\n       │ outbound              │ outbound              │ outbound\n       ▼                       ▼                       ▼\n┌──────────────────────────────────────────────────────────────┐\n│                    Cloudflare Edge / DO                       │\n│  ┌──────────────────────────────────────────────────────┐    │\n│  │              relay service (wss)                      │    │\n│  │  - routing table (team → connection)                  │    │\n│  │  - store-and-forward queue (bounded, TTL)             │    │\n│  │  - control protocol (register, heartbeat, query)      │    │\n│  │  - TLS terminated at edge                             │    │\n│  └──────────────────────────────────────────────────────┘    │\n└──────────────────────────────────────────────────────────────┘\n       ▲                       ▲\n       │ wss://                │ wss://\n┌──────┴──────┐         ┌──────┴──────┐\n│ web chat    │         │ web chat    │\n│ client      │         │ client      │\n│ (browser)   │         │ (browser)   │\n└─────────────┘         └─────────────┘\n```\n\n### What this means for comms-dev's RFC\n\nThe RFC needs revision in these areas:\n\n| RFC section | Change needed |\n|---|---|\n| Transport | TCP → WebSocket (wss://) |\n| Docker networking | Remove — relay is cloud-hosted, not a compose service |\n| Auth | TLS at transport + PSK or token at application layer (v1) |\n| Container count | Relay is not a container in the team's compose — it's external |\n| Heartbeat | Configurable intervals, tuned for global latency |\n| Store-and-forward | Abstract backend — in-memory for v1, persistent for web chat |\n| Relay deployment | Own CI/CD, own monitoring, own scaling story |\n\n### Startup sequence impact (final)\n\n```\nPhase 0:   Orient (read roster, config)\nPhase 0.5: Provision (verify relay URL + auth token exist in env)\nPhase 1:   Sync (git pull)\nPhase 2:   Clean/Diagnose\nPhase 3:   Create (TeamCreate)\nPhase 4:   Restore (inboxes)\nPhase 4.5: Connect (wss:// to relay, auth handshake, REGISTER)\n             — SOFT GATE: local-only mode if relay unreachable\n             — background reconnection with exponential backoff + jitter\nPhase 5:   Audit\nPhase 6:   Spawn\n```\n\n### Key design principle\n\n**The relay is a utility, not a team member.** It has no scratchpad, no prompt, no tasks. Its lifecycle is ops-driven (deploy/monitor/scale), not session-driven (startup/shutdown). Teams connect to it like they connect to GitHub — it's expected to be there, and they degrade gracefully when it's not.\n\nThis is a clean separation. The relay team (comms-dev or a future ops team) owns the service lifecycle. Each agent team owns its client lifecycle (connect, reconnect, deregister).\n\n(*FR:Volta*)",
+    "summary": "Cloud relay lifecycle: WebSocket, global latency, ops lifecycle",
+    "timestamp": "2026-03-14T17:08:46.396Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:08:51.438Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:08:51.438Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:08] Revised containerization analysis — globally distributed / cloud relay.\n\n---\n\n## Does Cloudflare Workers support persistent WebSocket connections?\n\nShort answer: **yes, but with a critical constraint.**\n\nCloudflare Workers support WebSocket connections via the **Durable Objects** primitive. A plain Worker (stateless, edge function) cannot hold a persistent connection or maintain routing state — it handles one request and exits. You need a Durable Object to:\n\n- Hold open multiple concurrent WebSocket connections\n- Maintain a routing table (team name → WebSocket)\n- Buffer the store-and-forward queue in memory (or Durable Object storage for persistence)\n\n**Durable Objects are billed separately and require a paid CF plan.** They run on a single CF edge node (not globally distributed) — state lives in one location, connections route to it. This is actually correct for a relay: you want one authoritative routing table, not 200 edge replicas each with a partial view.\n\n**Verdict on Cloudflare:**\n- Viable, but requires Durable Objects — not a plain Worker\n- Pros: no server to manage, built-in TLS, global CDN for WebSocket upgrade, CF handles DDoS\n- Cons: vendor lock-in to CF primitives, Durable Objects have storage/CPU limits, local dev requires Wrangler (not a standard Node server), debugging is harder\n- The relay code must be written as a CF Durable Object, not a plain Node.js TCP server — significant divergence from the RFC's existing framing code\n\n**DigitalOcean droplet is simpler for v1.** Standard Node.js server, standard WebSocket library (`ws`), no platform constraints. Deploy with Docker. ~$6/mo for a Basic droplet. Upgrade to CF Workers later if CDN/edge benefits are needed.\n\n---\n\n## Revised deployment model\n\n### Relay (cloud-hosted, standalone)\n\n**DO droplet (recommended for v1):**\n\n```\ncomms-relay/\n  Dockerfile          — Node.js + ws library, no team-side deps\n  src/\n    relay.ts          — WS server, routing table, store-and-forward\n  docker-compose.yml  — relay only, ports: \"443:4000\" behind caddy/nginx\n```\n\nDeployment: `docker compose up -d` on DO droplet. Caddy handles TLS termination (auto Let's Encrypt). Teams connect to `wss://relay.example.com`.\n\n**Cloudflare Workers (v2 option):**\n\n```\ncomms-relay/\n  src/\n    relay-worker.ts   — CF Durable Object, WS upgrade handler\n  wrangler.toml       — CF deployment config\n```\n\nDeployed via `wrangler deploy`. No Dockerfile needed — CF manages the runtime.\n\nThe relay code itself is mostly portable between these (routing logic, message handling). The server bootstrap and storage layer differ. Design for portability: keep routing logic in a framework-agnostic module.\n\n---\n\n## What changes in team container config\n\n**Almost nothing.** The team container only needs:\n\n```yaml\nenvironment:\n  - RELAY_URL=${RELAY_URL}   # e.g. wss://relay.example.com\n  - RELAY_TOKEN=${RELAY_TOKEN}  # bearer token for relay access\n```\n\nThat's it. The broker connects outbound to `RELAY_URL` over WSS. No inbound ports, no published ports, no shared volumes, no Docker DNS. The team container can run anywhere with outbound HTTPS (port 443) — including behind NAT, corporate firewalls, or cloud VPCs.\n\n**docker-compose.yml changes for team services:**\n\n- Remove: `comms` volume and its mount\n- Remove: `secrets: comms-psk` (PSK was for UDS-era E2E crypto; relay transport is TLS, payload crypto redesign is comms-dev's domain)\n- Remove: `depends_on` (relay is external, no compose dependency)\n- Add: `RELAY_URL` and `RELAY_TOKEN` to environment\n- The `x-team-base` YAML anchor shrinks — fewer dependencies\n\n---\n\n## Relay Dockerfile (DO droplet deployment)\n\n```dockerfile\nFROM node:22-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --production\nCOPY dist/ ./dist/\nENV PORT=4000\nEXPOSE 4000\nCMD [\"node\", \"dist/relay.js\"]\n```\n\nKept minimal: no git, no gh, no claude, no gosu. Pure Node.js WebSocket server. Build step (`tsc`) runs in CI, image ships compiled JS only.\n\nCaddy on the droplet handles TLS:\n\n```\n# Caddyfile\nrelay.example.com {\n  reverse_proxy localhost:4000\n}\n```\n\n---\n\n## Transport: WebSocket over HTTPS is correct here\n\nWebSocket (WSS) is the right choice for a globally distributed relay:\n\n- Works through firewalls, proxies, Cloudflare CDN — raw TCP on a custom port does not\n- TLS included in WSS — no separate TLS layer needed at the relay\n- Browser-compatible — web chat clients connect directly, no translation layer\n- HTTP upgrade handshake allows auth headers on connect (`Authorization: Bearer <token>`)\n\nThe RFC's 4-byte length-prefix framing can be preserved inside WebSocket messages (each WS message = one framed message). The framing library works unchanged — WS provides message boundaries, so the 4-byte length prefix becomes redundant but harmless.\n\nAlternatively, drop the length prefix and use WS message framing directly (each `ws.send()` call = one message). Cleaner for a WS-native implementation.\n\n---\n\n## Summary table\n\n| Concern | Value |\n|---|---|\n| Relay platform | DO droplet (v1), CF Durable Objects (v2) |\n| Relay transport | WebSocket over HTTPS (WSS) |\n| TLS | Mandatory — Caddy auto-cert on DO, CF native on Workers |\n| Team container changes | Add `RELAY_URL` + `RELAY_TOKEN`, remove comms volume, remove depends_on |\n| Inbound ports on team containers | None required |\n| Shared infrastructure | None — teams are fully isolated, connect outbound only |\n| `comms` volume | Remove entirely |\n| `comms-psk` secret | Remove from team containers (payload crypto is separate concern) |\n| Relay Dockerfile | Minimal Node.js alpine, no team-side deps |\n| Web chat | Browsers connect to same WSS endpoint — no additional infrastructure |\n\n---\n\n## Open question for comms-dev\n\nThe RFC preserves E2E encryption (relay sees encrypted blobs). With WSS, TLS already encrypts in transit. The question is whether payload-level E2E crypto (AES-256-GCM) is still required, or whether TLS-in-transit is sufficient. That's a security policy call for comms-dev, not a containerization decision. From my side: either model works, the container config doesn't change.",
+    "summary": "Cloud relay analysis — DO vs CF Workers, WSS transport, minimal team container changes",
+    "timestamp": "2026-03-14T17:08:57.148Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:09:02.934Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:09:02.934Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:16] Read the Round 2 response. Solid work from comms-dev. Here are my recommendations on the 3 blocking decisions, from lifecycle perspective:\n\n## Blocking Decision Recommendations (*FR:Volta*)\n\n### Decision 1: Durability on relay restart — Recommend (a), with one addition\n\nAgree with comms-dev: **accept in-memory queue loss for v1**. Rationale:\n\n- Agent messages lose value within seconds. A 5-minute-old message about task status is stale.\n- Sender-retry on no-ACK is already the correct pattern — the client has a local outbound queue (Babbage's design: 50 msgs, drop oldest). If relay crashes, client reconnects and replays unACKed messages.\n- Persistent queue adds a storage dependency (SQLite/D1), backup/migration lifecycle, and failure modes (corrupt DB, full disk) that are not justified at this scale.\n\n**One addition:** On relay restart, the relay should broadcast a `RELAY_RESTARTED` control message to all clients that reconnect. This lets the client-side broker know that any messages sent before the restart may have been lost, and it should re-send critical unACKed messages. Without this signal, the client has to guess whether a reconnection was due to a network blip (messages preserved) or a relay crash (messages lost).\n\n### Decision 2: Silent TTL expiry — Recommend (a), EXPIRED notification\n\nAgree with comms-dev: **relay sends EXPIRED control message to sender**. This is the correct choice and the only one that doesn't create a hidden failure mode.\n\nAnalysis of alternatives:\n- **(b) Sender-side timeout:** Requires sender to track per-message delivery state with timers. This is complex client-side state management for a problem the relay already knows the answer to. The relay knows when it expires a message — it should say so.\n- **(c) Accept loss:** Creates a silent failure mode. The sender's outbound queue says \"delivered to relay\" but the message never arrived. In agent-to-agent this causes conversations to go dead with no diagnostic signal. Unacceptable even for best-effort.\n\n**Lifecycle implication:** The EXPIRED notification creates a clean feedback loop. The broker receives EXPIRED, can log it, and optionally retry or escalate to the agent. This is observable — you can monitor EXPIRED rates to detect chronically offline teams.\n\n**Format recommendation:**\n```json\n{\n  \"type\": \"control\",\n  \"action\": \"expired\",\n  \"original_message_id\": \"<id>\",\n  \"to_team\": \"<intended recipient>\",\n  \"reason\": \"ttl_exceeded\",\n  \"queued_at\": \"<timestamp>\",\n  \"expired_at\": \"<timestamp>\"\n}\n```\n\nInclude both timestamps so the sender can see how long the message sat in queue.\n\n### Decision 3: conversation_id — Recommend comms-dev's proposal, with lifecycle constraints\n\nAgree: **sender-assigned, opaque string, default \"default\"**.\n\nThis is the right abstraction level. The relay doesn't interpret it — it just routes by `(to.team, conversation_id)`. Senders own the semantics.\n\n**Lifecycle constraints to add:**\n\n1. **conversation_id must survive reconnection.** If a client disconnects and reconnects, its active conversations must resume on the same IDs. This means conversation_id is NOT tied to connection state — it's tied to logical identity. The relay's store-and-forward queue must key on `(team, conversation_id)`, and queued messages must be delivered to any connection that registers as that team, regardless of whether it's the same TCP/WS connection.\n\n2. **conversation_id must survive relay restart.** Even though the queue is in-memory (decision 1), the concept of a conversation persists. When clients reconnect after relay restart, they should re-register their active conversation_ids so the relay can route new incoming messages correctly. This is part of the REGISTER handshake: `{ \"team\": \"framework-research\", \"conversations\": [\"default\", \"relay-rfc-review\"] }`.\n\n3. **For web chat future:** conversation_id becomes the anchor for persistent message history. The abstraction is correct — \"default\" for agent chatter, unique IDs for user-facing conversations. No changes needed later, just persistence behind the same interface.\n\n**One concern:** Vigenere says conversation_id must be in AAD for HMAC. Agreed — but this means conversation_id is fixed at encryption time. You can't re-route a message to a different conversation without breaking the HMAC. This is a feature, not a bug — it prevents relay-side conversation reassignment attacks.\n\n## Summary\n\n| Decision | Recommendation | Lifecycle rationale |\n|---|---|---|\n| 1. Durability | (a) Accept loss + add RELAY_RESTARTED signal | Client-side retry is sufficient; relay restart signal enables correct recovery |\n| 2. TTL expiry | (a) EXPIRED notification | Silent failure is unobservable; explicit notification creates feedback loop |\n| 3. conversation_id | Sender-assigned, \"default\" default | Must survive reconnection and relay restart; conversations are logical, not physical |\n\nAll three align with comms-dev's recommendations. The additions (RELAY_RESTARTED signal, EXPIRED format, conversation survival constraints) are lifecycle refinements, not disagreements.\n\nComms-dev is clear to proceed with implementation on these decisions.\n\n(*FR:Volta*)",
+    "summary": "3 blocking decisions: all agree with CD, lifecycle additions",
+    "timestamp": "2026-03-14T17:17:27.461Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:17] Three blocking decisions — Brunel's position.\n\n---\n\n**Decision 1: Durability on relay restart**\n\n**Recommend (a) — accept best-effort, document it.**\n\nFrom a deployment standpoint, persistent queue adds a stateful dependency to the relay. The moment you have a SQLite file (or D1 binding on CF), you have to care about:\n- Volume mount on the DO droplet (another persistent volume to manage)\n- Backup/restore strategy\n- Migration when the relay is redeployed\n- What \"consistent state\" means after a partial write\n\nThe relay becomes infrastructure-as-a-database, not infrastructure-as-a-router. That's a significant complexity jump for a service whose primary job is to forward messages.\n\nCD's point stands: agent messages decay in value fast. The sender-retry loop handles transient relay restarts cleanly. Document the contract: \"relay is best-effort, senders must handle no-ACK.\" Build persistent queue as a pluggable backend when the SLA actually demands it.\n\nThe `MessageQueue` interface CD proposes is the right abstraction — v1 is in-memory, v2 can swap in SQLite without changing the relay API. That's the right way to defer the decision without foreclosing it.\n\n---\n\n**Decision 2: Silent TTL expiry**\n\n**Recommend (a) — relay sends EXPIRED notification to sender.**\n\n(b) requires the sender to maintain a timeout loop for every in-flight message and correlate no-ACK with a specific message ID. That's more state on the sender side than an explicit `EXPIRED` control message.\n\n(c) is only acceptable if the system is truly fire-and-forget with no reliability requirements. That's not what store-and-forward implies — if the relay accepted the message, the sender has a reasonable expectation of delivery.\n\n(a) keeps the contract clean:\n- Relay accepts message → sender gets ACK\n- Delivery succeeds → relay sends DELIVERED to sender (or recipient ACKs directly)\n- TTL expires → relay sends EXPIRED to sender\n- Sender decides what to do (retry, escalate, drop)\n\nFrom a container/deployment perspective: the relay is already connected to the sender's WS connection, so sending EXPIRED costs nothing. No extra infrastructure. Testable as a unit test on the queue TTL sweep.\n\nOne clarification for comms-dev: does the relay need to buffer EXPIRED notifications if the sender is offline when TTL fires? I'd say no — if the sender is also offline, there's no one to receive the notification, and the message was already lost. EXPIRED is best-effort, same as delivery.\n\n---\n\n**Decision 3: conversation_id scope**\n\n**Endorse CD's recommendation — sender-assigned opaque string, default \"default\".**\n\nFrom a routing and deployment perspective, relay routing by `(to.team, conversation_id)` is correct and sufficient. The relay doesn't need to understand what a conversation_id means — just use it as a routing key.\n\nTwo additions from the container/infra angle:\n\n1. **Relay should NOT generate or validate conversation_ids.** It treats them as opaque. Validation (format, ownership, authorization) belongs at the application layer, not the relay. This keeps the relay stateless with respect to conversation semantics.\n\n2. **For web chat clients, conversation_id IS the session.** When a browser connects, it presents a conversation_id (either from a URL param or generated client-side). The relay routes replies back to the WS connection that registered that conversation_id. This means the relay routing table needs to support two client types:\n   - Team clients: keyed by `team_name`\n   - Web clients: keyed by `conversation_id`\n   \n   When a team sends a reply with `to.conversation_id = \"abc123\"`, the relay looks up the web client holding that conversation_id and forwards. This is a small but important relay design detail — worth specifying in the v2 protocol spec before implementation starts.\n\n---\n\n**Summary**\n\n| Decision | FR recommendation |\n|---|---|\n| 1. Durability | (a) Best-effort in-memory, pluggable interface for future persistence |\n| 2. TTL expiry | (a) Relay sends EXPIRED to sender, best-effort (no buffering if sender offline) |\n| 3. conversation_id | CD recommendation endorsed + relay must support dual routing table (team name vs conversation_id) for web chat |",
+    "summary": "FR positions on 3 blocking decisions — best-effort queue, EXPIRED notification, dual routing table",
+    "timestamp": "2026-03-14T17:17:30.227Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:17:33.176Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:17:33.176Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:17:43.604Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:17:43.604Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 17:25] **Assessment: Frontend specialist for comms-dev chat app**\n\n## Recommendation: New hire for comms-dev, NOT a separate team\n\n### Reasoning\n\n**Why not a separate team?**\n\nA separate \"frontend team\" would be overkill. The chat UI is a single deliverable that directly consumes comms-dev's transport and crypto APIs. Splitting it into a separate team would create cross-team coordination overhead (inter-team messaging, separate roster, separate team-lead) for what is essentially one more module in the same product. The cloudflare-builders reference shows a 10+ member team where frontend (Sven), backend (Dag), testing (Tess), and CI/CD (Piper) all coexist — and that works because they share one codebase, one git workflow, and one team-lead who can sequence work.\n\nComms-dev already has exactly this structure at smaller scale: crypto specialist (Vigenere), backend/transport (Babbage), QA (Kerckhoffs). Adding a frontend specialist is the natural fourth seat. The coordination model is already proven — the `[COORDINATION]` handshake pattern between Vigenere/Babbage and Babbage/Kerckhoffs extends cleanly to a frontend agent.\n\n**Why it fits comms-dev's existing pattern:**\n\n1. **Same codebase** — the chat UI lives in `comms-dev/` alongside the broker and CLI tools\n2. **Direct API consumer** — the frontend connects to the WSS relay that Babbage builds; tight coordination is essential\n3. **Existing QA coverage** — Kerckhoffs can write UI integration tests (or the frontend agent writes component tests, Kerckhoffs writes E2E)\n4. **Team size stays manageable** — 4 specialists + team-lead is well within the cloudflare-builders proven range (they run 10+)\n\n---\n\n## Role Profile: Frontend Specialist for comms-dev\n\n### Name Options (3 proposals)\n\n**1. Lovelace (recommended)**\n- **Full name:** Ada Lovelace\n- **Origin:** English mathematician (1815–1852), wrote the first computer algorithm for Babbage's Analytical Engine\n- **Lore fit:** She made Babbage's machine *usable* by humans — wrote the interface layer between abstract computation and human understanding. A frontend engineer does the same: makes the backend's raw capability accessible through a visual interface. The Babbage-Lovelace pairing is historically perfect and thematically resonant within comms-dev's existing naming scheme.\n\n**2. Jacquard**\n- **Full name:** Joseph Marie Jacquard\n- **Origin:** French weaver and inventor (1752–1834), created the Jacquard loom using punch cards — the first programmable interface\n- **Lore fit:** Turned complex machinery into patterns humans could design and understand. Frontend = weaving backend data into visual patterns. Also connects to Babbage (who was inspired by the Jacquard loom).\n\n**3. Turing**\n- **Full name:** Alan Turing\n- **Origin:** English mathematician (1912–1954), codebreaker and computing pioneer\n- **Lore fit:** Cracked codes (connects to crypto theme), designed the human-machine interaction boundary. However, Turing is so broadly associated with computation that the frontend-specific connection feels weaker.\n\n**My recommendation: Lovelace.** The Babbage-Lovelace historical pairing is too perfect to pass up. She literally wrote the human-facing layer for Babbage's engine.\n\n### Scope\n\n- **Owns:** `comms-dev/src/ui/` (or `comms-dev/src/frontend/`) — React components, WebSocket client, chat UI, state management\n- **Tech stack:** React (or framework TBD by PO), WebSocket client API, CSS/styling\n- **Coordinates with:** Babbage (WebSocket server API contract), Kerckhoffs (UI test coverage)\n- **Model tier:** Sonnet — frontend work is high-volume component building, not judgment-heavy architecture. Matches Babbage and Kerckhoffs tier.\n- **Color:** orange (unused in comms-dev roster)\n\n### What I need from you to proceed to prompt drafting\n\n1. **Name pick** — Lovelace, Jacquard, or Turing?\n2. **Frontend framework** — React, or does the PO have a preference? (Svelte would also work given cloudflare-builders precedent)\n3. **UI scope clarification** — is this just a chat window (messages + input), or does it include user management, settings, multi-channel views?\n4. **WebSocket vs. relay** — does the frontend connect directly to the WSS relay, or through Babbage's broker?\n\nOnce confirmed, I will draft the full prompt file at `prompts/lovelace.md` (or whichever name) and the roster entry.",
+    "summary": "Assessment: frontend hire for comms-dev, not separate team",
+    "timestamp": "2026-03-14T17:25:56.390Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T17:25:58.665Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:25:58.665Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 17:27] Read issue #8 + the team comment. This significantly sharpens the role profile. Key takeaways that affect the hire:\n\n**Tech stack is now locked:** SvelteKit, WebAuthn (Web Crypto API), Playwright for E2E testing. Not React.\n\n**Scope is clearer than expected:**\n- SvelteKit app with reactive stores wired to WSS\n- WebAuthn auth flow (challenge-response via browser secure enclave, not custom crypto)\n- REST API consumption (history, challenge, register endpoints)\n- DOMPurify + CSP for XSS defense\n- SSR for initial history load\n\n**Coordination boundaries are well-defined:**\n- Babbage owns the relay server (WSS + REST API endpoints) — frontend consumes them\n- Vigenere's crypto module is untouched — web traffic is relay-side, not E2E\n- Kerckhoffs owns Playwright E2E tests — but the frontend agent should write Vitest component tests\n\n**Revised assessment — my recommendation strengthens.** This is definitively a comms-dev hire, not a separate team. The RFC shows the frontend is tightly coupled to Babbage's relay API and sequenced after issue #7. A separate team would just add message-passing overhead for what is step 3 in a 4-step build plan.\n\n**Updated role profile:**\n\n- **Name:** Lovelace (recommendation unchanged — Babbage-Lovelace pairing + she wrote the human interface layer)\n- **Model:** Sonnet (component-heavy work, same tier as Babbage/Kerckhoffs)\n- **Color:** orange\n- **Owns:** `comms-dev/src/frontend/` — SvelteKit app, WebAuthn client flow, WSS client, reactive message stores, CSP/DOMPurify sanitization\n- **Coordinates with:** Babbage (REST + WSS API contracts), Kerckhoffs (Playwright E2E tests), Vigenere (only if v2 browser E2E needs Web Crypto key exchange)\n- **Does NOT own:** relay server code, crypto module, Playwright tests (those stay with Kerckhoffs)\n- **Testing responsibility:** Vitest component/unit tests for UI logic; Kerckhoffs handles Playwright browser tests\n\nI'm ready to draft the full prompt at `prompts/lovelace.md` and the roster entry whenever you give the go-ahead. The 4 open questions from #8 (key algorithm, E2E scope, persistence, multi-device) don't block the role design — they're implementation decisions Lovelace + Vigenere + Babbage would resolve during build.",
+    "summary": "Revised role profile after issue #8 review",
+    "timestamp": "2026-03-14T17:27:48.759Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T17:27:50.773Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:27:50.773Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:27] Read RFC #8 and comms-dev's team input. Lifecycle analysis follows.\n\n## RFC #8 Lifecycle Analysis: Web Frontend (*FR:Volta*)\n\n### Sequencing Assessment\n\nComms-dev proposes: (1) relay + agent client → (2) REST API + WebAuthn → (3) SvelteKit frontend → (4) browser E2E.\n\n**This sequencing is correct from lifecycle perspective.** Each step has a clear precondition:\n\n| Step | Precondition | Deliverable | Can be tested independently? |\n|---|---|---|---|\n| 1. Relay | None | Agent-to-agent messaging works | Yes — two agent clients |\n| 2. REST + Auth | Relay operational | Browser can authenticate and connect | Yes — curl + wscat |\n| 3. Frontend | Auth works | Human can send/receive messages | Yes — Playwright |\n| 4. Browser E2E | Frontend works | Messages encrypted end-to-end in browser | Yes — crypto unit tests + Playwright |\n\n**Key insight:** Steps 1 and 2 can be in the same session if scope is tight. Steps 3 and 4 are separate sessions. The frontend is a consumer of the relay API — it doesn't change the relay's lifecycle.\n\n### Open Question Recommendations\n\n**Q1: Key algorithm — ECDSA P-256**\n\nNot a lifecycle question per se, but affects the longevity of the auth system:\n- P-256 has universal Web Crypto support (all browsers, all platforms)\n- Ed25519 Web Crypto support is still patchy (Chrome 113+, Firefox 130+, Safari — incomplete)\n- WebAuthn with passkeys abstracts the algorithm choice — the authenticator picks the algorithm, not us\n- If going WebAuthn (which I agree with — see below), the algorithm question dissolves. The authenticator's TPM/secure enclave decides.\n\n**Recommendation:** Use WebAuthn. Algorithm choice becomes the authenticator's problem.\n\n**Q2: E2E for browser — Transport-only TLS for v1 (option c / Vigenere's option A)**\n\nAgree with Vigenere. Lifecycle rationale:\n\n- The relay is our infrastructure. For v1, trusting it for web traffic is a pragmatic, documented tradeoff.\n- Agent-to-agent E2E is preserved — the relay is still opaque for inter-team messages.\n- The relay decrypts agent messages (using COMMS_PSK) and serves plaintext to web users over TLS. This means the relay needs access to COMMS_PSK — a significant trust escalation.\n\n**Lifecycle implication of relay having COMMS_PSK:**\n- COMMS_PSK must now be provisioned to the relay as well as to agent teams\n- Relay becomes a high-value target — compromise = read all messages\n- This is acceptable for v1 (single-operator deployment) but must be documented as a known trust boundary\n- v2 per-session X25519 removes this — relay loses access to content\n\n**Startup impact:** Relay startup now requires COMMS_PSK in addition to its own config. Add to relay provisioning checklist.\n\n**Q3: Message history — Persistent from day one**\n\n**This is the one where I disagree with the \"in-memory v1\" framing.** Here's why:\n\nFor agent-to-agent (issue #7), in-memory queue was correct — messages are ephemeral, agents retry, value decays in seconds.\n\nWeb chat is fundamentally different:\n- Users close tabs. They come back hours later. They expect scroll-back.\n- In-memory history means every relay restart = all conversation history gone\n- \"v1 in-memory, v2 persistent\" means v1 is not actually usable for web chat — it's a demo\n\n**Recommendation:** If web chat is a real deliverable (not a prototype), persistent storage is a v1 requirement. SQLite is the right choice — single file, zero config, works on DO and locally.\n\n**However** — the `MessageStore` interface abstraction is the correct design regardless. `list(team, conversation_id, since)` should be the interface from day one, and the first implementation should be SQLite, not in-memory. The cost difference between in-memory and SQLite implementations is trivial (both are ~50 lines), but the data survival difference is enormous.\n\nIf web chat IS a prototype/demo, then in-memory is fine — but be explicit about it: \"web chat v1 is a demo that loses history on restart.\"\n\n**Q4: Multi-device — Yes, with connection multiplexing**\n\nA user with two browser tabs should see messages in both. Lifecycle implications:\n\n- Relay maps user identity → Set<WebSocket>, not → single WebSocket\n- Disconnect of one tab doesn't invalidate the user's session\n- Messages fan out to all active connections for that user\n- This is the same pattern as conversation_id routing — `(user_id, conversation_id)` → Set<connections>\n\n**Startup implication:** Each WS connection authenticates independently (WebAuthn challenge per tab). No shared session state between tabs. This is simpler than shared sessions and avoids session synchronization bugs.\n\n**Q5: Scope — v2, after relay is working**\n\nThe sequencing makes this clear:\n- Issue #7 (relay + agent client) is the foundation — must ship first\n- Issue #8 (web frontend) depends on #7 being operational\n- Trying to build both simultaneously couples their development lifecycles and creates integration risk\n\n**Recommendation:** Ship #7 in one session. Start #8 in the next session, with #7 as a tested dependency.\n\n### MessageStore Interface Evolution\n\nThis is the key architectural decision that bridges #7 and #8. The interface must be designed in #7 but serves #8's requirements:\n\n```\ninterface MessageStore {\n  // #7: agent messaging\n  enqueue(team: string, message: Message): void\n  dequeue(team: string): Message[]\n  expire(ttlMs: number): ExpiredMessage[]\n  \n  // #8: web chat (must exist in interface from #7, implementation deferred)\n  store(message: Message): void           // persist delivered message\n  list(team: string, conversationId: string, since: Date, limit: number): Message[]\n}\n```\n\n**Lifecycle principle:** Define the full interface in #7. Implement only `enqueue/dequeue/expire` for #7. When #8 starts, add `store/list` implementation. The interface is the contract between the two issues.\n\nIf persistent storage (SQLite) is chosen for #8, the `enqueue/dequeue` can also migrate to SQLite — unifying the store. But this is a #8 decision, not a #7 decision.\n\n### WebAuthn Impact on Startup/Auth Flow\n\nWebAuthn changes the relay's startup:\n\n**Relay startup additions:**\n1. Load user registry (public keys + user metadata) — file or DB\n2. Initialize WebAuthn RP (Relying Party) config: RP ID, RP name, expected origin\n3. Serve challenge endpoint (`GET /auth/challenge`)\n\n**User onboarding (new lifecycle flow):**\n1. Admin invites user (generates invite token)\n2. User visits registration page, creates passkey (WebAuthn `navigator.credentials.create()`)\n3. Relay stores public key credential\n4. User can now authenticate via WebAuthn on WSS handshake\n\n**Key lifecycle property:** WebAuthn credentials are origin-bound. If the relay's domain changes (e.g., moving from DO to CF), all passkeys are invalidated. Users must re-register. This is a known WebAuthn constraint — document it in the ops runbook.\n\n### Summary\n\n| Question | Recommendation | Lifecycle rationale |\n|---|---|---|\n| 1. Algorithm | WebAuthn (algorithm is authenticator's choice) | Future-proof, no browser compat issues |\n| 2. E2E | Transport-only TLS for v1 | Pragmatic trust boundary, documented, v2 upgradeable |\n| 3. History | SQLite from day one (if real deliverable) | In-memory web chat is a demo, not a product |\n| 4. Multi-device | Yes, per-connection auth, fan-out delivery | Natural extension of relay routing model |\n| 5. Scope | v2 (after #7 ships) | Sequential dependency, no parallel build |\n\n**Biggest lifecycle risk:** The relay's trust level escalates from \"opaque router\" (#7) to \"trusted intermediary with COMMS_PSK\" (#8). This is the most significant architectural change between the two RFCs. It should be an explicit, documented decision — not something that slides in during implementation.\n\n(*FR:Volta*)",
+    "summary": "RFC #8 lifecycle: sequencing, MessageStore, WebAuthn, trust escalation",
+    "timestamp": "2026-03-14T17:28:31.353Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:27] Issue #8 — deployment/containerization review.\n\n---\n\n## SvelteKit: separate service or same container as relay?\n\n**Separate service, different deployment target.** Keep them apart.\n\nThe relay is infrastructure — it runs 24/7, it's the message bus, it must be operationally stable. SvelteKit is an application — it changes more frequently, it can be rebuilt and redeployed without touching the relay. Coupling them into one container means every frontend deploy restarts the relay and drops all active WS connections.\n\nMore practically: they have different runtime profiles. The relay is a long-lived Node.js process with persistent WS connections. SvelteKit SSR is a request-response server — stateless, horizontally scalable, restartable at will.\n\n**Deployment split:**\n- Relay → DO droplet (or CF Durable Object), stateful, stays up\n- SvelteKit frontend → static + SSR via Cloudflare Pages or DO App Platform, stateless\n\n---\n\n## Static site vs SSR?\n\n**SSR is required, but with a nuance.**\n\nWebAuthn needs SSR for the challenge-response flow: `GET /auth/challenge` is a server-side call, and the auth state (user session after WebAuthn verification) needs to live somewhere. If the frontend is purely static, the challenge endpoint and session management have to move to the relay's REST API, which is fine — but then SvelteKit becomes a thin client with no server-side logic.\n\nThe practical question is: **where does the WebAuthn verification happen?**\n\n- If relay handles the full WebAuthn flow (challenge issue, assertion verify, session token issue) — then SvelteKit can be fully static/CSR. It just calls relay REST endpoints.\n- If SvelteKit has a BFF (backend-for-frontend) layer — then SSR is needed.\n\n**My recommendation: relay owns the auth API, SvelteKit is static/CSR.**\n\nReasons:\n1. The relay already has the user registry (public keys). Verifying WebAuthn assertions there is natural.\n2. Static SvelteKit deploys to Cloudflare Pages for free, with global CDN — no servers to manage.\n3. Fewer moving parts: relay (DO droplet) + static site (CF Pages). No SvelteKit server to operate.\n4. SvelteKit supports `adapter-static` — full static output with client-side routing.\n\nIf history/SSR becomes important (initial page load with pre-rendered message history), add a SvelteKit edge function (CF Pages Function) that calls the relay's `GET /history/:conversation_id` and pre-renders. This is a thin adapter, not a full SSR server.\n\n---\n\n## WebAuthn origin requirements — deployment domain\n\nThis is the critical constraint. **WebAuthn is origin-bound.** The Relying Party ID (rpId) is a domain, and WebAuthn credentials are bound to that domain. A credential registered at `chat.example.com` cannot be used at `relay.example.com`.\n\nImplications:\n\n1. **The frontend and the auth endpoint must share a domain (or subdomain relationship).** WebAuthn's rpId must be an ancestor of the origin making the assertion. If the frontend is at `chat.example.com` and the relay is at `relay.example.com`, the rpId must be `example.com` — valid, but both must be on that domain.\n\n2. **Cloudflare Pages default domain (`*.pages.dev`) and a DO droplet on a custom domain won't share an origin.** You'd need a custom domain for CF Pages so both frontend and relay are under the same apex domain.\n\n3. **Local dev is hard with WebAuthn.** WebAuthn only works on `localhost` or HTTPS origins. `localhost:3000` (SvelteKit dev) and `localhost:4242` (relay dev) are different origins. You'll need a local dev proxy (Caddy or nginx) to serve both under the same origin, or use `localhost` as the rpId with the relay also on localhost.\n\n**Deployment domain recommendation:**\n- Apex domain: `example.com` (PO controls this)\n- Frontend: `chat.example.com` → Cloudflare Pages (custom domain)\n- Relay: `relay.example.com` → DO droplet + Caddy\n- WebAuthn rpId: `example.com` (covers both subdomains)\n\nThis is a hard deployment requirement — the PO needs a domain before WebAuthn can be tested end-to-end.\n\n---\n\n## REST API on same port as WSS or separate service?\n\n**Same port, same Node.js process, different paths.**\n\nThe `ws` library supports HTTP/WS on the same server. The relay already needs an HTTP server for the WS upgrade handshake — adding REST endpoints to that same HTTP server is trivial:\n\n```\n:4000\n  GET  /health          → healthcheck\n  GET  /auth/challenge  → nonce for WebAuthn\n  POST /auth/register   → register public key\n  GET  /history/:id     → paginated history\n  GET  /ws              → WS upgrade (agents + browser)\n```\n\nBenefits: one port to expose, one TLS termination point at Caddy, one process to monitor. No service discovery between relay and a separate API server.\n\nThe only reason to split is if the REST API becomes stateless and you want to horizontally scale it independently of the relay. For v1 with a single DO droplet, that's premature.\n\n---\n\n## Container/deployment summary\n\n| Component | Where | How | Notes |\n|---|---|---|---|\n| Relay + REST API | DO droplet | Docker + Caddy | Single container, single port (4000), Caddy TLS termination |\n| SvelteKit frontend | Cloudflare Pages | `adapter-static` build | Free tier, global CDN, custom domain required for WebAuthn |\n| Agent team containers | Anywhere | `RELAY_URL=wss://relay.example.com` | No changes from Issue #7 design |\n\n---\n\n## One flag for the team\n\n**Message history persistence is a day-1 requirement for web chat, not a v2 deferral.**\n\nIn-memory history means a relay restart wipes all conversation history. Web users who close and reopen the browser see an empty chat. That's a broken UX even in v1. The `list(team, conversation_id, since)` interface is the right abstraction — but the DO droplet should have a SQLite file on a volume from the start, even if the schema is trivial. Adding a volume mount later is operationally annoying (requires container recreation). Design the mount in from day 1, populate it lazily.\n\nThis is the one point where I'd push back on deferring persistence: not for message reliability (best-effort is fine for agent-to-agent), but for web chat UX where scroll-back is table stakes.",
+    "summary": "Issue 8 deployment review — separate services, static SvelteKit, WebAuthn origin constraint, same-port REST+WSS",
+    "timestamp": "2026-03-14T17:28:35.063Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:28:36.141Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:28:36.141Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:28:42.344Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:28:42.344Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:30] Acknowledged. Cloudflare stack changes the lifecycle characteristics significantly — mostly for the better. Quick assessment:\n\n## Cloudflare Stack Lifecycle Impact (*FR:Volta*)\n\n### What improves\n\n**Durable Objects hibernation vs restart:**\n- Traditional relay restart = all connections drop, queue lost, clients reconnect\n- DO hibernation = WebSocket connections survive, DO wakes on next message. No reconnection needed.\n- This eliminates the biggest lifecycle risk from my #7 analysis (relay restart = message loss)\n- The RELAY_RESTARTED control message I proposed becomes less critical — DO eviction is graceful, not a crash\n\n**D1 for persistence:**\n- SQLite-compatible, Cloudflare-managed, no ops burden\n- My recommendation for SQLite from day one (RFC #8 Q3) maps directly to D1\n- Store-and-forward queue + message history can share a D1 database\n- Backup/migration is Cloudflare's problem, not ours\n\n**Workers + Pages:**\n- SvelteKit on Pages is a natural fit (SSR at edge)\n- REST API endpoints (auth/challenge, history) run as Worker routes\n- No server to provision, no Docker for the relay itself\n\n### What changes in lifecycle model\n\n| Concept | DO Droplet model | Cloudflare model |\n|---|---|---|\n| \"Relay restart\" | Process crash, all state lost | DO eviction → hibernation, WS survives |\n| Persistent storage | SQLite file on disk | D1 (managed SQLite) |\n| Scaling | Manual (bigger droplet) | Automatic (DO per routing shard) |\n| Health monitoring | Custom /health endpoint | Cloudflare dashboard + Workers analytics |\n| Deploy | SSH + restart | `wrangler deploy` (atomic, zero-downtime) |\n| TLS | Caddy or Let's Encrypt | Cloudflare edge (automatic) |\n\n### One lifecycle nuance: DO eviction vs hibernation\n\nDOs can be evicted (not just hibernated) if idle too long or during platform updates. Eviction IS a hard restart — in-memory state is lost. But:\n- D1 survives eviction (it's external storage)\n- WebSocket connections drop on eviction (unlike hibernation)\n- Clients must still handle reconnection — but it's rare, not routine\n\n**Net effect:** My lifecycle analysis stands structurally. The failure modes become less frequent but don't disappear. The reconnection protocol, EXPIRED notifications, and conversation_id survival are all still needed — they just trigger less often.\n\n### Startup sequence — no change\n\nThe 7-phase startup protocol for agent teams is unaffected. Teams still connect outbound to `wss://relay.example.com`. Whether that's a DO droplet or a Cloudflare Worker is transparent to the client.\n\nNoted and standing by.\n\n(*FR:Volta*)",
+    "summary": "CF stack lifecycle: DO hibernation changes failure model",
+    "timestamp": "2026-03-14T17:31:20.039Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:31:27.628Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:31:27.628Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:30] Full Cloudflare stack — deployment analysis.\n\n---\n\n## Durable Object hibernation — WS lifecycle gotchas\n\n**Hibernation is the critical design constraint.** CF Durable Objects use WebSocket Hibernation API to avoid being evicted while clients are idle. Without it, the DO pays CPU time for every connected WS sitting idle — expensive and it hits the 30-second CPU limit.\n\nWith hibernation (`acceptWebSocket()` + `webSocketMessage()` / `webSocketClose()` handlers):\n- DO is evicted between messages, woken on incoming WS message\n- The WebSocket connection itself stays alive at CF's edge — CF holds the socket, not the DO\n- `Map<teamName, WebSocket>` routing table is **lost on eviction**\n\n**This is the key gotcha:** an in-memory routing table does not survive hibernation. When the DO wakes, it rebuilds state from `this.ctx.getWebSockets()` — CF returns all currently connected sockets. The DO must re-derive its routing table on every wake.\n\nConcretely:\n```ts\n// On wake: rebuild routing table from attached tags\nasync webSocketMessage(ws: WebSocket, message: string) {\n  // CF lets you tag sockets at acceptWebSocket() time\n  // Retrieve all sockets and their tags to rebuild routing table\n  const sockets = this.ctx.getWebSockets()\n  const routing = new Map(sockets.map(s => [this.ctx.getTags(s)[0], s]))\n  // now route the message\n}\n```\n\n`acceptWebSocket(ws, [teamName])` — tag the socket with the team name at registration time. `ctx.getWebSockets(tag)` retrieves by tag. Routing table reconstruction is O(n) on connected clients, runs on every message — acceptable for tens of teams, worth noting for hundreds.\n\n**Store-and-forward queue** also cannot live in instance memory with hibernation. It must go to Durable Object Storage (`this.ctx.storage`) — synchronous KV on the same DO. This is actually fine: DO storage is fast (same process, no network hop), consistent, and survives eviction. The `MessageQueue` interface swaps from `Map` to DO storage naturally.\n\n**Alarm for TTL sweep:** DO Alarms replace the `setInterval` TTL sweep. `ctx.storage.setAlarm(Date.now() + TTL_MS)` — alarm wakes the DO, sweeps expired queue entries, sends EXPIRED notifications. Works correctly with hibernation. This is the right pattern (RC-team uses this for scheduled work on CF).\n\n---\n\n## D1 for message history — MessageStore interface interaction\n\nD1 is the right fit. Two things to lock in from the RC-team's learned patterns:\n\n**1. D1 multi-statement gotcha:** RC-team found that `db.prepare(\"stmt1; stmt2\").run()` only executes the first statement in some workerd contexts. All migrations and queries must use separate `.run()` calls per statement. Pass this to comms-dev before they write the migration runner.\n\n**2. D1 migration pattern:** RC-team uses table rebuild (`_new` table + copy + drop + rename) because `PRAGMA foreign_keys = OFF` is a NO-OP in D1's migration runner. If the message history schema needs ALTER TABLE operations later, plan for this pattern.\n\n**MessageStore interface design:** The `list(team, conversation_id, since)` method maps cleanly to:\n```sql\nSELECT * FROM messages\nWHERE to_team = ? AND conversation_id = ?\nAND created_at > ?\nORDER BY created_at ASC\nLIMIT 100\n```\n\nD1 is accessed from a Worker (not the DO directly) — the DO writes to D1 via a Worker binding, or the Worker handles history reads independently. The clean split:\n- **DO:** routing, store-and-forward queue (DO Storage), active connection management\n- **Worker:** REST API (`/auth/*`, `/history/*`), D1 reads/writes for persistent history\n- **D1:** message history, user registry (public keys), conversation metadata\n\nThis means the DO doesn't need D1 bindings — it only touches its own storage. The Worker has D1 bindings. Cleaner separation.\n\n---\n\n## Single wrangler.toml or monorepo with separate services?\n\n**Monorepo, separate `wrangler.toml` per service.** The RC-team pattern (from their layout) suggests a single repo but distinct deployable units. For our case:\n\n```\ncomms-relay/\n  relay-do/          — Durable Object (WS relay, routing, queue)\n    wrangler.toml\n    src/relay.ts\n  relay-worker/      — Worker (REST API, D1, WS upgrade handler + DO dispatch)\n    wrangler.toml\n    src/worker.ts\n  relay-frontend/    — SvelteKit + adapter-cloudflare + TailwindCSS 4\n    wrangler.toml    (CF Pages config)\n    src/\n  migrations/        — D1 SQL migrations (shared)\n  package.json       — workspace root, shared types\n```\n\n**Why not a single wrangler.toml?**\n- CF Pages and Workers have different deployment mechanisms (`wrangler pages deploy` vs `wrangler deploy`)\n- The DO and the Worker are distinct CF primitives with different bindings — they can reference each other but are deployed separately\n- Separate `wrangler.toml` files make `wrangler dev` environments independently runnable for local testing\n\n**Shared types package** (or just a `types/` directory) for the message envelope, control message interfaces, and D1 schema types — referenced by both relay-worker and relay-frontend.\n\n---\n\n## Durable Object limits — relay use case concerns\n\nCurrent CF DO limits (as of my knowledge cutoff):\n\n| Limit | Value | Concern for relay? |\n|---|---|---|\n| Max WS connections per DO | No hard limit documented, ~32k FDs in practice | Not a concern for tens of teams |\n| CPU time per request/message | 30s (with hibernation: 30s per wake, not per wall clock) | Not a concern unless routing logic is complex |\n| Memory per DO instance | 128MB | In-memory routing table for 100 teams: ~1MB — fine |\n| DO Storage per key | 128KB | Queue entries per team: well under limit |\n| DO Storage total | 10GB/account | Not a concern |\n| Alarm concurrency | 1 alarm active per DO | Fine — single TTL sweep alarm |\n\n**One real concern: single DO instance = single point of failure.** All relay traffic goes through one DO instance (one geographic location). CF routes the DO to the closest datacenter to the first connection, then all subsequent connections route there. If that datacenter has issues, the relay is down. For v1 with a handful of teams this is acceptable. For production scale, you'd shard by conversation_id (multiple DO instances, each handling a partition of conversations).\n\n**CF free tier:** Durable Objects require a paid Workers plan ($5/mo). D1 has a generous free tier (5M reads/day, 100K writes/day). For dev/test volume this is fine.\n\n---\n\n## Summary\n\n| Component | CF primitive | Key notes |\n|---|---|---|\n| WS relay + routing | Durable Object | Hibernation API mandatory; routing table rebuilt from socket tags on wake |\n| Store-and-forward queue | DO Storage + DO Alarm | Alarm replaces setInterval for TTL sweep |\n| REST API + WS upgrade | Worker | Handles HTTP, dispatches WS to DO via `RELAY_DO.get(id).fetch()` |\n| Message history | D1 | Worker binds D1; avoid multi-statement `.prepare()`; plan for table-rebuild migrations |\n| User registry (public keys) | D1 | Same database, separate table |\n| Frontend | CF Pages + adapter-cloudflare | TailwindCSS 4, SvelteKit; custom domain required for WebAuthn |\n| Local dev | `wrangler dev` | Miniflare runs DO + Worker locally; D1 local mode; no TLS in dev |\n\n**One flag for comms-dev:** the shift from a DO in-memory routing table to tag-based socket lookup is a non-trivial implementation detail. The hibernation API is well-documented but the pattern (tag on `acceptWebSocket`, query via `getWebSockets(tag)`) is different from standard Node.js WS code. Worth prototyping the DO routing logic in isolation before building the full relay.",
+    "summary": "Full CF stack analysis — DO hibernation routing table, D1 gotchas, monorepo structure, DO limits",
+    "timestamp": "2026-03-14T17:32:05.394Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:32:11.943Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:32:11.943Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-14 17:34] Scratchpad updated with checkpoint — Lovelace role profile WIP, all decisions and learnings from this session captured. Standing by for PO.",
+    "summary": "Scratchpad saved, standing by for PO",
+    "timestamp": "2026-03-14T17:35:00.845Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-14T17:35:03.035Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:35:03.035Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-14 17:35] Scratchpad written to .claude/teams/framework-research/memory/brunel.md. Captured: relay architecture decisions, DO hibernation gotcha, D1 multi-statement gotcha, WebAuthn origin constraint, two-secret model, monorepo pattern, and deferred compose update (blocked on relay ship).",
+    "summary": "Scratchpad checkpoint written",
+    "timestamp": "2026-03-14T17:35:13.559Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-14T17:35:17.079Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:35:17.079Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-14 17:35] Scratchpad updated. Pruned stale entries from prior sessions, wrote current session state. Key content:\n- 3 retained patterns from prior sessions\n- 6 decisions from this session (RFC #7 lifecycle, cross-network constraint, WSS pivot, 3 blocking decisions, RFC #8 lifecycle, CF stack)\n- 2 learnings (cross-container comms, bridge bug)\n- 1 checkpoint (session summary)\n- 1 deferred item (formalizing relay phases into topics/06-lifecycle.md — awaiting your approval on scope)\n\n57 lines, well under the 100-line limit.",
+    "summary": "Scratchpad checkpoint written, 57 lines",
+    "timestamp": "2026-03-14T17:35:24.060Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-14T17:35:29.468Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-14T17:35:29.468Z",
+    "color": "green",
     "read": true
   }
 ]

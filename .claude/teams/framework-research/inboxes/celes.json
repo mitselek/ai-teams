@@ -71,8 +71,23 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773502696121@celes\",\"from\":\"team-lead\",\"reason\":\"Moving framework-research into Docker container to test inter-team comms with comms-dev. Save state to scratchpad.\",\"timestamp\":\"2026-03-14T15:38:16.121Z\"}",
-    "timestamp": "2026-03-14T15:38:16.121Z",
+    "text": "[2026-03-14 17:20] Task: Comms-dev is planning a web frontend for a chat app (part of the relay service from issue #7). PO asks: should we help them design a new hire for their team, or should this be a separate team?\n\nContext:\n- comms-dev is building a cloud-hosted WSS relay service\n- They need a web frontend (chat app UI) that connects to the relay\n- PO points to a successful full-stack dev team for inspiration: the cloudflare-builders team at reference/rc-team/\n\nPlease review:\n1. Read the cloudflare-builders reference at `reference/rc-team/` in our repo to understand their team structure\n2. Assess: is a frontend specialist a good fit for comms-dev's existing team, or does it warrant a separate team?\n3. If it's a new hire for comms-dev, draft a role profile (name, scope, model tier)\n4. If it's a separate team, explain why and what that team would look like\n\nConsider: comms-dev already has crypto (Vigenere), transport (Babbage), and QA (Kerckhoffs) specialists. A chat frontend is a different skill set (React/UI, WebSocket client, UX).\n\nSend your analysis to me.",
+    "summary": "Celes: assess frontend hire for chat app",
+    "timestamp": "2026-03-14T17:24:56.754Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:27] Update on your assessment — comms-dev posted issue #8 with their full web frontend RFC. They already propose SvelteKit + WebAuthn. This may affect your role profile draft. Please read: `gh issue view 8 --json body,comments --jq '{body: .body, comments: [.comments[].body]}'`\n\nThe frontend hire question is still open — continue with your analysis but factor in their proposed tech stack (SvelteKit, WebAuthn, Playwright for testing). Hold on the 4 questions for the PO — we'll bundle everything after we review #8.",
+    "summary": "Update Celes: issue #8 has frontend RFC",
+    "timestamp": "2026-03-14T17:27:14.837Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:35] Mid-session checkpoint. Please write your current state to your scratchpad at `.claude/teams/framework-research/memory/celes.md` — key decisions, learnings, and WIP from this session (especially the Lovelace role profile). Use the standard tags. Then stand by — PO wants to discuss something with you next.",
+    "summary": "Write scratchpad, then stand by for PO",
+    "timestamp": "2026-03-14T17:34:27.334Z",
     "read": true
   }
 ]

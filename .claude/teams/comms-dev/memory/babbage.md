@@ -1,67 +1,74 @@
-# Babbage Scratchpad
-<!-- (*CD:Babbage*) -->
+# Babbage scratchpad — comms-dev backend engineer
 
-## State: ALL TASKS COMPLETE — standing by
+## [CHECKPOINT] 2026-03-14 session end
 
-## [CHECKPOINT] 2026-03-14 — Initial implementation complete
+### Current state
+- v1 comms system (UDS-based) is **complete and working**
+- Cross-container test confirmed: comms-dev → framework-research delivered in 1 attempt
+- All 212 tests passing
+- v2 redesign (WSS relay on Cloudflare) is **in brainstorm/design phase** — no code written yet
 
-**What's implemented (all type-check clean):**
+### v1 deliverables (all shipped)
+- `comms-dev/src/transport/` — UDS server/client, framing, FrameDecoder
+- `comms-dev/src/discovery/registry.ts` — file-based registry with .lock
+- `comms-dev/src/broker/daemon.ts` — broker daemon (PSK crypto, heartbeat, bridge)
+- `comms-dev/src/broker/sendmessage-bridge.ts` — broker→framework inbox bridge
+- `comms-dev/src/integration/inbox-watcher.ts` — polls inbox, dispatches to handler
+- `comms-dev/src/cli/comms-send.ts`, `comms-watch.ts`, `comms-publish.ts`
+- `comms-dev/scripts/start-broker.sh`, `test-comms.sh`
+- `docker-compose.yml` — PSK secret provisioning added
+
+---
+
+## [DECISION] v2 transport architecture
+
+### Transport
+- **WebSocket (WSS)** replaces raw TCP + 4-byte framing
+- WS message framing is sufficient — drop FrameDecoder/encodeFrame for relay transport
+- `ws` npm library for Node.js client; Cloudflare DO handles WS server natively
+- `RELAY_URL` env var (wss://...), `RELAY_TOKEN` env var (bearer token)
+
+### Deployment: full Cloudflare stack
+- **Relay**: Cloudflare Durable Object — persistent WS, hibernation-aware
+- **DB**: Cloudflare D1 (managed SQLite) — history from day one
+- **API**: Cloudflare Worker (REST + WS upgrade → DO)
+- **Frontend**: SvelteKit 2 + Svelte 5 + TailwindCSS 4 on CF Pages
+
+### [CRITICAL] DO Hibernation constraints
+- `Map<teamName, WebSocket>` does NOT survive hibernation — DO NOT use instance memory for routing
+- Use `ctx.acceptWebSocket(ws, [teamName])` to tag connections
+- Rebuild routing on each handler call via `ctx.getWebSockets(tag)`
+- Store-and-forward queue → DO Storage (`ctx.storage.put/get`), not RAM
+- TTL sweep → `ctx.storage.setAlarm()`, not `setInterval`
+- DO does NOT have D1 binding — Worker handles all D1 queries
+- Multi-statement D1 queries unreliable — use separate `.run()` calls
+
+### Monorepo structure (v2)
 ```
-comms-dev/src/
-  types.ts                     — all shared interfaces
-  transport/
-    framing.ts                 — 4-byte length-prefix encode/decode (FrameDecoder handles fragmentation)
-    client.ts                  — UDSClient with exponential backoff + at-least-once retry
-    server.ts                  — UDSServer with checksum validation + ACK
-  discovery/
-    registry.ts                — RegistryManager: read/write/heartbeat/cleanStale, .lock sentinel locking
-  broker/
-    message-builder.ts         — buildMessage() + computeChecksum() (sorted-key JSON for determinism)
-    message-store.ts           — MessageStore: dedup by ID with TTL GC
-    daemon.ts                  — Broker daemon: wires server+registry+store, heartbeat, stale cleanup
-  cli/
-    comms-send.ts              — CLI: send to team via UDS, looks up socket from registry
-    comms-publish.ts           — CLI: create GitHub Issue via gh CLI with structured header+attribution
+comms-relay/
+  relay-do/        — Durable Object (WS relay, routing, queue)
+  relay-worker/    — Worker (REST API, D1, WS upgrade → DO)
+  relay-frontend/  — SvelteKit app
+  migrations/      — D1 SQL migrations
 ```
 
-## [DECISION] Checksum canonical form — FIXED (Issue #2, Task #16)
+### Sequencing
+- #7 relay first, #8 web frontend second — no parallel build
+- Prototype DO hibernation behavior before committing to full design
+- Lock MessageQueue interface before Kerckhoffs writes tests
 
-~~JSON.stringify with sorted key array~~ — WRONG: array replacer only covers top-level keys, nested objects (`from`, `to`) serialise as `{}`.
+---
 
-**Correct:** `stableStringify()` from `src/util/stable-stringify.ts` — recursive key sort at every depth. Both `message-builder.ts` and `server.ts` import and use this function.
+## [REUSE] v1 code that carries forward unchanged
+- `comms-dev/src/crypto/` — entire directory
+- `comms-dev/src/broker/message-builder.ts`
+- `comms-dev/src/util/stable-stringify.ts`
+- `comms-dev/src/broker/inbox.ts` + `sendmessage-bridge.ts` (receiving side)
+- `comms-dev/src/integration/inbox-watcher.ts`
+- Message types: `Message`, `MessageType`, `MessagePriority` from `types.ts`
 
-## [LEARNED] JSON.stringify array replacer gotcha
-
-`JSON.stringify(obj, ['key1', 'key2'])` only filters top-level keys. Nested object values are included if the key appears in the array, but their own keys are NOT filtered recursively — they're just dropped, producing `{}`. Never use for canonical hashing of nested structures.
-
-## [DECISION] File locking strategy
-
-Sentinel `.lock` file with O_EXCL + 10s stale detection. No external dep. Atomic registry write via .tmp + rename (POSIX atomic).
-
-## [WIP] Crypto integration pending
-
-`CryptoProvider` interface defined in `types.ts`. Broker accepts `config.crypto?: CryptoProvider`. When Vigenere delivers their module:
-1. Import from `comms-dev/src/crypto/`
-2. Wire into UDSServer (decrypt incoming) and UDSClient (encrypt outgoing)
-3. The interface: `{ encrypt(plaintext: Buffer): Promise<Buffer>, decrypt(ciphertext: Buffer): Promise<Buffer> }`
-
-## [GOTCHA] Checksum computed before encryption
-
-Checksum covers plaintext envelope fields. Encryption wraps the already-checksummed frame. On receive: decrypt first, then verify checksum.
-
-## [DEFERRED] SendMessage integration glue
-
-`daemon.ts:handleIncoming()` logs messages but doesn't yet deliver to local agent inbox. Need to define how broker writes to the inbox files that agents poll. File-based inbox? Named pipe? Requires team-lead decision.
-
-## [GOTCHA] gh CLI / /tmp restriction
-
-`comms-publish` writes body to cwd as `.gh-issue-body.md`, not /tmp. See common-prompt.md gotcha.
-
-## Key scenario notes for Kerckhoffs
-
-Test priorities:
-1. `framing.ts` — encode/decode round-trip, fragmented chunks, oversized messages
-2. `message-builder.ts` — checksum determinism (two builds of same payload = same checksum)
-3. `registry.ts` — concurrent lock acquisition, stale entry cleanup
-4. `message-store.ts` — dedup within TTL, accept after TTL expiry
-5. Integration: server receives message → deduplicates → ACKs correctly
+## [REWRITE] v1 code that does NOT carry forward
+- `UDSServer`, `UDSClient` — replaced by WS client + DO WS handler
+- `RegistryManager` / registry.json — replaced by DO socket tags
+- `framing.ts` — replaced by WS message framing
+- `daemon.ts` — replaced by relay-do + relay-worker

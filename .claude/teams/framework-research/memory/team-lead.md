@@ -1,17 +1,39 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## Session: 2026-03-13 (R5 → R6 transition)
+## Session: 2026-03-14 (R6)
 
-[CHECKPOINT] R5 assessment completed — Grade B (best ever). Inbox durability validated.
-[DECISION] R5-1 fix: team-lead writes own scratchpad in S2a, before task snapshot and agent shutdowns.
-[LEARNED] COLD START was anomalous (runtime dir missing despite prior sessions). User approved proceeding. Root cause unknown — likely Claude Code restart or OS cleanup.
-[LEARNED] Inbox restore from repo worked perfectly — 3 files (finn, team-lead, volta) recovered.
-[LEARNED] config.json appeared immediately after TeamCreate — R4 ghost team issue not reproduced.
+[CHECKPOINT] R6 startup: COLD START (anomalous, same as R5 — runtime dir missing). User approved proceeding. 6 inboxes restored from repo. config.json appeared immediately after TeamCreate.
+[CHECKPOINT] Agents spawned: celes, volta, brunel. All reported in successfully.
+
+### Cross-container comms
+[DECISION] Cross-container comms with comms-dev established via shared UDS broker. Brunel set up FR broker.
+[LEARNED] Bridge bug (5f2aebc) — agent inbox files crash the bridge. Brunel pulled fix, restarted broker.
+[LEARNED] Team-lead messages may not route cross-container reliably — agent-to-agent messages work. Used Volta as relay for settings.json question.
+[LEARNED] Outbound FR→CD worked; inbound CD→FR was intermittent due to bridge bug.
+
+### Issue #7: Central relay service RFC
+[DECISION] Accepted comms-dev's pivot from P2P UDS to cloud-hosted WSS relay.
+[DECISION] PO requirements: no shared infra assumption (teams globally distributed), future-proof for web chat + separate conversations.
+[DECISION] Separate `comms-relay/` codebase — relay is infrastructure, not a team service.
+[DECISION] Two-secret model: RELAY_TOKEN (relay auth) + COMMS_PSK (E2E payload encryption).
+[DECISION] 3 blocking decisions unblocked: (1) best-effort in-memory queue + RELAY_RESTARTED signal, (2) EXPIRED notification to sender, (3) sender-assigned conversation_id with default "default".
+[DECISION] PO: go full Cloudflare stack — Durable Objects (relay), D1 (SQLite), Workers (API), Pages (frontend). Matches RC-team pattern.
+
+### Issue #8: Web frontend RFC
+[DECISION] WebAuthn/passkeys for browser auth (algorithm is authenticator's choice).
+[DECISION] Transport-only TLS for v1 (relay becomes trusted intermediary with COMMS_PSK — trust escalation documented).
+[DECISION] SQLite (D1) from day one — in-memory web chat history is a demo, not a product.
+[DECISION] Multi-device: yes, per-connection auth, fan-out delivery.
+[DECISION] Scope: v2 after #7 ships.
+[DECISION] Deployment: relay DO + Worker on CF, SvelteKit on CF Pages (adapter-cloudflare), TailwindCSS 4.
+[LEARNED] WebAuthn is origin-bound — PO needs a domain before E2E testing. rpId must cover both frontend and relay subdomains.
+[LEARNED] DO hibernation gotcha: routing table lost on eviction, must rebuild from socket tags. Store-and-forward queue → DO Storage, TTL sweep → DO Alarm.
+[LEARNED] D1 gotchas from RC-team: multi-statement queries unreliable, PRAGMA foreign_keys is no-op in migration runner.
+
+### Celes: Lovelace hire for comms-dev
+[WIP] Celes assessed: frontend specialist is a comms-dev hire, not a separate team.
+[WIP] Proposed role: "Lovelace" — SvelteKit + WebAuthn + WSS client. Sonnet tier. Prompt draft ready on request.
+[DEFERRED] PO wants to discuss something with Celes next.
 
 ## Active agents this session
-- volta (only agent spawned)
-
-## Next session (R6)
-- Volta has R6 assessment questions prepared
-- Present raw startup transcript to Volta for evaluation
-- Test: does this scratchpad survive the restart? (R5-1 verification)
+- celes, volta, brunel (all active)

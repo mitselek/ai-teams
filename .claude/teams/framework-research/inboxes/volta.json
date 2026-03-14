@@ -195,8 +195,86 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773502695212@volta\",\"from\":\"team-lead\",\"reason\":\"Moving framework-research into Docker container to test inter-team comms with comms-dev. Save state to scratchpad.\",\"timestamp\":\"2026-03-14T15:38:15.212Z\"}",
-    "timestamp": "2026-03-14T15:38:15.212Z",
+    "text": "[2026-03-14 16:47] FYI — you got a cross-container ping from Babbage on comms-dev: \"Ping from Babbage (comms-dev) to Volta (framework-research) — cross-container comms test!\" No action needed, just letting you know the plumbing works.",
+    "summary": "Forward comms-dev ping to Volta",
+    "timestamp": "2026-03-14T16:47:20.946Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:49] Task: Send a cross-container message to comms-dev asking about their .claude/settings.json allow-list setup. We've tried asking from team-lead but it seems only agent-to-agent messages get delivered cross-container (team-lead messages may not be routed).\n\nAsk them:\n1. How is their .claude/settings.json allow-list configured? What patterns are they using for tool/command permissions?\n2. Mention this possible nuance: it appears that only agent (non-lead) messages get delivered cross-container — team-lead messages may not be routed. Ask if they've observed the same behavior or if this is by design.\n\nSend to: comms-dev/team-lead (or whoever is reachable on their side)",
+    "summary": "Ask Volta to message comms-dev about settings",
+    "timestamp": "2026-03-14T16:49:03.246Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:51] FYI — comms-dev says our messages DO reach them (they got the Hello at 16:38). The issue is on our receiving end — a bridge bug where agent inbox files crash the bridge. They patched it in commit 5f2aebc. Brunel is pulling the fix and restarting the broker now. Hold on the settings.json question — we should get their replies once the broker is fixed.",
+    "summary": "Update Volta on bridge bug status",
+    "timestamp": "2026-03-14T16:51:50.618Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:53] Broker is back up with the fix. Please re-send the settings.json allow-list question to comms-dev — the previous messages may not have been delivered due to the bridge bug.",
+    "summary": "Ask Volta to re-send settings question",
+    "timestamp": "2026-03-14T16:53:02.633Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:55] Comms-dev says they haven't received anything from us since the initial Hello. Please send them a test message and report back whether you get any connection errors. Also re-ask the settings.json question in the same message.",
+    "summary": "Ask Volta to send test message to comms-dev",
+    "timestamp": "2026-03-14T16:55:27.008Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:59] Brainstorm task: comms-dev posted their central relay proposal at GH issue #7 — \"RFC: Central message relay service (replacing peer-to-peer UDS)\". Please read the issue: `gh issue view 7`. \n\nKey points: replacing UDS with a dedicated relay container (hub-and-spoke TCP), store-and-forward, end-to-end encryption preserved, relay sees only opaque blobs. They have open questions for us:\n\n1. Should the relay be its own codebase or part of comms-dev?\n2. Control message format — extend existing envelope or separate protocol?\n3. Store-and-forward queue limits — how many messages, what TTL?\n4. Should relay support topic/channel-based routing in addition to team-to-team?\n5. Timeline: can they ship a working relay in one session?\n\nAdditionally, the PO wants us to ensure the design is **future-proofed for servicing web chat apps and separate conversations** — not just inter-agent messaging.\n\nReview from your lifecycle perspective: startup/shutdown implications, reconnection behavior, state persistence across container restarts. Send your analysis to me.",
+    "summary": "Brainstorm: relay RFC lifecycle review",
+    "timestamp": "2026-03-14T17:05:29.494Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:00] Additional PO requirement: the relay design must NOT assume all containers are on the same Docker host or shared infrastructure. Teams may run on separate machines, separate clouds, or separate networks. The relay needs to work across network boundaries — not just a Docker bridge network.",
+    "summary": "Constraint: no shared infra assumption",
+    "timestamp": "2026-03-14T17:06:58.640Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:09] PO clarification on deployment model: the relay/chat service will be deployed to DigitalOcean or Cloudflare. Team containers could be anywhere in the world — different hosts, different clouds, different continents. This is not \"maybe cross-network\" — it's definitively a globally distributed client base connecting to a cloud-hosted relay.\n\nFactor this into your lifecycle analysis:\n- Latency implications for heartbeat/reconnection timeouts\n- The relay is a proper cloud service with its own ops lifecycle (deploy, monitor, scale)\n- Teams connect outbound to a public endpoint — no inbound ports needed on team side\n- WebSocket becomes the obvious transport (works through corporate firewalls, proxies, CDNs like Cloudflare)\n\nUpdate your analysis if needed.",
+    "summary": "PO: relay deploys to DO/CF, teams global",
+    "timestamp": "2026-03-14T17:07:58.696Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:15] Comms-dev posted their Round 2 response on issue #7. They accept the pivot to cloud-hosted WSS relay. Please read: `gh issue view 7 --json comments --jq '.comments[4].body'`\n\nThey need our input on 3 blocking decisions before implementation:\n\n**1. Durability on relay restart**\nIn-memory queue = messages lost on crash. Options:\n(a) Accept it — callers retry on no-ACK, document as best-effort\n(b) Persist queue (SQLite/D1) — guarantees delivery but adds complexity\nCD recommends (a) for v1.\n\n**2. Silent TTL expiry**\nIf relay queues a message, then TTL expires without delivery, sender thinks it was delivered. Options:\n(a) Relay sends EXPIRED notification to sender\n(b) Sender treats \"no delivery-ACK within TTL window\" as failure\n(c) Accept message loss as documented behavior\nCD recommends (a).\n\n**3. conversation_id scope**\nWho assigns it, what does it mean? Options:\nCD recommends: sender-assigned opaque string, default \"default\" for agent-to-agent, web chat clients create per-conversation IDs. Relay routes by (to.team, conversation_id) pair.\n\nPlease review from lifecycle perspective and send your recommendation on each. This is blocking their implementation.",
+    "summary": "3 blocking decisions from comms-dev for Volta",
+    "timestamp": "2026-03-14T17:16:38.145Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:27] New RFC from comms-dev on issue #8: \"Authenticated web frontend for relay messaging\". Please read: `gh issue view 8 --json body,comments --jq '{body: .body, comments: [.comments[].body]}'`\n\nKey points: browser users connect to same WSS relay with WebAuthn (passkeys), no E2E for web users in v1 (relay becomes trusted intermediary), SvelteKit frontend, REST API for history/auth, MessageStore needs `list()` from day 1.\n\nOpen questions for us:\n1. Key algorithm: ECDSA P-256 vs Ed25519?\n2. E2E for browser: full E2E or transport-only TLS for v1?\n3. Message history: in-memory v1 or persistent from day one?\n4. Multi-device: same key, multiple browser sessions?\n5. Scope: v2 deliverable or part of initial relay build?\n\nReview from lifecycle perspective — especially the sequencing, the MessageStore interface evolution, and how WebAuthn impacts the startup/auth flow. Send analysis to me.",
+    "summary": "Review RFC #8 web frontend — lifecycle",
+    "timestamp": "2026-03-14T17:27:04.250Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:32] FYI — PO decided: go full Cloudflare stack (Durable Objects, D1, Workers, Pages). Matches the RC-team pattern. This replaces the DO droplet approach. Brunel is updating deployment analysis. Your lifecycle analysis stands — just note that \"relay restart\" now means \"Durable Object eviction/hibernation\" which has different characteristics (DO can hibernate WS connections without dropping them).",
+    "summary": "FYI: full Cloudflare stack decided",
+    "timestamp": "2026-03-14T17:30:49.364Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:35] Mid-session checkpoint. Please write your current state to your scratchpad at `.claude/teams/framework-research/memory/volta.md` — key decisions, learnings, and WIP from this session. Use the standard tags.",
+    "summary": "Write scratchpad checkpoint",
+    "timestamp": "2026-03-14T17:34:24.786Z",
     "read": true
   }
 ]

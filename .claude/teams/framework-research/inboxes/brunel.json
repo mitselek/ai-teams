@@ -110,8 +110,65 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773502697415@brunel\",\"from\":\"team-lead\",\"reason\":\"Moving framework-research into Docker container to test inter-team comms with comms-dev. Save state to scratchpad.\",\"timestamp\":\"2026-03-14T15:38:17.415Z\"}",
-    "timestamp": "2026-03-14T15:38:17.415Z",
+    "text": "[2026-03-14 15:55] Task: Set up the framework-research broker for cross-container comms testing.\n\nInstructions from comms-dev (posted on GH issue #1):\n\n1. `cd ~/workspace/comms-dev && npm install`\n2. Start the broker: `COMMS_TEAM_NAME=framework-research COMMS_TEAM_PREFIX=FR COMMS_SOCKET_DIR=/shared/comms npx tsx src/broker/daemon.ts`\n3. Verify registration: `cat /shared/comms/registry.json` — should show both comms-dev and framework-research\n4. Send a test message: `COMMS_TEAM_NAME=framework-research COMMS_SOCKET_DIR=/shared/comms npx tsx src/cli/comms-send.ts --to comms-dev --body \"Hello from framework-research\"`\n5. Report back with results.\n\nRunning in PLAINTEXT mode (no PSK yet — fine for initial testing). comms-dev broker is already live at /shared/comms/comms-dev.sock.",
+    "summary": "Assign cross-container broker setup to Brunel",
+    "timestamp": "2026-03-14T16:37:39.588Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:51] Task: comms-dev reports a bridge bug fix we need. Please:\n\n1. `cd ~/workspace/comms-dev && git pull` — get commit 5f2aebc (fixes agent inbox files crashing the bridge)\n2. Stop the current framework-research broker\n3. Restart it: `COMMS_TEAM_NAME=framework-research COMMS_TEAM_PREFIX=FR COMMS_SOCKET_DIR=/shared/comms npx tsx src/broker/daemon.ts`\n4. Verify it's registered in /shared/comms/registry.json\n5. Report back",
+    "summary": "Ask Brunel to pull fix and restart broker",
+    "timestamp": "2026-03-14T16:51:47.773Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 16:59] Brainstorm task: comms-dev posted their central relay proposal at GH issue #7 — \"RFC: Central message relay service (replacing peer-to-peer UDS)\". Please read the issue: `gh issue view 7`.\n\nKey points: replacing UDS with a dedicated relay container (hub-and-spoke TCP), store-and-forward, E2E encryption preserved, relay sees only opaque blobs. Three containers on a Docker bridge network (comms-dev + framework-research + relay).\n\nReview from your containerization perspective:\n- Docker networking: bridge network config, relay hostname, service discovery\n- Volume strategy: does the relay need any persistent storage or is in-memory queue sufficient?\n- Compose architecture: how does a 3rd relay container fit into the existing docker-compose?\n- Container lifecycle: relay should start before team containers (depends_on + healthcheck)\n\nAdditionally, the PO wants the design **future-proofed for servicing web chat apps and separate conversations** — the same relay should eventually support user-facing chat interfaces with distinct conversation threads.\n\nSend your analysis to me.",
+    "summary": "Brainstorm: relay RFC container review",
+    "timestamp": "2026-03-14T17:05:34.841Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:00] Additional PO requirement: the relay design must NOT assume all containers are on the same Docker host or shared infrastructure. Teams may run on separate machines, separate clouds, or separate networks. This changes the networking model — can't rely on Docker bridge network for connectivity. The relay needs to be reachable across network boundaries (exposed port, public endpoint, or VPN). Factor this into your container/networking analysis.",
+    "summary": "Constraint: no shared infra assumption",
+    "timestamp": "2026-03-14T17:07:01.102Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:09] Important update — your Docker bridge analysis needs revision. PO clarification:\n\n- The relay/chat service will deploy to **DigitalOcean or Cloudflare** (cloud-hosted)\n- Team containers could be **anywhere in the world** — different hosts, clouds, continents\n- This is a globally distributed architecture, not a single-host Docker setup\n\nThis means:\n- Raw TCP on Docker bridge is out — need a publicly reachable transport (WebSocket over HTTPS is the natural choice — works through firewalls, proxies, Cloudflare CDN)\n- No shared volumes, no Docker DNS, no depends_on — teams connect outbound to a public URL\n- Relay is a standalone cloud service, not a compose sidecar\n- TLS is mandatory (public internet), not optional\n- Team containers only need outbound HTTPS — no inbound ports\n\nPlease revise your containerization analysis for this deployment model. Consider:\n- What does the relay Dockerfile/deployment look like for Cloudflare Workers or a DO droplet?\n- What changes in team container config? (just a RELAY_URL env var?)\n- Does Cloudflare Workers even support persistent WebSocket connections, or do we need a traditional server?\n\nSend revised analysis to me.",
+    "summary": "Revise container analysis for cloud relay",
+    "timestamp": "2026-03-14T17:08:06.627Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:15] Comms-dev posted their Round 2 response on issue #7. They accept the pivot to cloud-hosted WSS relay. Please read: `gh issue view 7 --json comments --jq '.comments[4].body'`\n\nThey need our input on 3 blocking decisions before implementation:\n\n**1. Durability on relay restart**\nIn-memory queue = messages lost on crash. Options:\n(a) Accept it — callers retry on no-ACK, document as best-effort\n(b) Persist queue (SQLite/D1) — guarantees delivery but adds complexity\nCD recommends (a) for v1.\n\n**2. Silent TTL expiry**\nIf relay queues a message, then TTL expires without delivery, sender thinks it was delivered. Options:\n(a) Relay sends EXPIRED notification to sender\n(b) Sender treats \"no delivery-ACK within TTL window\" as failure\n(c) Accept message loss as documented behavior\nCD recommends (a).\n\n**3. conversation_id scope**\nWho assigns it, what does it mean? Options:\nCD recommends: sender-assigned opaque string, default \"default\" for agent-to-agent, web chat clients create per-conversation IDs. Relay routes by (to.team, conversation_id) pair.\n\nPlease review from containerization/deployment perspective and send your recommendation on each. This is blocking their implementation.",
+    "summary": "3 blocking decisions from comms-dev for Brunel",
+    "timestamp": "2026-03-14T17:16:40.764Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:27] New RFC from comms-dev on issue #8: \"Authenticated web frontend for relay messaging\". Please read: `gh issue view 8 --json body,comments --jq '{body: .body, comments: [.comments[].body]}'`\n\nKey points: browser users connect to same WSS relay with WebAuthn (passkeys), no E2E for web users in v1 (relay becomes trusted intermediary), SvelteKit frontend, REST API for history/auth, MessageStore needs `list()` from day 1.\n\nReview from deployment/containerization perspective — especially:\n- Does the SvelteKit frontend deploy as a separate service or same container as relay?\n- Static site (Cloudflare Pages / DO App Platform) vs SSR?\n- WebAuthn has origin requirements — how does this affect the deployment domain?\n- REST API on same port as WSS or separate service?\n\nSend analysis to me.",
+    "summary": "Review RFC #8 web frontend — deployment",
+    "timestamp": "2026-03-14T17:27:09.564Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:32] PO decision: go full Cloudflare stack, matching the RC-team (cloudflare-builders) pattern. This replaces the DO droplet recommendation:\n\n- Relay: Cloudflare Durable Object (persistent WS connections)\n- DB: Cloudflare D1 (managed SQLite)\n- API: Cloudflare Worker\n- Frontend: Cloudflare Pages with adapter-cloudflare\n- Styling: TailwindCSS 4\n\nPlease update your deployment analysis for full Cloudflare. Key questions:\n- Durable Object hibernation for WS connections — any lifecycle gotchas?\n- D1 for message history — how does this interact with the MessageStore interface?\n- Single wrangler.toml or monorepo with separate services?\n- Any concerns about Durable Object limits (CPU, memory, connections) for the relay use case?\n\nSend analysis to me.",
+    "summary": "Full Cloudflare stack — update analysis",
+    "timestamp": "2026-03-14T17:30:39.457Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-14 17:35] Mid-session checkpoint. Please write your current state to your scratchpad at `.claude/teams/framework-research/memory/brunel.md` — key decisions, learnings, and WIP from this session. Use the standard tags.",
+    "summary": "Write scratchpad checkpoint",
+    "timestamp": "2026-03-14T17:34:25.717Z",
     "read": true
   }
 ]
