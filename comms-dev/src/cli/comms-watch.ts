@@ -15,6 +15,16 @@
 //
 // Required environment:
 //   COMMS_TEAM_NAME   — team whose inbox to watch
+//
+// !! MUTUAL EXCLUSION WARNING !!
+// comms-watch --consume and SendMessageBridge both poll the same inbox directory
+// and delete files after processing. Running both simultaneously causes a race:
+// one process may consume a file before the other has processed it, silently
+// dropping messages.
+//
+// Rule: run EITHER comms-watch (for human inspection) OR the broker with
+// SendMessageBridge enabled (for agent delivery) — never both at the same time.
+// comms-watch without --consume is safe to run alongside the broker (read-only).
 
 import fs from 'fs';
 import path from 'path';
@@ -72,8 +82,17 @@ async function main(): Promise<void> {
   if (!values.follow) return;
 
   // Poll for new files
+  let running = true;
+  const shutdown = (): void => {
+    running = false;
+    console.error('\n[comms-watch] Shutting down…');
+    process.exit(0);
+  };
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+
   console.error('[comms-watch] Waiting for new messages… (Ctrl+C to exit)');
-  while (true) {
+  while (running) {
     await sleep(POLL_INTERVAL_MS);
     const current = listMessages(inboxDir);
     for (const filePath of current) {

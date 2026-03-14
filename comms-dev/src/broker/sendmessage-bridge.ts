@@ -14,6 +14,12 @@
 //
 // The target agent is determined by msg.to.agent. If the agent has no inbox
 // file yet, one is created. Unknown agents default to 'team-lead'.
+//
+// !! MUTUAL EXCLUSION WARNING !!
+// SendMessageBridge and `comms-watch --consume` both poll and delete files from
+// the same inbox directory. Running both simultaneously causes a race that silently
+// drops messages. Run EITHER the broker (with this bridge) OR comms-watch --consume
+// — never both. comms-watch without --consume (read-only) is safe alongside the broker.
 
 import fs from 'fs';
 import path from 'path';
@@ -49,15 +55,25 @@ export interface BridgeOptions {
   frameworkInboxDir: string;
   onDelivered?: (message: Message, agentName: string) => void;
   onError?: (err: Error) => void;
+  /** Maximum number of paths to retain in the seen set. Default: 1000. */
+  maxSeenSize?: number;
 }
+
+const DEFAULT_MAX_SEEN_SIZE = 1000;
 
 export class SendMessageBridge {
   private readonly opts: BridgeOptions;
+  readonly maxSeenSize: number;
   private timer: ReturnType<typeof setInterval> | null = null;
   private readonly seen = new Set<string>();
 
   constructor(opts: BridgeOptions) {
     this.opts = opts;
+    this.maxSeenSize = opts.maxSeenSize ?? DEFAULT_MAX_SEEN_SIZE;
+  }
+
+  seenSize(): number {
+    return this.seen.size;
   }
 
   start(): void {
@@ -72,6 +88,7 @@ export class SendMessageBridge {
       clearInterval(this.timer);
       this.timer = null;
     }
+    this.seen.clear();
   }
 
   private async poll(): Promise<void> {
@@ -86,6 +103,11 @@ export class SendMessageBridge {
 
     for (const filePath of files) {
       if (this.seen.has(filePath)) continue;
+      // Evict oldest entry if at capacity
+      if (this.seen.size >= this.maxSeenSize) {
+        const oldest = this.seen.values().next().value;
+        if (oldest !== undefined) this.seen.delete(oldest);
+      }
       this.seen.add(filePath);
 
       let message: Message;

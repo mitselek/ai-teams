@@ -262,6 +262,8 @@ describe('InboxWatcher — lifecycle', () => {
 
 describe('InboxWatcher — error handling', () => {
   it('does not crash if onMessage handler throws — continues polling', async () => {
+    // When onMessage throws, the file is LEFT in place for retry.
+    // The watcher must not crash and must process subsequent messages.
     let callCount = 0;
     const received: Message[] = [];
 
@@ -277,15 +279,42 @@ describe('InboxWatcher — error handling', () => {
     });
     watcher.start();
     try {
-      writeInboxFile(inboxDir, makeMessage('first — throws'));
-      await new Promise(r => setTimeout(r, 150));
+      writeInboxFile(inboxDir, makeMessage('retried after throw'));
+      await new Promise(r => setTimeout(r, 200)); // enough for retry to succeed
 
-      writeInboxFile(inboxDir, makeMessage('second — ok'));
-      await new Promise(r => setTimeout(r, 150));
-
+      // Message was retried — now dispatched successfully on second attempt
       expect(callCount).toBeGreaterThanOrEqual(2);
       expect(received).toHaveLength(1);
-      expect(received[0].body).toBe('second — ok');
+      expect(received[0].body).toBe('retried after throw');
+    } finally {
+      watcher.stop();
+    }
+  });
+
+  it('file survives when onMessage throws — not lost on transient failure', async () => {
+    let threw = false;
+    const received: Message[] = [];
+    const msg = makeMessage('survives failure');
+    writeInboxFile(inboxDir, msg);
+
+    const watcher = new InboxWatcher({
+      teamName: 'comms-dev',
+      baseDir: tmpDir,
+      onMessage: async (m) => {
+        if (!threw) {
+          threw = true;
+          throw new Error('transient failure');
+        }
+        received.push(m);
+      },
+      pollIntervalMs: 50,
+    });
+    watcher.start();
+    try {
+      await new Promise(r => setTimeout(r, 200));
+      // File was retried and eventually delivered
+      expect(received).toHaveLength(1);
+      expect(received[0].id).toBe(msg.id);
     } finally {
       watcher.stop();
     }

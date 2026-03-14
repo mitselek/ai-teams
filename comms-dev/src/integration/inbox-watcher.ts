@@ -75,9 +75,8 @@ export class InboxWatcher {
         fs.unlinkSync(filePath);
       } catch (err) {
         this.onError(err as Error);
-        // Leave the file — do not re-deliver on next cycle (file still exists,
-        // but stop trying so we don't spin). Delete to avoid infinite loop:
-        try { fs.unlinkSync(filePath); } catch { /* ignore */ }
+        // Leave the file in place — it will be retried on the next poll cycle.
+        // Deleting on failure would cause permanent message loss for transient errors.
       }
     }
   }
