@@ -1,6 +1,20 @@
 # Herald Scratchpad
 
-## 2026-03-14
+## 2026-03-14 (session 2)
+
+[DECISION] T02 resource coordination protocols (R1-R5) written. Five protocols: branch reservation (R1), deployment lock (R2), DB migration queue (R3), API rate limit partitioning (R4), unified lock registry (R5). All integrate with T03 communication protocols — no new primitives needed.
+
+[DECISION] Migration locks are NEVER force-released on timeout (unlike merge/deploy locks). Half-applied migrations can corrupt data — escalate to PO instead.
+
+[PATTERN] Resource coordination is a use case of the communication protocols, not a separate system. Lock requests use T03 Protocol 1 (Handoff) with `type: resource-lock`. Rate limit alerts use Protocol 3 (Broadcast).
+
+[PATTERN] Finn's research and Herald's protocols are complementary layers: Finn defines isolation mechanisms (worktrees, per-team DBs, token-per-team), Herald defines coordination protocols (lock lifecycle, conflict detection, queue ordering).
+
+[CHECKPOINT] All 5 original T02 open questions resolved. 5 new open questions raised (lock infrastructure, cross-repo, migration rollback, fairness, offline recovery).
+
+[DECISION] Protocol 4 broker deployment: SIDECAR container (not inline daemon). Broker must outlive Claude session to queue undelivered messages. Startup ordering via `depends_on` + healthcheck on socket file. TLS-PSK secret mounts on broker sidecar, not Claude container. Broker needs persistent inbox directory on team-scoped volume (`/team-data/inbox/`). Coordinated with Brunel.
+
+## 2026-03-14 (session 1)
 
 [DECISION] Inter-team encrypted chat transport: Unix Domain Socket (UDS) via shared Docker volume at `/shared/comms/`. Each team runs a broker daemon that listens on `<team-name>.sock`. Chosen over TCP (port management overhead), message queues (infra dependency), git-based (latency), and filesystem polling (race conditions).
 

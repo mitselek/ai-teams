@@ -902,45 +902,53 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 
 ### Problem
 
-Claude's auto-memory (`~/.claude/`) lives on the host filesystem. Each new shell session starts with whatever state was accumulated. When teams are run in ephemeral environments (cloud VMs, CI, shared machines), the `~/.claude/` directory is lost between sessions. The repo-versioned scratchpads and inboxes survive (via git), but the auto-memory does not.
+Claude's auto-memory (`~/.claude/`) lives on the host filesystem. Each new shell session starts with whatever state was accumulated. When teams are run in ephemeral environments (cloud VMs, CI, shared machines), the `~/.claude/` directory is lost between sessions. The repo-versioned scratchpads and inboxes survive (via git), but the auto-memory does not. Teams also need resource isolation — one team's auto-memory must not be visible to another.
 
 ### Solution
 
-Run Claude inside a Docker container with `~/.claude/` mounted as a named Docker volume. Named volumes survive `docker stop`/`docker start` and are independent of any container lifecycle. The container is ephemeral; the volume is persistent.
+Full container isolation: each team runs in its own service inside a shared Docker image, with separate named volumes for auto-memory. No host bind mounts. Git credentials are passed via `GITHUB_TOKEN` environment variable. Claude is installed via npm inside the image.
 
-### Architecture
+Named volumes survive `docker stop`/`docker start`. The container is ephemeral; the volumes are persistent.
 
-| Component | Host path | Container mount | Persistence |
+### Architecture (implemented)
+
+| Component | Container path | Persistence | Isolation |
 |---|---|---|---|
-| Auto-memory | `~/.claude/` | Named volume `ai-teams_claude-home` | Survives restarts |
-| Repo | `~/Documents/github/mitselek/ai-teams/` | Bind mount (read-write) | Git-versioned |
-| Claude binary | `~/.local/share/claude/` | Bind mount (read-only) | Host-managed |
-| SSH keys | `~/.ssh/` | Bind mount (read-only) | Host-managed |
-| Git config | `~/.gitconfig` | Bind mount (read-only) | Host-managed |
+| Auto-memory | `/home/ai-teams/.claude/` | Named volume per team | Per-team — `ai-teams_fr-claude-home` / `ai-teams_cd-claude-home` |
+| Repo (workspace) | `/home/ai-teams/workspace/` | Shared named volume `ai-teams_repo-data` | Shared — both teams read same repo |
+| Inter-team comms | `/shared/comms/` | Shared named volume `ai-teams_comms` | Shared — Unix socket inter-team messaging |
+| Claude binary | `/home/ai-teams/.npm/...` | Inside image (npm install -g) | Shared image layer |
+| Git credentials | env `GITHUB_TOKEN` | `.env` file on host (not mounted) | Per-container env |
 
-**Key constraint:** `$HOME` inside the container matches the host (`/home/michelek`). This is load-bearing — the lifecycle scripts (`restore-inboxes.sh`, `persist-inboxes.sh`) use `$HOME` to derive runtime team dir paths. No script changes are needed.
+**Container user:** `ai-teams` (UID 1000, GID 1000). Ubuntu 24.04's default UID 1000 (`ubuntu`) is renamed via `groupmod -n` + `usermod -l` in the Dockerfile.
+
+**`$HOME` inside container:** always `/home/ai-teams`. Volta's lifecycle scripts use `$HOME/.claude/teams/<team-name>` for the runtime team dir — this resolves correctly inside the container. No `$HOME` validation failures; the Windows/Git Bash `$HOME` bug documented in Phase 2.0a does not apply in the container environment.
+
+**Workspace init:** `entrypoint.sh` clones the repo on first start (`/home/ai-teams/workspace/` is empty on a fresh volume); subsequent starts do `git pull`. Race condition possible if both teams start simultaneously on a fresh volume — acceptable for current sequential-start usage.
 
 ### First-Run Volume Ownership Problem
 
-Docker creates named volume directories owned by root before any container user exists. If the container user is UID 1000, they cannot write to their own `~/.claude/`.
+Docker creates named volumes owned by root before any container user exists. `ai-teams` (UID 1000) cannot write to `/home/ai-teams/.claude/` or `/shared/comms/` on first start.
 
-**Fix:** `entrypoint.sh` runs as root, detects root ownership on `~/.claude/`, chowns it to `HOST_UID:HOST_GID`, then uses `gosu` to drop privileges and exec the user command. `gosu` (unlike `su -c`) preserves the full environment, including `ANTHROPIC_API_KEY`.
+**Fix:** `entrypoint.sh` runs as root, loops over `/home/ai-teams/.claude/` and `/shared/comms/`, chowns both to `1000:1000` on first start, then uses `gosu` to drop privileges and exec the user command. `gosu` (unlike `su -c`) preserves the full environment, including `ANTHROPIC_API_KEY`.
 
 ### Implementation Files
 
 | File | Purpose |
 |---|---|
-| `Dockerfile` | Ubuntu 24.04 + git + jq + openssh-client + gosu; user creation matching host UID/GID |
-| `docker-compose.yml` | Volume, bind mounts, env vars, UID/GID passthrough |
-| `entrypoint.sh` | Root → ownership fix → gosu drop to user |
-| `session-start.sh` | One command to build (if needed) and start interactive session |
-| `session-stop.sh` | One command to stop containers (volume preserved); `--wipe-memory` flag for intentional wipe |
+| `Dockerfile` | Ubuntu 24.04 + nodejs + npm + git + gh + jq + openssh-client + gosu; renames ubuntu user to ai-teams |
+| `docker-compose.yml` | Two services (framework-research, comms-dev); 4 named volumes; YAML anchor for shared config |
+| `entrypoint.sh` | Root → chown volumes → git clone/pull → gosu drop to ai-teams |
+| `session-start.sh` | One command to build (if needed) and start interactive session for a named team |
+| `session-stop.sh` | Stop containers; `--wipe-memory [team]` / `--wipe-all` flags for intentional wipe |
+| `.env.example` | `GITHUB_TOKEN`, `ANTHROPIC_API_KEY` |
 
 ### Usage
 
 ```bash
-# Start a session (builds image on first run)
-./session-start.sh
+# Start a session for a specific team (defaults to framework-research)
+./session-start.sh framework-research
+./session-start.sh comms-dev
 
 # Inside the container, run Claude:
 claude
@@ -948,12 +956,69 @@ claude
 # Stop (from another terminal, or Ctrl+D inside container)
 ./session-stop.sh
 
-# Intentionally wipe memory (irreversible):
-./session-stop.sh --wipe-memory
+# Intentionally wipe one team's auto-memory (irreversible):
+./session-stop.sh --wipe-memory framework-research
+
+# Wipe all team memory:
+./session-stop.sh --wipe-all
 ```
+
+### Interaction with Volta's Startup/Shutdown Protocol
+
+The container is transparent to Volta's protocol. From the lifecycle protocol's perspective:
+
+- **Phase 0 (Orient):** reads files from `/home/ai-teams/workspace/` — the cloned repo. Same paths as non-container usage.
+- **Phase 1 (Sync):** `git pull` inside container. GITHUB_TOKEN is available as env var for HTTPS auth.
+- **Phase 2.0a ($HOME validation):** `$HOME` is always `/home/ai-teams` — validation passes immediately. The Windows/Git Bash fallback path is never triggered.
+- **Phase 3 (Create):** `TeamCreate` writes to `/home/ai-teams/.claude/teams/<team-name>/` — on the team's named volume. Survives container restarts.
+- **Phase 4 (Restore inboxes):** reads from repo dir (`/home/ai-teams/workspace/.claude/teams/<team-name>/inboxes/`). Same path resolution as non-container.
+- **Shutdown Phase 4a (Persist inboxes):** writes to repo dir, then `git push`. GITHUB_TOKEN covers auth.
+
+No protocol changes required. The container is a deployment detail, not a protocol change.
+
+### Interaction with Herald's Protocol 4 (Inter-Team Transport)
+
+Herald's Protocol 4 (T03) specifies UDS-based inter-team messaging via a shared Docker volume at `/shared/comms/`. The current container implementation provides the volume infrastructure; the broker daemon is built by comms-dev.
+
+**What the container provides:**
+
+| Component | Status | Notes |
+|---|---|---|
+| `/shared/comms/` volume | Implemented — `ai-teams_comms` named volume | Both team services mount it |
+| Socket directory ownership | Implemented — `entrypoint.sh` chowns to 1000:1000 | Broker can create socket files as `ai-teams` user |
+| `comms-channel:` volume in compose | Volume name: `ai-teams_comms` | Herald's spec calls it `comms-channel` — naming difference, same concept |
+
+**What is NOT yet in the container (comms-dev team's responsibility):**
+
+- Message broker daemon implementation (Python/Node) — `ai-teams-broker:latest` image is a placeholder in compose
+- `registry.json` management with file locking
+- `comms-send` / `comms-publish` / `comms-watch` CLI tools
+
+**Broker deployment: SIDECAR** (decided 2026-03-14, Brunel + Herald). Rationale: broker must outlive the Claude session. Inline daemon drops queued messages on `Ctrl+D` — same failure mode as no broker. Linear service count cost (N teams = N extra services) is acceptable.
+
+**Compose architecture (implemented in docker-compose.yml):**
+
+```
+broker-framework-research  ──healthcheck(socket)──►  framework-research (Claude)
+broker-comms-dev           ──healthcheck(socket)──►  comms-dev (Claude)
+```
+
+- Claude containers: `depends_on: broker-<team>: condition: service_healthy`
+- Healthcheck: `test -S /shared/comms/<team>.sock` — Claude cannot start before broker socket exists
+- TLS-PSK: secret mounts on broker sidecars only (Claude containers do not need the PSK)
+- Per-team broker inbox volumes (`fr-broker-inbox`, `cd-broker-inbox`) persist queued messages across broker restarts
+
+**Volumes added for broker pattern:**
+
+| Volume | Name | Purpose |
+|---|---|---|
+| `fr-broker-inbox` | `ai-teams_fr-broker-inbox` | framework-research broker message queue |
+| `cd-broker-inbox` | `ai-teams_cd-broker-inbox` | comms-dev broker message queue |
 
 ### Open Questions
 
-- **SSH agent forwarding** — `git push` over SSH requires `SSH_AUTH_SOCK` forwarding into the container. Currently, HTTPS git credentials (mounted `.git-credentials`) cover the common case. SSH forwarding is a one-line addition to `docker-compose.yml` when needed.
-- **MCP servers** — No MCP servers are currently configured. If added, they may require socket or port mounts.
-- **Multiple concurrent sessions** — The `session-start.sh` script does not prevent multiple containers from sharing the same named volume simultaneously. This is safe for `~/.claude/` (files are written by one process at a time) but should be documented.
+- **SSH agent forwarding** — `git push` over SSH requires `SSH_AUTH_SOCK` forwarding. Currently HTTPS + `GITHUB_TOKEN` covers the common case. SSH forwarding is a one-line addition to `docker-compose.yml` when needed.
+- **MCP servers** — No MCP servers configured. If added, may require port or socket mounts into the container.
+- **Simultaneous first-start race condition** — If both team containers start simultaneously against a fresh `repo-data` volume, both attempt `git clone` concurrently. Low priority for current sequential-start usage; fix is a lock file or init container pattern.
+- **GITHUB_TOKEN rotation** — Token is passed at container start via `.env`. Rotation requires container restart. For long-running containers, a secrets manager mount would be preferable.
+- **Broker image** — `ai-teams-broker:latest` is a placeholder. comms-dev team delivers the implementation. Compose is ready to wire it in.

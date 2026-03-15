@@ -1,101 +1,121 @@
-# Framework Research — Knowledge Health Report (Audit v4, 2026-03-13)
+# Framework Research — Knowledge Health Report (Audit v5, 2026-03-14)
 
 (*FR:Medici*)
 
 ## Summary
 
-Fourth audit, second cold start. **State since v3:** task-list-snapshot.md now exists (SC-5c resolved). Volta's scratchpad grew with 3 amendments from restart test field data. No other topic or scratchpad changes since v3. The team is stable and coherent — primary work remains in the HIGH-gap topics (T04, T02, T05).
+Fifth audit. **Major progress since v4:** T03 gained Protocol 4 (inter-team transport specification — UDS + GitHub Issues knowledge layer), T06 gained container lifecycle sections (state preservation tiers, container isolation requirements). New infrastructure: Dockerfile, docker-compose.yml, session scripts, comms-dev team fully provisioned. Two new agents active since v4: Brunel (containerization) and Herald (protocol design, session 2). Volta produced lifecycle scripts (restore-inboxes.sh, persist-inboxes.sh).
 
-**Overall health: GOOD — stable, no regressions, known gaps unchanged**
+**9 recommendations total (3 HIGH, 3 MEDIUM, 3 LOW)**
+
+**Overall health: GOOD — significant forward progress, two blocking gaps reduced to one**
 
 ---
 
 ## 1. [COHERENCE] — Are topic files consistent with each other?
 
-**Status: PASS (unchanged from v3)**
+**Status: IMPROVED (from v4)**
 
-Cross-references remain implicitly consistent through Finn's extraction sections. No terminological contradictions.
+### Positive coherence signals (verified):
 
-**Positive coherence signals (verified):**
-- T06 (lifecycle) and T03 (communication) — same shutdown reporting protocol, consistent
-- T04 (hierarchy) and T07 (safety) — identical team-lead tool restrictions
-- T01 (taxonomy) and T06 (lifecycle) — consistent spawn path descriptions
-- T03 (Herald's protocols) and T06 (Volta's lifecycle) — both reference manager agent; neither contradicts
+- T03 Protocol 4 (Herald) explicitly references T06 container model (Volta/Brunel) — shared Docker volume for inter-team comms aligns with docker-compose.yml
+- T03 Protocol 4 transport spec references Protocol 1 (Handoff), Protocol 2 (Topology), Protocol 3 (Broadcast) correctly — layered design is consistent
+- T06 lifecycle scripts (restore-inboxes.sh, persist-inboxes.sh) implement the Phase 4a/Phase 4 Restore patterns documented in the protocol
+- T06 container isolation (Brunel) and T02 resource isolation are consistent — both describe behavioral isolation with shared workspace
+- T03 attribution format (`(*TEAM:Agent*)`) is consistent with actual practice across all topic files
 
-**Key tension (still unresolved):**
-- T03 assumes a manager agent exists (Herald's protocols route through it). T04 has no manager agent design. This is the single biggest cross-topic dependency.
-- T01 "Can an agent belong to multiple teams?" — still open, impacts T02, T05, T07.
+### Key tensions:
+
+1. **T03 → T04 manager agent dependency — STILL BLOCKING but REDUCED.** Herald's Protocols 1-3 assume a manager agent exists. T04 still has no manager agent design. However, Protocol 4's UDS transport works without a manager agent (point-to-point sockets). The transport layer is independent; the routing/governance layer still depends on T04.
+
+2. **T03 Protocol 4 → T05 Identity gap.** Protocol 4 specifies TLS-PSK encryption with Docker secrets for inter-team transport. T05 (Identity) documents only current shared-credential state and doesn't reference the new PSK-based inter-team auth. These should cross-reference.
+
+3. **T06 container model → T02 isolation.** Brunel's container design (shared repo-data volume, per-team claude-home volumes) is a concrete resource isolation proposal, but T02 doesn't reference it. T02 still reads as "current state only, no proposals" — the container model IS a proposal.
 
 ---
 
 ## 2. [EXTRACTION] — Have patterns from reference/ been extracted into topics?
 
-**Status: DONE (unchanged from v3)**
+**Status: DONE (unchanged) + NEW SOURCE MATERIAL**
 
-All 8 topic files have `## Patterns from Reference Teams (*FR:Finn*)` sections. No new reference material has been added since v3, so extraction remains complete.
+All 8 original Finn extraction sections remain complete. No new reference material added to `reference/`.
 
-| Topic | Finn section | Content quality |
+**New source:** The comms-dev team (`/.claude/teams/comms-dev/`) is now a reference implementation for the framework's own inter-team communication design. Its roster (Vigenere, Babbage, Kerckhoffs), common-prompt, and agent prompts contain patterns not yet extracted into topics:
+
+| Pattern | Source | Relevant topic |
 |---|---|---|
-| T01 Team Taxonomy | Yes | Rich — agent types table, team configs, model tiering |
-| T02 Resource Isolation | Yes | Good — git isolation, worktree, branch strategy, DB naming, rate limits |
-| T03 Communication | Yes | Excellent — 7 intra-team patterns + Herald's 3 inter-team protocols |
-| T04 Hierarchy & Governance | Yes | Good — team-lead restrictions, anti-patterns table, governance rules |
-| T05 Identity & Credentials | Yes | Good — credential listing, loading pattern, Figma rate-limit protocol |
-| T06 Lifecycle | Yes | Excellent — Volta's canonical protocol + 3 restart-test amendments |
-| T07 Safety & Guardrails | Yes | Good — prompt-level guardrails, peer enforcement, quality gates |
-| T08 Observability | Yes | Good — Medici pattern, shutdown reports, attribution, dashboard |
+| Cross-team code review via GitHub Issues | Volta scratchpad, Issues #3-#6 | T03, T08 |
+| TDD across agent boundaries (Kerckhoffs writes tests, Babbage implements) | Volta scratchpad | T04 (governance), T07 (quality gates) |
+| Provider adapter pattern for crypto/transport | comms-dev implementation | T02 (isolation seam design) |
+
+**Recommendation:** These are not urgent extractions — comms-dev is still v1. Flag for Finn when comms-dev matures.
 
 ---
 
 ## 3. [GAP] — What's missing? Which topics are thin?
 
-**Updated gap ranking (unchanged from v3 — no new content added to gap topics):**
+**Updated gap ranking:**
 
-| Topic | Gap severity | Key missing element |
-|---|---|---|
-| T04 Hierarchy & Governance | **HIGH** | Manager agent layer design absent — Herald's T03 protocols depend on it |
-| T02 Resource Isolation | **HIGH** | D1 migration serialization, deployment locking — only current state, no proposals |
-| T05 Identity & Credentials | **HIGH** | Per-team credential scoping — only current (shared) state documented |
-| T08 Observability | MEDIUM | Implementation mechanisms for metrics, dashboards, cost tracking missing |
-| T01 Taxonomy | MEDIUM | Multi-team agent membership and team-type lifecycle unresolved |
-| T07 Safety | LOW | Circuit breaker and runaway detection design still needed |
-| T03 Communication | LOW | Cross-team message delivery mechanism and cross-team Finn pattern open |
-| T06 Lifecycle | LOW | Inbox backup atomicity, daemon shutdown protocol, multi-team startup coordination |
+| Topic | Gap severity | v4 severity | Change | Key missing element |
+|---|---|---|---|---|
+| T04 Hierarchy & Governance | **HIGH** | HIGH | unchanged | Manager agent layer design absent — Protocols 1-3 depend on it |
+| T02 Resource Isolation | **HIGH** → **MEDIUM** | HIGH | improved | Container model (Brunel) is a concrete proposal, but not integrated into T02 |
+| T05 Identity & Credentials | **HIGH** | HIGH | unchanged | Per-team credential scoping — only current state documented |
+| T08 Observability | MEDIUM | MEDIUM | unchanged | Implementation mechanisms for metrics, dashboards, cost tracking |
+| T01 Taxonomy | MEDIUM | MEDIUM | unchanged | Multi-team agent membership and team-type lifecycle |
+| T07 Safety | LOW | LOW | unchanged | Circuit breaker and runaway detection design |
+| T03 Communication | **LOW** → **VERY LOW** | LOW | improved | Most open questions now resolved by Protocols 1-4 |
+| T06 Lifecycle | **LOW** → **VERY LOW** | LOW | improved | Container lifecycle + scripts address most gaps |
 
-**No gap movement since v3.** The HIGH-gap topics (T04, T02, T05) need specialist attention.
+**Key changes:**
+- T02 drops from HIGH to MEDIUM: Brunel's container model provides concrete isolation proposals (per-team volumes, shared comms volume). The gap is now integration into the topic file, not missing design work.
+- T03 drops to VERY LOW: Protocol 4 resolved the transport mechanism question. Remaining opens are edge cases (cross-team Finn, broadcast ACK).
+- T06 drops to VERY LOW: Container lifecycle, state preservation tiers, lifecycle scripts all added. Remaining opens are minor (daemon shutdown, multi-team startup coordination).
+
+**Top blocking gap remains T04** — manager agent layer design.
 
 ---
 
 ## 4. [CONTRADICTION] — Do any files contradict each other?
 
-**Status: MINOR — 2 items (1 carried from v3, 1 resolved)**
+**Status: 4 items (2 carried, 2 new)**
 
-### 4a. Finn's scratchpad team size claim — STILL STALE
+### 4a. finn.md team size claim — STILL STALE (3rd audit)
 
 `memory/finn.md` line 14: "Team size: 3 agents (team-lead opus-4-6, finn opus-4-6, medici sonnet-4-6)"
 
-**Reality:** roster.json has 6 members, all on opus-4-6. This was flagged in v3 and in the task-list-snapshot. Still not updated (Finn not yet spawned this session).
+**Reality:** roster.json has 7 members (team-lead, finn, medici, celes, volta, herald, brunel). All opus-4-6 except brunel (sonnet-4-6).
 
-**Severity:** Low — scratchpad text, not authoritative.
-**Fix:** Finn should update on next startup.
+**Severity:** Low — scratchpad text, not authoritative. But persists across 3 audits.
 
-### 4b. README.md status column — STILL STALE
+### 4b. README.md status column — STILL STALE (3rd audit)
 
-README.md shows all 8 topics as "brainstorm". Multiple topics are now at "drafting" or better:
+README.md shows all 8 topics as "brainstorm". Updated actual status:
 
 | Topic | README says | Actual status |
 |---|---|---|
-| T01 Taxonomy | brainstorm | drafting (patterns extracted, composition model clear) |
-| T02 Isolation | brainstorm | brainstorm+ (patterns extracted, no proposals yet) |
-| T03 Communication | brainstorm | drafting (3 inter-team protocols designed) |
-| T04 Hierarchy | brainstorm | brainstorm+ (patterns extracted, manager agent undefined) |
-| T05 Identity | brainstorm | brainstorm+ (patterns extracted, no proposals yet) |
-| T06 Lifecycle | brainstorm | **advanced draft** (canonical protocol written + tested + amended) |
-| T07 Safety | brainstorm | drafting (permission categories, enforcement patterns clear) |
-| T08 Observability | brainstorm | drafting (Medici pattern, attribution, dashboard documented) |
+| T01 Taxonomy | brainstorm | drafting |
+| T02 Isolation | brainstorm | drafting (container model adds proposals) |
+| T03 Communication | brainstorm | **advanced draft** (4 inter-team protocols + transport spec) |
+| T04 Hierarchy | brainstorm | brainstorm+ |
+| T05 Identity | brainstorm | brainstorm+ |
+| T06 Lifecycle | brainstorm | **advanced draft** (canonical protocol + scripts + container lifecycle) |
+| T07 Safety | brainstorm | drafting |
+| T08 Observability | brainstorm | drafting |
 
-**Severity:** Medium — the README is the first thing a newcomer reads. Inaccurate status misleads.
-**Fix:** Team-lead should update the status column.
+**Severity:** Medium — newcomer confusion. Elevated to recommendation.
+
+### 4c. NEW — roster.json workDir path (Celes flagged)
+
+`roster.json` line 5: `"workDir": "$HOME/Documents/github/mitselek-ai-teams"` — uses a dash, not slash. Actual repo path uses `mitselek/ai-teams`. This was flagged by Celes (scratchpad line 87) and is documented in T06 Phase 0 as a known issue. Still unfixed.
+
+**Severity:** Medium — any script using roster.json's workDir will fail path resolution.
+
+### 4d. NEW — T06 $HOME validation is Windows-specific but platform moved to Linux
+
+T06 Phase 2.0a includes `$HOME` validation with a Windows/Git Bash fallback (`/c/Users/$(whoami)`). Volta's scratchpad notes "Platform moved Windows→Linux. All hardcoded paths replaced." But T06 still contains the Windows-specific fallback. The scripts (restore-inboxes.sh, persist-inboxes.sh) correctly use `$SCRIPT_DIR` (platform-independent), but the protocol text in T06 still references the Windows path.
+
+**Severity:** Low — the scripts are correct; the protocol text is documentary and slightly stale.
 
 ---
 
@@ -103,17 +123,17 @@ README.md shows all 8 topics as "brainstorm". Multiple topics are now at "drafti
 
 | Scratchpad | Lines | Limit | Status | Issues |
 |---|---|---|---|---|
-| memory/celes.md | ~80 | 100 | Current | Approaching limit (80/100). All entries valid. |
-| memory/finn.md | ~41 | 100 | **Stale item** | Line 14: "Team size: 3 agents" is wrong (now 6). `[DEFERRED]` about `topics/02-roles.md` may be stale. |
-| memory/herald.md | ~17 | 100 | Current | Clean, all entries valid |
-| memory/medici.md | ~40 | 100 | **Stale** | Will update after this audit — current content is from session 4, needs session 5 checkpoint |
-| memory/volta.md | ~28 | 100 | Current | Comprehensive, all entries valid with restart test amendments |
+| memory/finn.md | ~46 | 100 | **Stale item** | "Team size: 3" wrong (now 7). `[DEFERRED]` about `topics/02-roles.md` may be stale. |
+| memory/medici.md | ~43 | 100 | **Will update** | Current content is v4 — updating now |
+| memory/celes.md | ~89 | 100 | **Near limit** | 89/100 lines. All entries valid. Session 2026-03-14 section adds 6 lines. |
+| memory/volta.md | ~36 | 100 | Current | Rich session content, all entries valid |
+| memory/herald.md | ~40 | 100 | Current | Good — all decisions valid, checkpoint accurate |
+| memory/brunel.md | ~38 | 100 | Current | Good — implementation complete, WIP/DEFERRED items tracked |
+| memory/team-lead.md | ~12 | 100 | Current | Sparse but valid for session state |
 
-**All under 100-line limit.** finn.md stale item persists from v3. celes.md at 80% capacity — monitor.
-
-### task-list-snapshot.md — NOW EXISTS
-
-**v3 finding resolved:** `memory/task-list-snapshot.md` was created during session 4 shutdown (SC-5c now passes). Content accurately reflects: 2 completed items (Medici audit v3, Volta amendments), 3 not-started items from priorities, 2 minor deferred items.
+**Concerns:**
+- celes.md at 89% capacity. Next session will likely exceed 100 lines. Needs pruning — the "Domain Mental Model" section (lines 9-41) duplicates topic file content and could be reduced to references.
+- finn.md stale claim persists across 3 audits. Risk of permanent staleness.
 
 ---
 
@@ -123,53 +143,75 @@ README.md shows all 8 topics as "brainstorm". Multiple topics are now at "drafti
 |---|---|---|---|
 | "Almost everything is behavioral/prompt-enforced, not infrastructure-enforced" | celes.md | common-prompt as design principle | Medium |
 | "Real incidents drive design" | celes.md | common-prompt as design principle | Medium |
-
-Same as v3 — still valid recommendations.
+| TDD across agent boundaries pattern (Kerckhoffs→Babbage) | volta.md | T07 Safety or T04 Governance (quality gate pattern) | Low |
+| Cross-team code review via GitHub Issues | volta.md | T08 Observability (audit trail pattern) | Low |
 
 ---
 
 ## Cross-Topic Dependencies
 
-Unchanged from v3:
+| Dependency | Status | Why it matters |
+|---|---|---|
+| **T03 → T04** | **BLOCKING** | Protocols 1-3 assume manager agent; T04 hasn't designed it |
+| T03 Protocol 4 → T05 | NEW | Transport encryption (TLS-PSK) is an identity/credential concern |
+| T06 container → T02 | NEW | Container volumes are a resource isolation mechanism |
+| T01 → T06 | unchanged | Team taxonomy drives lifecycle |
+| T04 → T07 | unchanged | Governance defines permission tiers |
+| T05 → T02 | unchanged | Credential scoping is resource isolation |
 
-| Dependency | Why it matters |
-|---|---|
-| **T03 → T04** | Herald's inter-team protocols assume manager agent exists; T04 hasn't designed it. **BLOCKING.** |
-| T01 → T06 | Team taxonomy drives lifecycle (project = long-lived, specialty = temporary) |
-| T04 → T07 | Governance defines permission tiers that safety enforces |
-| T05 → T02 | Credential scoping is a form of resource isolation |
-| T06 → T01 | Lifecycle phases differ by team type (T06 doesn't reference T01) |
-
-**Recommendation (carried from v3):** Add a "Related topics" one-liner to each topic file header.
+**Recommendation (carried + new):** Add "Related topics" cross-references to topic file headers. NEW: T03 and T06 are now tightly coupled via container transport — explicit cross-reference needed.
 
 ---
 
-## What Changed Since v3
+## What Changed Since v4
 
-| Item | v3 Status | v4 Status | Change |
+| Item | v4 Status | v5 Status | Change |
 |---|---|---|---|
-| SC-5c task-list-snapshot | FAIL | **PASS** | Created during session 4 shutdown |
-| Volta scratchpad | 17 lines | 28 lines | 3 amendments from restart test |
-| finn.md "Team size: 3" | Stale | **Still stale** | Finn not spawned since v3 |
-| README status column | All "brainstorm" | **Still all "brainstorm"** | Not yet updated |
-| Topic file content | — | **Unchanged** | No new content since v3 |
-| Roster | 6 members, all opus | **Same** | No changes |
+| T03 content | 3 inter-team protocols | **4 protocols + transport spec** | Protocol 4 (UDS + GitHub Issues) added |
+| T06 content | Canonical protocol + amendments | **+ container lifecycle + scripts** | State preservation tiers, container isolation, lifecycle scripts |
+| Roster | 6 members, all opus | **7 members** (+ brunel, sonnet) | Brunel added |
+| comms-dev team | Did not exist | **Fully provisioned** | 3 agents, common-prompt, prompts, implementation started |
+| Container infra | Did not exist | **Dockerfile + compose + scripts** | Full container setup by Brunel |
+| T02 gap | HIGH | **MEDIUM** | Container model provides isolation proposals |
+| T03 gap | LOW | **VERY LOW** | Transport mechanism resolved |
+| T06 gap | LOW | **VERY LOW** | Container lifecycle + scripts |
+| finn.md stale claim | 2 audits stale | **3 audits stale** | Still not fixed |
+| README status | All "brainstorm" | **Still all "brainstorm"** | 3 audits stale |
+| roster.json workDir | Not flagged | **Flagged by Celes** | mitselek-ai-teams (dash) vs mitselek/ai-teams (slash) |
 
 ---
 
-## Recommended Next Steps (for team-lead)
+## Recommendations (for team-lead)
 
-**Priority 1 — T04 Hierarchy: Manager agent layer design** (carried from v3)
-Herald's T03 protocols depend on an entity that T04 hasn't defined. This is a **blocking** cross-topic dependency. Candidate assignment: Herald (protocol expertise) or a new Governance Architect specialist (per Celes's gap analysis).
+### HIGH
 
-**Priority 2 — README.md status column update** (elevated from P4)
-Low effort, high impact. All 8 topics still show "brainstorm" but most have progressed. Newcomer confusion risk.
+**H1. T04 Hierarchy: Manager agent layer design** (carried from v4, 4th time)
+Herald's T03 Protocols 1-3 depend on an entity that T04 hasn't defined. This is the single remaining blocking cross-topic dependency. Now more urgent: Protocol 4's hub-routed topology needs the manager agent to function. Candidate assignment: Herald (protocol expertise) or new Governance Architect.
 
-**Priority 3 — T02 Resource Isolation: D1 + deployment proposals** (carried from v3)
-Current state documented; future state not designed. Needs concrete multi-team resource management design.
+**H2. README.md status column update** (elevated from MEDIUM)
+3 audits stale. All 8 topics show "brainstorm" but T03 and T06 are at "advanced draft". This is the project's public face — inaccurate status misleads newcomers and understates progress. Low-effort fix.
 
-**Priority 4 — T05 Identity: Multi-team credential scoping** (carried from v3)
-Similar to T02 — current state documented, proposals needed.
+**H3. roster.json workDir fix**
+`mitselek-ai-teams` (dash) should be `mitselek/ai-teams` (slash). Any script consuming this field will break. One-line fix.
 
-**Priority 5 — finn.md stale claim cleanup**
-Minor, but persists across 2 audits. Finn should fix "Team size: 3 agents" on next spawn.
+### MEDIUM
+
+**M1. T02 Resource Isolation: Integrate container model**
+Brunel's container design (per-team volumes, shared comms volume, shared repo) is a concrete resource isolation proposal that should be reflected in T02. Currently T02 still reads "only current state, no proposals."
+
+**M2. Cross-reference T03 ↔ T05 on transport encryption**
+Protocol 4 introduces TLS-PSK for inter-team comms. T05 should reference this as the first concrete per-team credential (PSK per Docker compose deployment).
+
+**M3. celes.md pruning**
+At 89/100 lines and growing. The "Domain Mental Model" section (30+ lines) duplicates topic file summaries. Replace with topic file references to free ~20 lines.
+
+### LOW
+
+**L1. finn.md stale claim cleanup** (3 audits running)
+"Team size: 3 agents" is wrong (now 7). Finn should fix on next spawn.
+
+**L2. T06 Windows path fallback cleanup**
+Phase 2.0a still contains Windows/Git Bash `$HOME` fallback. Platform is now Linux. The scripts are correct (platform-independent); the protocol text is slightly stale.
+
+**L3. Add "Related topics" cross-references to topic headers**
+Carried from v4. T03↔T06 coupling (container transport) makes this more valuable now.

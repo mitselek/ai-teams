@@ -79,11 +79,13 @@
 
 ## Session 2026-03-14
 
-[DECISION] Brunel hire approved. Prompt at `prompts/brunel.md`. Model: sonnet. Color: yellow. Coordinates with Volta on lifecycle/containers.
-[DECISION] Volta+Brunel coordination: section ownership partition of 06-lifecycle.md + `[COORDINATION]` handshake.
-[DECISION] comms-dev team fully provisioned. Roster: Vigenere (crypto, opus, red), Babbage (backend, sonnet, blue), Kerckhoffs (QA/security, sonnet, green). All files at `.claude/teams/comms-dev/`.
-[GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working directory instead.
-[GOTCHA] framework-research roster.json line 5 has `mitselek-ai-teams` (dash) instead of `mitselek/ai-teams` (slash) — flagged, unresolved.
+[DECISION] Brunel hire approved (2026-03-14). Designed as "Isambard Kingdom Brunel" (Victorian engineer — tunnels, ships, railways; containment and transport lore). Prompt at `prompts/brunel.md`. Model: sonnet. Color: yellow. Writes to 06-lifecycle.md (container sections), Docker config files, own scratchpad. Coordinates with Volta on lifecycle requirements.
+[DECISION] Volta+Brunel coordination model: section ownership partition of 06-lifecycle.md + `[COORDINATION]` handshake protocol. Both prompts updated.
+[DECISION] Brunel scope expanded: added compose architecture decisions (#7) and container networking (#8).
+[DECISION] comms-dev team approved and fully provisioned (2026-03-14). Roster: Vigenere (crypto, opus, red), Babbage (backend, sonnet, blue), Kerckhoffs (QA/security, sonnet, green). All files at `.claude/teams/comms-dev/`. Includes GitHub Issues as cross-team knowledge base, `[COORDINATION]` handshake between Vigenere↔Babbage and Babbage↔Kerckhoffs.
+[GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working directory instead. Fixed in comms-dev common-prompt.md.
+[GOTCHA] framework-research roster.json workDir parandatud R6 sessioonis (`mitselek-ai-teams` → `mitselek/ai-teams`).
+[DECISION] Manager-agent role drafted (2026-03-14). Designed as "Richelieu" (Cardinal Richelieu — centralized French administration, coordinated provinces under the crown). Prompt at `prompts/richelieu.md`. Model: opus. Color: red (suggested). Attribution: `(*MGR:Rich*)`. NOT a framework-research team member — this is a Level 1 role that sits above team-leads. Roster entry prepared for team-lead review. GitHub issue #10 created.
 
 ### Lovelace hire — DELIVERED (2026-03-14)
 

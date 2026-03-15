@@ -11,9 +11,27 @@
 #   $HOME:       /home/ai-teams/
 #   ~/.claude/:  /home/ai-teams/.claude/    → per-team named volume (auto-memory)
 #   Repo:        /home/ai-teams/workspace/  → shared named volume (same repo, both teams)
-#   Comms:       /shared/comms/             → shared volume (Unix domain sockets)
+#   Comms:       /shared/comms/             → shared volume (Unix domain sockets, broker sidecars)
+#   Inbox:       /team-data/inbox/          → per-team named volume (broker message queue)
 #
 # NO bind mounts to host filesystem (PO requirement).
+#
+# Broker sidecars (per Herald's Protocol 4 decision, 2026-03-14):
+#   Each team has a broker-<team> sidecar that owns the team's UDS socket.
+#   The Claude container depends_on the broker being healthy (socket exists).
+#   Broker uses per-team inbox volume for message persistence across broker restarts.
+#   TLS-PSK via Docker secrets (comms-psk) — shared symmetric key, 256-bit.
+#   NOTE: broker image is a placeholder (comms-dev team delivers the implementation).
+
+x-broker-base: &broker-base
+  image: ai-teams-broker:latest  # built by comms-dev team
+  volumes:
+    - comms:/shared/comms
+  environment:
+    - COMMS_PSK_FILE=/run/secrets/comms-psk
+  secrets:
+    - comms-psk
+  restart: unless-stopped
 
 x-team-base: &team-base
   build:
@@ -40,8 +58,50 @@ x-team-base: &team-base
   tty: true
 
 services:
+
+  # ── Broker sidecars ──────────────────────────────────────────────────────────
+  # Start before Claude containers. Claude containers depend_on broker healthy.
+  # Broker persists queued messages to per-team inbox volume across restarts.
+
+  broker-framework-research:
+    <<: *broker-base
+    volumes:
+      - comms:/shared/comms
+      - fr-broker-inbox:/team-data/inbox
+    environment:
+      - COMMS_PSK_FILE=/run/secrets/comms-psk
+      - TEAM_NAME=framework-research
+      - SOCKET_PATH=/shared/comms/framework-research.sock
+      - INBOX_DIR=/team-data/inbox
+    healthcheck:
+      test: ["CMD", "test", "-S", "/shared/comms/framework-research.sock"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+
+  broker-comms-dev:
+    <<: *broker-base
+    volumes:
+      - comms:/shared/comms
+      - cd-broker-inbox:/team-data/inbox
+    environment:
+      - COMMS_PSK_FILE=/run/secrets/comms-psk
+      - TEAM_NAME=comms-dev
+      - SOCKET_PATH=/shared/comms/comms-dev.sock
+      - INBOX_DIR=/team-data/inbox
+    healthcheck:
+      test: ["CMD", "test", "-S", "/shared/comms/comms-dev.sock"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+
+  # ── Claude team containers ───────────────────────────────────────────────────
+
   framework-research:
     <<: *team-base
+    depends_on:
+      broker-framework-research:
+        condition: service_healthy
     volumes:
       # Auto-memory: isolated per team
       - fr-claude-home:/home/ai-teams/.claude
@@ -60,6 +120,9 @@ services:
 
   comms-dev:
     <<: *team-base
+    depends_on:
+      broker-comms-dev:
+        condition: service_healthy
     volumes:
       # Auto-memory: isolated per team
       - cd-claude-home:/home/ai-teams/.claude
@@ -90,20 +153,26 @@ volumes:
   repo-data:
     name: ai-teams_repo-data
 
-  # Inter-team communication via Unix domain sockets
-  # Mounted at /shared/comms/ in both containers
+  # Inter-team communication via Unix domain sockets (broker sidecars)
+  # Mounted at /shared/comms/ in all broker and Claude containers
   comms:
     name: ai-teams_comms
 
+  # Per-team broker inbox — persists queued messages across broker restarts
+  # Owned by broker sidecar; not mounted in Claude container
+  fr-broker-inbox:
+    name: ai-teams_fr-broker-inbox
+
+  cd-broker-inbox:
+    name: ai-teams_cd-broker-inbox
+
 secrets:
   # Pre-shared key for inter-team message encryption.
-  # Mounted at /run/secrets/comms-psk in both containers.
+  # Mounted at /run/secrets/comms-psk in broker containers.
   #
   # To provision for a test session:
-  #   openssl rand -hex 32 > /tmp/comms-psk
-  #   COMMS_PSK_FILE=/tmp/comms-psk docker compose up
+  #   mkdir -p secrets && openssl rand -hex 32 > secrets/comms-psk.key
   #
   # Or set COMMS_PSK_FILE env var to point at an existing key file.
-  # If the file is absent, brokers start in PLAINTEXT mode (dev/CI only).
   comms-psk:
-    file: ${COMMS_PSK_FILE:-/run/secrets/comms-psk}
+    file: ${COMMS_PSK_FILE:-./secrets/comms-psk.key}

@@ -56,3 +56,9 @@
 [DEFERRED] — Write relay lifecycle findings to topics/06-lifecycle.md (Phase 0.5, Phase 4.5, relay ops lifecycle section). Awaiting team-lead approval on which sections to formalize.
 
 [CHECKPOINT] 2026-03-14 18:05 — Session closing. All analysis delivered via SendMessage to team-lead. No writes to topic files this session (all review/advisory). Scratchpad is the complete record.
+
+[GOTCHA] 2026-03-14 — Platform moved Windows→Linux. All hardcoded paths replaced. Scripts are platform-independent via $SCRIPT_DIR and $HOME.
+
+[LEARNED] 2026-03-14 21:44 — R6 startup assessment: grade B+. Protocol structurally works. New gap: indirect spawning (team-lead-2 has no Agent tool, PO spawns). Loses spawn ordering control (Medici-first not guaranteed).
+
+[PATTERN] 2026-03-14 21:44 — When team-lead is a teammate (not PO), spawning is delegated. Canonical protocol assumes direct spawn control. Need "indirect spawn path" variant in 06-lifecycle.md.

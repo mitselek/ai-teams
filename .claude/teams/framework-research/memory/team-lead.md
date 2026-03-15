@@ -2,8 +2,8 @@
 
 ## Session: 2026-03-14 (R6)
 
-[CHECKPOINT] R6 startup: COLD START (anomalous, same as R5 — runtime dir missing). User approved proceeding. 6 inboxes restored from repo. config.json appeared immediately after TeamCreate.
-[CHECKPOINT] Agents spawned: celes, volta, brunel. All reported in successfully.
+[CHECKPOINT] R6-early startup: COLD START (anomalous, same as R5 — runtime dir missing). User approved proceeding. 6 inboxes restored from repo. config.json appeared immediately after TeamCreate.
+[CHECKPOINT] R6-early agents spawned: celes, volta, brunel. All reported in successfully.
 
 ### Cross-container comms
 [DECISION] Cross-container comms with comms-dev established via shared UDS broker. Brunel set up FR broker.
@@ -31,9 +31,16 @@
 [LEARNED] D1 gotchas from RC-team: multi-statement queries unreliable, PRAGMA foreign_keys is no-op in migration runner.
 
 ### Celes: Lovelace hire for comms-dev
-[WIP] Celes assessed: frontend specialist is a comms-dev hire, not a separate team.
-[WIP] Proposed role: "Lovelace" — SvelteKit + WebAuthn + WSS client. Sonnet tier. Prompt draft ready on request.
-[DEFERRED] PO wants to discuss something with Celes next.
+[DECISION] Lovelace hire approved by PO. Frontend specialist for comms-dev. SvelteKit + WebAuthn + WSS client. Sonnet tier.
 
-## Active agents this session
-- celes, volta, brunel (all active)
+## R6 session (2026-03-14 evening)
+[CHECKPOINT] R6 startup. Scratchpad from R5 survived — R5-1 verification SUCCESS.
+[LEARNED] R5 scratchpad persisted correctly across session boundary. The fix (write scratchpad before shutdown) works.
+[LEARNED] No Agent tool available to team-lead — PO must spawn teammates. This caused team-lead-2 naming (PO registered as team-lead by TeamCreate).
+[CHECKPOINT] R6 tasks completed: Volta (B+ startup assessment), Finn (T02 deep research), Herald (5 resource protocols R1-R5), Medici (health report v5), Brunel (T06 container review + broker sidecar), Celes (Richelieu manager-agent role).
+[DECISION] Richelieu manager-agent role approved — GitHub issue #10. Level 1 coordinator above team-leads.
+[DECISION] roster.json workDir fixed: mitselek-ai-teams → mitselek/ai-teams.
+
+## Previous session notes (R5)
+- R5 Grade B (best ever). Inbox durability validated.
+- Volta has R6 assessment questions prepared.

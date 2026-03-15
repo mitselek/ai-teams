@@ -68,6 +68,12 @@
 - Team containers need minimal changes for relay: drop comms volume + psk, add RELAY_URL + RELAY_TOKEN
 - No Brunel implementation tasks outstanding — analysis phase complete, awaiting comms-dev build
 
+[CHECKPOINT] 2026-03-14 21:42 — T06 Container Lifecycle section rewritten to match actual implemented architecture (full isolation, named volumes, no bind mounts, ai-teams user, GITHUB_TOKEN). Added "Interaction with Volta's Startup/Shutdown Protocol" subsection confirming container is transparent to Volta's 7-phase startup and 5-phase shutdown — no protocol changes required. All phases verified compatible.
+
+[DECISION] 2026-03-14 21:49 — Broker deployment: SIDECAR (confirmed with Herald). docker-compose.yml updated: broker-framework-research + broker-comms-dev services, depends_on+healthcheck(socket), TLS-PSK via Docker secrets on broker only, per-team broker inbox volumes (fr-broker-inbox, cd-broker-inbox). ai-teams-broker:latest is placeholder — comms-dev delivers implementation. T06 updated.
+
+[GOTCHA] 2026-03-14 — Per-team broker inbox volume is essential. Without it, broker restart loses queued messages — same failure mode as inline daemon, just less frequent. Herald identified this gap; volumes added to compose.
+
 [DEFERRED] 2026-03-14 — MCP server connectivity. No MCP servers configured. If added, may need ports or socket mounts.
 [DEFERRED] 2026-03-14 — SSH agent forwarding for git push over SSH. HTTPS + GITHUB_TOKEN covers current use.
 [DEFERRED] 2026-03-14 — Shared repo-data race condition on simultaneous first start. Low priority for current sequential use.

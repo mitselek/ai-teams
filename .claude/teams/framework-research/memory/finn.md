@@ -39,6 +39,17 @@ Topics covered: taxonomy, isolation, communication, hierarchy, identity, lifecyc
 - Spawned on opus-4-6, startup completed, no tasks assigned
 - Immediate shutdown requested by team-lead
 
+## [CHECKPOINT] 2026-03-14 — T02 deep research completed
+
+Deep research section added to `topics/02-resource-isolation.md` covering:
+1. Git isolation (worktrees vs forks vs separate repos)
+2. DB migration serialization (lock registry vs per-team DBs vs timestamps)
+3. Deployment queue design (file lock → Durable Object progression)
+4. API rate limit partitioning (token-per-team + quota budgeting + proxy)
+5. Cross-cutting: behavioral→structural isolation, secret isolation, filesystem paths
+
+Sources read: both common-prompts, both team-lead prompts, both rosters, dag (both), piper, harmony, sven scratchpads, startup-shutdown.md, eilama-concept.md, architecture-decisions.md.
+
 ## [DEFERRED] Open question
 
 No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but file is `02-resource-isolation.md`. Clarify if a separate roles file is wanted.
