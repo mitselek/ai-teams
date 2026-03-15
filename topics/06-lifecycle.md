@@ -127,86 +127,50 @@ echo "Using TEAM_DIR=$TEAM_DIR"
 
 **Impact on all subsequent phases:** Every bash script in Phases 2-4 that references `$HOME` must use `$RESOLVED_HOME` instead, or must run this validation first. The reference implementations below are updated accordingly.
 
-#### Phase 2.0b: Diagnose (_FR:Volta_ — amended in restart 4, 2026-03-13)
+#### Phase 2.0b: Diagnose (_FR:Volta_ — rewritten R7, 2026-03-15)
 
-Before touching the filesystem, classify the starting scenario. This costs one `ls` and eliminates the diagnostic uncertainty of "why is the state this way?"
+Before touching the filesystem, check whether a stale runtime dir exists. This costs one `ls`.
 
 **Precondition:** `$RESOLVED_HOME` is validated (Phase 2.0a). `$TEAM_DIR` is set.
 
+**Key insight (R7, 2026-03-15):** The runtime dir (`$HOME/.claude/teams/<team-name>/`) is **ephemeral by platform design**. The Claude Code platform does not preserve team directories between CLI sessions. An empty runtime dir at startup is the **normal** state, not an anomaly. All durable state lives in the repo (scratchpads in `memory/`, inboxes in `inboxes/`, both git-tracked). The previous protocol (R1–R6) treated a missing runtime dir as anomalous and required investigation — this was wrong and wasted tokens every session.
+
 ```bash
 # TEAM_DIR was set in Phase 2.0a — do NOT re-derive from $HOME
-if [ -d "$TEAM_DIR/inboxes" ]; then
-  echo "WARM RESTART — stale team dir with inboxes (normal)"
-elif [ -d "$TEAM_DIR" ]; then
-  echo "PARTIAL STATE — stale team dir, no inboxes (TeamDelete was called or inboxes never created)"
-elif ls -d "$RESOLVED_HOME/.claude/teams/<team-name>"-* 2>/dev/null | head -1 >/dev/null; then
-  echo "MISCREATION — team dir exists under wrong name (prior TeamCreate without clean)"
+if [ -d "$TEAM_DIR" ]; then
+  echo "STALE DIR — runtime dir exists (interrupted session or same CLI invocation). Will clean."
 else
-  echo "COLD START — no prior state (first ever, different machine, or dir cleaned externally)"
+  echo "CLEAN — no runtime dir. Normal state between sessions."
 fi
 ```
 
-| Scenario      | Meaning                                                                                | What 2a–2c do                                                                                                   |
-| ------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| WARM RESTART  | Normal session resumption                                                              | 2a backs up inboxes, 2c removes dir                                                                             |
-| PARTIAL STATE | Inboxes lost — TeamDelete was called or previous session crashed before inbox creation | 2a is a no-op (no inboxes), 2c removes dir. **Investigate** (see below).                                        |
-| COLD START    | No prior team state exists on this machine                                             | 2a, 2b, 2c are all no-ops — proceed through them anyway. **Investigate if not first-ever session** (see below). |
-| MISCREATION   | TeamCreate ran against an existing dir, generated a suffixed name                      | 2c removes the wrong-name dir                                                                                   |
+| Scenario  | Meaning                                                          | What 2a–2c do                              |
+| --------- | ---------------------------------------------------------------- | ------------------------------------------ |
+| STALE DIR | Runtime dir left over from interrupted or same-invocation session | 2b kills zombies if needed, 2c removes dir |
+| CLEAN     | Normal state — platform cleaned up after last session            | 2a, 2b, 2c are all no-ops                 |
 
-All four scenarios converge to the same outcome: `$TEAM_DIR` does not exist, inboxes (if any) are backed up. The diagnosis is informational — it tells the team lead what happened, not what to do differently. **Always run 2a–2c regardless of scenario** — they are idempotent and safe on empty state.
-
-#### Anomaly Detection in Phase 2.0 (_FR:Volta_ — amendment from restart test 3, 2026-03-13)
-
-The shutdown protocol (Phase 5: Preserve) explicitly states: **do NOT call TeamDelete.** This means the team directory SHOULD exist at the start of every non-first session. If it doesn't, something went wrong.
-
-**Problem this solves:** In the field test (2026-03-13, restart 3), the team dir was missing. The team-lead classified this as COLD START and moved on silently. The PO flagged this as a mistake — the dir's absence was an anomaly that should have been investigated.
-
-**Rule: COLD START and PARTIAL STATE require a decision, not silent acceptance.**
-
-After classifying the scenario, the team-lead must ask:
-
-```
-Is this the first-ever session for this team on this machine?
-  YES → COLD START is expected. Proceed normally.
-  NO  → COLD START or PARTIAL STATE is ANOMALOUS. Team dir should exist per shutdown protocol.
-         Ask the user: "The team dir is missing but the shutdown protocol says it should be preserved.
-         What happened? Options: (a) It was manually cleaned, (b) TeamDelete was called by mistake,
-         (c) Different machine, (d) I don't know."
-         Record the answer in the team-lead's scratchpad as [LEARNED] for future reference.
-```
-
-**How the team-lead determines "first-ever":**
-
-1. Check git log for prior commits that include team memory files (e.g., `git log --oneline -- .claude/teams/<team-name>/memory/`)
-2. If commits exist → this is NOT first-ever → anomaly
-3. If no commits → genuinely first session → expected COLD START
-
-**Why this matters:** Silently accepting a missing dir means the team-lead never learns that inboxes were lost. If the cause was "TeamDelete was called by mistake," the team can add a safeguard. If it was "machine was reimaged," no action needed. But without asking, the cause is never known and the same failure can repeat.
+Both scenarios converge to the same outcome: `$TEAM_DIR` does not exist. **Always run 2a–2c regardless** — they are idempotent and safe on empty state. No anomaly investigation is needed; the repo is the source of truth for all cross-session state.
 
 **Reference implementation (sub-steps 2a–2c):**
 
 ```bash
 # TEAM_DIR was set in Phase 2.0a ($HOME validation) — do NOT re-derive from $HOME
 
-# 2a — no-op (inbox backup removed — see amendment below)
-# Inboxes are now persisted to the repo during Shutdown Phase 4a.
-# The runtime dir's inboxes are stale copies — safe to discard with the dir in 2c.
+# 2a — no-op. Inboxes are persisted to the repo during Shutdown Phase 4a.
+# Runtime dir inboxes are stale copies — safe to discard with the dir in 2c.
 
 # 2b — kill zombies (RC: kill all non-%0 panes; local: N/A)
 # RC-specific: tmux kill-pane for each agent pane
 # Local: Agent tool processes terminate with parent session
 
-# 2c — remove stale dir (REQUIRED)
+# 2c — remove stale dir (safe even if it doesn't exist)
 rm -rf "$TEAM_DIR"
 ```
 
-**Expected outcome:** `$TEAM_DIR` does not exist. Team lead knows which scenario was encountered.
-
-**Amendment (_FR:Volta_ — 2026-03-13, inbox durability):** Sub-step 2a previously copied runtime inboxes to `/tmp/` for restoration in Startup Phase 4. This created a fragile two-hop chain: runtime dir → `/tmp/` → new runtime dir. Both hops are ephemeral. Shutdown Phase 4a now persists inboxes directly to the repo (durable). Sub-step 2a is no longer needed — the repo copy is the source of truth. The `/tmp/` backup is removed entirely to avoid a confusing fallback chain.
+**Expected outcome:** `$TEAM_DIR` does not exist. Ready for Phase 3 (Create).
 **Failure if skipped:**
 
-- Skip 2.0 → team lead wastes a round-trip investigating why the dir is/isn't there
-- Skip 2a → inboxes lost → agents lose cross-session message history
+- Skip 2.0b → team lead wastes tokens investigating a non-problem
 - Skip 2b → zombie processes hold TTY → new spawn may fail or create invisible agents
 - Skip 2c → `TeamCreate` generates a random name (e.g. `cloudflare-builders-a7f3`) → inbox routing breaks, all `SendMessage` calls fail silently
 
@@ -330,7 +294,7 @@ Medici reads all scratchpads, prompts, and common-prompt, then reports:
 
 ### Decision
 
-Shutdown is a 5-phase sequence: **Halt → Notify → Collect → Persist → Preserve**. Team lead shuts down last. TeamDelete is never called.
+Shutdown is a 4-phase sequence: **Halt → Notify → Collect → Persist**. Team lead shuts down last. The repo is the sole durable store — the runtime dir is ephemeral.
 
 ### Rationale
 
@@ -448,14 +412,7 @@ git push
 **Expected outcome:** All scratchpads, task snapshots, and pruned inboxes are committed and pushed.
 **Failure if skipped:** Next session has no scratchpad state and no inbox history — agents restart with amnesia, closing reports lost.
 
-### Phase 5: Preserve
-
-**Precondition:** Persist complete.
-**Action:** Do nothing. Specifically: **do NOT call TeamDelete**. The team directory remains on disk.
-
-**Expected outcome:** `$TEAM_DIR` still exists with `config.json`, `inboxes/`, and all memory files. The runtime dir is now a convenience (faster startup if it survives) but NOT the source of truth — the repo has the durable copy.
-
-**Failure if violated (TeamDelete called):** Runtime dir destroyed. Impact is reduced compared to pre-amendment: inboxes are now in the repo. But `config.json` loss still forces a full TeamCreate cycle on next startup. Rule stands: do NOT call TeamDelete.
+**Note (_FR:Volta_ — R7, 2026-03-15):** Previous versions had a Phase 5 (Preserve) that said "do NOT call TeamDelete." This was removed because the runtime dir is ephemeral by platform design — the platform destroys it between sessions regardless. Phase 4 (Persist to repo) is the final shutdown step. The repo is the sole durable store. Calling TeamDelete is harmless (the platform will clean up anyway) but also pointless.
 
 ---
 

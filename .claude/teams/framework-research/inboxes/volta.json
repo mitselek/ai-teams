@@ -278,9 +278,22 @@
     "read": true
   },
   {
+    "from": "user",
+    "text": "here is transcript from startup. teamlead is confused by COLD START outcome every single restart. \n\n\n[Pasted text #1 +32 lines]",
+    "timestamp": "2026-03-15T08:27:12.491Z",
+    "read": true
+  },
+  {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773511558419@volta\",\"from\":\"team-lead\",\"reason\":\"Session ending. Please write any final state to your scratchpad and approve shutdown.\",\"timestamp\":\"2026-03-14T18:05:58.419Z\"}",
-    "timestamp": "2026-03-14T18:05:58.419Z",
+    "text": "[2026-03-15 10:30] PO approved. Go ahead — rewrite the COLD START protocol in both `topics/06-lifecycle.md` and `startup.md`. Specifically:\n\n1. Remove WARM RESTART expectation — COLD START is the normal state\n2. Remove Shutdown Phase 5 (Preserve) entirely\n3. Simplify Phase 2.0b diagnostic to two scenarios (DIR EXISTS / NO DIR)\n4. Remove COLD START / WARM RESTART / PARTIAL STATE terminology\n5. Update `startup.md` Steps 2, 2b, and 3 to match the new protocol\n\nKeep changes minimal and focused on this fix.",
+    "summary": "Approve COLD START protocol rewrite",
+    "timestamp": "2026-03-15T09:02:35.774Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773565542663@volta\",\"from\":\"team-lead\",\"reason\":\"R7 session complete. Save your scratchpad and send closing report.\",\"timestamp\":\"2026-03-15T09:05:42.663Z\"}",
+    "timestamp": "2026-03-15T09:05:42.663Z",
     "read": true
   }
 ]

@@ -96,11 +96,5 @@
     "summary": "Draft Lovelace prompt for comms-dev",
     "timestamp": "2026-03-14T17:39:24.500Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773511557776@celes\",\"from\":\"team-lead\",\"reason\":\"Session ending. Please write any final state to your scratchpad and approve shutdown.\",\"timestamp\":\"2026-03-14T18:05:57.776Z\"}",
-    "timestamp": "2026-03-14T18:05:57.776Z",
-    "read": true
   }
 ]

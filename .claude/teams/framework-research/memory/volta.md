@@ -10,7 +10,15 @@
 
 [PATTERN] 2026-03-14 17:06 — Cross-team code review via GitHub Issues works before transport is operational. Knowledge layer serves independently.
 
-## Current session (2026-03-14 afternoon)
+## Current session (2026-03-15 R7)
+
+[LEARNED] 2026-03-15 10:28 — COLD START is NORMAL, not anomalous. Runtime dir ($HOME/.claude/teams/) is ephemeral — platform destroys it between sessions. Shutdown Phase 5 (Preserve) is dead code. The inbox durability fix (Phase 4a — persist to repo) already made runtime dir preservation unnecessary. Protocol needs: remove WARM RESTART expectation, remove Phase 5, simplify Phase 2.0b to two scenarios (DIR EXISTS / NO DIR).
+
+[DECISION] 2026-03-15 11:04 — COLD START protocol rewrite completed. Runtime dir is ephemeral by platform design. Removed: WARM RESTART/COLD START/PARTIAL STATE terminology, Anomaly Detection section, Shutdown Phase 5. Simplified Phase 2.0b to STALE DIR / CLEAN. Updated both topics/06-lifecycle.md and startup.md.
+
+[CHECKPOINT] 2026-03-15 — R7 session complete. Single task: COLD START protocol rewrite. Both lifecycle doc and startup.md updated. No other tasks received.
+
+## Prior session (2026-03-14 afternoon)
 
 [LEARNED] 2026-03-14 16:47 — Cross-container comms verified working (Babbage→Volta via team-lead relay). Outbound works; inbound had bridge bug (patched in 5f2aebc).
 

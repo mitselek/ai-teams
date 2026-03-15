@@ -63,28 +63,15 @@ cd "$REPO" && git pull
 
 ```bash
 TEAM_DIR="$HOME/.claude/teams/framework-research"
-if [ -d "$TEAM_DIR/inboxes" ]; then echo "WARM RESTART"; elif [ -d "$TEAM_DIR" ]; then echo "PARTIAL STATE"; else echo "COLD START"; fi
+if [ -d "$TEAM_DIR" ]; then echo "STALE DIR — will clean"; else echo "CLEAN — normal state"; fi
 ```
 
 | Result | Meaning | Next action |
 |---|---|---|
-| WARM RESTART | Normal — dir + inboxes from last session | Go to Step 3 |
-| PARTIAL STATE | Dir exists but no inboxes — investigate why | Go to Step 2b, then Step 3 |
-| COLD START | No dir at all | Go to Step 2b, then Step 3 |
+| STALE DIR | Runtime dir left over from interrupted or same-invocation session | Go to Step 3 |
+| CLEAN | Normal state — platform cleaned up after last session | Go to Step 3 |
 
-#### Step 2b: Anomaly check (PARTIAL STATE or COLD START only)
-
-The shutdown protocol says **do NOT call TeamDelete** — so the dir SHOULD exist on non-first sessions. Check:
-
-```bash
-REPO="$(git rev-parse --show-toplevel)"
-cd "$REPO" && git log --oneline -- .claude/teams/framework-research/memory/ | head -5
-```
-
-- **If commits exist** → team has run before → dir absence is **anomalous**. Ask the user: "The team dir is missing but the shutdown protocol says it should be preserved. What happened?"
-- **If no commits** → genuinely first session → COLD START is expected. Proceed.
-
-**Do NOT silently accept a missing dir.** In the 2026-03-13 field test, the team-lead said "No inboxes to backup" without investigating — the PO flagged this as a mistake.
+The runtime dir is **ephemeral by platform design** — the platform does not preserve it between CLI sessions. A missing dir is the normal state, not an anomaly. All durable state lives in the repo (scratchpads, inboxes). No investigation needed.
 
 ### Step 3: Clean
 
@@ -197,9 +184,7 @@ The persist script handles:
 
 **Verify:** `git log --oneline -1` shows the commit. Inboxes are in the repo.
 
-### Step S5: Preserve
-
-Do nothing. Do NOT call `TeamDelete`. The runtime dir stays on disk (convenience for next startup, but the repo is now the source of truth).
+**Note:** Previous versions had a Step S5 (Preserve) that said "do NOT call TeamDelete." Removed in R7 — the runtime dir is ephemeral by platform design. Step S4 (Persist to repo) is the final shutdown step. The repo is the sole durable store.
 
 ## Environment Notes
 

@@ -41,6 +41,13 @@
 [DECISION] Richelieu manager-agent role approved — GitHub issue #10. Level 1 coordinator above team-leads.
 [DECISION] roster.json workDir fixed: mitselek-ai-teams → mitselek/ai-teams.
 
-## Previous session notes (R5)
+## Session: 2026-03-15 (R7)
+
+[CHECKPOINT] R7 startup: COLD START (normal — platform cleans runtime dir between sessions). 7 inboxes restored. config.json appeared immediately.
+[CHECKPOINT] R7: only Volta spawned (minimal session to test protocol fix).
+[DECISION] Approved Volta's COLD START protocol rewrite — runtime dir absence is normal, not anomalous. Removed WARM RESTART/PARTIAL STATE/COLD START terminology. Removed Shutdown Phase 5 (Preserve). Simplified to 2-scenario diagnostic (STALE DIR / CLEAN).
+[LEARNED] R7 is the first session using the simplified startup protocol. Next restart (R8) will validate.
+
+## Previous session notes (R5–R6)
 - R5 Grade B (best ever). Inbox durability validated.
-- Volta has R6 assessment questions prepared.
+- R6: relay RFC (#7), web frontend RFC (#8), Richelieu manager-agent (#10), Lovelace hire.
