@@ -50,6 +50,23 @@ Deep research section added to `topics/02-resource-isolation.md` covering:
 
 Sources read: both common-prompts, both team-lead prompts, both rosters, dag (both), piper, harmony, sven scratchpads, startup-shutdown.md, eilama-concept.md, architecture-decisions.md.
 
+## [CHECKPOINT] 2026-03-17 — Agent naming research completed
+
+Deep web research on role-based vs persona-based agent naming across frameworks.
+Consensus: frameworks favor role-based routing names; persona as metadata layer.
+Recommendation: keep `name: "team-lead"` for routing, persona in `lore`.
+
+## [CHECKPOINT] 2026-03-17 — apex-research team brainstorm (Finn's input)
+
+Researched AI-assisted legacy migration patterns, APEX reverse engineering, reference team applicability.
+Key findings:
+- Azure Legacy Modernization Agents = best precedent (multi-agent COBOL→Java, "RE first" pipeline)
+- VirtusLab: 3-agent arch (planning, coding, E2E tester), single-agent fails >20k lines
+- Salesforce: dependency graph first, leaf-to-root conversion order
+- Existing scripts extract metadata but not semantics — need table deps, PL/SQL logic, overlap detection
+- apex-research is a HYBRID team (research + dev) — neither reference team is exact fit
+- Recommended 6 capabilities: parser specialist, cross-app analyst, spec writer, dashboard dev, auditor, research coord
+
 ## [DEFERRED] Open question
 
 No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but file is `02-resource-isolation.md`. Clarify if a separate roles file is wanted.

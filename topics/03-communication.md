@@ -137,7 +137,7 @@ Team A has completed work that Team B must now act on (e.g., dev team hands off 
 
 - **From:** <team-name-A>
 - **To:** <team-name-B>
-- **Type:** review | deploy | build | test | consult | migrate
+- **Type:** review | deploy | build | test | consult | migrate | dispute
 - **Priority:** blocking | high | normal | low
 - **Subject:** <one-line summary>
 
@@ -194,9 +194,12 @@ The manager agent maintains a simple ledger of active handoffs:
 |---|---|---|---|---|---|---|---|
 | H-001 | hr-devs | qa-team | review | high | ACCEPTED | 2026-03-13 | 2026-03-13 |
 | H-002 | platform | hr-devs | deploy | blocking | COMPLETED | 2026-03-12 | 2026-03-13 |
+| H-003 | hr-devs | platform | dispute | blocking | RESOLVED | 2026-03-14 | 2026-03-14 |
 ```
 
 This ledger lives in the manager agent's memory directory, not in any team's workspace.
+
+**Dispute entries:** When the T04 escalation ladder (§Q5) reaches Step 2 (L1 mediates), L1 logs the dispute to this ledger with `type: dispute`. The resolution and reasoning are recorded in the `Updated` column timestamp and a linked decision record. Recurring disputes between the same teams signal a structural gap — consider granting a direct link or establishing shared ownership rules.
 
 ---
 
@@ -247,11 +250,49 @@ Direct links are **registered** — the manager agent knows they exist and can r
 Maintained by the manager agent:
 
 ```markdown
-| Team A | Team B | Reason | Authorized | Revoke condition |
-|---|---|---|---|---|
-| hr-devs | qa-team | PR review handoff | 2026-03-01 | When QA team is dissolved |
-| hr-devs | platform | Shared D1 database | 2026-03-01 | When DB isolation is implemented |
+| Team A | Team B | Reason | Authorized | Last active | Review due | Last review |
+|---|---|---|---|---|---|---|
+| hr-devs | qa-team | PR review handoff | 2026-03-01 | 2026-03-13 | 2026-04-01 | — |
+| hr-devs | platform | Shared D1 database | 2026-03-01 | 2026-03-14 | 2026-04-01 | — |
 ```
+
+**Note:** `Last active` is updated on each message sent via the direct link. `Review due` is computed from trigger thresholds (see Lifecycle Protocol below). `Last review` records the most recent review date.
+
+#### Direct Link Lifecycle Protocol (*FR:Herald*)
+
+Direct links are not permanent — they require periodic review to prevent stale connections that consume registry space and create the illusion of active coordination paths. Authority to grant/revoke: L1 manager agent (T04 delegation matrix Rows 27-28). This protocol defines the lifecycle mechanics.
+
+##### Review Triggers
+
+| Trigger | Detection | Who initiates |
+|---|---|---|
+| **Time-based** | Link age > 30 sessions (or PO-configured threshold) | L1 manager agent (automated sweep) |
+| **Inactivity** | No messages on direct link for 10 consecutive sessions | L1 manager agent (from message log) |
+| **Scope change** | One of the linked teams changes its mission or dissolves | L1 manager agent (triggered by team lifecycle event) |
+| **Incident** | A direct link was involved in a coordination failure or resource conflict | Team-lead or L1 (post-incident review) |
+| **On-demand** | PO or L1 requests a review | PO or L1 |
+
+##### Review Process
+
+```
+1. L1 identifies link for review (via trigger above)
+2. L1 sends review request to both team-leads:
+   "Direct link [Team-A ↔ Team-B] is under review.
+    Reason: <trigger>.
+    Respond with: RETAIN (justify) | REVOKE (agree) | MODIFY (explain)"
+3. Both team-leads respond within 1 message cycle
+4. Decision matrix:
+   ├─ Both say REVOKE → L1 revokes (T04 Row 28)
+   ├─ Both say RETAIN → L1 retains, resets review timer
+   ├─ Disagreement → L1 applies judgment (T04 Row 28 authority)
+   └─ No response within timeout → L1 treats as REVOKE (stale = unused)
+5. L1 updates Direct Link Registry with decision + timestamp
+6. L1 informs PO (T04 Row 28: I column)
+```
+
+##### Scaling Notes
+
+At 10 teams with 5 direct links, the review overhead is manageable (max 5 reviews per audit sweep). At 20+ teams, consider batching reviews by domain and delegating the sweep to a scheduled task rather than manual L1 initiative.
 
 #### Why Not Pure Mesh
 
@@ -598,4 +639,4 @@ The comms-dev team does **not** build: the protocols themselves (defined here), 
 
 5. **Broadcast delivery confirmation** — Protocol 3 says "no reply-to-broadcast" but the sender has no way to know if a team-lead actually processed the message (vs. it sitting unread in their inbox). Should broadcasts require a lightweight ACK?
 
-6. **Direct link lifecycle** — How are direct links established, tested, and revoked in practice? Does the manager agent periodically audit direct links for ones that are no longer needed?
+6. ~~**Direct link lifecycle**~~ --> Resolved by Direct Link Lifecycle Protocol (Protocol 2 §Lifecycle). Review triggers (time-based, inactivity, scope change, incident, on-demand), structured review process, authority split with T04 delegation matrix Rows 27-28.

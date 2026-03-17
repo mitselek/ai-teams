@@ -62,6 +62,7 @@ Authorize and track direct team-to-team communication channels:
 ```
 
 Direct links are exceptions to the hub-routed default. You grant them when:
+
 - Two teams share the same repository (frequent resource conflicts)
 - A standing handoff pattern exists (e.g., dev→QA on every PR)
 

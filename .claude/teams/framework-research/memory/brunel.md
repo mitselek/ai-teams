@@ -78,3 +78,36 @@
 [DEFERRED] 2026-03-14 — SSH agent forwarding for git push over SSH. HTTPS + GITHUB_TOKEN covers current use.
 [DEFERRED] 2026-03-14 — Shared repo-data race condition on simultaneous first start. Low priority for current sequential use.
 [DEFERRED] 2026-03-14 — docker-compose.yml update to remove comms volume + psk + add RELAY_URL/RELAY_TOKEN. Blocked on comms-dev shipping the relay. Do not update compose until relay is live.
+
+[CHECKPOINT] 2026-03-17 13:40 — apex-research container deployed on RC server (dev@100.96.54.170):
+- Dockerfile.apex: ai-teams-claude:latest + Node.js 22 (binary) + Python 3.12 + sshd (port 2222) + sudo
+- docker-compose.yml: network_mode: host, 3 named volumes, no broker/comms
+- entrypoint-apex.sh: clone 2 repos, symlink, venv, sshd, runtime validation gates
+- All gates passing: Python 3.12, Node.js v22.14.0, Claude 2.1.77, both repos cloned, source-data read-only enforced
+
+[GOTCHA] 2026-03-17 — RC server runs Cloudflare WARP. Docker bridge traffic NOT routed through WARP tunnel. Fix: network_mode: host in docker-compose.yml + --network=host for docker build.
+
+[GOTCHA] 2026-03-17 — WARP does TLS interception with self-signed CA. curl/wget fail SSL verification inside containers. Fix for Node.js install: download binary with curl --insecure (build-time only).
+
+[GOTCHA] 2026-03-17 — Base image (ai-teams-claude:latest) installs Node.js 18 via Ubuntu apt. Not enough for Claude Code. Apex Dockerfile overlays Node.js 22 binary from nodejs.org into /usr/local/ (overwrites 18).
+
+[GOTCHA] 2026-03-17 — Base image's GitHub CLI apt source key goes stale in child images. Remove /etc/apt/sources.list.d/github-cli.list before apt-get update in derived Dockerfiles.
+
+[GOTCHA] 2026-03-17 — useradd creates accounts with locked password (! in /etc/shadow). With UsePAM no, sshd rejects locked accounts even for pubkey auth ("User not allowed because account is locked"). Fix: usermod -p '*' <user> sets password to "no password" (*) instead of "locked" (!). This allows pubkey auth while still having no usable password.
+
+[GOTCHA] 2026-03-17 — Docker :ro volume flag prevents ALL writes including root. Can't clone into :ro volume. Fix: mount read-write, then chown root:root + chmod a-w,a+rX after clone to enforce read-only at filesystem level.
+
+[GOTCHA] 2026-03-17 — network_mode: host means container sshd shares host ports. Must use port 2222 to avoid conflict with host sshd on port 22.
+
+[GOTCHA] 2026-03-17 — WARP CA cert must NOT be bind-mounted to /etc/ssl/certs/ — update-ca-certificates tries to create a symlink at the same path and fails ("Device or resource busy"). Mount to /opt/warp-ca.pem instead and set NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem. Entrypoint copies cert to /usr/local/share/ca-certificates/ and runs update-ca-certificates for system tools.
+
+[GOTCHA] 2026-03-17 — Entrypoint multi-key SSH: collect all SSH_PUBLIC_KEY* env vars into authorized_keys. Docker Compose .env doesn't support multiline values, so use SSH_PUBLIC_KEY, SSH_PUBLIC_KEY_2, etc.
+
+[CHECKPOINT] 2026-03-17 14:27 — apex-research container fully operational on RC server:
+- All runtime gates green (Python 3.12, Node.js v22, Claude 2.1.77)
+- Both repos cloned, source-data read-only enforced
+- SSH on port 2222 (michelek, apex key, passwordless sudo)
+- WARP TLS interception resolved (bind-mount CA + NODE_EXTRA_CA_CERTS + update-ca-certificates)
+- hostname resolution fixed (/etc/hosts)
+- Missing: ANTHROPIC_API_KEY in .env (PO must provide)
+- Files not yet committed to git (local changes on both local machine and RC server via SCP)

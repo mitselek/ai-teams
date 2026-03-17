@@ -1,5 +1,23 @@
 # Herald Scratchpad
 
+## 2026-03-17 (session R8)
+
+[DECISION] T03 open question #6 resolved: Direct Link Lifecycle Protocol added to Protocol 2. Five review triggers (time-based, inactivity, scope change, incident, on-demand). Registry extended with Last active, Review due, Last review columns. Authority split with T04: Herald owns protocol mechanics, Montesquieu owns authority model (delegation matrix Rows 27-28).
+
+[DECISION] `type: dispute` added to Protocol 1 handoff type enumeration. Dispute entries logged to Handoff Ledger when T04 §Q5 escalation reaches Step 2 (L1 mediates). Recurring disputes signal structural gaps. Coordinated with Montesquieu — he'll cross-reference from T04.
+
+[PATTERN] apex-research → migration teams: one-to-many handoff pattern. Spec is the contract. New handoff type `migrate`. Dashboard as third communication layer (between operational UDS and knowledge GitHub Issues) — reduces status query volume at scale.
+
+[PATTERN] Spec readiness gate: 6 criteria (data model, business logic, auth, LOVs, overlaps, peer review). If migration team asks >2 clarification questions, the spec wasn't ready — quality signal back to research team.
+
+[PATTERN] Dashboard-as-communication-substrate: PO sees prioritization view, manager agent sees dependency graph for handoff sequencing, migration teams self-serve status checks. Reduces inter-team message volume by ~60% at 3+ migration teams.
+
+[DECISION] T05 Identity & Credentials deepened (76→481 lines). 5 sections: agent auth across teams, credential passing in containers, cross-team identity verification, secrets management, audit trail. Key decisions: (1) identity is team-scoped not agent-scoped, (2) per-team fine-grained GitHub PATs, (3) Docker secrets + `_FILE` convention, (4) no self-escalation of credentials, (5) per-team tokens for audit trail. All 5 original open questions resolved, 5 new ones raised.
+
+[PATTERN] Credentials are injected, never discovered. Anti-pattern: credential sharing between teams — use handoff protocol instead. MCP servers need `_FILE` env var convention for multi-team secret isolation.
+
+[GOTCHA] `~/.claude/mcp.json` contains plaintext Jira API token inline — concrete example of the credential management problem at multi-team scale.
+
 ## 2026-03-14 (session 2)
 
 [DECISION] T02 resource coordination protocols (R1-R5) written. Five protocols: branch reservation (R1), deployment lock (R2), DB migration queue (R3), API rate limit partitioning (R4), unified lock registry (R5). All integrate with T03 communication protocols — no new primitives needed.

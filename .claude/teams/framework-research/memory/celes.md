@@ -26,14 +26,21 @@
 | Richelieu | Cardinal Richelieu | L1 mgr | opus | `prompts/richelieu.md` | 2026-03-14 |
 | Lovelace | Ada Lovelace | CD | sonnet | CD prompts | 2026-03-14 |
 | Aeneas | Virgil's Aeneas | FR TL | opus | `prompts/team-lead-aeneas.md` | 2026-03-17 |
+| Schliemann | Heinrich Schliemann | AR TL | opus | AR `prompts/schliemann.md` | 2026-03-17 |
+| Champollion | Jean-Francois Champollion | AR | sonnet | AR `prompts/champollion.md` | 2026-03-17 |
+| Nightingale | Florence Nightingale | AR | sonnet | AR `prompts/nightingale.md` | 2026-03-17 |
+| Berners-Lee | Tim Berners-Lee | AR | sonnet | AR `prompts/berners-lee.md` | 2026-03-17 |
+| Hammurabi | Hammurabi | AR | opus | AR `prompts/hammurabi.md` | 2026-03-17 |
+| Montesquieu | Charles de Montesquieu | FR | opus | `prompts/montesquieu.md` | 2026-03-17 |
 
 ## Session 2026-03-17 (R8)
 
-[DECISION] Team-lead persona designed as "Aeneas" (Virgil's Aeneid — duty-bound leader, pietas, carries the past forward). Nickname: Aen. Three options presented (Aeneas, Theseus, Columella); Aeneas approved by team-lead + PO.
-[DECISION] Full package delivered: updated prompt at `prompts/team-lead-aeneas.md`, roster.json lore block, common-prompt.md update suggestion. Team-lead to apply (rename file, update roster).
-[LEARNED] Persona design from "evidence trail" (scratchpad + prompt + protocols) works well for introspective assignments. The character analysis step (before naming) builds trust.
-[GOTCHA] Repeated message delivery confusion — if team-lead asks for something already sent, resend full content.
-[GOTCHA] `gh` CLI cannot read `/tmp/` files (sandbox isolation). Use `.gh-issue-body.md` in working dir.
-[DEFERRED] Remaining specialist gaps: Isolation Analyst, Governance Architect, Identity/Security Designer, Safety Architect, Observability Designer — not yet requested.
+[DECISION] Aeneas lore polished — added "continuous evolution" reading, Anchises/Ascanius detail, "conditions for civilization" reframe. Applied to roster.json by team-lead.
+[DECISION] apex-research team designed: 5 agents (Schliemann, Champollion, Nightingale, Berners-Lee, Hammurabi). Full roster, common-prompt, and 5 prompts written to `apex-migration-research/.claude/teams/apex-research/`. Attribution prefix: `(*AR:*)`.
+[DECISION] T04 Hierarchy & Governance identified as most imminent underdeveloped topic. Rationale: apex-research deployment created concrete multi-team governance gaps (cross-team audit authority, spec approval chain, manager agent need).
+[DECISION] Montesquieu hired as Governance Architect (opus, FR team). Owns T04. Coordination boundary with Herald defined (Volta/Brunel handshake pattern).
+[LEARNED] Designing a second team reveals governance gaps that pure research doesn't surface. The act of deployment is the best requirements-gathering tool.
+[LEARNED] Coordination boundary tables (like Volta/Brunel section ownership) are the key pattern for preventing write conflicts between agents sharing adjacent domains.
+[DEFERRED] Remaining specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer — 4 of original 8 still open.
 
 (*FR:Celes*)

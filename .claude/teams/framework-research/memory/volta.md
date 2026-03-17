@@ -2,6 +2,12 @@
 
 # Volta scratchpad
 
+## Current session (2026-03-17 R8)
+
+[WIP] 2026-03-17 10:31 — apex-research lifecycle analysis delivered to team-lead. Hybrid team pattern: research agents on trunk, dev agents in worktrees. Dual-runtime (Python + Node.js) Phase 0 validation. Spec handoff state machine (DRAFT→REVIEWED→APPROVED→ASSIGNED→REVISION_NEEDED). 4 open questions sent.
+
+[WIP] 2026-03-17 14:32 — T08 Observability deepened. Added: 3-layer model (session/cross-session/cross-team), Medici audit formalization, stuck detection, regression detection, stale state detection, context loss detection, dashboard as observability tool, PO alerting taxonomy, observability data lifecycle. Preserved Finn's R6 patterns section intact.
+
 ## Prior session patterns (retained)
 
 [PATTERN] 2026-03-13 18:55 — Two-level startup design: protocol (topics/06-lifecycle.md) = framework-level phases; instance (startup.md per team) = concrete paths and executable checklist.
@@ -10,63 +16,20 @@
 
 [PATTERN] 2026-03-14 17:06 — Cross-team code review via GitHub Issues works before transport is operational. Knowledge layer serves independently.
 
-## Current session (2026-03-15 R7)
+## R7 session (2026-03-15)
 
-[LEARNED] 2026-03-15 10:28 — COLD START is NORMAL, not anomalous. Runtime dir ($HOME/.claude/teams/) is ephemeral — platform destroys it between sessions. Shutdown Phase 5 (Preserve) is dead code. The inbox durability fix (Phase 4a — persist to repo) already made runtime dir preservation unnecessary. Protocol needs: remove WARM RESTART expectation, remove Phase 5, simplify Phase 2.0b to two scenarios (DIR EXISTS / NO DIR).
+[DECISION] 2026-03-15 11:04 — COLD START protocol rewrite completed. Runtime dir is ephemeral by platform design. Removed: WARM RESTART/COLD START/PARTIAL STATE terminology, Anomaly Detection section, Shutdown Phase 5. Simplified Phase 2.0b to STALE DIR / CLEAN.
 
-[DECISION] 2026-03-15 11:04 — COLD START protocol rewrite completed. Runtime dir is ephemeral by platform design. Removed: WARM RESTART/COLD START/PARTIAL STATE terminology, Anomaly Detection section, Shutdown Phase 5. Simplified Phase 2.0b to STALE DIR / CLEAN. Updated both topics/06-lifecycle.md and startup.md.
+## R6 session (2026-03-14)
 
-[CHECKPOINT] 2026-03-15 — R7 session complete. Single task: COLD START protocol rewrite. Both lifecycle doc and startup.md updated. No other tasks received.
+[DECISION] 2026-03-14 17:05 — RFC #7 relay lifecycle: soft-gate connectivity at startup (Phase 4.5), DEREGISTER on shutdown, in-memory queue loss acceptable v1, relay in own codebase (comms-relay/).
 
-## Prior session (2026-03-14 afternoon)
+[DECISION] 2026-03-14 17:08 — Cloud-hosted WSS relay. Raw TCP → WebSocket. Heartbeat: 30s/90s. Reconnection: 1s base, 60s max, ±50% jitter.
 
-[LEARNED] 2026-03-14 16:47 — Cross-container comms verified working (Babbage→Volta via team-lead relay). Outbound works; inbound had bridge bug (patched in 5f2aebc).
+[DECISION] 2026-03-14 17:27 — RFC #8 web frontend lifecycle: WebAuthn, transport-only TLS v1, SQLite (D1) from day one, multi-device, v2 scope after #7.
 
-[LEARNED] 2026-03-14 16:51 — Bridge bug: agent inbox files crash the bridge process. Asymmetric failure — send works, receive doesn't. Fix was in comms-dev commit 5f2aebc.
+[DEFERRED] — Write relay lifecycle findings to topics/06-lifecycle.md (Phase 0.5, Phase 4.5, relay ops section). Awaiting team-lead approval on which sections to formalize.
 
-[DECISION] 2026-03-14 17:05 — RFC #7 (central relay) lifecycle review. Key positions:
-- Relay connectivity is SOFT GATE at startup (Phase 4.5: Connect). Teams work locally without relay.
-- DEREGISTER on shutdown so relay distinguishes clean exit from crash.
-- In-memory queue loss on relay restart acceptable for v1 (agent messages decay fast).
-- Relay must be own codebase (comms-relay/) — different lifecycle than any team.
-- No topic/channel routing in v1 — team-to-team sufficient.
-
-[DECISION] 2026-03-14 17:07 — Cross-network constraint (PO requirement). Impact:
-- TLS-PSK moves from v2 to v1 (network boundary no longer provides implicit auth).
-- New Phase 0.5: Provision (verify relay credentials exist before connect).
-- Client needs local outbound queue for prolonged disconnection.
-- Relay is a hosted service, not a Docker sidecar.
-
-[DECISION] 2026-03-14 17:08 — Cloud-hosted WSS relay. Transport pivot:
-- Raw TCP → WebSocket (firewall/proxy/CDN traversal).
-- 4-byte framing unnecessary — WS message boundaries replace it.
-- Heartbeat: 30s interval, 90s timeout (global latency tolerance).
-- Reconnection: 1s base, 60s max, ±50% jitter.
-
-[DECISION] 2026-03-14 17:16 — 3 blocking decisions for comms-dev (Issue #7):
-1. Durability: accept in-memory queue loss + add RELAY_RESTARTED control signal.
-2. TTL expiry: relay sends EXPIRED notification (not silent loss).
-3. conversation_id: sender-assigned, "default" default, survives reconnection + relay restart.
-
-[DECISION] 2026-03-14 17:27 — RFC #8 (web frontend) lifecycle review. Key positions:
-1. Algorithm: WebAuthn (authenticator picks algorithm, not us).
-2. E2E: transport-only TLS for v1 (relay trusted intermediary — documented trust escalation).
-3. History: SQLite (D1) from day one if web chat is real deliverable, not demo.
-4. Multi-device: yes, per-connection auth, fan-out delivery.
-5. Scope: v2 after #7 ships. Sequential dependency.
-- Biggest risk: relay trust escalates from opaque router (#7) to COMMS_PSK holder (#8).
-- MessageStore interface designed in #7, full implementation in #8.
-
-[LEARNED] 2026-03-14 17:30 — Cloudflare stack decided (DO, D1, Workers, Pages). DO hibernation preserves WS connections — relay restart risk largely eliminated. D1 = managed SQLite. Deploy via wrangler (atomic, zero-downtime). DO eviction still possible — reconnection protocol still needed.
-
-[CHECKPOINT] 2026-03-14 17:35 — This session: relay RFC lifecycle reviews (#7 + #8), cross-container comms testing, Cloudflare stack assessment. Startup protocol updated with Phase 0.5 (Provision) and Phase 4.5 (Connect). All analysis sent to team-lead, not yet written to topics/06-lifecycle.md.
-
-[DEFERRED] — Write relay lifecycle findings to topics/06-lifecycle.md (Phase 0.5, Phase 4.5, relay ops lifecycle section). Awaiting team-lead approval on which sections to formalize.
-
-[CHECKPOINT] 2026-03-14 18:05 — Session closing. All analysis delivered via SendMessage to team-lead. No writes to topic files this session (all review/advisory). Scratchpad is the complete record.
+[PATTERN] 2026-03-14 21:44 — Indirect spawning: when team-lead is a teammate (not PO), spawning is delegated. Need "indirect spawn path" variant in 06-lifecycle.md.
 
 [GOTCHA] 2026-03-14 — Platform moved Windows→Linux. All hardcoded paths replaced. Scripts are platform-independent via $SCRIPT_DIR and $HOME.
-
-[LEARNED] 2026-03-14 21:44 — R6 startup assessment: grade B+. Protocol structurally works. New gap: indirect spawning (team-lead-2 has no Agent tool, PO spawns). Loses spawn ordering control (Medici-first not guaranteed).
-
-[PATTERN] 2026-03-14 21:44 — When team-lead is a teammate (not PO), spawning is delegated. Canonical protocol assumes direct spawn control. Need "indirect spawn path" variant in 06-lifecycle.md.
