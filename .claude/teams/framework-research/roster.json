@@ -89,7 +89,7 @@
       }
     },
     {
-      "name": "montesquieu",
+      "name": "monte",
       "agentType": "general-purpose",
       "model": "claude-opus-4-6",
       "color": "white",
