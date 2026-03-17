@@ -8,7 +8,7 @@
       "name": "team-lead",
       "agentType": "team-lead",
       "model": "claude-opus-4-6",
-      "prompt": "prompts/team-lead.md",
+      "prompt": "prompts/aeneas.md",
       "lore": {
         "fullName": "Aeneas",
         "nickname": "Aen",
