@@ -19,6 +19,8 @@ export type Model =
 export interface AgentLore {
   /** Full ceremonial name */
   fullName: string;
+  /** Short name used in conversation */
+  nickname?: string;
   /** Literary or cultural origin of the name */
   origin: string;
   /** Why this name fits the agent's role */
