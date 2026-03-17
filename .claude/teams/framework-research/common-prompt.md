@@ -3,7 +3,7 @@
 ## Team
 
 - **Team name:** `framework-research`
-- **Members:** team-lead, finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer), brunel (containerization engineer)
+- **Members:** team-lead/Aen (team coordinator), finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer), brunel (containerization engineer)
 - **Mission:** Design a multi-team AI agent framework that scales to tens of teams
 
 ## Workspace

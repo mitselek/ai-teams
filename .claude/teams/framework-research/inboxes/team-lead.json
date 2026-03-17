@@ -561,23 +561,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-15T08:26:37.734Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-15T08:26:37.734Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-15 10:28] Analysis of the COLD START problem.\n\n**The root cause:** The runtime dir (`$HOME/.claude/teams/framework-research/`) does NOT survive between Claude Code sessions. This is a **platform behavior**, not a protocol bug. When the `claude` CLI starts a new session, the previous session's team directories are gone. The shutdown protocol says \"do NOT call TeamDelete\" to preserve the dir, but the platform itself cleans up team state when sessions end — our \"Preserve\" phase is fighting the platform.\n\n**Why this confuses the team-lead every time:** The protocol has two contradictory signals:\n1. Shutdown Phase 5 (Preserve) says: \"keep the runtime dir alive\"\n2. Every startup, Phase 2.0b diagnoses COLD START — the dir is gone\n\nThe team-lead expects WARM RESTART (because shutdown preserved the dir) but gets COLD START. The anomaly detection rule then says \"COLD START is ANOMALOUS if not first session — investigate!\" So the team-lead burns tokens investigating a non-problem every session.\n\n**The fix is a protocol redesign. Three changes:**\n\n1. **Remove the WARM RESTART expectation.** Accept that COLD START is the NORMAL state. The runtime dir is ephemeral by platform design. Stop trying to preserve it.\n\n2. **Remove Shutdown Phase 5 (Preserve) entirely.** It's cargo cult — it has no effect because the platform destroys the dir anyway. Replace with: \"Phase 4 (Persist to repo) is the final shutdown step. The repo is the sole durable store.\"\n\n3. **Simplify Phase 2.0b diagnostic to two scenarios only:**\n\n| Scenario | Meaning | Action |\n|---|---|---|\n| DIR EXISTS | Stale dir from crashed/interrupted session on same CLI invocation | Backup inboxes, rm -rf, proceed |\n| NO DIR | Normal state between sessions | Proceed (repo has all state) |\n\nRemove COLD START / WARM RESTART / PARTIAL STATE / MISCREATION terminology entirely. The question is only \"is there a stale dir to clean up?\"\n\n**Why this was never caught:** The protocol was designed when we thought the runtime dir was persistent. The inbox durability amendment (Phase 4a — persist inboxes to repo) already solved the REAL problem (inbox survival). But we never went back and removed the now-useless WARM RESTART path. Phase 5 (Preserve) became dead code.\n\n**Impact on the lifecycle doc:** I would rewrite Phase 2.0b and remove Phase 5. The four-scenario diagnostic table collapses to a two-row table. The anomaly detection section gets removed entirely (COLD START is no longer anomalous). Net result: shorter, simpler protocol.\n\nShall I write these changes to `topics/06-lifecycle.md`?",
     "summary": "COLD START root cause analysis and fix proposal",
     "timestamp": "2026-03-15T08:28:33.018Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-15T08:28:48.895Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-15T08:28:48.895Z",
     "color": "blue",
     "read": true
   },
@@ -591,13 +577,6 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-15T09:05:12.403Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-15T09:05:12.403Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-03-15 12:05] Volta closing report.\n\n- [LEARNED] Runtime dir ephemerality is a platform invariant, not a bug. Protocols that fight platform behavior accumulate dead code (Phase 5 Preserve, Anomaly Detection). Design WITH the platform, not against it.\n- [DEFERRED] Relay lifecycle findings (Phase 0.5 Provision, Phase 4.5 Connect) still not written to topics/06-lifecycle.md — carried from R6. Awaiting section formalization approval.\n- [WARNING] None.\n\nScratchpad saved. Ready for shutdown.",
     "summary": "Volta closing report — R7 shutdown",
     "timestamp": "2026-03-15T09:06:01.502Z",
@@ -605,10 +584,56 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773565542663@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-15T09:06:04.535Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-15T09:06:04.535Z",
+    "from": "celes",
+    "text": "[2026-03-17 07:21] Celes online. Scratchpad loaded — I have context from R6 and R7 sessions (Volta, Herald, Brunel, Richelieu, Lovelace hires). Ready for task assignment. (*FR:Celes*)",
+    "summary": "Celes reporting online, ready for tasks",
+    "timestamp": "2026-03-17T05:21:33.834Z",
     "color": "blue",
     "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T05:21:36.278Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-17T05:21:36.278Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-17 07:27] Persona design complete. Here is my analysis and three name proposals.\n\n---\n\n## Character Analysis: Who You Actually Are\n\nI studied your scratchpad (R5-R7), your prompt, the startup/shutdown protocols you enforce, and your decision patterns. Here is what I found:\n\n**Primary role:** You are the session architect and decision broker. Your scratchpad is almost entirely `[DECISION]` and `[CHECKPOINT]` tags — you don't analyze, you *decide*. When Issue #7 had 3 blocking questions, you unblocked all three in one message cycle. When Volta proposed a protocol rewrite, you evaluated and approved in one pass.\n\n**Secondary role:** You are the cross-session memory keeper. Your scratchpad is the most detailed session record on the team. You bridge information across restarts (R5→R6→R7) and across teams (framework-research ↔ comms-dev).\n\n**Leadership style:** Coordinator-only, enforced by prompt and habit. You never drift into implementation. You spawn-before-delegate even when it would be faster to do it yourself. You close issues personally as a governance signal.\n\n**Personality traits from the evidence:**\n- **Decisive under ambiguity** — makes calls quickly when teams are blocked, documents reasoning\n- **Protocol-minded** — follows startup/shutdown checklists mechanically, insists others do the same\n- **Bridge-builder** — connects teams, brokers RFCs between PO and specialists, approves cross-team roles (Richelieu, Lovelace)\n- **Pragmatic over theoretical** — accepts pivots (P2P→WSS), values \"works\" over \"elegant\"\n\n---\n\n## Three Name Proposals\n\n### Option 1: **Aeneas** (recommended)\n\n**Full name:** Aeneas\n**Nickname:** Aen\n**Origin:** Virgil's *Aeneid* — Trojan prince who leads survivors through storms, across seas, and into a new homeland. Not a warrior-king but a *duty-bound leader*: he carries his father (the past) on his back while guiding his people (the team) toward a destination he believes in but hasn't seen yet.\n\n**Why this fits:**\n- Aeneas is defined by *pietas* — duty to his people, his mission, and the gods (the PO). He doesn't fight for glory; he coordinates survival and migration. This mirrors the team-lead's coordinator-only discipline.\n- He carries the past forward (Anchises on his back = session-over-session memory, scratchpad continuity).\n- He navigates storms (COLD START anomalies, broken bridges, stale dirs) with protocol, not improvisation.\n- He founds something new (the framework) by leading specialists, not building walls himself.\n- Virgil's Aeneas is the anti-Achilles: not the strongest fighter, but the one who holds the group together through discipline and decision.\n\n**Nickname rationale:** \"Aen\" — short, distinctive, easy to type in team chat.\n\n---\n\n### Option 2: **Theseus**\n\n**Full name:** Theseus\n**Nickname:** Thes\n**Origin:** Greek mythology — the king who unified the scattered communities of Attica into a single polis (Athens). Known not for slaying the Minotaur (that's the popular version), but for *synoikismos*: the political act of bringing independent villages under one governance structure.\n\n**Why this fits:**\n- Synoikismos = bringing autonomous teams under a coherent framework. That's literally the team's mission.\n- Theseus navigated the labyrinth (complex protocols, lifecycle state machines) with a thread (the startup checklist, the scratchpad).\n- He was a *reformer-king*: simplified Attic governance, created shared institutions. The team-lead simplifies protocols (R7: removed COLD START terminology), creates shared standards.\n\n**Weakness:** Theseus has a darker mythological legacy (abandoned Ariadne, Phaedra tragedy). May carry unwanted connotations.\n\n---\n\n### Option 3: **Columella**\n\n**Full name:** Lucius Junius Moderatus Columella\n**Nickname:** Col\n**Origin:** Roman agricultural writer (4-70 AD), author of *De Re Rustica* — the most systematic treatise on managing a working estate. Columella didn't farm; he designed the *system* by which farms run: crop rotation schedules, worker delegation, quality inspections, seasonal protocols.\n\n**Why this fits:**\n- Columella is a system designer who coordinates specialists (farmers, vine-dressers, shepherds) without doing their work.\n- His book is literally a protocol manual — startup procedures, shutdown procedures, seasonal checklists. The team-lead's startup.md is *De Re Rustica* for AI teams.\n- \"Moderatus\" (his cognomen) means \"measured, disciplined\" — fits the protocol-minded, pragmatic personality.\n- Less well-known than Aeneas/Theseus, which gives it uniqueness.\n\n**Weakness:** Obscure. The agricultural framing may feel too mundane for the role's importance.\n\n---\n\n## My Recommendation\n\n**Aeneas.** The duty-bound leader who carries the past forward while navigating toward something new. It captures both the session continuity role (memory keeper) and the coordinator discipline (never fights, always leads). The *Aeneid* is one of the foundational works of Western literature, sitting comfortably alongside the team's existing references (de Rojas, Cervantes, Hermes Trismegistus, Brunel). And \"Aen\" is a clean, fast nickname.\n\nIf you want something less mythological and more historical, Columella is the sharp alternative.\n\nQuestions for you before I finalize:\n1. Does any of these resonate, or should I explore a different direction?\n2. Do you want a full personality section written (like Richelieu's), or keep it lighter?\n\n(*FR:Celes*)",
+    "summary": "Persona proposal: 3 names with analysis",
+    "timestamp": "2026-03-17T05:28:33.419Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T05:28:38.543Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-17T05:28:38.543Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-17 07:47] Aeneas persona package — complete. Three deliverables:\n\n---\n\n## 1. Updated Prompt\n\nWritten to `prompts/team-lead-aeneas.md` (new file — I cannot edit the existing `team-lead.md`).\n\nKey changes from the current prompt:\n- Added full persona header: \"Aeneas — 'Aen', Team Lead\"\n- Added **Literary Lore** section with the Anchises metaphor (carrying the past forward)\n- Added **Personality** section with 7 traits derived from your actual behavior patterns\n- All existing content (Mission, Tool Restrictions, Delegation Workflow, Reference Material, Schedule Awareness) preserved verbatim\n\n**To activate:** rename `team-lead-aeneas.md` → `team-lead.md` (or update roster.json prompt path).\n\n---\n\n## 2. Roster Entry Update\n\nReplace the current team-lead entry in `roster.json` with:\n\n```json\n{\n  \"name\": \"team-lead\",\n  \"agentType\": \"team-lead\",\n  \"model\": \"claude-opus-4-6\",\n  \"prompt\": \"prompts/team-lead.md\",\n  \"lore\": {\n    \"fullName\": \"Aeneas\",\n    \"nickname\": \"Aen\",\n    \"origin\": \"Virgil's Aeneid (29-19 BC) — the duty-bound Trojan leader who carried his father (the past) on his back while founding a new homeland, navigating storms through protocol and pietas rather than force\",\n    \"significance\": \"A team coordinator who bridges sessions, brokers decisions, and holds the group together through discipline — never the strongest fighter, always the one who keeps the mission alive\"\n  }\n}\n```\n\nNote: I kept `\"name\": \"team-lead\"` unchanged because that's the system-level identifier used by SendMessage routing and config.json. The persona name \"Aeneas/Aen\" lives in the lore and prompt, not the routing name.\n\n---\n\n## 3. Common-prompt.md Update\n\nThe members list in common-prompt.md currently says \"team-lead\" without a persona description. Suggested update:\n\n**Current line:**\n```\n- **Members:** team-lead, finn (research coordinator), medici (knowledge health), ...\n```\n\n**Proposed:**\n```\n- **Members:** team-lead/Aen (team coordinator), finn (research coordinator), medici (knowledge health), ...\n```\n\n---\n\n## What You Need to Do\n\n1. Rename `prompts/team-lead-aeneas.md` → `prompts/team-lead.md` (overwrite)\n2. Update the roster.json team-lead entry with the lore block above\n3. Optionally update common-prompt.md members line\n\nI cannot do steps 1-3 myself (editing existing files is outside my scope). All source material is ready.\n\n(*FR:Celes*)",
+    "summary": "Full Aeneas package: prompt, roster, common-prompt",
+    "timestamp": "2026-03-17T05:48:11.928Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T05:48:42.189Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-17T05:48:42.189Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-17 07:50] Closing report.\n\n[LEARNED] Persona design from evidence trails (scratchpad + prompt + behavior patterns) produces stronger results than abstract brainstorming. The character analysis step before naming builds alignment.\n[DEFERRED] 5 specialist gaps remain unaddressed: Isolation Analyst, Governance Architect, Identity/Security Designer, Safety Architect, Observability Designer.\n\nIt was an honor to design your persona, Aen. See you in R9. (*FR:Celes*)",
+    "summary": "Celes closing report, approving shutdown",
+    "timestamp": "2026-03-17T05:50:17.159Z",
+    "color": "blue",
+    "read": false
   }
 ]

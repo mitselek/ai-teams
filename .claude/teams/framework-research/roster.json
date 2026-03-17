@@ -8,7 +8,13 @@
       "name": "team-lead",
       "agentType": "team-lead",
       "model": "claude-opus-4-6",
-      "prompt": "prompts/team-lead.md"
+      "prompt": "prompts/team-lead.md",
+      "lore": {
+        "fullName": "Aeneas",
+        "nickname": "Aen",
+        "origin": "Virgil's Aeneid (29-19 BC) — the duty-bound Trojan leader who carried his father (the past) on his back while founding a new homeland, navigating storms through protocol and pietas rather than force",
+        "significance": "A team coordinator who bridges sessions, brokers decisions, and holds the group together through discipline — never the strongest fighter, always the one who keeps the mission alive"
+      }
     },
     {
       "name": "finn",

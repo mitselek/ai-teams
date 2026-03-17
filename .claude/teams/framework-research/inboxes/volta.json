@@ -289,11 +289,5 @@
     "summary": "Approve COLD START protocol rewrite",
     "timestamp": "2026-03-15T09:02:35.774Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773565542663@volta\",\"from\":\"team-lead\",\"reason\":\"R7 session complete. Save your scratchpad and send closing report.\",\"timestamp\":\"2026-03-15T09:05:42.663Z\"}",
-    "timestamp": "2026-03-15T09:05:42.663Z",
-    "read": true
   }
 ]
