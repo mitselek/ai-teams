@@ -68,6 +68,7 @@ SPAWN_SCRIPT=$(mktemp /tmp/spawn-cmd-XXXXXX.sh)
   echo '#!/usr/bin/env bash'
   echo 'export CLAUDECODE=1'
   echo 'export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1'
+  echo "export CLAUDE_ENV_ID=\"$TMUX_SESSION\""
   # RC-specific: only set cert path if the file exists
   if [[ -f "$HOME/.claude/custom_certs.pem" ]]; then
     echo "export NODE_EXTRA_CA_CERTS=$HOME/.claude/custom_certs.pem"
