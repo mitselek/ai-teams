@@ -87,6 +87,19 @@
         "origin": "Victorian engineer (1806–1859) — builder of the Thames Tunnel, Great Western Railway, and SS Great Britain; pioneered containment and transport across hostile environments",
         "significance": "A containerization engineer who designs the shell that preserves agent team state across sessions, hosts, and restarts"
       }
+    },
+    {
+      "name": "montesquieu",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "white",
+      "prompt": "prompts/montesquieu.md",
+      "lore": {
+        "fullName": "Charles de Montesquieu",
+        "nickname": "Monte",
+        "origin": "French political philosopher (1689-1755), author of The Spirit of the Laws. Designed the separation of powers doctrine — legislative, executive, judicial — transforming governance from 'who is in charge?' to 'who is in charge of what?'",
+        "significance": "A governance architect who designs the authority structure for multi-team AI agent frameworks: delegation matrices, manager agent boundaries, conflict resolution, and the checks that prevent authority drift at scale."
+      }
     }
   ]
 }
