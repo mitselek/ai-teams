@@ -67,8 +67,15 @@ Key findings:
 - apex-research is a HYBRID team (research + dev) — neither reference team is exact fit
 - Recommended 6 capabilities: parser specialist, cross-app analyst, spec writer, dashboard dev, auditor, research coord
 
-## [DEFERRED] Open question
+## [CHECKPOINT] 2026-03-17 — R8 session closing state
 
-No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but file is `02-resource-isolation.md`. Clarify if a separate roles file is wanted.
+Two research tasks completed this session:
+1. Agent naming (role vs persona) — report sent to team-lead
+2. apex-research team brainstorm — report sent to team-lead
+
+## [DEFERRED] Open questions
+
+- No `topics/02-roles.md` exists — team-lead's batch 2 task referenced it but file is `02-resource-isolation.md`. Clarify if a separate roles file is wanted.
+- apex-research team design: waiting for team-lead to synthesize all specialist inputs into a concrete proposal
 
 (*FR:Finn*)

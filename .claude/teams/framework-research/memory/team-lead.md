@@ -1,53 +1,60 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## Session: 2026-03-14 (R6)
+## Session: 2026-03-17/18 (R8)
 
-[CHECKPOINT] R6-early startup: COLD START (anomalous, same as R5 — runtime dir missing). User approved proceeding. 6 inboxes restored from repo. config.json appeared immediately after TeamCreate.
-[CHECKPOINT] R6-early agents spawned: celes, volta, brunel. All reported in successfully.
+[CHECKPOINT] R8 startup: CLEAN (normal). 7 inboxes restored. config.json appeared immediately.
+[CHECKPOINT] R8 agents spawned: celes, finn, volta, herald, brunel, montesquieu (new hire).
 
-### Cross-container comms
-[DECISION] Cross-container comms with comms-dev established via shared UDS broker. Brunel set up FR broker.
-[LEARNED] Bridge bug (5f2aebc) — agent inbox files crash the bridge. Brunel pulled fix, restarted broker.
-[LEARNED] Team-lead messages may not route cross-container reliably — agent-to-agent messages work. Used Volta as relay for settings.json question.
-[LEARNED] Outbound FR→CD worked; inbound CD→FR was intermittent due to bridge bug.
+### Aeneas persona refinement
+[DECISION] Celes polished Aeneas lore: "continuous evolution, not arrival." Anchises/Ascanius metaphor, "conditions for civilization" framing. Committed.
+[DECISION] Prompt renamed team-lead.md → aeneas.md, duplicate team-lead-aeneas.md deleted.
+[DECISION] roster.ts moved from .claude/teams/types/ to .claude/teams/, nickname field added to AgentLore interface.
 
-### Issue #7: Central relay service RFC
-[DECISION] Accepted comms-dev's pivot from P2P UDS to cloud-hosted WSS relay.
-[DECISION] PO requirements: no shared infra assumption (teams globally distributed), future-proof for web chat + separate conversations.
-[DECISION] Separate `comms-relay/` codebase — relay is infrastructure, not a team service.
-[DECISION] Two-secret model: RELAY_TOKEN (relay auth) + COMMS_PSK (E2E payload encryption).
-[DECISION] 3 blocking decisions unblocked: (1) best-effort in-memory queue + RELAY_RESTARTED signal, (2) EXPIRED notification to sender, (3) sender-assigned conversation_id with default "default".
-[DECISION] PO: go full Cloudflare stack — Durable Objects (relay), D1 (SQLite), Workers (API), Pages (frontend). Matches RC-team pattern.
+### Agent naming research (Finn)
+[DECISION] Keep name: "team-lead" for routing, persona in lore/prompt. Frameworks overwhelmingly favor role-based routing names.
+[DECISION] GitHub issue #11 created for multi-team persona-based routing (future).
 
-### Issue #8: Web frontend RFC
-[DECISION] WebAuthn/passkeys for browser auth (algorithm is authenticator's choice).
-[DECISION] Transport-only TLS for v1 (relay becomes trusted intermediary with COMMS_PSK — trust escalation documented).
-[DECISION] SQLite (D1) from day one — in-memory web chat history is a demo, not a product.
-[DECISION] Multi-device: yes, per-connection auth, fan-out delivery.
-[DECISION] Scope: v2 after #7 ships.
-[DECISION] Deployment: relay DO + Worker on CF, SvelteKit on CF Pages (adapter-cloudflare), TailwindCSS 4.
-[LEARNED] WebAuthn is origin-bound — PO needs a domain before E2E testing. rpId must cover both frontend and relay subdomains.
-[LEARNED] DO hibernation gotcha: routing table lost on eviction, must rebuild from socket tags. Store-and-forward queue → DO Storage, TTL sweep → DO Alarm.
-[LEARNED] D1 gotchas from RC-team: multi-statement queries unreliable, PRAGMA foreign_keys is no-op in migration runner.
+### apex-research team — designed and deployed
+[DECISION] 5-agent team: Schliemann (TL/opus), Champollion (research/sonnet), Nightingale (analyst/sonnet), Berners-Lee (dashboard/sonnet), Hammurabi (specs/opus). No Medici — audits remotely from FR.
+[DECISION] Dashboard-first approach: SvelteKit + TailwindCSS, API-based, local dev server.
+[DECISION] Container: self-contained, no host bind mounts, 3 named volumes, network_mode: host (WARP).
+[DECISION] Cluster-based specs (not per-app) for apps sharing >3 tables.
+[DECISION] Spec status validated against TypeScript interface from YAML frontmatter.
+[DECISION] Deployed on RC server (dev@100.96.54.170), container running, SSH on port 2222.
+[LEARNED] WARP tunnel causes: Docker DNS failure, TLS interception, env vars not reaching sudo su shells.
+[LEARNED] Brunel's deployment runbook captures 11 gotchas for future container deployments.
+[CHECKPOINT] Apex team delivered in first day: 80 commits, 202K+ lines, 11 cluster specs, all 57 apps analyzed, dashboard with 7 views, migration readiness report.
 
-### Celes: Lovelace hire for comms-dev
-[DECISION] Lovelace hire approved by PO. Frontend specialist for comms-dev. SvelteKit + WebAuthn + WSS client. Sonnet tier.
+### Montesquieu — new hire (Governance Architect)
+[DECISION] Montesquieu hired for T04 (Hierarchy & Governance). Opus tier. Nick: "Monte". Color: white.
+[DECISION] Phase 1 approved and delivered: 39-decision delegation matrix, 5 apex-research governance questions answered.
+[DECISION] Phase 2 approved and delivered: manager agent role formalized, PO-to-manager handoff protocol, emergency authority protocol.
+[LEARNED] Monte found the five-layer governance stack already existed de facto — just needed naming and codification.
 
-## R6 session (2026-03-14 evening)
-[CHECKPOINT] R6 startup. Scratchpad from R5 survived — R5-1 verification SUCCESS.
-[LEARNED] R5 scratchpad persisted correctly across session boundary. The fix (write scratchpad before shutdown) works.
-[LEARNED] No Agent tool available to team-lead — PO must spawn teammates. This caused team-lead-2 naming (PO registered as team-lead by TeamCreate).
-[CHECKPOINT] R6 tasks completed: Volta (B+ startup assessment), Finn (T02 deep research), Herald (5 resource protocols R1-R5), Medici (health report v5), Brunel (T06 container review + broker sidecar), Celes (Richelieu manager-agent role).
-[DECISION] Richelieu manager-agent role approved — GitHub issue #10. Level 1 coordinator above team-leads.
-[DECISION] roster.json workDir fixed: mitselek-ai-teams → mitselek/ai-teams.
+### comms-dev roster completion
+[DECISION] Marconi persona for comms-dev team-lead (Celes designed). Prompt renamed team-lead.md → marconi.md.
+[DECISION] Lovelace added to comms-dev roster (was in prompts/ but missing from roster.json).
 
-## Session: 2026-03-15 (R7)
+### Topic fan-out (R8)
+[CHECKPOINT] T01 (Celes): 83 → 450 lines. Team archetypes, role taxonomy, model tiering, sizing.
+[CHECKPOINT] T04 (Monte): 103 → ~640 lines. Delegation matrix, manager agent design, emergency authority.
+[CHECKPOINT] T05 (Herald): 76 → 481 lines. 4-layer auth, credential passing, secrets management.
+[CHECKPOINT] T08 (Volta): 113 → 290 lines. 3-layer observability, Medici formalization, alerting.
+[CHECKPOINT] T03 (Herald): dispute handoff type + direct link lifecycle added.
+[DEFERRED] T07 (Safety & Guardrails) — only light topic remaining at 121 lines.
 
-[CHECKPOINT] R7 startup: COLD START (normal — platform cleans runtime dir between sessions). 7 inboxes restored. config.json appeared immediately.
-[CHECKPOINT] R7: only Volta spawned (minimal session to test protocol fix).
-[DECISION] Approved Volta's COLD START protocol rewrite — runtime dir absence is normal, not anomalous. Removed WARM RESTART/PARTIAL STATE/COLD START terminology. Removed Shutdown Phase 5 (Preserve). Simplified to 2-scenario diagnostic (STALE DIR / CLEAN).
-[LEARNED] R7 is the first session using the simplified startup protocol. Next restart (R8) will validate.
+### Container infrastructure
+[LEARNED] Brunel produced deployment runbook: 11 gotchas from WARP/Docker deployment.
+[LEARNED] tmux -u needed for UTF-8 rendering inside container.
+[LEARNED] Compose env vars don't reach shells via sudo su — must persist to .bashrc.
+[LEARNED] Locked user accounts (!) block all SSH auth including pubkey — use usermod -p '*'.
+[LEARNED] OAuth credentials (.credentials.json) instead of API key on RC server.
+[LEARNED] Project-level .mcp.json solved MCP server discovery (global mcp.json HOME path issue).
 
-## Previous session notes (R5–R6)
+### IT ticket
+[CHECKPOINT] IT ticket submitted 2026-03-17 for dedicated apex-research server (Ubuntu 24.04, 200GB SSD, Docker). Requested deadline 2026-04-01. SSH key: ~/.ssh/id_ed25519_apex, username: michelek.
+
+## Previous session notes (R5–R7)
 - R5 Grade B (best ever). Inbox durability validated.
 - R6: relay RFC (#7), web frontend RFC (#8), Richelieu manager-agent (#10), Lovelace hire.
+- R7: simplified startup protocol, removed COLD START anomaly.

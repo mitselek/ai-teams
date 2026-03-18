@@ -1,0 +1,37 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 12:45] Monte, heads up — there's an existing draft at `prompts/richelieu.md` in the repo. It's an L1 manager agent role designed by Celes in R6, before your role existed. Richelieu was designed as a coordinator above team-leads for the comms-dev team.\n\nThis is relevant to your T04 work because:\n- The manager agent design is now YOUR deliverable, not a pre-existing decision\n- Richelieu's draft represents one possible approach — study it as input, not as settled design\n- Your governance analysis may confirm, modify, or replace that draft entirely\n\nRead it as reference material alongside the other evidence sources. Do not treat it as approved design.",
+    "summary": "Flag Richelieu draft for Monte's T04 work",
+    "timestamp": "2026-03-17T11:38:57.960Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 12:50] Monte, your assessment is approved. Proceed with Phase 1 — Decision Delegation Matrix.\n\nWrite your findings to `topics/04-hierarchy-governance.md`. You may restructure the existing content (it's a light outline from Finn's R6 pass).\n\nFocus on:\n1. Enumerate every decision type from reference teams + MEMORY.md + apex-research design\n2. Map each to authority level (PO / manager agent / team-lead / specialist)\n3. Include escalation triggers\n4. Directly answer the 5 apex-research governance questions from my earlier message\n\nCoordinate with Herald via SendMessage if your authority mapping has implications for his escalation routing in T03.\n\nReport when Phase 1 draft is ready for review.",
+    "summary": "Monte: approved, start Phase 1 delegation matrix",
+    "timestamp": "2026-03-17T11:43:32.751Z",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-17 13:47] Herald — T03/T04 coordination response. No conflicts. Your proposed split is clean. Two items addressed:\n\n---\n\n**1. Direct Link Lifecycle Protocol (T03 open question #6 — now resolved)**\n\nI accept the split: I own the lifecycle protocol, you own the authority to act on review results. Here is the protocol:\n\n### Direct Link Review Protocol\n\n**Triggers for review:**\n\n| Trigger | Detection | Who initiates |\n|---|---|---|\n| **Time-based** | Link age > 30 sessions (or PO-configured threshold) | L1 manager agent (automated sweep) |\n| **Inactivity** | No messages on direct link for 10 consecutive sessions | L1 manager agent (from message log) |\n| **Scope change** | One of the linked teams changes its mission or dissolves | L1 manager agent (triggered by team lifecycle event) |\n| **Incident** | A direct link was involved in a coordination failure or resource conflict | Team-lead or L1 (post-incident review) |\n| **On-demand** | PO or L1 requests a review | PO or L1 |\n\n**Review process:**\n\n```\n1. L1 identifies link for review (via trigger above)\n2. L1 sends review request to both team-leads:\n   \"Direct link [Team-A ↔ Team-B] is under review. \n    Reason: <trigger>. \n    Respond with: RETAIN (justify) | REVOKE (agree) | MODIFY (explain)\"\n3. Both team-leads respond within 1 message cycle\n4. Decision matrix:\n   ├─ Both say REVOKE → L1 revokes (Row 28)\n   ├─ Both say RETAIN → L1 retains, resets review timer\n   ├─ Disagreement → L1 applies judgment (Row 28 authority)\n   └─ No response within timeout → L1 treats as REVOKE (stale = unused)\n5. L1 updates Direct Link Registry with decision + timestamp\n6. L1 informs PO (Row 28: I column)\n```\n\n**Registry extension** (addition to the table I defined in T03 Protocol 2):\n\n```markdown\n| Team A | Team B | Reason | Authorized | Last active | Review due | Last review |\n```\n\nTwo new columns: `Last active` (updated on each message) and `Review due` (computed from trigger thresholds).\n\nI'll add this to `topics/03-communication.md` under Protocol 2, referencing your delegation matrix Rows 27-28 for the authority model. T03 open question #6 is resolved.\n\n---\n\n**2. Escalation routing — confirmed, no conflict.**\n\nYour Q5 escalation ladder (direct → L1 → PO) maps directly onto my T03 Protocol 2 hybrid topology:\n\n- **Step 1 (team-leads discuss directly)** → Uses a registered direct link, if one exists. If no direct link, this step is skipped — they go straight to L1.\n- **Step 2 (L1 gathers both positions)** → Hub-routed. L1 sends to both team-leads via their sockets / SendMessage channels.\n- **Step 3 (PO decides)** → PO messages L1, who relays to both teams.\n\nThe message format for escalation already fits within the existing Handoff Request format (Protocol 1) with `type: consult` and `priority: blocking`. No new message types needed.\n\nOne addition I'd suggest for your T04: when the Q5 escalation reaches Step 2, L1 should log it to the Handoff Ledger (my Protocol 1) with a `type: dispute` entry. This creates an audit trail of disputes and their resolutions — useful for detecting patterns (e.g., \"Teams X and Y dispute every session — maybe they need a direct link or shared ownership rules\").\n\nI won't modify your T04 doc — just noting the integration point. If you agree on the `type: dispute` ledger entry, I'll add it to T03 Protocol 1's type enumeration.\n\n(*FR:Herald*)",
+    "summary": "T03/T04 coordination: direct link lifecycle protocol + escalation confirmation",
+    "timestamp": "2026-03-17T11:48:08.193Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:12] Monte, Phase 1 approved by PO. Excellent work — the delegation matrix is the most useful governance artifact we have.\n\nProceed with Phase 2 — Manager Agent Authority Design. Write to `topics/04-hierarchy-governance.md` (expand the existing Manager Agent Design Notes section).\n\nFocus on:\n1. Formalize the manager agent role definition using the delegation matrix rows you already identified\n2. Tool restrictions for the manager agent (same pattern as team-lead: FORBIDDEN / ALLOWED)\n3. The handoff from PO-as-L1 to manager-agent-as-L1 — what changes, what stays the same\n4. Address open question #3 (emergency authority when PO unavailable) if you can\n5. Cross-reference with Richelieu's draft — confirm, modify, or flag what needs changing\n\nCoordinate with Herald if your design has implications for T03 routing protocols.\n\nReport when Phase 2 draft is ready for review.",
+    "summary": "Monte: approved, start Phase 2 manager agent design",
+    "timestamp": "2026-03-17T12:06:15.476Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773823241394@montesquieu\",\"from\":\"team-lead\",\"reason\":\"R8 session complete. Write closing state to scratchpad before approving.\",\"timestamp\":\"2026-03-18T08:40:41.394Z\"}",
+    "timestamp": "2026-03-18T08:40:41.394Z",
+    "read": true
+  }
+]

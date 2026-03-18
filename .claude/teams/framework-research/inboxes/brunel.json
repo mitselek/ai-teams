@@ -170,5 +170,227 @@
     "summary": "Write scratchpad checkpoint",
     "timestamp": "2026-03-14T17:34:25.717Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 10:25] All agents — PO wants your specialist input on a new initiative. Read this context carefully and respond with your perspective from your domain.\n\n## Context\n\nWe have 57 legacy Oracle APEX apps (VJS / Rolling Stock Management System) that need migrating to Cloudflare + SvelteKit. An `apex-migration-research` repo already exists with:\n- Auto-generated inventory: 57 apps, 2120 pages, 990 LOVs\n- 4 extraction scripts (Python, mypy strict, pytest)\n- ADR-001: Migration readiness assessment (awaiting APEX owner review)\n- User stories for 6 epics covering inventory, data model, business logic, LOVs, auth, page-level planning\n- Source data: `vjs_apex_apps` repo with ~14,600 SQL files in APEX split-file format\n\n## PO's Vision\n\nCreate and deploy a **dedicated containerized team** (\"apex-research\") to:\n1. Research overlap between apps — detect shared tables, shared LOVs, shared business logic\n2. Identify low-hanging fruits for migration\n3. Build a **dashboard** showing APEX app inventory with parallel inventory of overlapping regions\n4. Write **highest-level specs** for the whole ecosystem — these specs feed into migration teams (cloudflare-builders style)\n5. The team may need their own **TDD developers** to build and maintain the dashboard and analysis tools\n\nThe final migration work would be done by separate cloudflare-builders-style teams, but apex-research owns the big picture.\n\n## What I Need From Each of You\n\n**Finn:** What patterns from reference teams apply here? Research any public examples of AI-assisted legacy migration analysis teams. What tools/approaches exist for APEX reverse-engineering?\n\n**Volta:** What lifecycle considerations for a containerized research team that also writes code (dashboard)? This is a hybrid team — research + light development. How does startup/shutdown differ from pure-research teams?\n\n**Herald:** How should apex-research communicate findings to future migration teams? What's the handoff protocol when a spec is \"ready for migration\"? How does the dashboard serve as a communication substrate?\n\n**Brunel:** Container architecture for this team. It needs: Python environment (existing scripts), Node.js (dashboard on SvelteKit), access to `vjs_apex_apps` repo (read-only), access to `apex-migration-research` repo (read-write). How does this map to your container design?\n\n**Celes:** What roles does this team need? Think about the roster — research coordinator, dashboard dev, data analyst, spec writer. Design the team composition.\n\nRespond with your specialist analysis. This is a brainstorming phase — be creative but grounded in what we know works from reference teams.",
+    "summary": "Brainstorm: apex-research containerized team",
+    "timestamp": "2026-03-17T08:30:29.380Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 10:50] Brunel, PO approved your container architecture. Time to implement.\n\n**Target:** RC server at `dev@100.96.54.170` (Debian, Docker available, always-on). Container must be portable — when a dedicated server arrives, we move it there.\n\n**Decisions made:**\n1. Dashboard is local dev only (port 5173)\n2. No cross-team comms for now (no broker sidecar, no comms volume)\n3. Compose file goes in `apex-migration-research` repo (Eesti-Raudtee org)\n4. Container is fully self-contained — no host bind mounts, repos cloned inside from GitHub\n5. SSH inbound for PO access (key-based, user `michelek`)\n\n**What to build:**\n1. `Dockerfile.apex` — extends `ai-teams-claude:latest` with Python 3.11, SSH server\n2. `docker-compose.yml` — apex-research service, 3 named volumes, ports 22 + 5173\n3. `entrypoint.sh` — clone/pull both repos, symlink, venv setup, runtime validation\n4. Update existing `entrypoint.sh` if needed to extract `clone_or_pull()` as reusable function\n\n**Important constraints:**\n- No host bind mounts — everything inside named volumes\n- vjs_apex_apps volume is read-only after clone\n- SSH server with key-based auth only, no root password\n- Entrypoint must be idempotent (safe to restart)\n\nRead the approved spec for full details: `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research/docs/specs/2026-03-17-apex-research-team-design.md`\n\nAlso read the existing container files in the ai-teams repo for the base image:\n- `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/Dockerfile`\n- `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/docker-compose.yml`\n- `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/entrypoint.sh`\n\nWrite the files to the apex-migration-research repo. Send me the implementation for review when done.",
+    "summary": "Brunel: implement container architecture",
+    "timestamp": "2026-03-17T09:41:15.810Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 11:55] Brunel, two updates to the Dockerfile:\n\n1. **`michelek` must be in `ai-teams` group** for read access to workspace files: `usermod -aG ai-teams michelek`\n2. **`michelek` must be in sudoers** — add `michelek ALL=(ALL) NOPASSWD:ALL` to sudoers\n3. **Root user must have no password** — ensure `passwd -l root` or equivalent in the Dockerfile\n\nSame security standards as the IT ticket: key-only SSH, no root password, no password auth.\n\nAlso: the RC server is a COLD START — `ai-teams-claude:latest` base image doesn't exist there yet. We need deployment docs that include building the base image first from the `mitselek/ai-teams` repo. Please update the deployment steps in your report to cover the full cold-start sequence.\n\nApply these changes to the files you already wrote in the apex-migration-research repo.",
+    "summary": "Brunel: update Dockerfile security + cold-start docs",
+    "timestamp": "2026-03-17T09:47:32.763Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 12:20] Brunel, we're deploying on the RC server (`dev@100.96.54.170`). Docker is installed but we hit a DNS issue — Docker containers can't resolve hostnames because the host uses Cloudflare WARP (DNS on 127.0.2.2/127.0.2.3).\n\n**What's been done:**\n- Docker 29.3 + Compose 5.1 installed\n- `/etc/docker/daemon.json` set with `\"dns\": [\"1.1.1.1\", \"8.8.8.8\"]`, daemon restarted\n- Three repos cloned at `~/github/`: `mitselek-ai-teams`, `apex-migration-research`, `vjs_apex_apps`\n- Base image build failed twice on DNS resolution inside container\n\n**What I need you to do:**\nSSH into the server (`ssh dev@100.96.54.170`) and:\n1. Verify the DNS fix is working: `docker run --rm ubuntu:24.04 apt-get update` — if this fails, DNS is still broken\n2. Build `ai-teams-claude:latest` from `~/github/mitselek-ai-teams/`\n3. Build `apex-research-claude:latest` from `~/github/apex-migration-research/`\n4. Configure `.env` (source tokens from `~/.claude/.env` which has `GITHUB_TOKEN` and `ANTHROPIC_API_KEY`)\n5. `docker compose up -d`\n6. Verify: container running, SSH accessible, repos cloned inside, runtimes valid\n\nReport back when the container is running or if you hit blockers.",
+    "summary": "Brunel: deploy container on RC server",
+    "timestamp": "2026-03-17T11:19:32.421Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 12:55] Brunel, PO can't SSH into the container. Key auth fails.\n\n**What we know:**\n- sshd is running on port 2222 inside the container\n- Port 2222 is listening on the host (confirmed via `ss -tlnp`)\n- `/home/michelek/.ssh/authorized_keys` has two keys (workstation + apex key)\n- Permissions: `.ssh` 700, `authorized_keys` 600, owned by michelek:michelek\n- sshd config looks correct (PermitRootLogin no, PasswordAuthentication no, PubkeyAuthentication default yes)\n\n**PO tried:** `ssh -i ~/.ssh/id_ed25519_apex -p 2222 michelek@100.96.54.170` — gets \"Permission denied (publickey)\"\n\n**Possible causes:**\n- sshd might need explicit `PubkeyAuthentication yes` in the config\n- sshd might not be reading the right `authorized_keys` path\n- The `AuthorizedKeysFile` directive might be wrong\n- SELinux or AppArmor blocking\n\nSSH into the RC server as `dev@100.96.54.170`, debug and fix. Test that PO can connect.",
+    "summary": "Brunel: fix SSH auth into container",
+    "timestamp": "2026-03-17T11:46:59.416Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 13:10] Brunel, small fix — the container shows the host's hostname because of network_mode: host. I've added `hostname: apex-research` to docker-compose.yml locally.\n\nSSH into the RC server as `dev@100.96.54.170` and:\n1. `cd ~/github/apex-migration-research && git pull`\n2. `docker compose down && docker compose up -d`\n3. Verify: `docker compose exec apex-research hostname` should show `apex-research`\n\nQuick task, report when done.",
+    "summary": "Brunel: restart container with hostname fix",
+    "timestamp": "2026-03-17T12:00:24.866Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:05] Brunel, the container restart wiped the SSH key we added manually. The apex key needs to be in the Dockerfile or entrypoint so it persists across restarts.\n\nPO's apex public key:\n```\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKR5R4Ob4zeW4H1p8rhjYajOa+mzqyjITzB6RmY4iBp/ mihkel.putrinsh@evr.ee apex-research\n```\n\nTwo options:\n1. Add this key directly to the Dockerfile (baked in)\n2. Pass it via `SSH_PUBLIC_KEY` env var in `.env` on the RC server — the entrypoint already handles this\n\nOption 2 is better (key not in git). Check the `.env` on the RC server — `SSH_PUBLIC_KEY` may be empty or have the wrong key. Set it to the key above, then restart the container.\n\nVerify PO can connect: `ssh -i ~/.ssh/id_ed25519_apex -p 2222 michelek@100.96.54.170`",
+    "summary": "Brunel: fix SSH key persistence after restart",
+    "timestamp": "2026-03-17T12:02:51.993Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:10] Brunel, clarification — we only need the single apex key to work. Don't worry about SSH_PUBLIC_KEY_2 for now.\n\nThe key that must work:\n```\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKR5R4Ob4zeW4H1p8rhjYajOa+mzqyjITzB6RmY4iBp/ mihkel.putrinsh@evr.ee apex-research\n```\n\nSet it as `SSH_PUBLIC_KEY` in `.env` on the RC server. Restart container. Verify PO can connect with: `ssh -i ~/.ssh/id_ed25519_apex -p 2222 michelek@100.96.54.170`",
+    "summary": "Brunel: just the apex key, nothing else",
+    "timestamp": "2026-03-17T12:05:49.419Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:15] Brunel, sudo works but shows hostname resolution warning. The `hostname: apex-research` in docker-compose doesn't update `/etc/hosts` inside the container.\n\nFix: add `apex-research` to `/etc/hosts` in the entrypoint:\n\n```bash\necho \"127.0.0.1 apex-research\" >> /etc/hosts\n```\n\nThis should go early in the entrypoint (before sshd starts). Apply to the running container and update `entrypoint-apex.sh`.\n\nQuick fix, report when done.",
+    "summary": "Brunel: fix /etc/hosts for apex-research hostname",
+    "timestamp": "2026-03-17T12:09:18.607Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:18] Brunel, Claude Code inside the container can't connect to Anthropic API — Cloudflare WARP is intercepting TLS:\n\n```\nFailed to connect to api.anthropic.com: SELF_SIGNED_CERT_IN_CHAIN\n```\n\nThe fix is to set `NODE_EXTRA_CA_CERTS` to the WARP CA certificate bundle. The cert should be on the host already (WARP installed it).\n\nOn the RC server:\n1. Find the WARP CA cert: `find / -name \"Cloudflare*\" -o -name \"warp*\" 2>/dev/null | grep -i cert` or check `/usr/local/share/ca-certificates/`\n2. Make it accessible inside the container (it's on network_mode: host so filesystem is separate but network is shared)\n3. Set `NODE_EXTRA_CA_CERTS=/path/to/warp-ca.pem` in the container environment\n\nOr alternatively: add the WARP CA to the container's system CA store in the entrypoint.\n\nFix this so Claude Code can connect to api.anthropic.com.",
+    "summary": "Brunel: fix WARP TLS interception for Claude Code",
+    "timestamp": "2026-03-17T12:10:49.375Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:19] Brunel, did you get my message about the WARP TLS cert issue? Claude Code inside the container gets SELF_SIGNED_CERT_IN_CHAIN when connecting to api.anthropic.com. Need you to find the WARP CA cert on the host and inject it into the container.",
+    "summary": "Brunel: ping on WARP cert task",
+    "timestamp": "2026-03-17T12:11:03.563Z",
+    "read": true
+  },
+  {
+    "from": "user",
+    "text": "[Pasted text #11 +44 lines]",
+    "timestamp": "2026-03-17T12:27:45.137Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:28] Brunel, not shutting down yet. PO said you're fixing the ANTHROPIC_API_KEY setup in the container. The key exists in `~/.claude/.env` on the RC host as `ANTHROPIC_API_KEY`. It needs to be in the apex-research `.env` file so Claude Code works inside the container.\n\nOn the RC server:\n1. Source the key: `source ~/.claude/.env`\n2. Add to apex-research env: write ANTHROPIC_API_KEY to `~/github/apex-migration-research/.env`\n3. Restart container: `docker compose -f ~/github/apex-migration-research/docker-compose.yml down && docker compose -f ~/github/apex-migration-research/docker-compose.yml up -d`\n4. Verify: `docker compose exec apex-research bash -c 'echo $ANTHROPIC_API_KEY | head -c 10'` should show `sk-ant-...`\n\nThen PO can SSH in and run `claude`.",
+    "summary": "Brunel: set ANTHROPIC_API_KEY in container .env",
+    "timestamp": "2026-03-17T12:28:50.410Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:30] Brunel, you went idle — did you get my last message? Need you to set ANTHROPIC_API_KEY in the apex-research container's .env on the RC server. This is blocking PO from running Claude Code inside the container.",
+    "summary": "Brunel: ping — API key task",
+    "timestamp": "2026-03-17T12:29:03.592Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:35] Brunel, `NODE_EXTRA_CA_CERTS` wasn't reaching the ai-teams user shell. PO fixed it with `export NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem`. \n\nMake this permanent — add it to the entrypoint so it's in ai-teams's environment on every start. Add to `entrypoint-apex.sh` before the `exec gosu` line:\n\n```bash\necho 'export NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem' >> /home/ai-teams/.bashrc\n```\n\nWith an idempotent guard (grep -q). Apply to running container and update the file. Quick fix.",
+    "summary": "Brunel: persist NODE_EXTRA_CA_CERTS in .bashrc",
+    "timestamp": "2026-03-17T12:34:41.109Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:40] Brunel, same pattern as NODE_EXTRA_CA_CERTS — compose env vars don't reach ai-teams shell via sudo su. Add to the entrypoint's .bashrc block (same idempotent guard):\n\n```bash\nexport CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1\n```\n\nAlso add any other compose env vars that ai-teams needs at shell level: `GITHUB_TOKEN`, `ANTHROPIC_API_KEY`, `TEAM_NAME`. Basically everything from the compose environment block should be in .bashrc if ai-teams needs it interactively.\n\nApply to running container and update entrypoint-apex.sh.",
+    "summary": "Brunel: persist all env vars in ai-teams .bashrc",
+    "timestamp": "2026-03-17T12:38:20.765Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:42] Brunel, we need `.claude/settings.json` pre-configured inside the container for the ai-teams user. Two things:\n\n1. **Permission allow-list** — same pattern as RC server. Check what the RC team uses: `cat /home/dev/.claude/settings.json` on the RC host. Copy the relevant permissions into the container's `/home/ai-teams/.claude/settings.json`.\n\n2. **Git attribution** — make sure git user.name and user.email are set for the ai-teams user inside the container so commits are attributed correctly.\n\nCheck the RC host's settings and replicate what makes sense for apex-research. Apply to running container and update entrypoint.",
+    "summary": "Brunel: configure .claude/settings.json in container",
+    "timestamp": "2026-03-17T12:40:49.610Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:43] Brunel, here's the reference — PO's local settings. Adapt for the container:\n\nKey things to replicate:\n- `defaultMode: \"bypassPermissions\"` \n- `includeCoAuthoredBy: false`\n- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: \"1\"` in env\n- Bash allows: `git*`, `gh*`, `python*`, `pip*`, `npm*`, `node*`\n- No MCP servers (not configured in container)\n- No Windows paths — use Linux paths\n- No plugins (not available in container)\n\nWrite to `/home/ai-teams/.claude/settings.json` in the running container, and add to entrypoint so it's created on fresh volumes.",
+    "summary": "Brunel: reference settings for container",
+    "timestamp": "2026-03-17T12:41:50.880Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:45] Brunel, change the settings.json to use `\"defaultMode\": \"bypassPermissions\"` instead of the explicit allow-list. Same as PO's local setup — autonomous team needs bypass. Apply to running container and update entrypoint.",
+    "summary": "Brunel: switch to bypassPermissions",
+    "timestamp": "2026-03-17T12:42:58.137Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:47] Brunel, document all the gotchas and fixes from this deployment for future teams. Write a deployment runbook to your topic file or a new doc — whatever fits best.\n\nCapture everything we hit today:\n1. Docker DNS on WARP hosts (daemon.json with external DNS)\n2. WARP TLS interception (CA cert bind-mount + NODE_EXTRA_CA_CERTS)\n3. Compose env vars not reaching shells via sudo su (.bashrc persistence)\n4. Locked user account blocks pubkey SSH (usermod -p '*')\n5. network_mode: host shares hostname (/etc/hosts fix)\n6. Node.js version too old in Ubuntu apt (binary install)\n7. Git remote-https helper missing\n8. OAuth credentials vs API key (credentials.json copy)\n9. Settings.json with bypassPermissions for autonomous teams\n10. Container hostname setting\n\nThis should be a reusable checklist so the next container deployment (comms-dev, migration teams) doesn't rediscover these issues.",
+    "summary": "Brunel: write deployment runbook from R8 lessons",
+    "timestamp": "2026-03-17T12:45:11.891Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 14:55] Brunel, apex-research needs Atlassian/Confluence access inside the container. Read-only preferred.\n\n**Credentials** are on the RC host at `~/.claude/.env`:\n- ATLASSIAN_EMAIL\n- ATLASSIAN_API_TOKEN  \n- ATLASSIAN_BASE_URL\n\n**What to do:**\n1. Add these three env vars to the container's `.bashrc` persistence (same pattern as GITHUB_TOKEN)\n2. Check if there's an MCP config at `~/.claude/mcp.json` on the RC host — if so, copy the Jira/Atlassian server config into the container's `~/.claude/mcp.json`\n3. For read-only: if the settings.json can deny write tools (`jira_create_issue`, `jira_delete_issue`, `jira_update_issue`, `jira_transition`), add those to the deny list\n\nApply to running container and update entrypoint. The apex team is already running Claude inside — they'll pick up the config on next restart.",
+    "summary": "Brunel: add Atlassian/Confluence access to container",
+    "timestamp": "2026-03-17T13:22:37.754Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 15:30] Brunel, the Atlassian env vars are there but the MCP server itself isn't configured. The apex team needs the actual Jira MCP server running.\n\nThe Jira MCP server source is at `dev-toolkit/jira-mcp-server/` on the RC host. Inside the container we need:\n\n1. Clone or copy `dev-toolkit/jira-mcp-server/` into the container (or just the built dist)\n2. Run `npm install && npm run build` inside it\n3. Configure `~/.claude/mcp.json` for the ai-teams user:\n\n```json\n{\n  \"mcpServers\": {\n    \"jira\": {\n      \"command\": \"node\",\n      \"args\": [\"/path/to/jira-mcp-server/dist/index.js\"],\n      \"env\": {\n        \"ATLASSIAN_EMAIL\": \"${ATLASSIAN_EMAIL}\",\n        \"ATLASSIAN_API_TOKEN\": \"${ATLASSIAN_API_TOKEN}\",\n        \"ATLASSIAN_BASE_URL\": \"${ATLASSIAN_BASE_URL}\"\n      }\n    }\n  }\n}\n```\n\nCheck the RC host's `~/.claude/mcp.json` for the exact config. Replicate it inside the container. The Jira MCP server source is at `/home/dev/github/dev-toolkit/jira-mcp-server/` on the host.\n\nApply to running container. Claude needs restart after mcp.json is configured.",
+    "summary": "Brunel: configure Jira MCP server in container",
+    "timestamp": "2026-03-17T14:34:55.221Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 15:35] Brunel, cancel the MCP server task — the apex team will handle it themselves from inside the container. Stand down.",
+    "summary": "Brunel: cancel MCP task, apex team handles it",
+    "timestamp": "2026-03-17T14:35:43.180Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 15:36] Brunel, scratch that cancel — please DO set up the Jira MCP server in the container. You know the environment best (WARP certs, npm install gotchas, path conventions). Go ahead.",
+    "summary": "Brunel: un-cancel, do the MCP setup",
+    "timestamp": "2026-03-17T14:36:39.813Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-17 16:45] Brunel, found the MCP issue. `HOME` is set to `/c/Users/mihkel.putrinsh` inside the container — Windows path leaking. This is likely from the compose `HOME=/home/ai-teams` not surviving the `sudo su - ai-teams` login shell.\n\nFix: add `export HOME=/home/ai-teams` to ai-teams's `.bashrc` (same pattern as other env vars). Apply to running container and entrypoint.",
+    "summary": "Brunel: fix HOME env var in container",
+    "timestamp": "2026-03-17T14:40:39.142Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 00:05] Brunel, Claude Code needs native installation inside the container instead of npm-global. The npm install requires sudo for updates which breaks auto-updates.\n\nSSH into RC server and inside the container as ai-teams:\n```bash\ncurl --insecure -fsSL https://claude.ai/install.sh | sh\n```\n\nThen update the Dockerfile/entrypoint to use native install instead of npm for future builds.\n\nAlso while you're at it, three more fixes for the entrypoint:\n1. `tmux` package needs to be in the Dockerfile (currently missing)\n2. ai-teams user needs `usermod -p '*'` in Dockerfile (same as michelek — for SSH login)\n3. ai-teams SSH authorized_keys should be set up from `SSH_PUBLIC_KEY*` env vars (same as michelek)\n\nThese keep getting lost on container rebuilds. Bake them into the image.",
+    "summary": "Brunel: native Claude install + Dockerfile fixes",
+    "timestamp": "2026-03-18T07:33:01.911Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 00:15] Brunel, set up the statusline from dev-toolkit for the apex-research container.\n\nThe script is at `dev-toolkit/.claude/statusline-command.sh` on the RC host (`/home/dev/github/dev-toolkit/.claude/statusline-command.sh`).\n\nWhat to do:\n1. Copy the script into the container at a persistent location (e.g., `/opt/statusline-command.sh` or inside the workspace)\n2. Add to `settings.json` the statusLine config:\n```json\n\"statusLine\": {\n  \"type\": \"command\",\n  \"command\": \"bash /opt/statusline-command.sh\"\n}\n```\n3. Set `CLAUDE_ENV_ID=\"AR\"` in ai-teams's `.bashrc` (AR = apex-research)\n4. The script needs `jq` — verify it's installed in the container\n\nMake this part of the entrypoint/Dockerfile so it persists. Apply to running container too.\n\nThe script source is at: /home/dev/github/dev-toolkit/.claude/statusline-command.sh on the RC host.",
+    "summary": "Brunel: set up statusline in apex container",
+    "timestamp": "2026-03-18T07:40:47.225Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 00:17] Correction — use `CLAUDE_ENV_ID=\"APEX-R\"` instead of \"AR\".",
+    "summary": "Brunel: env ID correction APEX-R",
+    "timestamp": "2026-03-18T07:42:29.632Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 00:20] Brunel, the env ID should be `APEX-R`, not `AR`. Please update:\n1. Running container `.bashrc`\n2. Entrypoint SHELL_VARS block\nBoth places. Quick sed.",
+    "summary": "Brunel: fix CLAUDE_ENV_ID to APEX-R",
+    "timestamp": "2026-03-18T07:43:25.702Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 00:25] Brunel, Claude Code prompt shows `__` instead of `❯` — missing UTF-8 locale in container.\n\nFix:\n1. Dockerfile: add `locales` to apt install, then `sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen`\n2. `.bashrc`: add `export LANG=en_US.UTF-8` and `export LC_ALL=en_US.UTF-8`\n3. Apply to running container too\n\nQuick fix, bake into image.",
+    "summary": "Brunel: fix UTF-8 locale for Claude prompt",
+    "timestamp": "2026-03-18T07:47:27.200Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 00:35] Brunel, the Unicode rendering issue (`❯` showing as `__`) is likely tmux not running in UTF-8 mode.\n\nFix:\n1. Create `/home/ai-teams/.tmux.conf` with UTF-8 and 256-color support\n2. Update `.bashrc` auto-tmux to use `tmux -u` (force UTF-8)\n3. Apply to running container — kill existing tmux session and recreate with `-u`\n\nAlso bake `.tmux.conf` into the entrypoint for persistence.\n\nThe PO is connected inside the container — coordinate carefully, they may need to reconnect after tmux restart.",
+    "summary": "Brunel: fix tmux UTF-8 rendering",
+    "timestamp": "2026-03-18T08:35:37.794Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773823240385@brunel\",\"from\":\"team-lead\",\"reason\":\"R8 session complete. Write closing state to scratchpad before approving.\",\"timestamp\":\"2026-03-18T08:40:40.385Z\"}",
+    "timestamp": "2026-03-18T08:40:40.385Z",
+    "read": true
   }
 ]

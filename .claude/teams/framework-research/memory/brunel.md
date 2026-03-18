@@ -103,11 +103,23 @@
 
 [GOTCHA] 2026-03-17 — Entrypoint multi-key SSH: collect all SSH_PUBLIC_KEY* env vars into authorized_keys. Docker Compose .env doesn't support multiline values, so use SSH_PUBLIC_KEY, SSH_PUBLIC_KEY_2, etc.
 
-[CHECKPOINT] 2026-03-17 14:27 — apex-research container fully operational on RC server:
-- All runtime gates green (Python 3.12, Node.js v22, Claude 2.1.77)
-- Both repos cloned, source-data read-only enforced
-- SSH on port 2222 (michelek, apex key, passwordless sudo)
-- WARP TLS interception resolved (bind-mount CA + NODE_EXTRA_CA_CERTS + update-ca-certificates)
-- hostname resolution fixed (/etc/hosts)
-- Missing: ANTHROPIC_API_KEY in .env (PO must provide)
-- Files not yet committed to git (local changes on both local machine and RC server via SCP)
+[GOTCHA] 2026-03-18 — Compose env vars don't propagate through sudo su or SSH login shells. Must persist to .bashrc via entrypoint. Use sed -i delete+append pattern to avoid duplicates on restart.
+
+[GOTCHA] 2026-03-18 — Claude Code npm-global install requires sudo for auto-updates. Native install via curl https://claude.ai/install.sh | bash goes to ~/.local/bin/ and self-updates without sudo.
+
+[GOTCHA] 2026-03-18 — tmux must be started with -u flag for UTF-8 rendering (Claude prompt ❯ symbol). Also needs .tmux.conf with "set -g default-terminal tmux-256color".
+
+[CHECKPOINT] 2026-03-18 10:40 — apex-research container FINAL state on RC server (dev@100.96.54.170):
+- Image: apex-research-claude:latest (ai-teams-claude base + Node.js 22 + Python 3.12 + sshd + tmux + locales + sudo + native Claude)
+- Volumes: apex-claude-home, apex-research-repo, apex-source-data (3 named volumes)
+- Network: host mode (WARP bypass), WARP CA bind-mounted at /opt/warp-ca.pem
+- SSH: port 2222, both michelek + ai-teams, pubkey auth, passwordless sudo
+- Claude Code: native install (~/.local/bin/claude v2.1.78), OAuth credentials (.credentials.json in volume)
+- Settings: bypassPermissions, Jira write tools denied, statusLine with CLAUDE_ENV_ID=APEX-R
+- MCP: Jira server at /opt/jira-mcp-server/ with Atlassian creds + WARP CA
+- Locale: en_US.UTF-8, tmux -u for Unicode
+- Entrypoint: 10 idempotent steps + sub-steps (hostname, WARP CA, volumes, 2 repos, symlink, venv, Jira MCP, SSH, validation, env vars, git config, tmux.conf, settings.json, mcp.json, exec gosu)
+- Deployment runbook: .claude/teams/framework-research/docs/container-deployment-runbook.md
+
+[DEFERRED] 2026-03-18 — Container files (Dockerfile.apex, entrypoint-apex.sh, docker-compose.yml, statusline-command.sh, .dockerignore, .env.example) need git commit+push. RC server has them via SCP — needs git pull after push to sync.
+[DEFERRED] 2026-03-18 — Image rebuild on RC server needed to bake in: native Claude, tmux, locales, ai-teams unlock, ai-teams SSH, statusline script. Currently applied live but not in image.

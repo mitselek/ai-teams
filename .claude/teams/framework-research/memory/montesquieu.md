@@ -28,4 +28,6 @@
 
 [DEFERRED] Phase 3 (cross-team audit authority deepening) — awaiting team-lead direction.
 
+[CHECKPOINT] 2026-03-18 — R8 session closing. Phase 1 + Phase 2 both approved by team-lead. T04 grew from ~103 lines (Finn's outline) to ~640 lines. Herald coordination complete (direct link lifecycle + dispute ledger type resolved). 3 of 5 open questions resolved (#3, #5, and all 5 original questions). 3 still open (#1 multiple manager agents, #2 amendment protocol, #4 compliance audit).
+
 (*FR:Montesquieu*)
