@@ -1,31 +1,32 @@
 # Medici — Knowledge Health Checker Scratchpad
 
-## [CHECKPOINT] 2026-03-14 session 6 — Audit v5
+## [CHECKPOINT] 2026-03-18 session 7 — Audit v6
 
-Major progress since v4: T03 gained Protocol 4 (transport spec), T06 gained container lifecycle. Brunel and Herald active. comms-dev team provisioned.
+Major changes since v5: T04 blocking gap RESOLVED (Montesquieu delivered 770 lines). T01+T05+T08 all substantially expanded. T07 Safety elevated to HIGH concern — only 120 lines, no specialist owner, 3 topics depend on it.
 
 Key findings:
-- T04 manager agent gap remains the sole BLOCKING dependency (4th audit flagging)
-- T02 dropped from HIGH to MEDIUM (Brunel's container model is a concrete proposal)
-- T03 and T06 both at "advanced draft" — README still shows "brainstorm" (3 audits stale)
-- roster.json workDir has dash-vs-slash typo (Celes flagged, still unfixed)
-- finn.md "Team size: 3" stale for 3 audits
-- celes.md at 89/100 lines, needs pruning
+- T07 is now the weakest link (120 lines vs 577 avg), replacing T04 as primary concern
+- brunel.md at 125/100 lines (over limit) — 15 deployment gotchas need relocation
+- README.md "brainstorm" status stale for 4th audit (7/8 topics at advanced draft)
+- finn.md "Team size: 3" stale for 4th audit
+- celes.md pruning from v5 M3 resolved (89→52)
+- 0% regression rate — no previously resolved findings regressed
+- Apex deployment created new empirical source material not yet extracted
 
 ## [PATTERN] Topic maturity ranking (updated)
 
-- **T06 Lifecycle** — most mature (canonical protocol + amendments + container lifecycle + scripts)
-- **T03 Communication** — strong (4 inter-team protocols + transport spec)
-- **T01 Taxonomy** — solid (agent types, team configs, model tiering)
-- **T07 Safety** — solid (permission categories + guardrail patterns)
-- **T04 Hierarchy** — partial (current state good, manager agent layer missing) — BLOCKING for T03
-- **T02 Resource Isolation** — improved (container model exists, not yet integrated into topic)
-- **T05 Identity** — partial (current state, no proposals; T03 P4 encryption not cross-referenced)
-- **T08 Observability** — partial (patterns documented, no implementation design)
+- **T06 Lifecycle** — 981 lines, most mature (canonical protocol + container lifecycle + scripts)
+- **T02 Isolation** — 791 lines, comprehensive (deep research + 5 resource protocols)
+- **T04 Hierarchy** — 770 lines, **newly complete** (delegation matrix + manager agent + emergency)
+- **T03 Communication** — 642 lines, strong (4 inter-team protocols + transport spec)
+- **T05 Identity** — 481 lines, **newly complete** (4-layer auth + secrets + audit trail)
+- **T01 Taxonomy** — 450 lines, solid (archetypes + roles + tiering + sizing)
+- **T08 Observability** — 379 lines, solid (3-layer model + Medici formalization + alerting)
+- **T07 Safety** — 120 lines, **WEAK** (extraction only, no design, no specialist owner)
 
-## [LEARNED] Audit cadence observation (updated)
+## [LEARNED] Audit effectiveness observation
 
-v4→v5 shows real progress — 724 lines added to T03+T06, new team provisioned, container infra built. The team was productive between audits. Audits are most valuable when specialist work happens between them.
+v5→v6 shows the most productive inter-audit period yet: 4 topics gained 1,900+ lines of quality content, a real team deployed, blocking T04 gap resolved. The team has matured from "gathering patterns" to "designing systems." Audit findings are now about coherence and gaps, not extraction completeness.
 
 ## [GOTCHA] Scratchpad path
 

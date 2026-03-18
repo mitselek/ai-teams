@@ -33,7 +33,11 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
         openssh-client \
         ca-certificates \
         gosu \
-    && rm -rf /var/lib/apt/lists/*
+        tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -snf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime \
+    && echo "Europe/Tallinn" > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata
 
 # Container user: always 'ai-teams', uid=1000
 # Ubuntu 24.04 has GID/UID 1000 = 'ubuntu' — rename it

@@ -30,4 +30,18 @@
 
 [CHECKPOINT] 2026-03-18 — R8 session closing. Phase 1 + Phase 2 both approved by team-lead. T04 grew from ~103 lines (Finn's outline) to ~640 lines. Herald coordination complete (direct link lifecycle + dispute ledger type resolved). 3 of 5 open questions resolved (#3, #5, and all 5 original questions). 3 still open (#1 multiple manager agents, #2 amendment protocol, #4 compliance audit).
 
+## Session 2026-03-18 — RFC #3 governance review
+
+[CHECKPOINT] 2026-03-18 11:02 — Analyzed apex-research RFC #3 (workflow formalization). Delivered structured governance analysis to team-lead covering Q3 (PR review authority), Q4 (TDD enforcement), Q6 (spec approval lifecycle), and meta-question (who decides this RFC).
+
+[DECISION] PR review by TL (Schliemann) is an interim exception to Row 13 — acceptable when no dedicated reviewer exists. Must be documented in common-prompt with lapse condition (exception ends when reviewer role added).
+
+[DECISION] TDD enforcement requires defense-in-depth: prompt mandate + CI gate + PR test summary + periodic Medici audit. No single layer is sufficient against quality erosion under pressure.
+
+[DECISION] Spec lifecycle: TL approves up to `approved` (Row 7, intra-team architecture). PO approves `handed-off` (Row 6 analogue, cross-team resource commitment). Consistent with R8 Q3 answer.
+
+[PATTERN] Authority uncertainty in autonomous teams — TL asks permission for decisions already within TL scope. Root cause: delegation matrix exists in T04 but not in team's common-prompt. Framework gap: need authority quick-reference per team.
+
+[WIP] Three framework recommendations pending team-lead review: (1) authority quick-reference in common-prompt, (2) "act and report" principle for TL-scope decisions, (3) distinguish advisory vs approval requests in cross-team communication.
+
 (*FR:Montesquieu*)
