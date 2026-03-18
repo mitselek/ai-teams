@@ -389,8 +389,16 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773823240385@brunel\",\"from\":\"team-lead\",\"reason\":\"R8 session complete. Write closing state to scratchpad before approving.\",\"timestamp\":\"2026-03-18T08:40:40.385Z\"}",
-    "timestamp": "2026-03-18T08:40:40.385Z",
+    "text": "[2026-03-18 11:01] PRIORITY TASK — apex-research RFC #3 review.\n\nThe apex-research team filed a help-wanted RFC: `Eesti-Raudtee/apex-migration-research#3` — \"RFC: Formalise team workflow — issues, PRs, spec lifecycle\"\n\nRead the addendum comment specifically: `gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[].body'`\n\nYOUR DOMAIN — container workdir and git isolation:\n\n**ADDENDUM — worktree/branch conflicts inside the container.** The apex team describes 5 options:\n- A) Time-slice (no parallel work)\n- B) Data files as git-ignored build artifacts\n- C) Dashboard reads data via API from canonical path\n- D) Trunk-based development for everything\n- E) Short-lived branches with auto-rebase\n\nYou built and deployed their container. You know the volume layout, the workdir, the entrypoint. Evaluate each option against the actual container architecture:\n- How does worktree isolation work inside their container (single volume, shared .git)?\n- Does option D (trunk-based) work with the container's git setup?\n- What are the practical risks of git lock contention in their environment?\n- If they go with E (short-lived branches), does the container support fast worktree creation?\n\nAlso read the full issue for context: `gh issue view 3 --repo Eesti-Raudtee/apex-migration-research`\n\nDeliver your analysis to me. Practical, grounded in what you know about their actual deployment. Deep empathy.",
+    "summary": "Assign Brunel container/workdir questions from RFC #3",
+    "timestamp": "2026-03-18T09:01:52.534Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 11:15] TASK — Fix timezone on the apex-research container.\n\nThe apex team's timestamps are off — they're not aligned with our timezone (Europe/Tallinn, EET/EEST).\n\nFix it across ALL layers:\n1. **Docker** — compose/Dockerfile timezone config (TZ env var, `/etc/localtime`, `/etc/timezone`)\n2. **OS** — container's Ubuntu timezone setting\n3. **Any other layer** — Claude Code, tmux, shell profile, entrypoint — anything that could produce timestamps\n\nThe container is at `dev@100.96.54.170`, SSH port 2222. You know the setup.\n\nWrite the specific changes needed (Dockerfile, compose, entrypoint) and report back. Don't SSH in yourself — document what needs to be changed so we can apply it.",
+    "summary": "Brunel: fix apex container timezone to EET",
+    "timestamp": "2026-03-18T09:57:48.322Z",
     "read": true
   }
 ]

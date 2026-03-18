@@ -1,8 +1,1 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773746233353@spec-reviewer-2\",\"from\":\"team-lead\",\"reason\":\"Review complete, cleaning up\",\"timestamp\":\"2026-03-17T11:17:13.353Z\"}",
-    "timestamp": "2026-03-17T11:17:13.353Z",
-    "read": true
-  }
-]
+[]

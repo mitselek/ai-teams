@@ -597,6 +597,117 @@ echo "$PROMPT"
 
 ---
 
+## Git Isolation Strategy Selection (_FR:Volta_ — R9, 2026-03-18)
+
+### Decision
+
+The isolation model for a team's git operations depends on the team's **data flow architecture**, not on team size or output volume. Two archetypes exist, each with its own canonical isolation strategy. This decision must be made at **team design time** (before the first spawn) and encoded in the team's common-prompt.
+
+| Team archetype | Data flow | Isolation model | Mechanism |
+|---|---|---|---|
+| **Independent output** | Agents produce outputs that no other agent consumes in real-time | Branch/worktree isolation | `isolation: "worktree"` at spawn; per-agent branches |
+| **Pipeline** | Each agent's output is another agent's input, consumed immediately | Directory ownership on trunk | Resource partition table in common-prompt |
+
+### Rationale
+
+The framework's prior recommendation (T02, T07) was: "use `isolation: "worktree"` when spawning parallel agents that work in the same git repo." This is correct for independent-output teams (e.g., two developers building separate features) where isolation prevents accidental conflicts with no downside.
+
+Field evidence from the apex-research team (6 sessions, 37 commits from 4 agents, zero conflicts) revealed a second archetype where worktree isolation is a **downgrade**: pipeline teams. In their architecture, agents form a sequential chain:
+
+```
+Champollion → inventory/    (extraction)
+    → Nightingale → shared/     (analysis, reads inventory/)
+        → Hammurabi → specs/    (specification, reads shared/ + inventory/)
+        → Berners-Lee → dashboard/  (visualization, reads shared/ + specs/ + inventory/)
+```
+
+Each agent reads another's output **immediately from the same checkout on trunk**. Worktree isolation would give each agent a separate working tree on a separate branch — breaking real-time visibility. The data wouldn't flow until branches were merged back to main and other agents rebased or pulled. This converts a real-time pipeline into a batch pipeline with merge ceremonies between every stage.
+
+### Independent-Output Teams: Branch/Worktree Isolation
+
+**When to use:** Agents produce outputs that no other agent needs to see in real-time. Typical for development teams where two agents build separate features, pages, or services.
+
+**Mechanism:** Spawn with `isolation: "worktree"`. Each agent gets its own working tree on its own branch. Merges happen via PR when the work is complete.
+
+**Advantages:**
+- Git-level conflict prevention (impossible to touch the same file by accident)
+- Clean PR/review workflow per agent
+- Long-running work doesn't pollute main
+
+**Lifecycle implications:**
+- Phase 6 (Spawn): worktree must be created before or during agent spawn
+- Shutdown Phase 4: worktree branches must be either merged or preserved (stale worktrees accumulate)
+- Roster should encode `isolation: "worktree"` per agent so spawning scripts handle it automatically
+
+**Reference:** T02 Section "Git Isolation — Worktrees vs Forks vs Separate Repos"; T07 "git worktree isolation for parallel agents."
+
+### Pipeline Teams: Directory Ownership on Trunk
+
+**When to use:** Agents form a data flow chain where each agent's output is another's input, consumed immediately. Typical for research/analysis teams with extraction → analysis → specification → visualization stages.
+
+**Mechanism:** All agents commit to main. Conflict prevention is achieved by a **resource partition table** — a contract specifying which directories each agent writes to. No two agents write to the same directory. All agents can read any directory.
+
+**Resource partition table format** (placed in common-prompt.md):
+
+```markdown
+## Resource Partition Table
+
+| Agent | Writes to | Reads from |
+|---|---|---|
+| Champollion | inventory/, scripts/ | source-data (read-only) |
+| Nightingale | shared/ | inventory/ |
+| Hammurabi | specs/, decisions/ | shared/, inventory/ |
+| Berners-Lee | dashboard/ | shared/, inventory/, specs/ |
+```
+
+**Advantages:**
+- Zero-latency data flow — each agent sees others' commits immediately
+- No merge ceremonies between pipeline stages
+- No worktree lifecycle overhead (creation, cleanup, stale worktree pruning)
+- Proven: 37 commits from 4 agents, zero conflicts (apex-research, session 6)
+
+**Failure mode if partition is violated:** Merge conflict on the conflicting file. This is visible and fixable — not data loss. The partition is enforced by prompt (behavioral), not by tooling (structural). Field evidence from 6 sessions shows prompt-based enforcement holds.
+
+**Lifecycle implications:**
+- Phase 6 (Spawn): no worktree creation needed. All agents share the main checkout.
+- Phase 0 (Orient): single `workDir` is sufficient — no worktree paths to track.
+- Resource partition table must be maintained in common-prompt.md. Changes to partition boundaries require team-lead approval and common-prompt update before the affected agent is (re)spawned.
+- CI build gate on trunk is recommended: `npm run build && npm run check` (or equivalent) after every push. One broken commit blocks the entire pipeline.
+
+**Reference:** apex-research RFC #3 response (Eesti-Raudtee/apex-migration-research#3).
+
+### Decision Tree: Which Isolation Model?
+
+```
+Does any agent consume another agent's output in real-time (same session, no merge step)?
+  YES → Do all agents write to non-overlapping directories?
+    YES → Pipeline: directory ownership on trunk
+    NO  → Hybrid: trunk for non-overlapping agents, worktree for overlapping ones
+  NO  → Independent output: branch/worktree isolation
+```
+
+**The hybrid case:** Some teams have both pipeline and independent agents. Example: a research pipeline (Champollion → Nightingale → Hammurabi on trunk) plus a developer agent building an unrelated service. The developer gets worktree isolation; the pipeline agents share trunk. The roster should encode isolation per agent, not per team.
+
+### When to Reconsider the Chosen Strategy
+
+**Pipeline → upgrade to worktree when:**
+1. Two agents need to write to the same directory (partition breaks down)
+2. Git lock contention becomes frequent (concurrent `git commit` hitting `index.lock`)
+3. Long-running feature work needs isolation from trunk (multi-session branches)
+
+**Worktree → simplify to trunk when:**
+1. Merge ceremonies become the bottleneck (agents waiting for merges to see each other's output)
+2. All agents' write domains are naturally non-overlapping
+3. Team velocity matters more than branch safety (early-stage research, prototyping)
+
+**The signal for each:** Pipeline teams upgrade on the first cross-directory write conflict. Worktree teams simplify when merge overhead exceeds conflict risk.
+
+### Coordination Note (T03)
+
+The resource partition table is both a **lifecycle artifact** (determines spawn-time isolation configuration) and a **communication artifact** (defines the implicit data contract between agents). T03 (Communication) may formalize the protocol aspects — message format for partition changes, notification when an agent's read dependency is updated. The lifecycle concern here is narrower: which isolation model to select and when to switch.
+
+---
+
 ## Cross-Session Handover (_FR:Volta_)
 
 ### Decision

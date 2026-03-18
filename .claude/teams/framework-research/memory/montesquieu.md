@@ -44,4 +44,26 @@
 
 [WIP] Three framework recommendations pending team-lead review: (1) authority quick-reference in common-prompt, (2) "act and report" principle for TL-scope decisions, (3) distinguish advisory vs approval requests in cross-team communication.
 
+## Session 2026-03-18 — T07 Safety & Guardrails rewrite
+
+[CHECKPOINT] 2026-03-18 12:10 — T07 rewritten from 121 lines (simple list + Finn patterns) to ~530 lines of designed framework. Read inputs: T04, T05, T08, T02, both reference team-lead prompts, both reference common-prompts, apex-research common-prompt, RFC #3 ratified decisions.
+
+[DECISION] Permission architecture: 4 tiers (T0 absolute, T1 human, T2 team-lead, T3 specialist) determined by 3 dimensions (reversibility, blast radius, external visibility). Each tier has specified enforcement mechanisms.
+
+[DECISION] Enforcement stack: 5 layers (E0 prompt, E1 peer, E2 CI gate, E3 review, E4 audit) with compensating relationships. No single layer is sufficient — design for defense in depth.
+
+[DECISION] Blast radius containment via 5 mechanisms: directory ownership, tool restrictions, branch isolation, container isolation, credential scoping. First two are behavioral; last three are structural.
+
+[DECISION] Authority quick-reference template for common-prompts — every team should have a "Decision Authority" section listing what TL can decide vs what needs PO.
+
+[DECISION] Quality preservation defense-in-depth: 6 layers (prompt mandate, delegation message, CI gate, PR test summary, code review, periodic audit). Missing-tests-for-new-features gap only caught by review + audit.
+
+[PATTERN] Drift taxonomy: 5 types (scope, quality, authority, process, communication). Each has different detection and prevention mechanisms. Communication drift is hardest to detect — silent teams are indistinguishable from crashed teams without heartbeat.
+
+[PATTERN] Circuit breakers are semi-automatic — they halt work but don't autonomously fix. Build-broken and test-failing are absolute; others require team-lead/PO judgment.
+
+[CHECKPOINT] 2026-03-18 12:29 — Finn's evidence integrated. T07 now 662 lines. Added: Evidence Base (12 incidents), gap mapping table, $5K MCP incident citation, Finn taxonomy cross-reference, Schliemann pipeline argument, warning ratchet.
+
+[GOTCHA] Naming mismatch: registered as `monte` but Finn sent to `montesquieu`. Messages landed in separate inbox file (`montesquieu.json` vs `monte.json`). Missed coordination — found only when team-lead asked. Safety concern for the framework: agent identity inconsistency causes missed messages.
+
 (*FR:Montesquieu*)

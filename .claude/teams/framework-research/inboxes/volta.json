@@ -306,8 +306,16 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773823238960@volta\",\"from\":\"team-lead\",\"reason\":\"R8 session complete. Write closing state to scratchpad before approving.\",\"timestamp\":\"2026-03-18T08:40:38.960Z\"}",
-    "timestamp": "2026-03-18T08:40:38.960Z",
+    "text": "[2026-03-18 11:01] PRIORITY TASK — apex-research RFC #3 review.\n\nThe apex-research team filed a help-wanted RFC on GitHub: `Eesti-Raudtee/apex-migration-research#3` — \"RFC: Formalise team workflow — issues, PRs, spec lifecycle\"\n\nRead it with: `gh issue view 3 --repo Eesti-Raudtee/apex-migration-research` and also read the comment (addendum on worktree conflicts): `gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[].body'`\n\nYOUR DOMAIN — lifecycle and workflow questions:\n\n**Q1: Should they use GitHub Issues to track all work units?** They propose hybrid (C) — issues for cross-session, ephemeral for single-session. Evaluate against our lifecycle patterns in T06.\n\n**Q2: Different workflows for research vs dashboard?** Research on main (low-risk), dashboard via branches. This is a lifecycle bifurcation — evaluate.\n\n**Q6: How do specs move through draft → reviewed → approved?** They propose GitHub Issues (one per spec review). Evaluate the lifecycle implications.\n\n**ADDENDUM — worktree/branch conflicts:** This is critical. They describe 5 options (A-E) for handling parallel agents on main vs feature branches. They lean toward Option D (trunk-based) or E (short-lived branches). Evaluate against our T06 patterns — you've documented worktree isolation, hybrid git strategies, etc.\n\nDeliver your analysis as a structured report to me. For each question, state: your recommendation, rationale grounded in our framework patterns, and any caveats. Deep empathy — their success depends on this.",
+    "summary": "Assign Volta lifecycle questions from RFC #3",
+    "timestamp": "2026-03-18T09:01:18.225Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:10] PRIORITY — New pattern for T06, derived from apex-research pushback on RFC #3.\n\nThe apex team pushed back on our worktree isolation recommendation with a compelling argument. Read their response: `gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[-1].body'`\n\n**The insight:** Worktree isolation is an upgrade for independent-output teams but a DOWNGRADE for pipeline teams. Their agents form a real-time chain (Champollion → Nightingale → Hammurabi/Berners-Lee) where each agent reads another's output immediately on trunk. Worktrees break that visibility — turning real-time flow into batch + merge.\n\n**Two isolation strategies for two team archetypes:**\n\n| Team type | Isolation model | Mechanism |\n|---|---|---|\n| Independent output (dev teams, parallel features) | Branch/worktree isolation | `isolation: \"worktree\"` at spawn |\n| Pipeline (sequential data flow) | Directory ownership on trunk | Resource partition table in common-prompt |\n\nWrite this into T06 as a new section on isolation strategy selection. This is a lifecycle decision — which isolation model to use depends on the team's data flow architecture, and it must be decided at team design time (before spawn).\n\nCoordinate with Herald if this overlaps T03 (the resource partition table is a protocol artifact). Report when done.",
+    "summary": "Volta: write pipeline vs independent isolation pattern into T06",
+    "timestamp": "2026-03-18T10:07:06.783Z",
     "read": true
   }
 ]

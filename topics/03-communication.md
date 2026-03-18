@@ -619,6 +619,179 @@ The comms-dev team does **not** build: the protocols themselves (defined here), 
 
 ---
 
+### Protocol 5: Resource Partition Table (*FR:Herald*)
+
+#### Purpose
+
+Define how agents within a single team can share a trunk (main branch) with zero coordination overhead by partitioning the repository into non-overlapping write domains. This protocol is the **pipeline team** counterpart to Branch Reservation (T02, Protocol R1), which serves **independent-output teams**.
+
+#### The Two Isolation Strategies
+
+Teams that share a repository face a fundamental choice: how do agents avoid conflicting writes? The answer depends on the team's data flow architecture.
+
+```
+Independent-Output Team          Pipeline Team
+
+  Agent A ──→ feature/A            Agent A ──→ inventory/
+  Agent B ──→ feature/B                ↓
+  Agent C ──→ feature/C            Agent B ──→ shared/
+                                       ↓
+  Each agent's output is           Agent C ──→ dashboard/
+  independent. No agent reads
+  another agent's work-in-         Each agent reads the previous
+  progress. Isolation by           agent's output. Isolation by
+  BRANCH (worktree).               DIRECTORY (partition table).
+```
+
+| Strategy | Mechanism | Best for | Conflict prevention | Visibility cost |
+|---|---|---|---|---|
+| **Branch isolation** (T02 R1) | Each agent works on a separate branch in a worktree | Independent-output teams (two devs building separate features) | Structural — branches cannot conflict | High — agents cannot see each other's output until merge |
+| **Directory partition** (this protocol) | All agents share trunk, each writes to exclusive directories | Pipeline teams (sequential data flow, each agent consumes prior agent's output) | Convention-enforced — partition table in prompt | Zero — agents see all changes immediately via `git pull` / shared checkout |
+
+**Critical insight from apex-research (RFC #3):** Worktree isolation is an upgrade for independent-output teams and a **downgrade for pipeline teams**. When Agent B's input is Agent A's output, isolating them on separate branches means Agent B cannot see Agent A's latest work without a merge step. The isolation that prevents conflicts also prevents data flow.
+
+#### When to Use Each Strategy
+
+```
+Does every agent's output flow into another agent's input?
+  │
+  ├─ YES (pipeline) ──→ Directory Partition (this protocol)
+  │                      Trunk-based development. CI build gate.
+  │
+  └─ NO (independent) ──→ Branch Reservation (T02 R1)
+                           Worktree isolation. PR merge cycle.
+```
+
+Mixed teams (some agents pipeline, some independent) use a hybrid: pipeline agents share trunk with a partition table; independent agents get worktrees. The partition table defines who is on trunk and who is on a branch.
+
+#### The Resource Partition Table
+
+The partition table is the protocol artifact. It is a mandatory section in the team's common-prompt (or equivalent team config) that declares, for each agent, which directories they may write to and which they read from.
+
+##### Format
+
+```markdown
+| Agent | Writes to | Reads from | Notes |
+|-------|-----------|------------|-------|
+| <name> | <dir1>, <dir2> | <dir1>, <dir2> | <constraints> |
+```
+
+##### Rules
+
+1. **No write overlap.** No two agents may have the same directory in their "Writes to" column. This is the invariant that prevents conflicts.
+2. **Read is unrestricted.** Any agent may read any directory. The "Reads from" column documents data dependencies, not access control.
+3. **Shared files have a single writer.** If a JSON file (e.g., `shared/clusters.json`) is read by multiple agents, exactly one agent owns writes to it. Other agents may read it but never modify it.
+4. **Team-lead writes only to memory.** Consistent with the reference team pattern (team-lead is read-only during implementation). Team-lead's write scope is `memory/` and team config files.
+5. **New directories require table update.** When an agent needs to create a new output directory, the team-lead updates the partition table before work begins.
+
+##### Example: apex-research
+
+```markdown
+| Agent | Writes to | Reads from | Notes |
+|-------|-----------|------------|-------|
+| Champollion | inventory/, scripts/ | source-data (read-only) | Raw extraction from APEX SQL |
+| Nightingale | shared/ | inventory/ | Analysis, overlap, clustering |
+| Berners-Lee | dashboard/ | shared/, inventory/, specs/ | SvelteKit dashboard |
+| Hammurabi | specs/, decisions/ | shared/, inventory/ | Cluster migration specs |
+| Schliemann | memory/, dashboard/data/agents.json | specs/ (review only) | Coordination, agent status |
+```
+
+Evidence: 6 sessions, 80+ commits, 4 agents interleaving on main with zero conflicts. The partition held without structural enforcement.
+
+##### Example: hr-devs (contrast — branch isolation team)
+
+hr-devs agents build separate features for the same SvelteKit app. Sven and Dag both write to `src/` — their output is independent, not pipelined. Directory partition would not work because their write domains overlap. They use branch isolation (worktrees) and merge locks (T02 R1) instead.
+
+#### Why This Works: Three Structural Properties
+
+The partition table alone is necessary but not sufficient. Zero-conflict trunk development also requires:
+
+**1. Unidirectional data flow (no circular dependencies)**
+
+```
+A → B → C    (pipeline — safe)
+A ↔ B        (bidirectional — unsafe, agents may overwrite each other's input)
+```
+
+If Agent B writes to a directory that Agent A reads *and* Agent A writes to a directory that Agent B reads, you have a cycle. Cycles on trunk create ordering hazards — the order of commits matters, which means agents need real-time coordination. Pipeline teams must have a DAG (directed acyclic graph) of data dependencies, not a cycle.
+
+**2. Append-mostly output pattern**
+
+Agents that create new files (e.g., `inventory/f101/overview.md`) rarely conflict even within the same directory. Agents that frequently update existing shared files (e.g., two agents appending to `CHANGELOG.md`) will conflict. The partition table handles the write-domain separation, but append-mostly behavior provides a second layer of safety within a single agent's domain.
+
+**3. Small, frequent commits**
+
+Trunk-based development with multiple agents requires frequent commits and pulls. An agent that accumulates 500 lines of uncommitted changes before committing creates a larger conflict surface than one that commits after each logical unit. The commit cadence is: **commit after each completed task, not at the end of the session.**
+
+#### Enforcement: Prompt-Level vs Platform-Level
+
+| Enforcement | Mechanism | Strength | Cost |
+|---|---|---|---|
+| **Prompt-level** (v1) | Partition table in common-prompt. Agents honor it by instruction. | Sufficient for teams with consistent agent behavior. | Zero infrastructure. |
+| **CI-level** (v2) | Pre-commit or push hook that checks `git diff --name-only` against the partition table for the committing agent. | Catches violations before they reach trunk. | Requires knowing which agent is committing (agent identity in commit metadata). |
+| **Platform-level** (v3) | File system permissions or container volume mounts that physically restrict write access per agent. | Structural — cannot be violated. | High complexity. Requires per-agent containers or user accounts. |
+
+**Recommendation:** Start with prompt-level enforcement. The apex-research evidence (6 sessions, zero violations) shows that well-prompted agents respect directory boundaries. Add CI-level enforcement when the team exceeds 5 agents or when a violation occurs.
+
+#### Failure Modes
+
+| Failure | Detection | Recovery |
+|---|---|---|
+| Agent writes to another agent's directory | `git log --name-only` audit shows cross-boundary writes | Team-lead identifies violation, reverts or reassigns the file. Update partition table if the boundary was wrong. |
+| Two agents update the same shared JSON file | Merge conflict on commit | Assign single-writer ownership for that file. Add to partition table Notes column. |
+| Circular data dependency emerges | Agent A blocks on Agent B's output while Agent B blocks on Agent A's | Refactor data flow to break the cycle. Introduce an intermediate shared file with a single writer. |
+| Agent needs a new output directory not in the table | Agent creates directory without updating table | Team-lead updates table. Low risk — new directories don't conflict with existing ones. |
+| Partition table becomes stale (agents' actual write patterns drift from table) | Periodic audit: `git log --name-only --author=<agent>` vs table | Team-lead reconciles table with reality. This is a health audit item (Medici's domain). |
+
+#### Scaling Analysis
+
+| Teams | Agents on trunk | Viable? | Notes |
+|---|---|---|---|
+| 1 team, 4 agents | 4 | Yes — proven by apex-research | Single partition table in common-prompt |
+| 1 team, 8 agents | 8 | Yes with care | More directories = more partitions. Risk: finer-grained partitions make the table harder to maintain. |
+| 2 teams, same repo | 8-16 | Hybrid recommended | Pipeline agents within each team share trunk via partition; inter-team isolation via branch/worktree (T02 R1). Each team's partition table covers its own agents. |
+| 10+ teams, same repo | Not recommended | — | At this scale, repo splitting (T02 Option C) or per-team repos with API contracts is more appropriate. |
+
+#### Integration with Other Protocols
+
+| Protocol | Integration |
+|---|---|
+| T02 R1 (Branch Reservation) | Complementary — R1 for independent-output teams, Protocol 5 for pipeline teams. Mixed teams use both: partitioned trunk for pipeline agents, worktrees for independent agents. |
+| T02 R3 (Migration Queue) | Partition table does not cover database migrations. If pipeline agents need schema changes, they still use the migration queue. |
+| T03 Protocol 1 (Handoff) | Partition-based teams rarely need inter-agent handoffs within the team — the data flow IS the handoff. When Agent A commits to `inventory/`, Agent B sees it on next pull. No explicit handoff message needed. |
+| T03 Protocol 3 (Broadcast) | Schema changes to shared data files (the fragile point) should be announced via team-internal broadcast or direct message. See Data Contract Protocol below. |
+| T06 (Lifecycle) | Volta should reference this protocol when writing isolation strategy selection: team archetype (pipeline vs independent) determines isolation mechanism (partition vs worktree). |
+
+#### Data Contract Protocol (sub-protocol) (*FR:Herald*)
+
+The fragile point in a partitioned trunk is **shared data files** — JSON or TypeScript interfaces that one agent writes and multiple agents read. When the writer changes the schema, readers break silently.
+
+##### Contract Location
+
+A `types/` or `contracts/` directory at the repo root. Contains TypeScript interfaces (or JSON schemas) that define the shape of shared data files. This directory has **shared read, coordinated write** — any change to it requires team-lead awareness.
+
+##### Schema Change Flow
+
+```
+1. Writer agent (e.g., Nightingale) needs to change shared data schema
+2. Writer updates the contract file in types/ (interface change)
+3. Writer messages team-lead: "Schema change: <field> added/removed/modified in <Interface>"
+4. Team-lead evaluates impact on reader agents
+5. If readers are affected:
+   ├─ Team-lead notifies affected agents with the schema diff
+   └─ Affected agents update their code to match the new contract
+6. Writer commits the data in the new format
+7. Reader agents commit their updated code
+```
+
+**Ordering matters:** The contract file is updated *before* the data changes. This ensures readers can detect the mismatch (runtime validation against the contract) rather than silently consuming malformed data.
+
+##### Contrast with api-contracts.md Pattern
+
+The reference teams (rc-team, hr-devs) use a shared `api-contracts.md` file where Sven (frontend) and Dag (backend) document agreed API shapes. The data contract protocol is the same principle applied to data pipeline teams: the contract defines the interface between pipeline stages, not between frontend and backend.
+
+---
+
 ### Open Questions (*FR:Herald*)
 
 #### Resolved by this design
@@ -626,6 +799,8 @@ The comms-dev team does **not** build: the protocols themselves (defined here), 
 - ~~How does a project team request a review from the QA team?~~ --> Handoff Protocol (Protocol 1), type: `review`
 - ~~How does a human PO broadcast a priority change to all teams?~~ --> Broadcast Governance (Protocol 3), category: `freeze` or `incident`
 - ~~Message format — structured (JSON) or natural language?~~ --> Hybrid: natural language body with structured metadata header (markdown fields, not JSON)
+- ~~Sync vs async communication — when is each appropriate?~~ --> Pipeline teams use sync (shared trunk, immediate visibility via Protocol 5). Independent-output teams use async (branch isolation, PR/merge cycle via T02 R1). Team archetype determines the communication mode.
+- ~~How do teams avoid duplicate work?~~ --> Resource Partition Table (Protocol 5) for intra-team: explicit directory ownership prevents overlap. Handoff Protocol (Protocol 1) for inter-team: manager agent tracks active work via handoff ledger.
 
 #### Still open
 

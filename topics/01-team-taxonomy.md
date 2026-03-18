@@ -54,11 +54,38 @@ Three team archetypes exist, defined by the relationship between their primary o
 **Structural patterns:**
 - **Data pipeline ownership** replaces topic file ownership: Champollion → `inventory/`, Nightingale → `shared/`, Berners-Lee → `dashboard/`, Hammurabi → `specs/`
 - **Strict directory boundaries** prevent hybrid teams from devolving into pure-dev teams — each agent has a MAY WRITE list that excludes other agents' directories
-- **Worktree isolation** for dev agents: Berners-Lee works on `dashboard-dev` branch in a worktree while research agents work on `main`
+- **Trunk-based development** — all agents commit to `main` because hybrid teams are pipeline teams (dev agents consume research agents' output files). Branch isolation breaks the data flow. Directory ownership is the isolation mechanism, not branches. (See "Data Flow Architecture" section below.)
 - **Dual output formats:** Markdown (human-readable) + JSON (machine-consumable) from analysis agents
 - Dev agents consume research agents' output via files, not via messaging
 
 **When to use:** Reverse-engineering, migration analysis, any domain where you need both understanding (research) and visibility (tooling). The research is the primary value; the tooling makes the research navigable.
+
+### Data Flow Architecture (*FR:Celes*)
+
+Orthogonal to archetype (research/development/hybrid), every team has a **data flow architecture** that determines its isolation model. This is a design-time decision made during team creation — it constrains how agents can be spawned and how they share work.
+
+| Data flow | Agent relationship | Isolation model | Git strategy |
+|---|---|---|---|
+| **Pipeline** | Sequential — each agent's input is another agent's output | Directory ownership on trunk | All agents commit to `main`; directories prevent conflicts |
+| **Independent-output** | Parallel — agents produce separate outputs with no inter-agent data dependency | Branch/worktree isolation | Each agent on own branch; PRs to `main` |
+
+**Pipeline teams** have a data dependency chain: `Source → Researcher → Analyst → Developer → Spec Writer`. Each stage reads the previous stage's output directory. If agents work on separate branches, the downstream agent's branch goes stale the moment an upstream agent commits — leading to merge conflicts, data drift, and rebase pain that compounds with every commit.
+
+**Independent-output teams** have agents working on unrelated deliverables. Frontend and backend developers in a dev team don't read each other's output files. Branch isolation prevents accidental interference without data flow consequences.
+
+**Evidence from apex-research (RFC #3, ADR-004):** The team was originally designed with worktree isolation for Berners-Lee (dashboard on `dashboard-dev` branch while researchers commit to `main`). In practice, 37 commits across 4 agents interleaved on `main` with zero conflicts — because directory ownership was sufficient. The worktree model was formally rejected: dashboard reads `shared/*.json` (Nightingale's output) and `inventory/*.json` (Champollion's output) at build time, so a separate branch goes stale immediately.
+
+**Design-time rule:** When sculpting a team, determine the data flow architecture first. If any agent reads another agent's output files, the team is a pipeline — use directory ownership on trunk, not branch isolation. The `isolation: "worktree"` spawn option is only appropriate for independent-output agents within the same team.
+
+| Archetype | Typical data flow | Why |
+|---|---|---|
+| Research | Independent-output | Each agent owns a topic file; no inter-agent data dependency |
+| Development | Independent-output | Frontend/backend/QA produce separate artifacts; integration via APIs, not files |
+| Hybrid | Pipeline | Research agents feed analysis data to dev agents and spec writers |
+
+**Caveat:** This is the typical pattern, not a hard rule. A development team with a shared `types/` contract directory has a pipeline element — contract changes must be coordinated. apex-research solved this with "PRs required only for `types/` contract changes" while keeping everything else on trunk.
+
+---
 
 ### Team Boundary Definition
 
@@ -340,8 +367,8 @@ Every team's common-prompt has a **fixed skeleton** (mandatory sections present 
 | **TDD mandate** | Not present | Present (detailed Red→Green→Refactor) | Present (for code-writing agents) |
 | **Tech stack** | Not present | Present (SvelteKit, TypeScript, etc.) | Present (Python + SvelteKit) |
 | **Spawn order** | Not specified | Named configurations ("full", "lite") | Explicit data-dependency order |
-| **Worktree isolation** | Not needed | Not needed (single-team, single-branch) | Present (dev agent on separate branch) |
-| **Git workflow** | Team-lead commits | Agents own branches, PRs to develop | Mixed (researchers on main, dev on worktree branch) |
+| **Isolation model** | Not needed | Branch/worktree (independent-output agents) | Directory ownership on trunk (pipeline data flow) |
+| **Git workflow** | Team-lead commits | Agents own branches, PRs to develop | All agents on trunk; PRs only for shared contract changes (`types/`) |
 | **External data rules** | N/A | N/A | READ-ONLY enforcement for source data |
 | **Quality audit** | Internal (Medici is a team member) | Internal (Medici or Marcus) | Remote (cross-team Medici) |
 

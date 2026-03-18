@@ -1,5 +1,19 @@
 # Herald Scratchpad
 
+## 2026-03-18 (session R9)
+
+[DECISION] Protocol 5: Resource Partition Table added to T03. Two isolation strategies: Branch Reservation (T02 R1) for independent-output teams, Directory Partition (Protocol 5) for pipeline teams. Selection criteria: does every agent's output flow into another agent's input? Yes = partition, No = branch.
+
+[PATTERN] apex-research proved directory partition at scale: 6 sessions, 80+ commits, 4 agents, zero conflicts. Three structural properties: (1) strict directory ownership, (2) unidirectional data flow (DAG, no cycles), (3) append-mostly output. Worktree isolation is a downgrade for pipeline teams — it blocks data flow.
+
+[DECISION] Data Contract sub-protocol added to Protocol 5. Shared data files (JSON schemas / TypeScript interfaces) are the fragile point in partitioned trunk. Contract file in types/ updated BEFORE data changes. Schema change notification via team-lead. Analogous to reference team api-contracts.md pattern.
+
+[DECISION] RFC #3 analysis: recommended trunk-based + CI build gate over PRs for apex-research dashboard. PRs create Protocol 1 handoff overhead (20 handoffs/session). Exception: PRs for data contract changes only.
+
+[DECISION] Two original T03 open questions resolved: "sync vs async" (pipeline=sync via Protocol 5, independent=async via T02 R1) and "duplicate work" (partition table for intra-team, handoff ledger for inter-team).
+
+[PATTERN] Enforcement progression for partition tables: prompt-level (v1, zero cost, sufficient for <5 agents) → CI-level (v2, pre-commit hook checks git diff against table) → platform-level (v3, filesystem permissions, high complexity). Start with v1 always.
+
 ## 2026-03-17 (session R8)
 
 [DECISION] T03 open question #6 resolved: Direct Link Lifecycle Protocol added to Protocol 2. Five review triggers (time-based, inactivity, scope change, incident, on-demand). Registry extended with Last active, Review due, Last review columns. Authority split with T04: Herald owns protocol mechanics, Montesquieu owns authority model (delegation matrix Rows 27-28).

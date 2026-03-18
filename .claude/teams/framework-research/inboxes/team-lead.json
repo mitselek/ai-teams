@@ -1,23 +1,9 @@
 [
   {
-    "from": "spec-reviewer-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"spec-reviewer-2\",\"timestamp\":\"2026-03-17T09:08:36.593Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T09:08:36.593Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-17 11:44] Brunel — apex-research container implementation complete. Ready for review.\n\n## Files Created (all in `apex-migration-research/`)\n\n### 1. `Dockerfile.apex` (55 lines)\nExtends `ai-teams-claude:latest` with:\n- **Python 3** (`python3`, `python3-venv`, `python3-pip`) — extraction scripts\n- **OpenSSH server** — key-based only, root login disabled, password auth disabled, PAM disabled\n- **`michelek` user** — separate from `ai-teams`, has a login shell for PO inspection via SSH\n- Exposes ports 22 (SSH) and 5173 (dashboard)\n\n### 2. `entrypoint-apex.sh` (183 lines, 9 steps)\nIdempotent. Safe to restart.\n\n| Step | Action | Gate |\n|------|--------|------|\n| 1 | Fix volume ownership (`~/.claude`, workspace) | — |\n| 2 | Validate `GITHUB_TOKEN` | Hard: exits if missing |\n| 3 | Clone/pull `apex-migration-research` (read-write) | Clone on first run, pull on restart |\n| 4 | Clone/pull `vjs_apex_apps` + **lock to root:root read-only** | chmod a-w,a+rX after clone/pull |\n| 5 | Symlink `/home/ai-teams/vjs_apex_apps` -> `source-data` | Preserves `../vjs_apex_apps/` paths |\n| 6 | Create Python venv + `pip install -e \".[dev]\"` | First run only; skips if venv exists |\n| 7 | Install SSH public key + start sshd | Skips if `SSH_PUBLIC_KEY` not set |\n| 8 | Runtime validation (Python 3.11+, Node 20+, claude, repos) | Hard gates + soft warn for source-data |\n| 9 | `exec gosu ai-teams \"$@\"` | Drop privileges |\n\n**Key design: source-data read-only enforcement.** Docker `:ro` flag prevents even root from writing, which blocks the initial clone. Instead, the volume is mounted read-write but the entrypoint locks it down via `chown root:root` + `chmod a-w,a+rX` after each clone/pull. The `ai-teams` user cannot write, but root (entrypoint) can temporarily unlock for git pull on restart.\n\n### 3. `docker-compose.yml` (70 lines)\nSingle service, 3 named volumes:\n\n| Volume | Mount | Notes |\n|--------|-------|-------|\n| `apex-claude-home` | `/home/ai-teams/.claude` | Claude state |\n| `apex-research-repo` | `/home/ai-teams/workspace` | Research repo (RW) |\n| `apex-source-data` | `/home/ai-teams/source-data` | vjs_apex_apps (RO via filesystem) |\n\nPorts: `${SSH_PORT:-2222}:22`, `${DASHBOARD_PORT:-5173}:5173`\nNo broker, no comms volume (per PO decision).\n\n### 4. `.env.example` (25 lines)\nDocuments all env vars: `GITHUB_TOKEN`, `ANTHROPIC_API_KEY`, `SSH_PUBLIC_KEY`, plus optional overrides for URLs, ports, team name.\n\n### 5. `.dockerignore` (18 lines)\nExcludes repo content from build context — only `entrypoint-apex.sh` needs to be sent to Docker. Everything else is cloned at runtime from GitHub.\n\n## Deployment Steps (for RC server)\n\n```bash\n# On dev@100.96.54.170:\ngit clone https://github.com/Eesti-Raudtee/apex-migration-research.git\ncd apex-migration-research\n\n# Must have ai-teams-claude:latest built first (from mitselek/ai-teams repo)\n# If not available on RC server, build it there or push to a registry\n\ncp .env.example .env\n# Edit .env: set GITHUB_TOKEN, ANTHROPIC_API_KEY, SSH_PUBLIC_KEY\n\ndocker compose build\ndocker compose up -d\ndocker compose exec apex-research bash\n# Inside: claude launches as ai-teams user, repos cloned, venv ready\n```\n\n## Dependency: Base Image\n\n`Dockerfile.apex` does `FROM ai-teams-claude:latest`. This image must be available on the build host. Two options:\n1. Clone `mitselek/ai-teams` on the RC server and build there first\n2. Push `ai-teams-claude:latest` to a container registry (GitHub Container Registry suggested)\n\nThis is a blocking dependency for the first build. Subsequent builds use Docker cache.\n\n## Open Item\n\nThe `michelek` user can SSH in and inspect the container, but cannot see workspace content by default (different user). Should `michelek` be added to the `ai-teams` group for read access? Or should workspace be world-readable? Current state: `michelek` can `ls` but can't read files owned by `ai-teams` (depends on umask). I recommend adding `michelek` to group `ai-teams` in the Dockerfile — one line: `usermod -aG ai-teams michelek`.",
     "summary": "Container implementation complete, 5 files",
     "timestamp": "2026-03-17T09:44:57.533Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T09:45:00.762Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T09:45:00.762Z",
     "color": "orange",
     "read": true
   },
@@ -30,39 +16,11 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T09:47:02.260Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T09:47:02.260Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-17 11:48] Brunel — Dockerfile updated with all three security changes. Applied to `apex-migration-research/Dockerfile.apex`.\n\n## Changes Made\n\n1. **`michelek` in `ai-teams` group:** `usermod -aG ai-teams michelek` — gives read access to workspace files via group permissions.\n\n2. **`michelek` has passwordless sudo:** `echo 'michelek ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/michelek` with 440 permissions. `sudo` package added to the SSH server install layer.\n\n3. **Root password locked:** `passwd -l root` — root account has no usable password. Entrypoint still runs as root (Docker default) but drops to ai-teams via gosu. No login path to root exists.\n\n## Cold-Start Deployment Steps (full sequence for RC server)\n\n```bash\n# ── 1. Prerequisites ──────────────────────────────────────────────────────────\n# SSH into RC server\nssh dev@100.96.54.170\n\n# Verify Docker is available\ndocker --version\ndocker compose version\n\n# ── 2. Build base image (ai-teams-claude:latest) ─────────────────────────────\n# This image is the foundation — must be built first.\ngit clone https://github.com/mitselek/ai-teams.git /opt/ai-teams\ncd /opt/ai-teams\ndocker build -t ai-teams-claude:latest .\n# Verify: docker images | grep ai-teams-claude\n\n# ── 3. Clone and build apex-research ─────────────────────────────────────────\ngit clone https://github.com/Eesti-Raudtee/apex-migration-research.git /opt/apex-research\ncd /opt/apex-research\n\n# ── 4. Configure environment ─────────────────────────────────────────────────\ncp .env.example .env\n# Edit .env — set these three required values:\n#   GITHUB_TOKEN=ghp_...       (needs read access to Eesti-Raudtee org)\n#   ANTHROPIC_API_KEY=sk-ant-...\n#   SSH_PUBLIC_KEY=\"ssh-ed25519 AAAA... michelek\"\n\n# ── 5. Build and start ──────────────────────────────────────────────────────\ndocker compose build\ndocker compose up -d\n\n# ── 6. Verify ────────────────────────────────────────────────────────────────\n# Check container is running\ndocker compose ps\n\n# Check entrypoint logs (repos cloned, venv created, validation passed)\ndocker compose logs apex-research\n\n# SSH in as PO\nssh -p 2222 michelek@100.96.54.170\n\n# Attach to Claude session\ndocker compose exec apex-research bash\n# Inside: claude --version, python3 --version, ls workspace/, ls source-data/\n```\n\n### Subsequent starts (warm)\n```bash\ncd /opt/apex-research\ndocker compose up -d\n# Entrypoint pulls latest from both repos, skips venv (already exists)\n```\n\n### Full reset\n```bash\ndocker compose down -v   # removes containers AND volumes\ndocker compose build     # rebuild image\ndocker compose up -d     # fresh clone of both repos\n```",
     "summary": "Security updates applied + cold-start docs",
     "timestamp": "2026-03-17T09:48:22.597Z",
     "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T09:48:31.374Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T09:48:31.374Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "spec-reviewer",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773746232991@spec-reviewer\",\"from\":\"spec-reviewer\",\"timestamp\":\"2026-03-17T11:17:18.872Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-17T11:17:18.872Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "spec-reviewer-2",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773746233353@spec-reviewer-2\",\"from\":\"spec-reviewer-2\",\"timestamp\":\"2026-03-17T11:17:25.993Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-17T11:17:25.993Z",
-    "color": "cyan",
     "read": true
   },
   {
@@ -75,23 +33,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T11:26:31.033Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:26:31.033Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-17 13:29] Aen, Montesquieu prompt written and roster entry ready.\n\n## Delivered\n\n**Prompt file:** `.claude/teams/framework-research/prompts/montesquieu.md` (written to repo)\n\n## Roster Entry (for you to add to roster.json)\n\n```json\n{\n  \"name\": \"montesquieu\",\n  \"agentType\": \"general-purpose\",\n  \"model\": \"claude-opus-4-6\",\n  \"color\": \"white\",\n  \"prompt\": \"prompts/montesquieu.md\",\n  \"lore\": {\n    \"fullName\": \"Charles de Montesquieu\",\n    \"origin\": \"French political philosopher (1689-1755), author of The Spirit of the Laws. Designed the separation of powers doctrine — legislative, executive, judicial — transforming governance from 'who is in charge?' to 'who is in charge of what?'\",\n    \"significance\": \"A governance architect who designs the authority structure for multi-team AI agent frameworks: delegation matrices, manager agent boundaries, conflict resolution, and the checks that prevent authority drift at scale.\"\n  }\n}\n```\n\n**Color: white** — the only unused color on the roster. Current allocation: finn=black, medici=magenta, celes=cyan, volta=blue, herald=green, brunel=yellow.\n\n## Key Design Decisions in the Prompt\n\n**1. Coordination boundary with Herald.** This was the most important design choice. Herald owns T03 (communication — *how messages flow*) and has already written protocols that assume a manager agent as router. Montesquieu owns T04 (governance — *who decides*). I defined an explicit boundary table and the same handshake protocol used by Volta/Brunel. The boundary: Montesquieu defines authority, Herald defines message routing. Neither edits the other's topic file directly.\n\n**2. Precedent-driven, not theory-driven.** The personality emphasizes studying *de facto* governance (how decisions were actually made in reference teams) over *de jure* governance (how they were supposed to be made). This is critical because the reference teams have implicit governance patterns scattered across MEMORY.md, common-prompts, and scratchpads that were never codified. Montesquieu's first job is to extract those patterns before designing new ones.\n\n**3. \"Skeptical of hierarchy for its own sake.\"** I deliberately included this personality trait. The risk with a governance architect is over-designing: adding a manager agent layer, approval chains, and audit processes that create overhead without value. Montesquieu should add governance only when the cost of not having it exceeds the coordination cost. At 2 teams, PO-as-coordinator may still be optimal.\n\n**4. Boundary-first design principle.** \"Defines what each level may NOT do before defining what it may do.\" This mirrors the pattern in team-lead prompts (FORBIDDEN before ALLOWED) and produces clearer authority boundaries. Restrictions are easier to enforce than permissions.\n\n**5. Six core deliverables** mapped directly to the T04 questions from my assessment: delegation matrix, manager agent design, cross-team audit authority, conflict resolution, team creation governance, authority abuse prevention.\n\n**6. Key Inputs section.** I listed the specific evidence sources Montesquieu should mine: reference team configs, workspace MEMORY.md (which contains accumulated de facto governance rules), Herald's protocols (which assume governance structure), and T07 safety (which has permission categories that map to authority levels). This prevents the \"where do I start?\" problem.\n\n## What I Did NOT Include\n\n- **No section ownership conflict with existing agents.** Montesquieu is the sole owner of T04. No other agent writes to that file. Clean.\n- **No coordination with Volta/Brunel.** Governance and lifecycle are orthogonal. If there's a governance implication for startup (e.g., \"manager agent must be spawned before team-leads\"), Montesquieu proposes to team-lead, who coordinates with Volta.\n- **No manager agent prompt.** Montesquieu *designs* the manager agent role — he doesn't *be* the manager agent. When the design is approved, I (Celes) write the manager agent prompt. Clean role separation.\n\nReady for you to add the roster entry.\n\n(*FR:Celes*)",
     "summary": "Montesquieu prompt written, roster entry ready for review",
     "timestamp": "2026-03-17T11:30:04.587Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T11:30:33.143Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:30:33.143Z",
     "color": "blue",
     "read": true
   },
@@ -104,31 +48,10 @@
     "read": true
   },
   {
-    "from": "montesquieu",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"montesquieu\",\"timestamp\":\"2026-03-17T11:38:43.156Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:38:43.156Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "montesquieu",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"montesquieu\",\"timestamp\":\"2026-03-17T11:39:05.206Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:39:05.206Z",
-    "color": "red",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-17 13:40] Brunel — apex-research container is LIVE on RC server.\n\n## Status: All Green\n\n```\nContainer: apex-research  |  Up  |  apex-research-claude:latest\nPID 1: bash (as ai-teams, uid=1000)\nsshd: listening on port 2222\n```\n\n### Runtime Validation (all gates passed)\n```\n  OK: Python 3.12\n  OK: Node.js v22\n  OK: claude available (v2.1.77)\n  OK: apex-migration-research repo\n  OK: vjs_apex_apps source data\n  source-data locked to read-only for ai-teams\n```\n\n### Read-Only Enforcement Verified\n```\nai-teams$ touch /home/ai-teams/source-data/test\ntouch: cannot touch '/home/ai-teams/source-data/test': Permission denied\n```\n\n## Issues Hit and Resolved During Deployment\n\n| Issue | Root Cause | Fix |\n|-------|-----------|-----|\n| Docker containers can't reach internet | WARP tunnel doesn't NAT Docker bridge traffic | `network_mode: host` in compose + `--network=host` for build |\n| `apt-get update` fails in child image | Base image's GitHub CLI apt source has stale GPG key | Remove `github-cli.list` before apt-get update |\n| Node.js v18 (too old for Claude Code) | Ubuntu 24.04 apt ships Node.js 18 | Download Node.js 22 binary from nodejs.org into /usr/local |\n| curl SSL verification fails | WARP TLS interception with self-signed CA | `curl --insecure` for build-time downloads only |\n| Node.js .tar.xz extraction fails | No `xz` utility in base image | Use `.tar.gz` instead |\n| SSH port 22 conflict | `network_mode: host` shares host network; host sshd on 22 | Container sshd on port 2222 |\n\n## SSH Access\n- **Port:** 2222\n- **User:** michelek\n- **Key:** installed (PO's ed25519 key from host authorized_keys)\n- **Sudo:** passwordless for michelek\n- **Root password:** locked\n- **Connect:** `ssh -p 2222 michelek@100.96.54.170`\n\nSSH tested from local — authentication requires PO's private key (different from `dev` user's key on the host). This is correct: container SSH is for PO access, not RC server internal access.\n\n## Missing: ANTHROPIC_API_KEY\nThe `.env` file has an empty `ANTHROPIC_API_KEY`. Claude Code won't start without it. PO needs to add the key:\n```bash\nssh dev@100.96.54.170\nnano ~/github/apex-migration-research/.env\n# Add: ANTHROPIC_API_KEY=sk-ant-...\ndocker compose -f ~/github/apex-migration-research/docker-compose.yml restart\n```\n\n## Files Modified (local, not yet committed)\nAll in `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research/`:\n- `Dockerfile.apex` — final version with all fixes\n- `entrypoint-apex.sh` — 9-step idempotent entrypoint\n- `docker-compose.yml` — network_mode: host, 3 volumes\n- `.env.example` — template with all variables\n- `.dockerignore` — minimal build context\n\nThese need to be committed and pushed so the repo is the source of truth. The RC server currently has the files via SCP — a git pull after push will keep it in sync.",
     "summary": "Container LIVE on RC, all gates green",
     "timestamp": "2026-03-17T11:40:52.965Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T11:40:58.077Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:40:58.077Z",
     "color": "orange",
     "read": true
   },
@@ -141,31 +64,10 @@
     "read": true
   },
   {
-    "from": "montesquieu",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"montesquieu\",\"timestamp\":\"2026-03-17T11:48:12.314Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] T04/T03 coordination: direct link lifecycle + escalation routing\"}",
-    "timestamp": "2026-03-17T11:48:12.315Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-17T11:48:14.360Z\",\"idleReason\":\"available\",\"summary\":\"[to montesquieu] T03/T04 coordination: direct link lifecycle protocol + escalation confirmation\"}",
-    "timestamp": "2026-03-17T11:48:14.360Z",
-    "color": "purple",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-17 13:49] Brunel — SSH auth fixed. PO can connect.\n\n## Root Cause\n\nsshd debug log showed: **`User michelek not allowed because account is locked`**\n\n`useradd` creates accounts with a locked password (`!` in `/etc/shadow`). With `UsePAM no` in sshd_config, OpenSSH rejects locked accounts entirely — even for pubkey auth. The key never gets checked.\n\n## Fix\n\n```bash\nusermod -p '*' michelek\n```\n\nSets the password field to `*` (no password) instead of `!` (locked). This allows pubkey auth while having no usable password. Password login is still impossible because `PasswordAuthentication no` is set.\n\n## Applied\n\n1. **Running container** — fixed live via `docker exec` + `usermod -p '*' michelek`\n2. **Dockerfile.apex** — added `usermod -p '*' michelek` to the useradd RUN block (line 65), copied to RC server\n3. **Scratchpad** — gotcha documented\n\n## Verified\n\n```\n$ ssh -p 2222 michelek@100.96.54.170\n=== whoami === michelek\n=== sudo === root\n=== workspace === CLAUDE.md, Dockerfile.apex, README.md, ...\n=== source-data === build.gradle, f101, f108, ...\n=== node === v22.14.0\n=== python === Python 3.12.3\n=== claude === 2.1.77 (Claude Code)\n```\n\nPO has full SSH access with passwordless sudo. Container is operational.",
     "summary": "SSH fixed — locked account was root cause",
     "timestamp": "2026-03-17T11:49:41.861Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T11:49:47.252Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:49:47.252Z",
     "color": "orange",
     "read": true
   },
@@ -178,31 +80,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-17T11:51:03.883Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T11:51:03.883Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "montesquieu",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"montesquieu\",\"timestamp\":\"2026-03-17T11:51:08.942Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Accepted both items: direct link lifecycle + dispute ledger type\"}",
-    "timestamp": "2026-03-17T11:51:08.942Z",
-    "color": "red",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-17 14:01] Brunel — done. Container restarted, hostname shows `apex-research`.\n\nHad to `git stash` first — the SCP'd files from earlier conflicted with the pushed changes. Stash can be dropped (`git stash drop` on RC server).",
     "summary": "Hostname fix applied and verified",
     "timestamp": "2026-03-17T12:01:35.964Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:01:38.912Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:01:38.912Z",
     "color": "orange",
     "read": true
   },
@@ -216,23 +97,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:06:36.788Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:06:36.788Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 14:07] Brunel — done. `.env` updated with apex key only, container restarted.\n\n```\n[entrypoint] 1 SSH public key(s) installed for michelek.\nauthorized_keys: ssh-ed25519 AAAAC3...iBp/ mihkel.putrinsh@evr.ee apex-research\n```\n\nPO can test: `ssh -i ~/.ssh/id_ed25519_apex -p 2222 michelek@100.96.54.170`\n\nI don't have the apex private key locally so I can't verify the connection end-to-end — needs PO to test.",
     "summary": "Apex key set, restart done, needs PO test",
     "timestamp": "2026-03-17T12:07:40.032Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:07:43.536Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:07:43.536Z",
     "color": "orange",
     "read": true
   },
@@ -241,13 +108,6 @@
     "text": "[2026-03-17 14:09] Phase 2 draft complete. `topics/04-hierarchy-governance.md` expanded — Manager Agent Design Notes section replaced with comprehensive role definition + two new sections.\n\n## What was done\n\nExpanded T04 from ~475 lines to ~640 lines. Three major additions:\n\n### 1. Manager Agent — Role Definition (expanded from Design Notes)\n\n- **Design principle:** Information broker, not bottleneck. Switchboard operator, not general.\n- **6 core responsibilities** formalized with matrix row references: inter-team routing, direct link registry, broadcast governance, conflict resolution, cross-team audit routing, team health monitoring.\n- **Authority boundary tables** — three tables replacing prose: autonomous decisions (8 types), always-escalate-to-PO (11 types), never-in-scope/belongs-to-L2 (6 types).\n- **Tool restrictions** — full FORBIDDEN/ALLOWED pattern matching team-lead format. Explicit bans on: editing other teams' memory dirs, reading source code, holding handoffs >1 message cycle.\n- **Persistent state design** — 5 files the manager agent maintains (handoff ledger, direct link registry, team status, scratchpad, policy index). Context budget rule: read from disk, don't hold in context.\n- **Richelieu cross-reference** — 11-row assessment table. All elements confirmed. 3 minor prompt updates recommended (Celes's responsibility):\n  1. Add \"observational, not directive\" to health monitoring\n  2. Add missing tool restrictions (other teams' memory dirs, source code, routing SLA)\n  3. Replace inline decision matrix with reference to T04\n\n### 2. PO-to-Manager-Agent Handoff Protocol (new section)\n\nThree-phase handoff: Preparation → Announcement → Active. Key design:\n- Atomic transition — explicit broadcast, mandatory ACK from all team-leads\n- \"What changes\" / \"What does NOT change\" comparison tables\n- Clean rollback: PO resumes L1 immediately if manager agent underperforms\n\n### 3. Emergency Authority Protocol (resolves open question #3)\n\nFour escalation levels for PO unavailability:\n1. PO present → normal matrix\n2. PO unavailable + manager agent → elevated triage authority (blocking priority conflicts only)\n3. PO unavailable + no manager agent → designated senior team-lead as cross-team router (no escalation authority)\n4. Blocking production incident → defensive actions only (rollback, disable, halt)\n\nKey constraints: time-bounded (1 session max), scope-limited (exhaustive list), mandatory post-hoc PO review. Emergency Decision Log format defined.\n\n## Open questions status\n\n- #3 (emergency authority): **Resolved**\n- #5 (direct link lifecycle): **Resolved** (Phase 1, with Herald)\n- #1 (multiple manager agents): Still open\n- #2 (governance amendment protocol): Still open\n- #4 (governance compliance audit): Still open\n\n## No Herald coordination needed\n\nPhase 2 doesn't change any T03 protocols. The manager agent role definition uses Herald's existing topology and protocols as-is.\n\n## Ready for\n\n- Your review of Phase 2 draft\n- Direction on Phase 3 (cross-team audit authority deepening) or any other priority",
     "summary": "Phase 2 complete: manager agent role, handoff protocol, emergency authority",
     "timestamp": "2026-03-17T12:09:42.044Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "montesquieu",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"montesquieu\",\"timestamp\":\"2026-03-17T12:09:46.153Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:09:46.153Z",
     "color": "red",
     "read": true
   },
@@ -261,23 +121,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:10:07.783Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:10:07.783Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 14:18] Brunel — WARP TLS interception fixed. Claude Code can now reach api.anthropic.com.\n\n**Solution:**\n1. Bind-mount host's WARP CA cert (`/usr/local/share/ca-certificates/managed-warp.pem`) into container at `/opt/warp-ca.pem:ro`\n2. Set `NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem` in compose environment — Node.js (Claude Code) trusts WARP proxy\n3. Entrypoint copies cert to `/usr/local/share/ca-certificates/` and runs `update-ca-certificates` — system tools (curl, pip, git) also trust WARP\n\n**Gotcha found during implementation:** Mounting cert at `/etc/ssl/certs/warp-ca.pem` conflicts with `update-ca-certificates` which tries to create a symlink at the same path. Moved to `/opt/warp-ca.pem`.\n\n**Verified:**\n```\nNode.js: fetch(\"https://api.anthropic.com\") → 404 (OK, reachable)\ncurl:    curl -sI https://api.anthropic.com  → HTTP/2 404 (OK, reachable)\n```\n\nContainer is stable, all gates green, SSH working, WARP TLS trusted. Ready for `ANTHROPIC_API_KEY` to be set in `.env` for Claude Code to start.",
     "summary": "WARP TLS fixed, Claude Code can reach Anthropic",
     "timestamp": "2026-03-17T12:19:09.796Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:19:15.939Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:19:15.939Z",
     "color": "orange",
     "read": true
   },
@@ -290,24 +136,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:19:41.246Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:19:41.246Z",
-    "color": "orange",
-    "read": true
-  },
-  {
     "from": "celes",
     "text": "[2026-03-17 14:25] Aen, here's the complete updated comms-dev roster with both fixes.\n\n## Team-Lead Persona: Marconi\n\n**Guglielmo Marconi** (1874-1937) — the engineer who built the first practical long-distance wireless communication system. Marconi didn't invent radio waves (Hertz did) or the theory behind them (Maxwell did). He built the *relay system* that made wireless communication work across the Atlantic — coordinating antenna design, transmitter engineering, and a chain of relay stations. He was a system integrator and coordinator, not a theorist.\n\n**Why Marconi over alternatives:**\n\n- **Chappe** (optical telegraph) — closer metaphor to a relay chain, but obscure and the technology was superseded. Marconi's system won.\n- **Turing** — too broad, and Turing was an implementer/solver, not a coordinator.\n- **Shannon** — information theory, not systems building. Shannon defined *what* could be communicated; Marconi built *how*.\n\nMarconi fits the team's naming pattern (cryptography/communications pioneers) and the coordinator role (system integration across Vigenere's crypto, Babbage's transport, Kerckhoffs' validation, Lovelace's frontend).\n\n## Updated roster.json\n\n```json\n{\n  \"name\": \"comms-dev\",\n  \"description\": \"Development team building a secure encrypted relay for inter-team agent communication. WSS transport, WebAuthn authentication, Cloudflare Workers + Durable Objects.\",\n  \"commonPromptFile\": \"common-prompt.md\",\n  \"workDir\": \"$HOME/Documents/github/mitselek/ai-teams\",\n  \"members\": [\n    {\n      \"name\": \"team-lead\",\n      \"agentType\": \"team-lead\",\n      \"model\": \"claude-opus-4-6\",\n      \"prompt\": \"prompts/team-lead.md\",\n      \"lore\": {\n        \"fullName\": \"Guglielmo Marconi\",\n        \"nickname\": \"Marconi\",\n        \"origin\": \"Italian engineer (1874-1937) who built the first practical long-distance wireless communication system. Did not invent radio — integrated antenna design, transmitter engineering, and relay stations into a working transatlantic system. A coordinator and system integrator, not a theorist.\",\n        \"significance\": \"A team coordinator who connects the pieces — crypto (Vigenere), transport (Babbage), validation (Kerckhoffs), frontend (Lovelace) — into a working relay system. Owns architecture decisions and the boundary between components, not the components themselves.\"\n      }\n    },\n    {\n      \"name\": \"vigenere\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"red\",\n      \"prompt\": \"prompts/vigenere.md\",\n      \"lore\": {\n        \"fullName\": \"Blaise de Vigenere\",\n        \"origin\": \"French diplomat and cryptographer (1523-1596), inventor of the polyalphabetic Vigenere cipher — unbroken for three centuries\",\n        \"significance\": \"A cryptography engineer who ensures messages are private by design, not by hope\"\n      }\n    },\n    {\n      \"name\": \"babbage\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"blue\",\n      \"prompt\": \"prompts/babbage.md\",\n      \"lore\": {\n        \"fullName\": \"Charles Babbage\",\n        \"origin\": \"English mathematician and engineer (1791-1871), designer of the Analytical Engine and the man who cracked the Vigenere cipher\",\n        \"significance\": \"A backend engineer who turns protocol specs into running systems — and knows the gap between design and implementation is where bugs live\"\n      }\n    },\n    {\n      \"name\": \"kerckhoffs\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"green\",\n      \"prompt\": \"prompts/kerckhoffs.md\",\n      \"lore\": {\n        \"fullName\": \"Auguste Kerckhoffs\",\n        \"origin\": \"Dutch linguist and cryptographer (1835-1903), author of Kerckhoffs' principle — a system must be secure even if everything except the key is public\",\n        \"significance\": \"A QA and security engineer who assumes the attacker knows everything and validates the system still holds\"\n      }\n    },\n    {\n      \"name\": \"lovelace\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"magenta\",\n      \"prompt\": \"prompts/lovelace.md\",\n      \"lore\": {\n        \"fullName\": \"Ada Lovelace\",\n        \"origin\": \"English mathematician (1815-1852) who wrote the first computer algorithm for Babbage's Analytical Engine. First to understand that computation needs a human interface layer.\",\n        \"significance\": \"A frontend engineer who builds the interface that makes the relay machinery usable by humans — SvelteKit, WebAuthn, reactive WebSocket state.\"\n      }\n    }\n  ]\n}\n```\n\n## Changes from Current Roster\n\n| Change | Detail |\n|--------|--------|\n| Team-lead lore block | Added: Marconi persona with fullName, nickname, origin, significance |\n| Team-lead prompt path | Unchanged (`prompts/team-lead.md`) — you'll rename to `prompts/marconi.md` if desired |\n| Lovelace added | New member entry: sonnet, magenta, `prompts/lovelace.md` |\n| Lovelace color | **magenta** — available colors after existing allocation (red=vigenere, blue=babbage, green=kerckhoffs) |\n| Description updated | Reflects current mission: WSS + WebAuthn + CF Workers + DO (was: \"encrypted chat system\") |\n\n## Notes\n\n- **Prompt rename** is your call. If you want the prompt file renamed from `team-lead.md` to `marconi.md` (matching the pattern in framework-research where `team-lead.md` became `team-lead-aeneas.md`), I can update the roster entry's `prompt` field. Let me know.\n- **Common-prompt.md** should be updated to include Lovelace in the members list: currently says \"team-lead, vigenere, babbage, kerckhoffs\" — needs \"+ lovelace (frontend engineer)\".\n- **Lovelace model tier: sonnet.** Her prompt is implementation-focused SvelteKit work — same tier as Babbage and Kerckhoffs. No judgment-heavy design work that would justify opus.\n\n(*FR:Celes*)",
     "summary": "Updated comms-dev roster: Marconi TL persona + Lovelace added",
     "timestamp": "2026-03-17T12:26:10.826Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T12:26:16.357Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:26:16.359Z",
     "color": "blue",
     "read": true
   },
@@ -321,23 +153,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:28:38.882Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:28:38.882Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 14:31] Brunel — Claude auth configured in container.\n\n**Finding:** The RC server doesn't have `ANTHROPIC_API_KEY` — it uses OAuth credentials stored in `~/.claude/.credentials.json`. This is how Claude Code authenticates via `claude login` (Max subscription, OAuth tokens).\n\n**What I did:**\n1. Copied `~/.claude/.credentials.json` from host into container's `~/.claude/` volume\n2. Set ownership to `ai-teams:ai-teams` with mode 600\n3. Verified `claude --version` works as ai-teams user\n\n**Persistence:** The file lives in the `apex-claude-home` named volume, so it survives container restarts. It does NOT survive `docker compose down -v` (volume wipe) — would need to be re-copied.\n\n**Note:** The `ANTHROPIC_API_KEY` line in `.env` can stay empty — Claude Code will use the OAuth credentials file instead. If PO wants API key auth in the future, they can set it in `.env` and it will take precedence.\n\nPO can now SSH in and run `claude`.",
     "summary": "Claude OAuth credentials copied into container",
     "timestamp": "2026-03-17T12:31:30.405Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:31:34.841Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:31:34.841Z",
     "color": "orange",
     "read": true
   },
@@ -350,24 +168,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:32:07.859Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:32:07.859Z",
-    "color": "orange",
-    "read": true
-  },
-  {
     "from": "celes",
     "text": "[2026-03-17 14:32] Aen, T01 draft is ready for review.\n\n**File:** `topics/01-team-taxonomy.md` — expanded from 83 lines to 450 lines.\n\n## What's New (5 sections added)\n\n**1. Team Archetypes** — Three archetypes defined from evidence: Research (framework-research), Development (cloudflare-builders, hr-devs, comms-dev), Hybrid (apex-research). Each has structural patterns, when-to-use guidance, and a team boundary definition table (repo, domain, mission lifecycle, output type).\n\n**2. Agent Role Taxonomy** — Six canonical roles that recur across all teams: Coordinator, Researcher, Analyst, Developer, Spec Writer, Design Specialist. Each has an invariant (what never changes about the role), a model tier pattern, and observed subtypes. Includes a role composition table showing typical counts per archetype.\n\n**3. Model Tiering Patterns** — The decision rule: model tier is driven by **consequence of error**, not task complexity. Opus when errors have no automated quality gate (governance design, specs, crypto decisions). Sonnet when tests/linters catch errors. Includes cost pattern per archetype: research ~75% opus, dev ~25% opus, hybrid ~40%.\n\n**4. Team Sizing Patterns** — Evidence from all 5 teams. Sizing formula: `1 coordinator + ceil(scope/bandwidth) + support roles`. Sweet spot 5-7, practical ceiling 12. Growth and shrinkage strategies with trigger signals.\n\n**5. Common-Prompt Patterns** — Fixed skeleton (9 sections present in ALL teams) vs variable sections by archetype. Includes the observation that the Estonian mandatory reporting sentence appears verbatim in every common-prompt — it's the PO's voice.\n\n**Bonus: Multi-Agent Membership** — Resolved the \"can an agent belong to multiple teams?\" question: No, but roles can be replicated (Medici pattern, Finn pattern).\n\n## What I Preserved\n\nFinn's R6 reference team analysis is intact at the bottom. I did not edit or remove it — the new sections are all above, with `(*FR:Celes*)` attribution.\n\n## Open Questions Resolved\n\n5 of the original 5 open questions are now answered with evidence. 4 new open questions added (function teams, temporary team lifecycle, evolution patterns, spawn config at scale).\n\nReady for your review.\n\n(*FR:Celes*)",
     "summary": "T01 Team Taxonomy expanded from 83 to 450 lines, ready for review",
     "timestamp": "2026-03-17T12:33:06.246Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-17T12:33:10.016Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:33:10.016Z",
     "color": "blue",
     "read": true
   },
@@ -380,24 +184,10 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-17T12:33:28.612Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:33:28.612Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-03-17 14:33] Herald — T05 draft ready for review. File: `topics/05-identity-credentials.md` (76 → 481 lines).\n\n**Structure:**\n\n- Finn's reference patterns preserved unchanged (lines 1-76)\n- New: 5 sections of protocol design (lines 79-481)\n\n**Sections written:**\n\n1. **Agent Authentication Across Teams** — 4-layer auth model (container isolation → TLS-PSK → HMAC signing → attribution). v1: container + PSK sufficient for 2-10 teams. v2: per-team signing keys for 10+.\n\n2. **Credential Passing in Containers** — Docker secrets + `_FILE` convention. Per-team env files for non-sensitive config. Concrete example from apex-research deployment (GitHub PAT needs two different repo scopes). MCP server credential isolation identified as a gap.\n\n3. **Cross-Team Identity Verification** — Trust model diagram. Hub-routed messages get dual signature (sender + manager attestation). Direct-link messages get single signature. Non-containerized fallback to Claude Code process model.\n\n4. **Secrets Management** — Full secrets inventory (current state), target per-team secret directory structure, per-team credential scoping rules by team type (research/dev/QA/infra), credential lifecycle (creation/rotation/revocation), credential escalation protocol (hard rule: no self-escalation).\n\n5. **Audit Trail Design** — Per-team tokens provide API-provider-level audit. Where not possible (Jira/Figma org-wide tokens), container logging + behavioral restriction.\n\n**All 5 original open questions resolved.** 5 new ones raised: Jira per-team scoping limitation, secret bootstrap automation, dashboard auth, signing key compromise recovery, MCP server credential isolation.\n\n**Cross-references:** T03 Protocol 4 (transport auth), T04 delegation matrix (credential escalation authority), T07 (permission categories), T02 (rate limit partitioning).\n\nScratchpad updated. Standing by.",
     "summary": "T05 draft ready: 5 sections, 481 lines, all original Qs resolved",
     "timestamp": "2026-03-17T12:33:33.797Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-17T12:33:38.222Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:33:38.222Z",
     "color": "purple",
     "read": true
   },
@@ -411,23 +201,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:35:43.529Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:35:43.529Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 14:39] Brunel — done. All compose env vars persisted to ai-teams .bashrc.\n\n**Running container** — exports added:\n```\nexport NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem\nexport CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1\nexport GITHUB_TOKEN=gho_...\nexport TEAM_NAME=apex-research\n```\n\n**entrypoint-apex.sh** — Step 9 rewritten: uses `sed -i` to replace (not append duplicates) + associative array of vars. On every start, current compose env values are written to .bashrc. Updated file copied to RC server.\n\nANTHROPIC_API_KEY intentionally omitted from .bashrc — it's empty in compose env (auth is via OAuth credentials file).",
     "summary": "All compose env vars persisted to .bashrc",
     "timestamp": "2026-03-17T12:39:34.520Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:39:41.544Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:39:41.544Z",
     "color": "orange",
     "read": true
   },
@@ -441,23 +217,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:42:42.343Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:42:42.343Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 14:43] Brunel — done. Settings updated to match PO reference.\n\n**Applied to running container + entrypoint:**\n- `defaultMode: \"bypassPermissions\"`\n- `includeCoAuthoredBy: false`\n- Bash allows: `git *`, `gh *`, `python*`, `pip *`, `npm *`, `node *`\n- Core tools: Edit, Write, Read, Glob, Grep\n- Agent teams env var\n- No plugins, no MCP, no Windows paths",
     "summary": "Settings updated to match PO reference",
     "timestamp": "2026-03-17T12:43:32.517Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:43:35.525Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:43:35.525Z",
     "color": "orange",
     "read": true
   },
@@ -471,23 +233,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:44:48.170Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:44:48.170Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 14:46] Brunel — deployment runbook written.\n\n**File:** `.claude/teams/framework-research/docs/container-deployment-runbook.md`\n\n**Contents — 11 sections:**\n\n| § | Topic | Key Fix |\n|---|-------|---------|\n| 1 | Docker DNS on WARP hosts | `daemon.json` with external DNS or `network_mode: host` |\n| 2 | WARP TLS interception | CA bind-mount to `/opt/`, `NODE_EXTRA_CA_CERTS`, `update-ca-certificates` |\n| 3 | Env vars not reaching shells | `sed`+`echo` to `.bashrc` in entrypoint |\n| 4 | Locked account blocks SSH | `usermod -p '*'` instead of `!` |\n| 5 | Hostname resolution | `/etc/hosts` entry in entrypoint |\n| 6 | Node.js too old | Direct binary install with `curl --insecure` |\n| 7 | Stale GitHub CLI apt source | Remove `.list` and keyring before `apt-get update` |\n| 8 | OAuth vs API key | Copy `.credentials.json` into volume |\n| 9 | Autonomous team settings | `bypassPermissions` + `includeCoAuthoredBy: false` |\n| 10 | SSH port conflict | sshd on 2222 with `network_mode: host` |\n| 11 | Read-only source volume | Filesystem permissions (chown root + chmod a-w) |\n\nPlus pre-flight checks and full entrypoint step ordering reference.\n\nEach section has: symptom, cause, fix (with code), and verify command. Designed as a reusable checklist for comms-dev, migration teams, or any new containerized team on a WARP host.",
     "summary": "Deployment runbook written — 11 sections",
     "timestamp": "2026-03-17T12:47:13.687Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T12:47:18.251Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T12:47:18.251Z",
     "color": "orange",
     "read": true
   },
@@ -501,23 +249,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T13:25:46.146Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T13:25:46.146Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 16:37] Brunel — Jira MCP server installed and configured in container.\n\n**Running container:**\n1. Copied `dev-toolkit/jira-mcp-server/` to `/opt/jira-mcp-server/`\n2. Ran `npm install` — postinstall built `dist/index.js`\n3. Created `/home/ai-teams/.claude/mcp.json` with Jira server config, including `NODE_EXTRA_CA_CERTS` for WARP\n\n**Entrypoint updated:**\n- Step 6b: On first run, sparse-clones `jira-mcp-server/` from dev-toolkit repo into `/opt/`, runs `npm install` (which triggers `tsc` build via postinstall). Skips if `dist/index.js` already exists.\n- Step 9d: Creates `mcp.json` with Jira server config if not already present. Credentials are injected from compose env vars (not hardcoded in entrypoint — `MCP_EOF` without quotes enables variable expansion).\n\n**Persistence:**\n- `mcp.json` is in the `~/.claude/` named volume — survives restarts\n- `/opt/jira-mcp-server/` is on container filesystem — rebuilt on image rebuild, provisioned by entrypoint on first start\n\n**Read-only enforcement:** The `settings.json` deny list blocks `jira_create_issue`, `jira_delete_issue`, `jira_update_issue`, `jira_transition`. The team can use `jira_get_issue`, `jira_search`, `jira_link_parent`.\n\nClaude needs restart to pick up `mcp.json`. The team can do `claude` exit + re-enter, or PO can restart the container.",
     "summary": "Jira MCP server installed + mcp.json configured",
     "timestamp": "2026-03-17T14:37:27.505Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T14:37:31.634Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T14:37:31.634Z",
     "color": "orange",
     "read": true
   },
@@ -531,23 +265,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T14:37:52.185Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T14:37:52.185Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-17 16:38] Brunel — already done. Check my 16:37 message.\n\nThe Jira MCP server is installed and configured in the running container:\n- `/opt/jira-mcp-server/dist/index.js` — built and ready\n- `/home/ai-teams/.claude/mcp.json` — configured with Atlassian creds + `NODE_EXTRA_CA_CERTS` for WARP\n- Entrypoint updated with Step 6b (sparse-clone + build) and Step 9d (mcp.json creation)\n- `settings.json` deny list blocks Jira write tools\n\nClaude needs restart inside the container to pick up `mcp.json`.",
     "summary": "Already done — MCP server live, see 16:37 msg",
     "timestamp": "2026-03-17T14:38:17.100Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T14:38:20.733Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T14:38:20.733Z",
     "color": "orange",
     "read": true
   },
@@ -561,23 +281,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-17T14:41:33.403Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-17T14:41:33.403Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-18 09:35] Brunel — all four fixes applied to running container + Dockerfile + entrypoint.\n\n**1. Native Claude Code install**\n- Installed as ai-teams via `curl --insecure ... | bash` — now at `~/.local/bin/claude` (v2.1.78)\n- Dockerfile: `gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash'`\n- `.bashrc`: `export PATH=\"$HOME/.local/bin:$PATH\"` added\n\n**2. tmux**\n- Added to apt install layer in Dockerfile\n- Installed in running container\n\n**3. ai-teams account unlock**\n- `usermod -p '*' ai-teams` in Dockerfile (same as michelek)\n- Applied to running container\n\n**4. ai-teams SSH authorized_keys**\n- Entrypoint Step 7 rewritten: installs SSH_PUBLIC_KEY* keys for BOTH michelek and ai-teams\n- Dockerfile: `.ssh` dir created with correct permissions\n- Running container: keys copied from michelek's authorized_keys\n\nPO can now SSH as ai-teams too: `ssh -p 2222 ai-teams@100.96.54.170`\n\nAll files copied to RC server. Image rebuild needed for Dockerfile changes to persist (`docker compose build && docker compose down && docker compose up -d`).",
     "summary": "Native Claude + tmux + ai-teams SSH/unlock done",
     "timestamp": "2026-03-18T07:36:03.786Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T07:36:08.844Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-18T07:36:08.844Z",
     "color": "orange",
     "read": true
   },
@@ -591,23 +297,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T07:43:15.426Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-18T07:43:15.426Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-18 09:43] Brunel — done. `CLAUDE_ENV_ID=\"APEX-R\"` in running container, entrypoint, and RC server.",
     "summary": "ENV_ID fixed to APEX-R",
     "timestamp": "2026-03-18T07:43:57.524Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T07:44:01.187Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-18T07:44:01.187Z",
     "color": "orange",
     "read": true
   },
@@ -621,13 +313,6 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T07:44:20.718Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-18T07:44:20.718Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-18 09:48] Brunel — done. UTF-8 locale fixed.\n\n- Running container: `locales` installed, `en_US.UTF-8` generated, `LANG` + `LC_ALL` in `.bashrc`\n- Dockerfile: `locales` in apt layer + `locale-gen`\n- Entrypoint: `LANG` + `LC_ALL` in SHELL_VARS\n- Files copied to RC server",
     "summary": "UTF-8 locale fixed for Claude prompt",
     "timestamp": "2026-03-18T07:48:30.684Z",
@@ -636,23 +321,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T07:48:36.117Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-18T07:48:36.118Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-18 10:36] Brunel — done. tmux UTF-8 rendering fixed.\n\n**Running container:**\n- `.tmux.conf` created for both ai-teams and michelek (256color, utf8, mouse, 50k history)\n- `.bashrc` auto-attach updated to `tmux -u attach` / `tmux -u new`\n- `alias tmux=\"tmux -u\"` added\n\n**Entrypoint:** Step 9a2 creates `.tmux.conf` on every start (container filesystem, doesn't survive rebuild without entrypoint).\n\n**PO action needed:** Exit current tmux session and reconnect via SSH — the new `-u` flag and `.tmux.conf` will take effect on the new session. Existing tmux sessions keep the old settings.",
     "summary": "tmux UTF-8 + 256color configured",
     "timestamp": "2026-03-18T08:36:58.543Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T08:37:02.506Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-18T08:37:02.506Z",
     "color": "orange",
     "read": true
   },
@@ -673,32 +344,11 @@
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773823237483@finn\",\"from\":\"finn\",\"timestamp\":\"2026-03-18T08:41:06.696Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-18T08:41:06.696Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-03-18 10:40] Herald closing — R8 session summary.\n\n- [LEARNED] T05 identity architecture connects deeply to T03 transport (TLS-PSK) and T04 governance (credential escalation authority). The three topics form a coherent triad: T03 defines how messages travel, T05 defines who is trusted to send them, T04 defines who authorizes the trust.\n- [DEFERRED] T05 open question #5 — MCP server credential isolation (`_FILE` convention). Needs coordination with Brunel on container architecture for MCP server instances.\n- [WARNING] `~/.claude/mcp.json` contains a plaintext Jira API token. This should be addressed before multi-team deployment.",
     "summary": "Herald R8 closing: LEARNED, DEFERRED, WARNING",
     "timestamp": "2026-03-18T08:41:07.831Z",
     "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773823239727@herald\",\"from\":\"herald\",\"timestamp\":\"2026-03-18T08:41:11.980Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-18T08:41:11.980Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "montesquieu",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773823241394@montesquieu\",\"from\":\"montesquieu\",\"timestamp\":\"2026-03-18T08:41:12.390Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-18T08:41:12.390Z",
-    "color": "red",
     "read": true
   },
   {
@@ -726,24 +376,303 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773823240385@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T08:41:22.531Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-18T08:41:22.531Z",
-    "color": "orange",
+    "from": "herald",
+    "text": "[2026-03-18 10:57] Herald reporting in.\n\nScratchpad loaded — 6 decisions, 5 patterns, 2 gotchas from R8 carry forward. T03 communication protocols (1-4) are mature. T05 identity & credentials deepened last session.\n\n**Session context acknowledged:** apex-research team will file \"help wanted\" issues on GitHub regarding workflows, working directory issues, TDD patterns, and new hires. My domain covers the workflow/communication protocol questions. I've reviewed:\n\n- `topics/03-communication.md` — all 4 protocols, open questions\n- My scratchpad — prior decisions on handoff, topology, broadcast, transport, identity\n- Common prompt — team standards\n\n**Ready for:**\n1. Responding to apex-research workflow questions when they arrive (handoff protocols, coordination patterns, communication topology for autonomous containerized teams)\n2. Any pending T03 or T05 open questions\n3. New protocol design tasks\n\nStanding by for assignment.",
+    "summary": "Herald intro — ready for apex-research workflow support",
+    "timestamp": "2026-03-18T08:58:01.706Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-18T08:58:04.458Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T08:58:04.458Z",
+    "color": "purple",
     "read": true
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773823238208@celes\",\"from\":\"celes\",\"timestamp\":\"2026-03-18T08:41:23.260Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-18T08:41:23.260Z",
+    "text": "[2026-03-18 10:57] Celes online. Scratchpad loaded — 16 hires cumulative, all domain knowledge current.\n\nReady for the apex-research support mission. I've reviewed:\n- My scratchpad (R8 session state, deferred items)\n- Roster (8 FR members, all present)\n- T01 Team Taxonomy (archetypes, role taxonomy — my prior work)\n- Common prompt standards\n\n**Standing deferred items from last session:**\n1. Comms-dev common-prompt needs Lovelace added to members list\n2. Comms-dev TL prompt rename (team-lead.md → marconi.md) — pending your decision\n3. Four specialist gaps remain: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer\n\n**Prepared for today:** When apex-research files \"help wanted\" issues on GitHub — especially new hire / agent design requests — I'm ready to intake, sculpt roles, and draft prompts. Their hybrid archetype has specific patterns (directory boundaries, worktree isolation, dual output formats) that I documented in T01. I can work from those patterns.\n\nAwaiting tasks.",
+    "summary": "Celes online, ready for apex-research support",
+    "timestamp": "2026-03-18T08:58:07.381Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-18T08:58:10.661Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T08:58:10.661Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-18 10:57] Finn online. Scratchpad loaded, all 8 topic files indexed, apex-research design spec and container deployment runbook reviewed.\n\n**Session context understood:** apex-research team will file \"help wanted\" issues on GitHub covering workflows, working directory issues, TDD patterns, and new hires/agent design. Our job is to respond with deep, empathetic guidance.\n\n**Preparation status:**\n- Topic files T01-T08 all populated with patterns from both reference teams\n- Apex-research team design spec read (5 agents: Schliemann, Champollion, Nightingale, Berners-Lee, Hammurabi)\n- Container deployment runbook read (11 sections, Brunel's work)\n- Key context: apex-research is a HYBRID team (research + dev), running autonomously in a container on the RC server, first day output was 80 commits / 202K+ lines\n\n**Areas I'm ready to research on demand:**\n1. **Workflows** — T06 lifecycle (Volta's 7-phase startup), T04 hierarchy/governance (Monte's delegation matrix), both reference team common-prompts\n2. **Working directory issues** — T02 resource isolation (worktree patterns, git isolation options), container volume architecture\n3. **TDD patterns** — reference team quality gates, pre-commit checks, coding standards from dev-toolkit\n4. **New hires / agent design** — T01 taxonomy (Celes's 3 archetypes), roster patterns from both reference teams, naming research (role vs persona)\n\nStanding by for specific research requests when the help-wanted issues arrive.",
+    "summary": "Finn online, prepared for apex-research support",
+    "timestamp": "2026-03-18T08:58:23.494Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-18T08:58:27.819Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T08:58:27.819Z",
     "color": "blue",
     "read": true
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773823238960@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-18T08:41:23.512Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-18T08:41:23.512Z",
+    "text": "[2026-03-18 10:57] Volta online. Scratchpad loaded — R8 context intact (hybrid lifecycle analysis, observability deepening).\n\nSession context understood: apex-research team will file \"help wanted\" issues on workflows and working directory isolation. Both are core lifecycle problems I've already documented patterns for:\n\n- **Workflows** — 7-phase startup protocol, phase ordering enforcement, startup.md vs protocol separation\n- **Working directory issues** — workDir resolution/validation (Phase 0), worktree isolation for parallel agents, the hybrid team git strategy pattern (research on trunk, dev in worktrees)\n\nReady for tasks. Standing by to review apex-research issues as they arrive and draft guidance rooted in topics/06-lifecycle.md.",
+    "summary": "Volta online, ready for apex-research support",
+    "timestamp": "2026-03-18T08:58:31.332Z",
     "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-18T08:58:36.163Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T08:58:36.163Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-03-18 10:58] Montesquieu reporting in.\n\n**Status:** Scratchpad loaded, T04 reviewed (640 lines, Phase 1 + Phase 2 complete from R8), common-prompt read.\n\n**Session context understood.** The apex-research team will be filing \"help wanted\" issues on GitHub covering:\n\n1. **Workflows** — governance overlap: who decides workflow changes, who approves deviations from established process\n2. **Working directory issues** — resource isolation, likely T02 territory but governance implications for who arbitrates conflicts\n3. **TDD programming** — governance of quality standards enforcement: who sets the bar, who enforces it, what happens when an autonomous team deviates\n4. **New hires** — delegation matrix Row 1-3 territory: team creation and composition changes are PO-exclusive, but an autonomous containerized team may feel the friction of that constraint acutely\n\n**My preparation plan:**\n\n- T04 already covers the delegation matrix (39 decision types) and the apex-research governance questions (Q1-Q5). The framework is in place.\n- The gap is **autonomous team governance** — apex-research runs in a container with no real-time PO presence. The current model assumes PO is available within a session. I should analyze what governance adaptations are needed for teams that operate across sessions without PO contact.\n- The Emergency Authority Protocol (T04) partially addresses this, but it was designed for \"PO temporarily unavailable,\" not \"team operates autonomously for extended periods.\"\n\n**Ready for tasks.** I can begin drafting governance guidance for the apex-research help-wanted topics, or wait for the issues to arrive and respond to specific questions. Your call.",
+    "summary": "Monte reporting in, ready for governance work",
+    "timestamp": "2026-03-18T08:58:36.383Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-03-18T08:58:39.821Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T08:58:39.821Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-18 10:58] Brunel online. Scratchpad loaded — I have full context from prior sessions.\n\nContainer architecture status:\n- apex-research container is LIVE on RC server (dev@100.96.54.170), port 2222 SSH, port 5173 dashboard\n- Deployment runbook documents 11 gotchas from that deployment (WARP DNS, TLS interception, Node.js version, SSH auth, workdir, etc.)\n- `Dockerfile`, `docker-compose.yml`, `entrypoint.sh` at repo root are current\n- Two deferred items: (1) Dockerfile.apex + entrypoint-apex.sh need git commit+push, (2) image rebuild on RC server to bake in native Claude, tmux, locales\n\nReady for workdir help-wanted issues from apex-research. Workdir issues inside containers are my domain — I know exactly what they're running and where the friction points are:\n- `working_dir: /home/ai-teams/workspace` set in compose\n- Volume populated by entrypoint (git clone), not Dockerfile WORKDIR\n- SSH sessions start at $HOME, not workspace\n- `docker exec` lands in compose `working_dir` only if the volume is already populated\n\nStanding by to respond to apex-research GitHub issues. Send me the issue numbers when they appear.",
+    "summary": "Brunel online, ready for apex-research workdir issues",
+    "timestamp": "2026-03-18T08:59:19.863Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T08:59:33.962Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T08:59:33.962Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-03-18 10:58] Medici online. Audit v6 complete. Report written to `docs/health-report.md`. Scratchpad updated.\n\n## Health Report Summary — Audit v6\n\n**12 recommendations (3 HIGH, 5 MEDIUM, 4 LOW). Overall health: GOOD.**\n\n### The big news: T04 blocking gap is RESOLVED.\n\nMontesquieu delivered. The manager agent dependency that was flagged in audits v2-v5 is gone. T04 is now 770 lines with a 39-decision delegation matrix, manager agent role definition, PO-to-L1 handoff protocol, and emergency authority protocol. This was the single most important change since v1.\n\n### The new concern: T07 Safety is dangerously thin.\n\nT07 is 120 lines — the thinnest topic by far (average across other 7 topics: 577 lines). Three topics (T04, T05, T08) reference T07's permission categories as if they're well-designed, but T07 only has a simple 4-tier list with no design rationale or enforcement mechanisms. With apex-research running autonomously, safety is not theoretical — it's operational.\n\n**Recommendation:** Assign T07 to Montesquieu (governance/safety overlap) + Finn (research). Or hire a Safety Architect.\n\n### HIGH recommendations:\n1. **T07 needs a specialist owner and expansion** — 120 lines, no owner, 3 topics depend on it\n2. **README.md status column** — 4th audit stale, 7/8 topics at \"advanced draft\" but showing \"brainstorm\"\n3. **brunel.md over 100-line limit** (125 lines) — promote 15 deployment gotchas to reference doc\n\n### Resolved from v5:\n- T04 manager agent gap: **RESOLVED** (Montesquieu)\n- celes.md pruning: **RESOLVED** (89→52)\n\n### Persistent issues (4th audit):\n- finn.md \"Team size: 3\" (actually 8)\n- README.md \"brainstorm\" status\n- roster.json workDir path\n\n### Apex-readiness assessment:\nOur knowledge base is ready to advise apex-research on most questions they'll ask — T01 (new hires), T04 (governance), T06 (lifecycle/workflows) are all strong. The gap is T07: if apex asks \"what stops us if something goes wrong?\", our answer is thin. I recommend addressing T07 before responding to their help-wanted issues.\n\nFull report at `docs/health-report.md`. Standing by.",
+    "summary": "Audit v6 complete — T04 resolved, T07 is new concern",
+    "timestamp": "2026-03-18T09:02:26.295Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-03-18T09:02:28.764Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:02:28.764Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-18 11:01] RFC #3 lifecycle analysis — apex-research team workflow formalization.\n\nI've read the full RFC and addendum, cross-referenced against T06, T02, T07, and T01. Here is my structured analysis for each assigned question.\n\n---\n\n## Q1: Should they use GitHub Issues to track all work units?\n\n**Recommendation: Option C (hybrid) — confirmed. But with a lifecycle refinement.**\n\n**Rationale grounded in T06:**\nThe core lifecycle insight is that cross-session state must be durable, and in-session state is disposable by design. T06 draws a hard line: scratchpads + task snapshots (committed to repo) are the durable layer; in-session task lists are ephemeral and expected to vanish. The apex-research team's 30-task-per-session volume confirms this — creating 30 GitHub issues per session would drown the backlog with noise that has zero re-discovery value once the session ends.\n\n**The lifecycle refinement:** Their hybrid should follow T06's Cross-Session Handover pattern exactly:\n- **In-session tasks** → internal task system (TaskCreate/TaskUpdate), ephemeral\n- **Cross-session work** → GitHub Issues, but only for work that will survive a shutdown/startup cycle\n- **Task snapshots** → On shutdown, the team lead dumps the in-session task list to `memory/task-list-snapshot.md` and commits it (T06 Shutdown Phase 2b). This captures the 30-task history without polluting GitHub Issues.\n\n**The test:** Before creating a GitHub Issue, ask: \"Will this work survive a shutdown?\" If yes → issue. If no → in-session task + snapshot on shutdown.\n\n**Caveat:** Their concern about \"losing task history\" is valid but solved by the snapshot pattern, not by more issues. The snapshot is cheap (raw dump, no synthesis) and lives in git history forever.\n\n---\n\n## Q2: Different workflows for research vs dashboard?\n\n**Recommendation: Yes — bifurcated workflow confirmed. This is the hybrid team git strategy.**\n\n**Rationale grounded in T06 + T01 + T02:**\nMy R8 scratchpad records this exact pattern: `[PATTERN] Hybrid teams (research + development) need split git strategy: research agents on trunk, dev agents in worktrees. Neither pure-research nor pure-dev isolation model works alone.`\n\nT01 (Team Taxonomy) documents the apex-research team as a hybrid type with the table entry: \"Worktree isolation: Present (dev agent on separate branch)\" and \"Git workflow: Mixed (researchers on main, dev on worktree branch).\"\n\nT02 (Resource Isolation) recommends git worktrees as the isolation mechanism for parallel agents on different branches, and T07 (Safety) notes: \"When 2+ agents need different branches: use `isolation: \"worktree\"` when spawning.\"\n\nTheir proposal (research on main, dashboard via branches) aligns perfectly with our documented pattern. The bifurcation is not a compromise — it's the canonical approach for hybrid teams.\n\n**Lifecycle implication:** The two workflows need different spawning configurations. Research agents should be spawned without worktree isolation (they share main). Dashboard agents should be spawned with `isolation: \"worktree\"` pointing to a dedicated worktree for the dashboard branch. This is a Phase 6 (Spawn) concern — the roster should encode which agents need worktree isolation.\n\n**Caveat:** The bifurcation means the team lead must maintain awareness of two git states. T06's Phase 0 (Orient) currently reads a single `workDir` — for hybrid teams, the orient phase should surface both the main checkout path and any active worktree paths. This is a gap in T06 that I should address.\n\n---\n\n## Q6: How do specs move through draft -> reviewed -> approved?\n\n**Recommendation: Option A (GitHub Issues for spec review) — confirmed with lifecycle guardrails.**\n\n**Rationale grounded in T06:**\nThe spec lifecycle (draft -> reviewed -> approved -> handed-off) is fundamentally a cross-session workflow — a spec review may span multiple sessions, involve different reviewers, and produce revision history. This makes it a GitHub Issue, per the Q1 test (\"will this work survive a shutdown?\").\n\nThe lifecycle concern is state consistency: the spec's frontmatter status (`draft | reviewed | approved`) must stay synchronized with the issue's state (open/closed) and labels (spec:draft, spec:review, spec:approved). Dual-state systems diverge. T06's handover design says: \"the repo is the sole source of truth.\" For specs, this means the **frontmatter status is authoritative** — the GitHub Issue is the coordination mechanism (comments, assignment, history), but the frontmatter in the .md file is the state.\n\n**Guardrails:**\n1. **One issue per spec review** (not per spec). A spec that needs revision gets a new issue, not a reopened one. This preserves clean audit trail.\n2. **Frontmatter update is the commit gate.** The issue is only closed when the frontmatter in the spec file is updated to the target status AND committed. No \"closing the issue but forgetting to update the file.\"\n3. **Label mirrors frontmatter** — the `spec:draft/review/approved` label on the issue should match the frontmatter. If they diverge, frontmatter wins.\n\n**Caveat:** Their 11 specs at draft status will generate 11 issues immediately. This is fine — these are genuine cross-session work items. The concern from Q1 (issue bloat) doesn't apply here because spec reviews have real lifecycle duration.\n\n---\n\n## ADDENDUM: Worktree and branch conflict resolution\n\n**Recommendation: Option D (trunk-based) for now, with a documented upgrade path to Option E when needed.**\n\n**Rationale grounded in T06 + T02 + T07 + operational evidence:**\n\nThis is the question I feel strongest about. Let me work through it systematically.\n\n### Why NOT Options A, B, or C\n\n**Option A (time-slicing)** — Kills parallelism, which is the primary value of multi-agent teams. T01 documents the sweet spot as 5-7 agents for \"meaningful parallelism.\" Time-slicing reduces the team to sequential execution. Reject.\n\n**Option B (git-ignored data files)** — Violates T06's principle: \"the repo is the sole source of truth.\" Moving data out of git creates a shadow state that the lifecycle protocol can't manage. Scratchpads, inboxes, specs — everything durable lives in git. Data files should too. Reject.\n\n**Option C (API reads from canonical dir)** — Architecturally clean but adds a build-time dependency that creates a new failure mode at startup. T06 Phase 0 validates workDir but can't validate symlinks to external data directories. This adds complexity for a problem that may not exist (see Option D). Defer unless D fails.\n\n### Why Option D (trunk-based) is correct for this team right now\n\nTheir own evidence is compelling: **37 commits from 4 agents on main, zero conflicts, one session.** This is not luck — it's the expected outcome when:\n1. Agents operate on non-overlapping file sets (research: `inventory/`, `specs/`, `shared/`; dashboard: `dashboard/`)\n2. Commits are small and frequent (not batched)\n3. No long-lived branches accumulate drift\n\nT02 recommends worktrees \"when 2+ agents need different branches.\" The key word is \"need.\" If all agents can work on main without conflicts, they don't need branches, and branches add lifecycle overhead (worktree creation/cleanup in Phase 6/shutdown, rebase management, merge conflict resolution).\n\nMy R8 pattern — \"research agents on trunk, dev agents in worktrees\" — was designed for the general case where dev agents DO conflict with research agents. But apex-research's dashboard agent (Berners-Lee) mostly touches `dashboard/` files that no other agent modifies. The conflict surface is limited to shared data files (`clusters.json`, `migration-order.json`), and those are written by research agents and only READ by the dashboard.\n\n**The trunk-based approach works when the read/write domains are naturally partitioned.** That's true here.\n\n### The CI build gate is the critical addition\n\nOption D without a CI check is fragile — one broken `npm run build` on main blocks everyone. Their proposal of `npm run build && npm run check` on push is the minimum viable safety net. This is analogous to T06's Phase 4b (Team Operational Check) — a verification gate before downstream work can proceed.\n\n### The upgrade path to Option E\n\nIf trunk-based development starts producing conflicts (e.g., when dashboard needs to restructure shared data schemas), they should upgrade to Option E (short-lived branches):\n- Branch lifetime: minutes, not hours\n- One branch per task, not a long-lived `dashboard-dev`\n- Merge immediately after build passes\n- Rebase window is minimal, so drift doesn't accumulate\n\nThe signal to upgrade: **the first time a dashboard commit breaks a research agent's build, or vice versa.** Until that happens, Option D is simpler and has zero lifecycle overhead.\n\n### Why the long-lived `dashboard-dev` branch is the worst option\n\nThe RFC already identifies this correctly. From a lifecycle perspective, long-lived branches are anti-patterns because:\n1. **Rebase pain compounds** — T06's shutdown protocol doesn't include \"rebase all open branches.\" Each session restart starts from HEAD of main, but the branch drifts further behind.\n2. **Merge conflict resolution is a lifecycle gap** — T06 has no protocol for \"agent encounters merge conflict.\" The agent would need to stop work, notify team lead, and wait for resolution — burning tokens the whole time.\n3. **Git lock contention** — T02 documents that worktrees share `.git`. Simultaneous commits from main checkout and worktree can hit lock files. This is solvable (git's index.lock is short-lived) but adds a failure mode that trunk-based avoids entirely.\n\n---\n\n## Summary table\n\n| Question | Recommendation | Confidence | Key framework reference |\n|---|---|---|---|\n| Q1 (Issues for work units) | Hybrid (C) + T06 task snapshots | High | T06 Cross-Session Handover, Shutdown Phase 2b |\n| Q2 (Bifurcated workflow) | Yes, research on main, dashboard via branches when needed | High | T06 R8 hybrid pattern, T01 taxonomy, T02 worktree isolation |\n| Q6 (Spec lifecycle) | GitHub Issues (A) with frontmatter-authoritative guardrails | High | T06 \"repo is sole source of truth,\" Cross-Session Handover |\n| Addendum (worktree conflicts) | Option D (trunk-based) now, upgrade path to E documented | High | T02 worktree recommendation, T07 parallel agent safety, operational evidence (37/0) |\n\n---\n\n## Gap identified in T06\n\nThe hybrid team pattern (Q2) reveals a gap: T06 Phase 0 (Orient) reads a single `workDir` from roster.json. For hybrid teams with worktree isolation, Orient should also surface active worktree paths. I can draft an amendment if you want me to write this into T06.\n\n(*FR:Volta*)",
+    "summary": "RFC #3 lifecycle analysis: 4 questions answered",
+    "timestamp": "2026-03-18T09:03:14.239Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-18T09:03:18.341Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:03:18.341Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-18 11:02] **Celes — RFC #3 Q4 Analysis: Dashboard TDD Split & Roster Review**\n\nI've read the full RFC, the addendum, Berners-Lee's prompt, his scratchpad (5 sessions of output), Schliemann's scratchpad, the common-prompt, and grounded this in T01 patterns. Here's my assessment.\n\n---\n\n## Q4: Should dashboard work split into a TDD pair?\n\n**Recommendation: Option B — single agent with strengthened test mandate. No split.**\n\nHere's why, grounded in the evidence:\n\n### 1. Berners-Lee's role is well-scoped, not overloaded\n\nHis prompt is textbook Role 4 (Developer) — clear directory ownership (`dashboard/`), read-only consumption of upstream data, API-first design, defined tech stack. The scratchpad shows he delivered across 5 sessions: scaffold, 6 views, tooltip system, glossary hover-to-scroll, sources page. 41 tests passing, build clean. That's a high-functioning single agent.\n\nThe concern about \"tests are sparse\" in the RFC is real — but the fix is a **prompt-level mandate tightening**, not a new agent. His prompt already says \"TDD disciplined — writes the test first, every time. No exceptions.\" The gap is enforcement, not design.\n\n### 2. TDD pair coordination cost exceeds the benefit for a dev tool\n\nFrom T01 Sizing Patterns: *\"Optimal team size is driven by communication overhead vs domain coverage needs.\"*\n\nA TDD pair requires:\n- **Handshake protocol** per task — test agent writes failing test, signals implementer, implementer passes test, signals back\n- **Shared branch access** — both agents write to `dashboard/`, creating the exact same contention the addendum identifies as painful\n- **Model tier decision** — the test writer would be sonnet (errors caught by build), but a sonnet test writer still costs coordination tokens\n\nFor a **production app**, this overhead is justified (bad code reaches users). For a **local dev tool** viewed by 1-2 people, the blast radius of a dashboard bug is: refresh the page. The consequence-of-error test (T01 Model Tiering) puts this firmly in \"not worth opus, not worth splitting.\"\n\n### 3. What to do instead\n\nStrengthen the test mandate in Berners-Lee's prompt. Add a concrete gate:\n\n> **Test coverage rule:** Every API route must have at least 2 tests (happy path + error/empty). Every interactive UI component (sort, filter, hover, expand) must have at least 1 test. Report test count in your completion message.\n\nThis is behavioral enforcement — the same pattern that works for team-lead code restrictions across all teams. It's cheaper than a new agent and doesn't add coordination overhead.\n\n### 4. When a split WOULD be warranted\n\nIf the dashboard becomes a **production-facing tool** used by migration teams (not just PO), then:\n- The blast radius increases (bad data → bad migration decisions)\n- A dedicated QA agent (Kerckhoffs pattern from comms-dev) becomes justified\n- But even then, **Option C (separate QA pass)** is better than Option A (TDD pair), because the QA agent can also review specs — amortizing the cost across two output types\n\n---\n\n## Roster Balance Assessment\n\nCurrent team: 5 agents, hybrid archetype.\n\n| Agent | Role | Model | T01 Role | Assessment |\n|---|---|---|---|---|\n| Schliemann | Coordinator | opus | Role 1 | Correct — judgment-heavy, team-wide blast radius |\n| Champollion | Researcher | sonnet | Role 2 | Correct — file parsing, errors caught by pytest+mypy |\n| Nightingale | Analyst | sonnet | Role 3 | Correct — aggregation, errors caught by dashboard inconsistencies |\n| Berners-Lee | Developer | sonnet | Role 4 | Correct — errors caught by vitest+build |\n| Hammurabi | Spec Writer | opus | Role 5 | Correct — specs are handoff contracts, bad spec wastes migration team's sprint |\n\n**This is a well-balanced hybrid team.** It covers all 5 roles needed for the archetype (no Role 6 / Design Specialist — correct, hybrid teams don't need them per T01). The opus/sonnet split is 40% opus (2/5), exactly matching the T01 hybrid pattern.\n\n**Size is at the sweet spot.** 5 agents for a narrow domain (one source format, one output). T01 says hybrid typical total is 5-6. They don't need more agents — they need their existing agents to work more effectively in the new phase.\n\n---\n\n## Role Evolution for Review/Approval/Handoff Phase\n\nThe team was built for research. The phase shift changes what each agent does, but not whether they should exist. Here's what needs to evolve:\n\n### Champollion — scope narrows\n\nResearch phase: parsing 57 apps, extending extraction scripts, producing inventory data. \nReview phase: **mostly done.** 570 artifacts extracted. Champollion's role shrinks to on-demand re-extraction if reviewers find data gaps.\n\n**Signal to watch:** If Champollion is consistently idle in review sessions → don't remove yet. Keep available for \"we need to re-examine app fXXX\" requests that arise during spec review. Remove only when all specs reach `approved` status.\n\n### Nightingale — pivot from production to validation\n\nResearch phase: analyzing raw data, producing shared JSON, scoring complexity.\nReview phase: **validate specs against analysis data.** When Hammurabi writes \"wagon-maintenance cluster has 5 apps,\" Nightingale can verify that against `shared/clusters.json`. This is the analyst-as-validator pattern — same skills, different trigger.\n\n**Prompt addition needed:**\n> **Review phase responsibility:** When a spec moves to `review` status, cross-check its claims against your analysis data. Report discrepancies to team-lead.\n\n### Berners-Lee — pivot from building to maintaining\n\nResearch phase: scaffold + 6 views + tooltip system.\nReview phase: **Spec Readiness Board becomes the primary view.** Currently built (view #5 in his priority list). Dashboard should reflect spec status changes in near-real-time. Minor new features as review workflow demands (e.g., a reviewer comments view).\n\n**No prompt change needed** — just prioritization guidance from Schliemann.\n\n### Hammurabi — enters peak load\n\nResearch phase: not spawned (deferred to session 2).\nReview phase: **primary producer.** 11 cluster specs to write/revise. This is the bottleneck agent. Every spec goes through Hammurabi, and bad specs waste downstream teams' time.\n\n**Already correctly tiered at opus.** No change needed. But Schliemann should sequence spec reviews to avoid Hammurabi getting blocked waiting for review feedback on all 11 specs simultaneously.\n\n### Schliemann — coordinator role intensifies\n\nResearch phase: mostly parallel delegation (\"everyone do your thing\").\nReview phase: **serial decision-making.** Each spec review requires Schliemann to read, judge, approve or request revision. This is the bottleneck risk — the coordinator becomes the review queue.\n\n**Mitigation:** Use the GitHub Issues workflow (RFC Q6 Option A) to track spec reviews. This externalizes the queue from Schliemann's context window to a persistent system, reducing the coordination burden.\n\n---\n\n## Summary of Recommendations\n\n1. **No TDD split.** Strengthen Berners-Lee's test mandate in prompt instead.\n2. **Roster is well-balanced** for this phase. No new hires needed.\n3. **Two prompt updates needed:** Nightingale (add review-phase validation responsibility), Berners-Lee (add concrete test coverage rule).\n4. **Watch Champollion for idle signal** — don't remove prematurely, but track whether re-extraction requests actually come.\n5. **Schliemann's review queue is the real bottleneck risk** — externalize it to GitHub Issues.\n6. **If dashboard becomes production-facing later**, revisit with a QA agent (Option C, not Option A).\n\nI can draft the specific prompt additions for Nightingale and Berners-Lee if you want them. I can also draft a QA agent role package (Kerckhoffs-for-apex pattern) as a shelf-ready design in case the dashboard scope expands.\n\n(*FR:Celes*)",
+    "summary": "RFC #3 Q4 analysis: no TDD split, roster review, role evolution",
+    "timestamp": "2026-03-18T09:03:32.268Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-18T09:03:37.084Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:03:37.084Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-18 11:02] RFC #3 addendum analysis — container/workdir/git isolation perspective.\n\nI read the full issue, the addendum, their Dockerfile.apex, entrypoint-apex.sh, and docker-compose.yml. Here's my evaluation of each option grounded in their actual deployment.\n\n---\n\n## Actual container layout (what they're running)\n\n```\n/home/ai-teams/workspace/     ← apex-research-repo (named volume, read-write)\n/home/ai-teams/source-data/   ← apex-source-data (named volume, root-owned, read-only)\n/home/ai-teams/.claude/       ← apex-claude-home (named volume, auto-memory)\n/home/ai-teams/vjs_apex_apps  ← symlink → /home/ai-teams/source-data\n```\n\nOne container, one user (`ai-teams`, uid=1000), one volume for the repo. ALL agents run in the same container process space, sharing `workspace/.git`. There is no per-agent filesystem isolation.\n\n---\n\n## Option A — Time-slice (no parallel work)\n\n**Container verdict: works, but kills the team's value.**\n\nNo git lock contention whatsoever. One agent at a time, sequential commits. Entrypoint does `git pull --ff-only` on start — if they serialise at session boundaries too, they're clean.\n\nBut this team ran 37 commits from 4 agents in one session. Time-slicing that workflow means either one agent at a time (4× slower) or complex hand-off logic at the agent prompt level. Not recommended unless conflict pain is severe enough to justify it.\n\n---\n\n## Option B — Data files as git-ignored build artifacts\n\n**Container verdict: architecturally awkward in their setup, solves the wrong problem.**\n\nThe JSON data files (`shared/clusters.json`, `inventory/apps.json`, etc.) are already on the `apex-research-repo` volume. Removing them from git means they exist only in the volume — not versioned, not visible to the PO via GitHub. For a research team whose entire output IS versioned data, this trades one problem for a worse one: loss of history.\n\nAlso: if Nightingale regenerates these files to the volume while Berners-Lee reads them, there's still a race condition — just not a git one. The `source-data` volume is locked read-only by my entrypoint (root-owned, `chmod a-w`), but the workspace volume is read-write for ai-teams. No filesystem-level locking between processes.\n\nNot recommended.\n\n---\n\n## Option C — Dashboard reads data via API from canonical path\n\n**Container verdict: technically feasible, adds runtime dependency.**\n\nThe workspace volume is at a fixed path: `/home/ai-teams/workspace`. There's already a symlink (`vjs_apex_apps → source-data`) established by the entrypoint. The same pattern could work: dashboard API routes read from `/home/ai-teams/workspace/shared/` directly (absolute path, always main's current state) rather than via relative import from the branch tree.\n\n**What this requires:**\n- Dashboard dev server must be running inside the container (it already runs on port 5173)\n- API routes use `fs.readFile('/home/ai-teams/workspace/shared/clusters.json')` not `import data from '../shared/clusters.json'`\n- The dashboard branch diverges from main only in `.svelte`/`.ts` files, never in data files\n\n**Container friction:** The workspace volume has one checkout. If Berners-Lee creates a worktree for `dashboard-dev` at `/home/ai-teams/workspace-dash/`, that's a NEW directory OUTSIDE the named volume — it won't persist across container restarts unless the entrypoint creates it. This is the key constraint (see worktree section below).\n\nOption C works IF they accept the architectural shift (API reads vs. static imports). The container can support it.\n\n---\n\n## Option D — Trunk-based development for everything\n\n**Container verdict: best fit for this architecture. Matches what actually worked.**\n\nThis is the honest answer from my deployment perspective. Their container has:\n- Single workspace volume, single checkout of main\n- `git pull --ff-only` on every container start (entrypoint step 2)\n- All agents sharing one `.git` directory\n- No per-agent path isolation\n\nTrunk-based is the natural mode for this layout. 37 commits from 4 agents in one session with zero conflicts is not luck — it's what happens when agents make small, fast commits on non-overlapping files. Research agents touch `specs/`, `decisions/`, `shared/`; Berners-Lee touches `dashboard/`. Very little overlap in practice.\n\n**Git lock contention risk is real but low:**\n- `git commit` acquires `.git/index.lock` for ~50ms\n- Four agents committing simultaneously: rare collision, retryable\n- If contention becomes a problem, a simple wrapper script with `flock` or exponential backoff would handle it\n- Not worth pre-solving. The 37-commit session had none.\n\n**CI gate on trunk:** Add `.github/workflows/ci.yml` with `npm run build && npm run check`. Runs on every push to main. Berners-Lee broke a build on main → they know within 60 seconds → they fix it. Simpler than PR overhead.\n\n**My recommendation: Option D + CI gate.**\n\n---\n\n## Option E — Short-lived branches with auto-rebase\n\n**Container verdict: supported, but requires worktree discipline. Read carefully.**\n\n### How worktrees work in their container\n\n`git worktree add` creates a second working tree from the same `.git`. In their setup:\n\n```bash\n# On main at /home/ai-teams/workspace\ngit worktree add /home/ai-teams/workspace-dash dashboard-dev\n```\n\n**Problem 1 — path is outside the named volume.**\n`apex-research-repo` is mounted at `/home/ai-teams/workspace`. A worktree at `/home/ai-teams/workspace-dash` is outside this mount — it lives in the container's writable layer, which is ephemeral. On `docker compose down && up`, the worktree directory vanishes but `.git/worktrees/workspace-dash` still exists → git reports the worktree as \"locked\" or \"missing\". Berners-Lee would need to run `git worktree prune` on every container start, then recreate the worktree.\n\n**Problem 2 — entrypoint does `git pull --ff-only` on the main checkout.**\nIf the workspace-dash worktree exists, a concurrent entrypoint pull on main won't affect it — but Berners-Lee's branch will need a rebase against the updated main before any PR merge. For a short-lived branch (minutes, not hours), the rebase is trivial. For a long-running dashboard-dev branch, it's painful.\n\n**Problem 3 — worktree path needs to be inside the volume for persistence.**\nIf they want worktrees to survive container restarts, they'd need the worktree inside `workspace/` as a subdirectory:\n```bash\ngit worktree add /home/ai-teams/workspace/.worktrees/dashboard-dev dashboard-dev\n```\nThis is non-standard but works. Add `.worktrees/` to `.gitignore`.\n\n### If they go with E\n\n- Keep branch lifetime to one task (one feature, one PR)\n- Always create worktree inside `workspace/.worktrees/` for persistence\n- Add `git worktree prune` to the entrypoint after git pull (safe, idempotent)\n- Schliemann must merge PRs fast — every hour of PR latency = more rebase surface\n- CI on PR required (not just main)\n\n---\n\n## Summary table\n\n| Option | Container fit | Conflict risk | Complexity | Recommendation |\n|--------|--------------|--------------|------------|----------------|\n| A Time-slice | Native fit | None | Low (but slow) | Skip — kills parallelism |\n| B Ignored data | Poor | Not eliminated | Medium | Skip |\n| C API data reads | Good (with worktree workaround) | Low | Medium | Consider for v2 |\n| D Trunk + CI | Best fit | Very low | Low | **Recommend** |\n| E Short branches | Supported with caveats | Low (if short-lived) | Medium | Viable if D proves insufficient |\n\n---\n\n## One concrete gotcha to flag in the response\n\nIf anyone proposes a long-lived `dashboard-dev` branch in their container, the combination of:\n1. Entrypoint `git pull --ff-only` only working on main checkout\n2. Worktree outside the named volume being ephemeral\n3. Multiple agents pushing to main while the branch is open\n\n...will create a bad developer experience quickly. The apex-research team should know this before they decide. Short-lived (option E) is fine; long-lived is not.\n\n---\n\nReady to draft the GitHub comment response if you want to post it. Or send it yourself with this analysis as the source. Your call on who posts.",
+    "summary": "RFC #3 container/workdir analysis — recommend Option D",
+    "timestamp": "2026-03-18T09:03:41.654Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T09:03:50.263Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:03:50.263Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-18 11:02] Herald — RFC #3 protocol analysis. Three sections as requested: Q3 (PR review cycle), Q2 protocol angle (research-dashboard drift), and Addendum (parallel agent coordination).\n\n---\n\n## Q3: Should Dashboard Use a PR/Review Cycle?\n\n### Communication Patterns Each Option Creates\n\n| Option | Message flow | Coordination cost | Failure mode |\n|--------|-------------|-------------------|--------------|\n| A: PR required | Berners-Lee→PR→Schliemann→review→merge | 3 message cycles per change | Review backlog blocks velocity. Schliemann becomes bottleneck. |\n| B: PR for features, direct for fixes | Mixed: features get 3-cycle, fixes get 0-cycle | ~1.5 average | Ambiguity: \"is this a feature or a fix?\" creates negotiation overhead |\n| C: No PRs (current) | Berners-Lee→commit→done | 0 message cycles | Build breaks propagate to main. No review artifact. |\n\n### Protocol Analysis\n\nTheir instinct on **Option B** is sound, but the real question is: **what is \"review\" for in an autonomous team with no human reading the code?**\n\nIn our reference teams (rc-team, hr-devs), review serves two purposes:\n1. **Quality gate** — does the code work? (build, tests, lint)\n2. **Knowledge transfer** — does another agent understand the change?\n\nFor apex-research, purpose #1 is better served by a **CI build check on every push to main** (their Option D from the addendum). Purpose #2 is low-value for a dev tool dashboard — Schliemann doesn't need to understand every Svelte component.\n\n**Recommendation: Trunk-based (Option C/D) with automated build gate, not PRs.**\n\nThe protocol reasoning:\n\n- PRs create a **handoff protocol** (Protocol 1 pattern) between Berners-Lee and Schliemann. Every PR is a mini-handoff: request-ACK-review-merge. At 20 tasks per session, that's 20 handoffs. Schliemann becomes a review bottleneck — a hub-and-spoke failure mode (Protocol 2, \"Why Not Pure Hub-and-Spoke\").\n- The review turnaround expectation for an autonomous team is: **zero**. Unlike human teams where PRs sit for hours/days, agent PRs should be reviewed within the same session. But even \"same session\" review creates serialization — Berners-Lee waits, Schliemann context-switches.\n- A CI build check (`npm run build && npm run check` on push) provides the quality gate without the coordination overhead. If the build breaks, Berners-Lee sees it immediately and fixes — no handoff needed.\n\n**Exception:** PRs make sense when dashboard changes affect the data contracts (the TypeScript interfaces in their design doc). If Berners-Lee changes `AppInventory` or `Cluster`, that affects Champollion and Nightingale. That specific class of change warrants review. But that's \"PR for contract changes,\" not \"PR for features.\"\n\n---\n\n## Q2 Protocol Angle: Preventing Research-Dashboard Drift\n\nIf they bifurcate workflows (research on main, dashboard on branches), two drift risks emerge:\n\n### Drift Risk 1: Data Schema Drift\n\n```\nChampollion updates apps.json schema (adds field)\n    ↓ commits to main\nBerners-Lee's dashboard code doesn't know about the field\n    ↓ stale TypeScript interfaces\nDashboard silently ignores data → user sees outdated view\n```\n\n**Protocol to prevent:** The TypeScript interfaces in the design doc (`AppInventory`, `Cluster`, `OverlapEntry`, `DependencyEdge`) are the **contract**. This is analogous to our `api-contracts.md` pattern in the reference teams. Both sides must respect the contract.\n\n**Coordination protocol:**\n\n1. **Schema changes require notification.** When Champollion or Nightingale changes the shape of a JSON output file, they must message Schliemann (or Berners-Lee directly if a direct link is authorized). This is a lightweight handoff — not a full Protocol 1, but a **notification with schema diff**.\n2. **Dashboard reads the contract, not the files directly.** Berners-Lee's API routes should validate incoming JSON against the TypeScript interfaces. A runtime validation failure is a signal that the contract was broken.\n3. **Shared `types/` directory** — a single source of truth for the data interfaces, imported by both extraction scripts (as validation targets) and dashboard code (as type definitions). Changes to this directory are the only cross-track coordination point.\n\n### Drift Risk 2: Priority Drift\n\nResearch and dashboard tracks may diverge in priority. Nightingale discovers a critical overlap that changes cluster composition, but Berners-Lee is busy building a visualization for the old cluster map.\n\n**Protocol to prevent:** This is a **broadcast** pattern (Protocol 3). When analysis produces a finding that invalidates existing dashboard state:\n\n1. Nightingale reports to Schliemann (mandatory reporting rule)\n2. Schliemann evaluates impact on dashboard\n3. If dashboard is affected, Schliemann sends Berners-Lee a **priority interrupt** with the changed data\n\nThis already works if they follow the \"mandatory reporting, no silent idle\" pattern from T03. The protocol isn't missing — the enforcement mechanism is: **Schliemann must actively track data-to-dashboard consistency as part of the team-lead role.**\n\n---\n\n## Addendum: Parallel Agent Coordination — Why 37 Commits Worked\n\n### What Made It Work (Protocol Diagnosis)\n\nThe 37 interleaved commits from 4 agents with zero conflicts are not luck. Looking at their commit history and data flow design, three structural properties are doing the heavy lifting:\n\n**1. Strict directory ownership (resource isolation by convention)**\n\n| Agent | Writes to | Never touches |\n|-------|-----------|---------------|\n| Champollion | `inventory/`, `scripts/` | `shared/`, `dashboard/`, `specs/` |\n| Nightingale | `shared/` | `inventory/`, `dashboard/`, `specs/` |\n| Berners-Lee | `dashboard/` | `inventory/`, `shared/`, `specs/` |\n| Hammurabi | `specs/`, `decisions/` | `inventory/`, `shared/`, `dashboard/` |\n\nThis is **implicit resource partitioning** — the same pattern as Protocol R1 (Branch Reservation) from T02, but operating at the directory level instead of the branch level. No two agents write to the same directory, so no two agents produce conflicting changes to the same file.\n\n**2. Unidirectional data flow (no circular dependencies)**\n\n```\nChampollion → Nightingale → Berners-Lee\n                          → Hammurabi\n```\n\nData flows one way. Nightingale reads Champollion's output but never writes to it. Berners-Lee reads both but writes only to `dashboard/`. This means commits can interleave in any order — a later Champollion commit doesn't conflict with an earlier Nightingale commit because they write to different directories.\n\n**3. Append-only output pattern**\n\nMost agents create new files rather than modifying existing ones. Champollion creates `inventory/fXXX/` directories. Nightingale creates analysis JSON files. Hammurabi creates spec files. New-file creation never conflicts with other new-file creation, even in the same directory.\n\n### Is It Fragile or Robust?\n\n**Robust — but with one fragile point.** The pattern is robust as long as:\n\n- Directory ownership is maintained (no agent starts writing to another's directory)\n- Shared JSON files (`apps.json`, `clusters.json`, `migration-order.json`) have a single writer\n\nThe **fragile point** is the shared JSON files. Right now, Nightingale is likely the sole writer of `shared/clusters.json`. If two agents ever need to update the same JSON file, the pattern breaks. This is the exact scenario their addendum identifies — Berners-Lee importing `clusters.json` into the dashboard while Nightingale updates it.\n\n**Protocol recommendation:** Formalize directory ownership in their common-prompt as a **resource partition table** (analogous to T02 Resource Isolation). Make it explicit, not implicit. The table above should be in their team config.\n\n### If They Move to Branches: Coordination Protocol\n\nTheir addendum correctly identifies that long-lived branches + parallel main commits = rebase pain. The protocol analysis:\n\n**Option D (trunk-based) is the correct choice** for this team, because:\n\n1. Their resource partitioning already prevents conflicts — branches add ceremony with no safety benefit\n2. A CI build gate on push to main catches the one risk (dashboard build breaks) without branching\n3. Short-lived branches (Option E) add protocol overhead: branch→PR→review→merge is a 4-step handoff for every task, multiplied by 20 tasks/session = 80 handoff steps per session\n\n**If they insist on branches for dashboard:** Option E (short-lived) with these protocol constraints:\n\n- Branch lifetime: maximum 1 task. Never a long-running `dashboard-dev`.\n- Merge latency: Schliemann must merge within 2 message cycles of PR creation. If Schliemann is busy, Berners-Lee is authorized to self-merge after build passes (a **direct link** authorization in Protocol 2 terms).\n- Rebase before PR: Berners-Lee rebases onto current main before opening PR. This is cheap if the branch is short-lived.\n\nBut honestly: **trunk-based + CI is simpler, cheaper, and matches their proven success pattern.** Do not fix what is not broken.\n\n---\n\n## Summary of Recommendations\n\n| Question | Recommendation | Protocol basis |\n|----------|---------------|----------------|\n| Q3: PR review cycle | No — trunk-based with CI build gate. PRs only for data contract changes. | Avoids Protocol 1 handoff overhead. Build gate replaces human review for quality. |\n| Q2: Drift prevention | Shared `types/` directory as contract. Schema change notification protocol. Schliemann tracks data→dashboard consistency. | Protocol 3 broadcast pattern for findings. Contract-based coordination from reference team `api-contracts.md`. |\n| Addendum: Why 37 commits worked | Directory ownership + unidirectional data flow + append-only pattern. Robust, not lucky. | T02 resource partitioning. Formalize in common-prompt. |\n| Addendum: Branch strategy | Stay trunk-based (Option D). It works. Add CI. | Short-lived branches (E) acceptable as fallback with strict merge latency. |\n\n(*FR:Herald*)",
+    "summary": "RFC #3 protocol analysis — Q3, Q2, addendum",
+    "timestamp": "2026-03-18T09:03:50.318Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-18T09:03:53.446Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:03:53.446Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-03-18 11:02] GOVERNANCE ANALYSIS — apex-research RFC #3\n\n---\n\n## Meta-Question: Who Has Authority to Decide This RFC?\n\nBefore answering the individual questions, the RFC itself raises the governance question I flagged: **can the apex-research team-lead decide these workflow questions, or must PO approve?**\n\n**Answer: Mixed authority.** Applying the delegation matrix:\n\n| RFC decision | Matrix row | Authority | Rationale |\n|---|---|---|---|\n| Use GitHub Issues for tracking (Q1) | 24, 25 | **TL decides** | GitHub issues are agent-managed; no approval needed |\n| Branch strategy (Q2, addendum) | 9 | **TL decides**, PO informed | Branch strategy within a team is L2 scope |\n| PR review process (Q3) | 12, 13, 14, 32 | **TL decides** | Code review assignments and PR merge are team-lead scope |\n| Quality enforcement / TDD (Q4) | 33 | **TL decides** within team | Quality gate enforcement is specialist + TL scope |\n| Labels and templates (Q5) | 24 | **TL decides** | Internal tooling |\n| Spec lifecycle: draft → reviewed (Q6) | 32 | **TL decides** | Team-lead assigns reviewer, controls review process |\n| Spec lifecycle: reviewed → approved (Q6) | 6, 7 | **TL decides** if intra-team; **PO decides** if cross-team implications | See detailed analysis below |\n| Spec lifecycle: approved → handed-off (Q6) | Row 1 analogue | **PO decides** | Commits another team's resources (see Q3 from R8 apex governance questions) |\n\n**Governance guidance to Schliemann:** You have authority to decide Q1-Q5 and most of Q6 autonomously. The only decision requiring PO is the `approved → handed-off` transition. Do not wait for PO approval on workflow structure — that's your operational domain.\n\nThis is the concrete manifestation of the autonomous team governance gap: Schliemann is asking permission for things already within his authority. The framework should make this clear. Recommendation: framework documentation should include a \"quick reference\" — what you CAN decide without asking vs. what you MUST escalate.\n\n---\n\n## Q3: PR Review — Who Reviews?\n\n**The RFC proposes:** Schliemann (TL) reviews Berners-Lee's PRs.\n\n**Delegation matrix says:** Code review verdict is **specialist scope** (Row 13: D = specialist reviewer). Team-lead **assigns** the reviewer (Row 32) and **merges** the PR (Row 14). Team-lead is **informed** of the review verdict, not the one performing it.\n\n**Problem:** In the apex-research team, there is no dedicated reviewer specialist (no Marcus equivalent). Berners-Lee is the sole dashboard developer. The team has 4 specialists: Champollion (extraction), Nightingale (analysis), Hammurabi (specs), Berners-Lee (dashboard). None of them has dashboard code review as a defined competency.\n\n**Governance options:**\n\n| Option | Alignment with T04 | Trade-off |\n|---|---|---|\n| **A) Schliemann reviews** | Violates Row 13 (TL should not be the reviewer) and TL tool restrictions (TL should not read source code to evaluate implementation) | Pragmatic — only person with cross-cutting context |\n| **B) Hammurabi reviews** | Better alignment — specialist-to-specialist peer review | Hammurabi writes specs, not code; review quality questionable |\n| **C) Cross-team review** | Best alignment — request review from a code-competent agent in another team | Adds latency; requires L1 routing (Row 26) |\n| **D) Automated gate only** | Weakest governance — `npm run build && npm run check` as the only review | No human/agent judgment on code quality |\n\n**My recommendation: Option A with documented exception.**\n\nThe governance principle is that TL should not review code because TL should not be reading source code (it's outside TL's role boundary). But this principle exists to prevent role drift in teams with dedicated reviewers. In a 5-agent team with one developer, strict separation creates a governance gap worse than the violation.\n\n**The correct governance framing:**\n\n1. Schliemann reviews Berners-Lee's PRs as an **interim exception**, documented in the team's common-prompt\n2. The exception is bounded: Schliemann reviews for \"does it build, does it meet the spec requirements\" — not deep code quality (that's an automated gate's job)\n3. If/when the team scales to include a second developer or a dedicated reviewer, this exception lapses\n4. Merge authority stays with Schliemann (Row 14 — this is already correct)\n\n**Failure mode to watch:** Schliemann starts spending significant time reading dashboard source code, effectively becoming a developer-reviewer hybrid. This is authority drift. Medici should flag if Schliemann's scratchpad shows implementation-level code discussion.\n\n---\n\n## Q4: TDD Pair vs. Single Agent — Quality Enforcement Governance\n\n**The RFC proposes:** Option B — single agent (Berners-Lee) with test mandate.\n\n**Governance question:** Who enforces the test mandate? What prevents quality erosion in an autonomous team under time pressure?\n\n**Current state:** The common-prompt has a TDD Mandate section (lines 139-147): \"RED -> GREEN -> REFACTOR.\" But a mandate without enforcement is a suggestion. In the cloudflare-builders reference team, TDD enforcement works because:\n\n1. Team-lead delegates tasks with explicit \"write test first\" in the delegation message\n2. Marcus (reviewer) checks for test coverage in PR review\n3. Medici audits test coverage in health reports\n\nThe apex-research team has **none of these enforcement layers** for Berners-Lee's dashboard work:\n- Schliemann delegates tasks but doesn't verify test-first ordering\n- No reviewer agent checks test coverage\n- Medici is external and periodic, not per-commit\n\n**Governance design for quality enforcement:**\n\n| Enforcement layer | Mechanism | Who |\n|---|---|---|\n| **Prompt-level mandate** | Common-prompt TDD section (exists) | Self-enforced by Berners-Lee |\n| **Delegation-level** | Schliemann includes \"tests first\" in task delegation (behavioral) | Schliemann |\n| **Gate-level** | CI build check includes test run — PR cannot merge if tests fail | Automated |\n| **Audit-level** | Medici cross-team audit checks test coverage trends | Medici (periodic) |\n\n**My recommendation: Option B (single agent) with three governance additions:**\n\n1. **CI gate** — `npm run build && npm run check && npm test` must pass before merge. This is the minimum automated enforcement. (Row 33: quality gate enforcement is specialist + TL scope — Schliemann can set this up without PO approval.)\n\n2. **Test coverage in PR description** — Berners-Lee's PR template should include \"Tests added: [yes/no, what]\". This creates an audit trail. If Berners-Lee consistently writes \"no tests,\" Schliemann can see the pattern and intervene.\n\n3. **Periodic Medici audit** — Framework-research Medici flags test coverage trends in cross-team health reports. This catches slow quality erosion that neither Berners-Lee nor Schliemann notice.\n\n**What happens when Berners-Lee skips tests under time pressure?**\n\nEscalation ladder:\n1. CI gate catches missing tests if existing tests break → PR blocked → immediate self-correction\n2. CI gate does NOT catch missing tests for new features (no test = no failure) → gap\n3. PR description audit trail reveals pattern → Schliemann notices → Schliemann reinforces mandate in delegation\n4. Medici periodic audit reveals declining coverage → reported to L1 → L1 routes to Schliemann → Schliemann acts\n5. If Schliemann is also deprioritizing tests (dual erosion) → Medici flags to PO\n\nThe critical governance insight: **no single enforcement layer is sufficient.** Prompt mandates erode under pressure. CI gates only catch regressions, not missing coverage. Audit catches patterns but is delayed. The three layers together provide defense in depth.\n\n**Why NOT a TDD pair (Option A):**\n\nFrom a governance perspective, a TDD pair introduces a coordination overhead that is itself a governance problem. Who resolves disagreements between the test-writer and the implementer? The team-lead becomes a bottleneck for every test/implementation dispute. For a local dev tool (not production), this overhead exceeds the quality benefit.\n\n---\n\n## Q6: Spec Approval Authority\n\n**The RFC asks:** How do specs move through draft → reviewed → approved?\n\n**Delegation matrix answer (direct mapping):**\n\n| Transition | Authority | Matrix row | Rationale |\n|---|---|---|---|\n| **draft → reviewed** | **TL decides** (Schliemann) | Row 32 | TL assigns reviewer, TL initiates review |\n| Spec review verdict | **Specialist decides** (Hammurabi or assigned reviewer) | Row 13 analogue | Domain expert assesses content accuracy |\n| **reviewed → approved** | **TL decides** (Schliemann) | Row 7 | Architecture decision within team scope — the spec is an intra-team artifact until handed off |\n| **approved → handed-off** | **PO decides** | Row 6 + Q3 from R8 | Commits another team's resources; cross-team deliverable |\n\n**Important distinction the RFC misses:** `approved` and `handed-off` are different governance events. Approving a spec means \"this is technically sound and complete enough to hand off.\" Handing off a spec means \"we are now creating work for another team.\" The first is a quality judgment (TL scope). The second is a resource commitment (PO scope).\n\n**Schliemann can approve specs autonomously.** This is critical for an autonomous team — if spec approval required PO, all 11 specs would block on PO availability. Schliemann has the domain context and team oversight to judge spec quality.\n\n**Schliemann cannot hand off specs autonomously.** The handoff creates a commitment for the downstream migration team (likely cloudflare-builders). Only PO has authority to commit Team A's resources based on Team B's output.\n\n**Process recommendation:**\n\n```\ndraft → Schliemann assigns reviewer (Hammurabi or domain expert)\n     → reviewer assesses, comments on issue/PR\n     → Schliemann reviews reviewer's verdict\nreviewed → Schliemann decides if spec meets quality bar\napproved → Schliemann notifies L1/PO: \"Spec X is approved, ready for handoff\"\n     → PO decides timing and target team for handoff\nhanded-off → PO directs handoff via L1 routing (Row 26)\n```\n\n**RFC Q6 sub-question — GitHub Issues vs PRs for spec review:**\n\nThis is an operational decision (TL scope), but my governance perspective: **Issues (Option A) are better** for spec review because they create a persistent, linkable audit trail that survives across sessions. PRs couple the review to a specific code change, which is wrong for content review — a spec might need multiple revision cycles before approval, and each revision would be a separate PR, fragmenting the review history. One issue per spec, with all review comments in that issue, gives the cleanest governance trail for \"who approved what and when.\"\n\n---\n\n## Autonomous Team Governance — The Structural Gap\n\nThis RFC reveals a pattern I want to name: **authority uncertainty in autonomous teams.**\n\nSchliemann is asking framework-research for help on decisions that are already within his authority. This is not a Schliemann problem — it is a framework problem. The delegation matrix exists in T04 but is not in the apex-research team's common-prompt. Schliemann has no local reference for what he can decide.\n\n**Concrete recommendations for the framework:**\n\n1. **Authority quick-reference in common-prompt.** Every team's common-prompt should include a \"Decision Authority\" section listing what the TL can decide autonomously vs. what requires escalation. This is a subset of T04's 39-row matrix, filtered to the decisions relevant to that team.\n\n2. **\"When in doubt, act and report\" principle for TL-scope decisions.** For autonomous teams, waiting for PO on TL-scope decisions is worse than making a possibly-wrong decision that PO can review later. The common-prompt should say: \"If a decision is within your authority per the delegation matrix, make it. Log it to your scratchpad. Report to L1/PO. PO may reverse, but waiting is the worse failure mode.\"\n\n3. **Distinguish \"help wanted\" from \"approval needed.\"** The RFC is labeled \"help wanted\" — Schliemann wants input, not permission. The governance framework should distinguish: advisory requests (seeking expertise) vs. approval requests (seeking authority). Both flow through L1, but the response expectations differ. Advisory: \"here's our recommendation, you decide.\" Approval: \"approved/denied, here's why.\"\n\n**This RFC is advisory, not approval.** Schliemann should receive governance guidance and then decide. Only the `approved → handed-off` transition needs PO approval.\n\n---\n\n## Summary Table\n\n| Question | Authority | Recommendation |\n|---|---|---|\n| Q3: PR reviewer | TL decides (Row 32) | Schliemann reviews as interim exception; document in common-prompt; add CI gate |\n| Q4: TDD pair vs single | TL decides (Row 33) | Single agent + CI gate + PR test summary + periodic Medici audit |\n| Q6: Spec lifecycle | TL decides up to `approved`; PO decides `handed-off` | Issues for review trail; TL approves specs autonomously; PO approves handoff |\n| Meta: Who decides this RFC | TL for workflow; PO for handoff only | Schliemann should decide and implement; report decisions to PO |\n\n(*FR:Montesquieu*)",
+    "summary": "Governance analysis of RFC #3 — 4 questions answered",
+    "timestamp": "2026-03-18T09:04:21.936Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-18 11:03] **Findings Report: Reference Team Evidence for RFC #3**\n\n---\n\n## 1. Issues vs Tasks: How Reference Teams Handle Work Tracking\n\n### Evidence\n\n**Neither reference team uses in-session TaskCreate/TaskUpdate as their primary tracking.** Both teams evolved toward GitHub Issues as the canonical work unit.\n\n**rc-team (cloudflare-builders) common-prompt.md:**\n- Issue Closure Protocol (lines 167-181): structured completion comment with Summary, Files changed, Tests, AC verification — then team-lead closes. This implies every meaningful work unit IS a GitHub Issue.\n- Shutdown protocol (lines 140-147): team-lead exports task list snapshot to `memory/task-list-snapshot.md` — this is the bridge between ephemeral session tasks and persistent state. Tasks that survive shutdown become issues for the next session.\n- Team-lead prompt (lines 133-148): delegation workflow is issue-centric — step 8 is \"CLOSE — After GREEN review, close the issue.\"\n\n**hr-devs common-prompt.md:**\n- Identical Issue Closure Protocol — copied from rc-team. Same structured completion comment pattern.\n- Identical team-lead delegation workflow — issue-centric.\n- Added `docs/` directory (absent in rc-team) for shared knowledge that outlives sessions — architecture-decisions.md, test-gaps.md, api-contracts.md.\n\n**test-gaps.md pattern (hr-devs/docs/test-gaps.md):**\n- Shows the transition layer: Tess appends gaps, team-lead triages into issues. Items start as \"UNFILED\" notes, then get promoted to issues when they're worth tracking.\n- This is **exactly the hybrid pattern** — internal notes for discovery, GitHub Issues for committed work.\n\n**MEMORY.md (workspace level):**\n- \"Jira updates ONLY when user explicitly requests — inner workings stay in GitHub (issues, PRs).\"\n- This confirms: GitHub Issues are the work tracking system, not Jira (Jira is for PO-level tracking only).\n\n### Pattern: Two-tier tracking\n\n```\nSession tasks (ephemeral, TaskCreate)\n  → discovered during work, tracked in-session\n  → on shutdown: task-list-snapshot.md saves state\n  → next session: team-lead triages snapshot into GitHub Issues\n  \nGitHub Issues (persistent, cross-session)\n  → milestone-level work units\n  → have structured AC, assigned agent, branch name\n  → closed with completion comment after PR merge\n```\n\n**Key insight:** The reference teams never created 30 issues per session. They used ephemeral in-session tasks for granular work and GitHub Issues for story-level units that need cross-session tracking, code review, and audit trail.\n\n---\n\n## 2. Git Workflow in Reference Teams\n\n### Evidence\n\n**Both teams use trunk-based development with short-lived feature branches + PRs.** This is explicit and heavily enforced.\n\n**rc-team common-prompt.md (lines 43-47):**\n```\n- Branch from `develop` — never branch from or target `main`\n- Branch naming: `story/<issue-number>-short-description` or `fix/<issue-number>-short-description`\n- Quality gates before PR: npm run tests, npm run check, npm run lint\n- PR body: use PR template. All [ ] checkboxes must be ticked to [x] before gh pr create\n```\n\n**hr-devs common-prompt.md:** Identical rules (lines 43-47). No divergence.\n\n**WORKFLOW.md (dev-toolkit, canonical):**\n- 8-step process: Capture → Branch → Analyze → Test First → Implement → Verify → Document → PR & Merge\n- Explicitly states: \"This is trunk-based development with short-lived feature branches. No release/* branches. No long-lived feature branches.\" (lines 155-162)\n- Feature branches are tied 1:1 to stories/issues\n- PR body must include: link to issue, approach summary, TDD cycle description\n\n**Shared Workspace Protocol (both common-prompts, lines 150-156):**\n- \"Only one agent owns git operations at a time\"\n- \"Coordinate before switching branches\"\n- \"Never force-push or reset without team-lead approval\"\n- This is behavioral serialization — one branch change at a time, team-lead coordinates\n\n**Sven's scratchpad (rc-team memory/sven.md):**\n- `[PATTERN] TDD GREEN Workflow` documents the actual flow across 6 stories:\n  1. Checkout branch → read RED tests → read source\n  2. Implement\n  3. Run quality gates: tests → check → lint\n  4. Fix prettier, re-run lint\n  5. Commit → push → `gh pr create --base develop`\n  6. Report to team-lead via SendMessage\n\n### Pattern: The branch lifecycle\n\n```\ndevelop (trunk, always deployable, protected)\n  ↓ checkout\nstory/<issue>-<desc> (short-lived, one agent owns it)\n  ↓ TDD red → green → refactor\n  ↓ quality gates pass\n  ↓ gh pr create --base develop\n  ↓ Marcus reviews (RED/YELLOW/GREEN)\n  ↓ merge\ndevelop (updated)\n```\n\n**Relevance to apex-research RFC:** The reference teams have NO precedent for \"research on main, code via PRs\" — they use PRs for ALL code changes. However, they also don't produce markdown research artifacts — that's a research team pattern, not a dev team pattern. The apex team's hybrid nature means they need a hybrid workflow.\n\n---\n\n## 3. TDD Patterns and Enforcement\n\n### Evidence\n\n**TDD is mandatory and heavily enforced at multiple levels.**\n\n**CODING_STANDARDS.md (dev-toolkit, lines 466-477):**\n```\nFollow the TDD cycle for all database functions and business logic:\n1. Red — Write a failing test that describes the expected behavior\n2. Green — Write the minimal code to make the test pass  \n3. Refactor — Clean up while keeping tests green\n\nThe test must fail before you write the implementation.\n```\n\n**WORKFLOW.md (step 4, lines 83-100):**\n- Each acceptance criterion becomes at least one test\n- Tests must FAIL first — \"If they pass, the test doesn't cover the issue\"\n- \"Include at least one integration test that exercises the full pipeline\"\n\n**Tess prompt (rc-team):**\n- TDD workflow explicitly: \"Write failing tests FIRST (red phase) before implementation\"\n- Tess writes RED tests, hands to Sven/Dag for GREEN implementation\n- This is the TDD PAIR pattern: separate agents for test writing vs implementation\n\n**PR Template (dev-toolkit/.github/PULL_REQUEST_TEMPLATE.md):**\n- Hard checklist items:\n  - \"Tests were written **before** implementation (TDD red → green)\"\n  - \"All acceptance criteria have corresponding tests\"\n  - \"All tests pass (`pnpm tests`)\"\n- These checkboxes must ALL be ticked before `gh pr create` is allowed\n\n**Quality gates (CODING_STANDARDS.md lines 479-508):**\n- CI pipeline: `pnpm check` (TypeScript strict), `pnpm tests`, `pnpm lint`, `eslint --max-warnings=N`\n- Warning ratchet: `sonarjs/cognitive-complexity` with decreasing threshold\n- Pre-commit hook option: `pnpm check || exit 1; pnpm tests || exit 1`\n\n**Marcus prompt (code reviewer):**\n- Reviews AFTER tests pass: \"after implementation is complete and tests are green, full code review\"\n- RED/YELLOW/GREEN verdict system\n- Posts via GitHub Reviews API for audit trail\n\n### Enforcement mechanisms (4 layers)\n\n| Layer | Mechanism | Source |\n|-------|-----------|--------|\n| 1. Agent prompt | \"TDD is mandatory\", \"Write failing tests FIRST\" | Tess prompt, WORKFLOW.md |\n| 2. PR template checklist | \"Tests written before implementation\" must be checked | PR_TEMPLATE.md |\n| 3. CI pipeline | `pnpm tests` as hard gate, `eslint --max-warnings=N` | CODING_STANDARDS.md |\n| 4. Code review | Marcus verifies TDD compliance in review | Marcus prompt |\n\n**Relevance to apex RFC Q4 (TDD pair):** The reference teams DO use a TDD pair pattern — Tess writes RED, Sven/Dag write GREEN. But this works because they have a dedicated test engineer agent. The RFC's option B (single agent with test mandate) matches what happens when Tess isn't spawned — the implementing agent does both, which is the \"lite\" configuration.\n\n---\n\n## 4. Research-to-Implementation Transition\n\n### Evidence\n\n**The rc-team → hr-devs evolution IS the research-to-implementation transition story.**\n\n**rc-team was the generalist team:**\n- 11 agents including alex (APEX migration), harmony (integration/auth), piper (CI/CD)\n- Broad scope: \"Multi-application development team building on the Cloudflare + SvelteKit stack\"\n- Located in dev-toolkit (shared tooling repo)\n\n**hr-devs was the specialized fork:**\n- 9 agents (dropped piper, harmony, alex — narrowed scope)\n- Single project focus: \"Specialized development team for the Eesti Raudtee HR platform\"\n- Moved from dev-toolkit INTO the project repo (`hr-platform/.claude/teams/hr-devs/`)\n- Added `docs/` directory for structured shared knowledge\n- Added `spawn_member.sh` for shell-based spawning (vs Agent tool)\n- Added `docs/startup-shutdown.md` as canonical procedure (vs inline in common-prompt)\n\n**What changed structurally:**\n\n| Aspect | rc-team | hr-devs | Evolution |\n|--------|---------|---------|-----------|\n| Location | dev-toolkit (shared) | project repo (co-located) | Team config moves into the project it serves |\n| Memory | Flat `memory/` only | `memory/` + `docs/` split | Personal scratchpads separated from team knowledge |\n| Startup | Inline in common-prompt | Dedicated `docs/startup-shutdown.md` | Extracted to standalone reference doc |\n| Spawning | Agent tool | `spawn_member.sh` script | Infrastructure code extracted from prompts |\n| Scope | Multi-project | Single project | Specialization |\n| Team size | 11 agents | 9 agents (dropped 3 specialists) | Right-sized for the domain |\n\n**Arvo (requirements analyst) as the transition role:**\n- Arvo sits between research (Finn's reports) and implementation (Sven/Dag's code)\n- Workflow: receives Finn's research → analyzes gaps between design/spec/code → drafts issues with AC → hands to team-lead\n- This is the \"spec review\" role that apex-research needs for their draft → reviewed → approved lifecycle\n- Key: Arvo's output format has structured sections: Kirjeldus, Vastuvotukriteeriumid, Avatud kusimused, Viited\n\n**Issue Closure Protocol as quality gate for handoff:**\n- Completion comment requires: Summary, Files changed, Tests, AC verification\n- This is the audit trail that survives handoff — when work moves from one team to another, the closed issue with its completion comment IS the record\n\n**Patterns relevant to apex spec lifecycle:**\n\nThe reference teams have a clear stage-gate flow:\n\n```\nRequirements (Arvo/Finn)\n  → Story with AC (GitHub Issue)\n    → Branch (story/<issue>-<desc>)\n      → RED tests (Tess)\n        → GREEN implementation (Sven/Dag)\n          → Code review (Marcus: RED/YELLOW/GREEN)\n            → PR merge\n              → Issue closure (team-lead, with completion comment)\n```\n\nFor apex-research's spec lifecycle, the analogous flow would be:\n\n```\nAnalysis (Champollion/Nightingale)\n  → Spec draft (Hammurabi)\n    → Review issue (GitHub Issue, structured template)\n      → Review (assigned reviewer, comments on issue)\n        → Revision if needed (Hammurabi)\n          → Approval (frontmatter status update)\n            → Handoff issue (on downstream team's repo)\n```\n\n---\n\n## Cross-Cutting Observations\n\n### 1. The reference teams never had apex's \"37 agents on main\" situation\nBoth teams enforce single-agent-at-a-time git ownership. The apex team's experience of 37 interleaved commits with zero conflicts is unprecedented in the reference material. This works BECAUSE:\n- Research output (markdown/JSON) has low merge conflict risk\n- Dashboard work was temporally interleaved, not truly parallel\n- All agents share a conceptual understanding of file ownership boundaries\n\n### 2. Long-lived branches are explicitly forbidden\nWORKFLOW.md line 161: \"No long-lived feature branches.\" The `dashboard-dev` branch in the apex design spec contradicts this principle. The RFC's own addendum reaches the same conclusion — Option D (trunk-based) or E (short-lived branches) aligns with reference team practice.\n\n### 3. The \"test-gaps.md → issues\" pattern is the missing link\nThe hr-devs `test-gaps.md` file shows how teams handle the \"too many items to track as issues, too important to lose\" problem. Items start as unfiled notes with a status tag, then get promoted to issues when triaged. This directly answers apex RFC Q1 — use a similar staging file for session discoveries, promote to issues for cross-session work.\n\n### 4. Code review as the quality gate, not PRs themselves\nMarcus's review (RED/YELLOW/GREEN) is the actual quality gate. The PR is just the delivery mechanism. For apex's spec lifecycle, the equivalent is a structured review with a verdict — not just \"looks good.\" The reviewer should produce a structured response (like Marcus's RED/YELLOW/GREEN) that maps to the spec's frontmatter status transitions.\n\n---\n\n(*FR:Finn*)",
+    "summary": "RFC #3 reference team findings report delivered",
+    "timestamp": "2026-03-18T09:04:54.980Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-18T09:05:03.535Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:05:03.535Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-03-18T09:05:59.505Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:05:59.505Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-18 11:58] Timezone fix analysis — all layers identified. Three files need changes.\n\n---\n\n## Layer audit\n\n| Layer | Current state | Issue |\n|-------|--------------|-------|\n| Dockerfile.apex | installs `tzdata`? No. | Ubuntu 24.04 defaults to UTC. No tzdata, no localtime config. |\n| docker-compose.yml | No `TZ` env var | All processes inherit UTC |\n| entrypoint-apex.sh | Step 9 writes `SHELL_VARS` to .bashrc | `TZ` not in the map — not persisted for interactive shells |\n| tmux | No timezone config needed | tmux reads system clock, inherits from shell env |\n| Claude Code | Reads system time / env `TZ` | Will pick up `TZ` if set in env/bashrc |\n| Python | Reads system time / env `TZ` | Same — no special handling needed |\n| git | Uses system time | Same |\n\nThree changes needed. All minimal and correct.\n\n---\n\n## Change 1 — Dockerfile.apex: install tzdata + set system timezone\n\nAdd after the `locales` line in the `apt-get install` block. `tzdata` is needed to make `/usr/share/zoneinfo/Europe/Tallinn` available. Then link it:\n\n```dockerfile\n# ── Python 3 + SSH server + sudo + tmux ──────────────────────────────────────\nRUN apt-get update && apt-get install -y --no-install-recommends \\\n        python3 \\\n        python3-venv \\\n        python3-pip \\\n        openssh-server \\\n        sudo \\\n        tmux \\\n        locales \\\n        tzdata \\\n    && rm -rf /var/lib/apt/lists/* \\\n    && sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen \\\n    && ln -snf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime \\\n    && echo \"Europe/Tallinn\" > /etc/timezone \\\n    && dpkg-reconfigure -f noninteractive tzdata \\\n    ...rest unchanged...\n```\n\nThe `DEBIAN_FRONTEND=noninteractive` + `dpkg-reconfigure` is the canonical Ubuntu pattern — it writes both `/etc/localtime` and `/etc/timezone` from the zoneinfo file.\n\n---\n\n## Change 2 — docker-compose.yml: add TZ environment variable\n\nAdd `TZ` to the `environment:` block:\n\n```yaml\n    environment:\n      - HOME=/home/ai-teams\n      - TZ=Europe/Tallinn\n      - REPO_URL=...\n      ...rest unchanged...\n```\n\nThis sets `TZ` on PID 1 (the entrypoint process) and all child processes. Node.js, Python, and bash all read `TZ` from the environment and use it for `new Date()`, `datetime.now()`, `date` commands.\n\n---\n\n## Change 3 — entrypoint-apex.sh: add TZ to SHELL_VARS\n\nStep 9 writes env vars to `.bashrc` for interactive shells (SSH sessions, `sudo su`). `TZ` must be in the map so it persists for agents running Claude Code interactively:\n\n```bash\ndeclare -A SHELL_VARS=(\n    [HOME]=\"/home/ai-teams\"\n    [TZ]=\"Europe/Tallinn\"                    # ← add this line\n    [NODE_EXTRA_CA_CERTS]=\"/opt/warp-ca.pem\"\n    ...rest unchanged...\n)\n```\n\n---\n\n## Why three layers and not just one\n\n- `TZ` in compose.yml → covers the entrypoint process, all agent subprocesses spawned from it\n- `TZ` in .bashrc (via entrypoint SHELL_VARS) → covers SSH login shells and `sudo su - ai-teams` (these don't inherit compose env vars — documented in runbook §3)\n- `/etc/localtime` + `/etc/timezone` in Dockerfile → covers any process that reads the system timezone directly (sshd, cron, system logs, Python `datetime.astimezone()` without explicit tz)\n\nIf we only set `TZ` in compose, timestamps in SSH sessions and system logs stay UTC. All three layers are needed for full coverage.\n\n---\n\n## Apply without image rebuild (for immediate fix)\n\nIf the team needs the fix now without waiting for a rebuild + redeploy, these commands on the RC server apply it to the running container:\n\n```bash\n# Fix system timezone (runs as root inside container)\ndocker exec -u root apex-research bash -c \"\n  ln -snf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime && \\\n  echo 'Europe/Tallinn' > /etc/timezone\n\"\n\n# Fix ai-teams .bashrc (add TZ for interactive shells)\ndocker exec -u root apex-research bash -c \"\n  sed -i '/^export TZ=/d' /home/ai-teams/.bashrc && \\\n  echo 'export TZ=Europe/Tallinn' >> /home/ai-teams/.bashrc && \\\n  sed -i '/^export TZ=/d' /home/michelek/.bashrc 2>/dev/null; \\\n  echo 'export TZ=Europe/Tallinn' >> /home/michelek/.bashrc\n\"\n\n# Verify\ndocker exec apex-research date\ndocker exec apex-research bash -c 'source /home/ai-teams/.bashrc && date'\n```\n\nExpected output: `Wed Mar 18 13:58:xx EET 2026` (UTC+2 in winter / UTC+3 in summer as EEST).\n\n---\n\n## Summary of file changes\n\n| File | Change |\n|------|--------|\n| `Dockerfile.apex` | Add `tzdata` to apt install; add `ln -snf` + `echo` + `dpkg-reconfigure` after locale-gen |\n| `docker-compose.yml` | Add `- TZ=Europe/Tallinn` to `environment:` |\n| `entrypoint-apex.sh` | Add `[TZ]=\"Europe/Tallinn\"` to `SHELL_VARS` in Step 9 |\n\nThese changes land in git, then image rebuild + container restart makes them permanent. The live-fix commands above cover the gap until rebuild.",
+    "summary": "Timezone fix: 3 files, immediate live-fix commands included",
+    "timestamp": "2026-03-18T09:59:01.182Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-18T09:59:04.186Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T09:59:04.186Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-18 12:08] **Celes — T01 updated: Data Flow Architecture section added**\n\nThree changes to `topics/01-team-taxonomy.md`:\n\n### 1. New section: \"Data Flow Architecture\" (lines 63-88)\n\nAdded between Hybrid Teams and Team Boundary Definition. Captures the pipeline vs independent-output distinction as a cross-cutting design dimension, orthogonal to archetype:\n\n- **Pipeline** — sequential data dependency chain, requires directory ownership on trunk. `isolation: \"worktree\"` breaks the data flow.\n- **Independent-output** — parallel, no inter-agent file reads. Branch/worktree isolation is safe.\n- **Design-time rule:** determine data flow architecture first during team sculpting. If any agent reads another's output files → pipeline → trunk + directory ownership.\n- Evidence grounded in apex-research RFC #3 and ADR-004 (37 commits, zero conflicts, worktree formally rejected).\n- Archetype correlation table: research = independent, dev = independent, hybrid = pipeline.\n- Caveat: not a hard rule — dev teams with shared `types/` contracts have a pipeline element.\n\n### 2. Updated: Hybrid Teams structural patterns (line 57)\n\nReplaced the \"Worktree isolation\" bullet with \"Trunk-based development\" — corrects the stale pattern that described Berners-Lee on a `dashboard-dev` branch. Now accurately states that directory ownership is the isolation mechanism, with a forward reference to the new Data Flow Architecture section.\n\n### 3. Updated: Common-Prompt variable sections table (lines 370-371)\n\nReplaced \"Worktree isolation\" and \"Git workflow\" rows with \"Isolation model\" and corrected Git workflow descriptions to match the ratified decisions.\n\n**Impact on my role sculpting process:** When I design a team, step 0 is now \"determine data flow architecture\" before choosing isolation models. This goes into my intake checklist — \"What problem are you solving? Who does it touch? **Does any agent read another agent's output files?**\"\n\n(*FR:Celes*)",
+    "summary": "T01 updated: data flow architecture, 3 edits",
+    "timestamp": "2026-03-18T10:08:46.455Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-18T10:08:51.765Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T10:08:51.765Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-03-18 12:07] T06 update complete — Git Isolation Strategy Selection section written.\n\n**What was written:**\nNew section in `topics/06-lifecycle.md` between \"Spawning Paths\" and \"Cross-Session Handover\" (~120 lines). Contents:\n\n1. **Decision** — Two archetypes (independent-output vs pipeline), each with its own canonical isolation model. Decision made at team design time.\n2. **Rationale** — Why the prior universal worktree recommendation (T02/T07) is correct for independent-output teams but a downgrade for pipeline teams. Grounded in apex-research's field evidence (37 commits, 4 agents, zero conflicts).\n3. **Independent-Output Teams** — When/how to use worktree isolation, lifecycle implications (worktree creation at spawn, cleanup at shutdown).\n4. **Pipeline Teams** — When/how to use directory ownership on trunk. Resource partition table format documented (for common-prompt.md). CI build gate recommended.\n5. **Decision Tree** — Flowchart for selecting isolation model. Includes hybrid case (mix of pipeline + independent agents in same team).\n6. **When to Reconsider** — Upgrade signals (pipeline → worktree) and simplification signals (worktree → trunk). Concrete triggers, not vague guidelines.\n7. **T03 Coordination Note** — Flagged that the resource partition table is both lifecycle and communication. T03 may formalize the protocol aspects (partition change notification, data contract updates). My section covers only the lifecycle concern.\n\n**Herald coordination:** The resource partition table touches T03 territory (it's an implicit data contract between agents). I've noted this in the T06 section. Do you want me to send Herald a coordination message, or will you handle that?\n\n**Scratchpad updated** with R9 decisions and the amended R8 hybrid pattern (pipeline teams are a third category, not a variant of hybrid).\n\n(*FR:Volta*)",
+    "summary": "T06 isolation strategy section written, report",
+    "timestamp": "2026-03-18T10:09:28.033Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-18T10:09:31.494Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T10:09:31.494Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-03-18 12:10] Herald — Protocol 5: Resource Partition Table written into T03. Task complete.\n\n## What was done\n\n**Protocol 5: Resource Partition Table** added to `topics/03-communication.md` (lines ~620-816, approximately 170 lines). Includes:\n\n1. **Two isolation strategies contrasted** — Branch Reservation (T02 R1) for independent-output teams vs Directory Partition (Protocol 5) for pipeline teams. Decision tree for strategy selection.\n\n2. **Partition table format** — mandatory section in common-prompt. Columns: Agent / Writes to / Reads from / Notes. Five rules (no write overlap, read unrestricted, shared files have single writer, team-lead writes only memory, new dirs require table update).\n\n3. **Why it works** — three structural properties: strict directory ownership, unidirectional data flow (DAG), append-mostly output. Grounded in apex-research evidence (6 sessions, 80+ commits, zero conflicts).\n\n4. **Enforcement progression** — prompt-level (v1) → CI-level (v2, pre-commit hook) → platform-level (v3, filesystem permissions). Recommendation: start with v1 always.\n\n5. **Data Contract sub-protocol** — the fragile point (shared JSON files) gets a schema change notification flow. Contract file updated BEFORE data changes. Analogous to reference team api-contracts.md pattern.\n\n6. **Failure modes, scaling analysis, integration table** with T02, T03 Protocols 1/3, and T06.\n\n## Also resolved\n\nTwo original T03 open questions marked resolved:\n- \"Sync vs async\" → pipeline=sync (Protocol 5), independent=async (T02 R1)\n- \"Duplicate work\" → partition table (intra-team), handoff ledger (inter-team)\n\n## Coordination needed\n\n**Volta (T06):** Protocol 5 references T06 for isolation strategy selection. When Volta writes that section, the decision tree is: team archetype (pipeline vs independent) determines isolation mechanism (partition vs worktree). I can coordinate directly if you authorize a message to him, or you can relay.\n\n## Scratchpad updated\n\n6 new entries (4 decisions, 2 patterns). 85/100 lines.\n\nStanding by.",
+    "summary": "Protocol 5 written into T03 — task complete",
+    "timestamp": "2026-03-18T10:10:23.811Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-18T10:10:27.639Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T10:10:27.639Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-18 12:11] **T07 Safety & Guardrails — Reference Evidence Report delivered to Monte.**\n\nFull report sent to Monte with 5 sections:\n\n1. **Permission restrictions** — team-lead tool FORBIDDEN list, Finn read-only, Marcus no-merge, apex per-agent access boundary table, shared workspace protocol\n2. **MEMORY.md safety rules** — 11 de facto guardrails from incidents: spawn reuse (REPEATED violation), delegation mandates, git isolation, external system controls, credential exposure warning\n3. **Dev-toolkit safety patterns** — 4 CI hard gates, warning ratchet mechanism, PR template checklist (12 items), code review RED/YELLOW/GREEN system\n4. **Apex pushback on enforcement** — Schliemann's argument: directory ownership IS isolation for pipeline teams, behavioral enforcement is valid long-term (not just interim). PO ratified this in RFC #3.\n5. **12 documented incidents/near-misses** including:\n   - MCP workers-bindings $5K production data loss (CRITICAL — strongest evidence for infrastructure enforcement)\n   - SQL injection in dynamics sync (UNFILED, HIGH)\n   - SENDING status stuck bug (production data corruption)\n   - `hasElevatedRights` auth bypass caught in review\n   - False green tests, test data shipped to production\n   - Figma rate limit exhaustion (repeated)\n   - Agent spawn duplicates (REPEATED violation)\n   - Plaintext credentials in mcp.json\n\n**Key finding for Monte:** The evidence shows 5 enforcement mechanisms currently in use (prompt restrictions, peer enforcement, CI gates, PR checklists, health audits) and 6 gaps (no infrastructure ACLs, no credential isolation, no runaway detection, no kill switch, no deployment lock, no rate limit enforcement).\n\nThe strongest tension is between Schliemann's \"behavioral enforcement works for pipeline teams\" and the $5K MCP incident showing \"behavioral enforcement fails when stakes are high enough.\"\n\nStanding by for follow-up questions from either of you.",
+    "summary": "T07 safety report summary for team-lead",
+    "timestamp": "2026-03-18T10:13:37.762Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-18T10:13:43.208Z\",\"idleReason\":\"available\",\"summary\":\"[to montesquieu] T07 safety evidence report for Monte\"}",
+    "timestamp": "2026-03-18T10:13:43.208Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-03-18 12:23] T07 COMPLETE — Safety & Guardrails rewritten.\n\n**Scope:** T07 grew from 121 lines (simple 4-tier list + Finn's patterns) to 608 lines of designed framework. Finn's reference patterns preserved at the bottom.\n\n**What I wrote (7 major sections):**\n\n1. **Permission Architecture** — 4-tier system (Absolute / Human / Team-lead / Specialist) with design rationale grounded in 3 dimensions: reversibility, blast radius, external visibility. Each tier maps to T04 delegation matrix rows with enforcement mechanisms specified.\n\n2. **Enforcement Layers** — 5-layer enforcement stack (E0 prompt, E1 peer, E2 CI gate, E3 review, E4 audit) with compensating relationships. The key design insight: each layer compensates for the failure mode of the layer below it. E4 audit findings feed back into E0 prompt updates (Known Pitfalls section).\n\n3. **Blast Radius Containment** — 5 containment mechanisms: directory ownership (behavioral), tool restrictions (behavioral), branch isolation (structural), container isolation (structural), credential scoping (structural). Blast radius table by role (PO → manager → TL → specialist).\n\n4. **Authority Compliance** — Detection mechanisms for authority violations (self-check, peer, scratchpad audit, git audit, decision log). Common violations table with prevention and detection for each. Includes the **authority quick-reference template** for common-prompts — the concrete deliverable from the RFC #3 analysis.\n\n5. **Quality Preservation** — 6-layer defense-in-depth for quality (prompt mandate → delegation message → CI gate → PR test summary → code review → periodic audit). Identifies the critical gap: missing tests for new features are invisible to CI and only caught by review + audit. Specific guidance for autonomous teams including TDD sequence enforcement.\n\n6. **Guardrails for Autonomous Teams** — Drift taxonomy (5 types: scope, quality, authority, process, communication), circuit breakers (6 types with triggers, actions, override authority), cascade failure prevention (5 cascade risk types linked to T02 protocols).\n\n7. **Integration section** — Cross-references T04, T05, T02, T08 with specific concept-to-concept mappings.\n\n**Open questions (4):**\n1. Infrastructure vs behavioral enforcement — when to invest in real ACLs/branch protection?\n2. Safety testing / red-teaming — should the framework include periodic boundary-testing?\n3. Proportional response — graduated response to violations (self-corrected vs TL-corrected vs PO-escalated)\n4. Safety metrics — what quantitative indicators measure safety posture?\n\n**Key design decisions:**\n- No single enforcement layer is sufficient (defense-in-depth is mandatory)\n- Tier 0 prohibitions are absolute — no emergency protocol overrides them\n- Authority quick-reference in every common-prompt (prevents the \"authority uncertainty\" pattern)\n- \"Act and report\" principle for autonomous team TL-scope decisions\n- Circuit breakers are semi-automatic — halt work but don't autonomously fix\n\n**Waiting for:** Finn's safety patterns research. If he sends findings, I'll integrate.\n\nScratchpad updated. Ready for review or next task.",
+    "summary": "T07 complete — 608 lines, 7 sections, ready for review",
+    "timestamp": "2026-03-18T10:23:33.915Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-03-18T10:23:38.396Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T10:23:38.396Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-03-18 12:29] UPDATE — Finn's evidence integrated into T07.\n\n**What happened:** I did NOT receive Finn's message during my T07 work. There's a naming mismatch: Finn sent to `montesquieu` (my full name from R8), but I'm registered as `monte` in this session. The message was in `montesquieu.json` inbox, marked unread. I found it after your prompt.\n\n**What I integrated (T07 now 662 lines, up from 608):**\n\n1. **New section: Evidence Base (12 incidents)** — added between Design Principle and Permission Architecture. All 12 of Finn's documented incidents with severity, which enforcement layer caught them (or didn't), and the lesson for each. Includes incident distribution table showing E3 (code review) caught 4/12, while the most damaging (#1, $5K) was caught by zero layers.\n\n2. **Gap mapping table** — Finn's 6 identified gaps mapped to the T07 sections that address them. All 6 are covered.\n\n3. **$5K MCP incident citation** — added to Enforcement Layers section as \"the strongest evidence that behavioral enforcement alone is insufficient for production-critical resources.\" This grounds the infrastructure enforcement argument in a real financial loss.\n\n4. **Finn's enforcement taxonomy cross-reference** — his 5 mechanisms mapped to my E0-E4 stack, showing alignment.\n\n5. **Schliemann's pipeline argument** — added to Blast Radius Containment (directory ownership subsection). Cites the 37-commit-zero-conflict evidence and PO ratification. Notes the boundary: behavioral enforcement is valid for pipeline architectures but NOT for shared-write scenarios.\n\n6. **Warning ratchet mechanism** — added to CI gate description in Quality Preservation. `eslint --max-warnings=N` with decreasing threshold.\n\n**[GOTCHA] Naming mismatch:** My team registration is `monte` but my full prompt name is `montesquieu`. Finn (and possibly Herald from R8) sent to `montesquieu`. Messages landed in a different inbox file. This is a concrete example of the identity verification problem that T05 discusses — and a safety concern: missed coordination messages could cause agents to work with incomplete information.",
+    "summary": "Finn evidence integrated, naming mismatch flagged",
+    "timestamp": "2026-03-18T10:29:39.414Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-03-18T10:33:19.333Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-18T10:33:19.333Z",
+    "color": "pink",
     "read": true
   }
 ]

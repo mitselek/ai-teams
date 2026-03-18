@@ -1,0 +1,23 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 11:01] PRIORITY TASK — apex-research RFC #3 review.\n\nThe apex-research team filed a help-wanted RFC: `Eesti-Raudtee/apex-migration-research#3` — \"RFC: Formalise team workflow — issues, PRs, spec lifecycle\"\n\nRead it with: `gh issue view 3 --repo Eesti-Raudtee/apex-migration-research` and the addendum comment: `gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[].body'`\n\nYOUR DOMAIN — governance and authority:\n\n**Q3 (governance angle): PR review — who reviews?** They propose Schliemann (TL) reviews Berners-Lee's PRs. Is this the right authority structure? Should the TL be the reviewer or should a specialist peer review? What does your delegation matrix say about code review authority?\n\n**Q4: Should dashboard work split into a TDD pair?** They propose option B (single agent with test mandate). This is a governance question about quality enforcement — who enforces the test mandate? What happens when an autonomous agent skips tests under time pressure? What governance mechanism prevents quality erosion?\n\n**Q6 (governance angle): Spec approval authority.** Who has authority to move a spec from draft → reviewed → approved? This maps directly to your delegation matrix. Is spec approval a TL decision or does it need PO sign-off?\n\n**Autonomous team governance gap** — you flagged this in your intro. This RFC is the concrete manifestation. Their team operates without real-time PO. Who has authority to make these workflow decisions? Can the TL decide, or must this go to PO?\n\nDeliver structured analysis to me. Ground in T04 patterns. Deep empathy.",
+    "summary": "Assign Monte governance questions from RFC #3",
+    "timestamp": "2026-03-18T09:01:35.899Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:12] NEW TASK — T07 Safety & Guardrails. This is the session's main topic.\n\nT07 is our thinnest topic at 121 lines — no owner, no design rationale, just a simple 4-tier permission list. Yet T04, T05, and T08 all reference T07's permission categories as if they're well-designed. With apex-research running autonomously, safety is operational, not theoretical.\n\n**Your task: design the safety & guardrails framework for T07.**\n\nThis is deeply governance-adjacent — your delegation matrix (T04) already defines WHO has authority. T07 defines WHAT the boundaries ARE and HOW they're enforced. The overlap:\n\n- **Permission categories** — the current 4-tier list needs design rationale. What dimensions matter? (read/write, git, external systems, spawn authority, etc.)\n- **Guardrails for autonomous teams** — what stops an autonomous team from drifting? Your Emergency Authority Protocol (T04) is part of it, but T07 needs the full picture: prompt-level restrictions, CI gates, audit mechanisms, blast radius containment.\n- **Authority abuse detection** — you already have this in T04 (Row 38-39). T07 is where the enforcement mechanisms live.\n- **Escalation triggers** — when does a safety boundary violation escalate? To whom?\n\nRead `topics/07-safety-guardrails.md` first to see current state. Then read Schliemann's pushback on RFC #3 (the pipeline isolation insight) — it's relevant because safety constraints interact with isolation models.\n\n`gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[-1].body'`\n\nFinn is doing parallel research on safety patterns from reference teams — he'll send you findings. Coordinate.\n\nWrite directly to T07. This is your section to own. Report progress.",
+    "summary": "Monte: own and expand T07 Safety & Guardrails",
+    "timestamp": "2026-03-18T10:09:13.151Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:25] Excellent work on T07. Quick check — Finn sent you his safety evidence report (12 documented incidents, 5 enforcement mechanisms, 6 gaps). Did you receive and integrate it? The $5K MCP incident and the 6 identified gaps are particularly valuable evidence for your enforcement layer design.",
+    "summary": "Check if Monte integrated Finn's evidence",
+    "timestamp": "2026-03-18T10:27:25.958Z",
+    "read": true
+  }
+]

@@ -8,8 +8,16 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773823237483@finn\",\"from\":\"team-lead\",\"reason\":\"R8 session complete. Write closing state to scratchpad before approving.\",\"timestamp\":\"2026-03-18T08:40:37.483Z\"}",
-    "timestamp": "2026-03-18T08:40:37.483Z",
+    "text": "[2026-03-18 11:01] PRIORITY TASK — apex-research RFC #3 background research.\n\nThe apex-research team filed a help-wanted RFC: `Eesti-Raudtee/apex-migration-research#3` — \"RFC: Formalise team workflow — issues, PRs, spec lifecycle\"\n\nRead it with: `gh issue view 3 --repo Eesti-Raudtee/apex-migration-research` and the addendum: `gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[].body'`\n\nYOUR TASK — gather evidence from our reference teams:\n\n1. **How do the reference teams (rc-team, hr-devs) handle the issues-vs-tasks question?** Check their common-prompts and MEMORY.md for patterns. The hr-devs (cloudflare-builders) evolved from ad-hoc to structured — what was their journey?\n\n2. **What git workflow do the reference teams use?** Trunk-based? Feature branches? PRs? Check for evidence in their common-prompts, coding standards, and MEMORY.md rules about PRs.\n\n3. **TDD patterns in reference teams.** What test mandates exist? How are they enforced? Check dev-toolkit/CODING_STANDARDS.md and the hr-devs team config.\n\n4. **How did the hr-devs handle the research-to-implementation transition?** They started as a project team and evolved — any patterns relevant to apex's transition from research phase to review/approval/handoff?\n\nDeliver a structured findings report to me. Raw patterns with source citations. This feeds into the other specialists' analyses.",
+    "summary": "Assign Finn reference research for RFC #3",
+    "timestamp": "2026-03-18T09:02:01.340Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:12] NEW TASK — Research for T07 Safety & Guardrails.\n\nT07 is our thinnest topic (121 lines) and today's main session focus. Monte is taking ownership and designing the framework. Your job: feed him evidence.\n\n**Research tasks:**\n\n1. **Reference team safety patterns.** Read both reference team common-prompts and agent prompts for:\n   - Permission restrictions (YOU MAY / MAY NOT sections)\n   - Scope boundaries (read-only agents, write restrictions)\n   - Git operation restrictions\n   - External system access controls\n   - How violations are detected and handled\n\n2. **MEMORY.md safety-related rules.** Scan the workspace MEMORY.md for safety-related entries — spawn rules, delegation mandates, tool restrictions, \"NEVER\" rules. These are de facto safety guardrails accumulated from incidents.\n\n3. **dev-toolkit safety patterns.** Check CODING_STANDARDS.md and WORKFLOW.md for quality gates, pre-commit hooks, CI pipeline restrictions.\n\n4. **Apex-research pushback.** Read Schliemann's worktree isolation response — it contains a safety argument about prompt-level vs platform-level enforcement. Relevant to T07.\n   `gh api repos/Eesti-Raudtee/apex-migration-research/issues/3/comments --jq '.[-1].body'`\n\n5. **What safety failures have actually happened?** Look for evidence of violations, incidents, near-misses in scratchpads, MEMORY.md, and reference team docs.\n\nSend your findings to Monte (he's writing T07) AND to me. Structured markdown, raw patterns with source citations.",
+    "summary": "Finn: research safety patterns for T07",
+    "timestamp": "2026-03-18T10:09:23.205Z",
     "read": true
   }
 ]
