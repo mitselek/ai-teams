@@ -317,6 +317,50 @@ chmod -R a-w,a+rX "$SOURCE_DATA"
 
 ---
 
+## §12. NODE_EXTRA_CA_CERTS for Claude Code on WARP Hosts
+
+**Symptom:** Claude Code fails with `SELF_SIGNED_CERT_IN_CHAIN` even though `update-ca-certificates` ran in the entrypoint and curl/git work fine.
+
+**Cause:** Node.js does NOT use the system CA store (`/etc/ssl/certs/`). It has its own bundled CA bundle. `update-ca-certificates` adds the WARP cert to the system store, which fixes curl, pip, and git — but Node.js (and therefore Claude Code) is unaffected. It needs to be told about the cert explicitly via `NODE_EXTRA_CA_CERTS`.
+
+This is a separate problem from §2 (WARP TLS interception for system tools). Both fixes are required on WARP hosts — §2 covers apt/curl/git, §12 covers Node.js/Claude Code.
+
+**Fix — Three parts:**
+
+### Part 1: Bind-mount the cert (docker-compose.yml)
+```yaml
+volumes:
+  - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
+```
+
+Mount to `/opt/` — **NOT** to `/etc/ssl/certs/`. The `update-ca-certificates` tool creates symlinks in `/etc/ssl/certs/` and fails with "Device or resource busy" if a bind-mount already occupies a target path there.
+
+### Part 2: Set NODE_EXTRA_CA_CERTS (docker-compose.yml environment)
+```yaml
+environment:
+  - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
+```
+
+Hardcode this value — do not rely on the host env var being set. If `NODE_EXTRA_CA_CERTS` is empty or unset, Claude Code silently falls back to the bundled CA bundle and fails against WARP.
+
+### Part 3: Persist to .bashrc (entrypoint)
+Compose env vars don't propagate to interactive shells (SSH sessions, `docker exec`, `sudo su`). Persist to `.bashrc` in the entrypoint's SHELL_VARS block:
+```bash
+if [ -n "${NODE_EXTRA_CA_CERTS:-}" ]; then
+    SHELL_VARS[NODE_EXTRA_CA_CERTS]="${NODE_EXTRA_CA_CERTS}"
+fi
+```
+This covers any Claude Code session started from an interactive shell rather than the container's PID 1.
+
+**Verify:**
+```bash
+docker exec <container> bash -c 'node -e "fetch(\"https://api.anthropic.com\").then(r=>console.log(r.status)).catch(e=>console.error(e.message))"'
+# Should return: 404
+# SELF_SIGNED_CERT error = NODE_EXTRA_CA_CERTS not reaching Node.js process
+```
+
+---
+
 ## Quick Reference: Full Entrypoint Order
 
 ```

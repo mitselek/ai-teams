@@ -317,5 +317,19 @@
     "summary": "Volta: write pipeline vs independent isolation pattern into T06",
     "timestamp": "2026-03-18T10:07:06.783Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:35] NEW TASK — Design lifecycle for polyphony-dev team.\n\nWe're refactoring a dev team for **Polyphony** (SvelteKit 2 + Svelte 5, Cloudflare D1). Read the current state:\n\n- Common prompt: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/common-prompt.md`\n- Brainstorm: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/brainstorm.md`\n\nThe existing common-prompt has a good memory system (scratchpads, shared knowledge files, shutdown protocol) designed by the team itself. But it lacks:\n- Startup protocol (no startup.md, no step-by-step)\n- Inbox persistence (no persist/restore scripts)\n- Task snapshots on shutdown\n- Author attribution\n\n**YOUR TASK:** Design the lifecycle additions for this team. Use T06 patterns. Don't reinvent what they already have — build on their existing memory/shutdown design. Output: the specific additions needed to their common-prompt.md and any new files (startup.md, lifecycle scripts). Report to me.",
+    "summary": "Volta: design polyphony-dev lifecycle",
+    "timestamp": "2026-03-18T13:54:56.948Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:55] APPROVED — Write startup.md for polyphony-dev.\n\nWrite to: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/startup.md`\n\nUse your proposed design from the report. Include all 6 phases (Orient → Sync → Clean → Create → Restore → Spawn). The machine-specific paths are correct in your proposal.\n\nAlso create the memory directory and shared knowledge files:\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/memory/` (create dir)\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/memory/architecture-decisions.md` (empty with header)\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/memory/test-gaps.md` (empty with header)\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/memory/i18n-conventions.md` (empty with header)\n\nWrite all files. Report when done.",
+    "summary": "Volta: write startup.md + create memory dir",
+    "timestamp": "2026-03-19T08:34:19.921Z",
+    "read": true
   }
 ]

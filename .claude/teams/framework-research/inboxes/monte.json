@@ -19,5 +19,12 @@
     "summary": "Check if Monte integrated Finn's evidence",
     "timestamp": "2026-03-18T10:27:25.958Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:35] NEW TASK — Design governance structure for polyphony-dev team.\n\nWe're refactoring a dev team for **Polyphony** (SvelteKit 2 + Svelte 5, Cloudflare D1). Read:\n\n- Roster: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/polyphony-dev.json`\n- Common prompt: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/common-prompt.md`\n\n**YOUR TASK:**\n1. **Authority quick-reference** — apply the T07 template. What can TL decide? What needs PO (human)?\n2. **\"Polly\" the agent PO** — evaluate this design. In our framework, PO is human. Is \"Polly\" actually a requirements analyst? What authority should she have vs the human PO?\n3. **Code review governance** — Arvo reviews, Dag merges. Is this the right authority chain?\n4. **Quality enforcement** — TDD mandate exists but who enforces? Apply T07 enforcement layers.\n5. **Safety boundaries** — apply T07 permission tiers to each role.\n\nOutput: governance specification ready to add to their common-prompt.md, plus authority quick-reference table. Report to me.",
+    "summary": "Monte: design polyphony-dev governance",
+    "timestamp": "2026-03-18T13:55:09.428Z",
+    "read": true
   }
 ]

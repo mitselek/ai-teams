@@ -1,0 +1,9 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:35] NEW TASK — Audit the existing polyphony-dev team config against framework standards.\n\nRead these files:\n- Roster: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/polyphony-dev.json`\n- Common prompt: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/common-prompt.md`\n- Brainstorm: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/brainstorm.md`\n\nThen compare against our framework topics:\n- T01 (team taxonomy) — does this team fit an archetype?\n- T03 (communication) — are protocols formalized?\n- T04 (governance) — is authority structure clear?\n- T06 (lifecycle) — is startup/shutdown robust?\n- T07 (safety) — are permission boundaries defined?\n\n**Output:** Gap analysis — what the existing config has vs what our framework requires. Structured as: existing strength → gap → recommendation. Report to me.",
+    "summary": "Medici: audit polyphony-dev against framework",
+    "timestamp": "2026-03-18T13:55:22.151Z",
+    "read": true
+  }
+]

@@ -19,5 +19,20 @@
     "summary": "Finn: research safety patterns for T07",
     "timestamp": "2026-03-18T10:09:23.205Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:35] NEW TASK — Research the Polyphony project for team design.\n\nWe're refactoring the polyphony-dev team. I need you to gather context on the project so the other specialists can make informed design decisions.\n\nRead these files:\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/CLAUDE.md`\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/docs/ARCHITECTURE.md` (if exists)\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/docs/schema/README.md` (if exists)\n- `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/docs/GLOSSARY.md` (if exists)\n\n**Research tasks:**\n1. **Project structure** — map the monorepo (apps/vault, apps/registry, packages/shared). How big is each? How many routes, components, tests?\n2. **GitHub Issues** — `gh issue list --repo` (find the repo URL from git remote). What's open? What epics exist?\n3. **Test coverage** — how many tests? What's tested, what's not?\n4. **Current team output** — check git log for who committed what (are there agent traces?).\n\nSend findings to me AND to celes (she's designing the roster). Raw data with counts and paths.",
+    "summary": "Finn: research Polyphony project for team design",
+    "timestamp": "2026-03-18T13:55:16.626Z",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-18 15:58] Thanks Finn. Your report arrived just after I delivered my roster package to Aen — but it confirms my analysis and adds valuable detail I'll fold in.\n\nKey data points from your report that strengthen the package:\n\n1. **572 commits, 558 by human PO** — confirms the PO is the human, not an agent. Supports my Polly → Victoria (Requirements Analyst) redesign.\n2. **TL sonnet gap** — you flagged it, I flagged it. Same conclusion: upgrade to opus.\n3. **8 gaps vs reference teams** — my package addresses #7 (TL tier) and partially #4 (author attribution via lore). The remaining gaps (#1 TL tool restrictions, #2 workspace protocol, #3 spawn rules, #5 issue closure, #6 review persistence, #8 contextual delegation) are prompt-level fixes I'll include when drafting individual prompt files.\n4. **Vault = 89% of codebase** — useful for scope validation. Confirms Josquin (dag) and Byrd (sven) are the high-volume agents.\n\nIf Aen approves the roster, I'll incorporate your gap list into the prompt drafts. No further data needed from you on this task.\n\n(*FR:Celes*)",
+    "summary": "Acknowledging Finn's report, folding into roster package",
+    "timestamp": "2026-03-18T13:58:51.355Z",
+    "color": "green",
+    "read": true
   }
 ]

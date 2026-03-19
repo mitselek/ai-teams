@@ -66,4 +66,12 @@
 
 [GOTCHA] Naming mismatch: registered as `monte` but Finn sent to `montesquieu`. Messages landed in separate inbox file (`montesquieu.json` vs `monte.json`). Missed coordination — found only when team-lead asked. Safety concern for the framework: agent identity inconsistency causes missed messages.
 
+[CHECKPOINT] 2026-03-18 15:55 — polyphony-dev governance spec delivered. 6 sections: Polly role analysis (requirements analyst, NOT PO), authority quick-reference, code review chain (Arvo reviews / Dag merges / team-lead informed), quality enforcement (4 gaps identified), safety tiers per role, project-specific safety (D1 remote migrations, auth/crypto code).
+
+[DECISION] Agent labeled "PO" is an authority violation — creates implicit authority that bypasses human PO. Polly should be "Requirements Analyst." Remove "product strategy" from scope. Add explicit "You are NOT the PO" disclaimer.
+
+[DECISION] Dag has elevated blast radius (opus model + implementation + merge). Acceptable with Arvo review as compensating control. If Arvo unavailable, Dag must NOT self-merge.
+
+[PATTERN] T07 framework is now applicable to external teams — polyphony-dev is the first non-Eesti-Raudtee team to receive governance analysis. Authority quick-reference template, permission tiers, enforcement layers all transferred cleanly.
+
 (*FR:Montesquieu*)

@@ -14,8 +14,10 @@
 [PATTERN] Model tier driven by **consequence of error**, not task complexity. Opus when no automated quality gate; sonnet when tests catch errors.
 [PATTERN] Three team archetypes: Research, Development, Hybrid — determined by primary output type.
 [PATTERN] Six canonical agent roles: Coordinator, Researcher, Analyst, Developer, Spec Writer, Design Specialist.
+[PATTERN] Data flow architecture (pipeline vs independent-output) determines isolation model. Pipeline → trunk + directory ownership. Independent → branch/worktree safe.
+[PATTERN] "Agent PO" is an anti-pattern — PO is always the human. Agent should be "Requirements Analyst" with explicit escalation rules.
 
-## Hires Delivered (cumulative — 16 agents)
+## Hires Delivered (cumulative — 24 agents)
 
 | Agent | Lore | Team | Model | Date |
 |---|---|---|---|---|
@@ -35,18 +37,24 @@
 | Hammurabi | Hammurabi | AR | opus | 2026-03-17 |
 | Montesquieu | Charles de Montesquieu | FR | opus | 2026-03-17 |
 | Marconi | Guglielmo Marconi | CD TL | opus | 2026-03-17 |
+| Palestrina | G.P. da Palestrina | PD TL | opus | 2026-03-18 |
+| Byrd | William Byrd | PD | sonnet | 2026-03-18 |
+| Josquin | Josquin des Prez | PD | opus | 2026-03-18 |
+| Tallis | Thomas Tallis | PD | sonnet | 2026-03-18 |
+| Bentham | Jeremy Bentham | PD | opus | 2026-03-18 |
+| Comenius | Jan Amos Comenius | PD | sonnet | 2026-03-18 |
+| Victoria | Queen Victoria | PD | sonnet | 2026-03-18 |
+| Finn | (reuse) | PD | sonnet | 2026-03-18 |
 
-## Session 2026-03-17/18 (R8) — Complete
+## Session 2026-03-18 (R9)
 
-[DECISION] Aeneas lore polished — "continuous evolution" reading, "conditions for civilization" reframe.
-[DECISION] apex-research team: 5 agents, full file set at `apex-migration-research/.claude/teams/apex-research/`.
-[DECISION] T04 most imminent → Montesquieu hired (governance architect, opus, FR).
-[DECISION] Marconi persona for comms-dev TL. Lovelace roster entry prepared (was missing).
-[DECISION] T01 Team Taxonomy deepened: 83→450 lines. Archetypes, role taxonomy, tiering, sizing, common-prompt patterns.
-[LEARNED] Deploying a second team is the best requirements-gathering tool for governance gaps.
-[LEARNED] Common-prompt has a fixed 9-section skeleton across all archetypes — variable sections are archetype-specific.
-[DEFERRED] Remaining specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer — 4 of original 8.
+[DECISION] T01 updated: Data Flow Architecture section (pipeline vs independent-output). Hybrid Teams corrected (trunk, not worktree). Common-prompt table updated.
+[DECISION] RFC #3 Q4: No TDD split for apex-research Berners-Lee — strengthen test mandate instead. Roster well-balanced at 5.
+[DECISION] polyphony-dev full redesign: 8 agents, music-themed lore, TL upgraded sonnet→opus, Polly→Victoria (Requirements Analyst).
+[DECISION] Finn scratchpad exception pattern: read-only agent gets one-file write permission for personal scratchpad.
+[LEARNED] First cross-project roster design (polyphony-dev). Music domain enables thematic lore coherence.
+[LEARNED] Finn's gap analysis (8 items vs reference teams) is a checklist for prompt quality — use in future designs.
+[DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
 [DEFERRED] Comms-dev common-prompt needs Lovelace added to members list.
-[DEFERRED] Comms-dev TL prompt rename (team-lead.md → marconi.md) — pending Aen's decision.
 
 (*FR:Celes*)

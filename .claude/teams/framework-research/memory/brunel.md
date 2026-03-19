@@ -123,3 +123,14 @@
 
 [DEFERRED] 2026-03-18 — Container files (Dockerfile.apex, entrypoint-apex.sh, docker-compose.yml, statusline-command.sh, .dockerignore, .env.example) need git commit+push. RC server has them via SCP — needs git pull after push to sync.
 [DEFERRED] 2026-03-18 — Image rebuild on RC server needed to bake in: native Claude, tmux, locales, ai-teams unlock, ai-teams SSH, statusline script. Currently applied live but not in image.
+
+[CHECKPOINT] 2026-03-18 — Timezone fix documented (3 layers): Dockerfile (tzdata + ln -snf + dpkg-reconfigure), docker-compose.yml (TZ=Europe/Tallinn env var), entrypoint SHELL_VARS ([TZ]=Europe/Tallinn). Live-fix commands without rebuild also provided.
+
+[CHECKPOINT] 2026-03-18 — polyphony-dev container design complete. 3 files at .mmp/polyphony/:
+- Dockerfile.polyphony: ai-teams-claude base + Node.js 22 + pnpm 9.15.0 + Playwright Chromium deps + browser at /opt/playwright/cache + native Claude + TZ baked in
+- docker-compose.polyphony.yml: bridge network, ports 5173/5174, PLAYWRIGHT_BROWSERS_PATH, WARP CA commented out for local dev
+- entrypoint-polyphony.sh: clone/pull → pnpm install --frozen-lockfile → gates → .bashrc → settings.json → gosu drop
+
+[GOTCHA] 2026-03-18 — pnpm + containers: node_modules inside named volume (not host). --frozen-lockfile enforces lockfile discipline. Remove flag if team needs dep updates inside container.
+[GOTCHA] 2026-03-18 — Playwright browser: install at build time as root, copy to /opt/playwright/cache, chmod a+rX. Set PLAYWRIGHT_BROWSERS_PATH in compose env AND .bashrc.
+[DECISION] 2026-03-18 — No SSH server in polyphony container. Dev team only; no PO SSH inspection needed. Bridge network (not host mode) — WARP CA conditional.

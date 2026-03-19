@@ -14,6 +14,12 @@
 
 [PATTERN] Enforcement progression for partition tables: prompt-level (v1, zero cost, sufficient for <5 agents) → CI-level (v2, pre-commit hook checks git diff against table) → platform-level (v3, filesystem permissions, high complexity). Start with v1 always.
 
+[DECISION] polyphony-dev is independent-output (not pipeline). Sven+Dag write domains overlap in src/. Protocol 5 does not apply. Uses branch isolation + serialized TDD handoff chain instead. Time-partitioned, not space-partitioned.
+
+[PATTERN] TDD teams need a third isolation mode: temporal ownership chain. Only one agent (or defined pair) owns the story branch at any given phase. Ownership rotates: Tess(RED)→Sven+Dag(GREEN)→Lingo(i18n)→Arvo(REVIEW)→Dag(MERGE). Complements Protocol 5 (space) and R1 (branch).
+
+[PATTERN] Sven+Dag co-ownership works because their write subdirectories within src/ are mostly disjoint (Sven=components+routes/UI, Dag=server/db+auth+migrations+API endpoints). If conflicts arise, serialize: Dag first (schema+API), then Sven (UI).
+
 ## 2026-03-17 (session R8)
 
 [DECISION] T03 open question #6 resolved: Direct Link Lifecycle Protocol added to Protocol 2. Five review triggers (time-based, inactivity, scope change, incident, on-demand). Registry extended with Last active, Review due, Last review columns. Authority split with T04: Herald owns protocol mechanics, Montesquieu owns authority model (delegation matrix Rows 27-28).

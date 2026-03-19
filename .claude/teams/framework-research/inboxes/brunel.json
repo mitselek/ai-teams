@@ -400,5 +400,33 @@
     "summary": "Brunel: fix apex container timezone to EET",
     "timestamp": "2026-03-18T09:57:48.322Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 13:10] NEW TASK — Design container setup for polyphony-dev team.\n\nWe've just redesigned the polyphony-dev team (choral music sharing platform, SvelteKit 2 + Svelte 5, Cloudflare D1, Paraglide i18n). The PO wants it containerized like the apex-research team.\n\nRead these for context:\n- Polyphony CLAUDE.md: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/CLAUDE.md`\n- Polyphony roster: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/polyphony-dev/roster.json`\n- Our existing Dockerfile (base): `/c/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/Dockerfile`\n- Our existing docker-compose.yml: `/c/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/docker-compose.yml`\n- Our existing entrypoint.sh: `/c/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/entrypoint.sh`\n- Apex deployment runbook: `/c/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/docs/container-deployment-runbook.md`\n\n**Key differences from apex-research:**\n- **pnpm workspaces** — monorepo with apps/vault, apps/registry, packages/shared. Needs `pnpm install` after clone.\n- **Wrangler** — needed for local D1 dev (`wrangler d1 migrations apply DB --local`)\n- **Playwright** — E2E testing needs browser deps\n- **TZ=Europe/Tallinn** — bake in from the start (we just learned this lesson)\n- **Same repo:** `mitselek/polyphony` (private)\n\n**YOUR TASK:**\n1. Design `Dockerfile.polyphony` — based on our standard Dockerfile but with pnpm, wrangler, and Playwright deps\n2. Design the `docker-compose.yml` service entry for polyphony-dev\n3. Design `entrypoint-polyphony.sh` — same pattern as our standard entrypoint but with `pnpm install` step after clone/pull\n4. Note any gotchas from the apex deployment that apply here\n\nWrite all 3 files to `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/`. Report when done.",
+    "summary": "Brunel: design polyphony container setup",
+    "timestamp": "2026-03-19T09:49:48.235Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 12:35] BUILD FAILED — need your help fixing the Dockerfile.\n\nDeploying on RC server (dev@100.96.54.170) — same WARP-protected host as apex. Two failed builds:\n\n**Error:** `apt-get update` fails → `E: Unable to locate package curl`. WARP TLS interception blocks apt repos.\n\n**What I tried:** Added `COPY warp-ca.pe[m]` + `update-ca-certificates` before apt-get. The cert file `warp-ca.pem` IS in the build context (`~/polyphony-deploy/warp-ca.pem`, copied from `/usr/local/share/ca-certificates/managed-warp.pem`). Still fails.\n\n**Build context:** `~/polyphony-deploy/` on the RC server. The Dockerfile, compose, entrypoint are at `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/` locally.\n\n**Questions for you:**\n1. Is the Docker COPY glob `warp-ca.pe[m]` actually working? Should it be a direct COPY?\n2. Does `update-ca-certificates` need to run in the same RUN as `apt-get update` to take effect?\n3. The base image (`ai-teams-claude:latest`) was built 47 hours ago on the same server — how did IT succeed with apt-get? Did it have the WARP cert already?\n4. Does curl even need to be installed? It's not in the base image's apt list but might be present as a dependency.\n\nFix the Dockerfile at `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/Dockerfile.polyphony` directly. Then I'll push and retry the build on the server. SSH access: `ssh dev@100.96.54.170` if you need to inspect the server state.",
+    "summary": "Brunel: fix WARP build failure on RC server",
+    "timestamp": "2026-03-19T10:43:52.641Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 12:55] Container is running but Claude fails with `SELF_SIGNED_CERT_IN_CHAIN` — WARP TLS interception. Same issue as apex.\n\nThe WARP cert is on the host at `/usr/local/share/ca-certificates/managed-warp.pem` but is NOT inside the container. `NODE_EXTRA_CA_CERTS` is empty.\n\nWe need:\n1. Bind-mount the WARP cert into the container (uncomment the line in docker-compose)\n2. Set `NODE_EXTRA_CA_CERTS` to point to it\n3. Restart the container\n\nFix the compose file at `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/docker-compose.polyphony.yml`. The WARP cert bind-mount line is already there but commented out. Uncomment it and ensure `NODE_EXTRA_CA_CERTS` points to the mounted path.\n\nNote: we're using `network_mode: host` now, so the `volumes:` section format may need adjustment. Check the apex-research compose for reference: `ssh dev@100.96.54.170 'docker inspect apex-research --format \"{{json .Mounts}}\" | python3 -m json.tool'`",
+    "summary": "Brunel: fix WARP cert for Claude in container",
+    "timestamp": "2026-03-19T10:57:55.154Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:00] Good fix on the compose. One more task: update your deployment runbook.\n\nAdd this as §12 to your runbook at `/c/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/docs/container-deployment-runbook.md`:\n\n**§12: NODE_EXTRA_CA_CERTS for Claude Code on WARP hosts**\n\nNode.js does NOT use the system CA store. Even if `update-ca-certificates` runs in the entrypoint, Claude Code (Node.js) will fail with `SELF_SIGNED_CERT_IN_CHAIN`. You must:\n1. Bind-mount the WARP cert into the container (read-only)\n2. Set `NODE_EXTRA_CA_CERTS` env var pointing to the mounted cert path\n3. Mount to `/opt/` — NOT to `/etc/ssl/certs/` (symlink conflicts with update-ca-certificates)\n\nThis is separate from the §2 WARP TLS issue (which covers system-level CA for apt/curl/git). Node.js is a special case.\n\nWrite the update directly. Report when done.",
+    "summary": "Brunel: add §12 to deployment runbook",
+    "timestamp": "2026-03-19T10:58:57.085Z",
+    "read": true
   }
 ]

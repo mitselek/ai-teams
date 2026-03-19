@@ -56,5 +56,12 @@
     "summary": "Herald: write resource partition protocol into T03",
     "timestamp": "2026-03-18T10:07:11.550Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-18 12:35] NEW TASK — Design communication protocols for polyphony-dev team.\n\nWe're refactoring a dev team for **Polyphony** (SvelteKit 2 + Svelte 5, Cloudflare D1, Paraglide i18n). Read:\n\n- Common prompt: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/common-prompt.md`\n- Roster: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/teams/polyphony-dev.json`\n- CLAUDE.md: `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/CLAUDE.md`\n\nThe team has a clear TDD workflow (Polly→issue→Tess→RED→Sven/Dag→GREEN→Arvo→review→merge). But the communication protocols are implicit, not formalized.\n\n**YOUR TASK:**\n1. **Data flow analysis** — is this pipeline or independent-output? Map the agent dependencies.\n2. **Resource partition table** — which agents write to which directories? Use Protocol 5 format.\n3. **Handoff protocols** — formalize the TDD handoff chain (RED→GREEN→REVIEW→MERGE).\n4. **Research support protocol** — how does Finn integrate? Who can request, what's the format?\n\nOutput: protocol specifications ready to add to their common-prompt.md. Report to me.",
+    "summary": "Herald: design polyphony-dev communication protocols",
+    "timestamp": "2026-03-18T13:55:03.330Z",
+    "read": true
   }
 ]
