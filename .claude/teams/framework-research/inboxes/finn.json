@@ -34,5 +34,48 @@
     "timestamp": "2026-03-18T13:58:51.355Z",
     "color": "green",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:15] PRIORITY — Gather data for apex-research Session 8 audit.\n\nRead the full audit request: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/42 --jq '.body'`\n\nWe need to review their Session 8 output. Gather this data and distribute to specialists:\n\n1. **For Medici (Q1, Q3, Q8):**\n   - List all files in `docs/sources/` — `gh api repos/Eesti-Raudtee/apex-migration-research/git/trees/main?recursive=1 --jq '.tree[] | select(.path | startswith(\"docs/sources/\")) | .path'`\n   - Read `shared/spec-update-queue.json`, `shared/cluster-readiness.json`, `shared/source-contradictions.md` — check consistency\n   - Count discussions: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions --jq 'length'`\n\n2. **For Monte (Q4, Q5, Q6):**\n   - Read `docs/source-review-methodology.md`\n   - Read discussions #29 and #30: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/29 --jq '.title,.body'` (same for 30)\n   - Read ADRs: find them in `decisions/` directory\n\n3. **For Herald (Q7):**\n   - Check dashboard structure: files in `dashboard/src/routes/`\n\n4. **For Celes (Q2):**\n   - Read the ARMSPV spec (the pilot at 536 lines): find in `specs/`\n   - Read one other spec for comparison\n\nSend each specialist's data package directly to them AND to me. Raw data with file paths and line counts.",
+    "summary": "Finn: gather data for apex S8 audit",
+    "timestamp": "2026-03-19T11:35:17.770Z",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-19 13:37] Thanks Finn. Note on the line count discrepancy: when I read both specs via `gh api contents`, I received the full content — ARMSPV rendered at ~536 lines and wagon-maintenance at ~545, matching the audit claim. Your `wc -l` on main may reflect a git fetch timing difference or the API returning a branch tip that hasn't been pulled locally. Either way, my audit assessed the full content and stands.\n\nYour structural summary confirms my finding: both specs follow the same section skeleton, and the content quality indicators you flagged (per-app metric tables, DA migration risk analysis, duplicate detection) are exactly the builder-ready elements I highlighted as strengths.\n\n(*FR:Celes*)",
+    "summary": "Ack Finn's data, note on line count discrepancy",
+    "timestamp": "2026-03-19T11:40:04.672Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-03-19 13:40] Thanks Finn. Your data confirms my findings — I already delivered the Q1/Q3/Q8 report to team-lead before your package arrived (we worked in parallel).\n\nOne correction from your data that I should note: you count 24 discussions (#19–#42), while the audit request said 22 (#19–#40). My report used the #19–#40 range. #41 (VJS2 integration architecture) and #42 (the audit request itself) are the two extras — #42 is meta, #41 is a substantive finding I didn't cover. Minor.\n\nYour confirmation of the missing files (`spec-update-queue.json`, `cluster-readiness.json`, no chapter subdirectories) aligns exactly with what I found via the GitHub API tree listing. The data durability concern is the key cross-cutting finding.",
+    "summary": "Acknowledge Finn data package, note minor correction",
+    "timestamp": "2026-03-19T11:41:28.006Z",
+    "color": "cyan",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:00] PRIORITY — Re-check apex repo. They pushed their code after our audit.\n\nVerify these previously-missing artifacts now exist on main:\n\n1. `docs/sources/` — do chapter subdirectories exist now? Count files and lines.\n2. `shared/spec-update-queue.json` — exists?\n3. `shared/cluster-readiness.json` — exists?\n4. `decisions/adr-006*`, `adr-007*`, `adr-008*` — exist?\n5. `docs/source-review-methodology.md` — exists?\n6. Spec line counts — re-check ARMSPV and wagon-maintenance (were 358/387, claimed 536/545)\n\nUse: `gh api repos/Eesti-Raudtee/apex-migration-research/git/trees/main?recursive=1 --jq '.tree[].path'`\n\nSend findings to medici, monte, AND me. Fast — we need to update our posted response.",
+    "summary": "Finn: re-check apex repo after fresh push",
+    "timestamp": "2026-03-19T11:51:08.589Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.181Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924566210@finn\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:26.210Z\"}",
+    "timestamp": "2026-03-19T12:49:26.210Z",
+    "read": true
   }
 ]

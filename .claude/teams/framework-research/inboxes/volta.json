@@ -331,5 +331,18 @@
     "summary": "Volta: write startup.md + create memory dir",
     "timestamp": "2026-03-19T08:34:19.921Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.206Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924566766@volta\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:26.766Z\"}",
+    "timestamp": "2026-03-19T12:49:26.766Z",
+    "read": true
   }
 ]

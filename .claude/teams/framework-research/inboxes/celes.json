@@ -195,5 +195,40 @@
     "summary": "Celes: write roster + all 9 prompt files",
     "timestamp": "2026-03-19T08:34:14.923Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:15] PRIORITY — Apex-research Session 8 audit: Q2.\n\nRead the audit request: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/42 --jq '.body'`\n\n**Q2: Spec update quality** — +807 lines across 11 cluster specs. ARMSPV (pilot) at 536 lines, wagon-maintenance at 545 lines.\n\nYour question: Are these specs actually useful for a downstream migration team? Would a builder understand what to build from the ARMSPV spec?\n\nEvaluate from your agent design / role perspective:\n- Read the ARMSPV spec: find in `specs/` directory of `Eesti-Raudtee/apex-migration-research`\n- Does it have clear scope, inputs, outputs, dependencies?\n- Could you design an agent team to execute this migration based on the spec alone?\n- Compare with one other spec for consistency\n\n`gh api repos/Eesti-Raudtee/apex-migration-research/git/trees/main?recursive=1 --jq '.tree[] | select(.path | startswith(\"specs/\")) | .path'`\n\nDeliver your assessment to me.",
+    "summary": "Celes: audit Q2 spec quality for apex S8",
+    "timestamp": "2026-03-19T11:35:36.544Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-19 13:37] **Apex S8 Audit — Data Package for Celes (Q2)**\n\n## Q2: Spec update quality — ARMSPV pilot + comparison spec\n\n### ARMSPV spec (`specs/armspv-smgs-portal.md`)\n- **358 lines** (audit claims 536 — discrepancy, possibly from a different branch or uncommitted changes)\n- **Status:** `reviewed` (frontmatter)\n- **Complexity:** `critical-path`\n- **Apps:** f143, f161, f172 (3 evolutionary versions of SMGS portal)\n- **Recommendation:** Migrate only f172 (v2 portal), retire f143 and f161\n- **Sections present:** Overview, Recommendation, Complexity Assessment (detailed metric table for all 3 apps), Data Model (core tables + reference tables), reference tables\n\n**Content quality indicators:**\n- Per-app metric table with scores from complexity-scores.json\n- Data model with core tables (SONUM, EDIFACT, SMGS_BLANK_BLOCK, COLLECTIONS, WAGONS, GOODS, etc.) and operations (SELECT, UPDATE, FORM CRUD)\n- Clear migration recommendation with rationale\n- f172 has 27 pages, 228 processes, 135 DA actions, 25 PL/SQL — detailed enough for a builder\n\n### Wagon-maintenance spec (`specs/wagon-maintenance.md`) — comparison\n- **387 lines** (audit claims 545 — same discrepancy pattern)\n- **Status:** `reviewed`\n- **Complexity:** `critical-path`\n- **Apps:** f168, f200, f203, f600, f602 (5 apps, f600/f602 are duplicates)\n- **Recommendation:** Migrate as 4 modules within portal SvelteKit app, retire f602\n- **Sections present:** Overview, Recommendation, Complexity Assessment, Dynamic Action Migration Risk analysis\n\n**Content quality indicators:**\n- Identified f600 as highest-scoring app in entire ecosystem (1493.5)\n- f600/f602 duplicate detection with specific differences noted (27 vs 26 redirect targets, different aliases)\n- DA migration burden analysis: 456 PL/SQL dynamic actions = \"CRITICAL\" risk\n- Module decomposition into 4 portal sub-routes\n\n### Line count discrepancy\nAudit claims ARMSPV at 536 and wagon-maintenance at 545. Actual main branch: 358 and 387. The \"+807 lines added across 11 specs\" claim may reflect uncommitted work or a different branch.\n\n### All 11 spec files in `specs/`:\n1. `armspv-smgs-portal.md`\n2. `wagon-maintenance.md`\n3. `ka2-freight-operations.md`\n4. `spv-freight-documents.md`\n5. `mesplan-freight-planning.md`\n6. `locomotive-traction-management.md`\n7. `rendivagunid-leased-wagons.md`\n8. `spf-portal-permissions.md`\n9. `portal-reports.md`\n10. `standalone-unclassified.md`\n11. `infra-stats.md`\nPlus: `SHARED-DEPENDENCIES.md` (cross-cluster shared infrastructure)\n\n(*FR:Finn*)",
+    "summary": "S8 audit data for Celes: Q2 specs",
+    "timestamp": "2026-03-19T11:39:48.536Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:00] RE-AUDIT — Apex pushed their code. Spec line counts may have changed.\n\nRe-check ARMSPV and wagon-maintenance specs — they were 358/387 lines before, audit claimed 536/545. If they're now longer, re-evaluate whether your 5 gaps are still accurate or if some were addressed.\n\nReport delta only.",
+    "summary": "Celes: re-check spec line counts",
+    "timestamp": "2026-03-19T11:51:17.312Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.199Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924564377@celes\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:24.377Z\"}",
+    "timestamp": "2026-03-19T12:49:24.377Z",
+    "read": true
   }
 ]

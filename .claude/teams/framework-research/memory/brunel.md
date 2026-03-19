@@ -133,4 +133,14 @@
 
 [GOTCHA] 2026-03-18 — pnpm + containers: node_modules inside named volume (not host). --frozen-lockfile enforces lockfile discipline. Remove flag if team needs dep updates inside container.
 [GOTCHA] 2026-03-18 — Playwright browser: install at build time as root, copy to /opt/playwright/cache, chmod a+rX. Set PLAYWRIGHT_BROWSERS_PATH in compose env AND .bashrc.
-[DECISION] 2026-03-18 — No SSH server in polyphony container. Dev team only; no PO SSH inspection needed. Bridge network (not host mode) — WARP CA conditional.
+[DECISION] 2026-03-18 — No SSH server in polyphony container initially. Later reversed — SSH server added (port 2223, ai-teams user, pubkey auth, auto-tmux). Polyphony key: ssh-ed25519 ...6AAt (dedicated, NOT apex key). Connection: ssh -i ~/.ssh/id_ed25519_polyphony -p 2223 ai-teams@100.96.54.170.
+
+[CHECKPOINT] 2026-03-19 — polyphony-dev container FINAL state (all tasks complete):
+- Dockerfile.polyphony: sshd (port 2223), tmux, locales, Playwright Chromium deps + browser at /opt/playwright/cache, native Claude, TZ=Europe/Tallinn, pnpm 9.15.0, usermod -p '*' ai-teams
+- docker-compose.polyphony.yml: network_mode: host (WARP), WARP CA at /opt/warp-ca.pem (uncommented), NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem (hardcoded), SSH_PUBLIC_KEY via .env, 2 named volumes
+- entrypoint-polyphony.sh: 7 steps — WARP CA, volumes, clone/pull, pnpm install --frozen-lockfile, gates, .bashrc (CLAUDE_ENV_ID=POLY, NODE_EXTRA_CA_CERTS, TZ, PLAYWRIGHT_BROWSERS_PATH), tmux config + auto-tmux, git config, settings.json, SSH key+sshd, gosu drop
+- .claude/statusline-command.sh: green badge, pnpm test cache from /tmp/polyphony-test-status.txt
+- .claude/settings.json: statusLine.command → bash /home/ai-teams/workspace/.claude/statusline-command.sh
+- Runbook: §12 (NODE_EXTRA_CA_CERTS 3-part fix) + §13 (statusline design rules) added
+
+[DEFERRED] 2026-03-19 — polyphony container files need git commit+push to polyphony repo. Also: Dockerfile.apex + entrypoint-apex.sh git commit+push still pending from 2026-03-18.

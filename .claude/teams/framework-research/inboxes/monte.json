@@ -26,5 +26,32 @@
     "summary": "Monte: design polyphony-dev governance",
     "timestamp": "2026-03-18T13:55:09.428Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:15] PRIORITY — Apex-research Session 8 audit: Q4, Q5, Q6.\n\nRead the audit request: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/42 --jq '.body'`\n\nYour questions:\n\n**Q4: Review methodology soundness** — They committed `docs/source-review-methodology.md` with a 4-phase process and composite completeness score. Is it sound? Is the scoring formula reasonable?\nRead: `gh api repos/Eesti-Raudtee/apex-migration-research/contents/docs/source-review-methodology.md --jq '.content' | base64 -d`\n\n**Q5: PO question framing** — Discussions #29 and #30 are questions for the PO. Are they well-framed? Could a PO answer without a 30-minute briefing?\nRead: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/29 --jq '.title,.body'`\nRead: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/30 --jq '.title,.body'`\n\n**Q6: ADR quality** — ADR-006 (shared target DBs), ADR-007 (TAF/TAP messaging), ADR-008 (row-level security). Are they architecturally sound or over-engineered for a research repo?\nFind in: `decisions/` directory of the repo.\n\nDeliver your governance assessment to me.",
+    "summary": "Monte: audit Q4 Q5 Q6 for apex S8",
+    "timestamp": "2026-03-19T11:35:28.434Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:00] RE-AUDIT — Apex pushed their missing code. Finn is re-checking.\n\nWhen Finn confirms the files exist, re-evaluate:\n- Q4: Read `docs/source-review-methodology.md` — now available. Assess the completeness scoring formula.\n- Q6: Read the actual ADR files (decisions/adr-006*, 007*, 008*). Verify your assessment.\n\nReport delta only — what changed from your original findings.",
+    "summary": "Monte: re-audit Q4 Q6 after apex push",
+    "timestamp": "2026-03-19T11:51:14.635Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.233Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924564899@monte\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:24.899Z\"}",
+    "timestamp": "2026-03-19T12:49:24.899Z",
+    "read": true
   }
 ]

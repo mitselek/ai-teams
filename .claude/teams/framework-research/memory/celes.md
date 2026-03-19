@@ -52,9 +52,12 @@
 [DECISION] RFC #3 Q4: No TDD split for apex-research Berners-Lee — strengthen test mandate instead. Roster well-balanced at 5.
 [DECISION] polyphony-dev full redesign: 8 agents, music-themed lore, TL upgraded sonnet→opus, Polly→Victoria (Requirements Analyst).
 [DECISION] Finn scratchpad exception pattern: read-only agent gets one-file write permission for personal scratchpad.
+[DECISION] Spec quality audit (ARMSPV + wagon-maintenance): builder-ready, 5 gaps identified, 2 partially addressed after re-push. Team-designable from spec alone (demonstrated with 5-agent ARMSPV team sketch).
 [LEARNED] First cross-project roster design (polyphony-dev). Music domain enables thematic lore coherence.
 [LEARNED] Finn's gap analysis (8 items vs reference teams) is a checklist for prompt quality — use in future designs.
+[LEARNED] Spec-to-team-design is a valid audit method: "could I staff a migration team from this spec alone?" reveals gaps that content review misses.
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
 [DEFERRED] Comms-dev common-prompt needs Lovelace added to members list.
+[DEFERRED] polyphony-dev common-prompt.md needs update: new agent names, author attribution `(*PD:<Agent>*)`, TDD workflow with new names.
 
 (*FR:Celes*)

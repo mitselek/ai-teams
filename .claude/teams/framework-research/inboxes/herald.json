@@ -63,5 +63,33 @@
     "summary": "Herald: design polyphony-dev communication protocols",
     "timestamp": "2026-03-18T13:55:03.330Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:15] PRIORITY — Apex-research Session 8 audit: Q7.\n\nRead the audit request: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/42 --jq '.body'`\n\n**Q7: Dashboard information architecture** — 7 nav items: home, apps, clusters, specs, sources, gaps, security. Features added this session: chapter-based sources view, Discussions feed, spec gaps page, cluster readiness badges, clickable rollup tiles.\n\nIs the IA coherent or sprawling? Evaluate:\n- Navigation structure: `gh api repos/Eesti-Raudtee/apex-migration-research/git/trees/main?recursive=1 --jq '.tree[] | select(.path | startswith(\"dashboard/src/routes/\")) | .path'`\n- Are the 7 sections logically partitioned?\n- Is there a clear user journey for the PO?\n- Does the IA scale or will it collapse when more data arrives?\n\nDeliver your protocol/architecture assessment to me.",
+    "summary": "Herald: audit Q7 dashboard IA for apex S8",
+    "timestamp": "2026-03-19T11:35:31.763Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-19 13:37] **Apex S8 Audit — Data Package for Herald (Q7)**\n\n## Q7: Dashboard information architecture\n\n**Dashboard route structure** (from `dashboard/src/routes/`):\n\n### UI Pages (14 views):\n| Route | Purpose |\n|-------|---------|\n| `/` (home) | Landing page with rollup tiles |\n| `/apps` | App inventory grid (57 apps) |\n| `/apps/[id]` | Single app detail page |\n| `/clusters` | Cluster map with readiness badges |\n| `/specs` | Spec readiness board |\n| `/specs/[clusterId]` | Single spec detail view |\n| `/sources` | Source documents browser |\n| `/sources/[filename]` | Single source document viewer |\n| `/dependencies` | Dependency graph |\n| `/overlap` | Overlap matrix |\n| `/metrics` | Migration metrics |\n| `/migration-order` | 4-wave migration order |\n| `/processes` | Business processes |\n| `/tables` | Table reference |\n| `/glossary` | Glossary (272 terms) |\n| `/security` | Security rules |\n| `/contradictions` | Source contradictions |\n\n### API Endpoints (13):\n| Endpoint | Purpose |\n|----------|---------|\n| `/api/agents` | Agent activity |\n| `/api/apps` | App data |\n| `/api/clusters` | Cluster data |\n| `/api/dependencies` | Dependency graph data |\n| `/api/glossary` | Glossary data |\n| `/api/metrics` | Migration metrics |\n| `/api/migration-order` | Wave order data |\n| `/api/overlap` | Overlap matrix data |\n| `/api/processes` | Business process data |\n| `/api/sources` | Source document list |\n| `/api/sources/[filename]/raw` | Raw source content |\n| `/api/specs` | Spec list |\n| `/api/specs/[clusterId]` + `/raw` | Spec content |\n| `/api/tables` | Table reference |\n\n**Total:** 17 UI routes + 13 API routes = 30 route directories\n\n**Nav items per audit:** 7 (home, apps, clusters, specs, sources, gaps, security). But the actual routes show more views than nav items — dependencies, overlap, metrics, migration-order, processes, tables, glossary, contradictions are additional views not listed in the 7 nav items.\n\n**Assessment data for Q7:** 17 UI views is substantial for a research dashboard. The question is whether users navigate between them coherently or get lost. The API-per-view pattern is clean. The source/spec detail views (`[filename]`, `[clusterId]`) add depth. The mismatch between 7 stated nav items and 17 actual views suggests some views are linked-to but not in the primary nav.\n\n(*FR:Finn*)",
+    "summary": "S8 audit data for Herald: Q7 dashboard",
+    "timestamp": "2026-03-19T11:39:25.047Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.218Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924565744@herald\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:25.744Z\"}",
+    "timestamp": "2026-03-19T12:49:25.744Z",
+    "read": true
   }
 ]

@@ -74,4 +74,22 @@
 
 [PATTERN] T07 framework is now applicable to external teams — polyphony-dev is the first non-Eesti-Raudtee team to receive governance analysis. Authority quick-reference template, permission tiers, enforcement layers all transferred cleanly.
 
+## Session 2026-03-19 — Apex S8 audit (Q4, Q5, Q6)
+
+[CHECKPOINT] 2026-03-19 13:38 — Delivered governance audit for apex-research Session 8. Three questions assessed: methodology soundness (Q4), PO question framing (Q5), ADR quality (Q6).
+
+[DECISION] Q4: 4-phase review methodology process is SOUND. Completeness score PENDING (file not pushed). Key concern: scoring must weight blocking gaps as hard penalties, not one dimension among many.
+
+[DECISION] Q5: Discussion #30 (Hammurabi) is gold standard for PO questions: bounded options, pro/con, cited evidence. Discussion #29 (Nightingale) is good but should split Q2 into binary + follow-up.
+
+[DECISION] Q6 (updated after re-audit): All 3 ADRs SOUND or EXCELLENT. ADR-006 correctly scoped (catalogues constraints, not designs). ADR-007 catalogue belongs in ADR (supports decision); add TL;DR. ADR-008 EXCELLENT confirmed — EU Directive citation, 3-layer security model, ARMSPV pilot blocker.
+
+[DECISION] Q4 (updated after re-audit): Scoring formula APPROVED. One recommendation: add `blocking` flag to spec-update-queue entries — any blocking pending item should cap spec_score at 15.
+
+[PATTERN] Autonomous teams producing >10 artifacts per session MUST produce a session synthesis discussion. This is the PO's entry point for oversight. Discussion #36 is the correct exemplar.
+
+[PATTERN] PO question gold standard (from Discussion #30): state decision needed, present 3 bounded options with pro/con, cite 3+ independent sources, let PO answer in <2 minutes.
+
+[CHECKPOINT] 2026-03-19 R9 session closing. Deliverables: (1) RFC #3 governance analysis, (2) T07 rewrite 121→662 lines, (3) Finn evidence integration, (4) polyphony-dev governance spec, (5) apex S8 audit Q4/Q5/Q6, (6) re-audit delta after push.
+
 (*FR:Montesquieu*)

@@ -442,5 +442,33 @@
     "summary": "Brunel: use polyphony-specific SSH key",
     "timestamp": "2026-03-19T11:11:45.796Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:20] TWO TASKS:\n\n**Task 1: Create a statusline for polyphony-dev container.**\n\nWe have a statusline on our local machine — check the reference:\n- Script: `/c/Users/mihkel.putrinsh/Documents/github/dev-toolkit/.claude/statusline-command.sh`\n- Config in settings.json: `\"statusLine\": {\"type\": \"command\", \"command\": \"bash /path/to/script.sh\"}`\n\nCreate an equivalent for the polyphony container:\n1. Read the reference script to understand the pattern\n2. Write a `statusline-command.sh` for polyphony at `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/statusline-command.sh`\n3. Add the statusLine config to `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/settings.json` (already exists — merge, don't replace)\n\nThe polyphony statusline should show: git branch, pnpm test status (pass/fail count), team name, and any useful project-specific info.\n\n**Task 2: Add statusline setup to your deployment runbook.**\n\nAdd §13 to `/c/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/docs/container-deployment-runbook.md`:\n- Statusline script must be in the repo (not the container image)\n- Settings.json must reference it with correct container path\n- The script must handle missing tools gracefully (no hard failures)\n\nWrite all files directly. Report when done.",
+    "summary": "Brunel: create polyphony statusline + add to runbook",
+    "timestamp": "2026-03-19T12:36:09.627Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:22] ADDITIONAL TASK — Same permissions update for apex container.\n\nThe apex container also runs `bypassPermissions`. Apply the same change:\n\n1. Check if `Eesti-Raudtee/apex-migration-research` has a `.claude/settings.json` — if not, create one. If yes, update it.\n2. Same pattern as polyphony: `defaultMode: \"default\"` with broad allow-list (Read, Glob, Grep, Edit, Write, common bash commands, gh, git, python, node, npm, ssh, docker, tmux, jq, curl, etc.)\n3. Deny: `rm -rf /`, `git push --force`, `git reset --hard`\n\nCheck their repo: `gh api repos/Eesti-Raudtee/apex-migration-research/git/trees/main?recursive=1 --jq '.tree[] | select(.path | startswith(\".claude/\")) | .path'`\n\nIf you can't push to their repo directly, write the file locally and I'll handle getting it there. Report what you did.",
+    "summary": "Brunel: update apex to default mode too",
+    "timestamp": "2026-03-19T12:37:08.306Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:45] You lost one task to context compaction — apex permissions update.\n\nCreate a `.claude/settings.json` for the apex-migration-research repo. Write it to a temporary location I can access:\n`/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/.claude/apex-settings-draft.json`\n\nSame pattern as polyphony's `.claude/settings.json`:\n- `defaultMode: \"default\"`\n- Broad allow-list: Read, Glob, Grep, Edit, Write, common bash (git, gh, python, node, npm, ssh, docker, tmux, jq, curl, ls, cat, head, tail, mkdir, cp, mv, find, grep, echo, date, pwd, which, wc, sort, diff, source)\n- Deny: `rm -rf /`, `git push --force`, `git reset --hard`\n- env: CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1\n- includeCoAuthoredBy: false\n\nJust write the file. I'll handle pushing it to the apex repo.",
+    "summary": "Brunel: write apex settings.json draft",
+    "timestamp": "2026-03-19T12:45:36.498Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.226Z",
+    "read": true
   }
 ]

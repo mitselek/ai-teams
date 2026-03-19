@@ -1,60 +1,42 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## Session: 2026-03-17/18 (R8)
+## Session: 2026-03-19 (R9)
 
-[CHECKPOINT] R8 startup: CLEAN (normal). 7 inboxes restored. config.json appeared immediately.
-[CHECKPOINT] R8 agents spawned: celes, finn, volta, herald, brunel, montesquieu (new hire).
+[CHECKPOINT] R9 startup: CLEAN. 10 inboxes restored. config.json immediate. All 7 agents spawned.
 
-### Aeneas persona refinement
-[DECISION] Celes polished Aeneas lore: "continuous evolution, not arrival." Anchises/Ascanius metaphor, "conditions for civilization" framing. Committed.
-[DECISION] Prompt renamed team-lead.md → aeneas.md, duplicate team-lead-aeneas.md deleted.
-[DECISION] roster.ts moved from .claude/teams/types/ to .claude/teams/, nickname field added to AgentLore interface.
+### Apex-research RFC #3 response
+[DECISION] Posted comprehensive workflow guidance to Eesti-Raudtee/apex-migration-research#3. 7 specialists contributed.
+[DECISION] Recommended: trunk-based + CI, TDD pair (Nightingale as RED), hybrid issues, frontmatter-authoritative spec lifecycle.
+[LEARNED] Apex pushed back on worktree isolation — pipeline teams need directory ownership on trunk, not branch isolation. Field-validated pattern.
 
-### Agent naming research (Finn)
-[DECISION] Keep name: "team-lead" for routing, persona in lore/prompt. Frameworks overwhelmingly favor role-based routing names.
-[DECISION] GitHub issue #11 created for multi-team persona-based routing (future).
+### New framework patterns (from apex pushback)
+[DECISION] Pipeline vs independent-output isolation: two archetypes, two strategies. Written into T01 (Celes), T03 Protocol 5 (Herald), T06 (Volta).
+[DECISION] T07 Safety & Guardrails rewritten by Monte + Finn: 121 → 662 lines. Permission architecture, 5-layer enforcement, circuit breakers, authority quick-reference template.
 
-### apex-research team — designed and deployed
-[DECISION] 5-agent team: Schliemann (TL/opus), Champollion (research/sonnet), Nightingale (analyst/sonnet), Berners-Lee (dashboard/sonnet), Hammurabi (specs/opus). No Medici — audits remotely from FR.
-[DECISION] Dashboard-first approach: SvelteKit + TailwindCSS, API-based, local dev server.
-[DECISION] Container: self-contained, no host bind mounts, 3 named volumes, network_mode: host (WARP).
-[DECISION] Cluster-based specs (not per-app) for apps sharing >3 tables.
-[DECISION] Spec status validated against TypeScript interface from YAML frontmatter.
-[DECISION] Deployed on RC server (dev@100.96.54.170), container running, SSH on port 2222.
-[LEARNED] WARP tunnel causes: Docker DNS failure, TLS interception, env vars not reaching sudo su shells.
-[LEARNED] Brunel's deployment runbook captures 11 gotchas for future container deployments.
-[CHECKPOINT] Apex team delivered in first day: 80 commits, 202K+ lines, 11 cluster specs, all 57 apps analyzed, dashboard with 7 views, migration readiness report.
+### Polyphony-dev team designed and deployed
+[DECISION] Full team redesign: 8 agents with music-themed lore (Palestrina TL, Byrd, Josquin, Tallis, Bentham, Comenius, Victoria, Finn).
+[DECISION] TL upgraded sonnet → opus. Polly renamed Victoria (requirements analyst, not PO). Arvo renamed Bentham (avoid Arvo Pärt confusion).
+[DECISION] Standard directory structure: .claude/teams/polyphony-dev/ with roster.json, prompts/, memory/, inboxes/, docs/.
+[DECISION] Container deployed on RC server (dev@100.96.54.170): port 2223 SSH, auto-tmux, dedicated key pair (id_ed25519_polyphony).
+[LEARNED] WARP gotchas: network:host for build AND runtime, NODE_EXTRA_CA_CERTS for Claude, Playwright cache at /home/ai-teams/ not /root/.
+[LEARNED] Runbook now 13 gotchas (§12 NODE_EXTRA_CA_CERTS, §13 statusline setup).
 
-### Montesquieu — new hire (Governance Architect)
-[DECISION] Montesquieu hired for T04 (Hierarchy & Governance). Opus tier. Nick: "Monte". Color: white.
-[DECISION] Phase 1 approved and delivered: 39-decision delegation matrix, 5 apex-research governance questions answered.
-[DECISION] Phase 2 approved and delivered: manager agent role formalized, PO-to-manager handoff protocol, emergency authority protocol.
-[LEARNED] Monte found the five-layer governance stack already existed de facto — just needed naming and codification.
+### Apex S8 audit
+[DECISION] Full audit posted to Discussion #42. Data durability was the cross-cutting finding (6 artifacts missing from git). Re-audited after push — all resolved. Quality is high.
+[DECISION] Monte approved their review methodology scoring (with blocking flag recommendation). ADR-008 rated excellent (regulatory compliance finding).
 
-### comms-dev roster completion
-[DECISION] Marconi persona for comms-dev team-lead (Celes designed). Prompt renamed team-lead.md → marconi.md.
-[DECISION] Lovelace added to comms-dev roster (was in prompts/ but missing from roster.json).
+### Settings standardization
+[DECISION] All 3 environments switched from bypassPermissions to default mode with broad allow-list: local machine, polyphony container, apex container.
+[DECISION] Statusline created for polyphony container.
 
-### Topic fan-out (R8)
-[CHECKPOINT] T01 (Celes): 83 → 450 lines. Team archetypes, role taxonomy, model tiering, sizing.
-[CHECKPOINT] T04 (Monte): 103 → ~640 lines. Delegation matrix, manager agent design, emergency authority.
-[CHECKPOINT] T05 (Herald): 76 → 481 lines. 4-layer auth, credential passing, secrets management.
-[CHECKPOINT] T08 (Volta): 113 → 290 lines. 3-layer observability, Medici formalization, alerting.
-[CHECKPOINT] T03 (Herald): dispute handoff type + direct link lifecycle added.
-[DEFERRED] T07 (Safety & Guardrails) — only light topic remaining at 121 lines.
+### Timezone fix
+[DECISION] Apex container fixed to Europe/Tallinn (live + committed). Polyphony baked in from start.
 
-### Container infrastructure
-[LEARNED] Brunel produced deployment runbook: 11 gotchas from WARP/Docker deployment.
-[LEARNED] tmux -u needed for UTF-8 rendering inside container.
-[LEARNED] Compose env vars don't reach shells via sudo su — must persist to .bashrc.
-[LEARNED] Locked user accounts (!) block all SSH auth including pubkey — use usermod -p '*'.
-[LEARNED] OAuth credentials (.credentials.json) instead of API key on RC server.
-[LEARNED] Project-level .mcp.json solved MCP server discovery (global mcp.json HOME path issue).
+### Monte naming mismatch
+[GOTCHA] Monte registered as "monte" but Finn sent to "montesquieu" — messages landed in wrong inbox. Fix for next session: spawn as "montesquieu" or standardize.
 
-### IT ticket
-[CHECKPOINT] IT ticket submitted 2026-03-17 for dedicated apex-research server (Ubuntu 24.04, 200GB SSD, Docker). Requested deadline 2026-04-01. SSH key: ~/.ssh/id_ed25519_apex, username: michelek.
-
-## Previous session notes (R5–R7)
+## Previous session notes (R5–R8)
 - R5 Grade B (best ever). Inbox durability validated.
 - R6: relay RFC (#7), web frontend RFC (#8), Richelieu manager-agent (#10), Lovelace hire.
 - R7: simplified startup protocol, removed COLD START anomaly.
+- R8: apex-research designed+deployed, Monte hired, T01/T04/T05/T08 expanded, comms-dev roster.

@@ -5,5 +5,42 @@
     "summary": "Medici: audit polyphony-dev against framework",
     "timestamp": "2026-03-18T13:55:22.151Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:15] PRIORITY — Apex-research Session 8 audit: Q1, Q3, Q8.\n\nRead the audit request: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions/42 --jq '.body'`\n\nYour questions:\n\n**Q1: Source extraction fidelity** — They went from 875 → 22,365 lines across 3 source documents. Are chapter digests faithful to originals? Look for signs of interpretation errors, hallucination, or over-summarization. Check `docs/sources/` in the repo.\n\n**Q3: Data consistency** — Multiple JSON artifacts built incrementally. Do `shared/spec-update-queue.json`, `shared/cluster-readiness.json`, `shared/source-contradictions.md`, and the 11 spec files agree with each other? Look for drift.\n\n**Q8: Discussion volume** — 22 discussions in one session (#19–#40). Are they discoverable and useful, or noise? Check: `gh api repos/Eesti-Raudtee/apex-migration-research/discussions --jq '.[] | \"\\(.number)\\t\\(.title)\"'`\n\nFinn is gathering raw data and will send you file listings. Start with what you can access directly. Deliver your audit findings to me.",
+    "summary": "Medici: audit Q1 Q3 Q8 for apex S8",
+    "timestamp": "2026-03-19T11:35:23.622Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-19 13:37] **Apex S8 Audit — Data Package for Medici (Q1, Q3, Q8)**\n\n## Q1: Source extraction fidelity\n\n**Files in `docs/sources/`:** 4 files\n- `docs/sources/er-system-functionality-v003.md`\n- `docs/sources/er-vjs-ea-model-v080.md`\n- `docs/sources/ldz-er-gap-analysis-v32.md`\n- `docs/sources/vjs-loppraport-v21.md`\n\n**Note:** The audit says \"50+ source chapter files\" but the actual tree shows only 4 monolithic files in `docs/sources/`, not chapter-by-chapter splits. Either the chapter files are inside these 4 docs (sections, not separate files), or the chapter split was planned but not pushed to main. Verify against the audit claim \"chapter-by-chapter extraction into `docs/sources/*/`\" — the `*/` subdirectory pattern doesn't exist in the tree.\n\n## Q3: Data consistency\n\n**Files that DO exist in `shared/`:** (37 files total)\n- `shared/source-contradictions.md` — **296 lines**, covers C1-C14+ with PO decisions on C2-C5 (resolved 2026-03-18)\n- `shared/clusters.json` + `shared/clusters.md`\n- `shared/complexity-scores.json` + `.md`\n- `shared/migration-order.json` + `.md`\n- `shared/migration-metrics.json` + `.md`\n- `shared/overlap-matrix.json` + `.md`\n- `shared/dependency-graph.json` + `.md`\n- `shared/auth-model.json` + `.md`\n- `shared/common-lovs.json` + `.md`\n- `shared/app-links.json` + `.md`\n- `shared/review-notes.md`\n- EA analysis files: ea-business-processes, ea-cim-entities, ea-cim-cluster-mapping, ea-components, ea-connectors, ea-information-elements, ea-schema-comparison, ea-schema-impact, ea-tobe-architecture (all with .json + .md pairs)\n\n**Files that DO NOT exist (referenced in audit but missing from main):**\n- `shared/spec-update-queue.json` — **NOT IN REPO** (audit claims \"80 updates across 11 clusters\")\n- `shared/cluster-readiness.json` — **NOT IN REPO** (audit claims \"per-cluster readiness assessment\")\n\n**This is a consistency finding:** The audit request references files that aren't committed. These may be in-session artifacts lost between sessions.\n\n## Q8: Discussion volume\n\n**Total discussions: 24** (#19-#42). The audit says 22 discussions (#19-#40) but there are actually 24 (includes #41 and #42).\n\nDiscussion listing:\n- #19: Ground Rules for apex-research Discussions\n- #20: Source digest completeness audit\n- #21: Session 8 findings: source document extraction gaps\n- #22: LDz-ER target state cross-reference against cluster specs\n- #23: LDz target state reveals 24 TAF/TAP messages not yet in specs\n- #24: Carrier questionnaire (Lisa 1) — 10 user voices\n- #25: VJS Lõppraport v2.1 cross-reference\n- #26: PO input needed: ESB + auth architecture (RESOLVED)\n- #27: VJS Lõppraport v2.1 migration-relevant findings\n- #28: ER System Functionality V0.03 data model cross-reference\n- #29: PO input needed: WIMO.EE scope + f301 status\n- #30: PO input needed: ARMSPV pilot scope\n- #31: ER message catalogue cross-reference\n- #32: ER doc ch12 — Business rules mapped to clusters\n- #33: ER System Functionality V0.03 — BR, message catalogue, integration\n- #34: ER doc ch13 — CSZT message catalogue mapped to clusters\n- #35: ER System Functionality V0.03 — key discoveries\n- #36: Session 8 synthesis\n- #37: ER business operations cross-reference\n- #38: ER doc ch15+16 — IMIS schemas\n- #39: PIIRMOODUL investigation\n- #40: TTCMS concept doc gap\n- #41: VJS2 integration architecture\n- #42: Audit request (this one)\n\n(*FR:Finn*)",
+    "summary": "S8 audit data for Medici: Q1 Q3 Q8",
+    "timestamp": "2026-03-19T11:38:41.072Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 14:00] RE-AUDIT — Apex pushed their missing code. Finn is re-checking the repo.\n\nWhen Finn sends you the updated file listing, re-evaluate:\n- Q1: Do the 50+ chapter source files exist now? Spot-check fidelity.\n- Q3: Do spec-update-queue.json and cluster-readiness.json exist? Check consistency with specs.\n\nReport delta only — what changed from your original findings.",
+    "summary": "Medici: re-audit Q1 Q3 after apex push",
+    "timestamp": "2026-03-19T11:51:12.410Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-03-19 13:52] **CORRECTION — Apex repo updated after fresh push.**\n\nAll previously-missing artifacts now exist on main:\n\n- `docs/sources/` now has **61 files** — 3 subdirectories with 50 chapter files + 11 standalone. The \"50+ chapter files\" claim holds.\n- `shared/spec-update-queue.json` — NOW EXISTS (+ dashboard loaders with tests)\n- `shared/cluster-readiness.json` — NOW EXISTS (+ dashboard loaders with tests)\n- `docs/source-review-methodology.md` — NOW EXISTS\n\nThe data durability concern stands as a process finding (they needed our audit to trigger the push), but the artifacts themselves are no longer missing.\n\n(*FR:Finn*)",
+    "summary": "CORRECTION: missing artifacts now in repo",
+    "timestamp": "2026-03-19T11:52:27.892Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "Session R9 complete. Shutdown requested. Please:\n1. Write in-progress state to your scratchpad (if any)\n2. Send closing message with [LEARNED], [DEFERRED], [WARNING] (1 bullet each, max)\n3. Then approve shutdown\n\nThank you all — exceptional session. RFC #3, T07, polyphony-dev team, apex audit, two container deployments.",
+    "summary": "Shutdown request to all agents",
+    "timestamp": "2026-03-19T12:48:08.238Z",
+    "read": true
   }
 ]

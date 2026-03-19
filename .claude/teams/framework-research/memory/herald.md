@@ -20,6 +20,8 @@
 
 [PATTERN] Sven+Dag co-ownership works because their write subdirectories within src/ are mostly disjoint (Sven=components+routes/UI, Dag=server/db+auth+migrations+API endpoints). If conflicts arise, serialize: Dag first (schema+API), then Sven (UI).
 
+[PATTERN] Dashboard IA audit (apex S8 Q7): 3-group nav (Analüüs/Migratsioon/Viited) is coherent. Misplaced: contradictions→Viited, security→Analüüs. Tipping point: when handoff begins, need 4th group (Üleandmine). Dashboard-as-PO-lens gap: Discussions not surfaced in dashboard despite being the PO feedback channel.
+
 ## 2026-03-17 (session R8)
 
 [DECISION] T03 open question #6 resolved: Direct Link Lifecycle Protocol added to Protocol 2. Five review triggers (time-based, inactivity, scope change, incident, on-demand). Registry extended with Last active, Review due, Last review columns. Authority split with T04: Herald owns protocol mechanics, Montesquieu owns authority model (delegation matrix Rows 27-28).
