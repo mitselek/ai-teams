@@ -4,8 +4,9 @@
 // Spec: #16 §3, #15 §3, #18 Phase 2.1
 
 import { createServer, type Server, type TLSSocket } from 'node:tls';
-import { FrameDecoder } from './framing.js';
+import { FrameDecoder, encodeFrame } from './framing.js';
 import { validateSenderIdentity } from '../crypto/tls-config.js';
+import { buildMessage } from '../broker/message-builder.js';
 import type { DaemonCryptoConfig } from '../crypto/tls-config.js';
 import type { Message } from '../types.js';
 
@@ -22,6 +23,7 @@ export class TlsServer {
   private readonly maxFrameSize: number;
   private server: Server | null = null;
   private _port = 0;
+  private activeSockets = new Set<TLSSocket>();
 
   private connectionHandlers: Array<(team: string) => void> = [];
   private messageHandlers: Array<(msg: Message) => void> = [];
@@ -61,6 +63,14 @@ export class TlsServer {
         maxVersion: 'TLSv1.3',
       });
 
+      // Track sockets from TCP connection event (before TLS handshake)
+      // so stop() can destroy them even if handshake hasn't completed.
+      server.on('connection', (socket) => {
+        const tlsSocket = socket as TLSSocket;
+        this.activeSockets.add(tlsSocket);
+        tlsSocket.once('close', () => this.activeSockets.delete(tlsSocket));
+      });
+
       // Absorb per-socket TLS errors so they don't crash the process
       server.on('tlsClientError', (_err, socket) => {
         socket.destroy();
@@ -86,8 +96,11 @@ export class TlsServer {
   async stop(): Promise<void> {
     return new Promise((resolve) => {
       if (!this.server) { resolve(); return; }
-      this.server.close(() => resolve());
+      const server = this.server;
       this.server = null;
+      for (const s of this.activeSockets) s.destroy();
+      this.activeSockets.clear();
+      server.close(() => resolve());
     });
   }
 
@@ -142,6 +155,19 @@ export class TlsServer {
       for (const h of this.forgeryHandlers) h();
       socket.destroy();
       return;
+    }
+
+    // Send ACK back to sender before delivering to handlers
+    const ack = buildMessage({
+      from: { team: this.teamName, agent: 'daemon' },
+      to:   message.from,
+      type: 'ack',
+      body: 'ok',
+      reply_to: message.id,
+      priority: 'normal',
+    });
+    if (!socket.destroyed) {
+      socket.write(encodeFrame(ack), () => { /* ignore write errors */ });
     }
 
     for (const h of this.messageHandlers) h(message);

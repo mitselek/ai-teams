@@ -65,6 +65,7 @@ export class TunnelManager {
 
   private peers = new Map<string, PeerState>();
   private tunnelDownHandlers: Array<(team: string) => void> = [];
+  private tunnelUpHandlers: Array<(team: string) => void> = [];
   private stopped = false;
 
   constructor(opts: TunnelManagerOptions) {
@@ -79,6 +80,10 @@ export class TunnelManager {
 
   onTunnelDown(handler: (team: string) => void): void {
     this.tunnelDownHandlers.push(handler);
+  }
+
+  onTunnelUp(handler: (team: string) => void): void {
+    this.tunnelUpHandlers.push(handler);
   }
 
   async start(endpoints: Record<string, PeerEndpoint>): Promise<void> {
@@ -193,6 +198,8 @@ export class TunnelManager {
       state.lastDataAt = Date.now();
       // Notify any send() calls waiting for connection
       this.notifyConnectWaiters(state);
+      // Notify tunnel-up listeners
+      for (const h of this.tunnelUpHandlers) h(team);
       // Reassign decoder to new socket
       state.decoder = this.makeDecoder(team);
       socket.on('data', (chunk: Buffer) => {
@@ -203,6 +210,12 @@ export class TunnelManager {
         state.connected = false;
         state.socket = null;
         this.clearTimers(state);
+        // Resolve any pending ACKs immediately so callers don't wait for ackTimeoutMs
+        for (const [, pending] of state.pendingAcks) {
+          clearTimeout(pending.timer);
+          pending.resolve('PEER_UNAVAILABLE');
+        }
+        state.pendingAcks.clear();
         for (const h of this.tunnelDownHandlers) h(team);
         this.scheduleReconnect(team, state);
       });
