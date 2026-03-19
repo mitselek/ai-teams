@@ -361,6 +361,70 @@ docker exec <container> bash -c 'node -e "fetch(\"https://api.anthropic.com\").t
 
 ---
 
+## §13. Statusline Script in Containerised Teams
+
+**Symptom:** Claude Code shows no statusline, or shows an error/blank line where the statusline should appear.
+
+**Cause:** The statusline script is not found at the path referenced in `settings.json`, OR the script hard-fails on a missing tool, causing Claude to suppress the statusline entirely.
+
+### Design rules
+
+**1. Script lives in the repo, not the image.**
+Keep `statusline-command.sh` in the project repo (e.g., `.claude/statusline-command.sh`). The repo is cloned to a predictable path by the entrypoint (`/home/ai-teams/workspace`). This means the script survives image rebuilds without requiring a Dockerfile change.
+
+**2. `settings.json` references the container path, not the host path.**
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/ai-teams/workspace/.claude/statusline-command.sh"
+  }
+}
+```
+The path must be the in-container absolute path. On local dev (non-containerised), the path must be adjusted to wherever the repo is checked out — or use a relative path via `$(git rev-parse --show-toplevel)/.claude/statusline-command.sh` if your shell supports it.
+
+**3. The script must never hard-fail.**
+Claude Code suppresses the statusline if the script exits non-zero or produces no output. Every external tool call must be guarded:
+```bash
+# BAD — fails if pnpm not installed
+TESTS=$(pnpm test --reporter=json 2>&1 | jq '.numPassedTests')
+
+# GOOD — graceful: no output if unavailable
+TESTS=""
+if command -v pnpm >/dev/null 2>&1; then
+  TESTS=$(pnpm test --reporter=json 2>&1 | jq -r '.numPassedTests // ""' 2>/dev/null || true)
+fi
+```
+
+**4. Don't run slow commands live.**
+The statusline script is called on every prompt render. Running `pnpm test` live would block for seconds. Instead, write test results to a temp file after each test run and read the cached value:
+```bash
+# After a test run (agent writes this):
+echo "PASS:42 FAIL:0" > /tmp/polyphony-test-status.txt
+
+# Statusline reads the cache:
+if [ -f /tmp/polyphony-test-status.txt ]; then
+  CACHED=$(cat /tmp/polyphony-test-status.txt)
+  # ... parse and display
+fi
+```
+
+**5. `CLAUDE_ENV_ID` must be set in `.bashrc` (not just compose env).**
+The statusline script reads `CLAUDE_ENV_ID` to show the environment badge. Compose env vars don't propagate to SSH sessions. Persist it in the entrypoint's SHELL_VARS block:
+```bash
+SHELL_VARS[CLAUDE_ENV_ID]="POLY"   # or whatever the container's env ID is
+```
+
+**Verify:**
+```bash
+# Test the script directly inside the container
+docker exec -u ai-teams <container> bash -c \
+  'echo "{\"model\":{\"display_name\":\"Claude Sonnet 4.6\"},\"workspace\":{\"current_dir\":\"/home/ai-teams/workspace\"},\"context_window\":{\"remaining_percentage\":80},\"cost\":{\"total_cost_usd\":0.05},\"session_id\":\"test\"}" | bash /home/ai-teams/workspace/.claude/statusline-command.sh'
+# Should print a coloured statusline, not an error
+```
+
+---
+
 ## Quick Reference: Full Entrypoint Order
 
 ```
