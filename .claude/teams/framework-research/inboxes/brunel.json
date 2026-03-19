@@ -428,5 +428,19 @@
     "summary": "Brunel: add §12 to deployment runbook",
     "timestamp": "2026-03-19T10:58:57.085Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:10] Add SSH server to polyphony container — same experience as apex.\n\n**What we want:** `ssh -i ~/.ssh/id_ed25519_apex -p 2223 ai-teams@100.96.54.170` → lands in tmux, auto-cd to workspace, claude ready.\n\n**Details:**\n- Port **2223** (2222 is taken by apex)\n- Same SSH key: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKR5R4Ob4zeW4H1p8rhjYajOa+mzqyjITzB2RmY4iBp/ mihkel.putrinsh@evr.ee apex-research`\n- User: `ai-teams` (existing container user)\n- Auto-tmux on login (same as apex — `.bashrc` or `.profile` starts tmux)\n- Auto-cd to `/home/ai-teams/workspace`\n- All env vars available in the SSH session (TZ, NODE_EXTRA_CA_CERTS, PLAYWRIGHT_BROWSERS_PATH, etc.)\n\n**Files to update:**\n1. `Dockerfile.polyphony` — add `openssh-server`, configure sshd\n2. `docker-compose.polyphony.yml` — expose port 2223 (note: network_mode:host, so just document the port)\n3. `entrypoint-polyphony.sh` — start sshd before dropping to ai-teams user, inject authorized_keys\n\nReference the apex Dockerfile/entrypoint for the exact pattern. Write all changes directly. Report when done.",
+    "summary": "Brunel: add SSH server to polyphony container",
+    "timestamp": "2026-03-19T11:11:00.440Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 13:12] CORRECTION — use this public key instead (dedicated polyphony key, not the apex key):\n\n```\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFJue20BqzBA0ClZemjQmNyCYIRkwMDKp5uV7nKu6AAt mihkel.putrinsh@evr.ee polyphony-dev\n```\n\nConnection will be: `ssh -i ~/.ssh/id_ed25519_polyphony -p 2223 ai-teams@100.96.54.170`\n\nUpdate the Dockerfile header comment and the authorized_keys setup accordingly.",
+    "summary": "Brunel: use polyphony-specific SSH key",
+    "timestamp": "2026-03-19T11:11:45.796Z",
+    "read": true
   }
 ]
