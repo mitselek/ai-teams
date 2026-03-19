@@ -16,8 +16,9 @@
 [PATTERN] Six canonical agent roles: Coordinator, Researcher, Analyst, Developer, Spec Writer, Design Specialist.
 [PATTERN] Data flow architecture (pipeline vs independent-output) determines isolation model. Pipeline → trunk + directory ownership. Independent → branch/worktree safe.
 [PATTERN] "Agent PO" is an anti-pattern — PO is always the human. Agent should be "Requirements Analyst" with explicit escalation rules.
+[GOTCHA] Count **characters**, not roles-plus-characters. Team-lead IS one of the characters. "5-character team" not "team-lead + 5 agents = 6."
 
-## Hires Delivered (cumulative — 24 agents)
+## Hires Delivered (cumulative — 29 agents)
 
 | Agent | Lore | Team | Model | Date |
 |---|---|---|---|---|
@@ -45,17 +46,20 @@
 | Comenius | Jan Amos Comenius | PD | sonnet | 2026-03-18 |
 | Victoria | Queen Victoria | PD | sonnet | 2026-03-18 |
 | Finn | (reuse) | PD | sonnet | 2026-03-18 |
+| Saavedra | Cervantes | ER TL | opus | 2026-03-19 |
+| Codd | E.F. Codd | ER | opus | 2026-03-19 |
+| Hopper | Grace Hopper | ER | opus | 2026-03-19 |
+| Semper | Gottfried Semper | ER | opus | 2026-03-19 |
+| Hamilton | Margaret Hamilton | ER | opus | 2026-03-19 |
 
-## Session 2026-03-18 (R9)
+## Session 2026-03-19 (R10)
 
-[DECISION] T01 updated: Data Flow Architecture section (pipeline vs independent-output). Hybrid Teams corrected (trunk, not worktree). Common-prompt table updated.
-[DECISION] RFC #3 Q4: No TDD split for apex-research Berners-Lee — strengthen test mandate instead. Roster well-balanced at 5.
-[DECISION] polyphony-dev full redesign: 8 agents, music-themed lore, TL upgraded sonnet→opus, Polly→Victoria (Requirements Analyst).
-[DECISION] Finn scratchpad exception pattern: read-only agent gets one-file write permission for personal scratchpad.
-[DECISION] Spec quality audit (ARMSPV + wagon-maintenance): builder-ready, 5 gaps identified, 2 partially addressed after re-push. Team-designable from spec alone (demonstrated with 5-agent ARMSPV team sketch).
-[LEARNED] First cross-project roster design (polyphony-dev). Music domain enables thematic lore coherence.
-[LEARNED] Finn's gap analysis (8 items vs reference teams) is a checklist for prompt quality — use in future designs.
-[LEARNED] Spec-to-team-design is a valid audit method: "could I staff a migration team from this spec alone?" reveals gaps that content review misses.
+[DECISION] entu-research team: 5 characters, all opus. Lore theme: Paradigm Translators. Two TDD pairs: Hopper+Codd (data), Hamilton+Semper (UI). Pipeline sequencing (data pair leads).
+[LEARNED] Count characters, not roles+characters. Team-lead is a character.
+[LEARNED] Tester placement matters: Hopper on API/Data side because SQL-assumption bugs (paradigm gotchas) live in the data layer, not the UI.
+
+## Deferred (carried forward)
+
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
 [DEFERRED] Comms-dev common-prompt needs Lovelace added to members list.
 [DEFERRED] polyphony-dev common-prompt.md needs update: new agent names, author attribution `(*PD:<Agent>*)`, TDD workflow with new names.

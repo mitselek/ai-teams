@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773942313510@layout-researcher\",\"from\":\"team-lead\",\"reason\":\"Task complete, research delivered.\",\"timestamp\":\"2026-03-19T17:45:13.510Z\"}",
+    "timestamp": "2026-03-19T17:45:13.510Z",
+    "read": true
+  }
+]

@@ -470,5 +470,95 @@
     "summary": "Shutdown request to all agents",
     "timestamp": "2026-03-19T12:48:08.226Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 19:12] Task: Prepare container deployment for the new entu-research team.\n\n**Context:** We've designed a new 5-agent team (entu-research) that will rebuild Polyphony on Entu. It needs to run in a container on the same machine where apex-research and polyphony-dev are already deployed.\n\n**Existing infra:**\n- RC server: `dev@100.96.54.170`\n- apex-research container: port 2222 SSH, port 5173 dashboard\n- Deployment runbook: `.claude/teams/framework-research/docs/container-deployment-runbook.md`\n\n**New team details:**\n- Repo: `entu/research` (just initialized, cloned at `.mmp/entu-research`)\n- 5 agents, all opus\n- Stack: SvelteKit + pnpm + Entu API (external, `https://entu.app/api/`)\n- Needs: git access to `entu/research`, web access to `entu.app` and `entu.dev`\n\n**Deliverable:** What needs to change in the container setup (Dockerfile, docker-compose, ports, SSH config) to add entu-research alongside the existing teams? Read the deployment runbook first, then produce a concrete plan with the required changes.\n\nReport when ready.",
+    "summary": "Brunel: container setup for entu-research",
+    "timestamp": "2026-03-19T17:13:19.805Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 19:16] Answers + additional requirement:\n\n**1. Ports:** 2224/5177 confirmed.\n**2. pnpm:** Pin 9.15.0 (same as polyphony).\n**3. Approved** to write the three files.\n\n**Additional requirement:** The entrypoint must also clone `entu/webapp` and `entu/plugins` into the workspace alongside `entu/research`. These are reference repos — the team needs them at hand for studying how the Entu webapp consumes the API.\n\n```\n~/workspace/\n├── entu-research/    # main working repo (entu/research)\n├── entu-webapp/      # reference: https://github.com/entu/webapp.git\n└── entu-plugins/     # reference: https://github.com/entu/plugins.git\n```\n\nAll three cloned on first start. entu-webapp and entu-plugins are read-only reference — no push needed.\n\nGo ahead and write all three files.",
+    "summary": "Confirmed ports, add webapp+plugins clones",
+    "timestamp": "2026-03-19T17:16:52.411Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 19:45] Task: Adopt hr-devs tmux layout system for entu-research container.\n\nThe hr-devs team has a production-ready tmux layout solution at:\n`~/Documents/github/hr-platform/.claude/teams/hr-devs/`\n\nKey files to study:\n- `layouts/default.json`, `layouts/full.json`, `layouts/lite.json` — declarative layout definitions\n- `apply-layout.sh` — creates pane structure from JSON\n- `spawn_member.sh` — spawns agent into specific pane\n- `reflow.sh` — rearranges after agent join/leave\n- `start-team.sh` — one-shot startup\n- `docs/tmux-layouts.md` — diagrams and split strategy\n- `docs/LAYOUT-SPEC.md` — full spec\n\n**What to do:**\n1. Read the hr-devs layout scripts and understand the system\n2. Create a `layouts/` directory in the entu-research repo (`.claude/teams/entu-research/layouts/`)\n3. Create a `default.json` layout for 5 panes: Saavedra (lead, 30% left) + 4 specialists (right column, evenly split)\n4. Copy and adapt the scripts (`apply-layout.sh`, `spawn_member.sh`, `reflow.sh`, `start-team.sh`) for entu-research\n5. Update startup.md to reference the layout scripts instead of manual Agent spawning\n\nThe entu-research team has 5 members with 2 TDD pairs:\n- Saavedra (team-lead)\n- Data pair: Codd + Hopper\n- UI pair: Semper + Hamilton\n\nWrite files to `~/Documents/github/.mmp/entu-research/.claude/teams/entu-research/`. Report when done.",
+    "summary": "Brunel: adopt hr-devs tmux layout for entu",
+    "timestamp": "2026-03-19T17:44:59.149Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 19:47] Layout preference from PO: use the **paired layout** — TDD pairs side by side:\n\n```\n┌──────────┬──────────┬──────────┐\n│          │  Codd    │  Semper  │\n│ Saavedra ├──────────┤──────────┤\n│  20%     │  Hopper  │ Hamilton │\n│          │  (data)  │  (UI)    │\n└──────────┴──────────┴──────────┘\n```\n\nThree columns: lead (20%), data pair (40%), UI pair (40%). Each pair column split vertically — implementer on top, tester on bottom.",
+    "summary": "PO wants paired TDD layout",
+    "timestamp": "2026-03-19T17:45:35.638Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:10] Bug fix needed — start-team.sh and apply-layout.sh failed on first real boot.\n\n**Two issues:**\n\n1. **Session name mismatch:** Entrypoint creates tmux session `entu` (lowercase) but both scripts default to `ENTU` (uppercase). Fix: change `${1:-ENTU}` to `${1:-entu}` in both `apply-layout.sh` and `start-team.sh`.\n\n2. **\"size missing\" error:** Line 51 in `apply-layout.sh` sends `cd $WORK_DIR && clear` to the Saavedra pane via `tmux send-keys`. If Claude is running in that pane, this interferes and causes the subsequent split to fail with \"size missing\". Fix: remove the `tmux send-keys` line — the `-c \"$WORK_DIR\"` on splits already sets the working directory for new panes.\n\nFiles to fix:\n- `.claude/teams/entu-research/apply-layout.sh` — both issues\n- `.claude/teams/entu-research/start-team.sh` — session name default\n- `.claude/teams/entu-research/reflow.sh` — check if same session name default\n\nAlso update `startup.md` — the example commands reference `ENTU` uppercase. Change to `entu`.\n\nCommit and push when done. The container auto-pulls on restart.",
+    "summary": "Brunel: fix session name + size missing bugs",
+    "timestamp": "2026-03-19T18:09:17.456Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:12] Additional: update the deployment runbook (`docs/container-deployment-runbook.md` in mitselek-ai-teams) with lessons from this deployment:\n\n1. **Container settings.json must include a full permission allow list** — bare `\"Bash\"` in allow, plus WebFetch domains. The minimal settings (just `defaultMode`) causes either denial (dontAsk without allow) or constant prompting (default without allow). Add a \"Settings Template\" section to the runbook.\n\n2. **tmux session names must match between entrypoint and team scripts** — entrypoint creates the session, scripts reference it. Use lowercase consistently. Add a \"Naming Convention\" note.\n\n3. **Don't send-keys to panes that have Claude running** — `tmux send-keys \"cd && clear\"` interferes with the running process. Use `-c <dir>` on `split-window` instead.\n\nThese are patterns that will apply to every future team container.",
+    "summary": "Brunel: update deployment runbook with lessons",
+    "timestamp": "2026-03-19T18:09:56.387Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:14] The superpowers plugin is interfering with the startup procedure. When the user says \"lets try startup procedure\", the brainstorming skill intercepts it instead of following startup.md.\n\nTwo fixes needed in the container settings.json:\n\n1. **Disable superpowers plugin** (or at least the brainstorming skill) — the team-lead should follow startup.md mechanically, not brainstorm. The container settings currently enable `superpowers@claude-plugins-official: true`.\n\n2. **The startup.md should be more directive** — add a line at the top: \"When the user says 'startup', 'start', or 'hello', follow this procedure. Do NOT invoke brainstorming or any other skill.\"\n\nFix the container settings live:\n```bash\ndocker exec entu-research python3 -c \"\nimport json\nwith open('/home/ai-teams/.claude/settings.json') as f:\n    s = json.load(f)\ns['enabledPlugins']['superpowers@claude-plugins-official'] = False\nwith open('/home/ai-teams/.claude/settings.json','w') as f:\n    json.dump(s, f, indent=2)\n\"\n```\n\nAlso update the entrypoint's settings template to not enable superpowers by default.\n\nThen update startup.md with the directive line.\n\nCommit both changes and push.",
+    "summary": "Brunel: disable superpowers, fix startup",
+    "timestamp": "2026-03-19T18:15:22.013Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:17] Cancel previous — do NOT disable superpowers. PO wants it enabled. The fix was simpler: CLAUDE.md now says \"read startup.md FIRST\" (already pushed).\n\nIf you already changed the entrypoint to disable superpowers, revert that change. Superpowers should stay `true` in the settings template.",
+    "summary": "Brunel: keep superpowers enabled, revert",
+    "timestamp": "2026-03-19T18:16:37.181Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:18] Correction: REVERT the superpowers change. PO wants superpowers ENABLED (`true`), not disabled.\n\n- Revert the live container fix: set `superpowers@claude-plugins-official` back to `true`\n- Revert the entrypoint change: `superpowers` back to `true`\n\nThe actual fix (CLAUDE.md pointing to startup.md) is already pushed. No other changes needed. Just the revert + push.",
+    "summary": "Brunel: REVERT superpowers to true",
+    "timestamp": "2026-03-19T18:17:08.866Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:20] \"size missing\" error is back. The `tmux send-keys` line in apply-layout.sh was NOT removed in your fix. Check the file on the container:\n\n```bash\nssh dev@100.96.54.170 \"docker exec entu-research grep 'send-keys' /home/ai-teams/workspace/entu-research/.claude/teams/entu-research/apply-layout.sh\"\n```\n\nIf it's still there, the fix didn't land. The line to remove is:\n```\ntmux send-keys -t \"$PANE_SAAVEDRA\" \"cd $WORK_DIR && clear\" Enter\n```\n\nAlso — the \"size missing\" error happens because Claude Code is running in the pane, and splitting a pane that's running a full-screen TUI (Claude) fails. The real fix might be that `start-team.sh` should NOT be called from inside Claude. It should be run from a bare shell BEFORE starting Claude in the saavedra pane.\n\nThink about the correct sequence:\n1. SSH into container → bare shell in tmux\n2. Run `bash start-team.sh entu` → creates panes, spawns agents\n3. THEN start `claude` in the saavedra pane\n\nUpdate startup.md accordingly. The team-lead should NOT call start-team.sh from inside Claude.",
+    "summary": "Brunel: size missing still — fix sequence",
+    "timestamp": "2026-03-19T18:20:18.066Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:22] Rethink the startup flow. PO wants: SSH in → run `claude` → say \"hello\" → team boots. No manual scripts.\n\n**The problem:** `apply-layout.sh` can't run from inside Claude because `tmux split-window` fails when splitting a pane running a full-screen TUI (\"size missing\").\n\n**The solution:** Move layout creation to the ENTRYPOINT. The panes should already exist when the user SSHs in.\n\n**New flow:**\n1. **Entrypoint** runs `apply-layout.sh` at container start → creates 5 panes, saves `/tmp/entu-panes.env`\n2. User SSHs in → lands in saavedra pane (bare shell, panes already visible)\n3. User types `claude` → Claude reads CLAUDE.md → startup.md\n4. Startup procedure: TeamCreate → `source /tmp/entu-panes.env` → run `spawn_member.sh` for each of the 4 agents into pre-existing panes\n5. Agents start Claude in their panes and check in\n\n**Changes needed:**\n1. `entrypoint-entu.sh` — add step after tmux session creation that runs `apply-layout.sh`\n2. `start-team.sh` — skip `apply-layout.sh`, only source pane env + spawn agents\n3. `startup.md` — update to reflect that panes already exist, only spawn step needed\n\nThis way the layout is always ready. No \"size missing\" possible because splits happen before any Claude process starts.\n\nCommit, push, and rebuild the container.",
+    "summary": "Brunel: move layout to entrypoint, fix UX",
+    "timestamp": "2026-03-19T18:23:05.987Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:25] Session ending. Please write your scratchpad and send closing report with [LEARNED], [DEFERRED], [WARNING] (1 bullet each max). Then approve shutdown when I send the request.",
+    "summary": "Session ending — write scratchpads",
+    "timestamp": "2026-03-19T18:24:26.280Z",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773944792663@brunel\",\"from\":\"team-lead\",\"reason\":\"R11 session complete.\",\"timestamp\":\"2026-03-19T18:26:32.663Z\"}",
+    "timestamp": "2026-03-19T18:26:32.663Z",
+    "read": true
   }
 ]

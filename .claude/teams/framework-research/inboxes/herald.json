@@ -106,5 +106,25 @@
     "summary": "GitHub Apps vs machine users deep dive",
     "timestamp": "2026-03-19T13:38:12.237Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:25] Research task: Entu API integration patterns.\n\nWe're designing a new team that will build a SvelteKit app on top of Entu (entity-property database, REST API, JWT auth). Your focus: how would a SvelteKit frontend communicate with the Entu API?\n\n**Research areas:**\n1. **Auth flow**: Entu supports API keys, OAuth (Google, Apple, Smart-ID, Mobile-ID, ID-card), and WebAuthn passkeys. JWT tokens valid 48h. Study the auth endpoints at the OpenAPI spec: `https://entu.app/api/openapi`\n2. **CRUD patterns**: Entities are created/read/updated/deleted via REST. Properties are added individually. Study how the existing Vue.js webapp (`https://github.com/entu/webapp`) handles CRUD — what patterns does it use?\n3. **Query/filter patterns**: The entity list endpoint has rich filtering (regex, range, exists, grouping, sorting). How would a SvelteKit server-side load function consume this?\n4. **File handling**: Files uploaded via signed S3 URLs. How does the webapp handle file upload/download?\n\nFocus on communication patterns and protocol design — how a new frontend should talk to Entu. Report structured findings.",
+    "summary": "Herald: Entu API integration patterns",
+    "timestamp": "2026-03-19T16:37:19.332Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:25] Session ending. Please write your scratchpad and send closing report with [LEARNED], [DEFERRED], [WARNING] (1 bullet each max). Then approve shutdown when I send the request.",
+    "summary": "Session ending — write scratchpads",
+    "timestamp": "2026-03-19T18:24:26.275Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773944792168@herald\",\"from\":\"team-lead\",\"reason\":\"R11 session complete.\",\"timestamp\":\"2026-03-19T18:26:32.168Z\"}",
+    "timestamp": "2026-03-19T18:26:32.168Z",
+    "read": true
   }
 ]

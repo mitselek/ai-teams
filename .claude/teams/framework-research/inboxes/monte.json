@@ -61,5 +61,18 @@
     "summary": "Governance: GitHub Apps vs machine users",
     "timestamp": "2026-03-19T13:38:20.376Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:25] Session ending. Please write your scratchpad and send closing report with [LEARNED], [DEFERRED], [WARNING] (1 bullet each max). Then approve shutdown when I send the request.",
+    "summary": "Session ending — write scratchpads",
+    "timestamp": "2026-03-19T18:24:26.295Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773944739236@monte\",\"from\":\"team-lead\",\"reason\":\"R11 session complete.\",\"timestamp\":\"2026-03-19T18:25:39.236Z\"}",
+    "timestamp": "2026-03-19T18:25:39.236Z",
+    "read": true
   }
 ]

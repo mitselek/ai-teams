@@ -19,21 +19,28 @@
 4. **Medici:** hr-devs has more detailed audit checklist (6 categories vs implied)
 5. **Attribution:** rc-team `(*RC-DEV:Name*)`; hr-devs same (not yet updated)
 
-## [CHECKPOINT] 2026-03-18/19 — R9 session (5 major tasks)
+## [CHECKPOINT] 2026-03-19 — R10 session
 
-1. **RFC #3 reference research** — gathered evidence on issues/tasks, git workflow, TDD, research-to-implementation transition from both reference teams. Identified two-tier tracking pattern (ephemeral tasks + GitHub Issues). RFC ratified by PO with 7 decisions.
+**Entu platform deep-dive** — full research on entity-property model, rights propagation, formula system, and plugin extension model. Sources: OpenAPI spec (live), webapp repo (Nuxt 3 + Vue 3 + Naive UI), plugins repo (Nuxt 3), docs site (15 VitePress markdown files).
 
-2. **T07 Safety & Guardrails research** — catalogued 5 enforcement mechanisms (prompt restrictions, peer enforcement, CI gates, PR checklists, health audits) and 6 gaps. Documented 12 incidents/near-misses including $5K MCP data loss. Key tension: behavioral vs structural enforcement. Sent to Monte + team-lead.
+Key findings:
+- MongoDB backend: `property` collection (immutable append, soft-delete) + `entity` collection (denormalized aggregated views)
+- Entity types and property definitions are themselves entities — fully self-describing schema
+- 9 property types: string, text, number, boolean, date, datetime, file, reference, counter
+- Rights: 5-level ACL (_owner > _editor > _expander > _viewer > _noaccess) + 3 sharing tiers + _inheritrights
+- Formulas: RPN-like syntax with 12 functions, references to children/referrers, two-pass evaluation on save
+- Plugins: iframe UI tabs + webhook triggers, 4 plugin types
 
-3. **Polyphony project context** — mapped `mitselek/polyphony` monorepo: 61K LOC, 343 source files, 123 tests, 572 commits. Existing 8-agent team config identified 8 gaps vs reference teams. Sent to team-lead + Celes for roster redesign.
+## [INDEX] Entu repos cloned
 
-4. **Apex S8 audit data gathering** — distributed data packages to 4 specialists (Medici, Monte, Herald, Celes). Found 6 missing artifacts on initial check; all resolved after apex team pushed. 61 source files, 24 discussions, 11 specs, 8 ADRs confirmed.
-
-5. **Re-verification after apex push** — confirmed all artifacts exist, spec line counts 550/570 (exceeding audit claims).
+- `.mmp/entu-webapp/` — webapp (Nuxt 3, ~50 Vue components, utils/api.js, stores/)
+- `.mmp/entu-plugins/` — plugins (CSV, Discogs, Ester, KML, Template importers)
+- Docs at `.mmp/entu-webapp/docs/` — 15 markdown files covering all platform aspects
 
 ## [DEFERRED] Open questions
 
 - `topics/02-roles.md` — still unclear if a separate roles file is wanted
 - Polyphony team roster redesign — Celes delivered package, awaiting PO approval
+- Entu: no server-side code repo studied (only API spec + client code) — backend aggregation logic not fully visible
 
 (*FR:Finn*)

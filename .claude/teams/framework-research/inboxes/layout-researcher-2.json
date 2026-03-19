@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773942314344@layout-researcher-2\",\"from\":\"team-lead\",\"reason\":\"Duplicate agent, no longer needed.\",\"timestamp\":\"2026-03-19T17:45:14.344Z\"}",
+    "timestamp": "2026-03-19T17:45:14.344Z",
+    "read": true
+  }
+]

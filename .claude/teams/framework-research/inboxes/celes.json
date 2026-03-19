@@ -224,5 +224,102 @@
     "summary": "Shutdown request to all agents",
     "timestamp": "2026-03-19T12:48:08.199Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:25] Intake: new team design — \"entu-builders\" (working name).\n\n**Context:** We're designing a standalone team that will rebuild \"Polyphony\" (a choral music sharing platform) on top of Entu (entity-property database). This is a PoC to validate Entu as an app platform.\n\n**Current polyphony stack:** SvelteKit 2, Svelte 5, Cloudflare Pages/Workers, D1 SQLite, pnpm monorepo (registry + vault + shared).\n\n**New stack:** SvelteKit frontend + Entu API as the data/auth/storage layer. Deployment platform TBD (keeping options open).\n\n**What the team needs to do:**\n1. Deeply understand Entu (entity-property model, rights, formulas)\n2. Map polyphony's domain model onto Entu entities\n3. Build the SvelteKit frontend\n4. Handle auth integration (Entu supports OAuth, API keys, WebAuthn)\n\n**Start your intake process:** Think about what roles this team needs. Consider that Entu's entity-property paradigm is very different from traditional SQL — the team needs someone who deeply understands Entu's data modeling approach. Read the existing polyphony CLAUDE.md at `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/CLAUDE.md` and the polyphony README at `/c/Users/mihkel.putrinsh/Documents/github/.mmp/polyphony/README.md` to understand the domain.\n\nDon't draft prompts yet — just send me your initial role analysis (what specialists are needed and why).",
+    "summary": "Celes: intake for new entu-builders team",
+    "timestamp": "2026-03-19T16:37:28.268Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:40] Answers to your intake questions:\n\n**1. Entu docs:** Finn and Herald are researching right now. Key sources:\n- OpenAPI spec: `https://entu.app/api/openapi` (72KB, full REST API)\n- Webapp: `https://github.com/entu/webapp` (Vue.js frontend — shows how apps consume the API)\n- Plugins: `https://github.com/entu/plugins` (extension model)\n- API docs: `https://entu.dev`\n- Entu is entity-property with: JWT auth (48h tokens), OAuth (Google, Apple, Smart-ID, Mobile-ID, ID-card), WebAuthn, S3 file storage, hierarchical ACL (_owner/_editor/_viewer/_expander), parent-child entity hierarchies, computed formulas, full-text search. Wait for Finn's report before writing the Entu Architect prompt — he'll have the specifics you need.\n\n**2. Team size:** Lean. This is a PoC, not production. 4-5 agents max. Combine where possible.\n\n**3. Relationship to existing polyphony:** Parallel experiment, clean slate. No code sharing, no shared specs. The existing polyphony is reference material only — the new team reads it to understand the domain, not to port it.\n\n**4. Deployment:** Deferred. No infra specialist. The PoC validates Entu as a data platform, not deployment architecture.\n\n**My thoughts on your roster:**\n- Agree that Entu Architect is the critical hire at opus tier\n- Consider combining Auth/Integration into the Frontend Builder — Entu's auth is API-based, it's just HTTP calls from SvelteKit server-side\n- Domain Analyst feels like it could be a read-only research phase, not a permanent team member. Finn could do the initial domain analysis before the team even starts building\n- Test Engineer: yes, TDD is mandatory\n\nSo I'm thinking: team-lead + Entu Architect + Frontend Builder (with auth) + Test Engineer = 4 agents. Lean and focused.\n\nWait for Finn's and Herald's reports before drafting prompts. Their findings will sharpen your role definitions considerably.",
+    "summary": "Answers to Celes's intake questions",
+    "timestamp": "2026-03-19T16:39:50.299Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:42] Herald's research is in. Key findings for your prompt drafting:\n\n**Auth pattern**: Two-phase OAuth → temp API key → JWT (48h, no refresh). BFF pattern recommended — JWT in httpOnly cookie, SvelteKit server proxies all Entu API calls. No token in localStorage.\n\n**CRUD pattern**: All properties are ARRAYS (multi-value by design). Create/update is additive (POST adds, never removes). Delete is per-property. This is a paradigm shift — the Frontend Builder must understand this.\n\n**Entity-property specifics**: Entity types define schemas (allowed properties, ordinals, mandatory/optional, formulas, defaults, multilingual). The Entu Architect needs to design type definitions, not just entity instances.\n\n**File handling**: S3 signed URLs with 60s TTL. Upload flow: POST file metadata → get signed URL → client uploads directly to S3. XHR needed for progress.\n\n**Permission tiers**: _owner > _editor > _expander > _viewer. Private/domain/public visibility. API auto-filters responses based on access level.\n\n**No real-time**: No WebSocket/SSE. Polling only.\n\nStill waiting on Finn for the deep dive on entity-property modeling patterns, rights propagation mechanics, and formulas. That's the piece you need most for the Entu Architect prompt.",
+    "summary": "Forward Herald's findings to Celes",
+    "timestamp": "2026-03-19T16:42:19.325Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:42] Finn's deep dive is in. Critical findings for your prompts:\n\n**Entity-Property internals:**\n- Two MongoDB collections: `property` (individual values, soft-deleted on change = full audit trail) and `entity` (denormalized aggregated view, rebuilt via `aggregateEntity()` after every mutation)\n- Entity types are themselves entities — the system is fully self-describing\n- Property definitions are child entities of their entity type\n- Multi-value: `list: true` allows multiple values per property name\n- Multilingual: `multilingual: true` adds language code per value\n\n**Schema design pattern:**\n1. Create entity types (which are entities with properties that define the schema)\n2. Property definitions are children of entity types, specifying: name, type, mandatory, default, formula, reference_query, set (dropdown values), ordinal, group, hidden, readonly, etc.\n3. Container entities as organizational roots, children inherit rights\n\n**Formulas (critical for Architect):**\n- **Reverse Polish Notation** syntax: `field1 field2 FUNCTION`\n- Nesting with parentheses: `(price tax SUM) quantity MULTIPLY`\n- Can reference: same entity properties, referenced entity properties (`ref.*.prop`), child properties (`_child.typeName.prop`), referrer properties (`_referrer.typeName.prop`)\n- Functions: CONCAT, SUM, COUNT, AVERAGE, MIN, MAX, SUBTRACT, MULTIPLY, DIVIDE, ROUND, ABS\n- Evaluated on every save (two-pass), plus manual re-aggregation endpoint\n- Read-only in UI, skipped on duplicate\n\n**Rights (refined):**\n- 5 levels: _owner > _editor > _expander > _viewer > _noaccess\n- _noaccess overrides ALL rights, NOT inherited by children\n- _inheritrights: true propagates parent's rights to children\n- Property-level _sharing capped by entity type's _sharing\n- API auto-filters response based on access level\n\n**Plugins:**\n- UI plugins: iframes in entity edit drawer, get token+context as URL params\n- Webhook plugins: POST on entity save/create, token valid 1 min\n\nYou now have everything needed to draft the 4 prompts: team-lead, Entu Architect, Frontend Builder, Test Engineer. The Entu Architect prompt especially needs the formula syntax and entity-type-as-entity paradigm. Go ahead and draft.",
+    "summary": "Forward Finn's findings, green light to draft",
+    "timestamp": "2026-03-19T16:42:51.557Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:46] Roster update from PO: **5 agents + team-lead** (6 total). Two dedicated TDD pairs:\n\n| # | Role | Pairs with | Tier |\n|---|------|-----------|------|\n| 1 | Team Lead | — | opus |\n| 2 | Entu Architect | API/Data Tester | opus |\n| 3 | Frontend Builder | Frontend Tester | sonnet |\n| 4 | API/Data Test Engineer | Architect | sonnet |\n| 5 | Frontend Test Engineer | Builder | sonnet |\n\n**TDD Pair 1:** Entu Architect + API/Data Test Engineer — tests entity type definitions, additive CRUD, rights propagation, formula evaluation, query filters. The tester writes failing tests against Entu's API, the Architect makes them pass by designing correct entity types and property structures.\n\n**TDD Pair 2:** Frontend Builder + Frontend Test Engineer — tests SvelteKit components, server load functions, BFF proxy, auth flow, file upload. The tester writes failing component/integration tests, the Builder implements.\n\nPO's emphasis: \"strongly want dedicated TDD pair available\" and \"two capable test writers addressing very different domains.\" These are permanent pairing roles, not ad-hoc.\n\nPlease draft all 5 agent prompts + team-lead prompt (6 total). Include the pairing relationship in each prompt so both partners know their counterpart.",
+    "summary": "Updated roster: 6 agents, two TDD pairs",
+    "timestamp": "2026-03-19T16:43:28.246Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:48] PO asking: have you picked a lore theme for the entu-research team? Team name confirmed as \"entu-research\". Share your lore direction when you're ready — don't let it block prompt drafting.",
+    "summary": "PO asks about lore theme choice",
+    "timestamp": "2026-03-19T16:44:11.570Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:49] PO directive: ALL agents in entu-research are opus tier. Updated roster:\n\n| # | Role | Tier |\n|---|------|------|\n| 1 | Team Lead | opus |\n| 2 | Entu Architect | opus |\n| 3 | Frontend Builder | opus |\n| 4 | API/Data Test Engineer | opus |\n| 5 | Frontend Test Engineer | opus |\n\nUpdate your drafts accordingly.",
+    "summary": "All entu-research agents upgraded to opus",
+    "timestamp": "2026-03-19T16:45:56.406Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:52] Prompts reviewed. Quality is high. Three corrections needed:\n\n**1. Team name:** \"entu-builders\" → \"entu-research\" everywhere. Attribution prefix: `(*EB:*)` → `(*ER:*)`. File rename: `entu-builders-common-prompt.md` → `entu-research-common-prompt.md`. Memory paths: `.claude/teams/entu-builders/` → `.claude/teams/entu-research/`.\n\n**2. All agents opus.** PO directive received after your draft. Update roster: Semper and Hopper both `claude-opus-4-6`.\n\n**3. Missing 5th agent — second test engineer.** PO wants TWO dedicated TDD pairs:\n- **Pair 1:** Codd (Architect) + API/Data Tester — tests entity types, CRUD, rights, formulas against Entu API\n- **Pair 2:** Semper (Builder) + Frontend Tester — tests SvelteKit components, BFF proxy, auth flow, UI\n\nCurrently Hopper covers both domains. Split Hopper into the API/Data tester and create a new agent for frontend testing. Hopper's strength is the Entu paradigm gotcha tests — keep her on the API/data side where SQL-assumption bugs live.\n\nYou need a new name+lore for the frontend test engineer. The common-prompt TDD section also needs updating to reference both testers.\n\nPlease apply all three corrections and send me the updated files.",
+    "summary": "Three corrections: name, tiers, missing 5th agent",
+    "timestamp": "2026-03-19T16:49:22.550Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:54] Additional correction: the team-lead (Saavedra) needs a proper lore entry in the roster JSON, same format as the other agents. The prompt file has the lore text, but make sure it's also in the roster entry under `\"lore\": { \"fullName\", \"nickname\", \"origin\", \"significance\" }`.",
+    "summary": "Add lore entry for team-lead in roster",
+    "timestamp": "2026-03-19T16:49:44.849Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:55] Two corrections STILL not applied:\n\n1. **Team name is \"entu-research\", NOT \"entu-builders\".** This was confirmed by PO. Update all files, roster, attribution prefix (`(*ER:*)`), memory paths, file names.\n\n2. **ALL agents are opus.** Turing, Semper, and Hopper are still listed as `claude-sonnet-4-6`. PO explicitly said \"please upgrade all agents to opus.\" All five must be `claude-opus-4-6`.\n\nThese are not suggestions. Please apply both NOW and confirm when done.",
+    "summary": "STILL: rename to entu-research, all opus",
+    "timestamp": "2026-03-19T16:54:13.692Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 18:58] Quick check: your v2 title said \"6 agents\" but the roster has 5 entries (Saavedra, Codd, Turing, Semper, Hopper). Were you counting team-lead twice, or did you intend a 6th specialist we're missing?",
+    "summary": "Clarify: 5 or 6 agents in roster?",
+    "timestamp": "2026-03-19T16:57:11.357Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 19:06] Point of precision for future work:\n\nYou designed **5 characters** (agents with lore, prompts, and personality), not 6:\n1. Saavedra (team-lead)\n2. Codd (Entu Architect)\n3. Hopper (API/Data Test Engineer)\n4. Semper (Frontend Builder)\n5. Hamilton (Frontend Test Engineer)\n\nThe team has 5 members. The team-lead IS one of the 5 — not a 6th entity on top. `team-lead` is a role, `Saavedra` is the character. Same person.\n\nThis matters because when you say \"6 agents\" and the roster has 5 entries, it creates confusion about whether a specialist is missing. In future team designs, count characters, not roles-plus-characters.",
+    "summary": "Correction: 5 characters, not 6",
+    "timestamp": "2026-03-19T17:06:09.111Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 20:25] Session ending. Please write your scratchpad and send closing report with [LEARNED], [DEFERRED], [WARNING] (1 bullet each max). Then approve shutdown when I send the request.",
+    "summary": "Session ending — write scratchpads",
+    "timestamp": "2026-03-19T18:24:26.265Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773944721748@celes\",\"from\":\"team-lead\",\"reason\":\"R11 session complete.\",\"timestamp\":\"2026-03-19T18:25:21.748Z\"}",
+    "timestamp": "2026-03-19T18:25:21.748Z",
+    "read": true
   }
 ]
