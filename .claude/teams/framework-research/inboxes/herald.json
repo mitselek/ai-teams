@@ -88,8 +88,23 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924565744@herald\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:25.744Z\"}",
-    "timestamp": "2026-03-19T12:49:25.744Z",
+    "text": "[2026-03-19 15:00] Task: Protocol analysis for apex-research discussion #45.\n\nThe apex team is building a `/qna` page that surfaces GitHub Q&A Discussions on their dashboard. They ask:\n- Is linking to GitHub Discussions for posting (GitHub handles auth) the right pattern?\n- What about ER users without GitHub accounts?\n- Is there a cross-team communication protocol we should standardize for Q&A / external questions?\n\nYour task: Analyze from a protocol design perspective — is \"GitHub Discussions as Q&A substrate\" a pattern we should codify in T03? What are the failure modes (auth gaps, discovery, notification routing)? How does this scale if multiple team dashboards each have their own Q&A? Report findings to me.",
+    "summary": "Protocol analysis for Q&A pattern in discussion #45",
+    "timestamp": "2026-03-19T13:17:35.713Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 15:15] Task: Protocol analysis — per-team GitHub accounts.\n\nPO is considering moving from shared GitHub account (all teams use one) to each team having their own GitHub account/mailbox. Currently all teams share a single identity on GitHub.\n\nAnalyze from a communication protocol perspective:\n- Cross-team messaging: if teams have separate accounts, how do cross-team PRs/issues/discussions work?\n- Notification routing: per-account notifications vs shared inbox\n- GitHub Discussions Q&A pattern (from discussion #45): does per-team account improve or complicate Q&A routing?\n- Commit attribution: `git blame` currently shows one author for all teams. How does this change?\n- MCP/API implications: each team needs its own PAT. Token management complexity?\n- Protocol changes needed: which of our T03 protocols would need updating?\n\nReport to me — I'll compile with Monte's governance analysis.",
+    "summary": "Protocol analysis: per-team GitHub accounts",
+    "timestamp": "2026-03-19T13:28:35.578Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 15:40] Follow-up task: GitHub Apps vs machine user accounts for per-team identity.\n\nPO wants a deeper comparison. Analyze from a protocol/integration perspective:\n\n**GitHub Apps:**\n- Installation-level permissions (per-repo, per-org)\n- Don't consume seats on paid plans\n- Have their own identity in git commits and PR reviews\n- Use JWT + installation tokens (short-lived, auto-rotating)\n- Can be installed on specific repos only\n- Have webhooks built-in\n- Rate limit: 5000 req/hr per installation (same as user)\n- Can act as a \"bot\" identity in PRs/issues/discussions\n\n**Machine user accounts:**\n- Regular GitHub accounts used for automation\n- Consume seats on paid plans\n- Use PATs (long-lived, manual rotation)\n- Standard account permissions model\n\nResearch the specifics and compare for our use case:\n1. Can a GitHub App create Discussions and post comments?\n2. Can it push commits with its own identity?\n3. How does the JWT auth work in practice — is it compatible with `gh` CLI and MCP servers?\n4. Can we create ONE GitHub App and install it per-team with different permissions?\n5. What are the limitations (no SSH git access? no `gh auth login`?)\n6. How does this affect our T03/T05 protocols?\n\nReport to me.",
+    "summary": "GitHub Apps vs machine users deep dive",
+    "timestamp": "2026-03-19T13:38:12.237Z",
     "read": true
   }
 ]

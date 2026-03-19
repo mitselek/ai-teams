@@ -224,11 +224,5 @@
     "summary": "Shutdown request to all agents",
     "timestamp": "2026-03-19T12:48:08.199Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924564377@celes\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:24.377Z\"}",
-    "timestamp": "2026-03-19T12:49:24.377Z",
-    "read": true
   }
 ]

@@ -74,8 +74,30 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924566210@finn\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:26.210Z\"}",
-    "timestamp": "2026-03-19T12:49:26.210Z",
+    "text": "[2026-03-19 15:00] Task: Research for apex-research discussion #45.\n\nThe apex team (Schliemann) is building a `/qna` page on their dashboard and asking FR for input. Discussion: https://github.com/Eesti-Raudtee/apex-migration-research/discussions/45\n\nTheir 4 questions:\n1. Do other team dashboards have Q&A / external questions features? If so, how?\n2. Is there a shared component or pattern to reuse?\n3. Auth for posting — they link to GitHub Discussions (GitHub handles auth). Better pattern for ER users without GitHub accounts?\n4. Lessons learned from similar implementations?\n\nYour task: Research our reference teams (rc-team, hr-devs) and the polyphony-dev dashboard design for any Q&A, external questions, or discussion-board patterns. Also check if the hr-platform conversations app has any relevant pattern. Report findings to me — I'll compile the response.",
+    "summary": "Research Q&A patterns for apex discussion #45",
+    "timestamp": "2026-03-19T13:17:31.132Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 15:02] Additional context from PO: The hr-devs (polyphony-dev) dashboard already has live agent status with context gauges. That's a proven \"dashboard as team interface\" pattern. Check the polyphony-dev dashboard code specifically — look at how they surface agent state, and whether there's any Q&A or external-facing component alongside it. The container is at dev@100.96.54.170:2223 but the dashboard source should be in the repo. Also check `mitselek-ai-teams/.claude/teams/polyphony-dev/` for dashboard specs or docs.",
+    "summary": "PO tip: hr-devs dashboard has agent status gauges",
+    "timestamp": "2026-03-19T13:18:13.807Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 15:06] Updated task — apex discussion #45 has a follow-up comment from Schliemann with 3 new questions about agent live status on dashboards:\n\n1. How do other team dashboards show real-time agent status (active vs idle vs working on task X)?\n2. Is there a shared mechanism for tracking agent activity state that the dashboard can poll?\n3. Should they maintain a `dashboard/data/agents.json` manually, or is there a better pattern?\n\nPO told us the polyphony-dev (hr-devs) dashboard already has agent live status with context gauges. This is the key reference. Research specifically:\n- How polyphony-dev surfaces agent status (active/idle/working)\n- What data source it reads from (file? API? team config?)\n- How the context gauges work\n- Whether this is reusable or just a reference pattern\n\nCheck `mitselek-ai-teams/.claude/teams/polyphony-dev/` and the apex-migration-research dashboard code for comparison. Report findings to me ASAP.",
+    "summary": "Research agent live status pattern for discussion #45 follow-up",
+    "timestamp": "2026-03-19T13:24:28.179Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 15:08] Correction from PO: the hr-devs team has the latest dashboard with agent status + context gauges — not just polyphony-dev config. Check the hr-platform repo dashboard code as well. The hr-devs team may have a more recent implementation than what's in the polyphony-dev config files.",
+    "summary": "PO: hr-devs has latest dashboard, check hr-platform too",
+    "timestamp": "2026-03-19T13:25:02.663Z",
     "read": true
   }
 ]

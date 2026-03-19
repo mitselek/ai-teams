@@ -50,8 +50,16 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773924564899@monte\",\"from\":\"team-lead\",\"reason\":\"R9 session complete. Thank you for exceptional work.\",\"timestamp\":\"2026-03-19T12:49:24.899Z\"}",
-    "timestamp": "2026-03-19T12:49:24.899Z",
+    "text": "[2026-03-19 15:15] Task: Governance analysis — per-team GitHub accounts.\n\nPO is considering moving from shared GitHub account (all teams use one) to each team having their own GitHub account/mailbox. Currently all teams share a single identity on GitHub.\n\nAnalyze from a governance perspective:\n- Authority/identity separation: does \"one account per team\" align with separation of powers?\n- Audit trail: how does per-team identity affect attribution, blame, accountability?\n- Access control: can teams be given different repo permissions?\n- Scaling: what happens at 10+ teams sharing one account vs separate accounts?\n- Risk: shared account = single point of failure (credential leak). How does this change?\n- Cost: GitHub account limits, PAT management, credential rotation\n\nReport to me — I'll compile with Herald's protocol analysis.",
+    "summary": "Governance analysis: per-team GitHub accounts",
+    "timestamp": "2026-03-19T13:28:30.604Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-19 15:40] Follow-up task: Governance analysis of GitHub Apps vs machine user accounts.\n\nPO wants to understand the trade-offs. Analyze from a governance perspective:\n\n**GitHub Apps** are purpose-built automation identities:\n- One App can be installed multiple times (per-repo or per-org)\n- Each installation gets its own short-lived token (auto-rotates every hour)\n- Don't consume GitHub seats (cost saving)\n- Have a distinct bot identity (commits show as `app-name[bot]`)\n- Permissions are scoped at installation time, not at token creation time\n\nCompare against machine user accounts for our governance needs:\n1. Authority mapping: does \"one App, multiple installations\" or \"one account per team\" map better to our delegation matrix?\n2. Audit trail: App installations vs account-level audit — which gives better traceability?\n3. Credential lifecycle: auto-rotating tokens vs manual PAT rotation — governance implications\n4. Access control: installation-scoped permissions vs account-scoped PATs — which is more governable?\n5. Cost: Apps are free and don't consume seats. Machine users consume seats at $4/mo each.\n6. Identity: `er-apex-research[bot]` vs `er-apex-research` in git blame — governance difference?\n7. Risk: What happens if the App is compromised vs one machine user account?\n\nAlso consider hybrid approaches: GitHub App for git/API operations + machine user accounts for things Apps can't do (if any).\n\nReport to me.",
+    "summary": "Governance: GitHub Apps vs machine users",
+    "timestamp": "2026-03-19T13:38:20.376Z",
     "read": true
   }
 ]
