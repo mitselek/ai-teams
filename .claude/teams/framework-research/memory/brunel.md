@@ -11,12 +11,13 @@
 [DECISION] 2026-03-14 12:12 — One shared Dockerfile for both teams (deps identical). gh CLI added. Both services → same ai-teams-claude:latest image. Per-team volumes: ai-teams_fr-claude-home, ai-teams_cd-claude-home.
 
 [DECISION] 2026-03-14 17:xx — Relay architecture (issues #7/#8): full Cloudflare stack.
-  - Relay WS routing: Durable Object (hibernation API)
-  - Store-and-forward queue: DO Storage + DO Alarm (replaces setInterval)
-  - REST API + WS upgrade: Worker
-  - Message history + user registry: D1
-  - Frontend: CF Pages + SvelteKit + adapter-cloudflare + TailwindCSS 4
-  - Team containers: only change is RELAY_URL + RELAY_TOKEN env vars; comms volume removed
+
+- Relay WS routing: Durable Object (hibernation API)
+- Store-and-forward queue: DO Storage + DO Alarm (replaces setInterval)
+- REST API + WS upgrade: Worker
+- Message history + user registry: D1
+- Frontend: CF Pages + SvelteKit + adapter-cloudflare + TailwindCSS 4
+- Team containers: only change is RELAY_URL + RELAY_TOKEN env vars; comms volume removed
 
 [DECISION] 2026-03-14 17:xx — UDS/comms volume is obsolete once relay is live. docker-compose.yml loses: comms volume, comms-psk secret, depends_on. Team containers become stateless WS clients pointing at cloud relay.
 
@@ -53,6 +54,7 @@
 [LEARNED] 2026-03-14 — DO single-instance = single geographic SPOF. CF pins DO to datacenter of first connection. Sharding by conversation_id (multiple DO instances) is the v2 scaling path. Acceptable for v1.
 
 [CHECKPOINT] 2026-03-14 12:12 — v1 container implementation complete and tested:
+
 - Dockerfile: ubuntu:24.04 + nodejs + npm + git + gh + jq + openssh + gosu
 - entrypoint.sh: fix volume ownership (loop), git clone/pull, gosu drop
 - docker-compose.yml: 2 services (framework-research, comms-dev), 4 volumes, YAML anchor for shared config
@@ -62,6 +64,7 @@
 - Tested: clone, git pull, claude --version, memory isolation, comms volume read/write
 
 [CHECKPOINT] 2026-03-14 17:35 — Relay architecture analysis complete (issues #7, #8):
+
 - Reviewed RFC #7 (UDS→WSS relay), RFC #8 (web frontend + WebAuthn)
 - Provided positions on 3 blocking decisions (best-effort queue, EXPIRED notification, dual routing table)
 - Full CF stack analysis: DO hibernation gotchas, D1 patterns, monorepo structure, DO limits
@@ -80,6 +83,7 @@
 [DEFERRED] 2026-03-14 — docker-compose.yml update to remove comms volume + psk + add RELAY_URL/RELAY_TOKEN. Blocked on comms-dev shipping the relay. Do not update compose until relay is live.
 
 [CHECKPOINT] 2026-03-17 13:40 — apex-research container deployed on RC server (dev@100.96.54.170):
+
 - Dockerfile.apex: ai-teams-claude:latest + Node.js 22 (binary) + Python 3.12 + sshd (port 2222) + sudo
 - docker-compose.yml: network_mode: host, 3 named volumes, no broker/comms
 - entrypoint-apex.sh: clone 2 repos, symlink, venv, sshd, runtime validation gates
@@ -105,11 +109,12 @@
 
 [GOTCHA] 2026-03-18 — Compose env vars don't propagate through sudo su or SSH login shells. Must persist to .bashrc via entrypoint. Use sed -i delete+append pattern to avoid duplicates on restart.
 
-[GOTCHA] 2026-03-18 — Claude Code npm-global install requires sudo for auto-updates. Native install via curl https://claude.ai/install.sh | bash goes to ~/.local/bin/ and self-updates without sudo.
+[GOTCHA] 2026-03-18 — Claude Code npm-global install requires sudo for auto-updates. Native install via curl <https://claude.ai/install.sh> | bash goes to ~/.local/bin/ and self-updates without sudo.
 
 [GOTCHA] 2026-03-18 — tmux must be started with -u flag for UTF-8 rendering (Claude prompt ❯ symbol). Also needs .tmux.conf with "set -g default-terminal tmux-256color".
 
 [CHECKPOINT] 2026-03-18 10:40 — apex-research container FINAL state on RC server (dev@100.96.54.170):
+
 - Image: apex-research-claude:latest (ai-teams-claude base + Node.js 22 + Python 3.12 + sshd + tmux + locales + sudo + native Claude)
 - Volumes: apex-claude-home, apex-research-repo, apex-source-data (3 named volumes)
 - Network: host mode (WARP bypass), WARP CA bind-mounted at /opt/warp-ca.pem
@@ -127,6 +132,7 @@
 [CHECKPOINT] 2026-03-18 — Timezone fix documented (3 layers): Dockerfile (tzdata + ln -snf + dpkg-reconfigure), docker-compose.yml (TZ=Europe/Tallinn env var), entrypoint SHELL_VARS ([TZ]=Europe/Tallinn). Live-fix commands without rebuild also provided.
 
 [CHECKPOINT] 2026-03-18 — polyphony-dev container design complete. 3 files at .mmp/polyphony/:
+
 - Dockerfile.polyphony: ai-teams-claude base + Node.js 22 + pnpm 9.15.0 + Playwright Chromium deps + browser at /opt/playwright/cache + native Claude + TZ baked in
 - docker-compose.polyphony.yml: bridge network, ports 5173/5174, PLAYWRIGHT_BROWSERS_PATH, WARP CA commented out for local dev
 - entrypoint-polyphony.sh: clone/pull → pnpm install --frozen-lockfile → gates → .bashrc → settings.json → gosu drop
@@ -136,6 +142,7 @@
 [DECISION] 2026-03-18 — No SSH server in polyphony container initially. Later reversed — SSH server added (port 2223, ai-teams user, pubkey auth, auto-tmux). Polyphony key: ssh-ed25519 ...6AAt (dedicated, NOT apex key). Connection: ssh -i ~/.ssh/id_ed25519_polyphony -p 2223 ai-teams@100.96.54.170.
 
 [CHECKPOINT] 2026-03-19 — polyphony-dev container FINAL state (all tasks complete):
+
 - Dockerfile.polyphony: sshd (port 2223), tmux, locales, Playwright Chromium deps + browser at /opt/playwright/cache, native Claude, TZ=Europe/Tallinn, pnpm 9.15.0, usermod -p '*' ai-teams
 - docker-compose.polyphony.yml: network_mode: host (WARP), WARP CA at /opt/warp-ca.pem (uncommented), NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem (hardcoded), SSH_PUBLIC_KEY via .env, 2 named volumes
 - entrypoint-polyphony.sh: 7 steps — WARP CA, volumes, clone/pull, pnpm install --frozen-lockfile, gates, .bashrc (CLAUDE_ENV_ID=POLY, NODE_EXTRA_CA_CERTS, TZ, PLAYWRIGHT_BROWSERS_PATH), tmux config + auto-tmux, git config, settings.json, SSH key+sshd, gosu drop
@@ -144,3 +151,24 @@
 - Runbook: §12 (NODE_EXTRA_CA_CERTS 3-part fix) + §13 (statusline design rules) added
 
 [DEFERRED] 2026-03-19 — polyphony container files need git commit+push to polyphony repo. Also: Dockerfile.apex + entrypoint-apex.sh git commit+push still pending from 2026-03-18.
+
+[CHECKPOINT] 2026-03-19 — entu-research container design complete. 3 files at .mmp/entu-research/:
+
+- Dockerfile.entu: polyphony base minus Playwright; SSH port 2224, pnpm 9.15.0, Node.js 22
+- entrypoint-entu.sh: clones 3 repos (entu-research main + entu-webapp + entu-plugins refs); pnpm install skipped if no package.json yet; CLAUDE_ENV_ID=ENTU-R; tmux session=entu; sshd port 2224
+- docker-compose.entu.yml: network_mode: host, 2 named volumes (entu-claude-home, entu-repo), WARP CA bind-mount, ports 2224/5177
+
+[DECISION] 2026-03-19 — entu-research workspace: ~/workspace/entu-research/ (rw) + ~/workspace/entu-webapp/ + ~/workspace/entu-plugins/ (refs). All in single entu-repo volume. No read-only filesystem enforcement on refs — team needs git pull on them at startup.
+
+[DEFERRED] 2026-03-19 — entu-research container files need git commit+push to entu/research repo + OAuth credentials copy from host after first deploy.
+
+[CHECKPOINT] 2026-03-19 — entu-research tmux layout system complete. Files in .mmp/entu-research/.claude/teams/entu-research/:
+
+- layouts/default.json: Saavedra left 30%, Codd+Hopper top-right, Semper+Hamilton bottom-right
+- apply-layout.sh: recursive split tree → writes /tmp/entu-panes.env with PANE_* vars
+- spawn_member.sh: duplicate gate + --target-pane + config.json registration; saavedra.md for team-lead
+- reflow.sh: tiled fallback reflow after agent crash
+- start-team.sh: one-shot apply-layout → source pane env → spawn 4 specialists
+- startup.md: updated to use tmux scripts (start-team.sh) not Agent tool
+
+[DECISION] 2026-03-19 — entu-research uses RC/tmux spawning path (spawn_member.sh), not local Agent tool. Container runs on RC server with tmux SSH access.

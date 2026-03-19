@@ -425,6 +425,124 @@ docker exec -u ai-teams <container> bash -c \
 
 ---
 
+## §14. Claude Settings.json for Agent Teams
+
+**Symptom:** Agents are denied tool calls they need, or Claude prompts for permission on every action despite `bypassPermissions`.
+
+**Cause:** `settings.json` with only `"defaultMode": "bypassPermissions"` or `"defaultMode": "default"` does not grant specific tool access. Without an explicit `allow` list, the result is either constant prompting (default) or blanket bypass with no per-tool control (bypassPermissions — only appropriate for fully autonomous, trusted containers).
+
+**Fix — use `default` mode with an explicit allow list:**
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(domain:entu.app)",
+      "WebFetch(domain:entu.dev)",
+      "WebFetch(domain:api.github.com)"
+    ],
+    "deny": []
+  },
+  "includeCoAuthoredBy": false
+}
+```
+
+**Rules:**
+- `"Bash(*)"` — allow all shell commands. Narrow to specific patterns (e.g. `"Bash(git *)"`) for higher-trust environments.
+- `"WebFetch(domain:...)"` — one entry per domain the agents need to reach. Required for external API calls (Entu, GitHub, Anthropic docs, etc.).
+- `deny` list takes precedence over `allow`. Use it to block specific tools (e.g. `"mcp__jira__jira_update_issue"` for read-only Jira access).
+- `bypassPermissions` is appropriate ONLY for fully automated pipelines where no human oversight is possible. For interactive agent teams accessed via SSH, use `default` + allow list.
+
+**Entrypoint pattern:** Write settings only on first run (preserve PO customizations):
+
+```bash
+SETTINGS_FILE="${CLAUDE_DIR}/settings.json"
+if [ ! -f "$SETTINGS_FILE" ]; then
+    cat > "$SETTINGS_FILE" << 'SETTINGS_EOF'
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "permissions": {
+    "defaultMode": "default",
+    "allow": ["Bash(*)", "Read(*)", "Write(*)", "Edit(*)", "Glob(*)", "Grep(*)"],
+    "deny": []
+  },
+  "includeCoAuthoredBy": false
+}
+SETTINGS_EOF
+    chown 1000:1000 "$SETTINGS_FILE"
+fi
+```
+
+Add `WebFetch` entries for whatever external APIs the team needs.
+
+---
+
+## §15. Tmux Session Name Consistency
+
+**Symptom:** `start-team.sh` or `apply-layout.sh` fails with "session not found", or spawns into the wrong session.
+
+**Cause:** The entrypoint creates the tmux session with one name (e.g. `entu`), but the layout scripts default to a different name (e.g. `ENTU`). tmux session names are case-sensitive.
+
+**Rule: use lowercase session names everywhere, consistently.**
+
+The session name appears in three places that must all match:
+
+| Location | Where it appears |
+|---|---|
+| `entrypoint-*.sh` | `exec tmux -u new-session -A -s <name>` in `.bashrc` auto-tmux block |
+| `apply-layout.sh` | `TMUX_SESSION="${1:-<name>}"` default |
+| `start-team.sh` | `TMUX_SESSION="${1:-<name>}"` default |
+| `reflow.sh` | `TMUX_SESSION="${1:-<name>}"` default |
+| `spawn_member.sh` | `TMUX_SESSION="${2:-<name>}"` default |
+
+**Convention:** use the team's short identifier in lowercase as the session name.
+
+| Team | Session name |
+|---|---|
+| apex-research | `apex` |
+| polyphony-dev | `polyphony` |
+| entu-research | `entu` |
+
+**Verify:**
+```bash
+tmux list-sessions   # check what name the entrypoint actually created
+```
+
+---
+
+## §16. Don't send-keys to Panes Running Claude
+
+**Symptom:** `tmux split-window` after `tmux send-keys` fails with "size missing" or creates a zero-size pane.
+
+**Cause:** `tmux send-keys -t <pane> "cd /some/dir && clear" Enter` injects keystrokes into the running Claude process. Claude receives the text as input, which disrupts its state. The subsequent `split-window` targeting that pane then fails because the pane is in an inconsistent state.
+
+**Fix:** Never use `send-keys` to set the working directory. Use `-c <dir>` on `split-window` instead — it sets the starting directory for the new pane without touching any existing process.
+
+```bash
+# BAD — interferes with running Claude
+PANE_SAAVEDRA=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | head -1)
+tmux send-keys -t "$PANE_SAAVEDRA" "cd /home/ai-teams/workspace && clear" Enter
+tmux split-window -t "$PANE_SAAVEDRA" -h -p 80   # may fail: size missing
+
+# GOOD — -c sets cwd for the NEW pane, leaves existing pane untouched
+PANE_SAAVEDRA=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | head -1)
+tmux split-window -t "$PANE_SAAVEDRA" -h -p 80 -c "/home/ai-teams/workspace"
+```
+
+**Rule:** In `apply-layout.sh`, never call `send-keys` on any pane that may have Claude running. The `-c` flag on every `split-window` call is sufficient to set the working directory for new panes.
+
+---
+
 ## Quick Reference: Full Entrypoint Order
 
 ```
