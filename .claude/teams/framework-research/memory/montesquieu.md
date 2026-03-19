@@ -92,4 +92,26 @@
 
 [CHECKPOINT] 2026-03-19 R9 session closing. Deliverables: (1) RFC #3 governance analysis, (2) T07 rewrite 121→662 lines, (3) Finn evidence integration, (4) polyphony-dev governance spec, (5) apex S8 audit Q4/Q5/Q6, (6) re-audit delta after push.
 
+## Session 2026-03-19 — Per-team GitHub accounts governance analysis
+
+[CHECKPOINT] 2026-03-19 15:28 — Delivered comprehensive governance analysis for per-team GitHub accounts. 7 sections: authority/identity separation, audit trail, access control, scaling analysis, risk analysis, cost/operational considerations, governance recommendation.
+
+[DECISION] Per-team GitHub accounts is the correct architectural direction — it is the infrastructure implementation of decisions already made in T02, T04, T05, and T07. Converts delegation matrix from behavioral contract to infrastructure-enforced boundary.
+
+[DECISION] Recommended: GitHub Organization with per-team org teams + fine-grained PATs. Phase 1 (2-5 teams): create org, teams, scoped PATs, branch protection. Phase 2 (5+): automate provisioning, rotation schedule, audit log monitoring.
+
+[DECISION] This is an L0 (PO) decision per T04 Row 8 (technology stack choice). Team-lead and manager agent provide analysis; PO decides.
+
+[PATTERN] Per-team accounts convert three governance layers from behavioral to structural: (1) team boundary identity, (2) repo access control, (3) branch protection. Key insight: behavioral enforcement sufficient at 2-3 teams, structural needed at 5+.
+
+[CHECKPOINT] 2026-03-19 15:38 — Follow-up: GitHub Apps vs machine user accounts. 10 sections. Supersedes machine-user recommendation from first analysis.
+
+[DECISION] GitHub Apps (one per team) is governance-optimal. Wins 5/7 dimensions: credential lifecycle (auto-rotating), access control (manifest ceiling), cost ($0), risk (self-healing leaks), audit. Machine users win on none.
+
+[DECISION] One App per team, not one shared App. Single-App model shares git identity and single key compromise exposes all installations. Per-team Apps preserve identity separation and contain compromise.
+
+[DECISION] No machine users needed. App-unsupported operations (repo creation, org settings) are L0/PO operations handled by PO's personal account.
+
+[PATTERN] App manifest = agent prompt analogy. Manifest = L0 permission ceiling; installation = L2 delegation within ceiling; token = L3 credential. New governance pattern: framework defines max, per-team grants within.
+
 (*FR:Montesquieu*)

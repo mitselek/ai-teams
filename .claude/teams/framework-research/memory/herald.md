@@ -76,7 +76,7 @@
 
 [GOTCHA] `gh issue create --body-file /tmp/...` fails in sandbox — /tmp is isolated. Must write temp files to repo directory and clean up after. Affects comms-dev's `comms-publish` tool design.
 
-[CHECKPOINT] Protocol 4 saved to topics/03-communication.md. GitHub Issue #1 created (https://github.com/mitselek/ai-teams/issues/1) — first test of the knowledge layer convention. Labels created: team:framework-research, type:finding, affects:all. Open Question #1 marked resolved. Standing by.
+[CHECKPOINT] Protocol 4 saved to topics/03-communication.md. GitHub Issue #1 created (<https://github.com/mitselek/ai-teams/issues/1>) — first test of the knowledge layer convention. Labels created: team:framework-research, type:finding, affects:all. Open Question #1 marked resolved. Standing by.
 
 ## 2026-03-13
 
