@@ -1,0 +1,84 @@
+# apex-research Container — Docker Compose (*FR:Brunel*)
+#
+# Usage:
+#   docker compose build                    # build image
+#   docker compose up -d                    # start container
+#   docker compose exec apex-research bash  # attach shell
+#   docker compose down                     # stop, preserve volumes
+#   docker compose down -v                  # stop, DELETE volumes (full reset)
+#
+# Container layout:
+#   User:        ai-teams  (uid=1000)     — runs Claude Code
+#   PO user:     michelek                  — SSH access for inspection
+#   $HOME:       /home/ai-teams/
+#   ~/.claude/:  /home/ai-teams/.claude    → apex-claude-home volume
+#   Repo:        /home/ai-teams/workspace  → apex-research-repo volume (read-write)
+#   Source:      /home/ai-teams/source-data → apex-source-data volume (read-only)
+#   Symlink:     /home/ai-teams/vjs_apex_apps → /home/ai-teams/source-data
+#
+# No host bind mounts. Repos cloned from GitHub inside the container.
+#
+# Network: host mode required on WARP-protected hosts where Docker bridge
+# traffic is not routed through the WARP tunnel. With host networking,
+# the container shares the host's network stack (including WARP DNS/routing).
+# Ports 22 (SSH) and 5173 (dashboard) bind directly on the host — no mapping needed.
+
+services:
+  apex-research:
+    build:
+      context: .
+      dockerfile: Dockerfile.apex
+      network: host
+    image: apex-research-claude:latest
+    container_name: apex-research
+    hostname: apex-research
+    network_mode: host
+    volumes:
+      # Claude state: auto-memory, team config, scratchpads
+      - apex-claude-home:/home/ai-teams/.claude
+      # Research repo (cloned from GitHub on first start)
+      - apex-research-repo:/home/ai-teams/workspace
+      # Source data — writable for entrypoint (root) to clone on first run.
+      # Entrypoint enforces read-only for ai-teams user via filesystem permissions.
+      # NOT using :ro because entrypoint needs write access for initial clone.
+      - apex-source-data:/home/ai-teams/source-data
+      # WARP TLS interception CA — bind mount from host (read-only).
+      # Required so Node.js (Claude Code) trusts HTTPS through WARP proxy.
+      # Mounted to /opt/ to avoid conflicting with update-ca-certificates in /etc/ssl/certs/.
+      - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
+    environment:
+      - HOME=/home/ai-teams
+      - REPO_URL=${REPO_URL:-https://github.com/Eesti-Raudtee/apex-migration-research.git}
+      - SOURCE_REPO_URL=${SOURCE_REPO_URL:-https://github.com/Eesti-Raudtee/vjs_apex_apps.git}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-}
+      - SSH_PUBLIC_KEY_2=${SSH_PUBLIC_KEY_2:-}
+      - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
+      - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+      - TEAM_NAME=${TEAM_NAME:-apex-research}
+      - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL:-}
+      - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN:-}
+      - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-}
+    # No ports: section needed — network_mode: host exposes ports directly.
+    # SSH on port 2222 (avoids conflict with host sshd on port 22).
+    # Dashboard on port 5173.
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+volumes:
+  # Claude auto-memory and team configuration
+  # Wipe: docker volume rm apex-research_apex-claude-home
+  apex-claude-home:
+    name: apex-research_apex-claude-home
+
+  # apex-migration-research repo (read-write)
+  # Wipe to force re-clone: docker volume rm apex-research_apex-research-repo
+  apex-research-repo:
+    name: apex-research_apex-research-repo
+
+  # vjs_apex_apps source data (read-only at runtime)
+  # Wipe to force re-clone: docker volume rm apex-research_apex-source-data
+  apex-source-data:
+    name: apex-research_apex-source-data
