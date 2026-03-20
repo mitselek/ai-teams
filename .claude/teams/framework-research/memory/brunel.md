@@ -207,6 +207,7 @@ Final flow: SSH → .bashrc creates layout + starts claude → PO lands in Claud
 - 6 open questions documented (Dynamics host path, wrangler pin, spawn script CA path override)
 
 [CHECKPOINT] 2026-03-20 — hr-devs container implementation complete. 8 files at .mmp/hr-devs/:
+
 - Dockerfile.hr-devs: Node.js 22, Wrangler@latest, SSH port 2225, native Claude, no pnpm
 - entrypoint-hr-devs.sh: 10 steps — WARP CA, volumes, 2 repos, MCP builds (Jira+Dynamics), npm ci, gates, .bashrc (HR-DEVS, CF creds, Atlassian creds), tmux, settings.json, mcp.json, SSH, gosu drop
 - docker-compose.hr-devs.yml: network_mode:host, 2 named volumes + Dynamics bind mount (:ro) at /home/dev/github/hr-platform/conversations/docs/temp, ports 2225/5178/8787

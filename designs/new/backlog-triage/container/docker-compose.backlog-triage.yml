@@ -1,0 +1,130 @@
+# docker-compose.backlog-triage.yml (*FR:Brunel*)
+#
+# backlog-triage team container — Jira/GitHub cross-reference agent team.
+#
+# This team reads code and talks to Jira. No Cloudflare, no Wrangler, no Dynamics.
+# Simpler than hr-devs: only SSH port, two named volumes, fewer env vars.
+#
+# Usage:
+#   docker compose -f docker-compose.backlog-triage.yml build
+#   docker compose -f docker-compose.backlog-triage.yml up -d
+#   docker compose -f docker-compose.backlog-triage.yml down          # stop, keep volumes
+#   docker compose -f docker-compose.backlog-triage.yml down -v       # stop + wipe volumes
+#
+# Container layout:
+#   User:       ai-teams  (uid=1000)
+#   $HOME:      /home/ai-teams/
+#   ~/.claude/: /home/ai-teams/.claude     → bt-claude-home (Claude state)
+#   Workspace:  /home/ai-teams/workspace   → bt-repo (named volume)
+#     ├── hr-platform/   — read target (Eesti-Raudtee/hr-platform)
+#     └── dev-toolkit/   — Jira MCP server source (Eesti-Raudtee/dev-toolkit)
+#
+# Ports (network_mode: host — binds directly on host, no mapping):
+#   2226  — SSH (ai-teams user, pubkey auth, auto-tmux on login)
+#
+# Port allocation on RC server (100.96.54.170):
+#   2222  — apex-research   (live)
+#   2223  — polyphony-dev   (live)
+#   2224  — entu-research   (live)
+#   2225  — hr-devs         (live)
+#   2226  — backlog-triage  (this file)
+#
+# Connect: ssh -i ~/.ssh/id_ed25519_backlog_triage -p 2226 ai-teams@100.96.54.170
+
+services:
+  backlog-triage:
+    build:
+      context: .
+      dockerfile: Dockerfile.backlog-triage
+      # network: host required on WARP-protected hosts (RC server).
+      # Without this, Docker build runs on bridge network — not routed through WARP,
+      # so apt-get and curl downloads fail with TLS errors.
+      network: host
+    image: backlog-triage-claude:latest
+    container_name: backlog-triage
+    hostname: backlog-triage
+    # network_mode: host required on WARP-protected hosts.
+    # Bridge networking cannot resolve DNS or route traffic through the WARP tunnel.
+    # SSH binds directly to host port 2226.
+    network_mode: host
+    environment:
+      - HOME=/home/ai-teams
+      - TZ=Europe/Tallinn
+      - LANG=en_US.UTF-8
+      - LC_ALL=en_US.UTF-8
+
+      # Repo URLs — override to point at a fork or mirror.
+      - REPO_URL=${REPO_URL:-https://github.com/Eesti-Raudtee/hr-platform.git}
+      - TOOLKIT_URL=${TOOLKIT_URL:-https://github.com/Eesti-Raudtee/dev-toolkit.git}
+
+      # GITHUB_TOKEN: PAT with read access to Eesti-Raudtee org.
+      # Required for git clone (private org) and gh CLI API calls.
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+
+      # ANTHROPIC_API_KEY: leave blank if using Claude OAuth (standard on RC server).
+      # Set to a key if OAuth is not configured on this host.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+
+      # Enables multi-agent team coordination (TeamCreate, SendMessage, etc.)
+      - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+      # Team identity — used in git commits and log attribution.
+      - TEAM_NAME=${TEAM_NAME:-backlog-triage}
+      - GIT_USER_NAME=${GIT_USER_NAME:-backlog-triage}
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-mihkel.putrinsh@evr.ee}
+
+      # SSH public keys for ai-teams user (injected into authorized_keys by entrypoint).
+      # SSH_PUBLIC_KEY_2, _3, etc. also supported.
+      - SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-}
+      - SSH_PUBLIC_KEY_2=${SSH_PUBLIC_KEY_2:-}
+
+      # Atlassian — required for Jira MCP server.
+      # Used by entrypoint validation and written into mcp.json.
+      - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-https://eestiraudtee.atlassian.net}
+      - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL}
+      - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN}
+
+      # NODE_EXTRA_CA_CERTS: Node.js does NOT use the system CA store.
+      # Must point to the WARP CA cert file so Claude Code can make HTTPS calls
+      # through the WARP TLS interception layer. Matches the bind-mount target below.
+      - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
+
+    volumes:
+      # Claude auto-memory, OAuth credentials, MCP config — isolated to backlog-triage.
+      # Survives container restarts; wipe with: docker volume rm bt_bt-claude-home
+      - bt-claude-home:/home/ai-teams/.claude
+
+      # Workspace: hr-platform + dev-toolkit repos (and built MCP server dist/).
+      # Cloned on first run by entrypoint; pulled on subsequent starts.
+      # Wipe to force re-clone: docker volume rm bt_bt-repo
+      - bt-repo:/home/ai-teams/workspace
+
+      # WARP CA cert — bind-mount from host (read-only).
+      # Required: WARP intercepts HTTPS and re-signs with this corporate CA.
+      # Mount to /opt/ — NOT to /etc/ssl/certs/ (entrypoint copies it to the system store).
+      - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
+
+    ports:
+      # Documented for reference; ignored by Docker with network_mode: host.
+      # The SSH daemon binds directly to host port 2226.
+      - "2226:2226"   # SSH
+
+    # Working dir points at the main repo root (not a subdirectory).
+    # hr-platform has no single 'conversations' subdirectory that serves as CWD here.
+    working_dir: /home/ai-teams/workspace/hr-platform
+
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+volumes:
+  # Claude auto-memory, OAuth credentials, MCP config, team scratchpads.
+  # Prefix bt_ avoids collisions with other containers on the same host.
+  # Wipe: docker volume rm bt_bt-claude-home
+  bt-claude-home:
+    name: bt_bt-claude-home
+
+  # Workspace: hr-platform + dev-toolkit repos + Jira MCP server dist/.
+  # Wipe to force re-clone + re-build: docker volume rm bt_bt-repo
+  bt-repo:
+    name: bt_bt-repo

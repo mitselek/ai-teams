@@ -18,7 +18,7 @@ Tasks 1–3 (Celes) and Tasks 4–6 (Brunel) are **fully independent** — run t
 
 ```
 Celes: Task 1 → Task 2 → Task 3 ──┐
-                                    ├─→ Task 7 (Lead)
+                                  ├─→ Task 7 (Lead)
 Brunel: Task 4 → Task 5 → Task 6 ─┘
 ```
 

@@ -1,0 +1,151 @@
+# Dockerfile.backlog-triage (*FR:Brunel*)
+#
+# Builds the backlog-triage team container from scratch on Debian bookworm-slim.
+# Unlike hr-devs (which extends ai-teams-claude:latest/Ubuntu), this image starts
+# from a minimal Debian base — cleaner, smaller, no inherited apt source conflicts.
+#
+# Purpose: Read-only cross-reference agent team (Jira + GitHub + git history).
+# No Wrangler, no Dynamics MCP, no dev server ports. Just SSH + Jira + gh CLI.
+#
+# What gets installed from scratch:
+#   - Node.js 22 LTS (binary tarball — bypasses Ubuntu PPA entanglement)
+#   - git, gh CLI (GitHub CLI), curl, jq
+#   - openssh-server (SSH on port 2226)
+#   - tmux, locales
+#   - gosu (privilege drop from root → ai-teams on exec)
+#   - Claude Code (native install as ai-teams user)
+#
+# Named volumes (no host bind mounts except WARP CA):
+#   bt-claude-home  → /home/ai-teams/.claude    (Claude state + auto-memory)
+#   bt-repo         → /home/ai-teams/workspace  (hr-platform + dev-toolkit repos)
+#
+# Ports:
+#   2226  — SSH (PO access, auto-tmux on login)
+#
+# Port allocation on RC server (100.96.54.170):
+#   2222  — apex-research
+#   2223  — polyphony-dev
+#   2224  — entu-research
+#   2225  — hr-devs
+#   2226  — backlog-triage (this image)
+#
+# Build (run from designs/new/backlog-triage/container/):
+#   docker compose -f docker-compose.backlog-triage.yml build
+#
+# Connect:
+#   ssh -i ~/.ssh/id_ed25519_backlog_triage -p 2226 ai-teams@<host>
+
+FROM debian:bookworm-slim
+
+# ── System locale and timezone ─────────────────────────────────────────────────
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Tallinn
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# ── Base system packages ───────────────────────────────────────────────────────
+# Install in one layer to minimise image size.
+# - curl:           needed for Node.js download, Claude Code install script
+# - jq:             used by entrypoint to manipulate JSON (settings.json, mcp.json)
+# - git:            clone repos, run git log / pickaxe searches
+# - openssh-server: SSH access on port 2226
+# - tmux:           terminal multiplexer for agent sessions
+# - locales:        en_US.UTF-8 locale (Claude Code requires UTF-8)
+# - gosu:           privilege drop without tty requirement (su/sudo need one)
+# - tzdata:         timezone data for Europe/Tallinn
+# - gnupg, lsb-release, apt-transport-https: required to add gh CLI apt repo
+#
+# WARP note: --insecure is NOT needed for apt-get (apt has its own CA handling).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
+        jq \
+        git \
+        openssh-server \
+        tmux \
+        locales \
+        gosu \
+        tzdata \
+        gnupg \
+        lsb-release \
+        apt-transport-https \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Locale ─────────────────────────────────────────────────────────────────────
+RUN sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen
+
+# ── Timezone ───────────────────────────────────────────────────────────────────
+RUN ln -snf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime \
+    && echo "Europe/Tallinn" > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata
+
+# ── GitHub CLI (gh) ───────────────────────────────────────────────────────────
+# Official GitHub CLI apt repo for Debian. Provides the `gh` binary.
+# Required: Archivist uses `gh issue` and `gh pr` for GitHub search.
+#
+# WARP note: --insecure for curl during key download (WARP TLS interception).
+RUN curl --insecure -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update && apt-get install -y --no-install-recommends gh \
+    && rm -rf /var/lib/apt/lists/* \
+    && gh --version
+
+# ── Node.js 22 LTS ────────────────────────────────────────────────────────────
+# Download official binary tarball directly from nodejs.org — avoids nodesource
+# PPA complexities and Ubuntu-only scripts.
+#
+# WARP note: --insecure for nodejs.org download (WARP TLS interception at build time).
+# The binary is identified by its versioned filename — not by TLS alone.
+RUN curl --insecure -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz \
+        -o /tmp/node.tar.gz \
+    && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+    && rm /tmp/node.tar.gz \
+    && node --version \
+    && npm install -g npm@latest 2>&1 | tail -1
+
+# ── Create ai-teams user ──────────────────────────────────────────────────────
+# uid/gid 1000 matches volumes created by Docker (consistent ownership on volume mount).
+# Password unlocked with '*' (not '!') so pubkey SSH auth works with UsePAM=no.
+RUN groupadd -g 1000 ai-teams \
+    && useradd -m -u 1000 -g 1000 -s /bin/bash ai-teams \
+    && usermod -p '*' ai-teams \
+    && mkdir -p /home/ai-teams/.ssh \
+    && chmod 700 /home/ai-teams/.ssh \
+    && chown 1000:1000 /home/ai-teams/.ssh
+
+# ── SSH server configuration ───────────────────────────────────────────────────
+# Port 2226 (backlog-triage allocation).
+# Root login and password auth disabled — pubkey only via ai-teams user.
+# UsePAM=no: PAM would block locked accounts; pubkey auth handles auth directly.
+RUN mkdir -p /run/sshd \
+    && ssh-keygen -A \
+    && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?UsePAM.*/UsePAM no/' /etc/ssh/sshd_config \
+    && sed -i '/^#\?Port /d' /etc/ssh/sshd_config \
+    && echo 'Port 2226' >> /etc/ssh/sshd_config
+
+ENV DEBIAN_FRONTEND=
+
+# ── Native Claude Code install ─────────────────────────────────────────────────
+# Installed as ai-teams (not root) so auto-updates work without sudo.
+# Native install lands at ~/.local/bin/claude.
+#
+# WARP note: --insecure for claude.ai/install.sh download (WARP TLS interception).
+RUN gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5
+
+# ── Entrypoint ─────────────────────────────────────────────────────────────────
+COPY entrypoint-backlog-triage.sh /entrypoint-backlog-triage.sh
+RUN chmod +x /entrypoint-backlog-triage.sh
+
+WORKDIR /home/ai-teams/workspace
+
+# Only SSH port — this team reads, it does not serve.
+EXPOSE 2226
+
+ENTRYPOINT ["/entrypoint-backlog-triage.sh"]
+CMD ["bash"]
