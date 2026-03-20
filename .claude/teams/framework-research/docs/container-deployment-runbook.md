@@ -834,3 +834,66 @@ Step 10: exec gosu ai-teams "$@"
 ```
 
 Every step is idempotent. Safe to restart.
+
+---
+
+## §21. spawn_member.sh — Operator Reference
+
+**Context:** After SSHing into a container and completing TeamCreate, the PO spawns agents using `spawn_member.sh`. This section documents the argument order and session name so operators don't have to read the script.
+
+### Argument order
+
+```
+spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
+```
+
+| Argument | Required | Description |
+|---|---|---|
+| `--target-pane %XX` | optional | Spawn into an existing pre-split pane. Get the pane ID from `apply-layout.sh` output or `tmux list-panes -F '#{pane_id}'`. Omit to split a new pane automatically. |
+| `<agent-name>` | required | Name as it appears in `roster.json` (e.g. `saavedra`, `codd`, `finn`). Case-sensitive. |
+| `[tmux-session]` | optional | Session name to target. **Defaults to the team's short name** (see below). Only needed if you renamed the session. |
+
+### Session name convention
+
+The tmux session name is the team's **short identifier, lowercase** — NOT the full team name:
+
+| Team directory | Session name |
+|---|---|
+| `apex-research` | `apex` |
+| `polyphony-dev` | `polyphony` |
+| `entu-research` | `entu` |
+| `hr-devs` | `hr-devs` |
+
+The entrypoint, `apply-layout.sh`, `start-team.sh`, and `spawn_member.sh` all default to this short name. If you pass the wrong name (e.g. `entu-research` instead of `entu`) the script will fail with "session not found".
+
+Verify the actual session name before spawning:
+
+```bash
+tmux list-sessions
+```
+
+### Typical spawn sequence (after TeamCreate)
+
+```bash
+# 1. Layout is pre-created by auto-tmux on SSH login.
+#    If not, create it manually:
+bash ~/workspace/<team-repo>/.claude/teams/<team>/apply-layout.sh <session>
+
+# 2. Source the pane env to get pane IDs
+source /tmp/<team>-panes.env
+
+# 3. Spawn agents into their panes
+spawn_member.sh --target-pane $PANE_FINN    finn
+spawn_member.sh --target-pane $PANE_MARCUS  marcus
+spawn_member.sh --target-pane $PANE_TESS    tess
+spawn_member.sh --target-pane $PANE_SVEN    sven
+# etc.
+```
+
+The pane env file is written by `apply-layout.sh` to `/tmp/<session>-panes.env` with variables named `PANE_<AGENTNAME>` (uppercase).
+
+### If you omit --target-pane
+
+`spawn_member.sh` falls back to `split-window`, creating a new pane by splitting the last active pane. This works but produces an uncontrolled layout. Prefer `--target-pane` with a pre-created layout for predictable results.
+
+(*FR:Brunel*)

@@ -176,6 +176,7 @@
 [GOTCHA] 2026-03-19 — tmux split-window -p <percent> fails with "size missing" when called from a Bash tool subprocess or external SSH against an attached session. Root cause: tmux needs a client to resolve percent to pixels. Fix: use -l <columns> (absolute size). Also use -d (keep focus) and -P -F '#{pane_id}' (reliable pane ID capture, no fragile tail -1).
 
 [CHECKPOINT] 2026-03-19 — entu-research startup UX fixed (final). Three commits to entu/research:
+
 - 6fe6ac8: apply-layout.sh uses -l not -p (safe from Bash tool subprocess)
 - 383ab24: entrypoint auto-tmux block creates 5-pane layout + starts claude before attach
 - a2fb91b: startup.md updated
@@ -186,6 +187,7 @@ Final flow: SSH → .bashrc creates layout + starts claude → PO lands in Claud
 [CHECKPOINT] 2026-03-19 — Runbook complete. §17 (size missing), §18 (SSH→hello pattern), §19 (pane labels) added to container-deployment-runbook.md. Generic enough for apex-research and future teams.
 
 [CHECKPOINT] 2026-03-20 — Statusline live-fixed for entu-research container:
+
 - statusline-command.sh written to ~/workspace/entu-research/.claude/ and pushed (commit 6525418)
 - ~/.claude/settings.json patched: statusLine.command = bash .../statusline-command.sh
 - CLAUDE_ENV_ID=ENTU-R already in .bashrc — no change needed
@@ -193,3 +195,25 @@ Final flow: SSH → .bashrc creates layout + starts claude → PO lands in Claud
 - Runbook: §13 marked MANDATORY with callout box; §20 (Statusline Deployment Checklist) added
 - Quick Reference updated with Step 9d (statusline-command.sh) and CLAUDE_ENV_ID note on Step 9
 - Root cause: entu deployed before §13 was written and statusline was treated as optional
+
+[CHECKPOINT] 2026-03-20 — hr-devs container spec complete:
+
+- Spec at: .claude/teams/framework-research/docs/hr-devs-container-spec.md
+- Port allocation: SSH=2225, Vite=5178, Wrangler=8787
+- Key deltas from entu: npm (not pnpm), Wrangler global, Jira+Dynamics MCP, dev-toolkit as 2nd repo
+- Dynamics data: bind mount read-only from host (Option A — no named volume needed)
+- MCP servers: Claude-launched processes (not sidecars), built by entrypoint if dist/ missing
+- Eilama DROPPED, agent dashboard DROPPED (separate track)
+- 6 open questions documented (Dynamics host path, wrangler pin, spawn script CA path override)
+
+[CHECKPOINT] 2026-03-20 — hr-devs container implementation complete. 8 files at .mmp/hr-devs/:
+- Dockerfile.hr-devs: Node.js 22, Wrangler@latest, SSH port 2225, native Claude, no pnpm
+- entrypoint-hr-devs.sh: 10 steps — WARP CA, volumes, 2 repos, MCP builds (Jira+Dynamics), npm ci, gates, .bashrc (HR-DEVS, CF creds, Atlassian creds), tmux, settings.json, mcp.json, SSH, gosu drop
+- docker-compose.hr-devs.yml: network_mode:host, 2 named volumes + Dynamics bind mount (:ro) at /home/dev/github/hr-platform/conversations/docs/temp, ports 2225/5178/8787
+- .env.example: all required + optional vars documented, ANTHROPIC_API_KEY optional (OAuth standard)
+- apply-layout.sh: "full" layout (finn+lead left 30%, marcus+tess+sven right 70%), -l absolute sizes, pane labels, /tmp/hr-devs-panes.env
+- spawn_member.sh: container variant — NODE_EXTRA_CA_CERTS via .bashrc (not hardcoded), eilama removed, TMUX_SESSION default=hr-devs
+- startup.md: PO onboarding — connect, TeamCreate, spawn sequence, Vite port 5178, Wrangler deploys, MCP verification
+- statusline-command.sh: HR-DEVS blue badge, npm test cache at /tmp/hr-devs-test-status.txt
+
+[GOTCHA] 2026-03-20 — hr-devs Vite port: apex uses 5173 on host. hr-devs must use 5178 (npm run dev -- --port 5178). Documented in startup.md + VITE_PORT in .bashrc. Wrangler dev = 8787 (no conflict).
