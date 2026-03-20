@@ -298,8 +298,7 @@ if [ ! -f "$SETTINGS_FILE" ]; then
   "permissions": {
     "defaultMode": "default",
     "allow": [
-      "Read", "Glob", "Grep", "Edit", "Write",
-      "Bash(git *)", "Bash(gh *)",
+      "Read", "Glob", "Grep", "Edit", "Write", "Bash",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:eestiraudtee.atlassian.net)"
