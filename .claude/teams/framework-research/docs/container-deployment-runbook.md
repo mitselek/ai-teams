@@ -543,6 +543,142 @@ tmux split-window -t "$PANE_SAAVEDRA" -h -p 80 -c "/home/ai-teams/workspace"
 
 ---
 
+## §17. tmux split-window "size missing" from Bash Tool or External Process
+
+**Symptom:** `apply-layout.sh` or any script calling `tmux split-window -p <percent>` fails with "size missing" when run from inside Claude's Bash tool or from an external SSH connection against an attached session.
+
+**Cause:** `tmux split-window -p <percent>` requires an attached client to resolve the percentage into pixel dimensions. When the caller is a subprocess (Claude Bash tool, external SSH) rather than the terminal session itself, tmux cannot determine the client dimensions and aborts.
+
+This is a separate issue from §16 (send-keys keyinjection). `split-window` does NOT inject keystrokes — it creates a new pane. The session attachment state is what matters.
+
+**Fix:** Replace `-p <percent>` with `-l <columns/rows>` (absolute size). tmux can always compute absolute sizes without a client.
+
+```bash
+# BAD — fails with "size missing" from Bash tool subprocess
+tmux split-window -t "$PANE_SAAVEDRA" -h -p 80 -c "$WORK_DIR"
+PANE_DATA_COL=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | tail -1)   # also fragile
+
+# GOOD — works from any context including Claude's Bash tool
+TOTAL_W=$(tmux display-message -t "$SESSION" -p '#{window_width}')
+TOTAL_H=$(tmux display-message -t "$SESSION" -p '#{window_height}')
+RIGHT_W=$((TOTAL_W * 80 / 100))
+PANE_DATA_COL=$(tmux split-window -t "$PANE_SAAVEDRA" -d -h -l $RIGHT_W -c "$WORK_DIR" -P -F '#{pane_id}' 'bash --norc -i')
+```
+
+Additional flags:
+- `-d` — detached: keeps focus on the current pane (Saavedra stays active)
+- `-P -F '#{pane_id}'` — prints the new pane ID to stdout; eliminates fragile `tail -1` pane tracking
+- `tmux display-message -t "$SESSION" -p '#{window_width}'` — reads dimensions from the session, not from a client; works without attachment
+
+**Implication for startup procedure:** With this fix, `apply-layout.sh` is safe to call from any context — `.bashrc`, entrypoint, Claude Bash tool, or external SSH. This enables the zero-friction startup pattern described in §18.
+
+**Verify:**
+```bash
+# From external SSH (simulates Bash tool subprocess context):
+ssh -p 2224 ai-teams@host "bash ~/workspace/entu-research/.claude/teams/entu-research/apply-layout.sh entu"
+# Should print pane IDs and succeed — no "size missing"
+tmux list-panes -t entu  # should show 5 panes
+```
+
+---
+
+## §18. Zero-Friction Startup: SSH → "hello"
+
+**Goal:** PO types `ssh ...` and lands directly in Claude, panes already created, ready to say hello and start the team.
+
+**Pattern:** `.bashrc` auto-tmux block handles the full first-session bootstrap. No manual steps required.
+
+```bash
+# In entrypoint — always rewrite .bashrc auto-tmux block:
+sed -i '/^# auto-tmux:/,/^fi$/{d}' "${BASHRC}"
+cat >> "${BASHRC}" << 'AUTOTMUX_EOF'
+# auto-tmux: attach or create session on SSH login
+if [ -z "$TMUX" ] && [ -n "$SSH_CONNECTION" ]; then
+    cd /home/ai-teams/workspace/<team-repo>
+    TMUX_SESSION="<team>"
+    LAYOUT_SCRIPT="$HOME/workspace/<team-repo>/.claude/teams/<team>/apply-layout.sh"
+    if ! tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
+        # Path 1: fresh session — build layout, start claude
+        tmux new-session -d -s "$TMUX_SESSION"
+        bash "$LAYOUT_SCRIPT" "$TMUX_SESSION"
+        tmux send-keys -t "$TMUX_SESSION" "claude" Enter
+    fi
+    # Path 2 + 3: session exists (detached or attached) — just attach
+    exec tmux -u attach-session -t "$TMUX_SESSION"
+fi
+AUTOTMUX_EOF
+```
+
+**Three paths:**
+
+| State | What happens |
+|---|---|
+| No tmux session | Create detached session → apply-layout.sh (panes + labels) → `claude` in pane 0 → attach |
+| Session exists, detached | Straight to `exec attach-session` |
+| Session exists, attached | Straight to `exec attach-session` (opens second client) |
+
+**`apply-layout.sh` idempotency:** Only call from `.bashrc` (path 1). If Saavedra needs to re-run layout manually from inside Claude, `apply-layout.sh` is safe to call from the Bash tool (uses `-l` absolute sizes — see §17).
+
+**`start-team.sh` idempotency:** Make it conditional on `/tmp/entu-panes.env`:
+```bash
+if [ -f "$PANE_ENV" ]; then
+    source "$PANE_ENV"   # layout already done
+else
+    bash "$SCRIPT_DIR/apply-layout.sh" "$TMUX_SESSION"
+    source "$PANE_ENV"
+fi
+# then spawn agents...
+```
+
+**Result for Saavedra:**
+```
+SSH → [auto: 5 panes created, claude starts] → "hello"
+→ TeamCreate → start-team.sh (spawn agents) → assign work
+```
+
+**Adapting for other teams:** replace `<team>` and `<team-repo>` tokens. The pattern is identical for apex-research, polyphony-dev, entu-research, or any future team.
+
+---
+
+## §19. Pane Labels for Agent Teams
+
+**Goal:** When a PO attaches to a tmux session, each pane shows the agent's name in the border — no need to guess which pane ID maps to which agent.
+
+**Pattern:** In `apply-layout.sh`, after all panes are created and before writing the env file:
+
+```bash
+# Label panes with agent names
+tmux select-pane -t "$PANE_SAAVEDRA" -T "Saavedra"
+tmux select-pane -t "$PANE_CODD"     -T "Codd"
+tmux select-pane -t "$PANE_HOPPER"   -T "Hopper"
+tmux select-pane -t "$PANE_SEMPER"   -T "Semper"
+tmux select-pane -t "$PANE_HAMILTON" -T "Hamilton"
+
+# Show labels in pane borders
+tmux set-option -t "$TMUX_SESSION" -g pane-border-format " #{pane_title} "
+tmux set-option -t "$TMUX_SESSION" -g pane-border-status top
+```
+
+**Notes:**
+- `select-pane -T` sets the pane title. This persists for the session lifetime.
+- `pane-border-status top` shows the border line above each pane with the title.
+- Use `-t "$TMUX_SESSION"` on `set-option` (not `-g` alone) to scope to this session rather than the tmux server global config.
+- Add a corresponding note in `startup.md` so agents know the labels are there without having to discover them visually.
+
+**Result:** PO attaches and sees:
+
+```
+┌─ Saavedra ───┬─ Codd ───────┬─ Semper ─────┐
+│              │              │              │
+│   (claude)   ├─ Hopper ─────┼─ Hamilton ───┤
+│              │              │              │
+└──────────────┴──────────────┴──────────────┘
+```
+
+**Adapting for other teams:** replace agent names in the `select-pane -T` calls. The `set-option` lines are identical for all teams.
+
+---
+
 ## Quick Reference: Full Entrypoint Order
 
 ```

@@ -18,6 +18,8 @@ Every message you send via SendMessage must be prepended with the current timest
 
 **KOHUSTUSLIK: Pärast iga ülesande lõpetamist saada team-leadile SendMessage raport.** Ära mine idle ilma raporteerimata.
 
+**REQUIREMENT ACKNOWLEDGMENT:** When you receive a message containing new requirements or instructions, acknowledge EACH item explicitly before beginning work. If you are already mid-task and new requirements arrive, pause to acknowledge them — do not silently absorb or ignore items. Multi-part messages must receive multi-part acknowledgments.
+
 ## Author Attribution
 
 All persistent text output must carry the author agent's name in the format `(*FR:<AgentName>*)`.
@@ -69,7 +71,8 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 ## Shutdown Protocol
 
 1. Write in-progress state to your scratchpad
-2. Send closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]` (1 bullet each, max)
+2. Send closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max)
+   - `[UNADDRESSED]`: any requirements from team-lead that were not completed or explicitly deferred
 3. Approve shutdown
 
 Team-lead shuts down last, commits memory files, pushes.

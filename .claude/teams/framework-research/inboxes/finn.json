@@ -113,11 +113,5 @@
     "summary": "Session ending — write scratchpads",
     "timestamp": "2026-03-19T18:24:26.212Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773944791343@finn\",\"from\":\"team-lead\",\"reason\":\"R11 session complete.\",\"timestamp\":\"2026-03-19T18:26:31.343Z\"}",
-    "timestamp": "2026-03-19T18:26:31.343Z",
-    "read": true
   }
 ]

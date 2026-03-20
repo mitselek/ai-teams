@@ -52,11 +52,12 @@
 | Semper | Gottfried Semper | ER | opus | 2026-03-19 |
 | Hamilton | Margaret Hamilton | ER | opus | 2026-03-19 |
 
-## Session 2026-03-19 (R10)
+## Session 2026-03-19 (R10-R11)
 
 [DECISION] entu-research team: 5 characters, all opus. Lore theme: Paradigm Translators. Two TDD pairs: Hopper+Codd (data), Hamilton+Semper (UI). Pipeline sequencing (data pair leads).
 [LEARNED] Count characters, not roles+characters. Team-lead is a character.
 [LEARNED] Tester placement matters: Hopper on API/Data side because SQL-assumption bugs (paradigm gotchas) live in the data layer, not the UI.
+[LEARNED] Prompt revision from behavioral audit: add listening/acknowledgment traits to builder personalities without diluting their identity. Key pattern: "Responsive" trait + "Confirm understanding" workflow gate + "Handling Feedback" section. Medici's audit → Celes applies → team-lead approves pipeline works well.
 
 ## Deferred (carried forward)
 

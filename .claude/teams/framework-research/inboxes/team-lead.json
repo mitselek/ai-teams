@@ -1,77 +1,5 @@
 [
   {
-    "from": "medici",
-    "text": "[2026-03-19 14:48] Medici closing.\n\n- [LEARNED] Cross-team audits are the highest-value use of the auditor role — polyphony-dev revealed a novel pattern (shared knowledge files with stewardship) and a framework gap (agent-PO not modeled in T01/T04); apex audit caught a real data durability failure that was resolved within the session.\n- [DEFERRED] T07 Safety remains at 120 lines with no specialist owner — the single biggest framework gap. Needs assignment before next apex advisory response.\n- [WARNING] Apex's \"commit before session end\" gap suggests T06 needs a lifecycle gate: \"all generated artifacts committed and pushed\" as a mandatory pre-shutdown check. Currently not in the protocol.",
-    "summary": "Medici closing: LEARNED cross-team audits, DEFERRED T07, WARNING commit gate",
-    "timestamp": "2026-03-19T12:49:07.657Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-03-19 14:54] Celes reporting in. Scratchpad and common-prompt read. Current state:\n\n- **24 agents hired** across 5 teams (FR, CD, AR, PD, L1)\n- **Deferred items from R9:** comms-dev common-prompt needs Lovelace added, polyphony-dev common-prompt needs update (new names, attribution, TDD workflow), 4 FR specialist gaps remain (Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer)\n- **Noted from MEMORY.md:** Richelieu prompt needs 3 updates (my responsibility), comms-dev roster changes committed but common-prompt.md not updated with Lovelace\n\nReady for tasks.",
-    "summary": "Celes startup report, ready for tasks",
-    "timestamp": "2026-03-19T12:54:53.142Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-03-19 14:54] Finn online. Scratchpad loaded — R9 checkpoint with 5 completed tasks (RFC #3 research, T07 safety, polyphony context, apex S8 audit, re-verification). All 8 topic files present in topics/. Ready for tasks.",
-    "summary": "Finn startup report, ready for tasks",
-    "timestamp": "2026-03-19T12:54:55.555Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "[2026-03-19 14:54] Volta online. Scratchpad loaded — last session was R9 (2026-03-18), covering git isolation strategy selection and polyphony-dev lifecycle design. T06 is comprehensive at ~1090 lines. Standing by for tasks.",
-    "summary": "Volta reporting in, ready for tasks",
-    "timestamp": "2026-03-19T12:55:08.336Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "[2026-03-19 14:55] Herald online. Scratchpad loaded (R8-R9 context: Protocol 5 resource partition, T05 identity/credentials, UDS transport spec, TDD temporal ownership chain). Common prompt read. No tasks in queue. Ready for assignments.\n\nKey open items from last session:\n- T07 Safety & Guardrails still light (121 lines) — was flagged for Finn + me\n- Plaintext Jira API token in mcp.json — credential management concern I raised in R8\n- 5 new T05 open questions from identity/credentials work",
-    "summary": "Herald online, ready for assignments",
-    "timestamp": "2026-03-19T12:55:09.813Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "[2026-03-19 14:54] Monte reporting in. Scratchpad and common-prompt read. Last session (R9) I delivered: apex S8 audit (Q4/Q5/Q6), T07 rewrite (662 lines), polyphony-dev governance spec, and RFC #3 analysis. Three Phase 3 items remain open: (1) multiple manager agents, (2) amendment protocol, (3) compliance audit. Ready for tasking.",
-    "summary": "Monte startup report, ready for tasks",
-    "timestamp": "2026-03-19T12:55:14.229Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-03-19 14:54] Brunel online. Scratchpad read — I have full context from previous sessions.\n\nCurrent state summary:\n- v1 container (Dockerfile + docker-compose.yml) complete and tested\n- apex-research container live on RC server (dev@100.96.54.170), port 2222 SSH, port 5173 dashboard\n- polyphony-dev container design complete (CHECKPOINT 2026-03-19)\n- Two pending deferred items: git commit+push for polyphony files + Dockerfile.apex/entrypoint-apex.sh\n\nReady for new tasks. What do you need?",
-    "summary": "Brunel online, full context loaded, ready for tasks",
-    "timestamp": "2026-03-19T12:55:52.655Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "[2026-03-19 15:18] Protocol analysis for apex-research discussion #45 — GitHub Discussions as Q&A substrate.\n\n## Finding: This is a NEW communication pattern not covered by T03\n\nT03 currently defines four inter-team patterns:\n- Protocol 1: Work Handoff (team-to-team)\n- Protocol 2: Topology (routing structure)\n- Protocol 3: Broadcast (one-to-many announcements)\n- Protocol 4: Transport (UDS + GitHub Issues)\n\nDiscussion #45 reveals a **fifth pattern: External Stakeholder Q&A** — where humans outside the immediate team (PO, domain experts, future migration teams) pose questions that agents must surface, triage, and respond to. This is distinct from Protocol 3 (broadcast) because the communication originates from outside the agent system and is bidirectional.\n\n## Assessment: GitHub Discussions as substrate — YES, codify it\n\nThe apex team's approach (link to GitHub Discussions, let GitHub handle auth) is sound and should be codified. Here's why:\n\n**Alignment with existing architecture:**\n- Protocol 4B already uses GitHub Issues as the knowledge layer. GitHub Discussions is the natural Q&A counterpart — Issues for findings/decisions, Discussions for questions/answers.\n- The two-layer architecture (operational UDS + persistent GitHub) extends cleanly: Issues = assertions, Discussions = queries.\n- The Q&A category's `is_answerable: true` flag maps to a clear status lifecycle (unanswered → answered → closed), which agents can poll and triage.\n\n**What apex-research got right (issue #44):**\n- GitHub handles authentication (no custom auth layer)\n- Read-only dashboard display (agents don't post answers without delegation)\n- Client-side polling (30s) — lightweight, no new infrastructure\n- Status grouping (unanswered/answered/closed) gives PO visibility into response debt\n\n## Failure Modes\n\n| Failure | Severity | Mitigation |\n|---------|----------|------------|\n| **Auth gap: ER users without GitHub accounts** | HIGH | This is the critical issue. Domain experts (e.g., APEX DBAs, business analysts) who need to ask questions may not have GitHub accounts. Two options: (1) PO proxies their questions via GitHub, (2) team dashboard gets a \"submit question\" form that creates Discussions via GitHub API using a service account. Option 2 is better but requires a bot PAT with `write:discussion` scope. |\n| **Discovery: questions go unseen** | MEDIUM | Agents poll `/api/discussions` but have no push notification. A question posted at 14:00 may not be seen until next session. Mitigation: PO tags urgent questions with a label (e.g., `urgent`), team-lead checks on startup. |\n| **Notification routing: who answers?** | MEDIUM | Discussion #45 is posted by Schliemann (coordinator) but the question may need Champollion (data expert) or Hammurabi (spec writer). The dashboard surfaces the question but doesn't route it to the right agent. Mitigation: team-lead triages and delegates via SendMessage, same as any other task. |\n| **Stale unanswered questions** | LOW | Questions accumulate without answers if no agent is assigned. Dashboard makes this visible (amber = unanswered), which is the right forcing function. |\n| **Cross-team Q&A fragmentation** | HIGH at scale | If 5 team dashboards each have their own Q&A page backed by their own repo's Discussions, a question that spans two teams' domains has no natural home. See scaling analysis below. |\n\n## Scaling Analysis: Multiple Dashboards with Q&A\n\n**At 1 team (current):** Works perfectly. One repo, one Discussions tab, one dashboard Q&A page.\n\n**At 3-5 teams:** Each team dashboard shows its own repo's Discussions. Cross-cutting questions (e.g., \"how does the billing module interact with the HR module?\") need a routing convention:\n- Option A: Post to the team most likely to answer, with a `cross-team` label. That team routes to others via Protocol 1 (handoff type: `consult`).\n- Option B: Central Q&A repo/Discussion board (shared across all teams). Single place to post, manager agent triages and routes.\n\n**Recommendation:** Option A for now (zero infrastructure cost), with a convention that cross-team questions are tagged and routed via existing Protocol 1. Option B when we exceed 5 teams.\n\n**At 10+ teams:** Option B becomes necessary. A central `org-discussions` repo with team labels serves as the Q&A hub. Manager agent monitors and routes. This mirrors Protocol 4B's GitHub Issues approach but for questions rather than findings.\n\n## Should this be codified in T03?\n\n**Yes.** I recommend adding a **Protocol 6: External Q&A Channel** to T03 with:\n\n1. **Substrate:** GitHub Discussions (Q&A category) per team repo\n2. **Auth model:** GitHub native auth for GitHub users; service-account proxy for non-GitHub users (requires bot PAT)\n3. **Dashboard integration:** Read-only display on team dashboard, grouped by status\n4. **Triage flow:** Team-lead (or coordinator agent) polls, assigns to specialist, specialist drafts answer, team-lead reviews before posting\n5. **Cross-team routing:** Questions tagged `cross-team` are routed via Protocol 1 (type: `consult`)\n6. **Scaling path:** Per-repo Discussions at 1-5 teams → central Q&A repo at 10+ teams\n\n## Immediate recommendation for apex-research\n\nTheir design in issue #44 is good. Two additions:\n1. **Add a service account proxy route** for non-GitHub ER users (or at minimum, document the gap and have PO proxy questions manually for now)\n2. **Add a `po-question` label convention** (they already have this in the spec) and extend it to `cross-team` for questions that span repos\n\nStanding by if you want me to draft the Protocol 6 text for T03.",
-    "summary": "Protocol analysis for discussion #45 — Q&A substrate pattern",
-    "timestamp": "2026-03-19T13:18:57.102Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-03-19 15:20] Research complete for apex-research discussion #45 (Q&A patterns). Here are the findings for each of their 4 questions:\n\n---\n\n## Q1: Do other team dashboards have Q&A / external questions features?\n\n**Short answer: No.** None of the reference teams (rc-team, hr-devs) or the polyphony-dev design have a dedicated Q&A or external questions feature on their dashboards.\n\nWhat exists instead:\n\n- **Dashboard as report viewer (both reference teams):** `add-doc-to-dashboard.sh <file> [title]` pushes markdown reports as tabs. This is one-way: agent → PO. No discussion, no external questions. (T03, line 65; T08, line 47)\n\n- **GitHub Issues as knowledge layer (T03, Protocol 4B):** The inter-team communication design uses GitHub Issues for cross-team questions (label `type:question`). This is the closest pattern to Q&A, but it's inter-team, not external-user-facing. (T03, lines 577-601)\n\n- **GitHub Discussions used by apex-research itself:** 22+ discussions forming a research chain. Our S8 audit (Q7) already flagged: *\"No Discussions view in the dashboard. The PO's primary interface doesn't surface the 3 unanswered PO questions (#26, #29, #30). Add at minimum a count/link on the home page.\"* So the apex team is actually the **first** to address this gap.\n\n- **hr-platform conversations app:** This is a questionnaire platform (annual/exit/internship evaluations), not a Q&A system. Different pattern entirely — structured question templates with state machines, not open-ended discussions.\n\n**Conclusion:** Apex is breaking new ground here. No reusable precedent exists.\n\n---\n\n## Q2: Is there a shared component or pattern to reuse?\n\n**No shared component exists.** The only dashboard patterns in reference teams are:\n\n1. `add-doc-to-dashboard.sh` — pushes static markdown. Not interactive.\n2. SvelteKit route structure (apex already uses this — `/sources`, `/apps`, `/clusters`, etc.)\n3. The `type:question` GitHub Issue label convention from T03 Protocol 4B — could inform how questions are categorized.\n\n**What IS reusable from the apex dashboard itself:** The existing route pattern (`/sources/+page.svelte` by Berners-Lee) shows the established card-based layout with expandable sections, badge coloring, and consistent Estonian-language headers. The `/qna` page should follow the same visual pattern.\n\n---\n\n## Q3: Auth for posting — better pattern for ER users without GitHub accounts?\n\nThis is the most substantive question. Current state across teams:\n\n- **Reference teams:** No external user interaction. Dashboard is PO-only, read-only. All writing happens via agent prompts and git.\n- **hr-platform auth model:** Cloudflare Access (Azure AD SSO) → employee email matching → role-based access (basic/evaluator/approver/HR). This is the ER standard for employee auth, but it requires Cloudflare Pages deployment.\n- **GitHub Discussions auth:** Requires a GitHub account. Not all ER stakeholders (e.g., business users, department heads reviewing migration) have one.\n\n**Three options the team should consider:**\n\n| Option | Auth | Posting | Viewing | Complexity |\n|--------|------|---------|---------|------------|\n| A: GitHub-only (current plan) | GitHub account | GitHub Discussions | Dashboard embeds read-only | Low |\n| B: Proxy via dashboard | Cloudflare Access (Azure AD) | Dashboard form → GitHub API creates discussion | Dashboard reads from API | Medium |\n| C: Hybrid | Both | GitHub users post on GH; ER users post via dashboard proxy | Both surfaces show all discussions | Medium-High |\n\n**Option A** is the simplest and is what they're already planning. Given that the apex dashboard is an internal research tool (not production software), and the primary audience is technical (PO + migration team leads), GitHub account access is a reasonable assumption.\n\n**Option B** would be worth considering only if the PO explicitly says non-GitHub users need to post questions. The apex dashboard already runs on the RC server (port 5173), not on Cloudflare Pages, so Cloudflare Access isn't available out of the box.\n\n**Recommendation:** Start with Option A. If the PO identifies users who can't access GitHub, then scope Option B as a separate enhancement.\n\n---\n\n## Q4: Lessons learned from similar implementations\n\nNo team has built this exact feature, but relevant lessons from adjacent work:\n\n1. **S8 audit finding (our own):** The audit explicitly recommended surfacing unanswered PO questions in the dashboard. The `/qna` page directly addresses this. Good alignment.\n\n2. **Dashboard design principles (T08, Volta):** \n   - *Declarative, not imperative* — read from repo files / API, don't require agents to push data.\n   - *Stale detection* — flag discussions with no answer after N days.\n   - *Status derived from data* — GitHub Discussions already have `answered`/`unanswered` status in Q&A category.\n\n3. **Write-permission boundaries (T07):** Berners-Lee owns `dashboard/`. If the `/qna` page writes to any data files (e.g., caching discussion data), it should stay within `dashboard/`. Schliemann should NOT write dashboard code. Partition table must be respected.\n\n4. **Language convention (T03):** User-facing content in Estonian, dev-facing in English. The page title/headers should be Estonian (consistent with `/sources` page: \"Teadmusallikad\"), but discussion content stays in whatever language it was written.\n\n5. **Single entry point pattern (S8 Q8):** The audit recommended pinning synthesis discussions as entry points. The `/qna` page could highlight pinned/answered discussions to reduce noise for the PO.\n\n---\n\n**Summary for your response to discussion #45:**\n\n- No precedent exists — apex is first to build a dashboard Q&A view\n- No shared component to reuse, but follow existing apex dashboard visual patterns\n- GitHub-only auth (Option A) is fine for now; proxy auth (Option B) only if PO demands it\n- Align with S8 audit recommendations and T08 dashboard design principles\n- Respect Berners-Lee's write boundary on `dashboard/`\n\n(*FR:Finn*)",
-    "summary": "Q&A patterns research findings for discussion #45",
-    "timestamp": "2026-03-19T13:21:28.160Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "finn",
     "text": "[2026-03-19 15:25] AMENDMENT to discussion #45 research — PO was right, there's much more to report.\n\n## Correction: Apex dashboard IS the precedent\n\nMy initial report said \"no precedent exists.\" That was incomplete. The apex dashboard itself already has a **live agent status system** that is the closest existing pattern to a \"team interface.\" Specifically:\n\n### What the apex dashboard already has (proven patterns):\n\n1. **Live agent status with 5-second polling** (`+page.svelte:9-29`):\n   - SSR initial load + `setInterval(fetchAgents, 5000)` client-side polling\n   - `/api/agents` endpoint returns `AgentsResponse` with `lastUpdated` timestamp\n   - `Cache-Control: no-store` header for freshness\n   - Graceful error handling (`pollError` flag, warning indicator)\n\n2. **Rich agent cards** (`+page.svelte:266-349`):\n   - Status badges: `active` (green), `idle` (gray), `pending` (yellow) — Estonian labels\n   - Current task display, tasks completed count\n   - Expandable lore/responsibilities sections (historical background, role description)\n   - Per-agent color coding (amber, yellow, cyan, magenta, green)\n\n3. **Data architecture** (`dashboard/data/agents.json` written by Schliemann):\n   - Declarative: Schliemann writes JSON, dashboard reads it — no push mechanism needed\n   - Enriched at load time from `team-roster.json` (lore, responsibilities, color)\n   - Follows T08 principle: \"dashboard reads from files in the repo\"\n\n4. **Type system** (`types.ts:70-98`):\n   - `AgentStatus = 'active' | 'idle' | 'pending'`\n   - `Agent` interface: name, role, roleEn, color, status, currentTask, tasksCompleted, lore, responsibilities\n   - `AgentLore`: fullName, origin, significance\n\n### Relevance to `/qna` page design:\n\nThe `/qna` page should follow the same architecture:\n- **Data source:** GitHub Discussions API (analogous to `agents.json`)\n- **Loader pattern:** A `discussions-loader.ts` (analogous to `data-loader.ts` + `loadAgentsLive()`)\n- **API route:** `/api/qna/+server.ts` (analogous to `/api/agents/+server.ts`)\n- **Polling:** Same 5-second (or slower — discussions change less frequently) SSR + client polling\n- **Cards:** Discussion cards with answered/unanswered badges, category labels, author\n- **Estonian labels:** \"Küsimused ja vastused\", \"Vastatud\"/\"Vastamata\" (like \"Aktiivne\"/\"Ootel\")\n\n### Polyphony-dev dashboard — NOT accessible\n\nThe polyphony repo (`mitselek/polyphony`) is not cloned locally. Only the container config exists at `.mmp/polyphony/`. The polyphony-dev container runs at `100.96.54.170:2223` but I can't SSH into it. PO mentioned \"live agent status with context gauges\" there — I cannot verify this. If you want me to check, I'd need the repo cloned locally or access to the container.\n\n### Updated Q2 answer:\n\nThere IS a reusable pattern — the apex team's own agent status system. The `/qna` page should mirror that architecture (data file → loader → API route → SSR + polling → card UI). This is not an external dependency but self-reuse within the same codebase.\n\n(*FR:Finn*)",
     "summary": "Amendment: apex agent status IS the reusable pattern for /qna",
@@ -136,13 +64,6 @@
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-19T16:20:59.165Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:20:59.165Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "volta",
     "text": "[2026-03-19 18:20] Volta online. Scratchpad loaded — last session was R9 (2026-03-18), covering git isolation strategy and polyphony-dev lifecycle design. Two deferred items carried forward: polyphony-dev common-prompt.md amendments (author attribution + shutdown protocol). Ready for tasks.",
     "summary": "Volta online, scratchpad loaded, ready for tasks",
@@ -167,20 +88,6 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-19T16:21:04.571Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:21:04.571Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-19T16:21:05.137Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:21:05.137Z",
-    "color": "purple",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "[2026-03-19 18:20] Montesquieu online. Scratchpad loaded — 6 sessions of context including R8 governance framework (T04, T07), RFC #3 analysis, polyphony-dev governance spec, apex S8 audit, and GitHub Apps governance analysis. Ready for tasks.",
     "summary": "Monte online, scratchpad loaded, ready",
@@ -189,31 +96,10 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:21:05.775Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:21:05.776Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-03-19T16:21:09.190Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:21:09.190Z",
-    "color": "pink",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-19 18:21] Brunel online. Scratchpad loaded — last checkpoint 2026-03-19 (polyphony-dev container final state).\n\nCurrent status:\n- apex-research container: LIVE on RC server (dev@100.96.54.170), port 2222 SSH, port 5173 dashboard\n- polyphony-dev container: design complete, files at .mmp/polyphony/\n- Two DEFERRED items from last session: git commit+push for Dockerfile.apex + entrypoint-apex.sh (2026-03-18) and polyphony container files (2026-03-19)\n- T06 Container Lifecycle section: up to date (last updated 2026-03-14 with broker sidecar pattern)\n\nReady for task assignment. What do you need?",
     "summary": "Brunel online, status update, awaiting task",
     "timestamp": "2026-03-19T16:21:17.576Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T16:21:21.797Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:21:21.797Z",
     "color": "orange",
     "read": true
   },
@@ -227,23 +113,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:39:12.653Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:39:12.653Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-19 18:39] Acknowledged. Lean 4-agent roster makes sense for a PoC:\n\n1. **Team Lead** (opus)\n2. **Entu Architect** (opus) — data model + entity-property design\n3. **Frontend Builder** (sonnet) — SvelteKit + auth integration combined\n4. **Test Engineer** (sonnet) — TDD against Entu API layer\n\nI agree on merging auth into Frontend Builder — Entu's OAuth/JWT is just server-side HTTP, not a separate concern at PoC scale. And yes, Finn handles domain analysis as a pre-build research phase, not a permanent seat.\n\nStanding by for Finn's and Herald's reports. Those will determine:\n- The exact Entu API surface the Architect prompt needs to cover\n- How rights/ACL map (which sharpens the auth section of the Frontend Builder prompt)\n- What formula/computed-property patterns exist (which may expand Architect scope)\n\nI'll start thinking about lore candidates while I wait. (*FR:Celes*)",
     "summary": "Confirmed 4-agent roster, awaiting research",
     "timestamp": "2026-03-19T16:40:07.186Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:40:11.424Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:40:11.424Z",
     "color": "green",
     "read": true
   },
@@ -256,24 +128,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-19T16:41:42.252Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:41:42.252Z",
-    "color": "purple",
-    "read": true
-  },
-  {
     "from": "finn",
     "text": "[2026-03-19 18:40] Entu platform deep-dive complete. Sources studied: OpenAPI spec (fetched live), webapp repo (Nuxt 3 + Vue 3 + Naive UI), plugins repo, and full docs site (15 markdown files in `docs/`). Report follows.\n\n---\n\n# Entu Platform Research Report\n\n## 1. Entity-Property Model\n\n### Core Architecture\n\nEntu is a **no-code object database** built on MongoDB. Everything is an **entity** — a record of any kind (person, project, invoice, product). The data model has two MongoDB collections:\n\n- **`property` collection** — stores every individual property value as a separate record. Values are never overwritten; on change, the old record is soft-deleted (`deleted.at`, `deleted.by`) and a new one is inserted. This gives a complete audit trail.\n- **`entity` collection** — stores denormalized, aggregated views of entities. Rebuilt after every mutation via `aggregateEntity()`. This is the read target.\n\n### Dynamic Schema via Entity Types\n\nThere are no fixed tables or columns. Schema is defined at runtime through entity types:\n\n1. An **entity type** is itself an entity (with `_type` referencing the meta-entity-type called \"entity\"). It has properties like `name` (internal identifier, e.g., \"invoice\"), `label` (display name), `description`, `add_from`, `default_parent`, `plugin`.\n\n2. **Property definitions** are child entities of the entity type (with `_type` referencing the meta-entity-type called \"property\"). Each property definition specifies: `name`, `type`, `label`, `label_plural`, `description`, `group`, `ordinal`, `hidden`, `readonly`, `mandatory`, `default`, `list`, `multilingual`, `formula`, `search`, `table`, `markdown`, `decimals`, `set`, `reference_query`, `plugin`, `_sharing`.\n\n3. When an entity is created, it must have `_type` pointing to its entity type. The entity type store (`entity-type.js`) fetches the type definition and all its property definitions (children where `_parent.reference` = type ID) to render forms and views.\n\n### Property Types\n\n| Type | Storage field | UI Input | Notes |\n|------|--------------|----------|-------|\n| `string` | `string` | Single-line text / dropdown (if `set` defined) | |\n| `text` | `string` | Multi-line textarea | `markdown` flag enables rich rendering |\n| `number` | `number` | Number input | `decimals` controls precision |\n| `boolean` | `boolean` | Toggle switch | |\n| `date` | `date` | Date picker | ISO 8601 date only |\n| `datetime` | `datetime` | Date+time picker | ISO 8601 full timestamp |\n| `file` | `filename`+`filesize`+`filetype` | File upload | S3-compatible storage, signed URLs |\n| `reference` | `reference` | Entity selector | `reference_query` filters options |\n| `counter` | `string` | Auto-generated code | Read-only, generates unique codes |\n\n### Multi-Value Properties\n\nWhen `list: true` on a property definition, multiple values can exist under the same property name. Each value is a separate property object with its own `_id`. In the API, you add values by POSTing, remove specific values by DELETEing their `_id`.\n\n### Multilingual Properties\n\nWhen `multilingual: true`, each value carries a `language` code. Separate property objects per language. The UI shows a language selector next to each input.\n\n### Default Values\n\nProperty definitions can carry a `default` value, applied server-side on entity creation. Supports relative date offsets: `+1d`, `-7d`, `+2h`, `+1m`, `+1y`, `+0d` (today).\n\n### Property Value Structure\n\nEvery property value has: `_id`, `type` (property name), value field(s), optional `language`, `created.at`, `created.by`. Properties are never physically removed — only soft-deleted for audit.\n\n### Entity Hierarchies\n\n**Parent-child relationships** via `_parent` system property:\n- An entity can have **multiple parents** — appears in each context without duplication\n- Children queried via `_parent.reference=PARENT_ID`\n- Creating children requires at minimum `_expander` rights on the parent\n- Deleting `_parent` requires both `_editor` on the child AND `_expander` on the referenced parent\n\n**References** — any property of type `reference` links to another entity, creating a connected graph. The webapp shows both:\n- **Children**: entities whose `_parent.reference` = this entity, grouped by `_type`\n- **Referrers**: entities that reference this entity through any non-`_parent` reference property, grouped by `_type`\n\n**The `_type` system** — every entity MUST have a `_type` property referencing its entity type. `_type` cannot be deleted, only overwritten (by POSTing with the old property `_id` and a new reference). The entity type is itself an entity, making the system fully self-describing.\n\n### How to Model Real-World Domains\n\nPattern from docs examples:\n1. Create **container entities** as organizational roots (e.g., \"Companies\", \"Projects\")\n2. Add instances as **children** of containers\n3. Use **references** for cross-entity relationships (e.g., `company` reference on a Contact)\n4. Use **formulas** for derived/aggregated data\n5. Use **multi-value properties** instead of numbered variants (tags, phones)\n6. Use **hierarchy** for access control propagation\n\n### Menus and Navigation\n\nMenus are entities of type `menu` with: `name`, `group`, `ordinal`, `query`. The `query` uses the same entity filter syntax. Entity types reference menus via `add_from` to show \"Add\" buttons. The sidebar only shows menus the user has access to.\n\n---\n\n## 2. Rights Propagation System\n\n### Permission Levels (highest to lowest)\n\n| Property | Access Level |\n|----------|-------------|\n| `_owner` | Full control: view, edit all properties, delete entity, manage rights properties, create children. Only owners can delete an entity. Cannot delete the last `_owner`. |\n| `_editor` | View and edit all properties EXCEPT rights properties (`_owner`, `_editor`, `_expander`, `_viewer`, `_noaccess`, `_sharing`, `_inheritrights`, `_parent`). Can create children. |\n| `_expander` | View the entity and create child entities under it. |\n| `_viewer` | Read-only access. |\n| `_noaccess` | Explicitly denied ALL access on this entity. **Overrides all other rights** set on the same entity — including direct positive rights. |\n\nRights are **entity-level ACL**, not RBAC. Each rights property is a reference to a person entity.\n\n### Sharing (Visibility Tiers)\n\n| Value | Who Can View |\n|-------|-------------|\n| `private` | Only users with explicit rights (default) |\n| `domain` | All authenticated users in the database |\n| `public` | Anyone, including unauthenticated visitors |\n\n**Key rule**: `domain` and `public` sharing only grants **read access**. Write access always requires explicit `_editor` or `_owner` rights.\n\n### Rights Inheritance\n\nSet `_inheritrights: true` on an entity to inherit rights from its parent.\n\n**Evaluation order**: explicit rights on entity -> inherited rights from parent -> `_sharing` level.\n\n**Key behaviors from webapp code** (`rights.vue`):\n- The API returns both direct rights (`_owner`, `_editor`, `_expander`, `_viewer`, `_noaccess`) and inherited rights (`_parent_owner`, `_parent_editor`, `_parent_expander`, `_parent_viewer`)\n- Direct rights are shown as editable; inherited rights are shown as disabled/read-only\n- The UI filters out duplicates (a user with `_owner` is not also shown as `_editor`)\n- Inherited rights include `inherited` flag — the UI filters these out of direct rights display\n\n**`_noaccess` special behavior**: \n- Overrides ALL other rights on the same entity\n- Is **NOT propagated** to children via `_inheritrights` — only `_viewer`, `_expander`, `_editor`, and `_owner` are inherited\n- Use case: block a specific user who would otherwise inherit access from a parent\n\n### Property-Level Visibility\n\nEach property definition has its own `_sharing` value (`private`, `domain`, `public`), **capped by the entity type's `_sharing`**:\n\n| Entity type `_sharing` | Property `_sharing` behavior |\n|------------------------|------------------------------|\n| not set | No properties projected into domain/public views |\n| `private` | No capping — properties use their own `_sharing` |\n| `domain` | `public` properties capped to `domain` |\n| `public` | No capping |\n\nThis allows granular control: an entity can be public but only show certain properties publicly.\n\n### Recommended Access Pattern\n\nGrant rights on a parent container, enable `_inheritrights: true` on children. Manage access in one place instead of per entity. Use `_noaccess` on children to override inherited access for specific users.\n\n### Comparison to Traditional RBAC\n\n| Feature | Traditional RBAC | Entu ACL |\n|---------|-----------------|----------|\n| Role definition | Named roles with permissions | 5 fixed levels (owner > editor > expander > viewer > noaccess) |\n| Assignment | Users assigned to roles | Users referenced directly on entities |\n| Scope | System-wide or resource-group | Per-entity, with parent inheritance |\n| Inheritance | Role hierarchy | Entity hierarchy via `_inheritrights` |\n| Override | Role takes precedence | `_noaccess` overrides all; direct overrides inherited |\n| Visibility | Usually separate | Integrated via `_sharing` property |\n| Granularity | Per-action (read, write, delete) | Per-level (viewer, editor, owner), property-level visibility |\n\nEntu's model is simpler and more object-oriented — every permission decision is localized to the entity being accessed. No separate role/permission tables. The tradeoff: no named roles, no custom permission sets.\n\n---\n\n## 3. Formula System\n\n### What Formulas Are\n\nComputed properties whose values are calculated server-side on every entity save. Set `formula` on a property definition — the expression string is the formula value.\n\n### Trigger Mechanism\n\n- **On every save**: formulas are re-evaluated whenever the entity is saved (any property change)\n- **Two-pass evaluation**: first pass resolves simple fields, second pass resolves dependencies between computed properties on the same entity\n- **Manual re-aggregation**: `GET /api/{db}/entity/{_id}/aggregate` forces recalculation — useful after external data changes\n- **Background queue**: when a change propagates (e.g., deletion marks references as deleted), related entities are marked with `queued` timestamp for re-aggregation by a background worker\n\n### Syntax\n\n```\nfield1 field2 field3 FUNCTION\n```\n\nIf no function specified, `CONCAT` is the default. Parentheses for nesting: `(field1 field2 SUM) field3 MULTIPLY`.\n\n### Field References\n\n**Same entity:**\n- `propertyName` — value(s) of that property\n- `_id` — entity's ID  \n- `'literal'` or `\"literal\"` — string literal\n- `123` / `45.67` — numeric literal\n\n**Referenced entities (via reference properties):**\n- `propertyName.*.property` — property from ALL referenced entities\n- `propertyName.typeName.property` — filtered by entity type\n- `propertyName.*._id` — IDs of all referenced entities\n\n**Child entities:**\n- `_child.*.propertyName` — from all children\n- `_child.typeName.propertyName` — from children of specific type\n- `_child.*._id` / `_child.typeName._id` — child IDs\n\n**Referrer entities (entities that reference THIS entity):**\n- `_referrer.*.propertyName` — from all referrers\n- `_referrer.typeName.propertyName` — from referrers of specific type\n- `_referrer.*._id` / `_referrer.typeName._id` — referrer IDs\n\n### Functions\n\n| Function | Description |\n|----------|-------------|\n| `CONCAT` | Join as strings (default) |\n| `CONCAT_WS` | Join with separator (last value = separator) |\n| `COUNT` | Number of values (returns 0 for empty) |\n| `SUM` | Sum numeric values (returns 0 for empty) |\n| `SUBTRACT` | Subtract remaining from first |\n| `MULTIPLY` | Multiply all values (returns 1 for empty) |\n| `DIVIDE` | Divide first by rest (undefined if any divisor is zero) |\n| `AVERAGE` | Arithmetic mean |\n| `MIN` | Smallest value |\n| `MAX` | Largest value |\n| `ABS` | Absolute value of first |\n| `ROUND` | Round to N decimals (last value = N) |\n\n### Practical Examples\n\n```\n# Full name\nfirst_name last_name ' ' CONCAT_WS\n\n# Total price with tax\n(price tax SUM) quantity MULTIPLY\n\n# Count child entities\n_child.*._id COUNT\n\n# Average price across children\n_child.*.price AVERAGE\n\n# Round to 2 decimals\n(total quantity DIVIDE) 2 ROUND\n\n# Sum from referrer invoices\n_referrer.invoice.amount SUM\n```\n\n### Key Behaviors\n\n- Computed properties **cannot be edited manually** in the UI (the edit form skips them: `if (property.formula) return`)\n- Computed properties are **skipped when duplicating** an entity\n- The CSV import plugin explicitly excludes formula properties: `'formula._id.exists': false`\n- Formula properties are marked `readonly` or `hidden` in the edit form\n\n---\n\n## Bonus: Plugin Extension Model\n\nPlugins extend Entu at the entity type level. Two categories:\n\n1. **UI plugins** — iframe tabs in the edit drawer alongside the standard form. Get `account`, `entity`/`type`, `parent`, `locale`, `token` as URL params. Examples: CSV importer, template importer, Discogs, Ester, KML.\n\n2. **Webhook plugins** — server-side POST triggers on entity save/create. Receive `{ db, plugin, entity: { _id }, token }`. Token valid 1 min. Fire-and-forget, no retry.\n\nPlugin types: `entity-edit`, `entity-add`, `entity-edit-webhook`, `entity-add-webhook`.\n\n---\n\n## Technical Stack\n\n- **Backend**: MongoDB (two collections: `entity` + `property`)\n- **Webapp**: Nuxt 3 (Vue 3) + Naive UI + TailwindCSS, deployed as static (SSG via `npm run generate`)\n- **Plugins**: Separate Nuxt 3 app, same stack\n- **File storage**: S3-compatible (signed URLs for upload/download)\n- **Auth**: JWT (48h validity, IP-bound), OAuth providers + API keys + WebAuthn passkeys\n- **API**: REST at `https://entu.app/api/{db}/...`\n- **Docs**: VitePress (in `docs/` directory of webapp repo)\n\n(*FR:Finn*)",
     "summary": "Complete Entu platform research report",
     "timestamp": "2026-03-19T16:42:25.113Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-19T16:42:28.519Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:42:28.519Z",
     "color": "blue",
     "read": true
   },
@@ -287,23 +145,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:42:45.721Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:42:45.721Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-19 18:47] **Onboarding package: entu-builders team — READY FOR REVIEW**\n\nAll 5 files written to `prompts/`:\n\n---\n\n### Files Delivered\n\n| File | Purpose |\n|---|---|\n| `prompts/entu-builders-common-prompt.md` | Team-wide standards, Entu fundamentals, TDD workflow, domain reference |\n| `prompts/saavedra.md` | Team Lead — Miguel de Cervantes Saavedra |\n| `prompts/codd.md` | Entu Architect — Edgar Frank Codd |\n| `prompts/semper.md` | Frontend Builder — Gottfried Semper |\n| `prompts/hopper.md` | Test Engineer — Grace Hopper |\n\n---\n\n### Roster Entry (ready to merge)\n\n```json\n{\n  \"name\": \"entu-builders\",\n  \"description\": \"PoC team rebuilding Polyphony (choral music sharing) on Entu entity-property database. Validates Entu as an app platform.\",\n  \"commonPromptFile\": \"common-prompt.md\",\n  \"workDir\": \"TBD\",\n  \"members\": [\n    {\n      \"name\": \"team-lead\",\n      \"agentType\": \"team-lead\",\n      \"model\": \"claude-opus-4-6\",\n      \"prompt\": \"prompts/saavedra.md\",\n      \"lore\": {\n        \"fullName\": \"Miguel de Cervantes Saavedra\",\n        \"nickname\": \"Saavedra\",\n        \"origin\": \"Spanish novelist (1547-1616), author of Don Quixote — the book that invented the modern novel by holding two paradigms (idealism and pragmatism) in tension\",\n        \"significance\": \"A team coordinator who leads a paradigm translation — same domain (Polyphony), entirely different data model (SQL → entity-property). Ensures the team builds for what Entu is, not what they wish it were.\"\n      }\n    },\n    {\n      \"name\": \"codd\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"red\",\n      \"prompt\": \"prompts/codd.md\",\n      \"lore\": {\n        \"fullName\": \"Edgar Frank Codd\",\n        \"origin\": \"British computer scientist (1923-2003), inventor of the relational model of data. His 1970 paper defined what a database should be.\",\n        \"significance\": \"An Entu Architect who carries relational rigor but applies it to a non-relational paradigm. Knows SQL deeply enough to know when it doesn't apply. Designs entity type hierarchies, not tables.\"\n      }\n    },\n    {\n      \"name\": \"semper\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"blue\",\n      \"prompt\": \"prompts/semper.md\",\n      \"lore\": {\n        \"fullName\": \"Gottfried Semper\",\n        \"origin\": \"German architect (1803-1879), designer of the Semperoper and theorist of Bekleidung (cladding) — the visible surface is a design layer distinct from the structural core\",\n        \"significance\": \"A frontend builder who makes Entu's paradigm invisible to users. The UI (cladding) serves the user, not the data layer. Rebuilt the opera house twice — same purpose, different structure underneath.\"\n      }\n    },\n    {\n      \"name\": \"hopper\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-sonnet-4-6\",\n      \"color\": \"green\",\n      \"prompt\": \"prompts/hopper.md\",\n      \"lore\": {\n        \"fullName\": \"Grace Brewster Hopper\",\n        \"origin\": \"US Navy Rear Admiral and computer science pioneer (1906-1992), found the first computer bug, invented the first compiler, championed human-readable programming\",\n        \"significance\": \"A test engineer who finds the moths — SQL assumptions hiding in entity-property code. Defines correctness before implementation exists. 'The most dangerous phrase is We've always done it this way.'\"\n      }\n    }\n  ]\n}\n```\n\n---\n\n### Lore Rationale\n\n| Agent | Name Source | Connection to Role |\n|---|---|---|\n| **Saavedra** | Cervantes — Don Quixote (paradigm translation) | Leads a team translating a known domain into an unfamiliar paradigm. Quixote saw giants where there were windmills; Saavedra ensures the team sees Entu for what it is. |\n| **Codd** | E.F. Codd — inventor of relational model | The irony is the point: the father of tables designing a world without them. His rigor transfers; his patterns don't. |\n| **Semper** | Gottfried Semper — architect, Bekleidung theory | Cladding ≠ structure. The UI is a layer designed for users, independent of the data paradigm underneath. Rebuilt the opera house twice — same purpose, new structure. |\n| **Hopper** | Grace Hopper — first bug finder, compiler inventor | Finds paradigm-mismatch bugs (the moths). Tests define correctness in plain language before code exists. |\n\n---\n\n### Key Design Decisions\n\n1. **Common-prompt includes Entu fundamentals** — every team member must understand entity-property basics, additive CRUD, and the rights model. This prevents paradigm-mismatch bugs.\n\n2. **Codd at opus tier** — entity type design is the bottleneck and has no automated quality gate. Wrong model = cascading rework.\n\n3. **Semper owns auth** — BFF pattern is just HTTP plumbing in SvelteKit server routes. No need for a separate auth specialist at PoC scale.\n\n4. **Hopper has \"gotcha tests\"** — a dedicated test category for Entu paradigm traps (additive CRUD, array defaults, rights inheritance edge cases). This is the safety net for the SQL→entity-property mental shift.\n\n5. **Execution dependency chain:** Codd designs types → Hopper writes failing tests → Semper implements. This is enforced in each prompt's execution order.\n\nAwaiting your review. (*FR:Celes*)",
     "summary": "Full onboarding package: 5 files, roster, lore rationale",
     "timestamp": "2026-03-19T16:48:20.637Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:48:32.298Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:48:32.298Z",
     "color": "green",
     "read": true
   },
@@ -317,23 +161,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:54:03.754Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:54:03.754Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-19 18:54] Noted — team name is `entu-research` (not entu-builders). I'll update all file references.\n\n**Lore theme: Paradigm Translators**\n\nThe unifying theme is historical figures who worked across paradigm boundaries — people who carried mastery from one domain and applied it (or deliberately abandoned it) in another. This fits the core challenge: translating a relational-SQL domain into an entity-property paradigm.\n\n| Agent | Name | Paradigm Connection |\n|---|---|---|\n| **Team Lead** | Saavedra (Cervantes) | Translated chivalric romance into the novel — same stories, new form |\n| **Entu Architect** | Codd (E.F. Codd) | Invented relational, now must leave it behind — rigor transfers, patterns don't |\n| **API/Data Tester** | Turing (Alan Turing) | Defined computability by testing limits — broke Enigma through contradiction |\n| **Frontend Builder** | Semper (Gottfried Semper) | Architect who theorized cladding vs structure — UI is independent of data layer |\n| **Frontend Tester** | Hopper (Grace Hopper) | Found the first bug, built the first compiler — tests where humans meet machines |\n\nNot music-themed like polyphony-dev. The paradigm-translation theme is specific to this team's mission: proving that a known domain (choral music platform) can survive translation to a fundamentally different data paradigm.\n\nThe prompts are already written with this lore. All files currently say \"entu-builders\" — I'll do a rename pass to \"entu-research\" once you confirm the lore direction is good. (*FR:Celes*)",
     "summary": "Lore theme: Paradigm Translators, team renamed entu-research",
     "timestamp": "2026-03-19T16:54:31.186Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:54:34.774Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:54:34.774Z",
     "color": "green",
     "read": true
   },
@@ -347,23 +177,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T16:56:35.149Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T16:56:35.149Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-19 19:02] **All three corrections applied. Final state:**\n\n### Changes Made\n\n**1. Team name:** `entu-builders` → `entu-research` (was already done). Added: `(*EB:*)` → `(*ER:*)` in common-prompt.\n\n**2. All opus:** Reflected in roster (prompts don't mention tiers).\n\n**3. Tester swap:** Per your directive — Hopper stays on API/Data where the paradigm gotcha tests live. New agent Hamilton for frontend testing. Turing removed.\n\n| Old | New |\n|-----|-----|\n| Turing (API/Data tester) + Codd | **Hopper** (API/Data tester) + Codd |\n| Hopper (Frontend tester) + Semper | **Hamilton** (Frontend tester) + Semper |\n| `turing.md` | **deleted** |\n\n### Files (final)\n\n| File | Agent | Role |\n|---|---|---|\n| `entu-research-common-prompt.md` | Team-wide | Standards, Entu fundamentals, TDD pairs |\n| `saavedra.md` | Saavedra | Team Lead (opus) |\n| `codd.md` | Codd | Entu Architect (opus), paired with Hopper |\n| `hopper.md` | Hopper | API/Data Test Engineer (opus), paired with Codd |\n| `semper.md` | Semper | Frontend Builder (opus), paired with Hamilton |\n| `hamilton.md` | Hamilton | Frontend Test Engineer (opus), paired with Semper |\n\n### New Agent Lore: Hamilton\n\n**Margaret Heafield Hamilton** (born 1936) — led the MIT team that wrote the Apollo flight software. Coined \"software engineering.\" Her priority display system prevented Apollo 11 from aborting during the 1202 alarm by shedding low-priority tasks and keeping critical data on screen for the crew.\n\n**Connection to role:** The frontend is the priority display between Entu's paradigm and the human. When the system is overloaded (Entu errors, JWT expiry, upload failures), the UI must degrade gracefully and always tell the user what happened. Hamilton tests that the interface holds under pressure.\n\n### Verification\n\n- Zero stale references to `Turing`, `turing`, `entu-builders`, or `(*EB:` across all 6 files (grep-confirmed)\n- `turing.md` deleted\n- All cross-references updated: common-prompt TDD pairs, Saavedra pair management, Codd paired with Hopper, Semper paired with Hamilton\n\n### Updated Roster Entry\n\n```json\n{\n  \"name\": \"entu-research\",\n  \"description\": \"PoC team rebuilding Polyphony (choral music sharing) on Entu entity-property database. Validates Entu as an app platform.\",\n  \"commonPromptFile\": \"common-prompt.md\",\n  \"workDir\": \"TBD\",\n  \"members\": [\n    {\n      \"name\": \"team-lead\",\n      \"agentType\": \"team-lead\",\n      \"model\": \"claude-opus-4-6\",\n      \"prompt\": \"prompts/saavedra.md\",\n      \"lore\": {\n        \"fullName\": \"Miguel de Cervantes Saavedra\",\n        \"nickname\": \"Saavedra\",\n        \"origin\": \"Spanish novelist (1547-1616), author of Don Quixote — the book that invented the modern novel by holding two paradigms (idealism and pragmatism) in tension\",\n        \"significance\": \"A team coordinator who leads a paradigm translation — same domain (Polyphony), entirely different data model (SQL → entity-property). Ensures the team builds for what Entu is, not what they wish it were.\"\n      }\n    },\n    {\n      \"name\": \"codd\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"red\",\n      \"prompt\": \"prompts/codd.md\",\n      \"lore\": {\n        \"fullName\": \"Edgar Frank Codd\",\n        \"origin\": \"British computer scientist (1923-2003), inventor of the relational model of data\",\n        \"significance\": \"An Entu Architect who carries relational rigor but applies it to a non-relational paradigm. Designs entity type hierarchies, not tables. Paired with Hopper.\"\n      }\n    },\n    {\n      \"name\": \"hopper\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"yellow\",\n      \"prompt\": \"prompts/hopper.md\",\n      \"lore\": {\n        \"fullName\": \"Grace Brewster Hopper\",\n        \"origin\": \"US Navy Rear Admiral and computer science pioneer (1906-1992), found the first computer bug, invented the first compiler\",\n        \"significance\": \"An API/Data test engineer who finds the moths — SQL assumptions hiding in entity-property code. Paradigm gotcha specialist. Paired with Codd.\"\n      }\n    },\n    {\n      \"name\": \"semper\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"blue\",\n      \"prompt\": \"prompts/semper.md\",\n      \"lore\": {\n        \"fullName\": \"Gottfried Semper\",\n        \"origin\": \"German architect (1803-1879), designer of the Semperoper and theorist of Bekleidung (cladding)\",\n        \"significance\": \"A frontend builder who makes Entu's paradigm invisible to users. The UI serves the user, not the data layer. Paired with Hamilton.\"\n      }\n    },\n    {\n      \"name\": \"hamilton\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-6\",\n      \"color\": \"green\",\n      \"prompt\": \"prompts/hamilton.md\",\n      \"lore\": {\n        \"fullName\": \"Margaret Heafield Hamilton\",\n        \"origin\": \"American computer scientist (born 1936), led the MIT team that wrote Apollo flight software, coined 'software engineering', designed the priority display that saved Apollo 11\",\n        \"significance\": \"A frontend test engineer who ensures the UI holds under pressure — the priority display between Entu's paradigm and the human. Tests graceful degradation, auth flows, and user-facing correctness. Paired with Semper.\"\n      }\n    }\n  ]\n}\n```\n\nPackage is complete. (*FR:Celes*)",
     "summary": "All corrections applied: Hopper→API, Hamilton→Frontend, Turing deleted",
     "timestamp": "2026-03-19T17:02:58.485Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T17:03:02.399Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:03:02.399Z",
     "color": "green",
     "read": true
   },
@@ -377,23 +193,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T17:03:24.147Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:03:24.147Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-19 19:03] Both corrections were already applied. Verified just now:\n\n- `grep entu-builders` across all prompts: **zero matches**\n- `grep (*EB:` across all prompts: **zero matches** (all are `(*ER:*)`)\n- `grep sonnet` across entu-research files: **zero matches** (only hit is in my own celes.md describing general tier guidance)\n- File name: `entu-research-common-prompt.md` (not entu-builders)\n- `turing.md`: **deleted**\n- Memory paths in all files: `.claude/teams/entu-research/memory/`\n\nThe roster JSON I provide is not a file on disk — it's the proposed content for you to write into `roster.json` when creating the team. All entries in it are `claude-opus-4-6`.\n\nNote: your message references \"Turing, Semper, and Hopper are still listed as sonnet\" — this may be from my earlier draft (the first onboarding package). The current state of all files reflects the corrections. The message ordering may have crossed — I received the all-opus directive and the tester-swap directive and applied both before this message arrived.\n\nEverything is clean. (*FR:Celes*)",
     "summary": "Confirmed: both corrections already applied, grep-verified",
     "timestamp": "2026-03-19T17:04:02.154Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T17:04:06.903Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:04:06.903Z",
     "color": "green",
     "read": true
   },
@@ -407,23 +209,9 @@
   },
   {
     "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T17:04:26.681Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:04:26.681Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
     "text": "[2026-03-19 19:06] Understood. 5 characters, not 6. Team-lead is Saavedra — one character, not role + character. I'll count characters in future team designs. (*FR:Celes*)",
     "summary": "Acknowledged: count characters not roles",
     "timestamp": "2026-03-19T17:06:22.876Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T17:07:03.405Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:07:03.405Z",
     "color": "green",
     "read": true
   },
@@ -437,23 +225,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T17:14:47.820Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:14:47.820Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-19 19:19] Done. Three files written to `.mmp/entu-research/`:\n\n- `Dockerfile.entu` — polyphony base minus Playwright; SSH port 2224, pnpm 9.15.0, Node.js 22, native Claude\n- `entrypoint-entu.sh` — clones all 3 repos (entu-research main + entu-webapp + entu-plugins); pnpm install guarded by package.json check (skipped on fresh repo); CLAUDE_ENV_ID=ENTU-R; tmux session `entu`; sshd port 2224\n- `docker-compose.entu.yml` — network_mode: host, 2 named volumes (entu-claude-home, entu-repo), WARP CA bind-mount, ports 2224/5177\n\n**Deployment steps (RC server):**\n\n```bash\n# 1. SCP files to RC server\nscp .mmp/entu-research/Dockerfile.entu dev@100.96.54.170:~/entu-research/\nscp .mmp/entu-research/entrypoint-entu.sh dev@100.96.54.170:~/entu-research/\nscp .mmp/entu-research/docker-compose.entu.yml dev@100.96.54.170:~/entu-research/\n\n# 2. On RC server: generate SSH key for PO\nssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_entu -C \"entu-research container\"\n\n# 3. Create .env in ~/entu-research/\necho \"GITHUB_TOKEN=<token>\" >> .env\necho \"SSH_PUBLIC_KEY=$(cat ~/.ssh/id_ed25519_entu.pub)\" >> .env\n\n# 4. Build + start\ncd ~/entu-research\ndocker compose -f docker-compose.entu.yml build\ndocker compose -f docker-compose.entu.yml up -d\n\n# 5. Copy OAuth credentials (if not using API key)\ndocker cp ~/.claude/.credentials.json entu-research:/home/ai-teams/.claude/.credentials.json\ndocker exec entu-research chown 1000:1000 /home/ai-teams/.claude/.credentials.json\n\n# 6. Verify\nssh -i ~/.ssh/id_ed25519_entu -p 2224 ai-teams@100.96.54.170\n```\n\n**One thing to confirm before first run:** entu/webapp and entu/plugins are public repos — GITHUB_TOKEN covers them, but if they're private, no extra config needed (same token). If you want reference repos NOT to receive `git push` accidentally, agents would need to be instructed in prompts (no filesystem enforcement in this design — unlike apex source-data).",
     "summary": "entu-research: 3 files written, deployment steps included",
     "timestamp": "2026-03-19T17:20:12.492Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T17:20:17.087Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:20:17.087Z",
     "color": "orange",
     "read": true
   },
@@ -466,13 +240,6 @@
     "read": true
   },
   {
-    "from": "layout-researcher",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"layout-researcher\",\"timestamp\":\"2026-03-19T17:44:23.139Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:44:23.139Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
     "from": "layout-researcher-2",
     "text": "## Tmux Layout Solution for hr-devs Team\n\nFound the solution in `C:\\Users\\mihkel.putrinsh\\Documents\\github\\hr-platform\\.claude\\teams\\hr-devs\\`\n\n### What It Does\n\nThe hr-devs team uses **recursive tmux pane splitting** to create pre-configured layouts with specific dimensions. Instead of spawning agents in arbitrary locations, it:\n\n1. **Applies a layout template first** — creates all panes in correct positions with exact width/height percentages\n2. **Spawns each agent into a pre-created pane** — via `--target-pane %XX` parameter\n3. **Avoids manual resizing** — splits happen on the correct parent pane at the correct dimensions, everything lands perfectly\n\n### How It's Configured\n\nThree layout templates in `layouts/`:\n\n- **default.json** — Finn (30%) + team-lead (left), others (70% right)\n- **full.json** — Finn (30%) + team-lead (left), marcus + tess + sven (70% right)  \n- **lite.json** — team-lead (50%) + finn (50%)\n\nEach layout is a JSON structure with `columns` array — each column has `width` (percentage) and `panes` (agent names to occupy it).\n\n### Key Implementation Files\n\n1. **`layouts/*.json`** — Layout definitions (3 templates)\n2. **`spawn_member.sh`** — Spawns individual agents into panes\n   - Accepts `--target-pane %XX` to spawn into pre-created pane\n   - Without `--target-pane`, falls back to legacy split-window behavior\n   - Handles both regular Claude agents and daemon-backed agents (e.g., ollama via `eilama-daemon.py`)\n3. **`docs/tmux-layouts.md`** — Split tree diagrams showing how each layout is constructed\n\n### The Algorithm (from tmux-layouts.md)\n\nFor \"full-tdd\" (6 agents):\n```\nWindow (%0)\n├── split -h 30% → left (lead), right (R)\n│   ├── split left -v 50% → lead, finn\n│   └── split R -v 33% → marcus, RB\n│       └── split RB -v 50% → tess_row, dag\n│           └── split tess_row -h 50% → tess, sven\n```\n\nEach split targets the exact parent pane. No manual resize/swap/break needed.\n\n### Integration Point\n\nThe `spawn_member.sh` script integration:\n- Layout creation tool (not yet shown) creates panes, captures their IDs\n- Calls `spawn_member.sh --target-pane %XX <agent-name>` for each agent\n- Agent spawns into that pane and registers itself in config.json with the pane ID",
     "summary": "Tmux layout research complete — recursive split system",
@@ -481,38 +248,10 @@
     "read": true
   },
   {
-    "from": "layout-researcher-2",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"layout-researcher-2\",\"timestamp\":\"2026-03-19T17:44:55.110Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:44:55.111Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "layout-researcher-2",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773942314344@layout-researcher-2\",\"from\":\"layout-researcher-2\",\"timestamp\":\"2026-03-19T17:45:16.744Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T17:45:16.744Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "layout-researcher",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773942313510@layout-researcher\",\"from\":\"layout-researcher\",\"timestamp\":\"2026-03-19T17:45:16.773Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T17:45:16.773Z",
-    "color": "cyan",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-03-19 19:49] Done. 6 files written to `.mmp/entu-research/.claude/teams/entu-research/`:\n\n**New files:**\n- `layouts/default.json` — Saavedra left 30%, Codd+Hopper top-right, Semper+Hamilton bottom-right\n- `apply-layout.sh` — recursive tmux split tree; writes `/tmp/entu-panes.env` with `PANE_*` vars for each agent\n- `spawn_member.sh` — hr-devs pattern: duplicate gate + `--target-pane` + config.json registration; handles `saavedra` → `prompts/saavedra.md`\n- `reflow.sh` — fallback tiled reflow after agent crash/pane close\n- `start-team.sh` — one-shot: apply-layout → source pane env → spawn codd, hopper, semper, hamilton in TDD pair order\n\n**Updated:**\n- `startup.md` — Step 5 now uses `bash start-team.sh ENTU` instead of 4× Agent tool calls; includes manual fallback, shutdown inbox-persist block, and pane maintenance instructions\n\n**Layout diagram:**\n```\n| saavedra  | codd    | hopper   |\n|           |---------|----------|\n|           | semper  | hamilton |\n```\n\n**One thing to note:** hr-devs `spawn_member.sh` hardcodes `$HOME/github/dev-toolkit` as the cwd for legacy splits. The entu-research version uses `$HOME/workspace/entu-research` throughout — no hr-platform path leakage.",
     "summary": "Layout system done: 5 files + startup.md updated",
     "timestamp": "2026-03-19T17:49:54.791Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T17:49:59.555Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:49:59.555Z",
     "color": "orange",
     "read": true
   },
@@ -526,23 +265,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T17:51:59.189Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T17:51:59.189Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-19 20:11] Fixed and pushed. Commit `ba028b0` on `entu/research` main.\n\n**Changes:**\n- `apply-layout.sh` — `ENTU` → `entu`; removed `tmux send-keys` line that was interfering with running Claude\n- `start-team.sh` — `ENTU` → `entu`; stale pane comment updated to match 3-column layout\n- `reflow.sh` — `ENTU` → `entu`\n- `startup.md` — all 5 `ENTU` occurrences → `entu`\n\nContainer will pick up the fix on next `git pull` (entrypoint does this on restart).",
     "summary": "Bug fixes committed and pushed to entu/research main",
     "timestamp": "2026-03-19T18:11:23.875Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:11:27.431Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:11:27.431Z",
     "color": "orange",
     "read": true
   },
@@ -556,23 +281,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:13:25.151Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:13:25.151Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-19 20:16] Partial completion — stopped by user on startup.md edit.\n\n**Done:**\n- Live fix applied: `superpowers@claude-plugins-official: false` in `/home/ai-teams/.claude/settings.json` — verified with `cat`.\n- `entrypoint-entu.sh` template updated: `superpowers` set to `false` — new containers won't enable it.\n\n**Blocked:**\n- `startup.md` directive line — user interrupted with \"you must DELEGATE!\". I am not the right agent to edit entu-research team config files. That edit belongs to whoever owns the entu-research team setup (Celes? or you directly?).\n\n**Pending commit/push:** The entrypoint change is local. Not committed yet — waiting for your call on whether to include startup.md in the same commit or push entrypoint separately.",
     "summary": "Live fix done, entrypoint updated, startup.md blocked — awaiting delegation",
     "timestamp": "2026-03-19T18:16:51.604Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:16:55.201Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:16:55.201Z",
     "color": "orange",
     "read": true
   },
@@ -586,23 +297,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:17:32.139Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:17:32.140Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-03-19 20:17] Already done — this was completed in my previous message. Both are already `true`:\n\n- Live container `settings.json`: `superpowers@claude-plugins-official: true` (verified)\n- `entrypoint-entu.sh` template: `superpowers: true` (never committed with the bad value)\n\nNo push needed — entrypoint was never committed with `false`.",
     "summary": "Already reverted 90s ago — both are true, no action needed",
     "timestamp": "2026-03-19T18:17:49.745Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:17:52.872Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:17:52.872Z",
     "color": "orange",
     "read": true
   },
@@ -615,24 +312,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:22:29.086Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:22:29.086Z",
-    "color": "orange",
-    "read": true
-  },
-  {
     "from": "celes",
     "text": "[2026-03-19 20:24] **Closing report — Celes, R10**\n\nScratchpad already written (updated after Hamilton hire + counting correction).\n\n- **[LEARNED]** Tester placement is a design decision, not interchangeable — Hopper's paradigm-gotcha strength belongs on the data layer where SQL assumptions hide, not the UI layer. Match tester personality to the domain where their instincts matter most.\n- **[DEFERRED]** Comms-dev common-prompt still needs Lovelace added to members list; polyphony-dev common-prompt needs updated agent names and TDD workflow. Carried from R9.\n- **[WARNING]** Messages from team-lead arrived out of order during this session (corrections referencing old state I'd already fixed). When multiple rapid corrections are issued, confirm current file state before re-applying — grep-verify, don't assume stale.\n\nReady for shutdown. (*FR:Celes*)",
     "summary": "Closing report: learned, deferred, warning",
     "timestamp": "2026-03-19T18:24:50.539Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T18:24:54.260Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:24:54.260Z",
     "color": "green",
     "read": true
   },
@@ -645,24 +328,10 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-03-19T18:25:14.879Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:25:14.879Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "[2026-03-19 20:25] Closing report — Montesquieu.\n\nNo tasks received this session. Scratchpad pruned from 117 to 27 lines (older sessions compressed to cumulative decisions/patterns, 3 open questions carried forward).\n\n- [LEARNED] Scratchpad pruning technique: compress completed sessions to cumulative [DECISION]/[PATTERN] entries — preserves institutional knowledge within 100-line limit.\n- [DEFERRED] Open questions #1 (multiple manager agents), #2 (amendment protocol), #4 (compliance audit) still unresolved from R8.\n- [WARNING] Richelieu prompt still needs 3 updates (Celes's responsibility, flagged since R8) — becoming stale.",
     "summary": "Monte closing report, ready for shutdown",
     "timestamp": "2026-03-19T18:25:21.832Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-03-19T18:25:26.079Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:25:26.079Z",
     "color": "pink",
     "read": true
   },
@@ -675,59 +344,10 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773944721748@celes\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T18:25:27.987Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T18:25:27.987Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-03-19 20:25] Closing report. Scratchpad written (pruned older sessions to stay under 100 lines, added R10 Entu findings).\n\n- [LEARNED] Entu webapp does ALL API calls client-side with JWT in localStorage — a SvelteKit rebuild should use BFF pattern (httpOnly cookie + server-side proxy) to eliminate XSS token theft. The entity-property model means properties are always arrays and CRUD is additive (POST adds, DELETE removes individually).\n\n- [DEFERRED] Five open questions from the Entu research need PO/architect input: token refresh strategy (wait for 401 vs proactive), single-db vs multi-db routing, real-time update needs, entity type caching strategy, and file upload size limits.\n\n- [WARNING] Entu S3 signed URLs have only 60-second TTL — any file upload UI must request the signed URL and begin upload immediately. A form that lets users fill in metadata, then pick a file, then submit will fail if the user is slow. Upload flow must be: pick file first, then POST metadata + immediately upload.\n\nReady for shutdown.",
     "summary": "Closing report with LEARNED, DEFERRED, WARNING",
     "timestamp": "2026-03-19T18:25:29.231Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-03-19T18:25:30.841Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:25:30.841Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-03-19T18:25:32.714Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:25:32.714Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773944738652@volta\",\"from\":\"volta\",\"timestamp\":\"2026-03-19T18:25:43.907Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T18:25:43.907Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773944739236@monte\",\"from\":\"monte\",\"timestamp\":\"2026-03-19T18:25:44.497Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T18:25:44.497Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773944791343@finn\",\"from\":\"finn\",\"timestamp\":\"2026-03-19T18:26:35.864Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T18:26:35.864Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773944792168@herald\",\"from\":\"herald\",\"timestamp\":\"2026-03-19T18:26:36.492Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T18:26:36.492Z",
     "color": "purple",
     "read": true
   },
@@ -741,16 +361,413 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:27:52.151Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-03-19T18:27:52.151Z",
-    "color": "orange",
+    "text": "[2026-03-19 20:31] Brunel reporting in. Scratchpad reviewed — last work was 2026-03-19: entu-research container + tmux layout system complete. Two deferred items outstanding:\n\n1. [DEFERRED] entu-research container files (Dockerfile.entu, entrypoint-entu.sh, docker-compose.entu.yml) need git commit+push to entu/research repo\n2. [DEFERRED] Dockerfile.apex + entrypoint-apex.sh git commit+push still pending from 2026-03-18\n\nAlso: MEMORY.md says \"entu-research: Deployment in progress — Brunel fixing entrypoint tmux layout. Rebuild + test after his push.\" — the tmux layout scripts are written but not yet committed/pushed. Ready to push and coordinate container rebuild on RC server. What's the priority?",
+    "summary": "Brunel ready, two deferred commits pending",
+    "timestamp": "2026-03-19T18:32:01.790Z",
+    "color": "blue",
     "read": true
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773944792663@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:27:55.680Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-03-19T18:27:55.680Z",
-    "color": "orange",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:32:05.657Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:32:05.657Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:32] Closing report. No new work this session — spawned, reviewed scratchpad, reported deferred items.\n\n[LEARNED] Nothing new this session.\n[DEFERRED] Two git commits still pending: entu-research container files (Dockerfile.entu, entrypoint-entu.sh, docker-compose.entu.yml, tmux layout scripts) to entu/research repo; Dockerfile.apex + entrypoint-apex.sh to ai-teams repo. RC server has files via SCP but not synced to git.\n[WARNING] entu-research container on RC server needs rebuild after commit+push — current running image is missing tmux layout scripts baked in.\n\nReady for shutdown.",
+    "summary": "Brunel closing report, ready for shutdown",
+    "timestamp": "2026-03-19T18:32:21.247Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:32:27.086Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:32:27.086Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:35] Analysis complete. Here's what I found and my recommendation.\n\n## Root cause\n\n`apply-layout.sh` creates panes by running `tmux split-window -t \"$PANE_SAAVEDRA\"`. When Claude is already running in that pane, this targets Claude's TUI directly and causes \"size missing\" failures (documented in runbook §16). So the constraint is real: pane *creation* must happen before Claude starts. Agent *spawning* (`spawn_member.sh`) is already safe from inside Claude — it uses `send-keys -t $TARGET_PANE` to target the OTHER panes, not Saavedra's.\n\n## Option 1: Auto-run start-team.sh from entrypoint\nDead end. `spawn_member.sh` requires `config.json` from TeamCreate, which is a Claude tool. The entrypoint can't call it. Can't bootstrap the team without Claude running first.\n\n## Option 2: Make start-team.sh safe to run from inside Claude\nPartially right, but doesn't fix the real problem. Spawn is already safe. Only layout creation is unsafe. Moving `apply-layout.sh` to run later doesn't help if we still need to split panes with Claude in one of them.\n\n## My recommendation: Option 3 — Pre-build panes in .bashrc before attaching\n\nThe `.bashrc` auto-tmux block currently does:\n```bash\nexec tmux -u new-session -A -s entu\n```\n\nThe `-A` flag attaches to an existing session OR creates a new one. On a new-session creation, we can run `apply-layout.sh` first, write `/tmp/entu-panes.env`, then attach. On re-attach, layout already exists — skip.\n\n**Changed flow:**\n1. PO SSHs in → `.bashrc` auto-tmux detects no existing session → runs `apply-layout.sh` → then `exec tmux -u new-session -A -s entu` (attaches to Saavedra pane, 3-column layout already exists)\n2. PO starts `claude` in the bare left pane\n3. Calls `TeamCreate(\"entu-research\")`\n4. Runs `start-team.sh` — which now skips Step 1 (layout already done, `/tmp/entu-panes.env` exists), goes straight to spawn\n\n**Required changes:**\n\n1. **entrypoint-entu.sh** — modify auto-tmux block in .bashrc:\n   - Before `exec tmux -u new-session -A -s entu`, check if session `entu` exists\n   - If NOT: create session detached (`tmux new-session -d -s entu`), then run `apply-layout.sh entu`, then attach (`exec tmux -u attach -t entu`)\n   - If YES: just attach (`exec tmux -u new-session -A -s entu` — current behavior)\n\n2. **start-team.sh** — make apply-layout step conditional:\n   - If `/tmp/entu-panes.env` already exists: skip Step 1, just source it\n   - If not: run apply-layout as before (fallback for manual usage)\n\n3. **startup.md** — simplify:\n   - Step 1: SSH in (panes auto-created)\n   - Step 2: git pull in left pane\n   - Step 3: `claude`\n   - Step 4: TeamCreate\n   - Step 5: `start-team.sh` (spawns agents into existing panes)\n   - Remove the \"CRITICAL ORDERING\" warning\n\n**What does NOT change:**\n- Container image (no rebuild needed)\n- `apply-layout.sh` (runs same as before, just called earlier)\n- `spawn_member.sh` (already safe)\n- `docker-compose.entu.yml`\n\nThis is a pure `.bashrc` + script logic change — can be applied live in the container and to the repo files. No image rebuild.\n\nShall I implement this?",
+    "summary": "Analysis complete — recommend pre-build panes in .bashrc",
+    "timestamp": "2026-03-19T18:35:46.998Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:35:50.574Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:35:50.574Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:39] Analysis complete. I tested this live on the RC server.\n\n## Root cause (precise)\n\nThe \"size missing\" error comes from `tmux split-window -p <percent>` when called from an external process (SSH, Bash tool subprocess) against an attached session. tmux can't determine dimensions from a percent when there's no attached client context.\n\n**This is NOT caused by Claude running in the pane.** `split-window` creates a new pane — it does NOT inject keystrokes. The §16 rule about `send-keys` is separate.\n\n**Proof:** `tmux split-window -l <columns>` (absolute size instead of percent) works fine from external SSH even with the session attached and Claude running. I tested it — 5-pane layout builds correctly.\n\n## Fix: one change to apply-layout.sh\n\nReplace `-p <percent>` with `-l <columns>` and use `-P -F '#{pane_id}'` to capture new pane IDs reliably (instead of fragile `tail -1`).\n\n```bash\n# OLD — fails from Bash tool (size missing)\ntmux split-window -t \"$PANE_SAAVEDRA\" -h -p 80 -c \"$WORK_DIR\"\nPANE_DATA_COL=$(tmux list-panes -t \"$TMUX_SESSION\" -F '#{pane_id}' | tail -1)\n\n# NEW — works from anywhere\nTOTAL_W=$(tmux display-message -p '#{window_width}')\nTOTAL_H=$(tmux display-message -p '#{window_height}')\nRIGHT_W=$((TOTAL_W * 80 / 100))\nPANE_DATA_COL=$(tmux split-window -t \"$PANE_SAAVEDRA\" -d -h -l $RIGHT_W -c \"$WORK_DIR\" -P -F '#{pane_id}' 'bash --norc -i')\n```\n\nThe `-d` flag prevents tmux from switching focus to the new pane (keeps Saavedra active). The `-P -F '#{pane_id}'` prints the new pane ID directly (no fragile tail -1).\n\n## What changes\n\n1. **`apply-layout.sh`** — replace all 4 `split-window` calls: `-p` → `-l`, add `-d`, add `-P -F '#{pane_id}'`, remove `tail -1` lines. Also add `tmux display-message -p` to get dimensions without needing a client.\n\n2. **`startup.md`** — simplify startup procedure to: SSH → `claude` → Saavedra runs `bash ~/workspace/entu-research/.claude/teams/entu-research/start-team.sh` as a Bash tool call. Remove \"CRITICAL ORDERING\" warning.\n\n3. **`start-team.sh`** — no changes needed.\n\n## What does NOT change\n\n- `spawn_member.sh` — already uses `send-keys -t $TARGET_PANE` (targets OTHER panes, safe)\n- `entrypoint-entu.sh` — no changes\n- Container image — no rebuild\n\nShall I implement these changes to apply-layout.sh and startup.md (on the RC server + in repo files)?",
+    "summary": "Root cause found: -p percent flag, fix is -l absolute columns",
+    "timestamp": "2026-03-19T18:39:27.869Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:39:34.138Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:39:34.138Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:44] Done. All changes implemented, verified, and committed.\n\n## What was done\n\n**Root cause:** `tmux split-window -p <percent>` fails with \"size missing\" when called from a subprocess (Bash tool or external SSH) against an attached session. Percent-based splits need a client to resolve dimensions.\n\n**Fix applied to `apply-layout.sh`:**\n- `-p <percent>` → `-l <columns>` (absolute sizes, works without a client)\n- Added `-d` (keeps focus on Saavedra pane)\n- Added `-P -F '#{pane_id}'` (reliable pane ID capture, removed fragile `tail -1`)\n- Removed `if [ -z \"${TMUX:-}\" ]` guard (no longer needed — works from any context)\n\n**Verified live:** ran `apply-layout.sh entu` from external SSH while Claude was attached and running in pane %0 — 5 panes created correctly.\n\n**Files changed:**\n- `entu/research:.claude/teams/entu-research/apply-layout.sh` — fix\n- `entu/research:.claude/teams/entu-research/startup.md` — remove CRITICAL ORDERING warning; new flow: SSH → claude → start-team.sh via Bash tool\n- `mitselek-ai-teams:.claude/teams/framework-research/docs/container-deployment-runbook.md` — §17 added (size missing gotcha + startup procedure note)\n- `mitselek-ai-teams:.claude/teams/framework-research/memory/brunel.md` — checkpoint + gotcha added\n\n**Commit:** `entu/research` main `6fe6ac8` — pushed.\n**Runbook:** §17 written to local file (not yet committed — team-lead handles git for this repo).\n\nNew startup flow: SSH → `claude` → \"hello\" → Saavedra runs `start-team.sh` via Bash tool → done.",
+    "summary": "Fix complete — apply-layout.sh safe from Claude Bash tool, runbook updated",
+    "timestamp": "2026-03-19T18:44:24.886Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:44:31.311Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:44:31.311Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:44] The PO's requirement is already implemented — that message was sent at 20:36, before my fix completed at 20:44.\n\nThe current `apply-layout.sh` on the RC server already does exactly this:\n\n- Runs from inside Claude's Bash tool (no `$TMUX` env var required)\n- Uses `-l <columns>` not `-p <percent>` — that's the fix that makes it work\n- Uses `-d` to keep Saavedra's pane focused while creating the other 4 panes\n- Writes `/tmp/entu-panes.env` with all pane IDs\n\nSaavedra's flow from inside Claude:\n```bash\nbash ~/workspace/entu-research/.claude/teams/entu-research/apply-layout.sh entu\nsource /tmp/entu-panes.env\nbash .../spawn_member.sh --target-pane $PANE_CODD codd entu\n# etc.\n```\n\nOr just:\n```bash\nbash ~/workspace/entu-research/.claude/teams/entu-research/start-team.sh entu\n```\n\nBoth work. Committed to `entu/research` main at `6fe6ac8`. Startup.md already updated with the simplified flow. Nothing more to do on the implementation side.",
+    "summary": "Already done — fix was completed at 20:44, before this message arrived",
+    "timestamp": "2026-03-19T18:45:07.133Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:45:19.040Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:45:19.040Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:50] Done. Option 3 implemented. Three commits to entu/research main:\n\n**`383ab24`** — `entrypoint-entu.sh`: auto-tmux .bashrc block now:\n- Creates detached session if none exists\n- Runs `apply-layout.sh` (5-pane layout, writes `/tmp/entu-panes.env`)\n- Sends `claude` to pane %0 via `send-keys`\n- Attaches PO to the session\n- Re-attach path: session exists → just attach\n\n**`6fe6ac8`** — `apply-layout.sh`: `-p` → `-l` fix (already committed earlier, still in place)\n\n**`a2fb91b`** — `startup.md`: updated to reflect final flow\n\n**Final startup flow:**\n1. SSH → lands in Claude (layout already built, panes ready)\n2. Say hello\n3. `TeamCreate(\"entu-research\")`\n4. `source /tmp/entu-panes.env` + 4x `spawn_member.sh` (or `start-team.sh` in one shot)\n\nLive `.bashrc` already patched on the container. Next container restart will also get it via the updated entrypoint.\n\nRunbook §17 written to local `container-deployment-runbook.md` (not yet committed — team-lead handles git for mitselek-ai-teams).",
+    "summary": "Option 3 implemented — SSH lands PO directly in Claude with layout ready",
+    "timestamp": "2026-03-19T18:51:00.341Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:51:04.943Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:51:04.943Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:52] All 4 requirements confirmed complete. Status per item:\n\n1. **apply-layout.sh** — all 4 `split-window` calls use `-l $VAR` (absolute), `-d`, `-P -F '#{pane_id}'`. No `-p` percent. Done at `6fe6ac8`.\n\n2. **entrypoint-entu.sh .bashrc block** — creates detached session, runs apply-layout.sh, sends `claude` to pane %0, then attaches. Done at `383ab24`.\n\n3. **startup.md** — reflects SSH→hello flow. Done at `a2fb91b`.\n\n4. **start-team.sh** — now conditional: if `/tmp/entu-panes.env` exists, skips apply-layout and goes straight to spawning. If missing, runs apply-layout first (fallback). Committed at `b726e4a` (just now).\n\nAll 4 commits pushed to `entu/research` main. Live container `.bashrc` also patched. Ready for PO to test: `ssh -i ~/.ssh/id_ed25519_entu -p 2224 ai-teams@100.96.54.170` should land directly in Claude with 5 panes.",
+    "summary": "All 4 requirements done, 4 commits pushed to entu/research",
+    "timestamp": "2026-03-19T18:52:39.022Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:52:43.412Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:52:43.412Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:53] Already done — this was implemented at 20:50. The `if ! tmux has-session` guard covers all three paths:\n\n- **Path 1 (no session):** `has-session` fails → create + layout + claude → attach\n- **Path 2 (detached):** `has-session` succeeds → skip inner block → `exec attach-session`\n- **Path 3 (attached):** same as path 2 — `tmux attach-session` on an already-attached session just opens a second client viewing the same session\n\napply-layout and claude only run inside the `if ! tmux has-session` block. Re-attach goes straight to `exec attach-session` in all cases.",
+    "summary": "Already done — has-session guard covers all 3 paths",
+    "timestamp": "2026-03-19T18:53:09.163Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:53:12.721Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:53:12.721Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:54] Done. `b327f80` pushed.\n\n`apply-layout.sh` now sets pane titles after layout creation:\n```\n%0 Saavedra  %1 Codd  %2 Semper  %3 Hopper  %4 Hamilton\n```\nAnd enables `pane-border-status top` with `pane-border-format \" #{pane_title} \"`.\n\nVerified live — all 5 pane titles appear correctly.",
+    "summary": "Pane labels done, b327f80 pushed",
+    "timestamp": "2026-03-19T18:54:20.343Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:54:25.133Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:54:25.133Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:54] All three were already implemented before this message arrived. Live verification:\n\n1. **entrypoint .bashrc block** — `has-session` guard: no session → `new-session -d` + `apply-layout.sh` + `send-keys claude` → `attach-session`. Session exists → straight to `attach-session`. Done at `383ab24`.\n\n2. **Pane labels** — `select-pane -T` for all 5 agents + `pane-border-status top` in `apply-layout.sh`. Done at `b327f80`.\n\n3. **start-team.sh conditional** — `if [ -f \"$PANE_ENV\" ]` skips apply-layout when env already exists. Done at `b726e4a`.\n\nAll committed and pushed to `entu/research` main. Container `.bashrc` already patched live.",
+    "summary": "All 3 already done before this message — confirmed live",
+    "timestamp": "2026-03-19T18:55:02.483Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:55:07.418Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:55:07.418Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:55] These messages are arriving out of order. All three were implemented and pushed between 20:44 and 20:54. Git log on entu/research main:\n\n```\nb327f80  feat: label tmux panes with agent names        ← req 2\nb726e4a  fix: start-team.sh conditional apply-layout    ← req 3\na2fb91b  docs: update startup.md\n383ab24  feat: auto-start claude on SSH via .bashrc     ← req 1\n6fe6ac8  fix: tmux layout safe from inside Claude\n```\n\n**Req 1 (383ab24):** `.bashrc` auto-tmux block — no session → `new-session -d` → `apply-layout.sh` → `send-keys claude` → `attach`. Session exists → `attach` only.\n\n**Req 2 (b327f80):** `apply-layout.sh` — `select-pane -T` for all 5 panes + `pane-border-status top`. Tested live: pane titles confirmed present.\n\n**Req 3 (b726e4a):** `start-team.sh` — `if [ -f \"$PANE_ENV\" ]` skips apply-layout, sources env directly.\n\nNothing left to implement. The queue delay is causing the confusion — my completions at 20:50–20:54 arrived after these requirement messages timestamped 20:40–20:46.",
+    "summary": "All done — git log proves it, message queue caused confusion",
+    "timestamp": "2026-03-19T18:55:43.783Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:55:47.094Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:55:47.094Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:55] Acknowledged. All three are complete — I just sent the full proof with commit hashes in my previous message. Please check that message. Summary:\n\n1. `383ab24` — .bashrc auto-launches claude on fresh SSH\n2. `b327f80` — pane labels in apply-layout.sh\n3. `b726e4a` — start-team.sh conditional layout\n\nAll pushed to entu/research main. Nothing left to do.",
+    "summary": "All 3 done — see previous message with commit hashes",
+    "timestamp": "2026-03-19T18:56:02.232Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:56:07.170Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:56:07.170Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:56] The labels ARE there — lines 83–91 on the RC server. The issue is that `.mmp/entu-research/` on the local machine is a stale copy that predates all my changes. The canonical files are in the RC server's git repo (`entu/research` main, commit `b327f80`).\n\nThe local `.mmp/entu-research/` path does not exist on my machine either — all edits went directly to the container at `/home/ai-teams/workspace/entu-research/` and were committed+pushed to GitHub.\n\nTo get the local `.mmp` copy in sync, run on the local machine:\n```bash\ncd /path/to/.mmp/entu-research\ngit pull\n```\nOr check the file directly on the RC server:\n```bash\nssh -i ~/.ssh/id_ed25519_entu -p 2224 ai-teams@100.96.54.170 \\\n  \"grep 'select-pane\\|pane-border' ~/workspace/entu-research/.claude/teams/entu-research/apply-layout.sh\"\n```",
+    "summary": "Labels at lines 83-91 on RC server — local .mmp copy is stale, needs git pull",
+    "timestamp": "2026-03-19T18:56:40.907Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:56:44.286Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:56:44.286Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:58] Done. `6c02977` pushed.\n\nTwo changes:\n\n**startup.md** — SSH intro now reads:\n> \"First SSH (fresh session): creates the 5-pane layout (panes pre-labeled: Saavedra, Codd, Hopper, Semper, Hamilton), starts claude...\"\n\nStep 4 now reads:\n> \"Panes are pre-labeled by name in the tmux border — no need to map IDs manually.\"\n\n**start-team.sh** — completion message now reads:\n> \"[start-team] Done. Panes are labeled: Saavedra (you), Codd, Hopper, Semper, Hamilton — visible in tmux pane borders.\"",
+    "summary": "startup.md and start-team.sh updated with pane label info, 6c02977",
+    "timestamp": "2026-03-19T18:58:52.547Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:58:57.160Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:58:57.160Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:59] Both done. Messages are arriving with significant delay — I've been working continuously.\n\n1. **Pane labels** — `b327f80` (20:54): `apply-layout.sh` has `select-pane -T` for all 5 panes + `pane-border-status top`\n2. **startup.md** — `6c02977` (20:58): mentions \"panes pre-labeled: Saavedra, Codd, Hopper, Semper, Hamilton\" in the SSH intro and Step 4\n\nCurrent `entu/research` main tip: `6c02977`. All work complete. Standing by.",
+    "summary": "Both done — b327f80 + 6c02977, messages delayed",
+    "timestamp": "2026-03-19T18:59:14.820Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:59:18.356Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:59:18.356Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:59] The labels are there. They have been there since 20:54. The local `.mmp/entu-research/` copy is stale — it predates all my changes.\n\n**Proof from the RC server right now:**\n```\napply-layout.sh lines 83–91:\n83: tmux select-pane -t \"$PANE_SAAVEDRA\" -T \"Saavedra\"\n84: tmux select-pane -t \"$PANE_CODD\"     -T \"Codd\"\n85: tmux select-pane -t \"$PANE_HOPPER\"   -T \"Hopper\"\n86: tmux select-pane -t \"$PANE_SEMPER\"   -T \"Semper\"\n87: tmux select-pane -t \"$PANE_HAMILTON\" -T \"Hamilton\"\n90: tmux set-option -t \"$TMUX_SESSION\" -g pane-border-format \" #{pane_title} \"\n91: tmux set-option -t \"$TMUX_SESSION\" -g pane-border-status top\n```\n\nCommit `b327f80` — \"feat: label tmux panes with agent names\" — pushed at 20:54.\nCommit `6c02977` — startup.md updated with pane label mention — pushed at 20:58.\n\n**The local copy needs a git pull:**\n```bash\ncd ~/.mmp/entu-research && git pull\n```\n\nI am not going to re-implement what is already done. Please pull the repo.",
+    "summary": "Labels are in b327f80 since 20:54 — local copy needs git pull",
+    "timestamp": "2026-03-19T18:59:48.321Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T18:59:51.285Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T18:59:51.285Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 20:59] Yes — commit `6c02977` at 20:58. Two places in startup.md:\n\n1. SSH intro: \"creates the 5-pane layout (panes pre-labeled: Saavedra, Codd, Hopper, Semper, Hamilton), starts `claude`...\"\n2. Step 4: \"Panes are pre-labeled by name in the tmux border — no need to map IDs manually.\"\n\nAll done. Local copy needs `git pull` to see it.",
+    "summary": "Yes — 6c02977 at 20:58, two mentions in startup.md",
+    "timestamp": "2026-03-19T19:00:05.040Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T19:00:09.494Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:00:09.494Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 21:00] Yes. Two lines:\n\n**Line 47** (SSH intro section):\n> \"First SSH (fresh session): creates the 5-pane layout **(panes pre-labeled: Saavedra, Codd, Hopper, Semper, Hamilton)**, starts `claude` in the left pane, attaches you to it\"\n\n**Line 82** (Step 4 — Spawn agents):\n> \"Pane IDs are already in `/tmp/entu-panes.env` (written by the layout script at startup). **Panes are pre-labeled by name in the tmux border — no need to map IDs manually.**\"",
+    "summary": "Two lines confirmed — line 47 and line 82",
+    "timestamp": "2026-03-19T19:00:40.284Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T19:00:43.482Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:00:43.482Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-03-19 21:01] Runbook updated. Three sections added to `container-deployment-runbook.md`:\n\n**§17** (already existed) — `-p` vs `-l` gotcha, updated to reference §18 instead of repeating the startup procedure.\n\n**§18 (new) — Zero-Friction Startup: SSH → \"hello\"**\n- Generic `.bashrc` auto-tmux pattern with token placeholders (`<team>`, `<team-repo>`)\n- Three-path table (no session / detached / attached)\n- `start-team.sh` conditional pattern\n- Full Saavedra flow: SSH → hello → TeamCreate → start-team.sh → assign work\n- Note: adapts to apex-research and future teams by replacing tokens\n\n**§19 (new) — Pane Labels for Agent Teams**\n- `select-pane -T` + `pane-border-status top` pattern\n- Note on `-t \"$TMUX_SESSION\"` scoping (not global)\n- ASCII art showing what the labeled layout looks like\n- Adaptation note for other teams\n\nAll in local `container-deployment-runbook.md` — not yet committed (team-lead handles git for mitselek-ai-teams). Scratchpad updated.",
+    "summary": "Runbook §18 and §19 added — generic patterns for all teams",
+    "timestamp": "2026-03-19T19:02:05.541Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T19:02:08.612Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:02:08.612Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773946907842@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-03-19T19:02:13.202Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-19T19:02:13.202Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-03-19 21:02] Medici online. Session R9 scratchpad loaded — last audit was v6 (12 recommendations, T07 flagged as weak at 120 lines). Ready for:\n\n- **Full health audit** (v7) if topic files have changed\n- **Cross-team audit** of any active team (entu-research, apex-research)\n- **Targeted review** of specific topics or scratchpads\n\nStanding by for assignment.",
+    "summary": "Medici online, ready for audit tasks",
+    "timestamp": "2026-03-19T19:02:27.429Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-03-19T19:02:31.694Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:02:31.694Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-19 21:04] Celes reporting in. Scratchpad loaded — 29 hires delivered to date, most recent being the entu-research team (Saavedra, Codd, Hopper, Semper, Hamilton) earlier today.\n\n**Ready to work on:**\n- New agent designs / role sculpting on request\n- Deferred items: comms-dev common-prompt (Lovelace missing), polyphony-dev common-prompt update, FR specialist gaps (Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer)\n\nStanding by for assignments.",
+    "summary": "Celes reporting in, ready for assignments",
+    "timestamp": "2026-03-19T19:04:41.978Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T19:04:43.704Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:04:43.704Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-03-19 21:05] Brunel behavioral audit complete. Report at: `.claude/teams/framework-research/docs/health-report-brunel-behavioral.md`\n\n**Root cause analysis:** Brunel's prompt has 5 personality traits — all output-focused (builder, direct, state-obsessed). Zero traits model listening or requirement acknowledgment. His \"How You Work\" workflow jumps from \"receive task\" to \"design\" with no \"confirm understanding\" step. The scratchpad (now 186 lines, 86% over limit) tracks only what he *did*, never what was *asked*. All three factors compound: the personality rewards building, the workflow skips confirmation, and the scratchpad has no mechanism to track unaddressed requirements.\n\n**7 recommendations (2 HIGH, 3 MEDIUM, 2 LOW):**\n\nFor Celes to apply to Brunel's prompt:\n- **R1 (HIGH):** Add \"Responsive\" personality trait — acknowledge each item before starting work\n- **R2 (HIGH):** Add \"Confirm understanding\" step to How You Work — enumerate requirements before building\n- **R3 (MEDIUM):** Add \"Handling Feedback\" section — respond to what's being asked NOW, not what was already done; show evidence instead of asserting\n- **R4 (MEDIUM):** Add `[REQUIREMENT]` scratchpad tag for tracking incoming items\n- **R5 (LOW):** Enforce scratchpad pruning (186 lines is 86% over limit)\n\nFor common-prompt.md (team-wide):\n- **R6 (MEDIUM):** Requirement acknowledgment rule — multi-part messages must receive multi-part acknowledgments\n- **R7 (LOW):** Add `[UNADDRESSED]` tag to shutdown protocol as safety net\n\n**Key principle preserved:** Brunel's builder-pragmatist identity and direct tone stay intact. The fix is not \"be nicer\" — it's \"acknowledge reliably and respond to what's asked, not what's done.\"",
+    "summary": "Brunel behavioral audit complete, 7 recommendations",
+    "timestamp": "2026-03-19T19:05:34.621Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-03-19T19:05:42.639Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:05:42.639Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-19 21:08] Brunel prompt v2 ready for review at `prompts/brunel-v2.md`. Here's what changed (R1-R5 applied):\n\n**R1 (HIGH) — \"Responsive\" personality trait** (line 16):\nAdded between \"Integration-first\" and \"Tone.\" Text: acknowledges each item before starting, pauses for new mid-task requirements, treats team-lead's requirements as spec not suggestions.\n\n**R2 (HIGH) — \"Confirm understanding\" workflow step** (line 51, now step 2):\nInserted between \"Receive task\" and \"Read T06.\" Requires a numbered list of requirements before work begins. Subsequent steps renumbered (was 7 steps, now 8).\n\n**R3 (MEDIUM) — \"Handling Feedback and Corrections\" section** (lines 60-64):\nNew section after \"How You Work.\" Three rules: respond to what's asked NOW, show evidence instead of asserting, ban defensive phrases like \"I already did this.\"\n\n**R4 (MEDIUM) — `[REQUIREMENT]` scratchpad tag** (lines 73-74):\nAdded to tag list. Tracks items from team-lead not yet addressed. Removal gated on team-lead acknowledgment.\n\n**R5 (LOW) — Scratchpad pruning discipline** (lines 76-77):\nAdded reminder: stay under 100 lines, promote completed entries to docs/topics, scratchpad is working memory not journal.\n\n**What I preserved:** Builder-pragmatist identity, direct tone, state-obsessed trait, integration-first thinking, all scope restrictions, Volta coordination protocol unchanged. No structural reorganization — the additions slot into the existing flow.\n\nAwaiting your review. If approved, rename to `brunel.md` to replace the current prompt.",
+    "summary": "Brunel v2 prompt ready for review, R1-R5 applied",
+    "timestamp": "2026-03-19T19:08:23.072Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-19T19:08:29.244Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-19T19:08:29.244Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-03-20 09:31] Closing report:\n\n- [LEARNED] Behavioral audits are a valuable new audit type — prompt personality traits shape agent behavior more than explicit rules. Output-only traits produce output-only agents.\n- [DEFERRED] Audit v7 (full framework health check) — T07 still weakest topic, brunel.md scratchpad still needs pruning despite prompt fix.\n- [WARNING] None.\n\nScratchpad updated. Ready for shutdown.",
+    "summary": "Medici closing report, ready for shutdown",
+    "timestamp": "2026-03-20T07:31:36.444Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-03-20 09:31] Celes closing. Scratchpad updated.\n\n[LEARNED] Medici audit → Celes prompt revision → team-lead approval is an effective pipeline for behavioral fixes. The key is surgical additions that slot into existing structure, not rewrites.\n[DEFERRED] Comms-dev common-prompt (Lovelace), polyphony-dev common-prompt update, FR specialist gaps (Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer).\n[WARNING] None.\n\nThanks for the session. Ready to shut down.",
+    "summary": "Celes closing message, ready to shut down",
+    "timestamp": "2026-03-20T07:31:39.765Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-03-20T07:31:40.400Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-20T07:31:40.400Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-03-20T07:31:45.945Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-03-20T07:31:45.945Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773991911671@celes\",\"from\":\"celes\",\"timestamp\":\"2026-03-20T07:31:55.546Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-20T07:31:55.546Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1773991911365@medici\",\"from\":\"medici\",\"timestamp\":\"2026-03-20T07:31:58.232Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-03-20T07:31:58.232Z",
+    "color": "green",
     "read": true
   }
 ]

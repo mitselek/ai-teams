@@ -318,8 +318,22 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773944721748@celes\",\"from\":\"team-lead\",\"reason\":\"R11 session complete.\",\"timestamp\":\"2026-03-19T18:25:21.748Z\"}",
-    "timestamp": "2026-03-19T18:25:21.748Z",
+    "text": "[2026-03-19 21:06] Task: Adjust Brunel's prompt based on Medici's behavioral audit.\n\nRead Medici's report at: `.claude/teams/framework-research/docs/health-report-brunel-behavioral.md`\n\nThen read Brunel's current prompt at: `.claude/teams/framework-research/prompts/brunel.md`\n\nApply recommendations R1-R5 from the report to Brunel's prompt:\n- R1 (HIGH): Add \"Responsive\" personality trait — acknowledge each item before starting work\n- R2 (HIGH): Add \"Confirm understanding\" step to How You Work — enumerate requirements before building\n- R3 (MEDIUM): Add \"Handling Feedback\" section — respond to what's being asked NOW, not what was already done; show evidence instead of asserting\n- R4 (MEDIUM): Add `[REQUIREMENT]` scratchpad tag for tracking incoming items\n- R5 (LOW): Enforce scratchpad pruning reminder\n\nKey constraint: Keep Brunel's builder-pragmatist identity and direct tone intact. This is NOT about making him nicer — it's about making him acknowledge reliably and respond to what's asked.\n\nWrite the updated prompt. Do NOT edit the existing file directly — write your proposed changes and present them to me for review.",
+    "summary": "Apply Medici's audit to Brunel's prompt",
+    "timestamp": "2026-03-19T19:06:54.607Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-03-20 00:10] PO says good session and thanks you. The Brunel prompt revision was clean — surgical changes that keep his personality while fixing the listening gap. Prompt replaced, common-prompt updated with R6+R7. Shutting down now.",
+    "summary": "PO thanks you, shutting down",
+    "timestamp": "2026-03-20T07:30:51.327Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773991911671@celes\",\"from\":\"team-lead\",\"reason\":\"Session complete. Save any notes to scratchpad.\",\"timestamp\":\"2026-03-20T07:31:51.671Z\"}",
+    "timestamp": "2026-03-20T07:31:51.671Z",
     "read": true
   }
 ]
