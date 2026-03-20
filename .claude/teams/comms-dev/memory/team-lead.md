@@ -1,56 +1,74 @@
 # Team Lead Scratchpad
 
-## [CHECKPOINT] 2026-03-14 17:34
+## [CHECKPOINT] 2026-03-20 08:07
 
 ### Session Summary
-- Built v1 comms system: broker, crypto, transport, inbox, bridge, CLI tools
-- 212 tests passing, 27 tasks completed
-- Cross-container UDS test: CD↔FR messages partially worked (FR→CD unreliable)
-- Root cause: UDS sockets don't work reliably across Docker container namespaces
-- Pivoted to centralized relay architecture
+- Pivoted from CF relay (#7/#8) to **cross-team secure messaging** with per-team daemon mesh
+- Brainstorm → spec → implementation in one session
+- **409 tests passing across 21 files**, all 6 phases complete
+- Lovelace joined the team (frontend → CLI/TUI tooling engineer pivot)
 
-### Architecture Decision: Cloudflare Stack (Issue #7 + #8)
-- **Relay:** Cloudflare Durable Object (WS hibernation API, socket tags)
-- **DB:** Cloudflare D1 (managed SQLite, persistent history from day one)
-- **API:** Cloudflare Worker (REST + WS upgrade → DO dispatch)
-- **Frontend:** SvelteKit 2 + Svelte 5 + TailwindCSS 4 on CF Pages
-- **Auth:** RELAY_TOKEN (agents) + WebAuthn/passkeys (browsers)
-- **Crypto:** COMMS_PSK for agent E2E, transport-only TLS for web users v1
-- **Deploy:** `wrangler` CLI, no Docker/Caddy
+### Architecture: Cross-Team Messaging v2
 
-### Key Design Constraints (from FR)
-- DO hibernation kills in-memory state — use socket tags + `ctx.getWebSockets(tag)`
-- Store-and-forward → DO Storage (not RAM)
-- TTL sweep → DO Alarm (not setInterval)
-- D1: no multi-statement queries, PRAGMA foreign_keys no-op in migrations
-- DO does NOT need D1 bindings — Worker handles all D1
+```
+Agent → MCP (CrossTeamSend) → Local Daemon → [persistent mTLS tunnel] → Remote Daemon → Recipient Inbox
+```
 
-### Blocking Prerequisites
-- [ ] Domain from PO (for WebAuthn rpId)
-- [ ] Cloudflare paid plan ($5/mo for DO)
+- **Per-team relay daemon** — key holder, ACL enforcer, transport
+- **mTLS tunnels** — persistent, encrypted transport (per-team ECDSA P-256 keypair)
+- **Plaintext inside tunnel** — no per-message crypto
+- **Per-agent ACL** — one-directional, wildcard support, default-deny, SIGHUP hot-reload
+- **At-least-once delivery** — ACK per message, retry with exponential backoff, dedup by message ID
+- **Trust model** — OS isolation inside container, zero trust between containers
+- **Hard invariant** — `from.team === peerCertCN` (close connection on mismatch, no NACK)
+- **Key provisioning** — pre-provisioned (.ssh model), daemon is pure consumer
+- **UDS control socket** — JSON-over-UDS for send, status, reload, peers commands
 
-### Build Sequence
-1. comms-relay/ — DO + Worker + D1 schema (#7)
-2. Web frontend — SvelteKit + WebAuthn + Playwright (#8)
+### Key Directory Layout
+```
+/run/secrets/comms/
+  daemon.key, daemon.crt
+  peers/*.crt
+  acl.json
+```
 
-### [DEFERRED] New team member "Lovelace" (frontend specialist, Sonnet)
-- FR proposed, comms-dev accepted
-- Hire when #8 starts
+### Implementation (6 Phases, TDD)
+| Phase | Files | Tests | Author |
+|---|---|---|---|
+| 1 Crypto | tls-config.ts, acl.ts | 60 | Vigenere |
+| 2 Transport | tls-server.ts, tls-client.ts, tunnel-manager.ts | ~47 | Babbage |
+| 3 Daemon | daemon-v2.ts | 17 | Babbage |
+| 4 MCP tool | cross-team-send.ts + UDS protocol | 16 | Babbage |
+| 5.1 CLI | comms-keys.ts | 20 | Lovelace |
+| 5.2 CLI | comms-acl.ts | 29 | Lovelace |
+| 5.3 CLI | comms-daemon.ts | 19 | Lovelace |
+| 6 E2E | cross-team-e2e.test.ts | 9 | Kerckhoffs |
 
-### [DEFERRED] v2 browser E2E (per-session X25519 via Web Crypto API)
+### GitHub Issues
+- #13 — Brainstorm decisions (open)
+- #14 — Test plan + security matrix (open)
+- #15 — Crypto implementation spec (open)
+- #16 — Protocol spec (open)
+- #17 — CLI tooling spec (open)
+- #18 — Implementation plan (open)
 
-### Issues
-- #1 — Protocol spec (open, testing instructions posted)
-- #2 — Checksum bypass (closed, fixed)
-- #7 — RFC: Central relay (open, all decisions resolved)
-- #8 — RFC: Web frontend (open, FR reviewed)
+### [LEARNED] TLS 1.3 gotchas (from Babbage)
+- `rejectUnauthorized: false` skips `checkServerIdentity` — verify fingerprint manually in `secureConnect`
+- `server.close(cb)` blocks until all connections close — track + destroy sockets in test helpers
+- Client fires `secureConnect` BEFORE server fires `secureConnection` on loopback
+
+### [DEFERRED] Items for v2+
+- Per-agent Ed25519 signatures (non-repudiation)
+- Online key rotation
+- Dynamic peer discovery
+- Persistent dedup across daemon restart
+- Daemon query interface (beyond UDS)
+- Container isolation verification tests
+- Clock skew tolerance testing
+- Cert rotation workflow
 
 ### Agent Status
-- vigenere: standing by, crypto module is transport-agnostic (100% reuse)
-- babbage: standing by, needs to adapt design for DO hibernation
-- kerckhoffs: standing by, Playwright required for web frontend testing
-
-### v1 Code Reuse for v2
-- 100%: crypto/*, message-store, inbox, sendmessage-bridge, stable-stringify
-- 80-90%: types.ts (add conversation_id), message-builder (add conversation_id to AAD)
-- 0%: transport/*, discovery/* (UDS-specific, replaced)
+- vigenere: Phase 1 delivered (tls-config + acl)
+- babbage: Phase 2+3+4 delivered (transport + daemon + MCP tool) — session MVP
+- kerckhoffs: RED tests for all phases + E2E integration
+- lovelace: Phase 5 delivered (all 3 CLI tools), pivoted from frontend to CLI/TUI
