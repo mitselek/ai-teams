@@ -217,3 +217,7 @@ Final flow: SSH → .bashrc creates layout + starts claude → PO lands in Claud
 - statusline-command.sh: HR-DEVS blue badge, npm test cache at /tmp/hr-devs-test-status.txt
 
 [GOTCHA] 2026-03-20 — hr-devs Vite port: apex uses 5173 on host. hr-devs must use 5178 (npm run dev -- --port 5178). Documented in startup.md + VITE_PORT in .bashrc. Wrangler dev = 8787 (no conflict).
+
+[LEARNED] 2026-03-20 — Layout confusion: no full-review.json exists. Only default.json, full.json, lite.json in hr-devs layouts/. full-review is defined only in tmux-layouts.md. Bake split tree directly into apply-layout.sh — no JSON file needed.
+
+[DEFERRED] 2026-03-20 — hr-devs container not yet deployed to RC server. Next step: SCP files, docker build, first-run OAuth.
