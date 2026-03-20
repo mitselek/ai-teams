@@ -137,6 +137,7 @@ Container on RC server (`dev@100.96.54.170`), following the apex-research / entu
 
 ### Container requirements
 
+- **Base image: Debian** (not Ubuntu)
 - Node.js (for Claude Code)
 - `gh` CLI
 - Git
