@@ -619,9 +619,9 @@ Additional flags:
 
 ```bash
 # From external SSH (simulates Bash tool subprocess context):
-ssh -p 2224 ai-teams@host "bash ~/workspace/entu-research/.claude/teams/entu-research/apply-layout.sh entu"
+ssh -p <port> ai-teams@host "bash ~/workspace/<team-repo>/.claude/teams/<team>/apply-layout.sh <session>"
 # Should print pane IDs and succeed — no "size missing"
-tmux list-panes -t entu  # should show 5 panes
+tmux list-panes -t <session>  # should show expected pane count
 ```
 
 ---
@@ -661,11 +661,12 @@ AUTOTMUX_EOF
 | Session exists, detached | Straight to `exec attach-session` |
 | Session exists, attached | Straight to `exec attach-session` (opens second client) |
 
-**`apply-layout.sh` idempotency:** Only call from `.bashrc` (path 1). If Saavedra needs to re-run layout manually from inside Claude, `apply-layout.sh` is safe to call from the Bash tool (uses `-l` absolute sizes — see §17).
+**`apply-layout.sh` idempotency:** Only call from `.bashrc` (path 1). If the team lead needs to re-run layout manually from inside Claude, `apply-layout.sh` is safe to call from the Bash tool (uses `-l` absolute sizes — see §17).
 
-**`start-team.sh` idempotency:** Make it conditional on `/tmp/entu-panes.env`:
+**`start-team.sh` idempotency:** Make it conditional on the pane env file:
 
 ```bash
+PANE_ENV="/tmp/<session>-panes.env"
 if [ -f "$PANE_ENV" ]; then
     source "$PANE_ENV"   # layout already done
 else
@@ -675,10 +676,10 @@ fi
 # then spawn agents...
 ```
 
-**Result for Saavedra:**
+**Result for the team lead:**
 
 ```
-SSH → [auto: 5 panes created, claude starts] → "hello"
+SSH → [auto: panes created + labeled, claude starts] → "hello"
 → TeamCreate → start-team.sh (spawn agents) → assign work
 ```
 
@@ -693,24 +694,23 @@ SSH → [auto: 5 panes created, claude starts] → "hello"
 **Pattern:** In `apply-layout.sh`, after all panes are created and before writing the env file:
 
 ```bash
-# Label panes with agent names
-tmux select-pane -t "$PANE_SAAVEDRA" -T "Saavedra"
-tmux select-pane -t "$PANE_CODD"     -T "Codd"
-tmux select-pane -t "$PANE_HOPPER"   -T "Hopper"
-tmux select-pane -t "$PANE_SEMPER"   -T "Semper"
-tmux select-pane -t "$PANE_HAMILTON" -T "Hamilton"
+# Label panes with agent names (replace with team's actual agent names)
+tmux select-pane -t "$PANE_LEAD"    -T "team-lead"
+tmux select-pane -t "$PANE_AGENT1"  -T "agent1"
+tmux select-pane -t "$PANE_AGENT2"  -T "agent2"
+# ... one line per agent
 
-# Show labels in pane borders
-tmux set-option -t "$TMUX_SESSION" -g pane-border-format " #{pane_title} "
-tmux set-option -t "$TMUX_SESSION" -g pane-border-status top
+# Show labels in pane borders — scoped to this session only
+tmux set-option -t "$TMUX_SESSION" pane-border-format " #{pane_title} "
+tmux set-option -t "$TMUX_SESSION" pane-border-status top
 ```
 
 **Notes:**
 
-- `select-pane -T` sets the pane title. This persists for the session lifetime.
-- `pane-border-status top` shows the border line above each pane with the title.
-- Use `-t "$TMUX_SESSION"` on `set-option` (not `-g` alone) to scope to this session rather than the tmux server global config.
-- Add a corresponding note in `startup.md` so agents know the labels are there without having to discover them visually.
+- `select-pane -T` sets the pane title. Persists for the session lifetime.
+- `pane-border-status top` shows a border line above each pane with the title.
+- Use `-t "$TMUX_SESSION"` on `set-option` **without** `-g` — scopes to this session only. Using `-g` changes the global tmux server config, affecting all sessions on the host.
+- Add a corresponding note in `startup.md` so agents know pane labels exist without having to discover them visually.
 
 **Result:** PO attaches and sees:
 
@@ -895,5 +895,51 @@ The pane env file is written by `apply-layout.sh` to `/tmp/<session>-panes.env` 
 ### If you omit --target-pane
 
 `spawn_member.sh` falls back to `split-window`, creating a new pane by splitting the last active pane. This works but produces an uncontrolled layout. Prefer `--target-pane` with a pre-created layout for predictable results.
+
+---
+
+## §22. Avoiding Duplicate Pane Map Output
+
+**Symptom:** The pane ID table (saavedra → %1, codd → %2, …) prints twice when Saavedra runs `start-team.sh` after the auto-tmux `.bashrc` hook already ran `apply-layout.sh`.
+
+**Cause:** Both `apply-layout.sh` and `start-team.sh` echo the pane map. When `.bashrc` calls `apply-layout.sh` on login and then Saavedra calls `start-team.sh`, the table appears twice.
+
+**Fix:** Print the pane map only in `apply-layout.sh` (the source of truth). `start-team.sh` should only print a completion summary, not re-echo the IDs.
+
+```bash
+# apply-layout.sh — print pane IDs here (once)
+echo "  codd     → $PANE_CODD"
+echo "  hopper   → $PANE_HOPPER"
+# ...
+echo "[apply-layout] Done. Pane IDs written to $PANE_ENV"
+
+# start-team.sh — do NOT repeat the pane map
+echo "[start-team] Done. All 4 agents spawned."
+echo "Panes are labeled in the tmux borders. Wait for intro messages."
+```
+
+**Rule for new teams:** `apply-layout.sh` owns pane ID reporting. `start-team.sh` owns spawn status reporting. No overlap.
+
+---
+
+## §23. set-option -g Scope Leak
+
+**Symptom:** After running `apply-layout.sh`, other tmux sessions on the same host unexpectedly show pane borders with agent name labels.
+
+**Cause:** `tmux set-option -t "$SESSION" -g pane-border-format " #{pane_title} "` — the `-g` flag overrides the session scope and sets the option globally on the tmux server, affecting all sessions.
+
+**Fix:** Remove `-g`. Session-scoped `set-option` does not need it:
+
+```bash
+# BAD — sets globally, affects all sessions on the host
+tmux set-option -t "$TMUX_SESSION" -g pane-border-format " #{pane_title} "
+tmux set-option -t "$TMUX_SESSION" -g pane-border-status top
+
+# GOOD — scoped to this session only
+tmux set-option -t "$TMUX_SESSION" pane-border-format " #{pane_title} "
+tmux set-option -t "$TMUX_SESSION" pane-border-status top
+```
+
+**Note:** `-t "$SESSION"` without `-g` already scopes the option to that session. The `-g` flag explicitly un-scopes it. They are mutually exclusive in intent.
 
 (*FR:Brunel*)

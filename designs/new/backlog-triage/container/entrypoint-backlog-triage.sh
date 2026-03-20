@@ -258,17 +258,22 @@ set -g status-interval 5
 TMUX_EOF
 chown "${CONTAINER_UID}:${CONTAINER_GID}" "${HOME_DIR}/.tmux.conf"
 
-# Auto-tmux on SSH login.
-# If no session: create named session + start claude.
-# If session exists (detached or attached): attach.
+# Auto-tmux on SSH login (runbook §18 pattern).
+# Path 1: no session — create layout (4 labeled panes) + start claude in team-lead pane.
+# Path 2/3: session exists (detached or attached) — attach directly.
+#
+# apply-layout.sh is baked into the image at /home/ai-teams/apply-layout.sh
+# (COPYed in Dockerfile) so it's available before any repo is cloned.
 sed -i '/^# auto-tmux:/,/^fi$/{d}' "${BASHRC}"
 cat >> "${BASHRC}" << 'AUTOTMUX_EOF'
 # auto-tmux: attach or create session on SSH login
 if [ -z "$TMUX" ] && [ -n "$SSH_CONNECTION" ]; then
     cd /home/ai-teams/workspace/hr-platform
     TMUX_SESSION="backlog-triage"
+    LAYOUT_SCRIPT="/home/ai-teams/apply-layout.sh"
     if ! tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
         tmux new-session -d -s "$TMUX_SESSION" -c /home/ai-teams/workspace/hr-platform
+        bash "$LAYOUT_SCRIPT" "$TMUX_SESSION"
         tmux send-keys -t "$TMUX_SESSION" "claude" Enter
     fi
     exec tmux -u attach-session -t "$TMUX_SESSION"

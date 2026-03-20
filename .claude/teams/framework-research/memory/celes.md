@@ -18,7 +18,7 @@
 [PATTERN] "Agent PO" is an anti-pattern — PO is always the human. Agent should be "Requirements Analyst" with explicit escalation rules.
 [GOTCHA] Count **characters**, not roles-plus-characters. Team-lead IS one of the characters. "5-character team" not "team-lead + 5 agents = 6."
 
-## Hires Delivered (cumulative — 29 agents)
+## Hires Delivered (cumulative — 33 agents)
 
 | Agent | Lore | Team | Model | Date |
 |---|---|---|---|---|
@@ -51,6 +51,14 @@
 | Hopper | Grace Hopper | ER | opus | 2026-03-19 |
 | Semper | Gottfried Semper | ER | opus | 2026-03-19 |
 | Hamilton | Margaret Hamilton | ER | opus | 2026-03-19 |
+| Theseus | Greek mythology | BT TL | opus | 2026-03-20 |
+| Hypatia | Hypatia of Alexandria | BT | sonnet | 2026-03-20 |
+| Vidocq | E.F. Vidocq | BT | sonnet | 2026-03-20 |
+| Portia | Shakespeare | BT | opus | 2026-03-20 |
+
+## Session 2026-03-20
+
+[DECISION] backlog-triage team: 4 characters. Pipeline team (Lead→Archivist→Forensic→Consul→Lead). Lore theme: Seekers of Truth — each character finds truth through a different lens (navigation, records, evidence, judgment). Opus for judgment roles (lead, consul), sonnet for pattern-matching roles (archivist, forensic).
 
 ## Session 2026-03-19 (R10-R11)
 

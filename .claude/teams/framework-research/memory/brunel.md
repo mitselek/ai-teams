@@ -222,3 +222,20 @@ Final flow: SSH → .bashrc creates layout + starts claude → PO lands in Claud
 [LEARNED] 2026-03-20 — Layout confusion: no full-review.json exists. Only default.json, full.json, lite.json in hr-devs layouts/. full-review is defined only in tmux-layouts.md. Bake split tree directly into apply-layout.sh — no JSON file needed.
 
 [DEFERRED] 2026-03-20 — hr-devs container not yet deployed to RC server. Next step: SCP files, docker build, first-run OAuth.
+
+[CHECKPOINT] 2026-03-20 — backlog-triage container designed and deployed:
+
+- Dockerfile.backlog-triage: Debian bookworm-slim base (not Ubuntu/ai-teams-claude), installs from scratch, SSH port 2226, no Wrangler, no Dynamics
+- docker-compose.backlog-triage.yml: SSH only (2226), volumes bt-claude-home + bt-repo, Jira+Atlassian env vars, no Cloudflare
+- entrypoint-backlog-triage.sh: 11 steps, Jira MCP only, settings.json with git/gh allow list
+- Deployed to RC server at ~/backlog-triage/, all gates passed, OAuth copied from apex-research
+- SSH: ssh -i ~/.ssh/id_ed25519 -p 2226 ai-teams@100.96.54.170
+
+[CHECKPOINT] 2026-03-20 — runbook §22 + §23 added:
+
+- §22: duplicate pane map output — apply-layout.sh owns pane ID reporting, start-team.sh owns spawn status only
+- §23: set-option -g scope leak — -g with -t SESSION is contradictory, affects all sessions on host
+
+[GOTCHA] 2026-03-20 — entu apply-layout.sh had -g on set-option (global scope leak) AND echoed pane IDs that start-team.sh also echoed (duplicate output). Both fixed. entu-research has 3 uncommitted changes.
+
+[GOTCHA] 2026-03-20 — RC server container dirs are NOT under ~/containers/ — each team has its own flat dir (~/entu-research/, ~/backlog-triage/, etc.).

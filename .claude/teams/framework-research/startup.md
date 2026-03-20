@@ -43,6 +43,7 @@ On every session start, read these files in this exact order:
 | 2 | `roster.json` | Team members, models, roles |
 | 3 | `common-prompt.md` | Mission, communication rules, shutdown protocol |
 | 4 | `memory/team-lead.md` | Your prior session's decisions, WIP, warnings |
+
 After these 4 reads, you know everything you need to execute the startup protocol. Zero exploration required.
 
 ## Startup Procedure
@@ -57,6 +58,7 @@ Field test (2026-03-13) showed the team-lead scrambled the phase order AND misla
 REPO="$(git rev-parse --show-toplevel)"
 cd "$REPO" && git pull
 ```
+
 **Verify:** Output says "Already up to date" or shows pulled changes.
 
 ### Step 2: Diagnose
@@ -84,6 +86,7 @@ TEAM_DIR="$HOME/.claude/teams/framework-research"
 # Remove stale dir (safe even if it doesn't exist)
 rm -rf "$TEAM_DIR"
 ```
+
 **Verify:** `ls "$TEAM_DIR"` returns "No such file or directory".
 
 ### Step 4: Create
@@ -93,6 +96,7 @@ TeamCreate(team_name="framework-research")
 ```
 
 **Verify (two checks):**
+
 1. TeamCreate returned success with a `team_file_path` and `lead_agent_id`
 2. Check disk: `ls "$HOME/.claude/teams/framework-research/config.json"`
 
@@ -101,6 +105,7 @@ TeamCreate(team_name="framework-research")
 This happened in Restart 4 (2026-03-13). TeamCreate reported success but config.json did not exist. Agents spawned into this state are wasted — team is non-functional.
 
 **Recovery (max 2 attempts):**
+
 1. `TeamDelete(team_name="framework-research")`
 2. `TeamCreate(team_name="framework-research")`
 3. Re-check disk for config.json
@@ -111,6 +116,7 @@ This happened in Restart 4 (2026-03-13). TeamCreate reported success but config.
 **Do NOT spawn any agent until the team is verified operational.** In Restart 4, an agent was spawned into a broken team state (TeamCreate returned "success" but team was non-functional). The agent was wasted.
 
 **Gate check:** After Step 4, before ANY spawn (Step 6):
+
 - config.json exists on disk: `ls "$HOME/.claude/teams/framework-research/config.json"`
 - If config.json is absent → do NOT proceed. Run Step 4 recovery.
 
@@ -124,6 +130,7 @@ bash "$REPO/.claude/teams/framework-research/restore-inboxes.sh"
 ```
 
 The script handles:
+
 - Precondition check (runtime dir must exist)
 - Copies inbox JSON files from repo to runtime
 - **Prunes stale shutdown/idle messages** (shutdown_request, shutdown_approved, shutdown_response, idle_notification)
@@ -177,6 +184,7 @@ git push
 ```
 
 The persist script handles:
+
 - Copies inbox JSON files from runtime to repo
 - Prunes to last 100 messages per file
 - Verification (source/dest count match)

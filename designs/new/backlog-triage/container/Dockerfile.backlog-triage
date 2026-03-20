@@ -138,9 +138,13 @@ ENV DEBIAN_FRONTEND=
 # WARP note: --insecure for claude.ai/install.sh download (WARP TLS interception).
 RUN gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5
 
-# ── Entrypoint ─────────────────────────────────────────────────────────────────
+# ── Entrypoint + layout script ────────────────────────────────────────────────
+# apply-layout.sh is placed in ai-teams home dir so the entrypoint auto-tmux
+# block can reference it without depending on any cloned repo being present.
 COPY entrypoint-backlog-triage.sh /entrypoint-backlog-triage.sh
-RUN chmod +x /entrypoint-backlog-triage.sh
+COPY apply-layout.sh /home/ai-teams/apply-layout.sh
+RUN chmod +x /entrypoint-backlog-triage.sh /home/ai-teams/apply-layout.sh \
+    && chown 1000:1000 /home/ai-teams/apply-layout.sh
 
 WORKDIR /home/ai-teams/workspace
 
