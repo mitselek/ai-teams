@@ -34,17 +34,20 @@ ls /usr/local/share/ca-certificates/managed-warp*
 **Cause:** WARP rewrites `/etc/resolv.conf` to `127.0.2.2` / `127.0.2.3` (local WARP DNS). Docker copies this into containers, but the WARP DNS listener only binds to the host network namespace — containers on the bridge network can't reach it.
 
 **Fix (daemon.json — applies to all containers):**
+
 ```bash
 # /etc/docker/daemon.json
 {
   "dns": ["1.1.1.1", "8.8.8.8"]
 }
 ```
+
 ```bash
 sudo systemctl restart docker
 ```
 
 **Fix (per-container — if daemon.json isn't enough):**
+
 ```yaml
 # docker-compose.yml
 services:
@@ -67,6 +70,7 @@ services:
 **Fix — Three layers needed:**
 
 ### Layer 1: Bind-mount the CA cert
+
 ```yaml
 # docker-compose.yml
 volumes:
@@ -76,6 +80,7 @@ volumes:
 **WARNING:** Do NOT mount to `/etc/ssl/certs/` — `update-ca-certificates` creates symlinks there and will fail with "Device or resource busy" if a bind mount occupies the target path.
 
 ### Layer 2: System CA store (curl, pip, git)
+
 ```bash
 # In entrypoint, running as root:
 cp /opt/warp-ca.pem /usr/local/share/ca-certificates/warp-ca.crt
@@ -83,6 +88,7 @@ update-ca-certificates --fresh > /dev/null 2>&1
 ```
 
 ### Layer 3: Node.js (Claude Code)
+
 ```yaml
 # docker-compose.yml environment:
 environment:
@@ -92,20 +98,26 @@ environment:
 Node.js does NOT use the system CA store. `NODE_EXTRA_CA_CERTS` is the only way.
 
 ### Layer 3b: Interactive shells
+
 Compose env vars don't propagate through `sudo su` or SSH sessions. Persist in `.bashrc`:
+
 ```bash
 # In entrypoint:
 echo 'export NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem' >> /home/ai-teams/.bashrc
 ```
 
 ### Build-time workaround
+
 During `docker build`, WARP intercepts HTTPS from build steps. For downloads that can't use the system CA store (e.g., NodeSource setup script), use:
+
 ```dockerfile
 RUN curl --insecure -fsSL https://example.com/file.tar.gz -o /tmp/file.tar.gz
 ```
+
 This is acceptable at build time only — the downloaded artifact should be verified by other means (checksum, known filename).
 
 **Verify:**
+
 ```bash
 docker exec mycontainer bash -c 'curl -sI https://api.anthropic.com | head -1'
 # Should return: HTTP/2 404 (or 200)
@@ -123,6 +135,7 @@ docker exec mycontainer bash -c 'node -e "fetch(\"https://api.anthropic.com\").t
 **Cause:** Docker Compose sets env vars on the entrypoint process (PID 1). But `su -` and SSH create new login shells that don't inherit PID 1's environment.
 
 **Fix:** Write env vars to `.bashrc` in the entrypoint:
+
 ```bash
 BASHRC="/home/ai-teams/.bashrc"
 declare -A SHELL_VARS=(
@@ -151,6 +164,7 @@ Use `sed -i` to delete-then-append (not just append) — prevents duplicates on 
 **Cause:** `useradd` creates accounts with a locked password (`!` in `/etc/shadow`). With `UsePAM no` in sshd_config, OpenSSH rejects locked accounts entirely — the key is never checked. Debug log shows: `User michelek not allowed because account is locked`.
 
 **Fix:**
+
 ```dockerfile
 RUN useradd -m -s /bin/bash myuser \
     && usermod -p '*' myuser
@@ -159,6 +173,7 @@ RUN useradd -m -s /bin/bash myuser \
 `*` = "no password" (pubkey auth works). `!` = "locked" (all auth rejected when PAM is off).
 
 **Debug:** Run sshd in debug mode to see the real reason:
+
 ```bash
 docker exec -d mycontainer /usr/sbin/sshd -d -p 2223
 ssh -p 2223 myuser@localhost  # watch debug output
@@ -173,6 +188,7 @@ ssh -p 2223 myuser@localhost  # watch debug output
 **Cause:** `hostname: mycontainer` in docker-compose.yml sets the hostname but doesn't add it to `/etc/hosts`. With `network_mode: host`, Docker doesn't manage the hosts file.
 
 **Fix (in entrypoint):**
+
 ```bash
 if ! grep -q 'mycontainer' /etc/hosts 2>/dev/null; then
     echo "127.0.0.1 mycontainer" >> /etc/hosts
@@ -188,6 +204,7 @@ fi
 **Cause:** Ubuntu noble ships Node.js 18 in the main repo. NodeSource setup script fails behind WARP (SSL interception).
 
 **Fix — Direct binary install:**
+
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && curl --insecure -fsSL \
@@ -199,6 +216,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 ```
 
 **Notes:**
+
 - Use `.tar.gz` not `.tar.xz` — base image may not have `xz`.
 - `--insecure` needed for WARP TLS interception at build time.
 - This overwrites the apt-installed Node.js 18 in `/usr/local/`.
@@ -212,6 +230,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 **Cause:** Base image (`ai-teams-claude:latest`) adds the GitHub CLI apt repo with a GPG key. The key expires or rotates, breaking `apt-get update` in derived images.
 
 **Fix (in derived Dockerfile, before any apt-get):**
+
 ```dockerfile
 RUN rm -f /etc/apt/sources.list.d/github-cli.list \
     && rm -f /usr/share/keyrings/githubcli-archive-keyring.gpg
@@ -228,6 +247,7 @@ RUN rm -f /etc/apt/sources.list.d/github-cli.list \
 **Cause:** Claude Code on the host uses OAuth authentication via `claude login`, storing tokens in `~/.claude/.credentials.json`. There is no `ANTHROPIC_API_KEY`.
 
 **Fix — Copy OAuth credentials into container:**
+
 ```bash
 docker cp ~/.claude/.credentials.json mycontainer:/home/ai-teams/.claude/.credentials.json
 docker exec mycontainer chown 1000:1000 /home/ai-teams/.claude/.credentials.json
@@ -260,6 +280,7 @@ docker exec mycontainer chown 1000:1000 /home/ai-teams/.claude/.credentials.json
 - Agent teams env var enables the experimental team features
 
 **Entrypoint pattern:** Write settings only if file doesn't exist (preserve PO customizations):
+
 ```bash
 if [ ! -f "$SETTINGS_FILE" ]; then
     cat > "$SETTINGS_FILE" << 'EOF'
@@ -276,12 +297,14 @@ fi
 **Symptom:** Container sshd can't bind to port 22 — host sshd already uses it.
 
 **Fix:** Configure container sshd on a different port (e.g., 2222):
+
 ```dockerfile
 RUN sed -i 's/^#\?Port .*/Port 2222/' /etc/ssh/sshd_config \
     && echo 'Port 2222' >> /etc/ssh/sshd_config
 ```
 
 Entrypoint starts sshd explicitly on the port:
+
 ```bash
 /usr/sbin/sshd -p 2222
 ```
@@ -297,6 +320,7 @@ PO connects with: `ssh -p 2222 myuser@host`
 **Cause:** Docker `:ro` flag prevents ALL writes, including root. Can't clone into a read-only volume.
 
 **Fix:** Mount read-write, enforce read-only via filesystem permissions after clone:
+
 ```bash
 # Clone as ai-teams user
 clone_or_pull "$SOURCE_REPO_URL" "$SOURCE_DATA"
@@ -307,6 +331,7 @@ chmod -R a-w,a+rX "$SOURCE_DATA"
 ```
 
 On restart, temporarily unlock for pull, then re-lock:
+
 ```bash
 chmod -R u+w "$SOURCE_DATA"
 chown -R 1000:1000 "$SOURCE_DATA"
@@ -328,6 +353,7 @@ This is a separate problem from §2 (WARP TLS interception for system tools). Bo
 **Fix — Three parts:**
 
 ### Part 1: Bind-mount the cert (docker-compose.yml)
+
 ```yaml
 volumes:
   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
@@ -336,6 +362,7 @@ volumes:
 Mount to `/opt/` — **NOT** to `/etc/ssl/certs/`. The `update-ca-certificates` tool creates symlinks in `/etc/ssl/certs/` and fails with "Device or resource busy" if a bind-mount already occupies a target path there.
 
 ### Part 2: Set NODE_EXTRA_CA_CERTS (docker-compose.yml environment)
+
 ```yaml
 environment:
   - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
@@ -344,15 +371,19 @@ environment:
 Hardcode this value — do not rely on the host env var being set. If `NODE_EXTRA_CA_CERTS` is empty or unset, Claude Code silently falls back to the bundled CA bundle and fails against WARP.
 
 ### Part 3: Persist to .bashrc (entrypoint)
+
 Compose env vars don't propagate to interactive shells (SSH sessions, `docker exec`, `sudo su`). Persist to `.bashrc` in the entrypoint's SHELL_VARS block:
+
 ```bash
 if [ -n "${NODE_EXTRA_CA_CERTS:-}" ]; then
     SHELL_VARS[NODE_EXTRA_CA_CERTS]="${NODE_EXTRA_CA_CERTS}"
 fi
 ```
+
 This covers any Claude Code session started from an interactive shell rather than the container's PID 1.
 
 **Verify:**
+
 ```bash
 docker exec <container> bash -c 'node -e "fetch(\"https://api.anthropic.com\").then(r=>console.log(r.status)).catch(e=>console.error(e.message))"'
 # Should return: 404
@@ -361,7 +392,10 @@ docker exec <container> bash -c 'node -e "fetch(\"https://api.anthropic.com\").t
 
 ---
 
-## §13. Statusline Script in Containerised Teams
+## §13. Statusline Script in Containerised Teams — MANDATORY
+
+> **Checklist item:** Every new team container MUST have statusline configured before handoff to the team.
+> Use §20 (Statusline Deployment Checklist) to verify. Missing statusline = incomplete deployment.
 
 **Symptom:** Claude Code shows no statusline, or shows an error/blank line where the statusline should appear.
 
@@ -373,6 +407,7 @@ docker exec <container> bash -c 'node -e "fetch(\"https://api.anthropic.com\").t
 Keep `statusline-command.sh` in the project repo (e.g., `.claude/statusline-command.sh`). The repo is cloned to a predictable path by the entrypoint (`/home/ai-teams/workspace`). This means the script survives image rebuilds without requiring a Dockerfile change.
 
 **2. `settings.json` references the container path, not the host path.**
+
 ```json
 {
   "statusLine": {
@@ -381,10 +416,12 @@ Keep `statusline-command.sh` in the project repo (e.g., `.claude/statusline-comm
   }
 }
 ```
+
 The path must be the in-container absolute path. On local dev (non-containerised), the path must be adjusted to wherever the repo is checked out — or use a relative path via `$(git rev-parse --show-toplevel)/.claude/statusline-command.sh` if your shell supports it.
 
 **3. The script must never hard-fail.**
 Claude Code suppresses the statusline if the script exits non-zero or produces no output. Every external tool call must be guarded:
+
 ```bash
 # BAD — fails if pnpm not installed
 TESTS=$(pnpm test --reporter=json 2>&1 | jq '.numPassedTests')
@@ -398,6 +435,7 @@ fi
 
 **4. Don't run slow commands live.**
 The statusline script is called on every prompt render. Running `pnpm test` live would block for seconds. Instead, write test results to a temp file after each test run and read the cached value:
+
 ```bash
 # After a test run (agent writes this):
 echo "PASS:42 FAIL:0" > /tmp/polyphony-test-status.txt
@@ -411,11 +449,13 @@ fi
 
 **5. `CLAUDE_ENV_ID` must be set in `.bashrc` (not just compose env).**
 The statusline script reads `CLAUDE_ENV_ID` to show the environment badge. Compose env vars don't propagate to SSH sessions. Persist it in the entrypoint's SHELL_VARS block:
+
 ```bash
 SHELL_VARS[CLAUDE_ENV_ID]="POLY"   # or whatever the container's env ID is
 ```
 
 **Verify:**
+
 ```bash
 # Test the script directly inside the container
 docker exec -u ai-teams <container> bash -c \
@@ -458,6 +498,7 @@ docker exec -u ai-teams <container> bash -c \
 ```
 
 **Rules:**
+
 - `"Bash(*)"` — allow all shell commands. Narrow to specific patterns (e.g. `"Bash(git *)"`) for higher-trust environments.
 - `"WebFetch(domain:...)"` — one entry per domain the agents need to reach. Required for external API calls (Entu, GitHub, Anthropic docs, etc.).
 - `deny` list takes precedence over `allow`. Use it to block specific tools (e.g. `"mcp__jira__jira_update_issue"` for read-only Jira access).
@@ -514,6 +555,7 @@ The session name appears in three places that must all match:
 | entu-research | `entu` |
 
 **Verify:**
+
 ```bash
 tmux list-sessions   # check what name the entrypoint actually created
 ```
@@ -566,6 +608,7 @@ PANE_DATA_COL=$(tmux split-window -t "$PANE_SAAVEDRA" -d -h -l $RIGHT_W -c "$WOR
 ```
 
 Additional flags:
+
 - `-d` — detached: keeps focus on the current pane (Saavedra stays active)
 - `-P -F '#{pane_id}'` — prints the new pane ID to stdout; eliminates fragile `tail -1` pane tracking
 - `tmux display-message -t "$SESSION" -p '#{window_width}'` — reads dimensions from the session, not from a client; works without attachment
@@ -573,6 +616,7 @@ Additional flags:
 **Implication for startup procedure:** With this fix, `apply-layout.sh` is safe to call from any context — `.bashrc`, entrypoint, Claude Bash tool, or external SSH. This enables the zero-friction startup pattern described in §18.
 
 **Verify:**
+
 ```bash
 # From external SSH (simulates Bash tool subprocess context):
 ssh -p 2224 ai-teams@host "bash ~/workspace/entu-research/.claude/teams/entu-research/apply-layout.sh entu"
@@ -620,6 +664,7 @@ AUTOTMUX_EOF
 **`apply-layout.sh` idempotency:** Only call from `.bashrc` (path 1). If Saavedra needs to re-run layout manually from inside Claude, `apply-layout.sh` is safe to call from the Bash tool (uses `-l` absolute sizes — see §17).
 
 **`start-team.sh` idempotency:** Make it conditional on `/tmp/entu-panes.env`:
+
 ```bash
 if [ -f "$PANE_ENV" ]; then
     source "$PANE_ENV"   # layout already done
@@ -631,6 +676,7 @@ fi
 ```
 
 **Result for Saavedra:**
+
 ```
 SSH → [auto: 5 panes created, claude starts] → "hello"
 → TeamCreate → start-team.sh (spawn agents) → assign work
@@ -660,6 +706,7 @@ tmux set-option -t "$TMUX_SESSION" -g pane-border-status top
 ```
 
 **Notes:**
+
 - `select-pane -T` sets the pane title. This persists for the session lifetime.
 - `pane-border-status top` shows the border line above each pane with the title.
 - Use `-t "$TMUX_SESSION"` on `set-option` (not `-g` alone) to scope to this session rather than the tmux server global config.
@@ -679,6 +726,91 @@ tmux set-option -t "$TMUX_SESSION" -g pane-border-status top
 
 ---
 
+## §20. Statusline Deployment Checklist — MANDATORY FOR EVERY NEW CONTAINER
+
+Run this checklist before marking a container deployment complete. All three items are required.
+
+### Item 1: statusline-command.sh exists in the repo
+
+The script must be committed to the team's repo at `.claude/statusline-command.sh`:
+
+```bash
+# Verify from inside the container:
+ls -la ~/workspace/<team-repo>/.claude/statusline-command.sh
+# Must exist and be executable (mode 755)
+```
+
+If missing, copy from an existing team. The apex-research container has the canonical script at
+`/home/ai-teams/workspace/entu-research/.claude/statusline-command.sh` (also committed to `entu/research`
+after the 2026-03-20 live fix). The script must be committed and pushed — container rebuilds clone fresh.
+
+### Item 2: settings.json has statusLine entry
+
+```bash
+# Verify from inside the container:
+python3 -c "import json,sys; d=json.load(open('/home/ai-teams/.claude/settings.json')); print('OK' if 'statusLine' in d else 'MISSING')"
+```
+
+If missing, add:
+
+```json
+"statusLine": {
+  "type": "command",
+  "command": "bash /home/ai-teams/workspace/<team-repo>/.claude/statusline-command.sh"
+}
+```
+
+Adjust `<team-repo>` to the actual directory name. The path must be the in-container absolute path.
+
+### Item 3: CLAUDE_ENV_ID is set in .bashrc
+
+```bash
+# Verify:
+grep 'CLAUDE_ENV_ID' ~/.bashrc
+# Must show: export CLAUDE_ENV_ID=<TEAM-ID>
+```
+
+Convention: `APEX-R` (apex-research), `POLY` (polyphony-dev), `ENTU-R` (entu-research).
+Use 2–10 chars, A-Z0-9 and hyphen only. If missing, add to the entrypoint's `SHELL_VARS` block.
+
+### Smoke test (all three items together)
+
+```bash
+# Run inside the container with the entu key or the team's SSH key:
+export CLAUDE_ENV_ID=$(grep 'CLAUDE_ENV_ID' ~/.bashrc | cut -d= -f2)
+echo '{"model":{"display_name":"Claude Sonnet 4.6"},"workspace":{"current_dir":"/home/ai-teams/workspace"},"context_window":{"remaining_percentage":80},"cost":{"total_cost_usd":0.05},"session_id":"smoke-test"}' \
+  | bash ~/workspace/<team-repo>/.claude/statusline-command.sh
+# Must print a colored statusline with the CLAUDE_ENV_ID badge — not an error
+```
+
+### What to do if statusline was missed (live fix, no rebuild)
+
+```bash
+# 1. Add the script to the repo (copy from another team, or write from scratch per §13)
+chmod +x ~/workspace/<team-repo>/.claude/statusline-command.sh
+cd ~/workspace/<team-repo>
+git add .claude/statusline-command.sh
+git commit -m "chore: add statusline-command.sh"
+git push
+
+# 2. Patch settings.json directly (takes effect on next Claude startup)
+python3 -c "
+import json
+p = '/home/ai-teams/.claude/settings.json'
+with open(p) as f: d = json.load(f)
+d['statusLine'] = {'type': 'command', 'command': 'bash /home/ai-teams/workspace/<team-repo>/.claude/statusline-command.sh'}
+with open(p, 'w') as f: json.dump(d, f, indent=2); f.write('\n')
+print('Done')
+"
+
+# 3. Verify CLAUDE_ENV_ID is in .bashrc (see Item 3 above)
+# 4. Run smoke test above, then restart Claude Code
+```
+
+(*FR:Brunel*)
+
+---
+
 ## Quick Reference: Full Entrypoint Order
 
 ```
@@ -693,8 +825,11 @@ Step 6:  Python venv setup (first run only)
 Step 7:  SSH key installation + start sshd
 Step 8:  Runtime validation gates (Python, Node.js, Claude, repos)
 Step 9:  Persist env vars to .bashrc
+         → CLAUDE_ENV_ID MANDATORY (for statusline — see §20)
 Step 9b: Git attribution
 Step 9c: Claude settings.json (first run only)
+         → statusLine entry MANDATORY (see §13 / §20)
+Step 9d: statusline-command.sh in repo — committed and pushed (see §20)
 Step 10: exec gosu ai-teams "$@"
 ```
 

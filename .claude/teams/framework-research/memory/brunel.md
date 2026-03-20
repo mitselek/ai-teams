@@ -184,3 +184,12 @@ Final flow: SSH → .bashrc creates layout + starts claude → PO lands in Claud
 [GOTCHA] 2026-03-19 — tmux new-session -d fails with "no server running" if a stale socket exists from a crashed server. Acceptable: container restart cleans /tmp, so stale sockets don't persist across restarts.
 
 [CHECKPOINT] 2026-03-19 — Runbook complete. §17 (size missing), §18 (SSH→hello pattern), §19 (pane labels) added to container-deployment-runbook.md. Generic enough for apex-research and future teams.
+
+[CHECKPOINT] 2026-03-20 — Statusline live-fixed for entu-research container:
+- statusline-command.sh written to ~/workspace/entu-research/.claude/ and pushed (commit 6525418)
+- ~/.claude/settings.json patched: statusLine.command = bash .../statusline-command.sh
+- CLAUDE_ENV_ID=ENTU-R already in .bashrc — no change needed
+- Smoke test passed: colored statusline with ENTU-R badge confirmed
+- Runbook: §13 marked MANDATORY with callout box; §20 (Statusline Deployment Checklist) added
+- Quick Reference updated with Step 9d (statusline-command.sh) and CLAUDE_ENV_ID note on Step 9
+- Root cause: entu deployed before §13 was written and statusline was treated as optional
