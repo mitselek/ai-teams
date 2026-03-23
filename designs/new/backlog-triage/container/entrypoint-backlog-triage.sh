@@ -76,8 +76,14 @@ clone_or_pull() {
         }
     else
         echo "[entrypoint] First run — cloning ${repo_url} to ${target_dir}..."
-        mkdir -p "${target_dir}"
-        chown "${CONTAINER_UID}:${CONTAINER_GID}" "${target_dir}"
+        # Remove any volume-seeded stub dir (Docker copies image contents into empty
+        # named volumes at mount time, leaving a non-empty dir without .git).
+        rm -rf "${target_dir}"
+        # Recreate workspace parent — rm may have deleted the WORKDIR.
+        mkdir -p "${WORKSPACE}"
+        chown "${CONTAINER_UID}:${CONTAINER_GID}" "${WORKSPACE}"
+        # cd to / before gosu so the subprocess doesn't inherit a deleted cwd.
+        cd /
         gosu "${CONTAINER_USER}" git clone "${auth_url}" "${target_dir}"
     fi
 }

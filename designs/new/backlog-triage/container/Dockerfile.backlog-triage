@@ -131,12 +131,14 @@ RUN mkdir -p /run/sshd \
 
 ENV DEBIAN_FRONTEND=
 
-# ── Native Claude Code install ─────────────────────────────────────────────────
-# Installed as ai-teams (not root) so auto-updates work without sudo.
-# Native install lands at ~/.local/bin/claude.
-#
-# WARP note: --insecure for claude.ai/install.sh download (WARP TLS interception).
-RUN gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5
+# ── Claude Code install ────────────────────────────────────────────────────────
+# Installed via npm global as root, then symlinked into ai-teams PATH.
+# npm install -g works natively (no SOCKS5 proxy needed) on PROD-LLM.
+# The claude.ai/install.sh native installer uses Node.js fetch() which does NOT
+# support SOCKS5 proxies — unusable on hosts where api.anthropic.com requires a
+# SOCKS tunnel. npm install avoids this entirely.
+RUN npm install -g @anthropic-ai/claude-code 2>&1 | tail -3 \
+    && claude --version
 
 # ── Entrypoint + scripts + team config ────────────────────────────────────────
 # apply-layout.sh, statusline-command.sh, spawn_member.sh, and start-team.sh
