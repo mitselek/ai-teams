@@ -89,6 +89,13 @@ services:
       # through the WARP TLS interception layer. Matches the bind-mount target below.
       - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
 
+      # HTTPS_PROXY: Node.js fetch() does NOT support SOCKS5 proxies.
+      # Set to the tinyproxy HTTP-to-SOCKS5 bridge (host port 3128 → SOCKS5 1080).
+      # Required on hosts where api.anthropic.com is firewalled and accessed via
+      # a SOCKS5 reverse tunnel. Leave empty on hosts with direct internet access.
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - https_proxy=${HTTPS_PROXY:-}
+
     volumes:
       # Claude auto-memory, OAuth credentials, MCP config — isolated to backlog-triage.
       # Survives container restarts; wipe with: docker volume rm bt_bt-claude-home
@@ -119,12 +126,15 @@ services:
 
 volumes:
   # Claude auto-memory, OAuth credentials, MCP config, team scratchpads.
-  # Prefix bt_ avoids collisions with other containers on the same host.
-  # Wipe: docker volume rm bt_bt-claude-home
+  # Migrated from RC server; pre-created externally.
+  # Wipe: docker volume rm bt-claude-home
   bt-claude-home:
-    name: bt_bt-claude-home
+    name: bt-claude-home
+    external: true
 
   # Workspace: hr-platform + dev-toolkit repos + Jira MCP server dist/.
-  # Wipe to force re-clone + re-build: docker volume rm bt_bt-repo
+  # Migrated from RC server; pre-created externally.
+  # Wipe to force re-clone + re-build: docker volume rm bt-repo
   bt-repo:
-    name: bt_bt-repo
+    name: bt-repo
+    external: true
