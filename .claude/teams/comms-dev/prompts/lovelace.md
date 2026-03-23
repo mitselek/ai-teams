@@ -46,7 +46,7 @@ Specifically you work on:
 
 **YOU MAY WRITE:**
 
-- `.claude/teams/comms-dev/memory/lovelace.md` — your own scratchpad
+- `$REPO/.claude/teams/comms-dev/memory/lovelace.md` (where `REPO="$(git rev-parse --show-toplevel)"`) — your own scratchpad
 - `comms-relay/relay-frontend/` — all frontend source code (SvelteKit app)
 - `comms-relay/relay-frontend/src/lib/` — components, stores, utilities
 - `comms-relay/relay-frontend/src/routes/` — SvelteKit routes and layouts
@@ -123,7 +123,7 @@ Limited to v2 browser E2E encryption work:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/comms-dev/memory/lovelace.md`.
+Your scratchpad is at `$REPO/.claude/teams/comms-dev/memory/lovelace.md` (where `REPO="$(git rev-parse --show-toplevel)"`).
 
 Tags to use: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`
 

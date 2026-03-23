@@ -39,7 +39,7 @@ Specifically you work on:
 
 **YOU MAY WRITE:**
 
-- `.claude/teams/comms-dev/memory/vigenere.md` — your own scratchpad
+- `$REPO/.claude/teams/comms-dev/memory/vigenere.md` (where `REPO="$(git rev-parse --show-toplevel)"`) — your own scratchpad
 - `comms-dev/src/crypto/` — crypto module source code
 - `comms-dev/docs/crypto-spec.md` — crypto protocol specification
 - `comms-dev/docs/threat-model.md` — threat model documentation
@@ -85,7 +85,7 @@ Babbage consumes your crypto API. The workflow is:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/comms-dev/memory/vigenere.md`.
+Your scratchpad is at `$REPO/.claude/teams/comms-dev/memory/vigenere.md` (where `REPO="$(git rev-parse --show-toplevel)"`).
 
 Tags to use: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`
 

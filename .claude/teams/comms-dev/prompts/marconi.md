@@ -73,7 +73,7 @@ REPO="$(git rev-parse --show-toplevel)"
 Read these files in order:
 1. `.claude/teams/comms-dev/roster.json` — team members, models, roles
 2. `.claude/teams/comms-dev/common-prompt.md` — mission, standards, protocols
-3. `.claude/teams/comms-dev/memory/team-lead.md` — your prior session state (if exists)
+3. `$REPO/.claude/teams/comms-dev/memory/team-lead.md` — your prior session state (if exists)
 
 ### 2. Create team
 

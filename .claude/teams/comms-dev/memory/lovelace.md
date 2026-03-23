@@ -1,75 +1,68 @@
-# Lovelace scratchpad — comms-dev CLI/TUI tooling engineer
+# Lovelace scratchpad
+# (*CD:Lovelace*)
 
-## [CHECKPOINT] 2026-03-20 session complete
+## [CHECKPOINT] 2026-03-23 — Initial codebase review
 
-### What was built this session
-All three CLI tools delivered and GREEN:
+### What exists
+- `comms-dev/src/` — full backend: broker daemon (v1 UDS, v2 TLS), crypto, discovery, CLI tools
+- `comms-dev/tests/` — vitest test suite covering transport, broker, crypto, CLI
+- **NO `comms-relay/relay-frontend/`** — frontend does not exist yet. I build it from scratch.
 
-| File | Tests | Status |
-|---|---|---|
-| `comms-dev/src/cli/comms-keys.ts` | 20/20 | GREEN |
-| `comms-dev/src/cli/comms-acl.ts` | 29/29 | GREEN |
-| `comms-dev/src/cli/comms-daemon.ts` | 21/22 | 1 fixture gap (TIMEOUT test) |
-
-Total test suite: 409/409 green (project-wide).
-
-### CLI tool interfaces (stable, shipped)
-
-**comms-keys** — cert inspection, no daemon dependency
-- `listKeys({ keysDir })` → `KeysListResult`
-- `exportDaemonCert({ keysDir, format })` → `ExportResult`
-- `verifyPeerCert({ keysDir, peerName })` → `KeysVerifyResult` (checks CN === filename stem)
-- Env: `COMMS_KEYS_DIR` (default `/run/secrets/comms`)
-
-**comms-acl** — ACL inspection, read-only
-- `listAcl({ aclPath, agentFilter? })` → `ListAclResult`
-- `checkAcl({ aclPath, from, to, localTeam })` → `CheckAclResult` (exitCode 0|1)
-- `showAgentAcl({ aclPath, agentName })` → `ShowAgentAclResult`
-- Uses `matchesPattern()` from `../crypto/acl.js` — no wildcard reimplementation
-- Env: `COMMS_KEYS_DIR`, `COMMS_TEAM_NAME`
-
-**comms-daemon** — daemon control via UDS socket
-- `daemonStatus({ socketDir, teamName, timeoutMs? })` → `DaemonStatusResult`
-- `daemonReload({ socketDir, teamName })` → `DaemonReloadResult`
-- `daemonPeers({ socketDir, teamName })` → `DaemonPeersResult`
-- Protocol: newline-delimited JSON, one command per connection
-- Socket: `<socketDir>/<teamName>.sock`
-- Env: `COMMS_SOCKET_DIR`, `COMMS_TEAM_NAME`
-
-### [GOTCHA] isMain guard — CRITICAL pattern
-All CLI files must guard `main()` with:
+### Message format (critical for frontend rendering)
 ```typescript
-const isMain = process.argv[1]?.endsWith('comms-foo.ts') ||
-  process.argv[1]?.endsWith('comms-foo.js');
-if (isMain) { main().catch(...) }
+interface Message {
+  version: '1';
+  id: string;          // "msg-<uuid>"
+  timestamp: string;   // ISO 8601
+  from: { team: string; agent: string; prefix?: string };
+  to:   { team: string; agent: string; prefix?: string };
+  type: 'handoff' | 'query' | 'response' | 'broadcast' | 'ack' | 'heartbeat';
+  priority: 'blocking' | 'high' | 'normal' | 'low';
+  reply_to: string | null;
+  body: string;        // Markdown-formatted
+  checksum: string;    // "sha256:<hex>" or "hmac-sha256:<hex>"
+}
 ```
-Without this, Vitest importing the module triggers `process.exit(1)` causing unhandled rejection that pollutes all test runs.
 
-### [GOTCHA] comms-daemon TIMEOUT test fixture gap
-Test `throws TIMEOUT when daemon socket exists but does not respond` uses an empty `socketDir` — no socket file exists. Connect fails with ENOENT → `DAEMON_NOT_RUNNING`, not `TIMEOUT`. Kerckhoffs needs to fix the fixture (create an unresponsive server at the socket path). This is the one remaining RED test in the CLI suite.
+### Backend transport (no HTTP yet)
+- v1 daemon: UDS sockets at `/shared/comms/<team>.sock` — binary framing (4-byte length prefix)
+- v2 daemon (DaemonV2): TLS TCP sockets between daemons + local UDS JSON-newline command socket
+- **No HTTP or WebSocket layer exists** — the frontend cannot connect to the backend directly today
 
-### [LEARNED] DaemonV2 UDS control socket (v2, shipped)
-- Babbage added UDS control socket to `daemon-v2.ts` alongside TLS transport
-- Protocol: newline-delimited JSON, one cmd per connection
-- Commands: `status`, `reload`, `peers`
-- `status` response includes: `status`, `uptime_seconds`, `version`, `team_name`, `port`
-- `reload` response includes: `success`, `reloaded_at`, `acl_agents_count`
-- `peers` response: full objects with `team`, `status`, `host`, `port`, `connected_at`
-- Disconnected peers ARE included in `peers` response (status: "disconnected")
-
-### [DEFERRED] Per-agent Ed25519 keypairs → v2
-- v1: daemon attests sender identity, OS trust inside container
-- v2: per-message signing for cryptographic non-repudiation
-
-### Architecture reference (v2, final)
+### DaemonV2 UDS command protocol (JSON-newline over socket)
 ```
-Agent → CrossTeamSend MCP → DaemonV2 UDS control socket
-                            ↓ ACL check
-                            ↓ TunnelManager (persistent mTLS to peer daemons)
-                            ↓ framed JSON message
-                         Remote DaemonV2
-                            ↓ peerCertCN === from.team (HARD INVARIANT)
-                            ↓ ACL check (receive side)
-                            ↓ inbox write
-                         Recipient agent polls inbox (500ms)
+send: { cmd, from, to ("agent@team"), body, type?, priority?, reply_to? }
+status: { cmd: "status" } → { ok, status, uptime_seconds, version, team_name, port }
+reload: { cmd: "reload" } → { ok, success, reloaded_at, acl_agents_count }
+peers:  { cmd: "peers"  } → { ok, peers: [{team, status, host, port, connected_at}] }
 ```
+Response: `{ ok: boolean, message_id?, delivered_at?, code?, message?, ... }`
+
+### Infrastructure context
+- comms-dev gets dedicated IP 10.100.136.163 on PROD-LLM network
+- Port 5173 open inbound (HTTP) — this is where the frontend will be served
+- Production: Cloudflare Pages or SvelteKit on adapter-node/cloudflare
+
+### [DEFERRED] Coordination needed with Babbage
+Frontend cannot connect to backend without an HTTP/WebSocket bridge layer.
+Babbage needs to expose:
+1. **REST API** — `GET /history/:conversation_id` (message history)
+2. **WebSocket** — real-time message stream from inbox
+3. **Authentication** — WebAuthn challenge endpoint
+
+Until Babbage builds this HTTP relay layer, I can:
+- Build the SvelteKit app scaffold, routes, layout
+- Build reactive stores and component structure against a mock API
+- Define the API contract I need and send [COORDINATION] to Babbage
+
+### [GOTCHA] comms-watch vs SendMessageBridge
+Running both simultaneously causes race condition on inbox files. Frontend must not poll inbox files directly — must go through a proper HTTP/WS bridge.
+
+### [PATTERN] Inbox delivery
+Messages land as `<message-id>.json` files in `~/.claude/teams/<team>/inboxes/`.
+The HTTP bridge (to be built by Babbage) would watch this dir and push via WebSocket.
+
+### [WIP] Next steps (waiting for task from team-lead)
+1. Coordinate with Babbage on HTTP/WebSocket API contract
+2. Scaffold `comms-relay/relay-frontend/` SvelteKit project
+3. Build message store (Svelte 5 runes), WebSocket client, message rendering components

@@ -40,7 +40,7 @@ Specifically you work on:
 
 **YOU MAY WRITE:**
 
-- `.claude/teams/comms-dev/memory/kerckhoffs.md` — your own scratchpad
+- `$REPO/.claude/teams/comms-dev/memory/kerckhoffs.md` (where `REPO="$(git rev-parse --show-toplevel)"`) — your own scratchpad
 - `comms-dev/tests/` — all test files
 - `comms-dev/vitest.config.ts` — test configuration
 - `comms-dev/.github/` — CI pipeline configuration
@@ -104,7 +104,7 @@ Babbage notifies you when modules are ready for testing:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/comms-dev/memory/kerckhoffs.md`.
+Your scratchpad is at `$REPO/.claude/teams/comms-dev/memory/kerckhoffs.md` (where `REPO="$(git rev-parse --show-toplevel)"`).
 
 Tags to use: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`
 
