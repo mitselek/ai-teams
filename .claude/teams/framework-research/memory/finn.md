@@ -19,28 +19,32 @@
 4. **Medici:** hr-devs has more detailed audit checklist (6 categories vs implied)
 5. **Attribution:** rc-team `(*RC-DEV:Name*)`; hr-devs same (not yet updated)
 
-## [CHECKPOINT] 2026-03-19 — R10 session
+## [CHECKPOINT] 2026-03-23 — Penrose dev team design — COMPLETE
 
-**Entu platform deep-dive** — full research on entity-property model, rights propagation, formula system, and plugin extension model. Sources: OpenAPI spec (live), webapp repo (Nuxt 3 + Vue 3 + Naive UI), plugins repo (Nuxt 3), docs site (15 VitePress markdown files).
+Research report delivered, then reviewed Celes's final design at `designs/new/penrose-dev/`.
+Final team: 6 agents, ALL opus (team-lead, shechtman/test, ammann/geometry, bruijn/simulation, escher/renderer, penrose/reviewer).
+Celes chose math-historian names and added a code reviewer role (penrose).
 
-Key findings:
-- MongoDB backend: `property` collection (immutable append, soft-delete) + `entity` collection (denormalized aggregated views)
-- Entity types and property definitions are themselves entities — fully self-describing schema
-- 9 property types: string, text, number, boolean, date, datetime, file, reference, counter
-- Rights: 5-level ACL (_owner > _editor > _expander > _viewer > _noaccess) + 3 sharing tiers + _inheritrights
-- Formulas: RPN-like syntax with 12 functions, references to children/referrers, two-pass evaluation on save
-- Plugins: iframe UI tabs + webhook triggers, 4 plugin types
+Review found 14 issues, all HIGH/MEDIUM resolved in final pass. Package approved for deployment.
 
-## [INDEX] Entu repos cloned
+## [LEARNED] Team-lead self-check pattern
 
-- `.mmp/entu-webapp/` — webapp (Nuxt 3, ~50 Vue components, utils/api.js, stores/)
-- `.mmp/entu-plugins/` — plugins (CSV, Discogs, Ester, KML, Template importers)
-- Docs at `.mmp/entu-webapp/docs/` — 15 markdown files covering all platform aspects
+penrose-dev team-lead.md introduced a "SELF-CHECK: Am I Doing The Work Myself?" section with explicit FORBIDDEN/ALLOWED tool lists. Strong pattern for preventing team-lead scope creep — worth adopting in future team designs.
+
+## [GOTCHA] TAU constant in Penrose project
+
+TAU = 1/PHI ≈ 0.618 (golden ratio reciprocal), NOT 2π. This is project-specific naming that conflicts with the common math convention.
+
+## [PATTERN] Team sizing heuristic
+
+- comms-dev: 4+lead for crypto+transport+QA — domain split by security boundary
+- backlog-triage: 3+lead for pipeline — one agent per pipeline stage
+- penrose-dev (proposed): 4+lead for math+sim+render+test — domain split by abstraction layer
+- Pattern: team size = number of distinct abstraction boundaries, not number of deliverables
 
 ## [DEFERRED] Open questions
 
-- `topics/02-roles.md` — still unclear if a separate roles file is wanted
 - Polyphony team roster redesign — Celes delivered package, awaiting PO approval
-- Entu: no server-side code repo studied (only API spec + client code) — backend aggregation logic not fully visible
+- Entu: no server-side code repo studied (only API spec + client code)
 
 (*FR:Finn*)

@@ -18,7 +18,7 @@
 [PATTERN] "Agent PO" is an anti-pattern — PO is always the human. Agent should be "Requirements Analyst" with explicit escalation rules.
 [GOTCHA] Count **characters**, not roles-plus-characters. Team-lead IS one of the characters. "5-character team" not "team-lead + 5 agents = 6."
 
-## Hires Delivered (cumulative — 33 agents)
+## Hires Delivered (cumulative — 39 agents)
 
 | Agent | Lore | Team | Model | Date |
 |---|---|---|---|---|
@@ -55,17 +55,20 @@
 | Hypatia | Hypatia of Alexandria | BT | sonnet | 2026-03-20 |
 | Vidocq | E.F. Vidocq | BT | sonnet | 2026-03-20 |
 | Portia | Shakespeare | BT | opus | 2026-03-20 |
+| Shechtman | Dan Shechtman | PEN | opus | 2026-03-23 |
+| Ammann | Robert Ammann | PEN | opus | 2026-03-23 |
+| Bruijn | N.G. de Bruijn | PEN | opus | 2026-03-23 |
+| Escher | M.C. Escher | PEN | opus | 2026-03-23 |
+| Penrose | Sir Roger Penrose | PEN | opus | 2026-03-23 |
+| PEN TL | (user-assigned) | PEN TL | opus | 2026-03-23 |
 
-## Session 2026-03-20
+## Session 2026-03-23
 
-[DECISION] backlog-triage team: 4 characters. Pipeline team (Lead→Archivist→Forensic→Consul→Lead). Lore theme: Seekers of Truth — each character finds truth through a different lens (navigation, records, evidence, judgment). Opus for judgment roles (lead, consul), sonnet for pattern-matching roles (archivist, forensic).
-
-## Session 2026-03-19 (R10-R11)
-
-[DECISION] entu-research team: 5 characters, all opus. Lore theme: Paradigm Translators. Two TDD pairs: Hopper+Codd (data), Hamilton+Semper (UI). Pipeline sequencing (data pair leads).
-[LEARNED] Count characters, not roles+characters. Team-lead is a character.
-[LEARNED] Tester placement matters: Hopper on API/Data side because SQL-assumption bugs (paradigm gotchas) live in the data layer, not the UI.
-[LEARNED] Prompt revision from behavioral audit: add listening/acknowledgment traits to builder personalities without diluting their identity. Key pattern: "Responsive" trait + "Confirm understanding" workflow gate + "Handling Feedback" section. Medici's audit → Celes applies → team-lead approves pipeline works well.
+[DECISION] penrose-dev team: 6 characters, all opus. Lore theme: Aperiodic Pioneers. TDD pair (Shechtman writes tests, builders make them pass) + dedicated reviewer (Penrose, RED/YELLOW/GREEN). Team-lead pure coordinator (no code, no review).
+[DECISION] Domain splits: Ammann (types/geometry/subdivision/tiling), Bruijn (wiring/signals/simulation), Escher (renderer/controls/main), Shechtman (tests/*), Penrose (review only).
+[LEARNED] Domain-specific constant conventions (TAU = 1/PHI in this project, not 2π) must be documented prominently in common-prompt AND a dedicated disambiguation doc. Finn's review caught this — would have caused incorrect test assertions.
+[PATTERN] When team-lead cannot write code, integration layers (simulation.ts) belong with the builder whose functions they call.
+[PATTERN] Pipeline: geometry → tiling → wiring → signals → simulation → renderer. Dependencies flow one way.
 
 ## Deferred (carried forward)
 
