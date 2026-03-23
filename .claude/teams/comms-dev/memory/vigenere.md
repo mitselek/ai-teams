@@ -1,73 +1,60 @@
-# Vigenere Scratchpad (*CD:Vigenere*)
+# Vigenere Scratchpad — comms-dev Crypto Engineer
 
-## [CHECKPOINT] Session 2026-03-19
+## Codebase Review (2026-03-23)
 
-### Completed This Session
+[CHECKPOINT] Full review of crypto domain complete.
 
-- Assessed WireGuard mesh vs. Cloudflare relay (crypto perspective) — recommended against mesh
-- Assessed capability-based selective sharing model — designed full crypto spec (later superseded)
-- Brainstormed cross-team messaging crypto: per-agent keypairs, signing, ACL, tunnel design
-- Published #15: mTLS config + ACL evaluation crypto implementation spec
-- Cross-reviewed #16 (Babbage's protocol spec) — found fingerprint vs. DER discrepancy, resolved
-- Implemented `src/crypto/tls-config.ts` — TLS config loading, fingerprint verification, sender identity validation
-- Implemented `src/crypto/acl.ts` — ACL parsing, wildcard matching, default-deny, hot-reload via SIGHUP
-- Phase 1 GREEN (57 tests), all 6 phases completed (409/409 green)
+### Module Inventory (`src/crypto/`)
 
-### Key Crypto Decisions (v2 — Cross-Team Messaging)
+| File | Lines | Purpose | Status |
+|------|-------|---------|--------|
+| `types.ts` | 88 | EncryptedPayload, DerivedKeys, CryptoOptions, CryptoAPI interfaces | Complete |
+| `crypto.ts` | 227 | AES-256-GCM encrypt/decrypt, HKDF-SHA256 deriveKey, HMAC-SHA256 checksum, loadPsk | Complete |
+| `provider.ts` | 33 | CryptoProvider adapter (Buffer→Buffer) for Babbage's broker | Complete |
+| `tls-config.ts` | 203 | mTLS cert loading, fingerprinting, sender identity validation | Complete |
+| `acl.ts` | 132 | Per-agent ACL with wildcard, default-deny, hot-reload via SIGHUP | Complete |
+| `index.ts` | 7 | Re-exports public API | Complete |
 
-[DECISION] **mTLS tunnel model** (supersedes v1 PSK + relay model):
-- Per-team ECDSA P-256 keypair + self-signed cert for mTLS
-- TLS 1.3 only, mutual authentication, certificate fingerprint pinning
-- Pre-provisioned certs (no TOFU, no key generation at runtime)
-- Encrypted tunnel, NOT encrypted content — mTLS handles transport security
+### API Surface
 
-[DECISION] **No per-agent signatures in v1:**
-- Trust OS process isolation inside container (SSH-agent model)
-- mTLS authenticates daemon-to-daemon; daemon attests agent identity
-- Per-agent Ed25519 signatures deferred to v2 if needed
+- `createCryptoAPI(keys)` → CryptoAPI (encrypt, decrypt, deriveKey, computeChecksum, verifyIntegrity)
+- `deriveKey(psk, context)` → DerivedKeys (encryptionKey + integrityKey via HKDF-SHA256)
+- `encrypt(key, plaintext, opts?)` → EncryptedPayload (AES-256-GCM, random 96-bit IV)
+- `decrypt(key, payload)` → Buffer (validates version, IV len, tag len, GCM auth)
+- `computeChecksum(integrityKey, data)` → "sha256:<hex>" (HMAC-SHA256)
+- `verifyIntegrity(integrityKey, data, checksum)` → boolean (constant-time)
+- `loadPsk(hexString)` → Buffer (validates hex format, ≥32 bytes)
+- `createCryptoProvider(api)` → CryptoProvider (Babbage's Buffer-in/Buffer-out interface)
+- `loadDaemonCrypto(opts)` → DaemonCryptoConfig (key, cert, peer certs + fingerprints)
+- `computeFingerprint(certPem)` → SHA-256 fingerprint string
+- `getAuthenticatedTeam(socket)` → string | null
+- `validateSenderIdentity(msg, authTeam)` → { valid, reason? }
+- ACL: `loadAcl`, `isAllowed`, `matchesPattern`, `createAclManager`
 
-[DECISION] **from.team === peerCertCN hard invariant:**
-- Receiving daemon MUST validate from.team matches mTLS peer cert CN
-- Mismatch = close connection immediately, no NACK, log WARNING
-- First check before ACL, dedup, or delivery
+### Test Coverage (`tests/`)
 
-[DECISION] **Per-agent ACL, default-deny:**
-- Per-agent `allowed_to` / `allowed_from` lists
-- Wildcard `*@team` supported, `*@*` NOT supported
-- Enforced on both sender (outbound) and receiver (inbound)
-- Hot-reload via SIGHUP, fail-safe (keep old ACL on parse error)
+- `tests/crypto/crypto.test.ts` — 40+ tests: key derivation, encrypt/decrypt roundtrip, nonce uniqueness, AAD, tamper detection, malformed payloads, checksum/integrity, loadPsk, known-answer vectors, CryptoProvider adapter
+- `tests/security/tls-config.test.ts` — 12 tests: cert loading, validation, fingerprinting, getAuthenticatedTeam
+- `tests/security/cert-invariant.test.ts` — 11 tests: validateSenderIdentity (from.team === peerCertCN)
+- `tests/acl/acl.test.ts` — 22 tests: matchesPattern, isAllowed send/receive, loadAcl parsing, hot-reload
 
-[DECISION] **Key directory layout:**
-```
-/run/secrets/comms/
-  daemon.key, daemon.crt, acl.json, peers/*.crt
-```
+### Docs
 
-### Files I Own
+- `docs/crypto-spec.md` — v1 spec: algorithm choices, key mgmt, encrypt/decrypt protocol, wire format, API
+- `docs/threat-model.md` — 7 threats analyzed (T1-T7), trust boundaries, assets, v2 upgrade path
 
-| File | Purpose |
-|---|---|
-| `src/crypto/tls-config.ts` | TLS config loading, fingerprint verification, sender identity validation |
-| `src/crypto/acl.ts` | ACL parsing, wildcard matching, isAllowed(), createAclManager() |
-| `src/crypto/crypto.ts` | AES-256-GCM, HKDF, HMAC (v1, still available) |
-| `src/crypto/types.ts` | Crypto type definitions (v1) |
-| `src/crypto/provider.ts` | CryptoProvider adapter (v1) |
+### Observations
 
-### GitHub Issues
+[DECISION] Crypto primitives: AES-256-GCM + HKDF-SHA256 + HMAC-SHA256. Conservative, proven. No changes needed.
 
-- #15: mTLS config + ACL evaluation spec (mine, 3 update comments posted)
-- #16: Cross-team protocol spec (Babbage, reviewed + commented)
-- #13: Brainstorm decisions
-- #18: Implementation plan
+[PATTERN] Clean separation: CryptoAPI (full interface) → CryptoProvider (Babbage's simplified adapter). Provider serializes EncryptedPayload as JSON Buffer on the wire.
 
-### Obsoleted
+[GOTCHA] AAD in EncryptedPayload is stored as base64 and embedded in the payload itself. On decrypt, AAD is extracted from the payload — the decryptor does NOT need to separately supply the AAD. This is correct for the provider adapter but means the AAD is visible (not encrypted, just authenticated).
 
-- `comms-dev/docs/sharing-crypto-spec.md` — superseded by cross-team messaging model, should be deleted
-- v1 relay/PSK decisions from session 2026-03-14 — superseded by mTLS model
+[GOTCHA] `encrypt`/`decrypt` in crypto.ts are `async` but contain no async operations — they're sync under the hood. This is fine for API compatibility but worth noting.
 
-### v2+ Crypto Upgrade Path
+[GOTCHA] The threat model notes T2 checksum as "SHA-256 of plaintext body" but the implementation uses HMAC-SHA256 with the integrity key. The spec correctly says HMAC-SHA256. Minor doc inconsistency in threat-model.md T2 section — not a code bug.
 
-[DEFERRED] Per-agent Ed25519 signing for non-repudiation
-[DEFERRED] Forward secrecy enhancement beyond TLS 1.3 (application-layer)
-[DEFERRED] Online key/cert rotation without daemon restart
-[DEFERRED] Dynamic peer discovery (currently all peers pre-provisioned)
+[DECISION] v1 has no forward secrecy, no per-team keys, no online key rotation. All accepted risks documented in threat model. v2 path: X25519 + NaCl.
+
+(*CD:Vigenere*)

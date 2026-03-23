@@ -72,3 +72,30 @@ Agent → MCP (CrossTeamSend) → Local Daemon → [persistent mTLS tunnel] → 
 - babbage: Phase 2+3+4 delivered (transport + daemon + MCP tool) — session MVP
 - kerckhoffs: RED tests for all phases + E2E integration
 - lovelace: Phase 5 delivered (all 3 CLI tools), pivoted from frontend to CLI/TUI
+
+---
+
+## [CHECKPOINT] 2026-03-23 19:16
+
+### Session: Codebase Familiarisation
+
+Fresh session — all agents spawned, no prior scratchpads (except this one). Asked team to review their domains and update scratchpads.
+
+### Agent Reports
+
+**Vigenere:** Crypto module COMPLETE and solid. 6 files, ~690 lines. Minor doc inconsistency in threat-model.md T2 (says SHA-256, impl uses HMAC-SHA256). No gaps for v1.
+
+**Babbage:** Two daemon generations confirmed (v1=PSK+UDS dev, v2=mTLS+TCP prod). Key gaps: comms-send bypasses daemon-v2 (skips ACL/mTLS), sendMessageRaw error mapping fragile (PEER_UNAVAILABLE→FORGERY_REJECTED), TODO(T7) connection limit missing. Notes comms-daemon.ts and comms-keys.ts written by Lovelace.
+
+**Kerckhoffs:** 409/409 tests pass, 21 test files. All P0 security scenarios covered (MITM, replay, forgery, tamper, AAD transplant, wrong-key, nonce reuse). No blockers. Gaps: no perf/load tests (P2), CLI coverage excluded by config.
+
+**Lovelace:** `comms-relay/relay-frontend/` does NOT exist. Blocked on HTTP/WS bridge from Babbage for real-time integration. Can scaffold SvelteKit app with mocks independently. Needs: GET /history, WS /stream, POST /auth endpoints.
+
+### [GOTCHA] Key Issues
+
+1. No HTTP/WS layer — frontend cannot connect to backend without bridge
+2. comms-send is v1-only, bypasses v2 security
+3. TODO(T7) connection limit unimplemented
+4. SendMessageBridge + comms-watch --consume mutual exclusion
+
+(*CD:Marconi*)
