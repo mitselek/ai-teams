@@ -138,13 +138,31 @@ ENV DEBIAN_FRONTEND=
 # WARP note: --insecure for claude.ai/install.sh download (WARP TLS interception).
 RUN gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5
 
-# ── Entrypoint + layout script ────────────────────────────────────────────────
-# apply-layout.sh is placed in ai-teams home dir so the entrypoint auto-tmux
-# block can reference it without depending on any cloned repo being present.
+# ── Entrypoint + scripts + team config ────────────────────────────────────────
+# apply-layout.sh, statusline-command.sh, spawn_member.sh, and start-team.sh
+# live in ai-teams home dir so they are available before any repo is cloned.
+# team-config/ holds roster, prompts, and common-prompt — read by agents at startup.
+# CLAUDE.md lands at workspace root so Claude picks it up automatically when cwd
+# is set to /home/ai-teams/workspace/hr-platform.
 COPY entrypoint-backlog-triage.sh /entrypoint-backlog-triage.sh
 COPY apply-layout.sh /home/ai-teams/apply-layout.sh
-RUN chmod +x /entrypoint-backlog-triage.sh /home/ai-teams/apply-layout.sh \
-    && chown 1000:1000 /home/ai-teams/apply-layout.sh
+COPY statusline-command.sh /home/ai-teams/statusline-command.sh
+COPY spawn_member.sh /home/ai-teams/spawn_member.sh
+COPY start-team.sh /home/ai-teams/start-team.sh
+COPY team-config/ /home/ai-teams/team-config/
+COPY CLAUDE.md /home/ai-teams/workspace/hr-platform/CLAUDE.md
+RUN chmod +x /entrypoint-backlog-triage.sh \
+        /home/ai-teams/apply-layout.sh \
+        /home/ai-teams/statusline-command.sh \
+        /home/ai-teams/spawn_member.sh \
+        /home/ai-teams/start-team.sh \
+    && chown -R 1000:1000 \
+        /home/ai-teams/apply-layout.sh \
+        /home/ai-teams/statusline-command.sh \
+        /home/ai-teams/spawn_member.sh \
+        /home/ai-teams/start-team.sh \
+        /home/ai-teams/team-config \
+        /home/ai-teams/workspace
 
 WORKDIR /home/ai-teams/workspace
 

@@ -228,7 +228,7 @@ declare -A SHELL_VARS=(
     [CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS]="${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-1}"
     [GITHUB_TOKEN]="${GITHUB_TOKEN}"
     [TEAM_NAME]="${TEAM_NAME:-backlog-triage}"
-    [CLAUDE_ENV_ID]="BACKLOG-TRIAGE"
+    [CLAUDE_ENV_ID]="BT-TRIAGE"
     [ATLASSIAN_BASE_URL]="${ATLASSIAN_BASE_URL}"
     [ATLASSIAN_EMAIL]="${ATLASSIAN_EMAIL}"
     [ATLASSIAN_API_TOKEN]="${ATLASSIAN_API_TOKEN}"
@@ -313,6 +313,10 @@ if [ ! -f "$SETTINGS_FILE" ]; then
       "Bash(git push --force:*)",
       "Bash(git reset --hard:*)"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/ai-teams/statusline-command.sh"
   }
 }
 SETTINGS_EOF

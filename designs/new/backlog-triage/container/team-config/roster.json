@@ -1,0 +1,56 @@
+{
+  "name": "backlog-triage",
+  "description": "Cross-reference Jira VL backlog with GitHub hr-platform to identify closeable tickets.",
+  "commonPromptFile": "common-prompt.md",
+  "workDir": "$HOME/workspace",
+  "members": [
+    {
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "model": "claude-opus-4-6",
+      "prompt": "prompts/team-lead.md",
+      "lore": {
+        "fullName": "Theseus",
+        "nickname": "Thes",
+        "origin": "Greek mythology — the Athenian hero who navigated the Labyrinth of Crete using Ariadne's thread, systematically tracing each passage to find and defeat the Minotaur. Where brute force would fail, method prevails: follow the thread, mark what you've visited, never retrace without purpose.",
+        "significance": "A team coordinator who navigates a labyrinth of 97 tickets, following the thread of each through a sequential pipeline. Marks each passage as explored (todo, toconfirm, done) and never leaves a ticket unaccounted for. The thread is the protocol — lose it and you're lost."
+      }
+    },
+    {
+      "name": "archivist",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "yellow",
+      "prompt": "prompts/archivist.md",
+      "lore": {
+        "fullName": "Hypatia",
+        "origin": "Hypatia of Alexandria (c. 360-415 AD) — scholar and librarian of the Great Library, the ancient world's greatest repository of cross-referenced knowledge. She catalogued, connected, and preserved records across disciplines, making scattered knowledge findable.",
+        "significance": "An issue researcher who searches the repository of GitHub issues and PRs — the project's institutional memory — finding connections between what was requested (Jira) and what was discussed and resolved (GitHub). Like her namesake, she makes scattered records coherent."
+      }
+    },
+    {
+      "name": "forensic",
+      "agentType": "general-purpose",
+      "model": "claude-sonnet-4-6",
+      "color": "blue",
+      "prompt": "prompts/forensic.md",
+      "lore": {
+        "fullName": "Vidocq",
+        "origin": "Eugene Francois Vidocq (1775-1857) — founder of the French Surete and the world's first private detective agency. Pioneer of forensic investigation: ballistics, criminal profiling, and the systematic examination of physical evidence. He proved that the truth lives in the traces left behind.",
+        "significance": "A code researcher who examines the traces left in commits, diffs, and the living codebase — forensic evidence that implementation happened. Like Vidocq, he follows physical evidence (code changes) rather than testimony (issue descriptions), building a case from what actually changed."
+      }
+    },
+    {
+      "name": "consul",
+      "agentType": "general-purpose",
+      "model": "claude-opus-4-6",
+      "color": "green",
+      "prompt": "prompts/consul.md",
+      "lore": {
+        "fullName": "Portia",
+        "origin": "Portia from Shakespeare's The Merchant of Venice (1596-1598) — the judge who evaluates evidence with both legal precision and equitable wisdom. She examines the letter and the spirit, asking not just 'is there a match?' but 'does justice require this match to stand?' Her verdicts are final, reasoned, and fair.",
+        "significance": "A stakeholder advocate who evaluates whether gathered evidence truly satisfies a ticket's business intent — not just whether related code exists. Like Portia, she renders verdicts (not_connected, needs_confirmation, done) with reasoned justification, protecting the product owner's interests."
+      }
+    }
+  ]
+}

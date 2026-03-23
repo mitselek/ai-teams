@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# spawn_member.sh — Spawn a backlog-triage agent into a tmux pane
+#
+# Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
+#
+# With --target-pane: spawns into an existing pane (created by apply-layout.sh)
+# Without: creates a new pane via split-window (legacy / ad-hoc)
+#
+# Agent names: archivist, forensic, consul
+# (team-lead is the PO — already in Claude, not spawned by this script)
+
+# Parse --target-pane option
+TARGET_PANE=""
+if [[ "${1:-}" == "--target-pane" ]]; then
+    TARGET_PANE="${2:?--target-pane requires a pane ID (e.g. %25)}"
+    shift 2
+fi
+
+AGENT_NAME="${1:?Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]}"
+TMUX_SESSION="${2:-backlog-triage}"
+
+TEAM_NAME="backlog-triage"
+TEAM_DIR="$HOME/.claude/teams/$TEAM_NAME"
+CONFIG="$TEAM_DIR/config.json"
+ROSTER="/home/ai-teams/team-config/roster.json"
+PROMPTS_DIR="/home/ai-teams/team-config/prompts"
+
+# Validate prerequisites
+[[ -f "$CONFIG" ]] || { echo "ERROR: $CONFIG not found. Run TeamCreate first." >&2; exit 1; }
+[[ -f "$ROSTER" ]] || { echo "ERROR: $ROSTER not found." >&2; exit 1; }
+
+# Duplicate gate — hard stop
+if jq -e ".members[] | select(.name == \"$AGENT_NAME\")" "$CONFIG" >/dev/null 2>&1; then
+    echo "ERROR: $AGENT_NAME already registered in config.json. Use SendMessage instead." >&2
+    exit 1
+fi
+
+# Validate target pane exists (if specified)
+if [[ -n "$TARGET_PANE" ]]; then
+    if ! tmux list-panes -t "$TMUX_SESSION" -F '#{pane_id}' | grep -q "^${TARGET_PANE}$"; then
+        echo "ERROR: Target pane $TARGET_PANE not found in session $TMUX_SESSION" >&2
+        exit 1
+    fi
+fi
+
+# Read roster entry
+ROSTER_ENTRY=$(jq -r ".members[] | select(.name == \"$AGENT_NAME\")" "$ROSTER")
+[[ -n "$ROSTER_ENTRY" ]] || { echo "ERROR: $AGENT_NAME not found in roster." >&2; exit 1; }
+
+MODEL=$(echo "$ROSTER_ENTRY" | jq -r '.model')
+COLOR=$(echo "$ROSTER_ENTRY" | jq -r '.color // "gray"')
+AGENT_TYPE=$(echo "$ROSTER_ENTRY" | jq -r '.agentType // "general-purpose"')
+
+# Read prompt file
+PROMPT_FILE=""
+if [[ -f "$PROMPTS_DIR/$AGENT_NAME.md" ]]; then
+    PROMPT_FILE="$PROMPTS_DIR/$AGENT_NAME.md"
+fi
+
+# Read leadSessionId
+LEAD_SESSION_ID=$(jq -r '.leadSessionId' "$CONFIG")
+
+WORK_DIR="/home/ai-teams/workspace/hr-platform"
+
+# Build spawn script (avoids quoting issues with tmux send-keys)
+SPAWN_SCRIPT=$(mktemp /tmp/spawn-bt-XXXXXX.sh)
+{
+    echo '#!/usr/bin/env bash'
+    echo 'export CLAUDECODE=1'
+    echo 'export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1'
+    echo "export CLAUDE_ENV_ID=\"BT-TRIAGE\""
+    # NODE_EXTRA_CA_CERTS: set in .bashrc by entrypoint, but repeat here for safety
+    echo 'if [ -f /opt/warp-ca.pem ]; then export NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem; fi'
+    if [[ -n "$PROMPT_FILE" ]]; then
+        echo "PROMPT=\"\$(cat '$PROMPT_FILE')\""
+    fi
+    printf 'exec claude --agent-id "%s" \\\n' "${AGENT_NAME}@${TEAM_NAME}"
+    printf '  --agent-name "%s" --team-name "%s" \\\n' "$AGENT_NAME" "$TEAM_NAME"
+    printf '  --agent-color "%s" --parent-session-id "%s" \\\n' "$COLOR" "$LEAD_SESSION_ID"
+    printf '  --agent-type general-purpose --model "%s"' "$MODEL"
+    if [[ -n "$PROMPT_FILE" ]]; then
+        printf ' \\\n  --append-system-prompt "$PROMPT"'
+    fi
+    # Initial prompt: agent reads files and sends intro
+    printf ' \\\n  "Read your prompt and scratchpad. Send an intro to team-lead and stand by."'
+    echo
+} > "$SPAWN_SCRIPT"
+chmod +x "$SPAWN_SCRIPT"
+
+if [[ -n "$TARGET_PANE" ]]; then
+    # Spawn into pre-created pane
+    TMUX_PANE_ID="$TARGET_PANE"
+    tmux send-keys -t "$TARGET_PANE" "cd $WORK_DIR && bash $SPAWN_SCRIPT" Enter
+else
+    # Legacy: create new pane via split-window
+    tmux split-window -t "$TMUX_SESSION" -h -l '70%' -c "$WORK_DIR" \
+        "bash $SPAWN_SCRIPT"
+    TMUX_PANE_ID=$(tmux list-panes -t "$TMUX_SESSION" -F '#{pane_id}' | tail -1)
+fi
+
+# Register in config.json
+TIMESTAMP=$(date +%s)000
+jq --arg name "$AGENT_NAME" \
+   --arg agentId "${AGENT_NAME}@${TEAM_NAME}" \
+   --arg agentType "$AGENT_TYPE" \
+   --arg model "$MODEL" \
+   --arg color "$COLOR" \
+   --arg paneId "$TMUX_PANE_ID" \
+   --argjson joinedAt "$TIMESTAMP" \
+   '.members += [{
+     agentId: $agentId,
+     name: $name,
+     agentType: $agentType,
+     model: $model,
+     color: $color,
+     joinedAt: $joinedAt,
+     tmuxPaneId: $paneId,
+     backendType: "tmux",
+     cwd: "",
+     subscriptions: []
+   }]' "$CONFIG" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "$CONFIG"
+
+echo "Spawned $AGENT_NAME in pane $TMUX_PANE_ID"
+echo "Done."
