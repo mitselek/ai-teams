@@ -245,6 +245,12 @@ if [ -n "${NODE_EXTRA_CA_CERTS:-}" ]; then
     SHELL_VARS[NODE_EXTRA_CA_CERTS]="${NODE_EXTRA_CA_CERTS}"
 fi
 
+# HTTPS_PROXY + https_proxy only written if set (not all hosts need a proxy).
+if [ -n "${HTTPS_PROXY:-}" ]; then
+    SHELL_VARS[HTTPS_PROXY]="${HTTPS_PROXY}"
+    SHELL_VARS[https_proxy]="${HTTPS_PROXY}"
+fi
+
 for var in "${!SHELL_VARS[@]}"; do
     val="${SHELL_VARS[$var]}"
     if [ -n "$val" ]; then
