@@ -40,7 +40,7 @@ Specifically you work on:
 
 **YOU MAY WRITE:**
 
-- `.claude/teams/comms-dev/memory/babbage.md` — your own scratchpad
+- `$REPO/.claude/teams/comms-dev/memory/babbage.md` (where `REPO="$(git rev-parse --show-toplevel)"`) — your own scratchpad
 - `comms-dev/src/` — all source code EXCEPT `comms-dev/src/crypto/` (that's Vigenere's module)
 - `comms-dev/package.json`, `comms-dev/tsconfig.json` — project config
 - `comms-dev/docs/architecture.md` — architecture documentation
@@ -91,7 +91,7 @@ You write testable code; Kerckhoffs writes the tests. The workflow is:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/comms-dev/memory/babbage.md`.
+Your scratchpad is at `$REPO/.claude/teams/comms-dev/memory/babbage.md` (where `REPO="$(git rev-parse --show-toplevel)"`).
 
 Tags to use: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`
 

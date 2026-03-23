@@ -135,15 +135,23 @@ Agents MUST be spawned with `run_in_background: true`.
 
 ## On Startup
 
-1. Read your personal scratchpad at `.claude/teams/comms-dev/memory/<your-name>.md` if it exists
-2. Read this common-prompt.md
-3. Send a brief intro message to `team-lead`
+1. Resolve the repo root: `REPO="$(git rev-parse --show-toplevel)"`
+2. Read your personal scratchpad at `$REPO/.claude/teams/comms-dev/memory/<your-name>.md` if it exists
+3. Read this common-prompt.md
+4. Send a brief intro message to `team-lead`
 
 ## Team Memory
 
 ### Personal Scratchpads
 
-Each teammate maintains a scratchpad at `.claude/teams/comms-dev/memory/<your-name>.md`.
+Each teammate maintains a scratchpad in the **repo** (not the runtime `~/.claude/` directory):
+
+```
+$REPO/.claude/teams/comms-dev/memory/<your-name>.md
+```
+
+where `REPO="$(git rev-parse --show-toplevel)"`. **Always resolve the repo root first** and write to the repo path so scratchpads are committed with the codebase.
+
 Keep it under 100 lines; prune stale entries.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`
