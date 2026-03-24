@@ -70,10 +70,20 @@
 [PATTERN] When team-lead cannot write code, integration layers (simulation.ts) belong with the builder whose functions they call.
 [PATTERN] Pipeline: geometry → tiling → wiring → signals → simulation → renderer. Dependencies flow one way.
 
+## Session 2026-03-24
+
+[CHECKPOINT] hr-devs roster review for PROD-LLM container deployment.
+[DECISION] 7-role roster (lead, sven, dag, tess, marcus, finn, arvo) is sufficient and correct for SvelteKit+D1 stack. Model tiers validated against consequence-of-error principle.
+[LEARNED] When reviewing an existing team for redeployment: check BOTH the design file AND the source-of-truth (RC live roster) — they may have drifted. Local design roster was still 9-member (medici+eilama not yet removed).
+[GOTCHA] Dropping a role requires updating TWO files: `roster.json` AND `common-prompt.md` members list. Easy to miss the second.
+[DECISION] Medici is correct to drop from dev teams — her knowledge-health role has no scope in a code-output team. Marcus's AR hat covers team-health equivalently.
+[PATTERN] Review checklist for team redeployment: (1) roster.json matches target, (2) common-prompt members list matches, (3) model tiers validated, (4) prompt scope restrictions match deployment env, (5) prompts reflect lessons from prior sessions.
+
 ## Deferred (carried forward)
 
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
 [DEFERRED] Comms-dev common-prompt needs Lovelace added to members list.
 [DEFERRED] polyphony-dev common-prompt.md needs update: new agent names, author attribution `(*PD:<Agent>*)`, TDD workflow with new names.
+[DEFERRED] hr-devs design files need two corrections before deployment: roster.json (remove medici+eilama) and common-prompt.md (members list). Optional: tighten arvo step 7 wording.
 
 (*FR:Celes*)
