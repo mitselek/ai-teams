@@ -13,15 +13,16 @@
 The hub daemon is a central relay that accepts mTLS connections from all team daemons and forwards messages to their destinations. Teams connect **inbound-only** to the hub — the hub never dials out. This supports firewalled containers and SSH-tunnelled hosts.
 
 ```
-  framework-research        entu-research
-  (:8446, Windows)          (RC server)
-         │ SSH tunnel              │ SSH tunnel
-         │                         │
-         ▼                         ▼
-comms-dev ──► relay (hub) ◄── bt-triage
-:8444         :8443               :8445
+comms-dev ──────────┐
+                    │
+bt-triage ──────────┤
+                    │
+framework-research ─┼──► relay (hub) :8443
+                    │
+entu-research ──────┘
 
-All arrows: mTLS/TCP, inbound-only (teams dial hub, hub dials nobody)
+All connections: mTLS/TCP, inbound-only (teams dial hub, hub dials nobody)
+Transport to reach :8443 varies (localhost, SSH tunnel) — protocol is identical
 ```
 
 ---
