@@ -4,27 +4,19 @@
 // each message as it arrives. Behaves like `tail -f` for the inbox.
 //
 // Usage:
-//   comms-watch [--follow] [--consume] [--format <pretty|json|oneline>]
+//   comms-watch [--follow] [--format <pretty|json|oneline>]
 //
 // Options:
 //   --follow            Keep watching after printing existing messages (default: true)
 //   --no-follow         Print existing messages and exit
-//   --consume           Delete message files after displaying (mark as read)
-//   --format <mode>     Output format: pretty (default), json (raw), oneline
+//   --format <mode>     Output format: pretty (default), json, oneline
 //   --base-dir <path>   Override ~/.claude/teams base directory
 //
 // Required environment:
 //   COMMS_TEAM_NAME   — team whose inbox to watch
 //
-// !! MUTUAL EXCLUSION WARNING !!
-// comms-watch --consume and SendMessageBridge both poll the same inbox directory
-// and delete files after processing. Running both simultaneously causes a race:
-// one process may consume a file before the other has processed it, silently
-// dropping messages.
-//
-// Rule: run EITHER comms-watch (for human inspection) OR the broker with
-// SendMessageBridge enabled (for agent delivery) — never both at the same time.
-// comms-watch without --consume is safe to run alongside the broker (read-only).
+// comms-watch is read-only and safe to run alongside the broker at all times.
+// SendMessageBridge is the sole inbox consumer — it deletes files after delivery.
 
 import fs from 'fs';
 import path from 'path';
@@ -39,7 +31,6 @@ async function main(): Promise<void> {
     args: process.argv.slice(2),
     options: {
       follow: { type: 'boolean', default: true },
-      consume: { type: 'boolean', default: false },
       format: { type: 'string', default: 'pretty' },
       'base-dir': { type: 'string' },
     },
@@ -58,8 +49,6 @@ async function main(): Promise<void> {
 
   console.error(`[comms-watch] Watching inbox for team: ${teamName}`);
   console.error(`[comms-watch] Directory: ${inboxDir}`);
-  if (values.consume) console.error('[comms-watch] Consume mode: messages will be deleted after display');
-
   // Track already-seen files so we only print new arrivals
   const seen = new Set<string>();
 
@@ -75,7 +64,6 @@ async function main(): Promise<void> {
     const msg = readMessage(filePath);
     if (msg) {
       printMessage(msg, values.format!, filePath);
-      if (values.consume) fs.unlinkSync(filePath);
     }
   }
 
@@ -101,9 +89,6 @@ async function main(): Promise<void> {
       const msg = readMessage(filePath);
       if (msg) {
         printMessage(msg, values.format!, filePath);
-        if (values.consume) {
-          try { fs.unlinkSync(filePath); } catch { /* already removed */ }
-        }
       }
     }
   }
