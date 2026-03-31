@@ -14,13 +14,13 @@ The hub daemon is a central relay that accepts mTLS connections from all team da
 
 ```
 PROD-LLM host
-┌─────────────────────────────────────────────────────────────────────┐
-│                                                                     │
-│  relay (hub)        comms-dev          bt-triage                   │
-│  :8443  ◄───────────── :8444 ──────────── :8445                   │
-│    ▲                                                                │
-│    │  mTLS/TCP (inbound-only)                                       │
-└────┼────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                                                                │
+│  relay (hub)        comms-dev          bt-triage               │
+│  :8443  ◄─────────── :8444 ─────────── :8445                   │
+│    ▲                                                           │
+│    │  mTLS/TCP (inbound-only)                                  │
+└────┼───────────────────────────────────────────────────────────┘
      │
      │ SSH tunnel (port-forward)
      ├──── framework-research (:8446, Windows)
