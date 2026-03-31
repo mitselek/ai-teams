@@ -11,6 +11,7 @@ import type { TLSSocket } from 'node:tls';
 import { PassThrough } from 'node:stream';
 import { verify as cryptoVerify } from 'node:crypto';
 import { stableStringify } from './util/stable-stringify.js';
+import { MessageQueue } from './delivery/queue.js';
 
 export interface HubOptions {
   tls: {
@@ -23,6 +24,9 @@ export interface HubOptions {
   logger?: boolean | { stream: NodeJS.WritableStream }; // Pino options
   signPubKeys?: Record<string, string>; // teamName → Ed25519 PEM public key
   adminTeams?: string[]; // if set, only these CNs may POST /api/register
+  queuePath?: string; // SQLite file path; absent = :memory:
+  queueCapacity?: number; // max queued messages per team; default 100
+  queueTtlMs?: number; // message TTL in ms; default 86_400_000 (24h)
 }
 
 /** Extract the CN from the peer TLS certificate, or null if absent. */
@@ -81,8 +85,10 @@ export function createHub(options: HubOptions) {
 
   // Message routing state
   const subscriptions = new Map<string, PassThrough[]>(); // teamName → active SSE streams
+  const streamSockets = new WeakMap<PassThrough, TLSSocket>(); // stream → backing TLS socket
   const seenIds = new Set<string>(); // dedup by message ID
-  const offlineQueue = new Map<string, unknown[]>(); // teamName → queued messages (no active subscriber)
+  // SQLite-backed offline queue (falls back to :memory: when queuePath is absent)
+  const queue = new MessageQueue(options.queuePath, options.queueCapacity, options.queueTtlMs);
 
   // SSE event id: monotonic counters and ring-buffer for Last-Event-ID replay
   const sseCounters = new Map<string, number>(); // teamName → last assigned SSE id
@@ -109,6 +115,38 @@ export function createHub(options: HubOptions) {
   /** Write a single SSE event to a stream with id: and data: lines. */
   function writeEvent(stream: PassThrough, sseId: number, msg: unknown): void {
     stream.write(`id: ${sseId}\ndata: ${JSON.stringify(msg)}\n\n`);
+  }
+
+  /**
+   * Verify an Ed25519 signature on an inbound message.
+   * Returns null on success, or an error string if verification fails.
+   * Only called when signPubKeys is configured and the message carries sig + body_hash.
+   */
+  function verifySignature(msg: Record<string, unknown>, fromTeam: string): string | null {
+    const pubKeyPem = options.signPubKeys![fromTeam];
+    const signData = {
+      version: msg.version,
+      id: msg.id,
+      timestamp: msg.timestamp,
+      from: msg.from,
+      to: msg.to,
+      type: msg.type,
+      priority: msg.priority,
+      reply_to: msg.reply_to,
+      body_hash: msg.body_hash,
+    };
+    const signInput = Buffer.from(stableStringify(signData), 'utf-8');
+    try {
+      const valid = cryptoVerify(
+        null,
+        signInput,
+        pubKeyPem,
+        Buffer.from(msg.signature as string, 'base64'),
+      );
+      return valid ? null : 'Invalid signature';
+    } catch {
+      return 'Signature verification failed';
+    }
   }
 
   const hub = Fastify({
@@ -157,14 +195,14 @@ export function createHub(options: HubOptions) {
       for (const s of streams) s.end();
     }
     subscriptions.clear();
+    queue.close(); // flush WAL and close SQLite connection
   });
 
   // GET /api/status — hub metrics + peerTeam for authenticated caller
   hub.get('/api/status', async (request: FastifyRequest) => {
     const peerTeam = getPeerCN(request.raw.socket as TLSSocket)!;
     const uptime = (Date.now() - startTime) / 1000;
-    let queueDepth = 0;
-    for (const q of offlineQueue.values()) queueDepth += q.length;
+    const queueDepth = queue.depth();
     return { uptime, version: HUB_VERSION, peerCount: registry.size, queueDepth, peerTeam };
   });
 
@@ -203,7 +241,8 @@ export function createHub(options: HubOptions) {
     const cn = getPeerCN(request.raw.socket as TLSSocket)!;
     const stream = new PassThrough();
 
-    // Register this subscriber
+    // Register this subscriber (and map stream → TLS socket for dead-socket detection)
+    streamSockets.set(stream, request.raw.socket as TLSSocket);
     const existing = subscriptions.get(cn) ?? [];
     existing.push(stream);
     subscriptions.set(cn, existing);
@@ -251,15 +290,11 @@ export function createHub(options: HubOptions) {
       }
     }
 
-    // Drain offline queue (messages sent while team had no active subscriber)
-    const queued = offlineQueue.get(cn);
-    if (queued && queued.length > 0) {
-      for (const msg of queued) {
-        const sseId = nextSseId(cn);
-        bufferEvent(cn, sseId, msg);
-        writeEvent(stream, sseId, msg);
-      }
-      offlineQueue.delete(cn);
+    // Drain offline queue — TTL cleanup runs inside drain() before delivery
+    for (const msg of queue.drain(cn)) {
+      const sseId = nextSseId(cn);
+      bufferEvent(cn, sseId, msg);
+      writeEvent(stream, sseId, msg);
     }
 
     reply
@@ -289,55 +324,47 @@ export function createHub(options: HubOptions) {
     // Ed25519 signature verification — only when key is configured AND message carries sig + body_hash
     const fromTeam = (msg.from as { team: string }).team;
     if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash) {
-      const pubKeyPem = options.signPubKeys[fromTeam];
-      // Canonical sign-data mirrors crypto-v2.ts signMessage (fields + body_hash, no body)
-      const signData = {
-        version: msg.version,
-        id: msg.id,
-        timestamp: msg.timestamp,
-        from: msg.from,
-        to: msg.to,
-        type: msg.type,
-        priority: msg.priority,
-        reply_to: msg.reply_to,
-        body_hash: msg.body_hash,
-      };
-      const signInput = Buffer.from(stableStringify(signData), 'utf-8');
-      try {
-        const valid = cryptoVerify(
-          null,
-          signInput,
-          pubKeyPem,
-          Buffer.from(msg.signature as string, 'base64'),
-        );
-        if (!valid) {
-          return reply.code(403).send({ error: 'Invalid signature' });
-        }
-      } catch {
-        return reply.code(403).send({ error: 'Signature verification failed' });
-      }
+      const sigError = verifySignature(msg, fromTeam);
+      if (sigError) return reply.code(403).send({ error: sigError });
     }
 
     // Mark seen after validation, before routing (at-least-once dedup)
     seenIds.add(msgId);
 
+    // Yield one event-loop turn so pending I/O callbacks (e.g. RST from a just-closed
+    // SSE subscriber) run before we inspect subscriptions. Without this, a dead stream
+    // whose socket RST hasn't been processed yet would intercept the message and lose it
+    // (PassThrough silently buffers the write; client is gone; message never queued).
+    await new Promise<void>((resolve) => setImmediate(resolve));
+
     // Route to active SSE subscriber or queue for offline delivery
     const toTeam = (msg.to as { team: string }).team;
-    const subs = subscriptions.get(toTeam);
+    const rawSubs = subscriptions.get(toTeam) ?? [];
 
-    if (subs && subs.length > 0) {
+    // Eagerly prune destroyed streams/sockets.
+    // stream.destroyed is only set after the close event chain completes, but socket.destroyed
+    // is set synchronously when the RST I/O event is processed — catches the race window.
+    const liveSubs = rawSubs.filter((s) => {
+      if (s.destroyed) return false;
+      const sock = streamSockets.get(s);
+      return !sock || !sock.destroyed;
+    });
+    if (liveSubs.length < rawSubs.length) {
+      if (liveSubs.length === 0) subscriptions.delete(toTeam);
+      else subscriptions.set(toTeam, liveSubs);
+    }
+
+    if (liveSubs.length > 0) {
       // Live delivery: assign SSE id, buffer for Last-Event-ID replay, fan-out
       const sseId = nextSseId(toTeam);
       bufferEvent(toTeam, sseId, msg);
-      for (const sub of subs) {
+      for (const sub of liveSubs) {
         writeEvent(sub, sseId, msg);
       }
       return { ok: true, id: msgId };
     } else {
-      // Offline: queue without SSE id (assigned when drained on subscribe)
-      const queue = offlineQueue.get(toTeam) ?? [];
-      queue.push(msg);
-      offlineQueue.set(toTeam, queue);
+      // Offline: store in SQLite queue (SSE id assigned when drained on subscribe)
+      queue.push(toTeam, msg);
       return { ok: true, id: msgId, queued: true };
     }
   });
