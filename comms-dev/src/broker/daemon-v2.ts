@@ -5,15 +5,18 @@
 // Spec: #16 §5–§7, #18 Phase 3–4
 
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { writeFileSync, unlinkSync, renameSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { createServer as createNetServer, type Server as NetServer, type Socket } from 'node:net';
 import { loadDaemonCrypto } from '../crypto/tls-config.js';
 import { createAclManager, loadAcl } from '../crypto/acl.js';
+import { createCryptoAPIv2, loadKeyBundle } from '../crypto/index.js';
 import { TlsServer } from '../transport/tls-server.js';
 import { TunnelManager } from '../transport/tunnel-manager.js';
 import { MessageStore } from './message-store.js';
 import { buildMessage } from './message-builder.js';
 import type { AclManager } from '../crypto/acl.js';
+import type { CryptoAPIv2, E2EPayload, SignedMessage } from '../crypto/types.js';
 import type { Message, MessageType, MessagePriority } from '../types.js';
 
 const DAEMON_VERSION = '1.0.0';
@@ -23,12 +26,36 @@ export interface DaemonV2Options {
   keysDir: string;         // contains daemon.key, daemon.crt, peers/*.crt, acl.json
   inboxDir: string;        // direct path to inbox directory (files land here as <id>.json)
   listenPort: number;      // 0 for OS-assigned
+  listenHost?: string;     // bind address; defaults to '0.0.0.0' for cross-container reachability
   socketDir?: string;      // UDS socket directory; if set, daemon listens on <socketDir>/<teamName>.sock
   peers?: Record<string, { host: string; port: number }>;
   reconnectBaseMs?: number;
   heartbeatIntervalMs?: number;
   deadConnectionMs?: number;
   maxQueueSize?: number;
+  /**
+   * 'hub': forward messages addressed to other teams; no local ACL enforcement.
+   * 'team' (default): deliver to local inbox, enforce ACL.
+   */
+  role?: 'team' | 'hub';
+  /**
+   * Cert CNs of hub peers (e.g. ["comms-hub"]). Passed to TlsServer to skip
+   * from.team === peerCertCN for hub-relayed messages.
+   * Ed25519 signature verification added when createCryptoAPIv2 is available.
+   */
+  hubPeers?: string[];
+  /** v2 E2E crypto: path to comms-key-bundle.json (all teams' public keys) */
+  keyBundlePath?: string;
+  /** v2 E2E crypto: path to this team's Ed25519 signing private key (PEM) */
+  signKeyPath?: string;
+  /** v2 E2E crypto: path to this team's X25519 encryption private key (PEM) */
+  encKeyPath?: string;
+  /**
+   * Default hub peer name for routing messages to teams not in the direct peers map.
+   * When set, sendMessage(msg) for unknown destinations routes via this peer (the relay).
+   * Example: 'relay' — cd sends to fr via relay without a direct fr→cd cert pin.
+   */
+  defaultPeer?: string;
 }
 
 // ── Per-peer tracking ─────────────────────────────────────────────────────────
@@ -89,6 +116,7 @@ export class DaemonV2 {
   private tunnelManager: TunnelManager | null = null;
   private aclManager: AclManager | null = null;
   private messageStore: MessageStore | null = null;
+  private cryptoV2: CryptoAPIv2 | null = null;
   private udsServer: NetServer | null = null;
   private ready = false;
   private connectedPeerSet = new Set<string>();
@@ -110,9 +138,25 @@ export class DaemonV2 {
       peersDir: join(keysDir, 'peers'),
     });
 
-    // Load ACL (throws if acl.json missing or malformed)
-    this.aclPath = join(keysDir, 'acl.json');
-    this.aclManager = createAclManager(this.aclPath);
+    // Hub mode skips ACL — it forwards based on routing metadata only.
+    // Team mode loads ACL (throws if acl.json missing or malformed).
+    if (this.opts.role !== 'hub') {
+      this.aclPath = join(keysDir, 'acl.json');
+      this.aclManager = createAclManager(this.aclPath);
+    }
+
+    // v2 E2E crypto: load key bundle and private keys if all three paths provided.
+    // When absent, daemon operates in v1 mode (no E2E encryption, no message signing).
+    if (this.opts.keyBundlePath && this.opts.signKeyPath && this.opts.encKeyPath) {
+      const keyBundle = loadKeyBundle(this.opts.keyBundlePath);
+      this.cryptoV2 = createCryptoAPIv2({
+        teamName,
+        signKey: readFileSync(this.opts.signKeyPath),
+        encKey:  readFileSync(this.opts.encKeyPath),
+        keyBundle,
+      });
+      console.log(`[daemon] v2 E2E crypto loaded (key bundle v${keyBundle.version})`);
+    }
 
     // Ensure inbox dir exists
     mkdirSync(inboxDir, { recursive: true });
@@ -122,10 +166,22 @@ export class DaemonV2 {
     this.messageStore.start();
 
     // Set up TLS server
-    this.tlsServer = new TlsServer({ config, teamName });
+    this.tlsServer = new TlsServer({
+      config,
+      teamName,
+      hubPeers: this.opts.hubPeers,
+    });
     this.tlsServer.onMessage((msg: Message) => this.handleInbound(msg));
 
-    await this.tlsServer.start(listenPort);
+    // Hub mode: when a peer authenticates an inbound connection, register
+    // the socket in TunnelManager so forwardMessage() can write back to them.
+    if (this.opts.role === 'hub') {
+      this.tlsServer.onPeerSocket((peerTeam, socket) => {
+        this.tunnelManager?.registerInboundSocket(peerTeam, socket);
+      });
+    }
+
+    await this.tlsServer.start(listenPort, this.opts.listenHost ?? '0.0.0.0');
 
     // Set up tunnel manager
     this.tunnelManager = new TunnelManager({
@@ -135,6 +191,7 @@ export class DaemonV2 {
       heartbeatIntervalMs: this.opts.heartbeatIntervalMs,
       deadConnectionMs:    this.opts.deadConnectionMs,
       maxQueueSize:        this.opts.maxQueueSize,
+      defaultPeer:         this.opts.defaultPeer,
     });
 
     // Initialise per-peer info from configured peers
@@ -167,6 +224,10 @@ export class DaemonV2 {
       }
       console.log(`[daemon] tunnel connected: ${team}`);
     });
+
+    // Messages received on outbound sockets (hub writing back to us) are
+    // processed identically to messages received via TlsServer.
+    this.tunnelManager.onMessage((msg: Message) => this.handleInbound(msg));
 
     await this.tunnelManager.start(peers);
 
@@ -231,11 +292,38 @@ export class DaemonV2 {
       return 'ACL_DENIED';
     }
 
-    const result = await this.tunnelManager.send(msg.to.team, msg);
+    // v2: E2E encrypt body + sign envelope before handing to tunnel
+    const outMsg = this.cryptoV2 ? await this.prepareOutbound(msg) : msg;
+
+    const result = await this.tunnelManager.send(outMsg.to.team, outMsg);
     if (result === 'PEER_UNKNOWN' || result === 'PEER_UNAVAILABLE') {
       return 'PEER_UNAVAILABLE';
     }
     return 'OK';
+  }
+
+  /**
+   * Encrypt body with E2E (X25519+AES-256-GCM) and sign the envelope (Ed25519).
+   * Returns a SignedMessage with encrypted body, body_hash, and signature fields.
+   * Falls back to the original message if encryption fails (logs error).
+   */
+  private async prepareOutbound(msg: Message): Promise<Message> {
+    if (!this.cryptoV2) return msg;
+    try {
+      const e2ePayload = await this.cryptoV2.e2eEncrypt(
+        Buffer.from(msg.body, 'utf-8'),
+        msg.to.team,
+        msg.id,
+      );
+      const encBody = JSON.stringify(e2ePayload);
+      const encMsg: Message = { ...msg, body: encBody };
+      const bodyHash = 'sha256:' + createHash('sha256').update(encBody, 'utf-8').digest('hex');
+      const signature = this.cryptoV2.signEnvelope(encMsg);
+      return { ...encMsg, body_hash: bodyHash, signature } as unknown as Message;
+    } catch (err) {
+      console.error(`[daemon] E2E encrypt failed for msg ${msg.id}:`, err);
+      return msg;
+    }
   }
 
   /**
@@ -411,11 +499,39 @@ export class DaemonV2 {
 
   // ── Inbound message handler ─────────────────────────────────────────────────
 
-  private handleInbound(msg: Message): void {
+  private async handleInbound(msg: Message): Promise<void> {
     if (!this.messageStore) return;
 
     const isNew = this.messageStore.record(msg);
     if (!isNew) return;
+
+    // Hub mode: forward messages addressed to other teams.
+    // Hub-local messages (msg.to.team === teamName) fall through to normal delivery.
+    if (this.opts.role === 'hub' && msg.to.team !== this.opts.teamName) {
+      this.forwardMessage(msg);
+      return;
+    }
+
+    // v2: verify Ed25519 signature and E2E decrypt body.
+    // Drop messages that fail verification — they may be forgeries relayed via hub.
+    const possibleSigned = msg as Partial<SignedMessage>;
+    if (this.cryptoV2 && possibleSigned.signature) {
+      const valid = this.cryptoV2.verifySignature(possibleSigned as SignedMessage);
+      if (!valid) {
+        console.warn(
+          `[daemon] Signature verification failed for msg ${msg.id} from ${msg.from.team}/${msg.from.agent} — dropping`,
+        );
+        return;
+      }
+      try {
+        const e2ePayload = JSON.parse(msg.body) as E2EPayload;
+        const plaintext = await this.cryptoV2.e2eDecrypt(e2ePayload, msg.id);
+        msg = { ...msg, body: plaintext.toString('utf-8') };
+      } catch (err) {
+        console.error(`[daemon] E2E decrypt failed for msg ${msg.id}:`, err);
+        return;
+      }
+    }
 
     if (this.aclManager) {
       const localAgent = msg.to.agent;
@@ -436,5 +552,27 @@ export class DaemonV2 {
       console.error(`[daemon] Failed to deliver message ${msg.id}:`, err);
       try { unlinkSync(tmpPath); } catch { /* ignore */ }
     }
+  }
+
+  // ── Hub forwarding ───────────────────────────────────────────────────────────
+
+  private forwardMessage(msg: Message): void {
+    if (!this.tunnelManager) {
+      console.error(`[hub] Cannot forward to ${msg.to.team}: tunnel manager not ready`);
+      return;
+    }
+
+    // Fire-and-forget: ACK to sender already sent by TlsServer on receipt.
+    // v1 semantics: hub delivery is best-effort; sender retries on its own schedule.
+    // v2 TODO: hold ACK until destination ACKs (async ACK chain).
+    this.tunnelManager.send(msg.to.team, msg).then((result) => {
+      if (result === 'PEER_UNKNOWN') {
+        console.error(`[hub] Forward failed — unknown destination team: ${msg.to.team} (msg ${msg.id})`);
+      } else if (result === 'PEER_UNAVAILABLE') {
+        console.warn(`[hub] Forward queued/failed — ${msg.to.team} unavailable (msg ${msg.id})`);
+      }
+    }).catch((err) => {
+      console.error(`[hub] Forward error to ${msg.to.team} (msg ${msg.id}):`, err);
+    });
   }
 }

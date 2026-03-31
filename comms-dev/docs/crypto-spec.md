@@ -242,8 +242,476 @@ const provider = createCryptoProvider(crypto);
 
 ---
 
+# Hub-Mode Cryptographic Protocol — v2 (*CD:Vigenere*)
+
+## Motivation
+
+v1 assumes peer-to-peer mTLS between teams on a shared Docker volume. The fleet now spans two hosts (RC server + PROD-LLM) separated by a firewall. Cross-firewall tunnels for every peer pair are not viable — O(n²) tunnels for n teams. A hub/relay architecture reduces this to O(n) connections (each team connects to the hub).
+
+**Critical constraint:** The hub routes messages but **MUST NOT read message content**. This requires E2E encryption between sender and receiver teams, with the hub blind to the payload.
+
+v2 layers E2E encryption on top of mTLS:
+- **mTLS** secures the transport (team ↔ hub): confidentiality, integrity, authentication of the connection
+- **E2E encryption** secures the payload (sender team ↔ receiver team): the hub sees routing metadata but not the message body
+
+---
+
+## Threat Model Summary (Hub-Specific)
+
+**Defending against:**
+- Compromised or curious hub reading message content
+- Hub forging messages claiming to be from another team
+- Hub replaying messages between teams
+- Man-in-the-middle between team and hub
+- Metadata correlation by the hub (partially — see limitations)
+
+**NOT defending against:**
+- Hub dropping messages (availability — not a crypto problem)
+- Hub performing traffic analysis on message sizes/timing (accepted risk, mitigate with padding)
+- Compromise of a team's private keys (endpoint security, not hub crypto)
+- Collusion between hub and a team (if hub + team A collude, team A's messages are readable by definition)
+
+Full threat model: see `threat-model.md` §v2.
+
+---
+
+## Cryptographic Identity Model
+
+### Per-Team Key Material
+
+Each team possesses three independent keypairs, serving distinct purposes:
+
+| Keypair | Algorithm | Purpose | Storage |
+|---|---|---|---|
+| **TLS identity** | ECDSA P-256 (existing) | mTLS authentication to the hub | `daemon.key` / `daemon.crt` |
+| **Signing key** | Ed25519 | Message-level sender authentication | `/run/secrets/comms-sign-key` |
+| **Encryption key** | X25519 | E2E key agreement with other teams | `/run/secrets/comms-enc-key` |
+
+**Why three separate keypairs:**
+- **TLS identity** authenticates the transport connection. The hub uses this to verify which team is connected. This is the existing ECDSA cert.
+- **Signing key** authenticates individual messages. Replaces `from.team === peerCertCN` invariant — the receiver verifies the Ed25519 signature, not the TLS peer identity (which is now always "hub").
+- **Encryption key** enables E2E confidentiality. X25519 DH between sender and receiver derives a pairwise symmetric key the hub never sees.
+
+Ed25519 and X25519 are intentionally kept separate (even though they use the same curve) to enforce domain separation and avoid cross-protocol attacks.
+
+### Hub Key Material
+
+| Keypair | Algorithm | Purpose |
+|---|---|---|
+| **TLS identity** | ECDSA P-256 | mTLS authentication — hub authenticates to teams, teams authenticate to hub |
+| **No signing key** | — | Hub does NOT sign messages. It forwards them opaquely. |
+| **No encryption key** | — | Hub does NOT participate in E2E encryption. |
+
+The hub's TLS certificate has `CN=comms-hub`. Teams authenticate the hub by having its cert in their `peers/` directory (existing mechanism).
+
+### Key Generation
+
+```bash
+# Ed25519 signing keypair
+openssl genpkey -algorithm ed25519 -out sign-key.pem
+openssl pkey -in sign-key.pem -pubout -out sign-key.pub
+
+# X25519 encryption keypair
+openssl genpkey -algorithm x25519 -out enc-key.pem
+openssl pkey -in enc-key.pem -pubout -out enc-key.pub
+```
+
+---
+
+## Key Distribution
+
+### Public Key Bundle
+
+Each team needs the public keys (Ed25519 verify + X25519 encrypt) of every other team. These are distributed as a **key bundle** — a JSON file provisioned out-of-band (Docker Compose volume mount or secret).
+
+```json
+{
+  "version": 1,
+  "generated_at": "2026-03-30T12:00:00Z",
+  "teams": {
+    "framework-research": {
+      "sign_pub": "MCowBQYDK2VwAyEA...",
+      "enc_pub": "MCowBQYDK2VuAyEA..."
+    },
+    "comms-dev": {
+      "sign_pub": "MCowBQYDK2VwAyEA...",
+      "enc_pub": "MCowBQYDK2VuAyEA..."
+    }
+  }
+}
+```
+
+**Path:** `/run/secrets/comms-key-bundle.json` (mounted as Docker secret)
+
+**Why NOT via the hub:**
+- The hub is untrusted for key distribution. If the hub provides public keys, a compromised hub can substitute its own keys (classic MITM on key exchange).
+- Out-of-band distribution via Docker secrets/Compose means the key bundle is provisioned by the infrastructure operator, not by any runtime component.
+
+**Key rotation:**
+1. Generate new keypair for the rotating team
+2. Update the key bundle with the new public key
+3. Distribute the updated bundle to all teams (Docker secret update + container restart)
+4. Old keys are removed from the bundle after a grace period
+
+The key bundle includes a `version` field. Teams reject bundles with a lower version than what they've seen (downgrade protection).
+
+---
+
+## E2E Encryption Protocol
+
+### Pairwise Key Derivation
+
+When team A wants to send to team B:
+
+```
+shared_secret = X25519(A.enc_private, B.enc_public)
+                  ≡ X25519(B.enc_private, A.enc_public)   // DH symmetry
+
+pairwise_key = HKDF-SHA256(
+  ikm:  shared_secret,           // 32 bytes from X25519
+  salt: SHA-256(sorted_team_names),  // deterministic: "comms-dev|framework-research"
+  info: "comms-v2:e2e:encryption",
+  len:  32                       // AES-256 key
+)
+
+pairwise_integrity_key = HKDF-SHA256(
+  ikm:  shared_secret,
+  salt: SHA-256(sorted_team_names),
+  info: "comms-v2:e2e:integrity",
+  len:  32                       // HMAC-SHA256 key
+)
+```
+
+**Salt construction:** Sort team names lexicographically, join with `|`, SHA-256 hash. This ensures both sides derive the same salt regardless of who initiates.
+
+**Key caching:** Pairwise keys are derived once per team pair and cached in memory for the session. They do not change unless a team's X25519 key is rotated.
+
+### Encrypt (E2E)
+
+Input: plaintext body, sender team name, receiver team name, message ID
+
+1. Look up (or derive) pairwise encryption key for the sender→receiver pair
+2. Generate 12 random bytes as IV: `crypto.randomBytes(12)`
+3. Construct AAD: `"v2:" + message.id + ":" + sender_team + ":" + receiver_team`
+4. AES-256-GCM encrypt with pairwise key, IV, AAD
+5. Return `E2EPayload { iv, ciphertext, tag, sender_team, version: 2 }`
+
+AAD now includes both sender and receiver team names (v1 only had sender), preventing the hub from re-routing an encrypted message to a different receiver.
+
+### Decrypt (E2E)
+
+Input: `E2EPayload`, receiver's own team name
+
+1. Extract sender_team from the payload
+2. Look up (or derive) pairwise decryption key for the sender→receiver pair
+3. Reconstruct AAD: `"v2:" + message.id + ":" + sender_team + ":" + receiver_team`
+4. AES-256-GCM decrypt with pairwise key, IV, AAD, tag
+5. If decryption fails: reject (tampered or wrong key)
+
+### E2EPayload Type
+
+```typescript
+interface E2EPayload {
+  /** AES-256-GCM initialization vector (12 bytes, base64) */
+  iv: string;
+  /** Ciphertext (base64) */
+  ciphertext: string;
+  /** GCM authentication tag (16 bytes, base64) */
+  tag: string;
+  /** Sender team name — needed by receiver to derive pairwise key */
+  sender_team: string;
+  /** Crypto protocol version */
+  version: 2;
+}
+```
+
+---
+
+## Message Signing (Sender Authentication)
+
+### The Problem
+
+In v1 peer-to-peer, `from.team === peerCertCN` works because the TLS peer IS the sender. In hub mode, the TLS peer is always the hub (`CN=comms-hub`). The receiver cannot trust the `from.team` field in the envelope — the hub could forge it.
+
+### The Solution: Ed25519 Envelope Signatures
+
+The sender signs the message envelope with its Ed25519 private key. The receiver verifies against the sender's Ed25519 public key (from the key bundle).
+
+**What is signed:**
+
+```
+sign_input = canonicalize({
+  version, id, timestamp,
+  from, to, type, priority,
+  reply_to,
+  body_hash: SHA-256(body),   // hash of the E2E-encrypted body, NOT plaintext
+})
+```
+
+The signature covers:
+- All routing metadata (from, to, type, priority, reply_to)
+- Message identity (version, id, timestamp)
+- A hash of the encrypted body (binding the metadata to the specific ciphertext)
+
+The signature does NOT cover the body directly — it covers `body_hash` (SHA-256 of the encrypted body string). This allows the hub to forward the message without needing to understand the body contents while still binding the signature to the specific ciphertext.
+
+### Signed Message Envelope
+
+```typescript
+interface SignedMessage extends Message {
+  /** Ed25519 signature over canonical envelope (base64) */
+  signature: string;
+  /** SHA-256 hash of the body field (hex), included in signed data */
+  body_hash: string;
+}
+```
+
+### Sign
+
+1. Compute `body_hash = SHA-256(message.body)` (hex-encoded)
+2. Construct sign input: all envelope fields + body_hash, excluding `signature` and `checksum`
+3. Canonicalize: deterministic JSON serialization (sorted keys, no whitespace)
+4. Sign with Ed25519 private key: `crypto.sign('ed25519', sign_input, private_key)`
+5. Encode signature as base64
+
+### Verify
+
+1. Extract `signature` from the message
+2. Recompute `body_hash = SHA-256(message.body)` — verify it matches the claimed body_hash
+3. Reconstruct sign input (same canonicalization)
+4. Look up sender's Ed25519 public key from the key bundle using `message.from.team`
+5. Verify: `crypto.verify('ed25519', sign_input, public_key, signature)`
+6. If verification fails: **reject the message**
+
+### Replacing `from.team === peerCertCN`
+
+The old invariant is replaced by a two-step verification:
+
+| Layer | v1 (peer-to-peer) | v2 (hub mode) |
+|---|---|---|
+| Transport auth | `from.team === peerCertCN` | `peerCertCN === "comms-hub"` (verify connected to hub) |
+| Message auth | (implicit from transport) | Ed25519 signature verification against key bundle |
+
+**Hub validation:** The hub itself should validate `from.team === peerCertCN` on the incoming connection (team→hub). This prevents a team from claiming to be another team at the hub level. But the receiver still MUST verify the Ed25519 signature — the hub's validation is defense-in-depth, not the primary trust mechanism.
+
+---
+
+## Hub Routing — What the Hub Sees
+
+The hub sees the **envelope** (routing metadata) but NOT the **plaintext body**:
+
+| Field | Visible to hub? | Purpose |
+|---|---|---|
+| `version`, `id`, `timestamp` | Yes | Message identity |
+| `from`, `to` | Yes | Routing |
+| `type`, `priority` | Yes | Routing priority |
+| `body` (E2E-encrypted) | Ciphertext only | Hub forwards opaquely |
+| `signature` | Yes | Hub MAY verify (defense-in-depth) |
+| `body_hash` | Yes | Binding signature to body |
+| `checksum` | Yes | Envelope integrity |
+
+The hub SHOULD verify the Ed25519 signature before forwarding (to reject forged messages early), but the receiver MUST NOT rely on the hub having done so.
+
+---
+
+## Backward Compatibility (v1 ↔ v2)
+
+### Version Detection
+
+- `EncryptedPayload.version === 1`: v1 PSK-encrypted body (peer-to-peer)
+- `E2EPayload.version === 2`: v2 E2E-encrypted body (hub mode)
+
+### Migration Path
+
+1. **Phase 1:** Deploy v2 key material (Ed25519 + X25519) alongside existing v1 PSK. Brokers support both versions.
+2. **Phase 2:** Hub comes online. ALL communication routes through the hub with v2 E2E. No peer-to-peer fallback.
+3. **Phase 3:** Deprecate v1. Remove v1 PSK support entirely.
+
+A message with `signature` field present is v2. Absence means v1 (legacy).
+
+---
+
+## Hub Compromise and Availability
+
+### Hub Compromise Impact
+
+| Asset | Impact if hub is compromised |
+|---|---|
+| Message content | **SAFE** — E2E encrypted, hub has no decryption keys |
+| Message metadata | **EXPOSED** — hub sees from, to, timestamp, type, priority |
+| Message integrity | **SAFE** — Ed25519 signatures are verified by receiver, not hub |
+| Availability | **AT RISK** — compromised hub can drop, delay, or reorder messages |
+| Sender identity | **SAFE** — hub cannot forge Ed25519 signatures |
+
+**Key insight:** A compromised hub is equivalent to a network adversary who can observe and drop traffic but cannot read or forge messages. This is the standard security model for E2E encrypted systems (analogous to Signal's server model).
+
+### Hub Unavailability
+
+There is **no peer-to-peer fallback**. The hub is the single communication path for all teams, whether same-host or cross-host. If the hub is down:
+
+1. Teams queue messages locally with configurable retention
+2. Hub restart is an ops responsibility (Docker restart policy, monitoring)
+3. When hub recovers, queued messages are delivered
+
+Hub availability is an operational concern, not an application-layer concern.
+
+---
+
+## Updated API (TypeScript)
+
+### New Types
+
+```typescript
+/** Key bundle loaded from /run/secrets/comms-key-bundle.json */
+interface KeyBundle {
+  version: number;
+  generated_at: string;
+  teams: Record<string, {
+    sign_pub: string;  // PEM-encoded Ed25519 public key
+    enc_pub: string;   // PEM-encoded X25519 public key
+  }>;
+}
+
+/** E2E encrypted payload (v2) */
+interface E2EPayload {
+  iv: string;           // base64, 12 bytes
+  ciphertext: string;   // base64
+  tag: string;          // base64, 16 bytes
+  sender_team: string;  // needed for key derivation
+  version: 2;
+}
+
+/** Extended message with Ed25519 signature */
+interface SignedMessage extends Message {
+  signature: string;    // base64 Ed25519 signature
+  body_hash: string;    // "sha256:<hex>" — hash of body field
+}
+```
+
+### New CryptoAPI Methods (v2 additions)
+
+```typescript
+interface CryptoAPIv2 extends CryptoAPI {
+  /**
+   * E2E encrypt a message body for a specific receiver team.
+   * Uses X25519 key agreement to derive a pairwise AES-256-GCM key.
+   * @param plaintext - Message body to encrypt
+   * @param receiverTeam - Destination team name
+   * @param messageId - Message ID for AAD binding
+   * @returns E2EPayload (hub-opaque)
+   */
+  e2eEncrypt(plaintext: Buffer, receiverTeam: string, messageId: string): Promise<E2EPayload>;
+
+  /**
+   * E2E decrypt a message body from a sender team.
+   * @param payload - E2EPayload received from hub
+   * @param messageId - Message ID for AAD verification
+   * @returns Decrypted plaintext
+   * @throws Error if decryption fails (tampered data or wrong key)
+   */
+  e2eDecrypt(payload: E2EPayload, messageId: string): Promise<Buffer>;
+
+  /**
+   * Sign a message envelope with Ed25519.
+   * @param message - Complete message (body should already be E2E-encrypted)
+   * @returns base64-encoded Ed25519 signature
+   */
+  signEnvelope(message: Message): string;
+
+  /**
+   * Verify an Ed25519 signature on a message envelope.
+   * @param message - SignedMessage to verify
+   * @returns true if signature is valid, false otherwise
+   */
+  verifySignature(message: SignedMessage): boolean;
+
+  /**
+   * Load and validate a key bundle.
+   * @param bundlePath - Path to comms-key-bundle.json
+   * @returns Parsed and validated KeyBundle
+   */
+  loadKeyBundle(bundlePath: string): KeyBundle;
+
+  /**
+   * Derive pairwise keys for a specific team pair.
+   * Cached after first derivation.
+   * @param peerTeam - The other team's name
+   * @returns DerivedKeys for E2E encryption with that team
+   */
+  derivePairwiseKeys(peerTeam: string): DerivedKeys;
+}
+```
+
+### Usage (v2)
+
+```typescript
+import { createCryptoAPIv2 } from './crypto/index.js';
+
+// 1. Load key material
+const signKey = readFileSync('/run/secrets/comms-sign-key');
+const encKey = readFileSync('/run/secrets/comms-enc-key');
+const bundle = loadKeyBundle('/run/secrets/comms-key-bundle.json');
+
+// 2. Create v2 API instance
+const crypto = createCryptoAPIv2({
+  teamName: 'comms-dev',
+  signKey,
+  encKey,
+  keyBundle: bundle,
+});
+
+// 3. E2E encrypt body for receiver
+const e2eBody = await crypto.e2eEncrypt(
+  Buffer.from('Hello from comms-dev'),
+  'framework-research',
+  'msg-abc123'
+);
+
+// 4. Sign the envelope
+const message = buildMessage({ body: JSON.stringify(e2eBody), ... });
+const signature = crypto.signEnvelope(message);
+
+// 5. Receiver: verify signature + decrypt
+const valid = crypto.verifySignature(signedMessage);
+const plaintext = await crypto.e2eDecrypt(e2eBody, signedMessage.id);
+```
+
+---
+
+## Security Invariants (v2 additions)
+
+6. **E2E key independence:** Pairwise keys are derived per team pair. Compromise of team A's key reveals only conversations involving team A, not conversations between teams B and C.
+7. **Signature non-repudiation:** Ed25519 signatures bind the sender's identity to the message. The sender cannot deny having sent a signed message (assuming their private key is uncompromised).
+8. **Hub blindness:** The hub MUST NOT possess any team's X25519 private key or Ed25519 signing key. The hub's TLS identity is sufficient for its routing function.
+9. **AAD binding:** E2E AAD includes sender team, receiver team, and message ID. The hub cannot re-route a message to a different receiver (AAD mismatch causes decryption failure).
+10. **Key bundle integrity:** Teams reject key bundles with a version lower than what they've previously seen. Downgrade attacks on the key bundle are detected.
+
+---
+
+## Algorithm Summary (v2)
+
+| Function | Primitive | Parameters | Rationale |
+|---|---|---|---|
+| E2E key agreement | X25519 | 256-bit keys | RFC 7748. Constant-time, no special cases. Standard choice for DH key agreement. |
+| E2E encryption | AES-256-GCM | 256-bit key, 96-bit IV, 128-bit tag | Same as v1. Proven, hardware-accelerated, AEAD. |
+| E2E key derivation | HKDF-SHA256 | SHA-256 hash, team-pair salt, context info | Same primitive as v1. Domain separation via distinct info strings. |
+| Message signing | Ed25519 | 256-bit keys, 512-bit signatures | RFC 8032. Deterministic signatures (no nonce generation needed). Fast, constant-time. |
+| Signature hash binding | SHA-256 | Over encrypted body | Binds signature to ciphertext without requiring the signer to include the full body in the signed data. |
+
+### Why These Specific Algorithms
+
+| Choice | Rationale |
+|---|---|
+| X25519 over ECDH P-256 | Simpler, constant-time by design, no point validation needed. Montgomery ladder is side-channel resistant. |
+| Ed25519 over ECDSA P-256 | Deterministic (no random nonce — eliminates a class of implementation bugs). Faster signature generation. |
+| Separate Ed25519 + X25519 over dual-use | Avoids cross-protocol attacks. Ed25519 keys on twisted Edwards curve, X25519 on Montgomery curve — mathematically related but operationally isolated. |
+| Static X25519 over ephemeral | Ephemeral DH per message would provide forward secrecy but requires a key exchange round-trip or prekey bundles (Signal-style). Static DH is simpler for v2; ephemeral ratcheting is a v3 upgrade path. |
+
+---
+
 ## Revision History
 
 | Date | Author | Change |
 |---|---|---|
 | 2026-03-14 | (*CD:Vigenere*) | Initial v1 crypto specification |
+| 2026-03-30 | (*CD:Vigenere*) | v2 hub-mode: E2E encryption (X25519+AES-256-GCM), Ed25519 message signing, key bundle distribution |

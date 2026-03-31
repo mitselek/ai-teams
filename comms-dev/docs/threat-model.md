@@ -242,8 +242,251 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 
 ---
 
+# Threat Model — Hub/Relay Architecture (v2) (*CD:Vigenere*)
+
+## Scope
+
+This section covers the hub/relay architecture where all inter-host communication passes through a central hub. It supplements the v1 threat model above — v1 threats still apply to the UDS layer; v2 adds hub-specific threats.
+
+**Architecture change:** Fleet spans two hosts (RC server + PROD-LLM). A single hub relays ALL messages between teams — there is no peer-to-peer fallback. If the hub is down, teams wait for it to recover. Hub availability is an ops concern (restart/monitoring), not an application concern.
+
+---
+
+## System Architecture (v2 Security View)
+
+```
+┌─────────────────────────────┐                    ┌─────────────────────────────┐
+│  Host A (RC Server)         │                    │  Host B (PROD-LLM)          │
+│                             │                    │                             │
+│  ┌──────────┐  ┌──────────┐ │    mTLS tunnel     │ ┌──────────┐  ┌──────────┐ │
+│  │ Team A   │  │ Team B   │ │◄──────────────────►│ │ Team C   │  │ Team D   │ │
+│  │ Ed25519  │  │ Ed25519  │ │   (team ↔ hub)     │ │ Ed25519  │  │ Ed25519  │ │
+│  │ X25519   │  │ X25519   │ │                    │ │ X25519   │  │ X25519   │ │
+│  └────┬─────┘  └────┬─────┘ │                    │ └────┬─────┘  └────┬─────┘ │
+│       │              │       │                    │      │              │       │
+│       └──────┬───────┘       │                    │      └──────┬───────┘       │
+│              │               │                    │             │               │
+│        ┌─────▼──────┐        │                    │       ┌─────▼──────┐        │
+│        │   HUB      │        │                    │       │   (HUB)    │        │
+│        │ CN=comms-  │◄───────┼────────────────────┼──────►│  or direct │        │
+│        │ hub        │  mTLS  │                    │       │  UDS       │        │
+│        │ NO E2E keys│        │                    │       │            │        │
+│        └────────────┘        │                    │       └────────────┘        │
+└─────────────────────────────┘                    └─────────────────────────────┘
+```
+
+---
+
+## Trust Boundaries (v2 additions)
+
+| Boundary | Description |
+|---|---|
+| **B5: Hub process** | The hub is a distinct process with its own TLS identity (`CN=comms-hub`). It sees message envelopes but NOT plaintext bodies. It has NO E2E key material. |
+| **B6: Cross-host network** | TCP/TLS connection between hosts. Subject to network-level attacks (eavesdropping, injection) — mitigated by mTLS. |
+| **B7: Key bundle provisioning** | The key bundle containing all teams' public keys is provisioned out-of-band. Compromise of the provisioning channel allows MITM on key distribution. |
+
+---
+
+## Assets (v2 additions)
+
+| Asset | Value | Location |
+|---|---|---|
+| **Ed25519 signing private key** | Per-team sender authentication — compromise allows message forgery as that team | `/run/secrets/comms-sign-key` |
+| **X25519 encryption private key** | Per-team E2E decryption — compromise allows reading messages TO that team | `/run/secrets/comms-enc-key` |
+| **Key bundle** | All teams' public keys — integrity is critical for E2E trust | `/run/secrets/comms-key-bundle.json` |
+| **Pairwise derived keys** | Cached symmetric keys for E2E encryption between team pairs | In-memory only |
+| **Message metadata** | Routing info visible to the hub: from, to, timestamp, type, priority | Hub memory during forwarding |
+
+---
+
+## Threat Analysis (v2)
+
+### T8: Compromised Hub — Content Exposure
+
+**Threat:** An attacker gains control of the hub process and attempts to read message content.
+
+**Attack vector:** Container escape, remote code execution on the hub, or insider access to the hub host.
+
+**Mitigation:**
+- Message bodies are E2E encrypted with X25519-derived AES-256-GCM keys
+- The hub possesses NO team X25519 private keys — it cannot derive pairwise keys
+- The hub sees only ciphertext in the `body` field
+- Even with full hub compromise, the attacker gets metadata (from, to, timestamp) but NOT content
+
+**Residual risk:** Metadata exposure. The hub knows who is talking to whom, when, and how often. Traffic analysis is possible. Mitigation: message padding (pad bodies to fixed size blocks), constant-rate dummy traffic (future).
+
+**Severity:** LOW for content (E2E protected). MEDIUM for metadata (accepted risk).
+
+---
+
+### T9: Hub Message Forgery
+
+**Threat:** A compromised hub injects forged messages claiming to be from a legitimate team.
+
+**Attack vector:** Hub crafts a message with `from.team = "victim-team"` and forwards it to the receiver.
+
+**Mitigation:**
+- All messages carry an Ed25519 signature from the sender team
+- The receiver verifies the signature against the sender's Ed25519 public key (from the key bundle)
+- The hub does NOT possess any team's Ed25519 signing private key
+- Forged messages fail signature verification and are rejected
+
+**Residual risk:** If the hub colludes with a team, that team can sign messages legitimately. This is inherent — you cannot prevent a willing participant from signing messages.
+
+**Severity:** MITIGATED by Ed25519 signatures.
+
+---
+
+### T10: Hub Message Replay
+
+**Threat:** The hub re-sends a previously valid message to the receiver.
+
+**Attack vector:** Hub stores forwarded messages and replays them later.
+
+**Mitigation:**
+- Message ID (`msg-<uuid>`) dedup at the receiver (existing v1 mechanism)
+- Timestamp validation — reject messages older than threshold (default: 300s)
+- Ed25519 signature is valid for the replay (it's a genuine message), so dedup + timestamp are the primary defenses
+- AAD in E2E encryption binds the message ID to the ciphertext — cannot change the ID without breaking decryption
+
+**Residual risk:** Same as v1 T3. Dedup window is finite.
+
+**Severity:** LOW with dedup + timestamp validation.
+
+---
+
+### T11: Hub Re-Routing (Ciphertext Misdirection)
+
+**Threat:** The hub forwards a message encrypted for Team B to Team C instead, hoping Team C can decrypt it.
+
+**Attack vector:** Hub modifies the `to` field and forwards to a different recipient.
+
+**Mitigation:**
+- E2E AAD includes both sender and receiver team names: `"v2:<msg-id>:<sender>:<receiver>"`
+- If the hub changes the `to` field, the receiver (Team C) would attempt to derive the wrong pairwise key (Team A↔C instead of Team A↔B), AND the AAD would not match
+- AES-GCM decryption fails — message rejected
+- Additionally, Ed25519 signature covers the `to` field — modifying it breaks the signature
+
+**Residual risk:** None for content exposure. The hub CAN drop messages (DoS), but cannot redirect them.
+
+**Severity:** MITIGATED by AAD binding + signature.
+
+---
+
+### T12: Key Bundle Substitution (MITM on Key Distribution)
+
+**Threat:** An attacker replaces the key bundle with one containing attacker-controlled public keys.
+
+**Attack vector:** Compromise of the Docker Compose configuration, the secrets provisioning pipeline, or the host filesystem where the bundle is stored.
+
+**Mitigation:**
+- Key bundle is provisioned via Docker secrets (tmpfs, not persisted to disk on host)
+- Key bundle has a `version` field — teams reject bundles with version ≤ previously seen version
+- Out-of-band verification: operators can verify key fingerprints manually
+- Future: sign the key bundle with an offline root key
+
+**Residual risk:** If the attacker controls the provisioning pipeline from the start (before any legitimate bundle is deployed), they can substitute keys undetected. This is the "trust on first use" (TOFU) problem.
+
+**Severity:** HIGH if provisioning is compromised. LOW given Docker secrets isolation.
+
+---
+
+### T13: Cross-Protocol Key Confusion
+
+**Threat:** An attacker tricks the system into using an Ed25519 signing key as an X25519 encryption key (or vice versa), exploiting the mathematical relationship between the curves.
+
+**Attack vector:** Malformed key bundle, implementation bug, or deliberate confusion.
+
+**Mitigation:**
+- Ed25519 and X25519 keys are generated, stored, and loaded separately
+- Key bundle uses distinct fields (`sign_pub` vs `enc_pub`)
+- PEM headers distinguish key types (`-----BEGIN PUBLIC KEY-----` with OID)
+- The crypto module validates key types before use (Ed25519 OID vs X25519 OID)
+- HKDF info strings include the purpose (`"e2e:encryption"` vs signing), preventing cross-purpose derivation
+
+**Severity:** LOW with proper implementation. MEDIUM if implementation skips key type validation.
+
+---
+
+### T14: Hub Denial of Service
+
+**Threat:** The hub becomes unavailable, disrupting all cross-host communication.
+
+**Attack vector:** Hub crash, resource exhaustion, network partition, or deliberate takedown.
+
+**Impact:**
+- ALL messages are blocked — hub is the single communication path (no peer-to-peer fallback)
+- Messages are queued locally at the sender until hub recovers
+
+**Mitigation:**
+- Hub restart is an ops responsibility — automatic restart via Docker restart policy
+- Message queue with configurable retention at the sender
+- Hub health monitoring via heartbeat (existing 60s interval)
+- Future: hub redundancy (active-passive or multi-hub)
+
+**Severity:** MEDIUM for availability. No impact on confidentiality or integrity.
+
+---
+
+### T15: Compromised Team Key Exposure Scope
+
+**Threat:** A team's E2E private keys (Ed25519 + X25519) are compromised.
+
+**Impact analysis:**
+
+| Key compromised | Impact | Scope |
+|---|---|---|
+| Team A's X25519 private key | Attacker can decrypt all messages TO Team A (past and future with static keys) | Only Team A's incoming messages. Team B↔C conversations are unaffected. |
+| Team A's Ed25519 signing key | Attacker can forge messages FROM Team A | Only messages claiming to be from Team A. Other teams' signatures remain valid. |
+| Both keys for Team A | Full impersonation + decryption for Team A | Isolated to Team A. Other team pairs unaffected. |
+
+**Mitigation:**
+- Key compromise is isolated per team (unlike v1 where PSK compromise breaks everything)
+- Revocation: remove compromised team from key bundle, distribute updated bundle
+- Future (v3): ephemeral X25519 ratcheting for forward secrecy — past messages remain safe even after key compromise
+
+**Severity:** HIGH for the compromised team. Contained — does not cascade to other teams.
+
+**Improvement over v1:** v1 PSK compromise breaks ALL confidentiality and integrity for ALL teams. v2 key compromise is scoped to the affected team only.
+
+---
+
+## What v2 Defends Against (additions to v1)
+
+| Threat | Defense | Confidence |
+|---|---|---|
+| Hub reading message content | X25519 E2E encryption (AES-256-GCM) | HIGH |
+| Hub forging messages | Ed25519 sender signatures | HIGH |
+| Hub re-routing messages | AAD binding (sender+receiver in AAD) + signature over `to` field | HIGH |
+| Hub replaying messages | Message ID dedup + timestamp validation | MEDIUM |
+| Impersonation (v1 gap!) | Ed25519 per-team signing keys | HIGH |
+| Key compromise blast radius | Per-team keypairs (isolated compromise) | HIGH |
+| Key bundle downgrade | Version field with monotonic check | MEDIUM |
+
+## What v2 Does NOT Defend Against
+
+| Threat | Reason | Mitigation Path |
+|---|---|---|
+| **Metadata / traffic analysis** | Hub sees routing info by design | Padding + dummy traffic (v3) |
+| **Forward secrecy** | Static X25519 — past messages decryptable with compromised key | v3: ephemeral X25519 ratcheting (Double Ratchet) |
+| **Key bundle TOFU** | First bundle must be trusted | Signed key bundles with offline root (v3) |
+| **Hub availability** | Single point of failure for cross-host | Multi-hub / active-passive (v3) |
+| **Compromised provisioning pipeline** | Attacker controls Docker secrets | Infrastructure security (out of scope) |
+
+---
+
+## Assumptions (v2 additions)
+
+6. **Hub is honest-but-curious (at worst).** The hub may try to read messages but will forward them correctly. A fully malicious hub (dropping/reordering) is a DoS problem, not a crypto problem.
+7. **Key bundle is provisioned securely.** The out-of-band channel for distributing the key bundle is trusted. If this is compromised, E2E guarantees are broken.
+8. **Ed25519 and X25519 implementations are correct.** We rely on Node.js `crypto` (OpenSSL) for these primitives.
+9. **Team private keys do not leave the container.** Ed25519 signing keys and X25519 encryption keys are mounted as Docker secrets and never transmitted.
+
+---
+
 ## Revision History
 
 | Date | Author | Change |
 |---|---|---|
 | 2026-03-14 | (*CD:Vigenere*) | Initial v1 threat model |
+| 2026-03-30 | (*CD:Vigenere*) | v2 hub-mode: hub-specific threats T8-T15, E2E trust model, key compromise isolation analysis |

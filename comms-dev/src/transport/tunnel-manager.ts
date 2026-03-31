@@ -28,8 +28,17 @@ export interface TunnelManagerOptions {
   deadConnectionMs?: number;
   /** Base reconnect delay in ms. Default: 1000 */
   reconnectBaseMs?: number;
+  /** Max reconnect backoff cap in ms. Default: 30_000 (was 60s, reduced for hub failover) */
+  reconnectMaxMs?: number;
   /** ACK timeout in ms. Default: 10_000 */
   ackTimeoutMs?: number;
+  /**
+   * Fallback peer name for destinations not in the peers map.
+   * When set, send('unknown-team', msg) routes through this peer (the hub)
+   * instead of returning PEER_UNKNOWN. Used by team daemons to reach other
+   * teams via the relay without needing a direct entry per destination.
+   */
+  defaultPeer?: string;
 }
 
 interface PendingAck {
@@ -49,6 +58,7 @@ interface PeerState {
   deadTimer: ReturnType<typeof setInterval> | null;
   lastDataAt: number;
   connected: boolean;
+  everConnected: boolean;  // true once first successful connection established
   connecting: boolean;  // true while initial/reconnect handshake is in progress
   connectWaiters: Array<() => void>;  // notified when connected becomes true
   decoder: FrameDecoder;
@@ -61,11 +71,15 @@ export class TunnelManager {
   private readonly heartbeatIntervalMs: number;
   private readonly deadConnectionMs: number;
   private readonly reconnectBaseMs: number;
+  private readonly reconnectMaxMs: number;
   private readonly ackTimeoutMs: number;
+  private readonly defaultPeer: string | undefined;
 
   private peers = new Map<string, PeerState>();
+  private inboundSockets = new Map<string, TLSSocket>();
   private tunnelDownHandlers: Array<(team: string) => void> = [];
   private tunnelUpHandlers: Array<(team: string) => void> = [];
+  private inboundMessageHandlers: Array<(msg: Message) => void> = [];
   private stopped = false;
 
   constructor(opts: TunnelManagerOptions) {
@@ -75,7 +89,9 @@ export class TunnelManager {
     this.heartbeatIntervalMs = opts.heartbeatIntervalMs ?? 30_000;
     this.deadConnectionMs = opts.deadConnectionMs ?? 90_000;
     this.reconnectBaseMs = opts.reconnectBaseMs ?? 1000;
+    this.reconnectMaxMs = opts.reconnectMaxMs ?? 30_000;
     this.ackTimeoutMs = opts.ackTimeoutMs ?? 10_000;
+    this.defaultPeer = opts.defaultPeer;
   }
 
   onTunnelDown(handler: (team: string) => void): void {
@@ -84,6 +100,43 @@ export class TunnelManager {
 
   onTunnelUp(handler: (team: string) => void): void {
     this.tunnelUpHandlers.push(handler);
+  }
+
+  /**
+   * Called with non-ACK frames received on outbound sockets — i.e. the hub
+   * wrote a message back down the connection we initiated to it.
+   * DaemonV2 wires this to handleInbound() so messages arriving this way
+   * are processed identically to messages received via TlsServer.
+   */
+  onMessage(handler: (msg: Message) => void): void {
+    this.inboundMessageHandlers.push(handler);
+  }
+
+  /**
+   * Register an inbound TLS socket (accepted by TlsServer) as a usable
+   * send-path for a peer. Used by hub mode: when team-a connects inbound,
+   * hub registers the socket so forwardMessage() can write back down it.
+   *
+   * The hub does NOT set up a data handler here — TlsServer already owns
+   * the read side of this socket. We only write to it.
+   *
+   * If the peer already has an outbound tunnel, the inbound socket is used
+   * as a fallback only when the outbound is not connected.
+   */
+  registerInboundSocket(team: string, socket: TLSSocket): void {
+    // Clean up stale entry if present
+    const old = this.inboundSockets.get(team);
+    if (old && old !== socket) old.destroy();
+
+    this.inboundSockets.set(team, socket);
+    for (const h of this.tunnelUpHandlers) h(team);
+
+    socket.once('close', () => {
+      if (this.inboundSockets.get(team) === socket) {
+        this.inboundSockets.delete(team);
+        for (const h of this.tunnelDownHandlers) h(team);
+      }
+    });
   }
 
   async start(endpoints: Record<string, PeerEndpoint>): Promise<void> {
@@ -114,21 +167,51 @@ export class TunnelManager {
   }
 
   async send(team: string, message: Message): Promise<SendResult> {
-    const state = this.peers.get(team);
-    if (!state) return 'PEER_UNKNOWN';
+    // 1. Try outbound tunnel: direct peer or defaultPeer fallback.
+    const state = this.peers.get(team)
+      ?? (this.defaultPeer ? this.peers.get(this.defaultPeer) : undefined);
 
-    // If connection attempt is still in progress, wait for it to resolve
-    if (!state.connected && state.connecting) {
-      await new Promise<void>((resolve) => state.connectWaiters.push(resolve));
+    if (state) {
+      // Wait for in-progress connection attempt before deciding
+      if (!state.connected && state.connecting) {
+        await new Promise<void>((resolve) => state.connectWaiters.push(resolve));
+      }
+
+      if (state.connected && state.socket && !state.socket.destroyed) {
+        return this.sendAndWaitAck(state, message);
+      }
+
+      // Outbound is down — try inbound socket before queuing
+      if (this.inboundSockets.has(team)) {
+        return this.sendViaInbound(team, message);
+      }
+
+      // Only queue if this peer was previously reachable.
+      if (!state.everConnected) return 'PEER_UNAVAILABLE';
+      if (state.queue.length >= this.maxQueueSize) return 'PEER_UNAVAILABLE';
+      state.queue.push({ msg: message, resolve: () => {} });
+      return 'QUEUED';
     }
 
-    if (state.connected && state.socket && !state.socket.destroyed) {
-      // Try to send directly and wait for ACK
-      return this.sendAndWaitAck(state, message);
+    // 2. No outbound tunnel — try inbound socket registered by TlsServer.
+    if (this.inboundSockets.has(team)) {
+      return this.sendViaInbound(team, message);
     }
 
-    // Peer is down — return immediately
-    return 'PEER_UNAVAILABLE';
+    return 'PEER_UNKNOWN';
+  }
+
+  // No outbound tunnel — try inbound socket registered by hub's TlsServer.
+  // Write directly and return OK: hub already ACKed the original sender,
+  // so delivery here is best-effort (per architecture §ACK semantics).
+  private sendViaInbound(team: string, message: Message): SendResult {
+    const socket = this.inboundSockets.get(team);
+    if (!socket || socket.destroyed) return 'PEER_UNAVAILABLE';
+    const frame = encodeFrame(message);
+    socket.write(frame, (err) => {
+      if (err) console.warn(`[tunnel-manager] inbound write error to ${team}:`, err.message);
+    });
+    return 'OK';
   }
 
   queueSize(team: string): number {
@@ -148,6 +231,7 @@ export class TunnelManager {
       deadTimer: null,
       lastDataAt: Date.now(),
       connected: false,
+      everConnected: false,
       connecting: true,
       connectWaiters: [],
       decoder: this.makeDecoder(team),
@@ -164,14 +248,18 @@ export class TunnelManager {
       if (!state) return;
       state.lastDataAt = Date.now();
 
-      // Handle ACK frames
       if (msg.type === 'ack' && msg.reply_to) {
+        // Resolve pending ACK for a message we sent outbound
         const pending = state.pendingAcks.get(msg.reply_to);
         if (pending) {
           clearTimeout(pending.timer);
           state.pendingAcks.delete(msg.reply_to);
           pending.resolve('OK');
         }
+      } else {
+        // Non-ACK frame received on our outbound socket — hub is sending us
+        // a message back down the connection we initiated.
+        for (const h of this.inboundMessageHandlers) h(msg);
       }
     });
   }
@@ -193,6 +281,7 @@ export class TunnelManager {
       const socket = await this.connectSocket(team, state.host, state.port, expectedFingerprint);
       state.socket = socket;
       state.connected = true;
+      state.everConnected = true;
       state.connecting = false;
       state.reconnectAttempt = 0;
       state.lastDataAt = Date.now();
@@ -298,7 +387,7 @@ export class TunnelManager {
     if (this.stopped) return;
     const delay = Math.min(
       this.reconnectBaseMs * Math.pow(2, state.reconnectAttempt),
-      60_000,
+      this.reconnectMaxMs,
     );
     state.reconnectAttempt++;
     state.reconnectTimer = setTimeout(() => {
