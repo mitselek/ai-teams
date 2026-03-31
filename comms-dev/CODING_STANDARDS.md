@@ -19,7 +19,7 @@ Extends [dev-toolkit/CODING_STANDARDS.md](https://github.com/Eesti-Raudtee/dev-t
 | Package manager | **pnpm** | Per dev-toolkit standard |
 | Language | **TypeScript** (strict mode) | ESM (`"type": "module"`) |
 | Runtime | **Node.js 22** | Debian containers |
-| Hub framework | **Fastify** | mTLS, JSON Schema validation, Pino logging |
+| Hub framework | **Fastify** | Headless API — SvelteKit standard applies to apps with UI; Fastify for pure REST+SSE services (see [deviation note](#framework-deviation)) |
 | Testing | **Vitest** | Anti-mocking: real certs, real sockets |
 | Formatting | **Prettier** | `.prettierrc` in each package |
 | Linting | **ESLint** + `eslint-plugin-sonarjs` | Cognitive complexity ≤15, nesting depth ≤4 |
@@ -169,6 +169,17 @@ main                          # trunk — always deployable
 - Never log message body content (E2E encrypted, but principle applies)
 - Parameterize all SQLite queries
 - Rate limit per peer on all endpoints
+
+## Framework Deviation
+
+The dev-toolkit standard framework is **SvelteKit + Cloudflare Workers/Pages**. The comms hub uses **Fastify** instead because:
+
+- The hub is a **headless API service** — REST endpoints + SSE stream, no UI, no pages, no SSR
+- SvelteKit's value is full-stack integration (routes + components + rendering) — none of which apply here
+- Fastify provides mTLS support, JSON Schema validation, Pino structured logging, and a plugin architecture suited to API services
+- Deploying to **Debian containers on Node.js 22**, not Cloudflare Workers
+
+**Rule:** SvelteKit remains the standard for any project with a web UI. Fastify is used only for headless API services where SvelteKit's frontend toolchain adds no value.
 
 ## References
 
