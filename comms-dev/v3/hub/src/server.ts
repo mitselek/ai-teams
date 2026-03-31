@@ -2,6 +2,7 @@
 // Hub v3 — Fastify REST API + SSE server with mTLS
 // story/28: mTLS auth, peer registry, per-peer rate limiting, structured logging
 // story/29: POST /api/send, GET /api/subscribe — message routing + offline queue
+// story/30: SSE id: field, per-team event buffer, Last-Event-ID replay on reconnect
 
 import Fastify, { type FastifyRequest, type FastifyReply } from 'fastify';
 import pino from 'pino';
@@ -44,6 +45,13 @@ function resolveLogger(
   return { loggerInstance: pino({ level: 'info' }, opt.stream) };
 }
 
+const EVENT_BUFFER_SIZE = 100;
+
+interface BufferedEvent {
+  sseId: number;
+  msg: unknown;
+}
+
 export function createHub(options: HubOptions) {
   // Mutable peer registry: CN → cert PEM
   const registry = new Map<string, string>();
@@ -65,7 +73,31 @@ export function createHub(options: HubOptions) {
   // Message routing state
   const subscriptions = new Map<string, PassThrough[]>(); // teamName → active SSE streams
   const seenIds = new Set<string>(); // dedup by message ID
-  const offlineQueue = new Map<string, unknown[]>(); // teamName → queued messages
+  const offlineQueue = new Map<string, unknown[]>(); // teamName → queued messages (no active subscriber)
+
+  // SSE event id: monotonic counters and ring-buffer for Last-Event-ID replay
+  const sseCounters = new Map<string, number>(); // teamName → last assigned SSE id
+  const eventBuffer = new Map<string, BufferedEvent[]>(); // teamName → last N live-delivered events
+
+  /** Assign the next SSE id for a team (1-based, monotonically increasing). */
+  function nextSseId(team: string): number {
+    const id = (sseCounters.get(team) ?? 0) + 1;
+    sseCounters.set(team, id);
+    return id;
+  }
+
+  /** Record a live-delivered event in the ring buffer (trim to EVENT_BUFFER_SIZE). */
+  function bufferEvent(team: string, sseId: number, msg: unknown): void {
+    const buf = eventBuffer.get(team) ?? [];
+    buf.push({ sseId, msg });
+    if (buf.length > EVENT_BUFFER_SIZE) buf.shift();
+    eventBuffer.set(team, buf);
+  }
+
+  /** Write a single SSE event to a stream with id: and data: lines. */
+  function writeEvent(stream: PassThrough, sseId: number, msg: unknown): void {
+    stream.write(`id: ${sseId}\ndata: ${JSON.stringify(msg)}\n\n`);
+  }
 
   const hub = Fastify({
     https: {
@@ -107,6 +139,14 @@ export function createHub(options: HubOptions) {
     request.log.info({ peerTeam: cn }, 'authenticated request');
   });
 
+  // Graceful shutdown: end all active SSE streams so clients get a clean FIN, not ECONNRESET
+  hub.addHook('onClose', async () => {
+    for (const streams of subscriptions.values()) {
+      for (const s of streams) s.end();
+    }
+    subscriptions.clear();
+  });
+
   // GET /api/status — returns { peerTeam } for authenticated peers
   hub.get('/api/status', async (request: FastifyRequest) => {
     const peerTeam = getPeerCN(request.raw.socket as TLSSocket)!;
@@ -123,7 +163,9 @@ export function createHub(options: HubOptions) {
     return reply.code(201).send({ registered: body.team });
   });
 
-  // GET /api/subscribe — SSE endpoint; client receives messages addressed to their team
+  // GET /api/subscribe — SSE endpoint; client receives messages addressed to their team.
+  // Supports Last-Event-ID replay: on reconnect, buffered events missed since lastId are
+  // replayed before the stream goes live. Offline-queued messages are also drained.
   hub.get('/api/subscribe', async (request: FastifyRequest, reply: FastifyReply) => {
     const cn = getPeerCN(request.raw.socket as TLSSocket)!;
     const stream = new PassThrough();
@@ -132,6 +174,9 @@ export function createHub(options: HubOptions) {
     const existing = subscriptions.get(cn) ?? [];
     existing.push(stream);
     subscriptions.set(cn, existing);
+
+    // Swallow stream errors (ECONNRESET when client abruptly disconnects)
+    stream.on('error', () => {});
 
     // Clean up on client disconnect
     request.raw.on('close', () => {
@@ -144,11 +189,25 @@ export function createHub(options: HubOptions) {
       stream.destroy();
     });
 
-    // Drain offline queue immediately on connect
+    // Last-Event-ID replay: re-send buffered live events the client missed
+    const lastEventIdRaw = request.headers['last-event-id'];
+    if (lastEventIdRaw) {
+      const lastSeen = parseInt(lastEventIdRaw as string, 10);
+      if (!isNaN(lastSeen)) {
+        const buf = eventBuffer.get(cn) ?? [];
+        for (const { sseId, msg } of buf) {
+          if (sseId > lastSeen) writeEvent(stream, sseId, msg);
+        }
+      }
+    }
+
+    // Drain offline queue (messages sent while team had no active subscriber)
     const queued = offlineQueue.get(cn);
     if (queued && queued.length > 0) {
       for (const msg of queued) {
-        stream.write(`data: ${JSON.stringify(msg)}\n\n`);
+        const sseId = nextSseId(cn);
+        bufferEvent(cn, sseId, msg);
+        writeEvent(stream, sseId, msg);
       }
       offlineQueue.delete(cn);
     }
@@ -217,11 +276,15 @@ export function createHub(options: HubOptions) {
     const subs = subscriptions.get(toTeam);
 
     if (subs && subs.length > 0) {
+      // Live delivery: assign SSE id, buffer for Last-Event-ID replay, fan-out
+      const sseId = nextSseId(toTeam);
+      bufferEvent(toTeam, sseId, msg);
       for (const sub of subs) {
-        sub.write(`data: ${JSON.stringify(msg)}\n\n`);
+        writeEvent(sub, sseId, msg);
       }
       return { ok: true, id: msgId };
     } else {
+      // Offline: queue without SSE id (assigned when drained on subscribe)
       const queue = offlineQueue.get(toTeam) ?? [];
       queue.push(msg);
       offlineQueue.set(toTeam, queue);
