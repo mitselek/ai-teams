@@ -1,0 +1,33 @@
+{
+  "name": "@comms-dev/mcp",
+  "version": "0.1.0",
+  "description": "v3 MCP server — Claude Code agent interface to the comms hub",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "prettier --check . && eslint src"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "typescript-eslint": "^8.58.0",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-sonarjs": "^3.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
