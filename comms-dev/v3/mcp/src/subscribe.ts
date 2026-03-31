@@ -1,8 +1,10 @@
-// (*CD:Lovelace*)
+// (*CD:Vigenere+Lovelace*)
 // SSESubscriber — background SSE subscription to the hub's /api/subscribe endpoint.
 // InboxBuffer — in-memory store for received messages.
+// E2E crypto: verifySignature → e2eDecrypt before inbox delivery.
 
 import * as https from 'node:https';
+import type { CryptoAPIv2, E2EPayload, SignedMessage } from '../../../src/crypto/index.js';
 
 // ── InboxBuffer ────────────────────────────────────────────────────────────────
 
@@ -41,12 +43,16 @@ export class SSESubscriber {
   private _lastEventId: string | null = null;
   private _currentReq: ReturnType<typeof https.request> | null = null;
   private _sseBuffer = '';
+  private readonly _crypto?: CryptoAPIv2;
 
   constructor(
     private readonly hubUrl: string,
     private readonly opts: { cert: string; key: string; ca: string },
     private readonly inbox: InboxBuffer,
-  ) {}
+    crypto?: CryptoAPIv2,
+  ) {
+    this._crypto = crypto;
+  }
 
   start(): void {
     this._stopped = false;
@@ -86,12 +92,38 @@ export class SSESubscriber {
       if (idLine) this._lastEventId = idLine.slice(3).trim();
       if (dataLine) {
         try {
-          this.inbox.push(JSON.parse(dataLine.slice(5).trim()) as unknown);
+          const msg = JSON.parse(dataLine.slice(5).trim()) as Record<string, unknown>;
+          this._processMessage(msg);
         } catch {
           /* ignore malformed events */
         }
       }
     }
+  }
+
+  private _processMessage(msg: Record<string, unknown>): void {
+    if (!this._crypto) {
+      // No crypto configured — pass through raw (backward compat / tests like AC3)
+      this.inbox.push(msg);
+      return;
+    }
+
+    // Verify signature first — drop unsigned or tampered messages
+    if (!this._crypto.verifySignature(msg as unknown as SignedMessage)) {
+      return; // silently drop
+    }
+
+    // Decrypt E2E body
+    const msgId = msg.id as string;
+    const e2ePayload = JSON.parse(msg.body as string) as E2EPayload;
+    this._crypto.e2eDecrypt(e2ePayload, msgId).then(
+      (plaintext) => {
+        this.inbox.push({ ...msg, body: plaintext.toString('utf-8') });
+      },
+      () => {
+        // Decryption failed — drop silently (wrong pairwise key, tampered, etc.)
+      },
+    );
   }
 
   private _connect(): Promise<void> {
@@ -144,16 +176,6 @@ export class SSESubscriber {
           });
         },
       );
-
-      // Set connected as soon as TLS handshake completes — before HTTP headers arrive.
-      // Fastify 5 delays HTTP response headers until data flows (sendStream uses
-      // setHeader + pipe), so waiting for the HTTP response callback would make
-      // `connected` unreliable for empty SSE streams.
-      req.on('socket', (socket) => {
-        (socket as TLSSocket).on('secureConnect', () => {
-          if (!this._stopped) this._connected = true;
-        });
-      });
 
       req.on('error', () => {
         this._connected = false;
