@@ -89,6 +89,78 @@ afterAll(() => {
   );
 });
 
+// ── TlsServer — bind address ──────────────────────────────────────────────────
+
+describe('TlsServer — bind address', () => {
+
+  it('defaults to 0.0.0.0 when no host is specified', async () => {
+    const config = await loadDaemonCrypto({
+      keyPath:  join(serverDir, 'daemon.key'),
+      certPath: join(serverDir, 'daemon.crt'),
+      peersDir: join(serverDir, 'peers'),
+    });
+    const server = new TlsServer({ config, teamName: 'comms-dev' });
+    await server.start();
+    expect(server.host).toBe('0.0.0.0');
+    await server.stop();
+  });
+
+  it('binds to the specified host when provided', async () => {
+    const config = await loadDaemonCrypto({
+      keyPath:  join(serverDir, 'daemon.key'),
+      certPath: join(serverDir, 'daemon.crt'),
+      peersDir: join(serverDir, 'peers'),
+    });
+    const server = new TlsServer({ config, teamName: 'comms-dev' });
+    await server.start(0, '127.0.0.1');
+    expect(server.host).toBe('127.0.0.1');
+    await server.stop();
+  });
+
+  it('is reachable on the specified host after start', async () => {
+    const config = await loadDaemonCrypto({
+      keyPath:  join(serverDir, 'daemon.key'),
+      certPath: join(serverDir, 'daemon.crt'),
+      peersDir: join(serverDir, 'peers'),
+    });
+    const server = new TlsServer({ config, teamName: 'comms-dev' });
+    await server.start(0, '127.0.0.1');
+
+    // Should be connectable at the specified address
+    const connected = await new Promise<boolean>((resolve) => {
+      const socket = connect({
+        host: '127.0.0.1',
+        port: server.port,
+        key:  readFileSync(join(clientDir, 'daemon.key')),
+        cert: readFileSync(join(clientDir, 'daemon.crt')),
+        rejectUnauthorized: false,
+        ca: [],
+        minVersion: 'TLSv1.3',
+        maxVersion: 'TLSv1.3',
+      });
+      socket.once('secureConnect', () => { socket.end(); resolve(true); });
+      socket.once('error', () => resolve(false));
+    });
+
+    expect(connected).toBe(true);
+    await server.stop();
+  });
+
+  it('exposes host getter before and after start', async () => {
+    const config = await loadDaemonCrypto({
+      keyPath:  join(serverDir, 'daemon.key'),
+      certPath: join(serverDir, 'daemon.crt'),
+      peersDir: join(serverDir, 'peers'),
+    });
+    const server = new TlsServer({ config, teamName: 'comms-dev' });
+    // Before start, host is empty string (not yet bound)
+    expect(server.host).toBe('');
+    await server.start(0, '127.0.0.1');
+    expect(server.host).toBe('127.0.0.1');
+    await server.stop();
+  });
+});
+
 // ── TlsServer — construction and lifecycle ───────────────────────────────────
 
 describe('TlsServer — construction', () => {

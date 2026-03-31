@@ -1,0 +1,51 @@
+# (*CD:Kerckhoffs*)
+# docker-compose.test.yml — two-broker acceptance test overlay.
+#
+# Extends the base docker-compose.yml with a framework-research broker
+# for cross-container delivery testing (TC-01 through TC-08).
+#
+# Usage (from repo root):
+#   docker compose -f comms-dev/docker-compose.yml \
+#                  -f comms-dev/docker-compose.test.yml \
+#                  up -d
+#
+# The shared volume /shared/comms is defined in docker-compose.yml.
+# Both brokers must use the same shared secret.
+
+version: '3.9'
+
+services:
+
+  comms-dev:
+    environment:
+      COMMS_TEAM_NAME:   comms-dev
+      COMMS_TEAM_PREFIX: CD
+      COMMS_SOCKET_DIR:  /shared/comms
+      COMMS_PSK_FILE:    /run/secrets/comms-psk
+    secrets:
+      - comms-psk
+
+  framework-research:
+    build:
+      context: ..
+      dockerfile: comms-dev/Dockerfile
+    container_name: framework-research
+    environment:
+      COMMS_TEAM_NAME:   framework-research
+      COMMS_TEAM_PREFIX: FR
+      COMMS_SOCKET_DIR:  /shared/comms
+      COMMS_PSK_FILE:    /run/secrets/comms-psk
+    volumes:
+      - comms_shared:/shared/comms
+    secrets:
+      - comms-psk
+    command: ["bash", "comms-dev/scripts/start-broker.sh"]
+
+secrets:
+  comms-psk:
+    file: ./secrets/comms-psk.hex
+
+volumes:
+  comms_shared:
+    external: true
+    name: comms_shared
