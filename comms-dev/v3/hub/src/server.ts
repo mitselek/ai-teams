@@ -3,6 +3,7 @@
 // story/28: mTLS auth, peer registry, per-peer rate limiting, structured logging
 // story/29: POST /api/send, GET /api/subscribe — message routing + offline queue
 // story/30: SSE id: field, per-team event buffer, Last-Event-ID replay on reconnect
+// story/31: GET /api/online, enhanced /api/status, /api/register admin + dedup
 
 import Fastify, { type FastifyRequest, type FastifyReply } from 'fastify';
 import pino from 'pino';
@@ -21,6 +22,7 @@ export interface HubOptions {
   rateLimit?: { max: number; timeWindow: number }; // per-peer sliding window
   logger?: boolean | { stream: NodeJS.WritableStream }; // Pino options
   signPubKeys?: Record<string, string>; // teamName → Ed25519 PEM public key
+  adminTeams?: string[]; // if set, only these CNs may POST /api/register
 }
 
 /** Extract the CN from the peer TLS certificate, or null if absent. */
@@ -46,13 +48,20 @@ function resolveLogger(
 }
 
 const EVENT_BUFFER_SIZE = 100;
+const HUB_VERSION = '0.1.0';
 
 interface BufferedEvent {
   sseId: number;
   msg: unknown;
 }
 
+type PresenceEntry =
+  | { team: string; type: string; status: 'connected'; since: string }
+  | { team: string; type: string; status: 'offline'; lastSeen: string };
+
 export function createHub(options: HubOptions) {
+  const startTime = Date.now();
+
   // Mutable peer registry: CN → cert PEM
   const registry = new Map<string, string>();
   if (options.peers) {
@@ -78,6 +87,9 @@ export function createHub(options: HubOptions) {
   // SSE event id: monotonic counters and ring-buffer for Last-Event-ID replay
   const sseCounters = new Map<string, number>(); // teamName → last assigned SSE id
   const eventBuffer = new Map<string, BufferedEvent[]>(); // teamName → last N live-delivered events
+
+  // Presence tracking for GET /api/online
+  const presence = new Map<string, PresenceEntry>();
 
   /** Assign the next SSE id for a team (1-based, monotonically increasing). */
   function nextSseId(team: string): number {
@@ -147,18 +159,39 @@ export function createHub(options: HubOptions) {
     subscriptions.clear();
   });
 
-  // GET /api/status — returns { peerTeam } for authenticated peers
+  // GET /api/status — hub metrics + peerTeam for authenticated caller
   hub.get('/api/status', async (request: FastifyRequest) => {
     const peerTeam = getPeerCN(request.raw.socket as TLSSocket)!;
-    return { peerTeam };
+    const uptime = (Date.now() - startTime) / 1000;
+    let queueDepth = 0;
+    for (const q of offlineQueue.values()) queueDepth += q.length;
+    return { uptime, version: HUB_VERSION, peerCount: registry.size, queueDepth, peerTeam };
+  });
+
+  // GET /api/online — list teams that have ever had an SSE subscription
+  hub.get('/api/online', async () => {
+    return Array.from(presence.values());
   });
 
   // POST /api/register — add a new peer cert at runtime (hot-reload, no restart)
   hub.post('/api/register', async (request: FastifyRequest, reply: FastifyReply) => {
+    const cn = getPeerCN(request.raw.socket as TLSSocket)!;
     const body = request.body as { team?: string; cert?: string };
+
     if (!body?.team || !body?.cert) {
       return reply.code(400).send({ error: 'Missing team or cert' });
     }
+
+    // Admin check: if adminTeams is configured, only listed CNs may register
+    if (options.adminTeams && !options.adminTeams.includes(cn)) {
+      return reply.code(403).send({ error: 'Forbidden: not an admin team' });
+    }
+
+    // Duplicate check: reject attempts to overwrite an existing registration
+    if (registry.has(body.team)) {
+      return reply.code(409).send({ error: 'Team already registered' });
+    }
+
     registry.set(body.team, body.cert);
     return reply.code(201).send({ registered: body.team });
   });
@@ -175,6 +208,14 @@ export function createHub(options: HubOptions) {
     existing.push(stream);
     subscriptions.set(cn, existing);
 
+    // Track presence: this team is now connected
+    presence.set(cn, {
+      team: cn,
+      type: 'sse',
+      status: 'connected',
+      since: new Date().toISOString(),
+    });
+
     // Swallow stream errors (ECONNRESET when client abruptly disconnects)
     stream.on('error', () => {});
 
@@ -184,7 +225,16 @@ export function createHub(options: HubOptions) {
       if (subs) {
         const idx = subs.indexOf(stream);
         if (idx !== -1) subs.splice(idx, 1);
-        if (subs.length === 0) subscriptions.delete(cn);
+        // Mark offline only when the last subscriber for this team disconnects
+        if (subs.length === 0) {
+          subscriptions.delete(cn);
+          presence.set(cn, {
+            team: cn,
+            type: 'sse',
+            status: 'offline',
+            lastSeen: new Date().toISOString(),
+          });
+        }
       }
       stream.destroy();
     });
