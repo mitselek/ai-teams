@@ -450,7 +450,6 @@ describe('AC4 — POST /api/register: admin team can register new peer', () => {
 
   beforeAll(async () => {
     hubPort = await getFreePort();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     hub = createHub({
       tls: { ca: caCrt, cert: hubCrt, key: hubKey },
       peers: {
@@ -552,7 +551,6 @@ describe('AC6 — POST /api/register: duplicate CN → HTTP 409', () => {
 describe('AC7 — GET /api/online: rate limited per peer (max 5 / 60s)', () => {
   it('given max=5, when team-a sends 10 rapid requests, exactly 5 return 200 and 5 return 429', async () => {
     const rlPort = await getFreePort();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rlHub = createHub({
       tls: { ca: caCrt, cert: hubCrt, key: hubKey },
       peers: { 'team-a': teamACert.cert },
