@@ -9,7 +9,7 @@ import Fastify, { type FastifyRequest, type FastifyReply } from 'fastify';
 import pino from 'pino';
 import type { TLSSocket } from 'node:tls';
 import { PassThrough } from 'node:stream';
-import { verify as cryptoVerify } from 'node:crypto';
+import { verify as cryptoVerify, createHash } from 'node:crypto';
 import { stableStringify } from './util/stable-stringify.js';
 import { MessageQueue } from './delivery/queue.js';
 
@@ -115,6 +115,32 @@ export function createHub(options: HubOptions) {
   /** Write a single SSE event to a stream with id: and data: lines. */
   function writeEvent(stream: PassThrough, sseId: number, msg: unknown): void {
     stream.write(`id: ${sseId}\ndata: ${JSON.stringify(msg)}\n\n`);
+  }
+
+  /** Returns true only when all required envelope fields are present. */
+  function isValidEnvelope(msg: Record<string, unknown>): boolean {
+    return !!(msg?.to && msg?.id && msg?.body && msg?.version && msg?.from && msg?.timestamp);
+  }
+
+  /**
+   * Returns true if body_hash is absent (no check needed) or matches sha256(body).
+   * Hub can verify integrity over the encrypted body without any E2E keys.
+   */
+  function bodyHashOk(msg: Record<string, unknown>): boolean {
+    if (!msg.body_hash) return true;
+    const expected =
+      'sha256:' +
+      createHash('sha256')
+        .update(msg.body as string, 'utf-8')
+        .digest('hex');
+    return msg.body_hash === expected;
+  }
+
+  /** Returns true if the stream and its backing socket are both alive. */
+  function isLiveStream(s: PassThrough): boolean {
+    if (s.destroyed) return false;
+    const sock = streamSockets.get(s);
+    return !sock || !sock.destroyed;
   }
 
   /**
@@ -302,6 +328,10 @@ export function createHub(options: HubOptions) {
       .header('Cache-Control', 'no-cache')
       .header('Connection', 'keep-alive');
 
+    // SSE keep-alive comment: flushes HTTP headers to the client immediately so
+    // connection establishment is detectable without TLS-layer workarounds.
+    stream.write(':\n\n');
+
     return reply.send(stream);
   });
 
@@ -310,7 +340,7 @@ export function createHub(options: HubOptions) {
     const msg = request.body as Record<string, unknown>;
 
     // Validate required fields
-    if (!msg?.to || !msg?.id || !msg?.body || !msg?.version || !msg?.from || !msg?.timestamp) {
+    if (!isValidEnvelope(msg)) {
       return reply.code(400).send({ error: 'Missing required fields' });
     }
 
@@ -321,8 +351,22 @@ export function createHub(options: HubOptions) {
       return reply.code(409).send({ error: 'Duplicate message ID' });
     }
 
-    // Ed25519 signature verification — only when key is configured AND message carries sig + body_hash
     const fromTeam = (msg.from as { team: string }).team;
+
+    // CN ↔ from.team binding: TLS identity must match the claimed sender.
+    // Belt-and-suspenders — Ed25519 sig also catches this, but the transport check is free
+    // and catches spoofing attempts from peers that haven't registered a signing key.
+    const senderCN = getPeerCN(request.raw.socket as TLSSocket)!;
+    if (fromTeam !== senderCN) {
+      return reply.code(403).send({ error: 'Sender team does not match TLS identity' });
+    }
+
+    // body_hash integrity: hub verifies hash over the (possibly encrypted) body without decrypting.
+    if (!bodyHashOk(msg)) {
+      return reply.code(400).send({ error: 'body_hash mismatch' });
+    }
+
+    // Ed25519 signature verification — only when key is configured AND message carries sig + body_hash
     if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash) {
       const sigError = verifySignature(msg, fromTeam);
       if (sigError) return reply.code(403).send({ error: sigError });
@@ -341,18 +385,11 @@ export function createHub(options: HubOptions) {
     const toTeam = (msg.to as { team: string }).team;
     const rawSubs = subscriptions.get(toTeam) ?? [];
 
-    // Eagerly prune destroyed streams/sockets.
-    // stream.destroyed is only set after the close event chain completes, but socket.destroyed
-    // is set synchronously when the RST I/O event is processed — catches the race window.
-    const liveSubs = rawSubs.filter((s) => {
-      if (s.destroyed) return false;
-      const sock = streamSockets.get(s);
-      return !sock || !sock.destroyed;
-    });
-    if (liveSubs.length < rawSubs.length) {
-      if (liveSubs.length === 0) subscriptions.delete(toTeam);
-      else subscriptions.set(toTeam, liveSubs);
-    }
+    // Eagerly prune destroyed streams/sockets (isLiveStream checks both stream.destroyed
+    // and socket.destroyed — the latter catches the RST race window).
+    const liveSubs = rawSubs.filter(isLiveStream);
+    if (liveSubs.length === 0) subscriptions.delete(toTeam);
+    else if (liveSubs.length < rawSubs.length) subscriptions.set(toTeam, liveSubs);
 
     if (liveSubs.length > 0) {
       // Live delivery: assign SSE id, buffer for Last-Event-ID replay, fan-out

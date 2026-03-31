@@ -13,5 +13,15 @@ export default tseslint.config(
       'no-console': 'off',
     },
   },
+  {
+    files: ['**/*.test.ts'],
+    rules: {
+      'sonarjs/os-command': 'off',
+      'sonarjs/pseudo-random': 'off',
+      'sonarjs/no-nested-template-literals': 'off',
+      'sonarjs/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_' }],
+    },
+  },
   { ignores: ['node_modules/', 'dist/'] },
 );
