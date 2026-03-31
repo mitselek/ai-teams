@@ -13,5 +13,12 @@ export default tseslint.config(
       'no-console': 'off',
     },
   },
+  {
+    files: ['**/*.test.ts'],
+    rules: {
+      'sonarjs/os-command': 'off',
+      'sonarjs/pseudo-random': 'off',
+    },
+  },
   { ignores: ['node_modules/', 'dist/'] },
 );
