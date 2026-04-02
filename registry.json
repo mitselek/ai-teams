@@ -1,0 +1,120 @@
+{
+  "updatedAt": "2026-03-30",
+  "updatedBy": "Strabo",
+  "hosts": {
+    "RC": "100.96.54.170",
+    "PROD-LLM": "10.100.136.162"
+  },
+  "registry": [
+    {
+      "num": "1",
+      "teamName": "(reserved)",
+      "host": "100.96.54.170",
+      "port": 2221,
+      "user": null,
+      "sshKey": null,
+      "location": "RC",
+      "accessMethod": "direct-ssh",
+      "status": "reserved"
+    },
+    {
+      "num": "2",
+      "teamName": "apex-research",
+      "host": "100.96.54.170",
+      "port": 2222,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_apex",
+      "location": "RC",
+      "accessMethod": "direct-ssh",
+      "containerName": "apex-research",
+      "status": "live"
+    },
+    {
+      "num": "3",
+      "teamName": "polyphony-dev",
+      "host": "100.96.54.170",
+      "port": 2223,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_polyphony",
+      "location": "RC",
+      "accessMethod": "direct-ssh",
+      "containerName": "polyphony-dev",
+      "status": "live"
+    },
+    {
+      "num": "4",
+      "teamName": "entu-research",
+      "host": "100.96.54.170",
+      "port": 2224,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_entu",
+      "location": "RC",
+      "accessMethod": "direct-ssh",
+      "containerName": "entu-research",
+      "status": "live"
+    },
+    {
+      "num": "5",
+      "teamName": "hr-devs",
+      "host": "10.100.136.162",
+      "port": 2225,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_apex",
+      "location": "PROD-LLM",
+      "accessMethod": "proxyjump",
+      "proxyHost": "michelek@10.100.136.162",
+      "containerName": "hr-devs",
+      "status": "live"
+    },
+    {
+      "num": "6",
+      "teamName": "BT-TRIAGE",
+      "host": "10.100.136.162",
+      "port": 2226,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_apex",
+      "location": "PROD-LLM",
+      "accessMethod": "proxyjump",
+      "proxyHost": "michelek@10.100.136.162",
+      "containerName": "backlog-triage",
+      "status": "live"
+    },
+    {
+      "num": "7",
+      "teamName": "comms-dev",
+      "host": "10.100.136.162",
+      "port": 2227,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_apex",
+      "location": "PROD-LLM",
+      "accessMethod": "proxyjump",
+      "proxyHost": "michelek@10.100.136.162",
+      "containerName": "comms-dev",
+      "status": "live"
+    },
+    {
+      "num": "0",
+      "teamName": "hr-devs (bare metal)",
+      "host": "100.96.54.170",
+      "port": 22,
+      "user": "dev",
+      "sshKey": null,
+      "location": "RC",
+      "accessMethod": "direct-ssh",
+      "containerName": null,
+      "status": "live"
+    },
+    {
+      "num": "9",
+      "teamName": "PROD-LLM",
+      "host": "10.100.136.162",
+      "port": 22,
+      "user": "michelek",
+      "sshKey": "~/.ssh/id_ed25519_apex",
+      "location": "PROD-LLM",
+      "accessMethod": "direct-ssh",
+      "containerName": null,
+      "status": "live"
+    }
+  ]
+}
