@@ -18,21 +18,19 @@
 #
 # No host bind mounts. Repos cloned from GitHub inside the container.
 #
-# Network: host mode required on WARP-protected hosts where Docker bridge
-# traffic is not routed through the WARP tunnel. With host networking,
-# the container shares the host's network stack (including WARP DNS/routing).
-# Ports 22 (SSH) and 5173 (dashboard) bind directly on the host — no mapping needed.
+# Network: bridge mode. All external access goes through the cloudflared
+# sidecar tunnel. DNS managed by IT.
 
 services:
   apex-research:
     build:
       context: .
       dockerfile: Dockerfile.apex
-      network: host
     image: apex-research-claude:latest
     container_name: apex-research
     hostname: apex-research
-    network_mode: host
+    ports:
+      - "127.0.0.1:5173:5173"
     volumes:
       # Claude state: auto-memory, team config, scratchpads
       - apex-claude-home:/home/ai-teams/.claude
@@ -60,11 +58,18 @@ services:
       - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL:-}
       - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN:-}
       - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-}
-    # No ports: section needed — network_mode: host exposes ports directly.
-    # SSH on port 2222 (avoids conflict with host sshd on port 22).
-    # Dashboard on port 5173.
+    # Dashboard bound to localhost only — accessible by cloudflared (host network)
+    # but not from the external network.
     stdin_open: true
     tty: true
+    restart: unless-stopped
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: apex-cloudflared
+    network_mode: host
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN:-}
+    command: tunnel --no-autoupdate --protocol http2 run
     restart: unless-stopped
 
 volumes:
