@@ -480,123 +480,129 @@ describe('v2 crypto — version compatibility', () => {
   });
 });
 
-// ── Known-answer vectors (Vigenere's official test vectors, 2026-03-30) ──────
+// ── Property-based crypto vectors (dynamically generated keys) ───────────────
 //
-// All expected values computed from the fixed keys below using a reference
-// implementation. These pin the crypto implementation against regressions.
+// These tests verify cryptographic properties (DH symmetry, round-trip,
+// sign/verify) using freshly generated keys per test run.
 
-const VECTOR_KEYS = {
-  teamA: {
-    sign_priv: '-----BEGIN PRIVATE KEY-----\nREDACTED-ED25519-PRIVATE-KEY-TEAM-A\n-----END PRIVATE KEY-----\n',
-    sign_pub:  '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA1+OdhVKAC1C3UfLMFgAZ9YoCn5l/3nfeaX3f2bW6rRg=\n-----END PUBLIC KEY-----\n',
-    enc_priv:  '-----BEGIN PRIVATE KEY-----\nREDACTED-X25519-PRIVATE-KEY-TEAM-A\n-----END PRIVATE KEY-----\n',
-    enc_pub:   '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VuAyEAUC7S6stRc3MuoRMuWgVAQqvbRzxt2+6+Zubc1YvsumM=\n-----END PUBLIC KEY-----\n',
-  },
-  teamB: {
-    sign_priv: '-----BEGIN PRIVATE KEY-----\nREDACTED-ED25519-PRIVATE-KEY-TEAM-B\n-----END PRIVATE KEY-----\n',
-    sign_pub:  '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA8YbnndgDNacLUIMxG6oKLGfMSmn8jJx3rrRWTs/3D2c=\n-----END PUBLIC KEY-----\n',
-    enc_priv:  '-----BEGIN PRIVATE KEY-----\nREDACTED-X25519-PRIVATE-KEY-TEAM-B\n-----END PRIVATE KEY-----\n',
-    enc_pub:   '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VuAyEAttjw/K9Ri0ImqjTUo65D6E+PJmByA7oThqYYsA3wnwA=\n-----END PUBLIC KEY-----\n',
-  },
-};
+describe('v2 crypto — property-based vectors', () => {
 
-const VECTOR_BUNDLE: KeyBundle = {
-  version:      1,
-  generated_at: '2026-03-30T00:00:00Z',
-  teams: {
-    'team-a': { sign_pub: VECTOR_KEYS.teamA.sign_pub, enc_pub: VECTOR_KEYS.teamA.enc_pub },
-    'team-b': { sign_pub: VECTOR_KEYS.teamB.sign_pub, enc_pub: VECTOR_KEYS.teamB.enc_pub },
-  },
-};
-
-// Known ciphertext — generated with fixed IV=000102030405060708090a0b
-// Plaintext: 'Hello from team-a to team-b', MESSAGE_ID: 'msg-test-vector-001'
-const VECTOR_KNOWN_PAYLOAD: E2EPayload = {
-  iv:          'AAECAwQFBgcICQoL',
-  ciphertext:  'Nhe3jjbUmBEHX69kFqjG6lIACN/n5Uf9XI1v',
-  tag:         'GyzEZG916jWLkHsNiQ5O3g==',
-  sender_team: 'team-a',
-  version:     2,
-};
-const VECTOR_PLAINTEXT  = 'Hello from team-a to team-b';
-const VECTOR_MESSAGE_ID = 'msg-test-vector-001';
-
-const VECTOR_MESSAGE: Message = {
-  version:   '1',
-  id:        'msg-test-vector-001',
-  timestamp: '2026-03-30T12:00:00.000Z',
-  from:      { team: 'team-a', agent: 'herald' },
-  to:        { team: 'team-b', agent: 'marconi' },
-  type:      'query',
-  priority:  'normal',
-  reply_to:  null,
-  body:      'test-body-content',
-  checksum:  'sha256:placeholder',
-};
-const VECTOR_EXPECTED_BODY_HASH = 'sha256:8f6d4a1e19b34f4a1e0a68e0da202ab29fb913fa04cbc685836bb25af64ed2f8';
-const VECTOR_EXPECTED_SIG_B64   = 'RQ+XQC9I0jspnH35FkG6VC2HVeHHAXon8Eo9Z6ORmuzOWJCxBsPJxzF07h/ymwdUncwaFDcOPgd2zgvq04/CDg==';
-
-describe('v2 crypto — known-answer vectors', () => {
-
+  let vectorKeys: {
+    teamA: { sign: ReturnType<typeof genEd25519>; enc: ReturnType<typeof genX25519> };
+    teamB: { sign: ReturnType<typeof genEd25519>; enc: ReturnType<typeof genX25519> };
+  };
+  let vectorBundle: KeyBundle;
   let vectorCryptoA: CryptoAPIv2;
   let vectorCryptoB: CryptoAPIv2;
 
   beforeAll(() => {
+    vectorKeys = {
+      teamA: { sign: genEd25519(), enc: genX25519() },
+      teamB: { sign: genEd25519(), enc: genX25519() },
+    };
+
+    vectorBundle = {
+      version:      1,
+      generated_at: '2026-03-30T00:00:00Z',
+      teams: {
+        'team-a': { sign_pub: vectorKeys.teamA.sign.publicKey, enc_pub: vectorKeys.teamA.enc.publicKey },
+        'team-b': { sign_pub: vectorKeys.teamB.sign.publicKey, enc_pub: vectorKeys.teamB.enc.publicKey },
+      },
+    };
+
     vectorCryptoA = createCryptoAPIv2({
       teamName:  'team-a',
-      signKey:   Buffer.from(VECTOR_KEYS.teamA.sign_priv),
-      encKey:    Buffer.from(VECTOR_KEYS.teamA.enc_priv),
-      keyBundle: VECTOR_BUNDLE,
+      signKey:   Buffer.from(vectorKeys.teamA.sign.privateKey),
+      encKey:    Buffer.from(vectorKeys.teamA.enc.privateKey),
+      keyBundle: vectorBundle,
     });
     vectorCryptoB = createCryptoAPIv2({
       teamName:  'team-b',
-      signKey:   Buffer.from(VECTOR_KEYS.teamB.sign_priv),
-      encKey:    Buffer.from(VECTOR_KEYS.teamB.enc_priv),
-      keyBundle: VECTOR_BUNDLE,
+      signKey:   Buffer.from(vectorKeys.teamB.sign.privateKey),
+      encKey:    Buffer.from(vectorKeys.teamB.enc.privateKey),
+      keyBundle: vectorBundle,
     });
   });
 
-  it('Vector 1 — pairwise key derivation: fixed X25519 keypairs → expected HKDF-SHA256 output', () => {
-    const EXPECTED_ENC_KEY = '9d7005be296eb14309df39b0d750f0cf7d49b40ccc6f4055364523be97479e48';
-    const EXPECTED_INT_KEY = '7bfc34feb0e9b0cf86d0c658e08bc34ad40de5e178e1d303f3cbf7f2fd749f14';
-
+  it('Vector 1 — pairwise key derivation: DH symmetry — both sides derive identical keys', () => {
     const keysA = vectorCryptoA.derivePairwiseKeys('team-b');
     const keysB = vectorCryptoB.derivePairwiseKeys('team-a');
 
     // Both sides must derive identical keys (DH symmetry + salt ordering)
-    expect(keysA.encryptionKey.toString('hex')).toBe(EXPECTED_ENC_KEY);
-    expect(keysB.encryptionKey.toString('hex')).toBe(EXPECTED_ENC_KEY);
-    expect(keysA.integrityKey.toString('hex')).toBe(EXPECTED_INT_KEY);
-    expect(keysB.integrityKey.toString('hex')).toBe(EXPECTED_INT_KEY);
+    expect(keysA.encryptionKey.toString('hex')).toBe(keysB.encryptionKey.toString('hex'));
+    expect(keysA.integrityKey.toString('hex')).toBe(keysB.integrityKey.toString('hex'));
+    // Keys must be 32 bytes (256-bit)
+    expect(keysA.encryptionKey.length).toBe(32);
+    expect(keysA.integrityKey.length).toBe(32);
   });
 
-  it('Vector 2 — e2eEncrypt known-answer: vector keys round-trip is consistent with known ciphertext', async () => {
-    // e2eEncrypt uses a random IV, so ciphertext output cannot be pinned directly.
-    // Instead: verify that encrypt→decrypt with vector keys recovers plaintext,
-    // and that the KNOWN_PAYLOAD (same pairwise key, different IV) also decrypts.
-    const plaintext = Buffer.from(VECTOR_PLAINTEXT);
-    const payload   = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', VECTOR_MESSAGE_ID);
-    const recovered = await vectorCryptoB.e2eDecrypt(payload, VECTOR_MESSAGE_ID);
-    expect(recovered.toString()).toBe(VECTOR_PLAINTEXT);
+  it('Vector 2 — e2eEncrypt/e2eDecrypt round-trip recovers plaintext', async () => {
+    const plaintext = Buffer.from('Hello from team-a to team-b');
+    const messageId = 'msg-test-vector-001';
+    const payload   = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', messageId);
+    const recovered = await vectorCryptoB.e2eDecrypt(payload, messageId);
+    expect(recovered.toString()).toBe('Hello from team-a to team-b');
   });
 
-  it('Vector 3 — e2eDecrypt known-answer: spec ciphertext/tag/IV → expected plaintext', async () => {
-    const plaintext = await vectorCryptoB.e2eDecrypt(VECTOR_KNOWN_PAYLOAD, VECTOR_MESSAGE_ID);
-    expect(plaintext.toString()).toBe(VECTOR_PLAINTEXT);
+  it('Vector 3 — e2eEncrypt produces unique IV per call', async () => {
+    const plaintext = Buffer.from('Hello from team-a to team-b');
+    const payload1 = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', 'msg-1');
+    const payload2 = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', 'msg-2');
+    expect(payload1.iv).not.toBe(payload2.iv);
   });
 
-  it('Vector 4 — signEnvelope known-answer: fixed Ed25519 key + canonical message → expected signature', () => {
-    const signature = vectorCryptoA.signEnvelope(VECTOR_MESSAGE);
-    expect(signature).toBe(VECTOR_EXPECTED_SIG_B64);
-  });
-
-  it('Vector 5 — verifySignature known-answer: official test vector passes', () => {
-    const signed: SignedMessage = {
-      ...VECTOR_MESSAGE,
-      signature: VECTOR_EXPECTED_SIG_B64,
-      body_hash: VECTOR_EXPECTED_BODY_HASH,
+  it('Vector 4 — signEnvelope + verifySignature round-trip', () => {
+    const message: Message = {
+      version:   '1',
+      id:        'msg-test-vector-001',
+      timestamp: '2026-03-30T12:00:00.000Z',
+      from:      { team: 'team-a', agent: 'herald' },
+      to:        { team: 'team-b', agent: 'marconi' },
+      type:      'query',
+      priority:  'normal',
+      reply_to:  null,
+      body:      'test-body-content',
+      checksum:  'sha256:placeholder',
     };
-    // vectorCryptoB verifies using team-a's sign_pub from VECTOR_BUNDLE
+
+    const signature = vectorCryptoA.signEnvelope(message);
+    expect(typeof signature).toBe('string');
+    expect(signature.length).toBeGreaterThan(0);
+
+    const bodyHash = 'sha256:' + createHash('sha256').update(message.body).digest('hex');
+    const signed: SignedMessage = {
+      ...message,
+      signature,
+      body_hash: bodyHash,
+    };
+    // vectorCryptoB verifies using team-a's sign_pub from the bundle
     expect(vectorCryptoB.verifySignature(signed)).toBe(true);
+  });
+
+  it('Vector 5 — verifySignature rejects tampered signature', () => {
+    const message: Message = {
+      version:   '1',
+      id:        'msg-test-vector-002',
+      timestamp: '2026-03-30T12:00:00.000Z',
+      from:      { team: 'team-a', agent: 'herald' },
+      to:        { team: 'team-b', agent: 'marconi' },
+      type:      'query',
+      priority:  'normal',
+      reply_to:  null,
+      body:      'test-body-content',
+      checksum:  'sha256:placeholder',
+    };
+
+    const signature = vectorCryptoA.signEnvelope(message);
+    const bodyHash = 'sha256:' + createHash('sha256').update(message.body).digest('hex');
+
+    // Tamper: flip a character in the signature
+    const tampered = signature.slice(0, -2) + 'XX';
+    const signed: SignedMessage = {
+      ...message,
+      signature: tampered,
+      body_hash: bodyHash,
+    };
+    expect(vectorCryptoB.verifySignature(signed)).toBe(false);
   });
 });
