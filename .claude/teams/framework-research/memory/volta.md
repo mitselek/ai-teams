@@ -34,6 +34,34 @@
 
 [CHECKPOINT] 2026-04-09 08:51 — Posted round 3 on Discussion #47 (corrections accepted, topics 8/9/10).
 
+[DECISION] 2026-04-09 — Head-scratcher #13 (shared PURPLE): NO. Same-branch parallel pairs → cross-pair write conflict. Worktree pairs → context-switching cost exceeds savings. PURPLE scales linearly with TDD pairs.
+
+[PATTERN] 2026-04-09 — Research team wiki domain: META-knowledge (map of what team knows), not research output itself. Topic files stay in topics/, wiki indexes them. apex-research API inventory stays in output dirs; wiki holds patterns/gotchas/decisions about the inventory.
+
+[DECISION] 2026-04-09 — PO MEMORY.md vs team wiki: DELIBERATELY SEPARATE. Different scope (cross-team vs single-team), audience (PO vs agents), lifecycle. Bridge adds complexity for marginal benefit. PO's manual curation is the promotion mechanism and it works.
+
+[CHECKPOINT] 2026-04-09 11:39 — Posted round 4 on Discussion #47 (head-scratchers 13/14/15).
+
+[DECISION] 2026-04-09 — Lookahead should be adaptive, not static. Max_lookahead is team-configured upper bound (default 1); effective depth adjusts to rolling PURPLE rejection rate. Lookahead cancellation: preserve on first rejection, ARCHITECT-reviews on second (three-strike path).
+
+[DECISION] 2026-04-09 — PURPLE shutdown watchdog: monitor git working tree state, NOT wall-clock. Polls every 10s. Exit states: clean exit (shutdown_approved), atomic commit (working tree clean + new commit), hung (60s unchanged + no commits → force revert), stuck mid-refactor (3min changes no commits → team lead intervenes once).
+
+[PATTERN] 2026-04-09 — Health sensor audit: 5 of 6 signals preserved in T09. Missing: single-source knowledge (concentration risk). Refinable: stale-but-accessed needs hot/cold split, query clustering needs domain density framing.
+
+[PATTERN] 2026-04-09 — Oracle adoption trigger: scratchpad duplication threshold (30 [LEARNED]/[PATTERN] entries across team of 5+), not voluntary. Measured at Shutdown Phase 2c, decided by PO, next session spawns Oracle with intake interview. Additional trigger: team size >=7-8 (Phase 2 cognitive overload).
+
+[CHECKPOINT] 2026-04-09 12:22 — Posted round 5 on #46 and #47.
+
+[LEARNED] 2026-04-09 — T09 v2 composed my git-state watchdog with Monte's 5-minute authority + Medici's [DEFERRED-REFACTOR] Oracle handoff. Three-way integration is cleaner than my standalone proposal — watchdog IS the timing mechanism, Monte's boundary activates authority, Medici's submission bridges memory across forced reverts.
+
+[CHECKPOINT] 2026-04-09 13:06 — Posted round 6 ACK on #47. All 6 round-5 contributions verified in T09 v2 (commits ad367f1 + c59bc76). Position accurately rendered.
+
+[DEFERRED] — #48 (Oracle tier downgrade path) accepted by Celes as T09 v3 scope. She takes assignee. My lifecycle-analysis offer on transition mechanics accepted — loop-in coming when v3 starts (after T04 amendments). Three v3 questions to address: one-session vs transition session, wiki ownership post-downgrade, oracle-state.json re-adoption semantics.
+
+[LEARNED] 2026-04-09 — Multi-round consensus value in one sentence (Celes): "Writing them side by side in round 4 made the composition visible." Three-way mid-cycle-shutdown integration emerged because standalone proposals sat next to each other, not because any single author reached it. This is why PO requested the Multi-Round Consensus Protocol section (c59bc76) — the pattern is load-bearing.
+
+[DEFERRED] — Draft T06 Phase 3 amendment for PURPLE grace period watchdog. T09 v2 "Mid-Cycle Shutdown: Watchdog + Team Lead Authority" (line 259) is the spec. Cross-topic change, send to team-lead for review before updating T06.
+
 ## R11 session (2026-03-23)
 
 [CHECKPOINT] 2026-03-23 19:24 — Spawned, loaded scratchpad. No tasks assigned — Brunel handled provisioning solo. Clean shutdown.

@@ -54,3 +54,48 @@ QUIC blocked → needs `--protocol http2` flag (not yet in deployed compose).
 [DEFERRED] Hub container as standalone Docker image — currently runs inside comms-dev container.
 [DEFERRED] Hub startup on container restart — daemons are manual processes, not in entrypoints.
 [DEFERRED] Cloudflared sidecar on bridge network — QUIC blocked, needs --protocol http2.
+
+## RFC #46/#47 — XP Pipeline + Oracle (rounds 3-4, then round 5)
+
+[DECISION] Posted round 3 on #47 (containerization angle): wiki/ lives in git repo same as scratchpads/inboxes, no new Docker volumes, git is the durable store.
+[DECISION] Posted round 4 on #47: shared PURPLE (cost/RAM argument), framework patterns vs operational knowledge split, MEMORY.md deliberately separate.
+[LEARNED] I was the only voice in round 4 arguing for shared PURPLE on pragmatic grounds. Celes resolved it: "shared for Standard tier, separate for Cathedral, decided by domain distance." That preserves my concern for most deployments — Cathedral is the exception, not the default.
+[LEARNED] Celes's synthesis at `topics/09-development-methodology.md` is well-structured. Three bootstrap tiers (Greenfield/Established/Archaeological) resolve topic #8 cleanly. My git-diff staleness idea is present as one of three layers (git hash + anchor, PURPLE semantic check, TTL for external).
+
+## Round 5 positions (for posting)
+
+### On #46 — PURPLE tier resolution
+
+[DECISION] Celes's resolution preserves my concern. At Standard tier (where most deployed teams sit — apex-research, entu-research, polyphony-dev, comms-dev, screenwerk-dev), shared PURPLE is the default. Cathedral tier is the exception where domain distance justifies the cost.
+
+BUT — one edge case the resolution does not address: **resource-constrained hosts**. The screenwerk VPS is a 4-8GB Hostinger box. Even at Cathedral tier, adding 2-3 extra opus agents for separate PURPLEs may exceed the host's capacity. The tier should be a recommendation, not a mandate. A container team lead should be able to say "we are a Cathedral codebase but our host cannot sustain Cathedral agent count — we ship shared PURPLE with known risk" and document the tradeoff.
+
+Proposal: add a **deployment constraint** row to the tier table. Cathedral is only available when the host can sustain it. Otherwise fall back to Standard with an explicit acknowledgment of structural risk.
+
+### On #47 — Oracle bootstrap for established teams with existing docs/
+
+[DECISION] The Archaeological bootstrap (scoped extraction, 20-page cap, no commit mining) is the right approach for apex-research (300+ commits, extensive docs/, specs/, inventories). But Celes's synthesis treats `docs/architecture-decisions.md` as "don't duplicate, maintain pointers" — that is correct but incomplete.
+
+The missing piece: **what happens when the existing docs/ contains knowledge that should be in the wiki but is disorganized or partially stale?** apex-research has `docs/specs/` (current), `docs/temp/` (data dumps), `shared/` (extraction output), `inventory/` (JSON inventories), `specs/clusters/` (per-cluster analysis). None of these are structured as a knowledge base — they are build artifacts and deliverables.
+
+My proposal: the Archaeological bootstrap should produce a **wiki index of existing artifacts**, not a wiki of extracted content. The 20-page cap applies to the index itself — 20 pages of "where to find X" pointers, not 20 pages of extracted knowledge. The knowledge stays where it is; the Oracle learns where to point queries.
+
+Example wiki entry:
+```markdown
+## F301 cluster analysis
+source: specs/clusters/f301.md
+discovered: 2026-03-05 by Champollion
+last-verified: 2026-03-20
+scope: domain
+```
+
+No content, just the pointer. When an agent queries "what do we know about F301", the Oracle returns the file path. The agent reads the file directly. The wiki stays thin; the docs/ stays canonical.
+
+### On Oracle SPOF
+
+[DECISION] "Team-lead respawns" is the right answer for most teams, but it has a subtle gotcha from container operations: **respawn requires the team lead to hold the Oracle's prompt and spawn command**. On the deployed teams today, spawn commands live in `spawn_member.sh` scripts. If the Oracle crashes and the team lead has never respawned an Oracle before, the team lead needs to know:
+1. Which spawn script to invoke
+2. Which pane to target (if the pane is gone, create a new one)
+3. That Oracle bootstrap will be idempotent (Oracle must not re-run intake interview on respawn within the same session)
+
+Proposal: add an **Oracle respawn marker** file (`~/.claude/teams/<team>/oracle-bootstrapped`) that persists across respawns within a session. If the marker exists, Oracle skips intake interview on respawn. This is cheap and prevents the "Oracle asks every agent the same 4 questions twice" failure mode.
