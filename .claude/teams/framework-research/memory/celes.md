@@ -100,10 +100,37 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 [GOTCHA] A duplicate post-crash respawn can exist alongside the primary — during my respawn, team-lead initially believed a parallel spawn had delivered the report and ordered me to stand down. Ten minutes later the "parallel spawn" turned out to be an empty orphan with no tool surface and team-lead reversed the shutdown. Lesson: during recovery, verify any "duplicate" actually has tool capability before deferring to it. Tool-less orphans aren't authoritative.
 [LEARNED] My scratchpad was NOT updated between 607ea8b and the crash — the Task 1 commit (264222d) landed but the scratchpad entry recording it did not. This is why the respawn brief had to warn me explicitly that in-memory notes were gone. Going forward: after every significant commit, update scratchpad in the same session before moving on to the next task. The 30-second cost is tiny; the risk of losing the reasoning is real.
 
+## Session 2026-04-09 (later) — T09 v2.3 (#49)
+
+[CHECKPOINT] T09 v2.3 committed as `9b8d0a3` — "cost framing removed, quality as the only axis (resolves #49)". Version bumped v2.2 → v2.3. Pushed to origin/main. Issue #49 was already in CLOSED state when I ran gh; resolution comment posted as comment 4213881485 so commit → issue link is recorded.
+
+[DECISION] Degraded Cathedral renamed **Host Capacity as Deployment Prerequisite**, relocated in-place (still between the Cathedral governance trigger and the Shared vs. Separate PURPLE section — already the tier-selection zone). Under-provisioned host is a **deployment blocker**, not a tier variant. The team-lead-as-PURPLE pattern survives as an **emergency-only recorded deficiency** with explicit "fix the hardware, do not normalize the compensation" guidance. Deployment Prerequisites table lists **code consequence (the decision) × host sizing (the prerequisite)** — no implication that host sizing is a second decision axis.
+
+[DECISION] PURPLE configuration table: Cost column dropped, renamed "Cost tiering" → "PURPLE configuration by tier". Degraded Cathedral row removed. Four rows remain.
+
+[DECISION] Team Composition Impact table: Degraded Cathedral row removed. Emergency compensation referenced via pointer to the Host Capacity section, not as a table row.
+
+[DECISION] Shared vs. Separate PURPLE convergence: Brunel's "resource capacity" cost bullet deleted. Now two quality arguments (Herald structural consistency + Finn Oracle cross-pattern detection) + Monte's authority caveat. Herald's bullet label changed from "cost + structural consistency" to "structural consistency". Brunel stays credited in the historical v2 Changelog entry.
+
+[DECISION] Opus Bookends Key Insight: "cost optimization" replaced with "consequence of error" framing. "Expensive/cheap" phrasing replaced with "high consequence when wrong / verifiable by tests".
+
+[DECISION] Single-pipeline same-agent ARCHITECT defense: "opus cost saves one agent" reframed as "one opus holds both cognitive stances coherently within a single story".
+
+[DECISION] Implementation Checklist: host-capacity checkbox reframed as "verify host can sustain tier; else resolve at infrastructure layer, not tier downgrade". Pipeline-tier checkbox gains "this is the only decision axis".
+
+[PATTERN] Part 2 (Oracle) cost mentions survived the scope directive verbatim. Lines ~598/609/880 reference "opus cost of knowledge management", "cost of lost knowledge", "costing 30+ minutes" — all consequence arguments for Part 2 Oracle adoption triggers, not tier decisions. PO's brief was explicit that Part 2 is untouched.
+
+[PATTERN] Historical changelog entries (v2.1, v2, v2.2) contain Degraded-Cathedral-as-tier language — preserved verbatim. Changelogs are historical records; rewriting them to match new framing would falsify history. The new v2.3 entry is the authoritative statement of what changed.
+
+[GOTCHA] Issue #49 was already CLOSED (`closedAt: 2026-04-09T11:39:34Z`, zero comments) when I went to close it. Something or someone — possibly team-lead, possibly automation — closed the issue earlier in the session without posting a resolution comment. Posted the resolution comment as a follow-up. Flagged in my report to team-lead. Lesson: `gh issue close` refuses to act on already-closed issues AND swallows the comment it was supposed to post. Use `gh issue comment` separately if the close-with-comment flow fails.
+
+[GOTCHA] Working tree had uncommitted modifications to `.claude/teams/framework-research/memory/team-lead.md` when I ran `git status` — team-lead's scratchpad, not mine to commit. Staged only `topics/09-development-methodology.md` explicitly with `git add <file>`. Reminder: always check `git status` before committing — other agents' in-flight work can land in the same working tree during a shared-isolation session.
+
+[LEARNED] Writing the scratchpad entry IMMEDIATELY after commit (before reporting to team-lead) is now habit. The previous session's crash cost me the v2.1 decision reasoning; I don't want to repeat that.
+
 ## Deferred (carried forward)
 
-[DEFERRED] #48 (Oracle tier downgrade path) — paused per Task 3 directive, awaiting PO assessment after v2.2 lands.
-[DEFERRED] #49 (Remove cost framing from tier decisions; Degraded Cathedral reframe) — paused per Task 3 directive.
+[DEFERRED] #48 (Oracle tier downgrade path) — paused per Task 3 directive, awaiting PO assessment. Now the last issue in the #48/#49 pair — #49 landed in v2.3.
 [DEFERRED] `types/t03-protocols.ts` for Herald's inter-team protocols (work handoff, broadcast, transport layer). Principle is documented, implementation belongs to Herald when he formalizes T03's protocols.
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
 [DEFERRED] Comms-dev common-prompt needs Lovelace added to members list.
