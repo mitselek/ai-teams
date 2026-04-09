@@ -13,7 +13,7 @@
 
 ## Workspace
 
-**Team repo:** `Raamatukoi/tugigrupp` — cloned at `~/workspace/tugigrupp/`
+**Team repo:** [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp) — cloned at `~/workspace/tugigrupp/`
 
 ```
 ~/workspace/tugigrupp/
@@ -26,8 +26,8 @@
     └── decisions/                   # Team-lead's ADRs
 ```
 
-- **Webstore code:** `webstore/` — Next.js 16 e-commerce store (`Raamatukoi/webstore`)
-- **Rat-project code:** `rat-project/` — FastAPI book procurement system (`Raamatukoi/rat-project`)
+- **Webstore code:** `webstore/` — Next.js 16 e-commerce store ([Raamatukoi/webstore](https://github.com/Raamatukoi/webstore))
+- **Rat-project code:** `rat-project/` — FastAPI book procurement system ([Raamatukoi/rat-project](https://github.com/Raamatukoi/rat-project))
 
 ### Submodule Workflow
 

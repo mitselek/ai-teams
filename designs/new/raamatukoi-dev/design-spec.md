@@ -64,7 +64,7 @@ Independent-output topology. Webstore and rat-project are separate codebases tha
 
 ### Isolation Model
 
-Agents work in submodules within `Raamatukoi/tugigrupp`:
+Agents work in submodules within [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp):
 
 ```
 tugigrupp/
@@ -77,7 +77,7 @@ tugigrupp/
     └── decisions/                   # Team-lead's ADRs
 ```
 
-Each TDD pair works in its own submodule. No branch conflicts between pairs. PRs are created against the real repos (Raamatukoi/webstore, Raamatukoi/rat-project).
+Each TDD pair works in its own submodule. No branch conflicts between pairs. PRs are created against the real repos ([Raamatukoi/webstore](https://github.com/Raamatukoi/webstore), [Raamatukoi/rat-project](https://github.com/Raamatukoi/rat-project)).
 
 ## 3. Team Composition
 
@@ -235,7 +235,7 @@ Full XP cycle per story: Cassiodorus decomposes → RED writes failing test → 
 
 ### Repo Structure
 
-**Team repo:** `Raamatukoi/tugigrupp` — the working directory for the team
+**Team repo:** [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp) — the working directory for the team
 
 ```
 tugigrupp/
@@ -250,9 +250,9 @@ tugigrupp/
 
 | Repo | Submodule path | Purpose | Access |
 |---|---|---|---|
-| `Raamatukoi/tugigrupp` | (root) | Team config, docs, coordination | read + write |
-| `Raamatukoi/webstore` | `webstore/` | Next.js e-commerce store | read + write |
-| `Raamatukoi/rat-project` | `rat-project/` | Book procurement system | read + write |
+| [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp) | (root) | Team config, docs, coordination | read + write |
+| [`Raamatukoi/webstore`](https://github.com/Raamatukoi/webstore) | `webstore/` | Next.js e-commerce store | read + write |
+| [`Raamatukoi/rat-project`](https://github.com/Raamatukoi/rat-project) | `rat-project/` | Book procurement system | read + write |
 
 ### Access Matrix
 
