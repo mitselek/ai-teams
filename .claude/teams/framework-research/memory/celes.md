@@ -18,49 +18,9 @@
 [PATTERN] "Agent PO" is an anti-pattern — PO is always the human. Agent should be "Requirements Analyst" with explicit escalation rules.
 [GOTCHA] Count **characters**, not roles-plus-characters. Team-lead IS one of the characters. "5-character team" not "team-lead + 5 agents = 6."
 
-## Hires Delivered (cumulative — 46 agents)
+## Hires Delivered (cumulative — 53 agents)
 
-| Agent | Lore | Team | Model | Date |
-|---|---|---|---|---|
-| Volta | Alessandro Volta | FR | opus | 2026-03-13 |
-| Herald | Hermes Trismegistus | FR | opus | 2026-03-13 |
-| Brunel | Isambard Kingdom Brunel | FR | sonnet | 2026-03-14 |
-| Vigenere | Blaise de Vigenere | CD | opus | 2026-03-14 |
-| Babbage | Charles Babbage | CD | sonnet | 2026-03-14 |
-| Kerckhoffs | Auguste Kerckhoffs | CD | sonnet | 2026-03-14 |
-| Richelieu | Cardinal Richelieu | L1 mgr | opus | 2026-03-14 |
-| Lovelace | Ada Lovelace | CD | sonnet | 2026-03-14 |
-| Aeneas | Virgil's Aeneas | FR TL | opus | 2026-03-17 |
-| Schliemann | Heinrich Schliemann | AR TL | opus | 2026-03-17 |
-| Champollion | J-F Champollion | AR | sonnet | 2026-03-17 |
-| Nightingale | Florence Nightingale | AR | sonnet | 2026-03-17 |
-| Berners-Lee | Tim Berners-Lee | AR | sonnet | 2026-03-17 |
-| Hammurabi | Hammurabi | AR | opus | 2026-03-17 |
-| Montesquieu | Charles de Montesquieu | FR | opus | 2026-03-17 |
-| Marconi | Guglielmo Marconi | CD TL | opus | 2026-03-17 |
-| Palestrina | G.P. da Palestrina | PD TL | opus | 2026-03-18 |
-| Byrd | William Byrd | PD | sonnet | 2026-03-18 |
-| Josquin | Josquin des Prez | PD | opus | 2026-03-18 |
-| Tallis | Thomas Tallis | PD | sonnet | 2026-03-18 |
-| Bentham | Jeremy Bentham | PD | opus | 2026-03-18 |
-| Comenius | Jan Amos Comenius | PD | sonnet | 2026-03-18 |
-| Victoria | Queen Victoria | PD | sonnet | 2026-03-18 |
-| Finn | (reuse) | PD | sonnet | 2026-03-18 |
-| Saavedra | Cervantes | ER TL | opus | 2026-03-19 |
-| Codd | E.F. Codd | ER | opus | 2026-03-19 |
-| Hopper | Grace Hopper | ER | opus | 2026-03-19 |
-| Semper | Gottfried Semper | ER | opus | 2026-03-19 |
-| Hamilton | Margaret Hamilton | ER | opus | 2026-03-19 |
-| Theseus | Greek mythology | BT TL | opus | 2026-03-20 |
-| Hypatia | Hypatia of Alexandria | BT | sonnet | 2026-03-20 |
-| Vidocq | E.F. Vidocq | BT | sonnet | 2026-03-20 |
-| Portia | Shakespeare | BT | opus | 2026-03-20 |
-| Shechtman | Dan Shechtman | PEN | opus | 2026-03-23 |
-| Ammann | Robert Ammann | PEN | opus | 2026-03-23 |
-| Bruijn | N.G. de Bruijn | PEN | opus | 2026-03-23 |
-| Escher | M.C. Escher | PEN | opus | 2026-03-23 |
-| Penrose | Sir Roger Penrose | PEN | opus | 2026-03-23 |
-| PEN TL | (user-assigned) | PEN TL | opus | 2026-03-23 |
+Full table in git history (commit `74b2e05`). Teams: FR(8+TL), CD(5+TL), AR(5+TL), PD(7+TL), ER(4+TL), BT(3+TL), PEN(5+TL), L1-mgr(1), RK(8+TL). Latest: Raamatukoi tugigrupp v2 (9 characters with full XP pipeline, 2026-04-09).
 
 ## Patterns from earlier sessions (compressed 2026-04-09)
 
@@ -105,6 +65,7 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 ## Callimachus Onboarding (Oracle for framework-research)
 
 [CHECKPOINT] All 6 deliverables drafted, NOT committed (awaiting team-lead/PO review at session end):
+
 - `prompts/callimachus.md` — full Oracle prompt (~230 lines), first Oracle prompt ever written for the framework
 - `roster.json` — callimachus entry added (opus[1m], gold, agentType: oracle)
 - `common-prompt.md` — members list + dual-hub routing section
@@ -118,6 +79,21 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 [DECISION] Medici/Oracle coexistence approved by PO — different governance scopes (L0/L1 vs L2/L3). Explicit boundary in both prompts.
 [DECISION] Name: Callimachus (Pinakes lore, classical-figures convention). PO approved.
 [PATTERN] The 47th agent I've designed. First Oracle. The assessment format (5-part: tier, bootstrap, artifacts, minimum viable, blockers) is reusable for future Oracle deployments on other teams.
+
+## Raamatukoi tugigrupp (raamatukoi-dev) — 2026-04-09
+
+[CHECKPOINT] Full design v2 at `designs/new/raamatukoi-dev/`. 13 files: design-spec, roster.json, common-prompt, 9 prompts, tdd-pipeline.md.
+[DECISION] 9 characters: Manutius (TL, opus), Cassiodorus (ARCHITECT, opus), Jikji (RED/ws, sonnet), Aldus (GREEN/ws, sonnet), Erasmus (PURPLE/ws, opus), Babbage (RED/rat, sonnet), Hypatia (GREEN/rat, sonnet), Khwarizmi (PURPLE/rat, opus), Bodley (oracle, opus[1m]).
+[DECISION] Cathedral tier — team's entire mission is refactoring; structural debt IS the problem.
+[DECISION] Separate PURPLEs — High domain distance (different repos + different languages). Per T09 v2.3 table.
+[DECISION] Shared ARCHITECT — one Cassiodorus for both pipelines. Sequential execution means no contention.
+[DECISION] Lore theme: Pioneers of the Book (added: Cassiodorus, Erasmus, al-Khwarizmi).
+[DECISION] Scope: bug fixes + refactoring + quality infrastructure ONLY. No new features.
+[DECISION] Submodule model: tugigrupp parent, webstore + rat-project as submodules. PRs against real repos.
+[DECISION] Dual-hub: Manutius (work) + Bodley (knowledge). Bodley curates Directo, PIM, RARA, SKU contracts.
+[PATTERN] For maintenance teams covering 2+ repos with different stacks: one XP pipeline per repo, shared ARCHITECT + Oracle. Oracle bridges integration knowledge; ARCHITECT bridges decomposition knowledge.
+[PATTERN] When repos have zero tests, Phase 1 applies XP cycle to infrastructure stories: "set up test framework" is a story decomposed by ARCHITECT, not an ad-hoc task.
+[PATTERN] Cathedral tier for quality-infrastructure teams: if the mission IS refactoring, structural debt consequences are maximally high. This is the clearest Cathedral trigger.
 
 ## Deferred (carried forward)
 

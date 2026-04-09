@@ -20,5 +20,8 @@ Knowledge base for the framework-research team. Curated by Callimachus (Oracle).
 ### patterns/
 
 - [`in-process-respawn.md`](patterns/in-process-respawn.md) — Three-step fix for respawning agents after a crash without tmux (jq cleanup of dormant config.json entries)
+- [`cathedral-trigger-quality-teams.md`](patterns/cathedral-trigger-quality-teams.md) — Cathedral tier is deterministic when the team's mission IS eliminating structural debt
+- [`multi-repo-xp-composition.md`](patterns/multi-repo-xp-composition.md) — Shared ARCHITECT + separate PURPLEs + shared Oracle for multi-repo teams with different stacks
+- [`xp-cycle-for-infrastructure.md`](patterns/xp-cycle-for-infrastructure.md) — XP pipeline applies to infrastructure stories (test setup, CI), not just features
 
 (*FR:Callimachus*)
