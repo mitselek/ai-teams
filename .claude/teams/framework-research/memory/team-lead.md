@@ -1,5 +1,34 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## Session: 2026-04-09 — Post-crash respawn pattern
+
+[LEARNED] **Agent-tool respawn pattern for in-process teams.** The framework-research team is in-process (not tmux panes). After a team crash where the runtime dir (`~/.claude/teams/framework-research/`) is preserved, dormant agent entries in `config.json` persist and BLOCK name reuse. Spawning `name: "celes"` with a dormant `celes` entry present creates `celes-2` (and every subsequent spawn becomes `celes-N`).
+
+[PATTERN] **hr-devs respawn adapted for in-process (no tmux).** Reference: `hr-platform/conversations/.claude/commands/respawn.md`. Hr-devs uses tmux; we translate:
+
+1. **Shutdown** — SendMessage `{type: shutdown_request}` to the running instance (in-process equivalent of `/exit`). Wait for `teammate_terminated` (NOT `shutdown_approved` alone).
+2. **jq remove from config.json** — the critical step. Delete BOTH any `-N` suffix entries AND the dormant original:
+   ```bash
+   jq 'del(.members[] | select(.name == "celes" or .name == "celes-2"))' ~/.claude/teams/framework-research/config.json > /tmp/new.json && mv /tmp/new.json ~/.claude/teams/framework-research/config.json
+   ```
+3. **Spawn via Agent tool** — `subagent_type: "general-purpose"`, `team_name: "framework-research"`, `name: "celes"`, `run_in_background: true`. The `name` parameter is critical — without it, the spawn is anonymous and lacks SendMessage tool access.
+
+[LEARNED] **Tradeoff: identity metadata is lost.** The dormant entry holds the original purple color, roster-backed task prompt, model tier (`opus[1m]`), and correct `cwd`. Removing it via jq drops all of that. The Agent-tool spawn creates a minimal entry: `color: red`, `agentType: general-purpose`, `model: claude-opus-4-6` (no `[1m]` suffix), `cwd` points to workspace root instead of repo root. **All cosmetic/navigational — none block functionality.** Celes could still read files, run git commands, SendMessage, and do work with the degraded entry.
+
+[LEARNED] **Agent-tool spawn does NOT read `roster.json`.** The `framework-research-startup` skill + `TeamCreate` is the "correct" mechanism that loads full roster identity. Agent-tool spawn is the lightweight path — produces functional agents, loses visual identity. Future: consider full skill-based respawn for visibility, but until then, accept the cosmetic loss.
+
+[LEARNED] **Background always-running agents that were anonymous (no `name` parameter) have no SendMessage tool.** They can only deliver via task-output channel. Use `name` parameter in Agent tool every time — it promotes the spawn to a proper team member with messaging access.
+
+[LEARNED] **`shutdown_approved` is NOT sufficient.** Always wait for `teammate_terminated` before jq-editing config.json. Early editing while the agent is mid-shutdown could create race conditions.
+
+[LEARNED] **config.json backup before edit is cheap insurance.** Copy to `/tmp/config-backup-$(date +%s).json` before every jq mutation.
+
+[DECISION] **Save this pattern in team-lead scratchpad until framework-research has a Librarian/Oracle.** Once the Oracle role is filled (T09 v2.2 spec exists but no team has one yet), this knowledge should be submitted as a `[PATTERN]` Knowledge Submission and live in the team wiki instead of a single scratchpad.
+
+[WIP] Celes is respawned and idle as `celes@framework-research` with `color: red`. Monte and Volta still dormant in config.json — same pattern will apply when we respawn them. PO is validating the respawn flow before continuing.
+
+---
+
 ## Session: 2026-03-19 (R10)
 
 [CHECKPOINT] R10 startup: CLEAN. 12 inboxes restored. config.json immediate. 6 agents spawned (all except medici).
