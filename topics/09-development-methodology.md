@@ -4,7 +4,7 @@ How development teams produce code and preserve the knowledge they generate. Syn
 
 (*FR:Celes*)
 
-**Version:** v2.2 (2026-04-09) — protocol typing principle + `types/t09-protocols.ts` per issue #51. Previous: v2.1 sequential-first default (#50 and #52). See [Changelog](#changelog) for binary calls and the reasoning behind them.
+**Version:** v2.3 (2026-04-09) — cost framing removed from tier decisions per issue #49; Degraded Cathedral reframed as a deployment prerequisite, not a tier variant. Previous: v2.2 protocol typing principle (#51), v2.1 sequential-first default (#50 and #52). See [Changelog](#changelog) for binary calls and the reasoning behind them.
 
 ---
 
@@ -104,7 +104,7 @@ The pipeline separates **judgment** from **execution** along model-tier lines:
 - **Opus** handles the bookends. ARCHITECT decomposes work (judgment: what to build, in what order). PURPLE refactors structure (judgment: how to improve code quality).
 - **Sonnet** handles the volume. RED writes one failing test at a time (execution: translate test plan item into code). GREEN writes minimum implementation (execution: make the test pass).
 
-This is cost optimization built into the development model. Judgment calls are expensive (opus); execution is cheap (sonnet). The pipeline puts opus exactly where errors have the highest consequence: architectural decomposition at the start and structural quality at the end.
+Model tier is driven by consequence of error, not by minimizing agent count. Judgment calls have high consequence when wrong (opus); execution is verifiable by tests (sonnet). The pipeline puts opus exactly where errors have the highest consequence: architectural decomposition at the start and structural quality at the end.
 
 ### Role Definitions
 
@@ -177,7 +177,7 @@ The same-agent option (one opus wearing both hats) was considered and rejected f
 2. **Confirmation bias.** The agent who decomposed the story has a bias toward accepting implementations that match its mental model, even if the structure is poor. Separate PURPLE provides genuine independence.
 3. **Pipeline parallelism in multi-pipeline teams.** ARCHITECT can decompose Story B while PURPLE finishes Story A. Same-agent serializes this.
 
-For **single-pipeline teams**, same-agent (Finn's position) is defensible — no parallelism to lose, shared context is valuable, and the opus cost saves one agent. This is a judgment call at team design time.
+For **single-pipeline teams**, same-agent (Finn's position) is defensible — no parallelism to lose, shared context is valuable, and one opus holds both cognitive stances coherently within a single story. This is a judgment call at team design time.
 
 ### Communication Protocol (Herald's Four Message Types)
 
@@ -382,56 +382,60 @@ Not every team needs the full XP pipeline. The tier is determined by the **conse
 
 This mirrors the manager agent scaling trigger (T04): manager agent is needed when the PO can no longer hold all teams' state simultaneously. Cathedral tier is needed when the team lead can no longer hold all implementation state simultaneously. Same pattern, different level.
 
-### Degraded Cathedral: Resource-Constrained Hosts
+### Host Capacity as Deployment Prerequisite
 
-Brunel's round 5 contribution. The tier model assumes host capacity matches team tier. In practice, deployment hosts vary — the screenwerk-dev team runs on a Hostinger VPS (4-8GB RAM), the apex-research team runs in a container on a shared 16GB RC server alongside 4+ other teams. A Cathedral-tier team with 4 opus agents plus the coordination overhead may exceed the host's sustainable capacity, at which point the team lead slows down, messages queue, and the pipeline stalls.
+**Tier selection is determined solely by consequence of structural debt. Host capacity is not a decision dimension — it is a deployment prerequisite that must be satisfied before the tier ships.**
 
-**Two-dimensional tier selection:**
+Brunel's round 5 observation (preserved here for the operational insight): deployment hosts vary. The screenwerk-dev team targets a Hostinger VPS (4-8GB RAM); the apex-research team runs in a container on a shared 16GB RC server alongside 4+ other teams. A Cathedral-tier team with 4 opus agents plus coordination overhead can exceed a small host's sustainable capacity, at which point the team lead slows down, messages queue, and the pipeline stalls. That is a real operational concern. But the conclusion is **not** "downgrade the tier to fit the host."
 
-| Tier | Code consequence | Host requirement |
+**If code-consequence requires Cathedral tier, the host must be provisioned to sustain it.** Quality is the only axis. A codebase with load-bearing, compounding structural debt does not become recoverable-debt code because the VPS is small. Teams cannot downgrade quality to fit hardware. If the host cannot sustain Cathedral, that is a deployment blocker — a problem to solve at the infrastructure layer — not a tier variant to ship.
+
+**Deployment prerequisites by tier:**
+
+| Tier | Code consequence (the decision) | Host sizing (the prerequisite) |
 |---|---|---|
-| Sprint | Disposable | Any host, any team composition |
+| Sprint | Disposable | Any host |
 | Standard | Recoverable debt | Standard deployment (4-8 agents sustainable) |
-| Cathedral | Irreversible debt | Dedicated host with headroom for 10+ agents OR **Degraded Cathedral** |
+| Cathedral | Irreversible debt | Host sized for the Cathedral opus agent count (dedicated or shared with explicit headroom) |
 
-**Degraded Cathedral** is the escape hatch for codebases that meet Cathedral criteria but cannot sustain the full agent count. The team ships Standard-tier composition (shared PURPLE, no dedicated ARCHITECT) with an explicit note in the team's design spec:
+**Provisioning challenges are deployment problems, not tier problems.** The screenwerk-dev VPS sizing and the apex-research shared-container contention are challenges to solve at the deployment layer — larger VPS, dedicated host, capacity reservation on the shared container server, or whatever the infrastructure answer turns out to be. They are not reasons to ship Standard-tier composition on load-bearing, Cathedral-criteria code.
 
-> This codebase meets Cathedral criteria (load-bearing, compounding structural debt), but deployment host constraints require Standard-tier composition. Structural review is elevated to the team lead's explicit responsibility at every PR merge. This is documented tech debt on the team configuration, not on the code.
+**Emergency-only compensation.** In the genuinely unavoidable case — the team must ship on a host that cannot sustain full Cathedral composition right now, and the deployment cannot wait for the host to be upgraded — the team lead personally takes on the PURPLE responsibility at PR review, and the team's design spec records this as a known deficiency against the target configuration:
 
-The team lead takes on the PURPLE responsibility they would otherwise delegate. This reintroduces the bottleneck that motivates ARCHITECT in the first place, but it is better than either (a) pretending the codebase is Standard tier, or (b) blocking deployment until we get a bigger host. The team's design spec documents both the current state and the target state, so the upgrade path is recorded.
+> This codebase meets Cathedral criteria (load-bearing, compounding structural debt). The current deployment host cannot sustain full Cathedral composition; the team lead holds PURPLE responsibility at PR review as an emergency compensation. This is a recorded deficiency, not a ship configuration. The target is full Cathedral composition on an adequately sized host, and the infrastructure work to get there is the path forward. Do not normalize the compensation.
+
+The team lead taking PURPLE responsibility reintroduces the exact bottleneck that motivates ARCHITECT and dedicated PURPLE in the first place. That is the point: it is visibly worse than the target, so the deficiency stays on the radar until infrastructure catches up. **Fix the hardware; do not normalize the compensation.**
 
 ### Shared vs. Separate PURPLE Across Pipelines — Deferred
 
-> **Status: deferred until sequential validation criteria are met.** See [Sequential First — Parallel Execution Is Deferred](#sequential-first--parallel-execution-is-deferred). Shared-PURPLE cross-pipeline pattern extraction is a *multi-pipeline execution mode* concern — it only matters when pipelines run concurrently. Under the sequential-first default, multi-pipeline teams run their pipelines one at a time, and a single PURPLE (or the team lead in Degraded Cathedral) handles refactoring for whichever pipeline currently holds the cycle. The discussion below is preserved as the target configuration once concurrent multi-pipeline execution is unlocked.
+> **Status: deferred until sequential validation criteria are met.** See [Sequential First — Parallel Execution Is Deferred](#sequential-first--parallel-execution-is-deferred). Shared-PURPLE cross-pipeline pattern extraction is a *multi-pipeline execution mode* concern — it only matters when pipelines run concurrently. Under the sequential-first default, multi-pipeline teams run their pipelines one at a time, and a single PURPLE handles refactoring for whichever pipeline currently holds the cycle. The discussion below is preserved as the target configuration once concurrent multi-pipeline execution is unlocked.
 
 Multi-pipeline teams face a choice: one shared PURPLE or one per pipeline?
 
-**The Cathedral default is shared PURPLE, with Monte's authority caveat.** Three independent arguments in round 5 converged on this:
+**The Cathedral default is shared PURPLE, with Monte's authority caveat.** Two independent quality-based arguments in round 5 converged on this:
 
-1. **Herald (cost + structural consistency).** A shared PURPLE enforces one refactoring style across pipelines. Two separate PURPLEs can diverge in their structural vision, producing "split personality" refactorings visible in the git history. Structural consistency is observable and measurable; the earlier "context bleed" concern (Vue idioms leaking into Node.js) was speculative and has no reference-team evidence.
+1. **Herald (structural consistency).** A shared PURPLE enforces one refactoring style across pipelines. Two separate PURPLEs can diverge in their structural vision, producing "split personality" refactorings visible in the git history. Structural consistency is observable and measurable; the earlier "context bleed" concern (Vue idioms leaking into Node.js) was speculative and has no reference-team evidence.
 2. **Finn (Oracle cross-pattern detection).** A single shared PURPLE sees convergence across pipelines directly — it submits "this is the third time we've needed time-range filtering" as one pattern. Two separate PURPLEs submit similar patterns independently and rely on the Oracle to detect the convergence. Shared PURPLE is better signal for the Oracle.
-3. **Brunel (resource capacity).** On constrained hosts, two opus refactorers plus two opus ARCHITECTs plus coordinator context can exceed sustainable team size. Shared PURPLE halves the refactorer cost without changing the pipeline discipline.
-4. **Monte (authority caveat).** A shared PURPLE that observes cross-pipeline patterns is constantly tempted to make architectural decisions (extract a shared utility). Those decisions belong to ARCHITECT. The shared PURPLE's prompt must include: "flag cross-pipeline patterns to ARCHITECT via Oracle, do not extract them yourself." With this caveat, shared PURPLE is governance-safe.
+3. **Monte (authority caveat).** A shared PURPLE that observes cross-pipeline patterns is constantly tempted to make architectural decisions (extract a shared utility). Those decisions belong to ARCHITECT. The shared PURPLE's prompt must include: "flag cross-pipeline patterns to ARCHITECT via Oracle, do not extract them yourself." With this caveat, shared PURPLE is governance-safe.
 
 **The variable that still matters: domain distance between pipelines.** Domain distance is the reason to consider separation, but structural consistency is the articulated benefit of sharing.
 
 | Domain distance | Example | Recommendation |
 |---|---|---|
 | Low — same codebase, same framework, same idioms | Two feature teams on the same Nuxt app | **Shared PURPLE.** Structural consistency is the benefit. |
-| Medium — same repo, different domains | screenwerk-dev (Node.js pipeline scripts vs. Vue composables) | **Shared PURPLE with authority caveat.** Accept slight context-switching cost for structural consistency + Oracle cross-pattern detection. |
+| Medium — same repo, different domains | screenwerk-dev (Node.js pipeline scripts vs. Vue composables) | **Shared PURPLE with authority caveat.** Accept slight context-switching overhead for structural consistency + Oracle cross-pattern detection. |
 | High — different repos or languages | One pipeline in TypeScript backend, another in Python analysis | **Separate PURPLEs.** Language boundaries force separation regardless of other reasoning. |
 
 **Pipeline-distance diagnostic (Medici, round 5).** The Oracle can verify that a shared PURPLE is configured correctly. For shared-PURPLE pipelines, the Oracle tracks **cross-pipeline pattern reuse rate** — refactoring patterns submitted by the shared PURPLE that apply across both pipelines. A low rate is a `[PIPELINE-DISTANCE]` signal that the pipelines are not actually sharing idioms and should have been separated. A high rate confirms the shared-PURPLE configuration. This observation goes in the Knowledge Health Summary.
 
-**Cost tiering (revised for shared-PURPLE default):**
+**PURPLE configuration by tier:**
 
-| Tier | PURPLE configuration | Cost |
-|---|---|---|
-| Sprint | No PURPLE | Baseline |
-| Standard | Reviewer (not PURPLE) | +1 sonnet |
-| Cathedral (Medium distance or below) | Shared PURPLE across pipelines with authority caveat | +1 opus |
-| Cathedral (High distance) | Separate PURPLE per pipeline | +N opus |
-| Degraded Cathedral | Team lead takes PURPLE responsibility at PR review | +0 agents, +cognitive load on lead |
+| Tier | PURPLE configuration |
+|---|---|
+| Sprint | No PURPLE |
+| Standard | Reviewer (not PURPLE) |
+| Cathedral (Medium distance or below) | Shared PURPLE across pipelines with authority caveat |
+| Cathedral (High distance) | Separate PURPLE per pipeline |
 
 **screenwerk-dev example (revised):** Pipeline pair writes Node.js data transformations. Player pair writes Vue composables. Medium domain distance. Cathedral tier gets **shared PURPLE with Monte's authority caveat**, not separate PURPLEs. Oracle tracks `[PIPELINE-DISTANCE]` to detect misconfiguration.
 
@@ -447,9 +451,8 @@ For a two-pipeline team like screenwerk-dev (pipeline pair on Node.js data trans
 | Standard tier (+ reviewer) | 2 pairs | Sequential (pairs take turns) | 3 | 5 | 8 |
 | Cathedral tier (ARCHITECT + shared PURPLE) | 2 pairs | **Sequential (current default)** | 5 | 4 | 9 |
 | Cathedral tier with separate PURPLEs | 2 pairs | **Parallel — deferred until validated** | 6 | 4 | 10 |
-| Degraded Cathedral (resource-constrained host) | 2 pairs | Sequential | 4 | 4 | 8 (lead takes PURPLE responsibility) |
 
-**Reading the table:** The current default for a screenwerk-dev-style Cathedral-tier team is row 3 — 2 pairs as the team shape, one shared PURPLE refactoring code for whichever pair currently holds the cycle, sequential execution across pairs. Row 4 (parallel execution, separate PURPLEs) becomes available only after the team has validated the sequential model per the [validation criteria](#validation-criteria-for-unlocking-parallelism).
+**Reading the table:** The current default for a screenwerk-dev-style Cathedral-tier team is row 3 — 2 pairs as the team shape, one shared PURPLE refactoring code for whichever pair currently holds the cycle, sequential execution across pairs. Row 4 (parallel execution, separate PURPLEs) becomes available only after the team has validated the sequential model per the [validation criteria](#validation-criteria-for-unlocking-parallelism). An emergency-only compensation — team lead taking PURPLE responsibility on an under-provisioned host — is discussed in [Host Capacity as Deployment Prerequisite](#host-capacity-as-deployment-prerequisite); it is a recorded deficiency, not a ship configuration.
 
 **The multi-pipeline team shape is preserved.** Teams are not flattened to single-pipeline configurations to fit the sequential-first default — domain separation (different idioms, different files, different agent rosters) remains a valid and encouraged reason to structure a team with two or more pairs. The pairs coordinate through the team lead and take turns at the XP cycle level.
 
@@ -1158,8 +1161,8 @@ For team designers (this is my use of this document):
 
 ### XP Pipeline
 
-- [ ] Determine pipeline tier (Sprint / Standard / Cathedral) based on consequence of structural debt
-- [ ] Determine host capacity tier (standard, constrained → Degraded Cathedral)
+- [ ] Determine pipeline tier (Sprint / Standard / Cathedral) based on consequence of structural debt — this is the only decision axis
+- [ ] Verify deployment host can sustain the chosen tier's opus agent count; if not, treat as a deployment blocker to resolve at the infrastructure layer, not as a tier downgrade
 - [ ] For Cathedral tier, add ARCHITECT to roster (opus, Spec Writer specialization with scoped authority)
 - [ ] For Cathedral tier, add PURPLE to roster (opus, Refactorer)
 - [ ] For multi-pipeline Cathedral teams, **default to shared PURPLE with Monte's authority caveat**; separate only when domain distance is High
@@ -1276,6 +1279,43 @@ The multi-round protocol works because (a) specialists form independent position
 ---
 
 ## Changelog
+
+### v2.3 (2026-04-09) — Cost Framing Removed, Quality as the Only Axis (resolves #49)
+
+PO issue #49 directive (verbatim): *"Tier selection is determined solely by consequence of structural debt (Finn's axis) — not host capacity, agent budget, or cost."*
+
+**Reframed:**
+
+- **Degraded Cathedral is no longer a tier variant.** Renamed to **Host Capacity as Deployment Prerequisite** and reframed. Quality is the only axis: if code-consequence requires Cathedral tier, the host must be provisioned to sustain it. Teams cannot downgrade quality to fit hardware. If the host cannot sustain Cathedral, that is a deployment blocker to solve at the infrastructure layer, not a tier variant to ship. The screenwerk-dev VPS sizing and the apex-research shared-container contention are deployment challenges to solve, not tier configurations to ship.
+- **Emergency-only compensation.** The "team lead takes PURPLE responsibility" pattern is preserved as a recorded deficiency for the genuinely unavoidable case — the team must ship on an under-provisioned host and the deployment cannot wait for infrastructure to catch up. The design spec must document this as a known gap against the target configuration. The guidance is explicit: fix the hardware, do not normalize the compensation. This replaces the earlier "escape hatch" framing.
+- **Brunel's operational insight is preserved** — deployment hosts vary, and a full-Cathedral opus agent count can exceed a small host's sustainable capacity. That observation stays; the conclusion changes from "downgrade the tier" to "provision the host or resolve the deployment blocker."
+
+**Removed:**
+
+- **Cost column from the PURPLE configuration table.** Renamed "Cost tiering (revised for shared-PURPLE default)" to "PURPLE configuration by tier" and dropped the Cost column entirely. Tier names (Sprint, Standard, Cathedral Medium/below, Cathedral High) and PURPLE configurations are preserved; the decision axis is quality, not cost.
+- **Cost row from the Team Composition Impact table.** The "Degraded Cathedral (resource-constrained host)" row is removed. The remaining four rows describe real tier configurations; the emergency compensation is referenced via a pointer to the Host Capacity section rather than as a table row, to avoid re-implying that "under-provisioned host" is a legitimate ship configuration.
+- **Brunel's cost bullet from the Shared vs. Separate PURPLE convergence.** The "resource capacity" bullet (`Shared PURPLE halves the refactorer cost without changing the pipeline discipline`) is deleted. Herald's structural-consistency argument and Finn's Oracle cross-pattern-detection argument both remain — they are quality-based and unaffected. The bullet count drops from three quality/cost arguments + Monte's caveat to two quality arguments + Monte's caveat; Brunel is still credited in the v2 Changelog entry for surfacing the operational concern that drove the original (now-reframed) Degraded Cathedral section.
+- **Cost framing from the Key Insight (Opus Bookends, Sonnet Executes) section.** The "cost optimization built into the development model" phrasing is replaced with "consequence of error" framing, consistent with Finn's quality axis.
+- **"opus cost saves one agent" justification** in the single-pipeline same-agent ARCHITECT discussion (`Same Agent or Separate`). The reasoning is reframed as "one opus holds both cognitive stances coherently within a single story" — a quality argument, not a cost-savings one.
+
+**Implementation Checklist updated:**
+
+- The "Determine host capacity tier (standard, constrained → Degraded Cathedral)" checkbox is reframed to "Verify deployment host can sustain the chosen tier's opus agent count; if not, treat as a deployment blocker to resolve at the infrastructure layer, not as a tier downgrade." The pipeline-tier checkbox gains the phrase "this is the only decision axis" for explicit emphasis.
+
+**Scope:**
+
+- Edits are confined to Part 1 (XP Development Pipeline). Part 2 (Oracle / Knowledge Base) is untouched. The Part 2 references to "opus cost of knowledge management" and "cost of lost knowledge" describe the consequence argument for the Standard-tier compromise and the Cathedral-tier Oracle adoption trigger — not tier decisions. Per the #49 directive scope, they stay.
+- No edit to T04, T06, or `types/t09-protocols.ts`. No edit to the v2.1 or v2 Changelog entries — historical records are preserved verbatim, including their references to "Degraded Cathedral tier" as that term existed at the time.
+
+**What did NOT change in v2.3:**
+
+- No tier names changed. Sprint, Standard, Cathedral remain.
+- No PURPLE configurations changed. Shared PURPLE remains the Cathedral default at Medium distance or below; separate PURPLEs at High distance.
+- No sequential-first constraint changed. The v2.1 execution-mode default still holds.
+- No Oracle design changed. Part 2 is untouched.
+- Issue #48 (Oracle tier downgrade path) remains paused — separate assignment.
+
+**Commit:** this v2.3 commit references #49.
 
 ### v2.2 (2026-04-09) — Protocol Typing (resolves #51)
 
