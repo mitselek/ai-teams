@@ -6,6 +6,7 @@
 
 [DECISION] Spawn Cal + Celes first as default. PO decides additional agents per task.
 [DECISION] Startup read order now includes team-lead prompt (step 4 of 5).
+[WIP] After spawn, have Celes assess Callimachus's first day performance — dual-hub effectiveness, wiki quality, submission processing. PO wants the Agent Resources Manager's perspective on the Oracle role in practice.
 
 ---
 
