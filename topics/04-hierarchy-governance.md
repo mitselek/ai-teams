@@ -34,6 +34,32 @@ The framework already has a de facto governance system, accumulated from inciden
 - `topics/03-communication.md` — Herald's inter-team protocols
 - `topics/07-safety-guardrails.md` — permission categories
 
+### Constitutional Rules
+
+Named rules that constrain governance across layers. Unlike delegation matrix rows (which describe who decides what), constitutional rules forbid certain flows regardless of who wants them. Named rules get enforced in prompts and reviews; unnamed constraints get skimmed.
+
+#### Rule: L3 → L0 Automated Flow Is Forbidden
+
+Knowledge produced at L3 (specialists, team wikis, Oracle-curated content) must not automatically propagate to L0 (workspace MEMORY.md, constitutional artifacts). The hierarchy must be preserved: information flows up through explicit governance review (team lead's session report, PO's cross-team context-gathering), gets synthesized by the human at L0, and flows back down through common-prompt edits or direct team-lead directives.
+
+**Forbidden:**
+
+- Automated sync of team wiki entries to workspace MEMORY.md
+- Agents reading workspace MEMORY.md directly
+- PO editing team wikis directly (PO messages team lead, who instructs the Oracle)
+- PO copying MEMORY.md entries into team wikis (if PO knowledge needs to reach a team, it goes through team-lead, who submits it as a normal Knowledge Submission with PO attribution)
+
+**Required:**
+
+- Cross-team-relevant wiki entries are tagged `[CROSS-TEAM]` in the Oracle's session report
+- Team lead includes tagged findings in session report to PO
+- PO decides at own discretion whether to record in MEMORY.md
+- PO directives to teams flow through common-prompt, team-lead messages, or explicit Knowledge Submissions to the Oracle (with attribution), never through direct wiki edits
+
+**Why this is a constitutional rule, not a delegation matrix row.** The matrix specifies who *may* decide something. This rule specifies a flow that *no one* may authorize — not even the PO, because the L0 ↔ L3 gap exists by design. Preserving it preserves the hierarchy's synthesis-at-the-top property: the PO's context is deliberately curated, not flooded with raw team output.
+
+**Source:** T09 v2 Part 2, lines 877-893 (PO MEMORY.md Bridge section). Extended from Monte's round 5 position with Finn's anti-pattern (round 5). See T09 v2 for the full PO MEMORY.md bridge discussion and the "PO is the bridge" framing.
+
 ---
 
 ## Hierarchy Levels
@@ -77,6 +103,25 @@ Executes within delegated scope. Owns work end-to-end: research, implement, test
 - Operates within directory/file ownership boundaries defined in common-prompt
 - Reports to team-lead after every completed task (mandatory, no silent idle)
 - May NOT: cross team boundaries, close issues, modify Jira, communicate externally, write outside owned directories
+
+#### Scope Authority Within L3 (Spec Writer Specialization Spectrum)
+
+The canonical L3 specialist has *execution* authority within its own scope — it decides how to implement, test, or refactor the work assigned to it. Some L3 specialists are additionally granted **scope authority over other L3 peers** for bounded durations. These are the "Spec Writer specialization" roles: they produce work breakdowns that other specialists consume.
+
+**Scope authority does not create a new hierarchy level.** The scope constraint (the bounded duration over which the specialist's decisions bind other specialists) replaces what would otherwise be a hierarchical layer. When the scope ends, the authority ends. ARCHITECT's authority over RED, GREEN, and PURPLE lasts one story; at story boundaries, ARCHITECT returns to peer status.
+
+**The precedent spectrum.** Not all Spec Writer specializations have identical authority scopes. There is a spectrum, and T04 must distinguish the points on it:
+
+| Specialization | Precedent | Authority mechanics |
+|---|---|---|
+| **Drafting authority** | Hammurabi (apex-research) drafts specs that Schliemann (L2 team-lead) approves per decision (`draft → reviewed → approved → handed-off`). The specs are not binding on downstream consumers until the team-lead approves the transition. | L3 produces, L2 approves each instance, L3 peers consume approved output. L2 re-approval is a per-decision gate. |
+| **Binding authority within bounded scope** | ARCHITECT (T09 v2 XP pipeline) decomposes a story into a test plan. The decomposition binds RED, GREEN, and PURPLE without team-lead re-approval during the story. Team-lead assigned the story; ARCHITECT owns the decomposition; the pipeline agents execute within it. | L3 produces, L3 peers are bound by the output within the assigned scope (one story). L2 re-approval is not required per decision — the scope assignment itself is the authorization. |
+
+The innovation in T09 v2 is the second row: **a bounded zone of L3 autonomy over L3 peers that does not require a new hierarchy level because the scope (one story) is the structural constraint.** ARCHITECT does not sit at a new level between L2 and L3. ARCHITECT sits at L3 with scoped binding authority that expires when the story completes.
+
+**Why both are "Spec Writer specializations."** Both roles produce work breakdowns that other specialists consume. Both use judgment over structural decomposition. Both fail in similar ways (bad decomposition cascades through downstream work). They differ in the authority mechanics, not the cognitive act. T04 recognizes both as valid patterns within the Spec Writer family.
+
+**Implication for team designers.** When adopting a role with binding scope authority (like ARCHITECT), the scope must be explicit and bounded at the team-lead level. If the scope is unbounded or informal, the role drifts toward becoming a team-lead peer — which violates the L2 coordination monopoly. The delegation matrix rows that encode scope-authority roles (see rows 40-45) always include the scope constraint explicitly.
 
 ---
 
@@ -143,6 +188,24 @@ This is the central governance artifact. For any decision type, it specifies: wh
 | 37 | Amend team common-prompt | D | I | C | — | Team-lead proposes, PO approves |
 | 38 | Amend agent prompt | D | I | C | — | Celes designs, PO approves |
 | 39 | Override a governance rule | D | — | — | — | Always PO; no agent may override |
+| **XP Pipeline governance** | | | | | | |
+| 40 | Story decomposition into test plan | I | — | C | D (ARCHITECT) | ARCHITECT decides within assigned story; inability to decompose → escalate to team-lead |
+| 41 | Test plan ordering | — | — | I | D (ARCHITECT), C (RED) | RED may flag untestable ordering; ARCHITECT revises or escalates to team-lead |
+| 42 | Scope dispute within pipeline (RED/GREEN/PURPLE disagrees with test spec) | — | — | Escalation target | D (ARCHITECT, first instance); C (disputing agent) | Unresolvable after ARCHITECT ruling → escalate to team-lead (L2) → PO (L0) |
+| 43 | Structural refactoring within PURPLE scope (rename, extract, restructure) | — | — | I | D (PURPLE); C (ARCHITECT) | Restructuring that would cross PURPLE's scope boundary (interface change, new module, test file edit) → escalate to ARCHITECT |
+| 44 | Mid-cycle termination of PURPLE (forced shutdown during refactoring) | — | — | D (team-lead) | C (ARCHITECT); C (PURPLE) | Watchdog detects hung/stuck state at 5-minute soft boundary; team-lead authority activates; PURPLE cannot refuse |
+| 45 | Cross-pipeline pattern extraction (shared utility across pipelines) | — | — | I | D (ARCHITECT); C (PURPLE flags via Oracle) | Shared PURPLE observing cross-pipeline pattern MUST flag to ARCHITECT via Oracle; may not extract unilaterally |
+| **Knowledge base (Oracle) governance** | | | | | | |
+| 46 | Knowledge submission scope classification (agent-only / team-wide / cross-team) | — | — | I | D (Oracle); C (submitting agent) | Submitting agent proposes scope; Oracle decides on filing; team-lead reviews disputes |
+| 47 | Knowledge promotion proposal acceptance (wiki entry → common-prompt candidate) | I | — | D | C (Oracle proposes) | Team-lead decides whether to forward to PO; final common-prompt amendment is Row 37 |
+| 48 | Oracle respawn authority (SPOF recovery) | — | — | D | — | Normal agent lifecycle per Rows 4-5; no special authority. Oracle state marker prevents re-running bootstrap. |
+| 49 | `[URGENT-KNOWLEDGE]` interrupt decision (whether to interrupt an affected agent with new knowledge) | — | — | D | C (Oracle flags relevance); C (affected agent receives) | Oracle never interrupts agents directly. Team-lead is the traffic controller. |
+
+**Reading the ARCHITECT, PURPLE, and Oracle rows.** Rows 40-49 use the existing 5-column format with role qualifiers in the Specialist (L3) column. ARCHITECT, PURPLE, and Oracle are all L3 specialists with scoped authority — they are not a new hierarchy level (see §Level 3: Scope Authority Within L3). The qualifier in parentheses identifies which L3 role holds the specified authority. Cross-reference `topics/09-development-methodology.md` Part 1 (Authority Boundaries, lines 284-299) for the 6-column view that isolates ARCHITECT into its own column for easier reading within the XP pipeline context.
+
+**ARCHITECT's authority is scoped to a single story at a time.** Between stories, ARCHITECT has no scope authority — it is passively available until the team-lead assigns the next story. This prevents authority creep. See T09 v2 Part 1, "Pipeline Governance as a Nested System" for the full treatment.
+
+**The mid-cycle termination row (44) is load-bearing for safety.** PURPLE's execution authority (Row 43) does NOT override team-lead's coordination authority (Row 44). When the watchdog detects a stuck state at the 5-minute soft boundary, team-lead termination activates and PURPLE cannot refuse. This preserves the L2-over-L3 termination invariant across the XP pipeline addition. See T09 v2 "Mid-Cycle Shutdown: Watchdog + Team Lead Authority" for the four exit states and the composition of Volta's git-state watchdog with the soft boundary.
 
 (*FR:Montesquieu*)
 
@@ -508,6 +571,7 @@ The existing `prompts/richelieu.md` (designed by Celes in R6) is the current man
 | Literary lore | **No T04 opinion.** Lore is Celes's domain. | None |
 
 **Summary:** Richelieu's draft is well-aligned with the T04 governance model. No structural changes needed. Three minor prompt updates recommended:
+
 1. Add "observational, not directive" to team health monitoring
 2. Add missing tool restrictions (other teams' memory dirs, source code, routing SLA)
 3. Replace inline decision authority matrix with reference to T04 delegation matrix
@@ -751,7 +815,7 @@ How does this governance model behave as team count grows?
 
 - ~~How many levels of hierarchy?~~ → 4 levels: PO (L0) → Manager agent (L1) → Team lead (L2) → Specialist (L3)
 - ~~Can a manager agent approve PRs or only humans?~~ → Neither. PR merge is team-lead scope (L2). Code review verdict is specialist scope (reviewer agent). Manager agent has no PR authority.
-- ~~What decisions require human approval vs. can be delegated?~~ → See Decision Delegation Matrix (39 decision types mapped)
+- ~~What decisions require human approval vs. can be delegated?~~ → See Decision Delegation Matrix (49 decision types mapped, including XP pipeline governance rows 40-45 and Oracle governance rows 46-49 added from T09 v2)
 - ~~Conflict resolution — when two teams disagree, who decides?~~ → See Q5 (escalation ladder: direct → L1 → PO)
 - ~~How do we prevent a manager agent from going rogue?~~ → See Anti-Patterns table + Failure Modes (authority drift, governance bypass)
 
