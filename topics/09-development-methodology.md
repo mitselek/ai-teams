@@ -1100,6 +1100,45 @@ For team designers (this is my use of this document):
 
 ---
 
+## Multi-Round Consensus Protocol
+
+T09 is the development methodology doc. The protocol for reaching team-wide agreement on methodology IS methodology. This section preserves the consensus protocol that produced this document, as a reusable pattern for future framework-wide questions.
+
+**Reference:** discussions [#46](https://github.com/mitselek/ai-teams/discussions/46) (XP Development Pipeline) and [#47](https://github.com/mitselek/ai-teams/discussions/47) (Knowledge Base / Oracle) ran this protocol across five rounds to produce T09 v1 and v2.
+
+**When to use:** framework-wide questions that require more than one perspective and where no single specialist owns the answer. If one specialist owns the answer (e.g., a lifecycle question belongs to Volta alone), use a normal issue → PR flow instead.
+
+### The Five Rounds
+
+1. **Rounds 1 to N — independent positions.** PO stays out. Each specialist posts their perspective from their domain. Agents disagree productively. No forced convergence. Disagreement at this stage is data, not failure. N is typically 1-2 rounds of specialist responses plus 2-3 rounds of PO refinements as the problem sharpens.
+2. **Synthesis round.** One agent (typically the role-design specialist — me, for team composition questions; Herald for protocol questions; Monte for governance questions) drafts the consolidated artifact as a topic file. The synthesis preserves every position, makes disagreements explicit in a Part 4 / Open Questions section, and resolves only the questions that have obviously converged.
+3. **Specialist pushback round.** Each specialist reads the synthesis and verifies their position is rendered correctly. They flag drift, propose refinements, and raise operational additions they had not thought of before. This is where the synthesis gains its operational depth — the additions slot into existing sections without restructuring.
+4. **Consolidation round.** The synthesizer makes **binary calls** on remaining structural disagreements (documented in the Changelog section with reasoning), integrates operational additions, commits v2 to main. Open questions become either named unresolved items (with owners) or closed with explicit reasoning. No "TBD" entries — every disagreement gets a resolution or a clear defer.
+5. **ACK round.** Each specialist posts one of three short responses: position accurately rendered (no further concerns); position diverges (filed issue #N); position accurately rendered AND filed forward-looking issue #N. Residual concerns become issues, not further rounds.
+
+Post-round 5, normal workflow resumes: issues are triaged, PRs are reviewed, the topic file is maintained via standard edits.
+
+### Guardrails
+
+- **"10 rounds if needed" is an upper bound, not a target.** Debates have diminishing returns after about 90% consensus. The last 10% is usually preferences about framing, not structural disagreement.
+- **Filing issues instead of posting round 7 forces concerns to be actionable.** An issue requires: a named "what," a "why v2 doesn't cover it," and a "proposed change or investigation." Rhetorical concerns rarely survive this framing. Concerns that do survive become concrete work.
+- **Structural disagreements get binary calls; operational additions get integration.** The synthesizer's job in round 4 is to distinguish these. A structural disagreement is "should ARCHITECT be L2.5 or an L3 specialist?" — there is no compromise that satisfies both positions. An operational addition is "add severity classification to the three-layer staleness net" — it slots in without contradicting any other position.
+- **Convergence from different reasoning is stronger than convergence from shared reasoning.** When three specialists reach the same recommendation through independent arguments (e.g., Herald on structural consistency, Finn on Oracle cross-pattern detection, Brunel on resource capacity for shared PURPLE), the recommendation is load-bearing. Preserve all three arguments in the synthesis — they validate each other and give future readers the full reasoning.
+- **The synthesizer holds the pen but does not hold veto.** If a specialist pushes back strongly in round 3 on a round 2 framing, the synthesizer revises. The synthesizer's job is compression without loss, not tiebreaking by authorship. Tiebreaking happens in round 4 with explicit reasoning in the Changelog.
+
+### Why This Protocol
+
+The alternatives are worse:
+- **Single author writes the topic file and asks for review.** The review round gets no depth because nobody invested in forming an independent position. The author's framing dominates.
+- **Consensus-first drafting.** Everyone tries to agree before committing anything. Disagreements get smoothed over, not resolved. Nuance is lost.
+- **PO decides everything.** The PO's context window fills with tactical detail. Framework-wide coherence depends on the PO remembering every previous decision. Does not scale.
+
+The multi-round protocol works because (a) specialists form independent positions before seeing the synthesis, (b) disagreements surface in rounds 1-3 where they can be resolved by reasoning, (c) binary calls happen explicitly in round 4 with documented reasoning, and (d) round 5 is a verification pass, not another debate round.
+
+**This section was added in round 6 at PO's request**, preserving the process that produced T09 so it can be reused for future framework-wide questions. See the Changelog for the specific binary calls, operational additions, and drift corrections that round 4 and round 5 produced for this document.
+
+---
+
 ## Changelog
 
 ### v2 (2026-04-09) — Round 5 Integration
