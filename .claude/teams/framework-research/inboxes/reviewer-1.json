@@ -1,0 +1,8 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775133937528@reviewer-1\",\"from\":\"team-lead\",\"reason\":\"Review complete\",\"timestamp\":\"2026-04-02T12:45:37.528Z\"}",
+    "timestamp": "2026-04-02T12:45:37.528Z",
+    "read": true
+  }
+]

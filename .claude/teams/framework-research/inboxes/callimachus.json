@@ -1,0 +1,15 @@
+[
+  {
+    "from": "team-lead",
+    "text": "## Knowledge Submission\n- From: team-lead\n- Type: pattern\n- Scope: team-wide\n- Urgency: standard\n- Related: none\n- Confidence: high\n\n### Content\n\n**In-process agent respawn pattern (no tmux).** When the framework-research team crashes and the runtime dir (`~/.claude/teams/<team>/`) survives, dormant agent entries persist in `config.json` and block name reuse. Spawning `name: \"X\"` with a dormant `X` entry present creates `X-2`. The fix is a jq removal before re-spawning:\n\n1. **Shutdown** — `SendMessage {type: shutdown_request}` to any running instance. Wait for `teammate_terminated` (NOT `shutdown_approved` alone — the agent may still be writing its scratchpad).\n2. **jq remove from config.json** — delete both the dormant original and any `-N` suffix entries:\n   ```bash\n   jq 'del(.members[] | select(.name == \"<agent>\" or .name == \"<agent>-2\"))' \\\n     ~/.claude/teams/<team>/config.json > /tmp/new.json \\\n     && mv /tmp/new.json ~/.claude/teams/<team>/config.json\n   ```\n3. **Spawn via Agent tool** — `name: \"<agent>\"` parameter is critical. Without it the spawn is anonymous and lacks SendMessage tool access.\n\n**Tradeoff:** The dormant entry holds roster-backed identity metadata (color, model tier with `[1m]` suffix, role-specific `agentType`, correct `cwd`). Removing it via jq drops all of that. The Agent-tool spawn creates a minimal entry with default color, `agentType: general-purpose`, and workspace-root `cwd`. All cosmetic/navigational — none block functionality.\n\n**Backup before every jq edit:** `cp config.json /tmp/config-backup-$(date +%s).json`\n\n**Reference implementation:** `hr-platform/conversations/.claude/commands/respawn.md` — the hr-devs tmux-based pattern this was adapted from.\n\n### Evidence\n\n- Validated 2026-04-09 during post-crash recovery of framework-research team\n- Celes, Monte, Volta all respawned successfully using this pattern\n- Three failed attempts before discovering the jq step (spawned as celes-2 twice before cleanup)\n- hr-devs respawn.md (step 6) documents the same jq removal for tmux-based teams",
+    "summary": "Protocol A — first submission: in-process respawn pattern",
+    "timestamp": "2026-04-09T12:03:48.372Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775736540900@callimachus\",\"from\":\"team-lead\",\"reason\":\"Session ending. PO wants a fresh start. Save your scratchpad state and approve shutdown. You will be the first agent respawned next session.\",\"timestamp\":\"2026-04-09T12:09:00.900Z\"}",
+    "timestamp": "2026-04-09T12:09:00.900Z",
+    "read": true
+  }
+]

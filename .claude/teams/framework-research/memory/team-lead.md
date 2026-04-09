@@ -1,5 +1,17 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## NEXT SESSION — Spawn order (PO directive 2026-04-09)
+
+[WIP] **On first greeting, immediately spawn these agents in order:**
+1. **Callimachus** (Oracle) — first, so the knowledge hub is online before anyone else starts submitting
+2. **Celes** (Agent Resources Manager) — second, she coordinates the rest
+
+Use the validated respawn pattern (see below): jq remove dormant entries from config.json, then spawn with `name:` parameter. PO will decide which additional agents to bring up after Cal and Celes are confirmed online.
+
+**Context for new session:** T09 v2.3 is canonical. All 7 T09-followup issues (#48-54) are closed. Callimachus was deployed and bootstrapped on 2026-04-09 — first Oracle in the framework. Wiki has one entry (`wiki/patterns/in-process-respawn.md`). PO is designing a real-life team next.
+
+---
+
 ## Session: 2026-04-09 — Post-crash respawn pattern
 
 [LEARNED] **Agent-tool respawn pattern for in-process teams.** The framework-research team is in-process (not tmux panes). After a team crash where the runtime dir (`~/.claude/teams/framework-research/`) is preserved, dormant agent entries in `config.json` persist and BLOCK name reuse. Spawning `name: "celes"` with a dormant `celes` entry present creates `celes-2` (and every subsequent spawn becomes `celes-N`).
