@@ -42,6 +42,43 @@ TAU = 1/PHI ≈ 0.618 (golden ratio reciprocal), NOT 2π. This is project-specif
 - penrose-dev (proposed): 4+lead for math+sim+render+test — domain split by abstraction layer
 - Pattern: team size = number of distinct abstraction boundaries, not number of deliverables
 
+## [CHECKPOINT] 2026-04-09 — Discussion #47 Round 3 Response — POSTED
+
+https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500125
+Synthesized all 6 agents' positions across 3 rounds. Key contributions:
+- Convergence table (8 settled decisions) + divergence table (2 open questions)
+- Bootstrap: 3-phase (inventory→approve→build), Librarian proposes, lead approves. "Don't migrate — index."
+- Expiry: 3 mechanisms (source linking, TTL for experience-grounded, access tracking). PURPLE + Librarian complementary.
+- Health sensor: knowledge velocity metric (discovery-to-warning ratio across sessions)
+- New: TTL on experience-grounded entries (external APIs have no source files to diff)
+- Connected #46 XP pipeline to #47 knowledge base (ARCHITECT/PURPLE as knowledge-generating roles)
+
+## [CHECKPOINT] 2026-04-08 — Knowledge Base RFC Discussion — POSTED
+
+GitHub Discussion #47: https://github.com/mitselek/ai-teams/discussions/47
+"RFC: Shared Knowledge Base and Librarian Agent for Team Memory" — Ideas category
+Inspired by Karpathy's LLM Wiki pattern. Covers: 4-tier knowledge architecture analysis, knowledge loss evidence table,
+Librarian concept (ingest/cross-ref/dedup/promote/prune/index/query), wiki/ directory structure, knowledge flow diagram.
+8 open questions. Tagged Herald + Celes. Key insight: knowledge loss happens at propagation, not discovery.
+
+## [CHECKPOINT] 2026-04-08 — XP Pipeline RFC Discussion — POSTED
+
+GitHub Discussion #46: https://github.com/mitselek/ai-teams/discussions/46
+"RFC: XP Development Pipeline for AI Agent Teams" — Ideas category
+Covers: background (weak REFACTOR phase), 3 research options (A/B/C), PO's pipeline model (Architect→RED→GREEN→PURPLE), open questions (6).
+Tagged for Herald + Celes input. No topic file changes.
+
+## [CHECKPOINT] 2026-04-06 — XP Triples Research — COMPLETE
+
+Research report delivered to team-lead. Key findings:
+- REFACTOR is the weakest phase across all current teams (vague ownership)
+- Three options analyzed: Refactorer (A), Reviewer (B), Rotating (C)
+- Recommended Option B: Tester + Developer(+REFACTOR) + Reviewer
+- penrose-dev (Shechtman→Implementers→Penrose) is the closest existing pattern
+- Reviewer should be formalized as 7th canonical role in T01
+- Reviewer can be shared across 2-3 TDD pairs (Marcus pattern)
+- Communication: RED→GREEN→REVIEW with [COORDINATION] and [REVIEW] tags
+
 ## [DEFERRED] Open questions
 
 - Polyphony team roster redesign — Celes delivered package, awaiting PO approval

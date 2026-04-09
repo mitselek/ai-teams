@@ -18,7 +18,7 @@
 [PATTERN] "Agent PO" is an anti-pattern — PO is always the human. Agent should be "Requirements Analyst" with explicit escalation rules.
 [GOTCHA] Count **characters**, not roles-plus-characters. Team-lead IS one of the characters. "5-character team" not "team-lead + 5 agents = 6."
 
-## Hires Delivered (cumulative — 39 agents)
+## Hires Delivered (cumulative — 46 agents)
 
 | Agent | Lore | Team | Model | Date |
 |---|---|---|---|---|
@@ -78,6 +78,33 @@
 [GOTCHA] Dropping a role requires updating TWO files: `roster.json` AND `common-prompt.md` members list. Easy to miss the second.
 [DECISION] Medici is correct to drop from dev teams — her knowledge-health role has no scope in a code-output team. Marcus's AR hat covers team-health equivalently.
 [PATTERN] Review checklist for team redeployment: (1) roster.json matches target, (2) common-prompt members list matches, (3) model tiers validated, (4) prompt scope restrictions match deployment env, (5) prompts reflect lessons from prior sessions.
+
+## Session 2026-04-06
+
+[DECISION] screenwerk-dev team: 7 characters (lead + 2 TDD pairs + 2 advisory specialists). Lore theme: Pioneers of Light and Display. TDD pairs: Daguerre+Niepce (pipeline), Reynaud+Plateau (player). Advisory: Talbot (Entu platform), Melies (legacy migration). Model tiers: opus for lead + Daguerre + Talbot, sonnet for Niepce + Reynaud + Plateau + Melies.
+[DECISION] Domain splits: Daguerre (publish pipeline, CDN), Niepce (pipeline tests), Talbot (Entu platform, auth, CMS bugs), Reynaud (player composables, components, pages), Plateau (player tests, E2E), Melies (legacy analysis, migration docs). Shared: types.ts requires Daguerre + Reynaud + Talbot.
+[LEARNED] Screenwerk is a PRIVATE project (not Eesti Raudtee). Three repos: ScreenWerk/2026 (Nuxt 4, primary), ScreenWerk/Screenwerk-2025 (vanilla JS, reference), ScreenWerk/Screenwerk-2016 (Electron legacy, read-only). 2016 repo uses `master` not `main`. Key gap is publish pipeline.
+[LEARNED] 2016 player is an Electron app that fetches same `{screenId}.json` from API, downloads media to local FS. JSON shape is essentially the same ScreenConfig. Key diff: desktop app with local file caching vs web PWA with Cache API.
+[PATTERN] For products with active clients hitting bugs, team must have dual tracks: (1) urgent bugfixes on live system, (2) parallel transition to new system. Work streams, not sequential phases.
+[PATTERN] Advisory specialists (non-TDD, non-coding) are valid when expertise crosses TDD pair boundaries. Talbot advises both pipeline and player pairs on Entu semantics. Melies feeds gap analysis into both pairs' test specs.
+[GOTCHA] Client communication is PO-only — agents draft, Mihkel sends. Must be explicit in common-prompt.
+[GOTCHA] TDD pair is non-negotiable PO constraint — every dev team must have explicit builder+tester pairs (per entu-research pattern). Initial 4-agent design was corrected through two rounds to final 7.
+
+## Hires Delivered (cumulative — 46 agents)
+
+Added: Lumiere (SW TL), Daguerre (SW), Niepce (SW), Talbot (SW), Reynaud (SW), Plateau (SW), Melies (SW) — 7 agents, 2026-04-07.
+
+## Session 2026-04-08 / 2026-04-09 — Discussions #46 and #47
+
+[CHECKPOINT] Authored `topics/09-development-methodology.md` as synthesis of both discussions. This is my reference document for team design going forward.
+[DECISION] PURPLE is the seventh canonical role (Refactorer, opus). Oracle is the eighth canonical role (Callimachus, opus[1m]). ARCHITECT is a Spec Writer specialization at L2.5.
+[DECISION] Three tiers (Sprint / Standard / Cathedral) apply to BOTH XP pipeline adoption AND Oracle adoption. Standard-tier teams use team-lead-as-librarian at shutdown — no dedicated Oracle.
+[DECISION] Temporal ownership is the third isolation model after branch and directory ownership. New to T06.
+[DECISION] Shared vs separate PURPLE: determined by domain distance between pipelines, not team size. screenwerk-dev would get separate PURPLEs in Cathedral tier (Node.js pipeline vs Vue composables = medium distance).
+[PATTERN] When synthesizing multi-round discussions into topic files: preserve disagreements in a Part 4 "Open questions" section, don't smooth over. Monte/Medici/Celes disagree on research team wiki domain — documented, not hidden.
+[PATTERN] Four-round discussion protocol works: initial specialist responses → PO response → refinements → specialist pushback → PO new questions → synthesis. Takes ~2 sessions but converges on high-quality decisions.
+[GOTCHA] Corrected my round 1 position on Oracle model tier (sonnet → opus[1m]) after PO's sole-gateway decision changed the consequence-of-error profile. Being willing to correct publicly is more valuable than being right on the first try.
+[LEARNED] #46 has only 5 comments (initial specialist responses, no PO rounds yet). All PO rounds so far are on #47. Round 5 is seeded on both.
 
 ## Deferred (carried forward)
 
