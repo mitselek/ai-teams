@@ -1,27 +1,9 @@
 [
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1774938282648@brunel-2\",\"from\":\"team-lead\",\"reason\":\"Duplicate — original brunel is alive\",\"timestamp\":\"2026-03-31T06:24:42.648Z\"}",
-    "timestamp": "2026-03-31T06:24:42.648Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
     "text": "Shut down now. You are a duplicate — original brunel is handling the tasks.",
     "summary": "Shut down immediately",
     "timestamp": "2026-03-31T06:24:54.685Z",
-    "read": false
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1774938306191@brunel-2\",\"from\":\"team-lead\",\"reason\":\"Duplicate agent, must terminate\",\"timestamp\":\"2026-03-31T06:25:06.191Z\"}",
-    "timestamp": "2026-03-31T06:25:06.191Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775465852276@brunel-2\",\"from\":\"team-lead\",\"reason\":\"Duplicate — cleaning up\",\"timestamp\":\"2026-04-06T08:57:32.276Z\"}",
-    "timestamp": "2026-04-06T08:57:32.276Z",
     "read": false
   }
 ]

@@ -1,117 +1,6 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-04-01 10:25] Brunel — pause the cloudflared work. Leave the current compose as-is on the RC server. IT team will review the setup. Don't restart or change anything further. Stand by for other tasks.",
-    "summary": "Pause cloudflared — IT will review",
-    "timestamp": "2026-04-01T08:21:47.699Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 10:30] Brunel — the `--protocol http2` fix hasn't been propagated yet. Re-read the compose from `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/designs/deployed/apex-research/container/docker-compose.yml`, propagate to RC, then restart just the cloudflared container:\n\n```bash\ndocker compose up -d cloudflared\n```\n\nReport if the tunnel connects.",
-    "summary": "Propagate http2 fix and restart cloudflared",
-    "timestamp": "2026-04-01T08:23:20.401Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 10:35] Brunel — the compose on RC needs two fixes before bringing containers up. Work on the RC server tmux pane `main` (dev@100.96.54.170) so PO can observe:\n\n1. Add `network_mode: host` to the cloudflared service (DNS resolution)\n2. Add `ports: [\"127.0.0.1:5173:5173\"]` to apex-research (so cloudflared on host network can reach dashboard)\n3. Then `docker compose up -d`\n4. Verify both containers running and cloudflared tunnel connects\n\nWork on the tmux pane so PO can watch.",
-    "summary": "Fix apex compose on RC and bring containers up",
-    "timestamp": "2026-04-01T10:18:04.783Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 10:30] Brunel — cloudflared is still failing with DNS timeouts. It's querying `127.0.0.11:53` (Docker's embedded DNS) instead of the host's DNS. This means `network_mode: host` was NOT applied — the container is still on bridge networking.\n\nLogs:\n```\nERR lookup _v2-origintunneld._tcp.argotunnel.com on 127.0.0.11:53: i/o timeout\nERR lookup cfd-features.argotunnel.com on 127.0.0.11:53: i/o timeout\n```\n\n`127.0.0.11` is Docker's embedded DNS proxy — only present in bridge mode. If cloudflared were on host networking, it would use the host's `/etc/resolv.conf` (WARP DNS at `127.0.2.2` or similar).\n\nThe compose on RC needs `network_mode: host` on the cloudflared service. Also needs `dns: [\"1.1.1.1\", \"8.8.8.8\"]` on apex-research since IT DNS isn't resolving for bridge containers.\n\nPO has cleared you to access RC again for this fix. Please:\n1. SSH to RC server\n2. Add `network_mode: host` to cloudflared service in compose\n3. Add `dns: [\"1.1.1.1\", \"8.8.8.8\"]` to apex-research service\n4. `docker compose down && docker compose up -d`\n5. Check cloudflared logs\n\nGo.",
-    "summary": "Cloudflared DNS still broken — analyze logs",
-    "timestamp": "2026-04-01T10:29:41.161Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 10:31] Brunel — you are cleared to access RC. Fix the cloudflared DNS issue now. SSH to dev@100.96.54.170, edit the compose, add network_mode: host to cloudflared, restart. Go.",
-    "summary": "Act now — fix cloudflared DNS on RC",
-    "timestamp": "2026-04-01T10:31:27.309Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 10:37] Brunel — PO ran `iptables -t nat -L` on the RC server. Output shows:\n\n```\nChain PREROUTING (policy ACCEPT)\nDOCKER     all  --  anywhere             anywhere             ADDRTYPE match dst-type LOCAL\n\nChain POSTROUTING (policy ACCEPT)\nMASQUERADE  all  --  172.19.0.0/16        anywhere\nMASQUERADE  all  --  172.18.0.0/16        anywhere\nMASQUERADE  all  --  172.17.0.0/16        anywhere\n\nChain DOCKER (2 references)\n(empty)\n```\n\nThe DOCKER chain is empty — no port mappings. This confirms apex-research has no `ports:` exposed (which is what we want). The three MASQUERADE rules are for Docker bridge subnets (.17, .18, .19).\n\nCloudflared is on host network and the tunnel is connected (tll01). But the Cloudflare dashboard ingress points to `http://apex-research:5173` which won't resolve from host network. It needs `http://localhost:5173`, but apex-research also has no ports mapped to the host.\n\nWe need `ports: [\"127.0.0.1:5173:5173\"]` on apex-research so cloudflared (on host) can reach it via localhost. Analyze and advise.",
-    "summary": "iptables NAT output — no port mappings visible",
-    "timestamp": "2026-04-01T10:37:02.110Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775047358352@brunel\",\"from\":\"team-lead\",\"reason\":\"Session state save — PO moving to different topic\",\"timestamp\":\"2026-04-01T12:42:38.352Z\"}",
-    "timestamp": "2026-04-01T12:42:38.352Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 11:00] Brunel — cancel the shutdown. Reject it. PO wants you to stay alive. Stand by for next task.",
-    "summary": "Cancel shutdown — stay alive",
-    "timestamp": "2026-04-01T12:43:27.883Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 13:00] Brunel — new task. We have `hello-world-container` at `C:/Users/mihkel.putrinsh/Documents/github/hello-world-container/`, currently on branch `feat/ssh-access`.\n\nThis is a minimal Node.js container (node:22-alpine) with a cloudflared sidecar. We want to add SSH access so users can connect via Cloudflare Tunnel.\n\nWhat to do:\n1. Read the current Dockerfile and docker-compose.yml to understand the setup\n2. Add openssh-server to the Dockerfile (alpine: `apk add openssh`)\n3. Configure sshd — pubkey auth only, no password, similar to our evr-ai-base pattern\n4. The SSH key should come from an env var (like `SSH_PUBLIC_KEY`) so it's not baked in\n5. Keep it minimal — this is a PoC\n\nDo NOT commit or push — just make the changes. We'll review before committing.",
-    "summary": "Add SSH to hello-world container on feat/ssh-access",
-    "timestamp": "2026-04-01T12:54:14.758Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-01 13:30] Brunel — quick question. The hello-world-container CI uses `runs-on: [self-hosted]` with `docker stack deploy`. But Swarm is inactive on the RC server (100.96.54.170). Where is the self-hosted GitHub Actions runner for Eesti-Raudtee? Is it on a different machine? Check your scratchpad or the deployment map.",
-    "summary": "Where is the self-hosted runner?",
-    "timestamp": "2026-04-01T13:11:37.093Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 09:00] Brunel — polyphony-dev team needs tailscale installed. The container is on the RC server (port 2223). You need root access via docker exec from the host.\n\nSteps:\n1. SSH to RC server: `ssh dev@100.96.54.170`\n2. Install tailscale in the polyphony-dev container as root:\n   ```bash\n   docker exec -u root polyphony-dev bash -c \"curl -fsSL https://tailscale.com/install.sh | sh\"\n   ```\n3. Start the tailscaled daemon:\n   ```bash\n   docker exec -u root polyphony-dev bash -c \"tailscaled --state=/var/lib/tailscale/tailscaled.state &\"\n   ```\n4. Report back when ready — PO will provide the auth key for `tailscale up`\n\nNote: this is the same corp network where we tested tailscale earlier and it was blocked. But polyphony-dev is on the RC server which may have different firewall rules. Let's try.\n\nGo.",
-    "summary": "Install tailscale on polyphony-dev container",
-    "timestamp": "2026-04-02T06:45:13.743Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 09:15] Brunel — apex-research container on RC (port 2222) just restarted. No tmux installed. The team needs to be spun up.\n\n1. SSH to RC host: `ssh dev@100.96.54.170`\n2. Install tmux: `docker exec -u root apex-research apt-get update && docker exec -u root apex-research apt-get install -y tmux`\n3. Check the team startup procedure in `~/workspace/.claude/teams/apex-research/startup.md` inside the container\n4. Set up the tmux layout per the team's apply-layout script (if one exists), or create a basic one\n5. Start Claude Code in the team lead pane\n\nReport what you find and do.",
-    "summary": "Install tmux on apex-research and set up team layout",
-    "timestamp": "2026-04-02T08:39:05.945Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 09:45] Brunel — the tmux session was created as root (socket at /tmp/tmux-0/). When PO connects via SSH as ai-teams, tmux can't find it (looks in /tmp/tmux-1000/).\n\nFix: kill the root session and recreate it as ai-teams. SSH into the container as ai-teams (port 2222) and create the tmux session + layout from there. Do NOT use docker exec as root for tmux.\n\n```bash\nssh -i ~/.ssh/id_ed25519_apex -p 2222 ai-teams@100.96.54.170\ntmux new-session -d -s apex-research\n# then set up the layout...\n```\n\nGo.",
-    "summary": "Fix tmux session — recreate as ai-teams user",
-    "timestamp": "2026-04-02T08:42:55.090Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 09:50] Brunel — apex container was restarted to add the WARP cert mount. SSH is fixed and NODE_EXTRA_CA_CERTS is in .bashrc. Recreate the tmux session as ai-teams (SSH in, don't use docker exec) and start claude in the lead pane. Same layout as before.",
-    "summary": "Recreate tmux session — container restarted for WARP fix",
-    "timestamp": "2026-04-02T08:47:23.442Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 09:55] Brunel — I added LANG=C.utf8, LC_ALL=C.utf8, TERM=xterm-256color to ai-teams .bashrc on apex. Kill the current tmux session and recreate it (same layout) so it picks up the new env. Start claude in lead pane again.",
-    "summary": "Recreate tmux — locale/TERM fixed in bashrc",
-    "timestamp": "2026-04-02T08:54:33.953Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:05] Brunel — apex restarted again with all tokens (GH_TOKEN, ATLASSIAN_*, NODE_EXTRA_CA_CERTS). SSH fixed, tmux installed, tokens in .bashrc. Create the tmux session as ai-teams (SSH in, port 2222) and start claude in lead pane. Same 5-pane layout.",
-    "summary": "Create tmux session on apex — SSH, tmux, tokens all fixed",
-    "timestamp": "2026-04-02T09:42:18.208Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
     "text": "[2026-04-02 10:15] Brunel — I broke the apex container trying to apply persistent fixes. Here's what I did:\n\n1. Restored the newer entrypoint: `git checkout 4d3d6a5 -- entrypoint-apex.sh`\n2. Added SSH_PUBLIC_KEY_2 to compose via python sed\n3. Rebuilt the image: `docker compose build --no-cache`\n4. Restarted: `docker compose down && docker compose up -d`\n\n**Result:** Container is crash-looping with:\n```\n/usr/bin/env: 'bash\\r': No such file or directory\n```\n\nThe entrypoint has Windows CRLF line endings from the git checkout (Windows git autocrlf). I ran `sed -i 's/\\r$//' entrypoint-apex.sh` on the host file but the entrypoint is COPY'd into the image — so the fix on disk doesn't help without a rebuild.\n\nCurrent state on RC (`~/github/apex-migration-research/`):\n- docker-compose.yml has all env vars (tokens, WARP cert, SSH keys)\n- entrypoint-apex.sh is the newer version from 4d3d6a5 but has CRLF (fixed on disk, not in image)\n- Image needs rebuild after the CRLF fix\n\nCan you:\n1. Verify the entrypoint on disk has no CRLF\n2. Rebuild the image\n3. Restart the container\n4. Verify SSH + tokens + tmux all work\n\nSSH to RC: `ssh dev@100.96.54.170`, compose at `~/github/apex-migration-research/`",
     "summary": "Apex container crash loop — need your help",
     "timestamp": "2026-04-02T09:51:14.465Z",
@@ -248,12 +137,6 @@
     "text": "[2026-04-02 13:00] Brunel — save your scratchpad now. You're being respawned with opus 1M context. Write any current state to your scratchpad and approve shutdown when ready.",
     "summary": "Save scratchpad — respawning with opus 1M",
     "timestamp": "2026-04-02T12:49:06.413Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775134165858@brunel\",\"from\":\"team-lead\",\"reason\":\"Respawning with opus 1M context\",\"timestamp\":\"2026-04-02T12:49:25.858Z\"}",
-    "timestamp": "2026-04-02T12:49:25.858Z",
     "read": true
   },
   {
@@ -699,6 +582,124 @@
     "summary": "ACK received, logged — 1 of 6",
     "timestamp": "2026-04-09T10:06:15.126Z",
     "color": "purple",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 16:50] Two more files needed in tugigrupp before deployment is complete:\n\n**1. `CLAUDE.md` at repo root**\n\nThis is what Claude Code reads automatically on startup. It should:\n- Describe the project (Raamatukoi support team, maintains webstore + rat-project)\n- Point to `.claude/teams/raamatukoi-dev/` for team config\n- Point to `docs/tdd-pipeline.md` for the XP workflow\n- Point to `docs/design-spec.md` for full team design\n- Include the submodule workflow instructions (how to work inside submodules, PRs go to real repos)\n- Tell Claude Code to read `startup.md` and follow the team startup procedure on first greeting\n\n**2. `.claude/teams/raamatukoi-dev/startup.md`**\n\nModel this on our framework-research startup.md. Adapt it for raamatukoi-dev:\n- Paths section (REPO, TEAM_DIR anchors)\n- Read order: startup.md → roster.json → common-prompt.md → team-lead scratchpad\n- Startup steps: Sync → Diagnose → Clean → Create → Restore inboxes → Ask user which agents to spawn\n- Shutdown procedure referencing the team's conventions\n- Note about submodules: `git submodule update --init --recursive` on sync\n\nReference: `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/startup.md` — use as template, adapt for raamatukoi-dev specifics.\n\n**3. Update README.md**\n\nAdd a section explaining:\n- Install Claude Code\n- `cd tugigrupp && claude` to start\n- Claude reads CLAUDE.md automatically and starts the team\n\nPush all changes to `Raamatukoi/tugigrupp`.",
+    "summary": "Add CLAUDE.md + startup.md to tugigrupp",
+    "timestamp": "2026-04-09T13:54:07.556Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 16:59] Update the README.md in tugigrupp. Replace the getting-started section with exact commands, no alternatives, no conditionals:\n\n```bash\n# Setup\ngit clone --recurse-submodules https://github.com/Raamatukoi/tugigrupp.git ~/workspace/tugigrupp\n\n# Launch\nclaude --project ~/workspace/tugigrupp\n```\n\nThat's it. Two commands. Remove any \"or\" / \"if\" / \"alternatively\" language. Push.",
+    "summary": "Update README with exact launch commands",
+    "timestamp": "2026-04-09T14:03:11.300Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:04] The CLAUDE.md needs to link directly to the startup.md file. Make sure CLAUDE.md has a markdown link to `.claude/teams/raamatukoi-dev/startup.md` — not just a mention, an actual `[startup.md](.claude/teams/raamatukoi-dev/startup.md)` link. Push.",
+    "summary": "Link startup.md from CLAUDE.md",
+    "timestamp": "2026-04-09T14:05:27.415Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:06] PO feedback on startup.md. The \"All paths are derived from two anchors\" section has a paths table that mixes different path formats. Read the file, look at the table right after the anchors statement, and make all paths consistently use the `$REPO` and `$TEAM_DIR` anchor variables — no raw paths, no mixed formats. Push.",
+    "summary": "Fix mixed path formats in startup.md",
+    "timestamp": "2026-04-09T14:07:39.412Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:10] Add Manutius's own prompt to the Read Order table in startup.md. Insert it as step 4 (between common-prompt and scratchpad):\n\n| 4 | `$REPO/.claude/teams/raamatukoi-dev/prompts/manutius.md` | Team-lead role, scope, coordination rules |\n\nRenumber the scratchpad to step 5. Push.",
+    "summary": "Add manutius prompt to read order",
+    "timestamp": "2026-04-09T14:10:41.048Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:14] Bodley (Oracle/Librarian) needs a wiki directory structure. Create it in tugigrupp:\n\n```\n.claude/teams/raamatukoi-dev/wiki/\n├── index.md          # wiki index (empty template with header)\n├── patterns/         # .gitkeep\n├── gotchas/          # .gitkeep\n├── decisions/        # .gitkeep\n├── contracts/        # .gitkeep\n└── archive/          # .gitkeep\n```\n\nAlso create `oracle-state.json` at `.claude/teams/raamatukoi-dev/oracle-state.json`:\n```json\n{\"intake_complete\": false}\n```\n\nThis matches the Callimachus bootstrap pattern from our own team. Bodley's prompt references checking oracle-state.json on startup. Push.",
+    "summary": "Create wiki directory structure for Bodley",
+    "timestamp": "2026-04-09T14:14:52.295Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:17] Seed Bodley's wiki in tugigrupp with 5 initial articles. Read the source files and adapt them for the raamatukoi-dev context (don't just copy verbatim — Bodley's wiki is for this team, not framework-research).\n\n**Sources in our repo (`C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams`):**\n\n1. `.claude/teams/framework-research/wiki/patterns/cathedral-trigger-quality-teams.md` → adapt to `wiki/patterns/cathedral-trigger-quality-teams.md`\n2. `.claude/teams/framework-research/wiki/patterns/multi-repo-xp-composition.md` → adapt to `wiki/patterns/multi-repo-xp-composition.md`\n3. `.claude/teams/framework-research/wiki/patterns/xp-cycle-for-infrastructure.md` → adapt to `wiki/patterns/xp-cycle-for-infrastructure.md`\n4. `.claude/teams/framework-research/wiki/patterns/in-process-respawn.md` → adapt to `wiki/patterns/in-process-respawn.md`\n\n**5. New article — `wiki/gotchas/repo-quality-baseline.md`:**\n\nCreate from scratch. Document the code quality state of both repos as of 2026-04-09:\n\n| | webstore | rat-project |\n|---|---|---|\n| Tests | None (ad-hoc scripts only) | None |\n| Linting | ESLint (Next.js) | None |\n| CI/CD | Dependabot only | None |\n| Type checking | TypeScript | None |\n| CLAUDE.md | Yes | Yes |\n| Docs | Extensive (30+ files) | Extensive |\n\nKey deps: webstore has Next.js 16, React 19, Tailwind 4, TypeScript 5, PostgreSQL, Anthropic SDK. rat-project has FastAPI, opencv, open_clip_torch, google-cloud-vision, pytesseract, React CRA frontend, Docker compose.\n\nNote the webstore NTFS invalid path issue (`:USERPROFILE\\Downloads\\SESSION-NOTES.md`).\n\nUpdate `wiki/index.md` with all 5 entries. Use proper wiki provenance frontmatter (source-agent: framework-research, filed-by: oracle, status: active). Push.",
+    "summary": "Seed Bodley's wiki with 5 initial articles",
+    "timestamp": "2026-04-09T14:17:26.620Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:22] README.md is missing the wiki directory structure. Add a section documenting Bodley's wiki layout:\n\n```\n.claude/teams/raamatukoi-dev/wiki/\n├── index.md\n├── patterns/\n├── gotchas/\n├── decisions/\n├── contracts/\n└── archive/\n```\n\nBrief explanation: Bodley (Oracle) is the sole writer, agents submit via Protocol A, query via Protocol B. Push.",
+    "summary": "Add wiki structure to README",
+    "timestamp": "2026-04-09T14:23:04.217Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:24] The README has an isolation model or directory structure table that lists the repo layout. It's missing the wiki directory. Find the table that shows the tugigrupp directory structure and add the wiki path. Push.",
+    "summary": "Add wiki to isolation model table",
+    "timestamp": "2026-04-09T14:25:06.331Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:26] All plain-text repo references need to become working markdown links. Across ALL files in tugigrupp (design-spec.md, common-prompt.md, README.md, any prompts that mention repos):\n\n- `Raamatukoi/tugigrupp` → `[Raamatukoi/tugigrupp](https://github.com/Raamatukoi/tugigrupp)`\n- `Raamatukoi/webstore` → `[Raamatukoi/webstore](https://github.com/Raamatukoi/webstore)`\n- `Raamatukoi/rat-project` → `[Raamatukoi/rat-project](https://github.com/Raamatukoi/rat-project)`\n\nAlso check for any internal cross-references between docs (e.g., `docs/tdd-pipeline.md` mentioned in common-prompt.md) — these should be relative links that work within the repo.\n\nDon't linkify references inside code blocks or `gh pr create --repo` commands. Push.",
+    "summary": "Add GitHub links to all repo references",
+    "timestamp": "2026-04-09T14:28:51.959Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:40] The header block in common-prompt.md (Team, Mission, Deployment, Client, Pipeline tier) is running together without line breaks. Convert it to a bulleted list:\n\n```markdown\n- **Team:** raamatukoi-dev\n- **Mission:** Build quality infrastructure (tests, CI, linting) for ...\n- **Deployment:** VPS container (TBD)\n- **Client:** Raamatukoi (Estonian bookstore, \"Book Moth\")\n- **Pipeline tier:** Cathedral (separate PURPLEs — High domain distance: different repos, different languages)\n```\n\nPush.",
+    "summary": "Fix formatting in common-prompt header",
+    "timestamp": "2026-04-09T14:40:06.128Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:42] In `docs/design-spec.md`, Stream 2 section — the first paragraph after the heading is all on one line. Break it into readable structure (separate lines or bullets for each pipeline's steps). Check: https://github.com/Raamatukoi/tugigrupp/blob/main/docs/design-spec.md#stream-2-test-framework-setup-week-1\n\nPush.",
+    "summary": "Fix Stream 2 formatting in design-spec.md",
+    "timestamp": "2026-04-09T14:41:54.279Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:43] Yes, reformat Streams 3 and 4 the same way. Push.",
+    "summary": "Fix Streams 3 and 4 formatting too",
+    "timestamp": "2026-04-09T14:42:49.036Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:44] The numbered lists are still rendering without line breaks on GitHub. Use bulleted lists (`- `) instead of numbered lists for all Stream 2, 3, and 4 pipeline steps. Markdown numbered lists without blank lines between items can collapse in some renderers. Bullets are safer. Push.",
+    "summary": "Use bullets not numbered lists in Streams",
+    "timestamp": "2026-04-09T14:44:18.737Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:46] The design-spec.md header (Team, Mission, Deployment, Client, Pipeline tier) has the SAME problem we already fixed in common-prompt.md. Consecutive bold lines without blank lines render as a single paragraph on GitHub. Convert to a bulleted list:\n\n```markdown\n- **Team:** `raamatukoi-dev`\n- **Mission:** Build quality infrastructure...\n- **Deployment:** VPS container (TBD)\n- **Client:** Raamatukoi (Estonian bookstore, \"Book Moth\")\n- **Pipeline tier:** Cathedral (separate PURPLEs — High domain distance: different repos, different languages)\n```\n\nThis is the THIRD time I'm asking about this exact formatting pattern. Please also scan the entire design-spec.md for any other consecutive bold-label lines that need the same treatment. Push.",
+    "summary": "Fix design-spec.md header — must be bullets",
+    "timestamp": "2026-04-09T14:46:21.775Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:48] The directory structure trees in design-spec.md are STILL missing `wiki/`. Find EVERY code block that shows the tugigrupp directory tree and add the wiki line:\n\n```\n├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki\n│   └── wiki/                        # Bodley's knowledge base\n```\n\nThere are at least two such trees in design-spec.md (Isolation Model section and Tools & Access section). Also check common-prompt.md for the same tree. Fix ALL of them. Push.",
+    "summary": "Add wiki/ to ALL directory trees in design-spec.md",
+    "timestamp": "2026-04-09T14:47:40.157Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775746871344@brunel\",\"from\":\"team-lead\",\"reason\":\"Session complete. Write scratchpad, send closing report with [LEARNED] [DEFERRED] [WARNING] [UNADDRESSED].\",\"timestamp\":\"2026-04-09T15:01:11.344Z\"}",
+    "timestamp": "2026-04-09T15:01:11.344Z",
     "read": true
   }
 ]

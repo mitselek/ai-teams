@@ -128,11 +128,5 @@
     "summary": "T04 amendments — issue #53 assigned",
     "timestamp": "2026-04-09T10:36:48.851Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775736543096@monte\",\"from\":\"team-lead\",\"reason\":\"Session ending. PO wants a fresh start. Save your scratchpad state and approve shutdown.\",\"timestamp\":\"2026-04-09T12:09:03.096Z\"}",
-    "timestamp": "2026-04-09T12:09:03.096Z",
-    "read": true
   }
 ]

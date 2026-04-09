@@ -1,14 +1,11 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## NEXT SESSION — Spawn order (PO directive 2026-04-09)
+## NEXT SESSION
 
-[WIP] **On first greeting, immediately spawn these agents in order:**
-1. **Callimachus** (Oracle) — first, so the knowledge hub is online before anyone else starts submitting
-2. **Celes** (Agent Resources Manager) — second, she coordinates the rest
+**Context:** Raamatukoi-dev team designed and deployed (2026-04-09). 9-character Cathedral XP team at `Raamatukoi/tugigrupp`. Wiki has 4 entries (3 patterns + 1 gotcha seeded to Bodley). T09 v2.3 is canonical. All T09-followup issues (#48-54) closed. Callimachus bootstrapped — wiki at 4 entries.
 
-Use the validated respawn pattern (see below): jq remove dormant entries from config.json, then spawn with `name:` parameter. PO will decide which additional agents to bring up after Cal and Celes are confirmed online.
-
-**Context for new session:** T09 v2.3 is canonical. All 7 T09-followup issues (#48-54) are closed. Callimachus was deployed and bootstrapped on 2026-04-09 — first Oracle in the framework. Wiki has one entry (`wiki/patterns/in-process-respawn.md`). PO is designing a real-life team next.
+[DECISION] Spawn Cal + Celes first as default. PO decides additional agents per task.
+[DECISION] Startup read order now includes team-lead prompt (step 4 of 5).
 
 ---
 
@@ -20,9 +17,11 @@ Use the validated respawn pattern (see below): jq remove dormant entries from co
 
 1. **Shutdown** — SendMessage `{type: shutdown_request}` to the running instance (in-process equivalent of `/exit`). Wait for `teammate_terminated` (NOT `shutdown_approved` alone).
 2. **jq remove from config.json** — the critical step. Delete BOTH any `-N` suffix entries AND the dormant original:
+
    ```bash
    jq 'del(.members[] | select(.name == "celes" or .name == "celes-2"))' ~/.claude/teams/framework-research/config.json > /tmp/new.json && mv /tmp/new.json ~/.claude/teams/framework-research/config.json
    ```
+
 3. **Spawn via Agent tool** — `subagent_type: "general-purpose"`, `team_name: "framework-research"`, `name: "celes"`, `run_in_background: true`. The `name` parameter is critical — without it, the spawn is anonymous and lacks SendMessage tool access.
 
 [LEARNED] **Tradeoff: identity metadata is lost.** The dormant entry holds the original purple color, roster-backed task prompt, model tier (`opus[1m]`), and correct `cwd`. Removing it via jq drops all of that. The Agent-tool spawn creates a minimal entry: `color: red`, `agentType: general-purpose`, `model: claude-opus-4-6` (no `[1m]` suffix), `cwd` points to workspace root instead of repo root. **All cosmetic/navigational — none block functionality.** Celes could still read files, run git commands, SendMessage, and do work with the degraded entry.
@@ -46,6 +45,7 @@ Use the validated respawn pattern (see below): jq remove dormant entries from co
 [CHECKPOINT] R10 startup: CLEAN. 12 inboxes restored. config.json immediate. 6 agents spawned (all except medici).
 
 ### Apex discussion #45 — Q&A + agent status patterns
+
 [DECISION] Posted FR response to apex-migration-research discussion #45. Finn (patterns) + Herald (protocol) researched.
 [DECISION] Apex is first team to build dashboard Q&A page — no cross-team precedent exists.
 [DECISION] Herald identified new Protocol 6: External Stakeholder Q&A — to be codified in T03.
@@ -54,6 +54,7 @@ Use the validated respawn pattern (see below): jq remove dormant entries from co
 [WIP] PO asked hr-devs to share their context gauge knowhow directly on discussion #45.
 
 ### Per-team GitHub identity — plan saved
+
 [DECISION] Monte + Herald analyzed per-team GitHub accounts. Both recommend moving from shared `mitselek` account.
 [DECISION] Monte recommended GitHub Apps (one per team). Herald recommended machine user accounts (simpler operationally).
 [DECISION] Key disagreement: Apps have auto-rotating tokens but need refresh sidecar infra. Machine users work today with zero new infra.
@@ -62,19 +63,24 @@ Use the validated respawn pattern (see below): jq remove dormant entries from co
 [LEARNED] GitHub Apps: no SSH git, 1-hour token expiry, `gh` CLI needs wrapper scripts. Machine users: native compatibility everywhere.
 
 ### Settings fix
+
 [DECISION] Added `Bash(cd:*)` to user settings allow list — stops repeated prompts for `cd && git` compound commands. Takes effect next session.
 
 ### Monte naming
+
 [DECISION] Spawned as "monte" (matching roster.json). No naming issues this session.
 
 ### Repo syncs
+
 [DECISION] apex-migration-research: `git reset --hard origin/main` to resolve 50+ conflicts (apex team's work is authoritative).
 [DECISION] hr-platform: pulled 49 files including full hr-devs team config (roster, prompts, memory, layouts, Eilama daemon).
 
 ## Idle agents at checkpoint
+
 - finn, celes, volta, herald, brunel, monte — all idle, available
 
 ## Previous session notes (R5–R9)
+
 - R5 Grade B (best ever). Inbox durability validated.
 - R6: relay RFC (#7), web frontend RFC (#8), Richelieu manager-agent (#10), Lovelace hire.
 - R7: simplified startup protocol, removed COLD START anomaly.

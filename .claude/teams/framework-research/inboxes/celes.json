@@ -529,14 +529,58 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775736542208@celes\",\"from\":\"team-lead\",\"reason\":\"Session ending. PO wants a fresh start. Save your scratchpad state and approve shutdown. You will be respawned second (after Callimachus) next session.\",\"timestamp\":\"2026-04-09T12:09:02.208Z\"}",
-    "timestamp": "2026-04-09T12:09:02.208Z",
+    "text": "[2026-04-09 15:23] New team design order from PO.\n\n**Client:** Raamatukoi (Estonian bookstore, \"Book Moth\")\n**Deployment repo:** `Raamatukoi/tugigrupp` (currently empty, ready for us)\n**Mission:** Maintain the other four repos in the Raamatukoi GitHub org.\n\n**The four repos this team will maintain:**\n\n1. **webstore** (TypeScript, Next.js App Router) — Main e-commerce store. Active development. Integrates with Directo ERP (article XML, book descriptions, image URLs), PIM system, SKU management.\n\n2. **rat-project** (Python) — \"Raamatukoi Acquisition Tool.\" Book procurement system. Imports from RARA (Estonian national library), syncs with PIM/Directo. Has cron jobs, health checks, DNS management.\n\n3. **TagHunt** (Java, Android) — Android app for UNIWA K626 PDA with UHF RFID reader. Scans barcode, locates physical book on shelves by RFID signal strength.\n\n4. **-TagHunt-sdk-libs** — SDK binaries (JAR/AAR/SO) for TagHunt's GZPDA40 UHF RFID hardware. Native libs for arm64-v8a and armeabi-v7a.\n\n**PO requirement:** Include a librarian (Oracle role) in the team.\n\n**Tech stack spans:** TypeScript/Next.js, Python, Java/Android, native SDK binaries.\n\nPlease run your intake process. Key questions to surface for PO:\n- Team size and composition\n- What \"maintenance\" means here (bug fixes? feature work? both?)\n- Any constraints on model tiers, deployment environment\n\nDesign the team. I'll relay your questions to PO.",
+    "summary": "Team design order: Raamatukoi tugigrupp",
+    "timestamp": "2026-04-09T12:23:09.601Z",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775736672782@celes\",\"from\":\"team-lead\",\"reason\":\"Session ending. All other agents already terminated. Save scratchpad and approve shutdown.\",\"timestamp\":\"2026-04-09T12:11:12.782Z\"}",
-    "timestamp": "2026-04-09T12:11:12.782Z",
+    "text": "[2026-04-09 15:35] PO answers to your intake questions. Proceed to role sculpting.\n\n**Scope narrowed to 2 repos:** webstore (Next.js/TypeScript) and rat-project (Python/FastAPI + React frontend). TagHunt and SDK libs are OUT of scope.\n\n**PO decisions:**\n\n1. **Scope:** Bug fixes + refactoring only. No new features. The primary mission is building quality infrastructure — zero automated tests exist today, no CI, no quality gates except ESLint on webstore. Refactoring for testability and establishing tests/CI will be the bulk of the work.\n\n2. **Team type:** Full XP team with TDD pairs.\n\n3. **Deployment:** Open question, probably VPS container.\n\n4. **Oracle scope:** Yes — integration contracts (Directo ERP, PIM, SKU formats), deployment procedures, repo-specific quirks, incident history.\n\n5. **Repo access model:** Submodule. `tugigrupp` is the parent repo, with `webstore` and `rat-project` as git submodules. Team config (.claude/teams/) lives at tugigrupp root. Agents cd into submodules to branch/commit/push/PR against the real repos.\n\n**Code quality assessment (from research agent):**\n\n| | webstore | rat-project |\n|---|---|---|\n| Tests | None (ad-hoc scripts only) | None |\n| Linting | ESLint (Next.js) | None |\n| CI/CD | Dependabot only | None |\n| Type checking | TypeScript | None |\n| CLAUDE.md | Yes | Yes |\n| Docs | Extensive (30+ files) | Extensive |\n\n- webstore: Next.js 16, React 19, Tailwind 4, TypeScript 5, PostgreSQL, Anthropic SDK, nodemailer, next-intl\n- rat-project: FastAPI + Uvicorn, opencv, open_clip_torch, google-cloud-vision, pytesseract (OCR), React frontend (CRA), Docker compose\n\nDesign the full XP team. Include Oracle (librarian). Remember: two very different tech stacks (TypeScript and Python) need separate builder+tester pairs.",
+    "summary": "PO answers — proceed with XP team design",
+    "timestamp": "2026-04-09T12:39:30.281Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 15:47] PO feedback on the raamatukoi-dev design. Two items:\n\n**1. No dedicated PURPLE (refactorer)?**\n\nThe design has RED+GREEN pairs but no explicit PURPLE role. This team's entire mission is refactoring for quality — the REFACTOR step is arguably the most important part. PO is asking whether there should be a dedicated refactorer.\n\nOptions to consider:\n- Dedicated PURPLE per pair (2 more agents = 8 total)\n- Shared PURPLE across both pairs (1 more = 7 total)\n- Team-lead as PURPLE (Manutius reviews/refactors for both)\n- Builder handles REFACTOR within the pair (current implicit design)\n\nConsider the T09 v2.3 guidance on PURPLE configuration. What's your recommendation for this specific team, given the refactoring-heavy mission and two different tech stacks?\n\n**2. TDD pipeline workflow document needed.**\n\nThe common-prompt mentions TDD protocol briefly but the team needs a proper workflow document — the full RED→GREEN→REFACTOR pipeline with handoff protocols, especially for a team that will live or die by TDD discipline. Draft this as a team artifact.\n\nPlease update the design with your recommendation on PURPLE and produce the TDD pipeline document.",
+    "summary": "PO feedback: add PURPLE role + TDD pipeline doc",
+    "timestamp": "2026-04-09T12:49:41.101Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 16:40] Design is approved pending final push. Before you go idle — did you submit any team-wide patterns from this design session to Callimachus via Protocol A? You've accumulated several potentially wiki-worthy findings (Cathedral tier assessment for maintenance teams, separate PURPLEs driven by language distance, the 9-character XP composition pattern, etc.). Check your Oracle Routing obligation.",
+    "summary": "Reminder: submit findings to Callimachus",
+    "timestamp": "2026-04-09T13:38:51.643Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-09 16:40] All three submissions received and filed. Acknowledgment:\n\n**1. Cathedral Tier Trigger for Quality Teams** → `wiki/patterns/cathedral-trigger-quality-teams.md`\n- Classification: team-wide pattern, high confidence\n- Filed with full provenance. Related to T09 § \"PURPLE configuration by tier.\"\n\n**2. Multi-Repo XP Composition** → `wiki/patterns/multi-repo-xp-composition.md`\n- Classification: team-wide pattern, high confidence\n- Filed with sharing-rules table (shared ARCHITECT/Oracle, separate PURPLEs). Related to T09 § \"Team Composition Impact.\"\n\n**3. XP Cycle for Infrastructure Stories** → `wiki/patterns/xp-cycle-for-infrastructure.md`\n- Classification: team-wide pattern, high confidence\n- Filed with anti-pattern note. Related to T09 § \"The Cycle.\"\n\nWiki index updated. Total wiki entries: 4 (all in `patterns/`).\n\nThese three patterns form a coherent cluster around \"how to stand up XP on quality-infrastructure teams.\" If future submissions fill in adjacent areas (e.g., how Phase 1 transitions to Phase 2, or how shared Oracle contracts are structured), I'll cross-reference automatically.",
+    "summary": "3 submissions filed — cathedral trigger, multi-repo XP, infra XP cycle",
+    "timestamp": "2026-04-09T13:40:52.794Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:50] PO wants a redundancy review of the raamatukoi-dev design spec. You wrote it — now review it with fresh eyes.\n\nRead: `/tmp/tugigrupp/docs/design-spec.md` (the live copy in tugigrupp)\n\nLook for:\n- Sections that say the same thing twice\n- Information repeated between design-spec.md and common-prompt.md (which agents will read separately)\n- Verbose passages that could be tightened\n- Any structure that could be collapsed\n\nReport what you find — don't edit files. List the redundancies with section references so we can decide what to cut.",
+    "summary": "Review design-spec.md for redundancy",
+    "timestamp": "2026-04-09T14:50:36.622Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 17:53] Apply all recommended cuts except C1 (keep lore). That means:\n\n**design-spec.md:**\n- A1: Delete duplicate workspace tree from §5 (keep the repo table)\n- A2: Collapse §6 Integration Points to one-liner pointing to §2\n- A3: Drop \"no features\" from §2 Team Archetype\n- B3: Remove File Ownership table from design-spec (Access Matrix covers it)\n- B4: Remove PURPLE scope from design-spec (tdd-pipeline.md is canonical)\n- C2: Collapse Model Rationale to grouped form\n\n**common-prompt.md:**\n- B1: Collapse tier justification to one-sentence pointer to design-spec §3\n- B2: Remove Key Rules from cycle section, keep ASCII diagram + pointer to tdd-pipeline.md\n\nFiles to edit: `/tmp/tugigrupp/docs/design-spec.md` and `/tmp/tugigrupp/.claude/teams/raamatukoi-dev/common-prompt.md`\n\nEdit and push.",
+    "summary": "Apply all redundancy cuts except C1",
+    "timestamp": "2026-04-09T14:53:30.308Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775746869784@celes\",\"from\":\"team-lead\",\"reason\":\"Session complete. Write scratchpad, send closing report with [LEARNED] [DEFERRED] [WARNING] [UNADDRESSED].\",\"timestamp\":\"2026-04-09T15:01:09.784Z\"}",
+    "timestamp": "2026-04-09T15:01:09.784Z",
     "read": true
   }
 ]

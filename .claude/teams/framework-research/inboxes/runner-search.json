@@ -1,8 +1,1 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775133940012@runner-search\",\"from\":\"team-lead\",\"reason\":\"Search complete\",\"timestamp\":\"2026-04-02T12:45:40.012Z\"}",
-    "timestamp": "2026-04-02T12:45:40.012Z",
-    "read": true
-  }
-]
+[]

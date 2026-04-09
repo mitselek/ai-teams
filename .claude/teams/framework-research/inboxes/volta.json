@@ -420,11 +420,5 @@
     "summary": "T06 Phase 3 amendment — issue #54 assigned",
     "timestamp": "2026-04-09T10:37:01.023Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775736544031@volta\",\"from\":\"team-lead\",\"reason\":\"Session ending. PO wants a fresh start. Save your scratchpad state and approve shutdown.\",\"timestamp\":\"2026-04-09T12:09:04.031Z\"}",
-    "timestamp": "2026-04-09T12:09:04.031Z",
-    "read": true
   }
 ]

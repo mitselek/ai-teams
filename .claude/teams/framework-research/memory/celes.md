@@ -94,6 +94,10 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 [PATTERN] For maintenance teams covering 2+ repos with different stacks: one XP pipeline per repo, shared ARCHITECT + Oracle. Oracle bridges integration knowledge; ARCHITECT bridges decomposition knowledge.
 [PATTERN] When repos have zero tests, Phase 1 applies XP cycle to infrastructure stories: "set up test framework" is a story decomposed by ARCHITECT, not an ad-hoc task.
 [PATTERN] Cathedral tier for quality-infrastructure teams: if the mission IS refactoring, structural debt consequences are maximally high. This is the clearest Cathedral trigger.
+[CHECKPOINT] Redundancy review done: 8 cuts applied to live files in `Raamatukoi/tugigrupp`, commit `b55f847`, pushed. -60 lines total.
+[CHECKPOINT] 3 Protocol A submissions sent to Callimachus (wiki/patterns/: cathedral-trigger, multi-repo-xp-composition, xp-cycle-for-infrastructure). All filed.
+[LEARNED] Design-spec, common-prompt, and tdd-pipeline.md form a three-document system. Design-spec is for PO/design review (rationale). Common-prompt is for agents (rules). Tdd-pipeline.md is the runtime reference (protocol). Redundancy between them should be replaced with pointers.
+[LEARNED] Live files in `Raamatukoi/tugigrupp` are at a different path than design files in `mitselek-ai-teams/designs/new/raamatukoi-dev/`. The design folder has the original drafts; the tugigrupp repo has the deployed copies. Edits go to the live repo.
 
 ## Deferred (carried forward)
 

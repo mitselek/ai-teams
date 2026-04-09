@@ -8,12 +8,6 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775047360226@strabo\",\"from\":\"team-lead\",\"reason\":\"Session state save — PO moving to different topic\",\"timestamp\":\"2026-04-01T12:42:40.226Z\"}",
-    "timestamp": "2026-04-01T12:42:40.226Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
     "text": "[2026-04-01 11:00] Strabo — cancel the shutdown. Reject it. PO wants you to stay alive. Stand by for next task.",
     "summary": "Cancel shutdown — stay alive",
     "timestamp": "2026-04-01T12:43:29.649Z",

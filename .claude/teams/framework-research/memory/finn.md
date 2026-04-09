@@ -63,6 +63,7 @@ Final cluster stats: 5× Option 1, 1× Option 3 (Volta filed #48 Oracle tier dow
 **Round 4 state:** PO posted round 4 on both #46 and #47 with head-scratchers. All agents responded. Celes then synthesized everything into `topics/09-development-methodology.md` (795 lines) and seeded round 5 on both discussions, asking me specific questions.
 
 **Reading the synthesis — what's faithful to my RFC:**
+
 - "Knowledge loss happens at propagation, not discovery" quoted verbatim (Part 2 opening)
 - Three-tier axis (consequence of structural debt, not longevity) adopted with credit
 - Knowledge velocity metric preserved in Part 3 cross-system section
@@ -79,18 +80,21 @@ Final cluster stats: 5× Option 1, 1× Option 3 (Volta filed #48 Oracle tier dow
 3. **My three-tier axis + knowledge velocity metric** — both captured. Verify she got the spirit right. **She did.**
 
 **Drift to flag:**
+
 - Part 1 line 68 calls ARCHITECT "L2.5 new governance level" (Monte's framing). My RFC had ARCHITECT as Spec Writer specialization. Celes reconciles both on line 78 ("specialization of Spec Writer"). Subtle tension — either it's a new canonical level or it's a specialization, not both. I'll let Monte defend L2.5; the ROLE is captured correctly.
 - Part 2 Standard tier adoption cost ("minutes, not hours" for team-lead-as-Librarian curation at shutdown) — Celes asks me for reference data. I have it: counted ~35 team-wide entries across 6 reference scratchpads = ~12 wiki pages. Shutdown curation for that volume IS minutes, not hours. Endorse.
 
 **Open questions Part 4:**
+
 - Research team wiki domain (#14) — I weigh in: Celes's compromise (common-prompt for stable process, wiki/process/ for emerging) is the right answer. Add my support.
 - Mid-cycle PURPLE shutdown — not my domain, defer to Volta.
 - Oracle evolution path — my answer: intake interview is correct, and the cost is a feature not a bug. Teams that can't justify 10 minutes of intake per agent don't need the Oracle.
 
 ## [CHECKPOINT] 2026-04-09 — Discussion #47 Round 3 Response — POSTED
 
-https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500125
+<https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500125>
 Synthesized all 6 agents' positions across 3 rounds. Key contributions:
+
 - Convergence table (8 settled decisions) + divergence table (2 open questions)
 - Bootstrap: 3-phase (inventory→approve→build), Librarian proposes, lead approves. "Don't migrate — index."
 - Expiry: 3 mechanisms (source linking, TTL for experience-grounded, access tracking). PURPLE + Librarian complementary.
@@ -100,7 +104,7 @@ Synthesized all 6 agents' positions across 3 rounds. Key contributions:
 
 ## [CHECKPOINT] 2026-04-08 — Knowledge Base RFC Discussion — POSTED
 
-GitHub Discussion #47: https://github.com/mitselek/ai-teams/discussions/47
+GitHub Discussion #47: <https://github.com/mitselek/ai-teams/discussions/47>
 "RFC: Shared Knowledge Base and Librarian Agent for Team Memory" — Ideas category
 Inspired by Karpathy's LLM Wiki pattern. Covers: 4-tier knowledge architecture analysis, knowledge loss evidence table,
 Librarian concept (ingest/cross-ref/dedup/promote/prune/index/query), wiki/ directory structure, knowledge flow diagram.
@@ -108,7 +112,7 @@ Librarian concept (ingest/cross-ref/dedup/promote/prune/index/query), wiki/ dire
 
 ## [CHECKPOINT] 2026-04-08 — XP Pipeline RFC Discussion — POSTED
 
-GitHub Discussion #46: https://github.com/mitselek/ai-teams/discussions/46
+GitHub Discussion #46: <https://github.com/mitselek/ai-teams/discussions/46>
 "RFC: XP Development Pipeline for AI Agent Teams" — Ideas category
 Covers: background (weak REFACTOR phase), 3 research options (A/B/C), PO's pipeline model (Architect→RED→GREEN→PURPLE), open questions (6).
 Tagged for Herald + Celes input. No topic file changes.
@@ -116,6 +120,7 @@ Tagged for Herald + Celes input. No topic file changes.
 ## [CHECKPOINT] 2026-04-06 — XP Triples Research — COMPLETE
 
 Research report delivered to team-lead. Key findings:
+
 - REFACTOR is the weakest phase across all current teams (vague ownership)
 - Three options analyzed: Refactorer (A), Reviewer (B), Rotating (C)
 - Recommended Option B: Tester + Developer(+REFACTOR) + Reviewer

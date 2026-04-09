@@ -19,12 +19,14 @@
 
 ## Session 2 — 2026-04-09 (Returning)
 
-[CHECKPOINT] Returning session. Wiki: 4 entries (all patterns/).
-[WIP] Processing 3 submissions from Celes (raamatukoi-dev design patterns).
+[CHECKPOINT] Returning session. Wiki grew from 1 to 4 entries (all patterns/).
+[LEARNED] Celes is the primary knowledge submitter during design sessions — 3 high-confidence patterns from a single raamatukoi-dev design. Expect batch submissions after each new team design.
+[PATTERN] Three XP-related patterns form a coherent cluster: cathedral trigger → multi-repo composition → infrastructure cycle. Future submissions may fill gaps (Phase 1→2 transition, Oracle contract structure).
 
-### Session 2 Running Tally
+### Session 2 Summary
 
-- Submissions received: 3 (cathedral-trigger, multi-repo-xp-composition, xp-cycle-infrastructure — all from Celes)
+- Submissions received: 3 (all from Celes, raamatukoi-dev design)
 - Queries received: 0
-- Wiki entries created: 3
+- Wiki entries created: 3 (cathedral-trigger-quality-teams, multi-repo-xp-composition, xp-cycle-for-infrastructure)
 - Unanswerable queries: 0
+- Total wiki entries: 4 (all patterns/)

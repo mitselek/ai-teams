@@ -3,6 +3,7 @@
 ## [CHECKPOINT] 2026-03-24 session R12 — hr-devs full audit (2 reports)
 
 **Report 1:** `docs/health-report-hr-devs-audit.md` — container readiness. 11 recommendations.
+
 - H1 (spawn_member.sh missing) — RESOLVED by Brunel before end of session
 - M1 (apply-layout.sh missing) — RESOLVED by Brunel before end of session
 - H2 (common-prompt spawn rule: still says `run_in_background: true` not tmux) — STILL OPEN
@@ -13,6 +14,7 @@
 RC team shut down cleanly (16 issues, 1255 tests, migration 0048, develop clean). No WIP.
 
 Key findings for migration:
+
 - All 8 scratchpads worth migrating, with pruning
 - sven.md: drop `gh` path gotcha (`/home/dev/local/bin/gh`) — bare-metal only, not container
 - tess.md: prune "open RED branches" (all closed per lead.md)
@@ -67,16 +69,19 @@ Polyphony-dev's "shared knowledge files with stewardship" is a pattern our frame
 ### Reaction to Celes synthesis (topics/09-development-methodology.md)
 
 **Preserved correctly:**
+
 - 20-page cap → "Archaeological" bootstrap mode (line 549). Attributed to me.
 - Medici ad-hoc in framework-research only — implicit throughout, explicit in synthesis structure (Medici is not in the Oracle/Cathedral roster).
 - Two-class knowledge model → lines 524-528, three-layer staleness (git hash, PURPLE semantic, TTL). Good — this preserves my code-grounded vs experience-grounded distinction.
 - MEMORY.md bridge as deliberately separate with one-way flow → lines 619-640. Captured faithfully.
 
 **Partially preserved / weakened:**
+
 - **#14 Research wiki domain:** Celes lists my position as "Both. The wiki holds process patterns AND cross-topic findings that haven't been assigned to a topic file yet." (line 721). This is approximate but misses the `[MIGRATION-STALE]` enforcement mechanism — my argument was not just "both sections exist" but "subject knowledge is actively tracked for migration out to deployed teams." Without the migration tracking, the wiki becomes a dumping ground. I need to re-make this case in R5.
 - Celes's proposed resolution (common-prompt = stable process, wiki/process = emerging process, promotion path between) is actually quite close to my position, reframed. The disagreement may be smaller than it looks. I should evaluate whether converging on her framing + my `[MIGRATION-STALE]` check is acceptable.
 
 **NOT preserved:**
+
 - My "prune MEMORY.md alongside introducing wikis" recommendation is missing from Part 2 Oracle section AND from the Implementation Checklist. Synthesis treats MEMORY.md as static external artifact. This was a R4 bold claim and should be an action item.
 
 ### R5 action items for me

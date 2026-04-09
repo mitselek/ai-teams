@@ -13,9 +13,11 @@
 
 ## Open Questions (carried forward)
 
-#1 Multiple manager agents — when/how to split L1 authority across multiple managers
-#2 Amendment protocol — how governance rules themselves get changed
-#4 Compliance audit — periodic governance compliance checks
+# 1 Multiple manager agents — when/how to split L1 authority across multiple managers
+
+# 2 Amendment protocol — how governance rules themselves get changed
+
+# 4 Compliance audit — periodic governance compliance checks
 
 ## Session 2026-03-19 R10 — Spawn only, no tasks assigned
 
