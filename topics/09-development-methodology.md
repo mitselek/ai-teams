@@ -149,11 +149,13 @@ This is cost optimization built into the development model. Judgment calls are e
 **Scope boundary** (from Monte's governance analysis):
 
 PURPLE MAY:
+
 - Rename local variables, extract private functions, restructure internal control flow
 - Eliminate duplication within a single module
 - Improve type signatures that do not change the public interface
 
 PURPLE MAY NOT (must escalate to ARCHITECT):
+
 - Change public interfaces (API surfaces, exported function signatures, database schemas)
 - Create new modules or files (structural decisions with cross-story implications)
 - Modify test files (RED's domain)
@@ -283,6 +285,7 @@ From Volta's lifecycle analysis. This is new to T06.
 In temporal ownership, agents write sequentially to the *same* files. At any moment, exactly one agent holds the write lock — the others are idle or processing messages. This is fundamentally different from directory ownership (multiple agents writing simultaneously to different directories) and branch isolation (multiple agents writing simultaneously to different branches).
 
 **Properties:**
+
 - No partition table needed. The whole codebase is the partition.
 - No merge conflicts possible. Sequential writes to a single branch.
 - No worktree lifecycle overhead. No creation, cleanup, or stale pruning.
@@ -354,6 +357,7 @@ The XP pipeline introduces scoped authority for ARCHITECT and PURPLE that T04's 
 A team using the XP pipeline creates governance at two levels. The team lead governs the team (T04 L2). ARCHITECT governs the pipeline within its story (L3 with scoped authority). This is the first nested governance pattern in the framework — previously, governance was flat at the team level.
 
 The implications:
+
 - ARCHITECT reports to team lead, not to PO
 - RED/GREEN/PURPLE report to ARCHITECT within the cycle, not to team lead
 - Cross-pipeline disputes (resource conflicts between two pipelines) are resolved by team lead, not by either ARCHITECT
@@ -454,6 +458,7 @@ For a two-pipeline team like screenwerk-dev (pipeline pair on Node.js data trans
 This section collects the parallel-execution design work from rounds 4 and 5 that is **deferred until sequential validation criteria are met**. The design is preserved here so that when a team's validation criteria unlock parallelism, the target configuration is already documented — no re-derivation is needed.
 
 **What is deferred:**
+
 - **Adaptive lookahead with `max_lookahead > 0`** (see [Adaptive Lookahead](#adaptive-lookahead-volta-round-5--deferred) section above)
 - **Concurrent multi-pipeline execution** — two or more XP pipeline instances advancing their cycles simultaneously
 - **Shared PURPLE cross-pipeline pattern extraction** (see [Shared vs. Separate PURPLE Across Pipelines](#shared-vs-separate-purple-across-pipelines--deferred) section above)
@@ -552,6 +557,7 @@ The Oracle creates the first intra-team communication pattern where the routing 
 ```
 
 Every agent has two reporting lines:
+
 - **Work reports** go to team-lead (task completion, blockers, status)
 - **Knowledge reports** go to Oracle (discoveries, patterns, gotchas, queries)
 
@@ -589,6 +595,7 @@ As with the XP pipeline, not every team needs the full Oracle.
 **The Standard-tier compromise is load-bearing.** Most teams are Standard tier. Adding a dedicated Oracle to every team would double the opus cost of knowledge management. The team lead already reads all scratchpads during shutdown — extending that to "promote team-wide entries to `wiki/`" adds about 30 minutes (see Finn's reference data below). The team lead also handles mid-session knowledge queries implicitly through task routing.
 
 **Finn's reference-team data (round 5).** Counted across `reference/rc-team/cloudflare-builders/memory/` and `reference/hr-devs/memory/` for a mature 6-agent team:
+
 - ~304 total scratchpad lines
 - ~35 team-wide tagged entries (`[LEARNED]`, `[PATTERN]`, `[GOTCHA]`, `[DECISION]`)
 - ~12 wiki pages after deduplication
@@ -603,9 +610,11 @@ This validates the Standard-tier claim with empirical evidence. Caveat: the numb
 A team should upgrade from Standard to Cathedral when the Standard tier's team-lead curation model runs out of capacity. Two objective triggers:
 
 1. **Scratchpad duplication threshold.** At shutdown Phase 2c, the team lead runs:
+
    ```bash
    grep -h '\[LEARNED\]\|\[PATTERN\]' memory/*.md | wc -l
    ```
+
    When the count exceeds **30 team-wide entries across a team of 5+ agents**, the team has accumulated enough shared knowledge to justify Oracle adoption. Team lead proposes to PO. If approved, the next session spawns an Oracle.
 
 2. **Team size threshold.** Teams of **7-8 agents or more** typically exceed the team lead's cognitive capacity at Phase 2 (task snapshot + wiki curation + shutdown requests). Beyond this size, Cathedral tier is structurally necessary, not optional.
@@ -669,6 +678,7 @@ Agents send explicit submission messages when they discover something team-wide.
 **Scope classification** is the agent's initial call (they have the domain context). The Oracle can override during filing.
 
 **Urgency** determines propagation path:
+
 - **Urgent** — discovery invalidates another agent's current assumptions. Oracle sends `[URGENT-KNOWLEDGE]` to team-lead, who decides whether to interrupt the affected agent. Oracle files with `[URGENT]` tag. Expected frequency: 0-2 per session.
 - **Standard** — useful pattern/gotcha for future work. Oracle files normally. Available via query. Expected frequency: 10-20 per session.
 
@@ -854,6 +864,7 @@ Read the source file directly. This entry is a pointer.
 No content. Just the pointer, a summary of what the source covers, and a staleness marker. When an agent queries "what do we know about F301", the Oracle returns the path. The agent reads the source directly. The wiki stays thin. The `docs/` stays canonical.
 
 **The two-mode wiki:**
+
 - **Index layer** — pointers to existing artifacts (populated by Archaeological bootstrap)
 - **Content layer** — new knowledge, gotchas, patterns discovered after bootstrap (grows organically)
 
@@ -891,6 +902,7 @@ The same marker pattern applies to Archaeological extraction (should run exactly
 The Oracle maintains persistent per-agent articles separate from the session-snapshot health report. These profiles are **factual, not evaluative**. They record observations, not judgments.
 
 Profile contents:
+
 - Submission frequency and types (counts, not quality ratings)
 - Query patterns (what topics the agent asks about)
 - Wiki corrections submitted (error reports, not author blame)
@@ -939,6 +951,7 @@ The Oracle's shutdown output. This is the team health sensor formalized as part 
 ```
 
 **Six health signals (Volta, round 5):**
+
 1. **Top queries** — what the team needs most this session
 2. **Query clusters** — domain density; multiple queries on under-documented areas (refinement of "top queries" to detect structural gaps, not just frequency)
 3. **Unresolved gaps** — tracked ignorance carried forward
@@ -947,6 +960,7 @@ The Oracle's shutdown output. This is the team health sensor formalized as part 
 6. **Source concentration** — domains where >60% of entries come from one agent (knowledge-concentration risk, load-bearing for next-session planning)
 
 Plus the two additions that emerged during the discussion:
+
 - **Pending staleness warnings** with hot/cold classification (stale-but-accessed entries are more urgent than cold stale entries)
 - **Knowledge velocity** (Finn's metric, Part 3)
 
@@ -981,12 +995,14 @@ The PO maintains a cross-team memory (`~/.claude/projects/.../MEMORY.md`) outsid
 Team wikis (L2 governed, Oracle curated) must not automatically propagate to PO MEMORY.md (L0 constitutional). The hierarchy must be preserved: information flows up through explicit governance review (team lead's session report, PO's cross-team context-gathering), gets synthesized by the human at L0, and flows back down through common-prompt edits or direct team-lead directives.
 
 **Forbidden:**
+
 - Automated sync of team wiki entries to PO MEMORY.md
 - Agents reading PO MEMORY.md directly
 - PO editing team wikis directly (PO messages team lead, who instructs Oracle)
 - **PO copying MEMORY.md entries into team wikis** (Finn's round 5 anti-pattern — if PO knowledge needs to reach a team, it goes through team-lead, who submits it as a normal Knowledge Submission with PO attribution)
 
 **Required:**
+
 - Cross-team-relevant wiki entries are tagged `[CROSS-TEAM]` in the Oracle's session report
 - Team lead includes tagged findings in session report to PO
 - PO decides at own discretion whether to record in MEMORY.md
@@ -1024,6 +1040,7 @@ ARCHITECT's first act on receiving a new story should be a wiki query: "What do 
 This solves the "new session starts cold" problem. Without the Oracle, ARCHITECT relies on whatever is in the common-prompt and its own prompt context. With the Oracle, ARCHITECT has access to every pattern the team has discovered since its first session.
 
 **Per-role Librarian access instructions (PO, round 4):**
+
 - RED queries for existing test patterns and known bugs
 - GREEN queries for API contracts and gotchas
 - PURPLE queries for architectural decisions and module boundaries
@@ -1247,6 +1264,7 @@ Post-round 5, normal workflow resumes: issues are triaged, PRs are reviewed, the
 ### Why This Protocol
 
 The alternatives are worse:
+
 - **Single author writes the topic file and asks for review.** The review round gets no depth because nobody invested in forming an independent position. The author's framing dominates.
 - **Consensus-first drafting.** Everyone tries to agree before committing anything. Disagreements get smoothed over, not resolved. Nuance is lost.
 - **PO decides everything.** The PO's context window fills with tactical detail. Framework-wide coherence depends on the PO remembering every previous decision. Does not scale.
