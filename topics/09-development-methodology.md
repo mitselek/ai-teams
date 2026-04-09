@@ -4,7 +4,7 @@ How development teams produce code and preserve the knowledge they generate. Syn
 
 (*FR:Celes*)
 
-**Version:** v2.1 (2026-04-09) — sequential-first default per PO directive on #50 and #52. Previous: v2 integrated round 5 feedback from Brunel, Finn, Herald, Medici, Monte, Volta. See [Changelog](#changelog) for binary calls and the reasoning behind them.
+**Version:** v2.2 (2026-04-09) — protocol typing principle + `types/t09-protocols.ts` per issue #51. Previous: v2.1 sequential-first default (#50 and #52). See [Changelog](#changelog) for binary calls and the reasoning behind them.
 
 ---
 
@@ -179,9 +179,13 @@ For **single-pipeline teams**, same-agent (Finn's position) is defensible — no
 
 ### Communication Protocol (Herald's Four Message Types)
 
-The pipeline is a **state machine**, not a linear flow. PURPLE's veto power creates a REJECT loop back to GREEN. The four message types cover every transition:
+The pipeline is a **state machine**, not a linear flow. PURPLE's veto power creates a REJECT loop back to GREEN. The four message types cover every transition.
+
+**TypeScript shape.** Each message type below has a corresponding interface in `types/t09-protocols.ts` — `TestSpec`, `GreenHandoff`, `PurpleVerdict`, and `CycleComplete`. The prose here describes semantics; the interfaces describe shape. See the [framework principle](#protocol-typing-principle) at the end of this document.
 
 #### TEST_SPEC (ARCHITECT → RED)
+
+*Interface: `TestSpec` in `types/t09-protocols.ts`.*
 
 ```markdown
 ## Test Spec
@@ -197,6 +201,8 @@ The pipeline is a **state machine**, not a linear flow. PURPLE's veto power crea
 
 #### GREEN_HANDOFF (GREEN → PURPLE)
 
+*Interface: `GreenHandoff` in `types/t09-protocols.ts`.*
+
 ```markdown
 ## Green Handoff
 - Story: <story-id>
@@ -210,6 +216,8 @@ The pipeline is a **state machine**, not a linear flow. PURPLE's veto power crea
 The **implementation notes** field is critical — this is where GREEN hands PURPLE a map of its shortcuts. Solves the refactorer-lacks-context problem.
 
 #### PURPLE_VERDICT (PURPLE → GREEN or PURPLE → ARCHITECT)
+
+*Interface: `PurpleVerdict` in `types/t09-protocols.ts` — a discriminated union of `PurpleVerdictAccept`, `PurpleVerdictReject`, and `PurpleVerdictEscalate` covering the three outcomes below.*
 
 ```markdown
 ## Purple Verdict
@@ -234,6 +242,8 @@ The **implementation notes** field is critical — this is where GREEN hands PUR
 ```
 
 #### CYCLE_COMPLETE (PURPLE → ARCHITECT)
+
+*Interface: `CycleComplete` in `types/t09-protocols.ts`.*
 
 ```markdown
 ## Cycle Complete
@@ -549,7 +559,7 @@ Knowledge submissions do NOT route through team-lead because (a) team-lead is al
 
 **Urgent notifications route through team-lead (Herald's round 5 refinement).** When the Oracle identifies new knowledge that may invalidate another agent's current work, it sends an `[URGENT-KNOWLEDGE]` tagged message to team-lead. Team-lead's prompt treats this as a priority interrupt, processed before the next work dispatch. Team-lead decides whether to interrupt the affected agent, queue for their next handoff, or mark informational. **This bounds the damage window to one team-lead dispatch cycle.** The dual-hub topology is preserved — only the narrow slice of urgent-relevance notifications flows through the work hub.
 
-**[URGENT-KNOWLEDGE] message format:**
+**[URGENT-KNOWLEDGE] message format** (interface: `UrgentKnowledgeMessage` in `types/t09-protocols.ts`):
 
 ```markdown
 ## [URGENT-KNOWLEDGE] — affects <agent-name>
@@ -636,6 +646,8 @@ A team should upgrade from Standard to Cathedral when the Standard tier's team-l
 
 #### Protocol A: Knowledge Submission (Agent → Oracle)
 
+*Interface: `KnowledgeSubmission` in `types/t09-protocols.ts`.*
+
 Agents send explicit submission messages when they discover something team-wide.
 
 ```markdown
@@ -663,6 +675,8 @@ Agents send explicit submission messages when they discover something team-wide.
 **Confidence** controls filing behavior. Speculative entries are tagged provisional; two independent speculative submissions at high confidence auto-promote to confirmed.
 
 #### Protocol B: Knowledge Query (Agent → Oracle → Agent)
+
+*Interfaces: `KnowledgeQuery` (request) and `KnowledgeResponse` (reply) in `types/t09-protocols.ts`.*
 
 ```markdown
 ## Knowledge Query
@@ -697,6 +711,8 @@ Response:
 
 #### Protocol C: Knowledge Promotion (Oracle → Team-Lead → Common-Prompt)
 
+*Interface: `PromotionProposal` in `types/t09-protocols.ts`.*
+
 When a wiki entry matures enough to become a team rule:
 
 ```markdown
@@ -725,7 +741,7 @@ Team-lead reviews and either approves (team-lead writes the update, since common
 
 ### Provenance, Source Linking, and Staleness
 
-Every wiki entry carries frontmatter:
+Every wiki entry carries frontmatter (interface: `WikiProvenance` in `types/t09-protocols.ts`):
 
 ```yaml
 ---
@@ -1175,11 +1191,27 @@ For team designers (this is my use of this document):
 
 ---
 
+## Protocol Typing Principle
+
+**All comms protocols defined in topic files must have a corresponding TypeScript interface. Prose describes semantics; the interface describes shape.**
+
+This is a framework-wide rule introduced with T09 v2.2 (issue #51). It applies to every inter-agent message format documented in a topic file — not just T09's. Topic files explain *why* a protocol exists and *what* each field means. Interfaces in `types/` pin down the *exact* structure in machine-checkable form, so future implementations (comms daemons, prompt builders, test harnesses) can import a single source of truth rather than parse prose.
+
+**Source of truth:** the `types/*.ts` files are authoritative for shape. If prose in a topic file and an interface disagree, the interface is canonical for shape and the topic file is canonical for semantics. Update whichever is wrong so they agree.
+
+**Placement:** interfaces live under `types/` at the repo root, named after the topic file they support (`types/t09-protocols.ts` for T09, `types/t03-protocols.ts` when T03's inter-team protocols are formalized, and so on).
+
+**For T03 (Communication).** T09's protocols were the first to get this treatment because issue #51 scoped the work to T09. T03's inter-team work-handoff, broadcast, and transport-layer message formats are equally eligible — the principle applies to them whenever they are formalized. See [Related Topics → T03](#related-topics) below.
+
+(*FR:Celes*)
+
+---
+
 ## Related Topics
 
 - **T01 (Team Taxonomy):** Refactorer is the seventh canonical role; Oracle is the eighth. ARCHITECT is a specialization of Spec Writer with scoped authority — not a new canonical role.
 - **T02 (Resource Isolation):** Temporal ownership is the third isolation model (after branch isolation and directory ownership on trunk).
-- **T03 (Communication):** Four XP message types are a specialization of Protocol 1. Dual-hub topology is a new pattern (work hub + knowledge hub). `[URGENT-KNOWLEDGE]` is a narrow routing exception. Oracle uses directory sovereignty (Protocol 5).
+- **T03 (Communication):** Four XP message types are a specialization of Protocol 1. Dual-hub topology is a new pattern (work hub + knowledge hub). `[URGENT-KNOWLEDGE]` is a narrow routing exception. Oracle uses directory sovereignty (Protocol 5). The [Protocol Typing Principle](#protocol-typing-principle) applies to T03's inter-team protocols as well — formalize them into a `types/t03-protocols.ts` file when the inter-team transport layer stabilizes.
 - **T04 (Governance):** ARCHITECT sits at L3 with scoped authority. Delegation matrix gains six new rows (story decomposition, test plan ordering, scope dispute, structural refactoring, mid-cycle termination, cross-pipeline pattern extraction). Pipeline-level governance is a new nested pattern within a team. Monte will draft the T04 amendments once T09 stabilizes.
 - **T06 (Lifecycle):** Spawn order changes for XP teams (ARCHITECT first). Shutdown Phase 3 gets PURPLE-specific watchdog extension. Test plan file + `oracle-state.json` are new handover artifacts. The adaptive lookahead ceiling and Oracle adoption triggers use Phase 2c timing. Volta will draft the T06 amendments.
 - **T07 (Safety):** PURPLE's authority boundary is a safety mechanism. Three-strike escalation is a safety valve for rejection loops. `[PIPELINE-DISTANCE]` is a diagnostic safety metric. L3 → L0 forbidden flow is a safety-critical constitutional rule.
@@ -1226,6 +1258,26 @@ The multi-round protocol works because (a) specialists form independent position
 ---
 
 ## Changelog
+
+### v2.2 (2026-04-09) — Protocol Typing (resolves #51)
+
+PO issue #51: "Formalize all comms protocols as TypeScript interfaces — foundation for inter-team comms API."
+
+**Added:**
+
+- **`types/t09-protocols.ts`** — strict-typed interfaces for every protocol in T09. XP pipeline message types (`TestSpec`, `GreenHandoff`, `PurpleVerdict`, `CycleComplete`), dual-hub routing (`UrgentKnowledgeMessage`), Oracle protocols (`KnowledgeSubmission`, `KnowledgeQuery`, `KnowledgeResponse`, `PromotionProposal`), and wiki frontmatter (`WikiProvenance`). `PurpleVerdict` is a discriminated union of the three outcomes (`Accept`, `Reject`, `Escalate`) to reflect the three-strike rule at the type level. Each interface carries a JSDoc comment linking back to the T09 section that is authoritative for its meaning.
+- **Protocol Typing Principle** — new short section before Related Topics. Codifies the framework rule: *all comms protocols defined in topic files must have a corresponding TypeScript interface*. Prose is canonical for semantics, interfaces are canonical for shape. Applies to all topic files, not just T09. Placement convention: `types/t09-protocols.ts`, `types/t03-protocols.ts`, etc.
+- **Cross-references** — every protocol block in T09 now has an "*Interface: `X` in `types/t09-protocols.ts`*" line above the markdown example. The reader can jump from prose to interface without guessing.
+
+**Clarification added to T03 Related Topics entry:** the Protocol Typing Principle applies to T03's inter-team protocols (work handoff, broadcast, transport layer) whenever they are formalized. A `types/t03-protocols.ts` is the expected placement. This is a one-line cross-reference in T09, not an edit to T03 itself — T03 is Herald's topic file and the full formalization belongs to him.
+
+**What did NOT change in v2.2:**
+
+- No semantics changed. All interface fields track T09 v2.1's prose verbatim.
+- No new binary calls, no deferred work unlocked, no tier structure changes.
+- #48 (Oracle tier downgrade path) and #49 (cost framing removal) remain paused per the Task 3 directive.
+
+**Commit:** this v2.2 commit references #51.
 
 ### v2.1 (2026-04-09) — Sequential First Default (resolves #50 and #52)
 
