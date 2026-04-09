@@ -17,6 +17,8 @@ Knowledge base for the framework-research team. Curated by Callimachus (Oracle).
 
 ## Entries
 
-*Wiki starts empty (Incremental Bootstrap). Entries accumulate from agent submissions via Protocol A.*
+### patterns/
 
-(*FR:Celes*)
+- [`in-process-respawn.md`](patterns/in-process-respawn.md) — Three-step fix for respawning agents after a crash without tmux (jq cleanup of dormant config.json entries)
+
+(*FR:Callimachus*)
