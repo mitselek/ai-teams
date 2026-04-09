@@ -62,85 +62,49 @@
 | Penrose | Sir Roger Penrose | PEN | opus | 2026-03-23 |
 | PEN TL | (user-assigned) | PEN TL | opus | 2026-03-23 |
 
-## Session 2026-03-23
+## Patterns from earlier sessions (compressed 2026-04-09)
 
-[DECISION] penrose-dev team: 6 characters, all opus. Lore theme: Aperiodic Pioneers. TDD pair (Shechtman writes tests, builders make them pass) + dedicated reviewer (Penrose, RED/YELLOW/GREEN). Team-lead pure coordinator (no code, no review).
-[DECISION] Domain splits: Ammann (types/geometry/subdivision/tiling), Bruijn (wiring/signals/simulation), Escher (renderer/controls/main), Shechtman (tests/*), Penrose (review only).
-[LEARNED] Domain-specific constant conventions (TAU = 1/PHI in this project, not 2π) must be documented prominently in common-prompt AND a dedicated disambiguation doc. Finn's review caught this — would have caused incorrect test assertions.
-[PATTERN] When team-lead cannot write code, integration layers (simulation.ts) belong with the builder whose functions they call.
-[PATTERN] Pipeline: geometry → tiling → wiring → signals → simulation → renderer. Dependencies flow one way.
+Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion rounds are in git history and in `topics/09-development-methodology.md` itself. The patterns worth carrying forward:
 
-## Session 2026-03-24
-
-[CHECKPOINT] hr-devs roster review for PROD-LLM container deployment.
-[DECISION] 7-role roster (lead, sven, dag, tess, marcus, finn, arvo) is sufficient and correct for SvelteKit+D1 stack. Model tiers validated against consequence-of-error principle.
-[LEARNED] When reviewing an existing team for redeployment: check BOTH the design file AND the source-of-truth (RC live roster) — they may have drifted. Local design roster was still 9-member (medici+eilama not yet removed).
-[GOTCHA] Dropping a role requires updating TWO files: `roster.json` AND `common-prompt.md` members list. Easy to miss the second.
-[DECISION] Medici is correct to drop from dev teams — her knowledge-health role has no scope in a code-output team. Marcus's AR hat covers team-health equivalently.
-[PATTERN] Review checklist for team redeployment: (1) roster.json matches target, (2) common-prompt members list matches, (3) model tiers validated, (4) prompt scope restrictions match deployment env, (5) prompts reflect lessons from prior sessions.
-
-## Session 2026-04-06
-
-[DECISION] screenwerk-dev team: 7 characters (lead + 2 TDD pairs + 2 advisory specialists). Lore theme: Pioneers of Light and Display. TDD pairs: Daguerre+Niepce (pipeline), Reynaud+Plateau (player). Advisory: Talbot (Entu platform), Melies (legacy migration). Model tiers: opus for lead + Daguerre + Talbot, sonnet for Niepce + Reynaud + Plateau + Melies.
-[DECISION] Domain splits: Daguerre (publish pipeline, CDN), Niepce (pipeline tests), Talbot (Entu platform, auth, CMS bugs), Reynaud (player composables, components, pages), Plateau (player tests, E2E), Melies (legacy analysis, migration docs). Shared: types.ts requires Daguerre + Reynaud + Talbot.
-[LEARNED] Screenwerk is a PRIVATE project (not Eesti Raudtee). Three repos: ScreenWerk/2026 (Nuxt 4, primary), ScreenWerk/Screenwerk-2025 (vanilla JS, reference), ScreenWerk/Screenwerk-2016 (Electron legacy, read-only). 2016 repo uses `master` not `main`. Key gap is publish pipeline.
-[LEARNED] 2016 player is an Electron app that fetches same `{screenId}.json` from API, downloads media to local FS. JSON shape is essentially the same ScreenConfig. Key diff: desktop app with local file caching vs web PWA with Cache API.
-[PATTERN] For products with active clients hitting bugs, team must have dual tracks: (1) urgent bugfixes on live system, (2) parallel transition to new system. Work streams, not sequential phases.
-[PATTERN] Advisory specialists (non-TDD, non-coding) are valid when expertise crosses TDD pair boundaries. Talbot advises both pipeline and player pairs on Entu semantics. Melies feeds gap analysis into both pairs' test specs.
-[GOTCHA] Client communication is PO-only — agents draft, Mihkel sends. Must be explicit in common-prompt.
-[GOTCHA] TDD pair is non-negotiable PO constraint — every dev team must have explicit builder+tester pairs (per entu-research pattern). Initial 4-agent design was corrected through two rounds to final 7.
-
-## Hires Delivered (cumulative — 46 agents)
-
-Added: Lumiere (SW TL), Daguerre (SW), Niepce (SW), Talbot (SW), Reynaud (SW), Plateau (SW), Melies (SW) — 7 agents, 2026-04-07.
-
-## Session 2026-04-08 / 2026-04-09 — Discussions #46 and #47
-
-[CHECKPOINT] Authored `topics/09-development-methodology.md` as synthesis of both discussions. This is my reference document for team design going forward.
-[DECISION] PURPLE is the seventh canonical role (Refactorer, opus). Oracle is the eighth canonical role (Callimachus, opus[1m]). ARCHITECT is a Spec Writer specialization at L2.5.
-[DECISION] Three tiers (Sprint / Standard / Cathedral) apply to BOTH XP pipeline adoption AND Oracle adoption. Standard-tier teams use team-lead-as-librarian at shutdown — no dedicated Oracle.
-[DECISION] Temporal ownership is the third isolation model after branch and directory ownership. New to T06.
-[DECISION] Shared vs separate PURPLE: determined by domain distance between pipelines, not team size. screenwerk-dev would get separate PURPLEs in Cathedral tier (Node.js pipeline vs Vue composables = medium distance).
-[PATTERN] When synthesizing multi-round discussions into topic files: preserve disagreements in a Part 4 "Open questions" section, don't smooth over. Monte/Medici/Celes disagree on research team wiki domain — documented, not hidden.
-[PATTERN] Four-round discussion protocol works: initial specialist responses → PO response → refinements → specialist pushback → PO new questions → synthesis. Takes ~2 sessions but converges on high-quality decisions.
-[GOTCHA] Corrected my round 1 position on Oracle model tier (sonnet → opus[1m]) after PO's sole-gateway decision changed the consequence-of-error profile. Being willing to correct publicly is more valuable than being right on the first try.
-[LEARNED] #46 has only 5 comments (initial specialist responses, no PO rounds yet). All PO rounds so far are on #47. Round 5 is seeded on both.
-
-## Session 2026-04-09 — T09 v2 Binary Calls
-
-[DECISION] 3-tier model preserved (Sprint/Standard/Cathedral). Finn's argument is load-bearing: "below Sprint is not a tier, it's the absence of methodology — three tiers map to where judgment lives." Herald's 4-tier proposal rejected. Framing clarified: tiers describe where judgment lives, not team size.
-[DECISION] L2.5 governance level DROPPED. Finn's argument: ARCHITECT's authority is bounded (one story) and temporary (idle between stories), not structural. Kept Monte's scope-authority framing and delegation matrix rows but removed L2.5 label. T04 gets delegation rows without a new hierarchy level.
-[DECISION] Shared PURPLE is the Cathedral default. Reframed around structural consistency (Herald's correction), added Monte's authority caveat (shared PURPLE flags cross-pipeline patterns to ARCHITECT via Oracle, does not extract them itself). Domain distance remains the decision variable.
-[DECISION] #14 research team wiki domain: three-track structure (wiki/process/ + wiki/observations/ + wiki/findings/). Monte and Medici converged. Closes #14.
-[DECISION] PURPLE grace period: integrate Volta's git-state watchdog AND Monte's 5-min clock with team-lead authority. They compose. Four exit states.
-
+[PATTERN] When team-lead cannot write code, integration layers belong with the builder whose functions they call. (penrose-dev)
+[PATTERN] Pipeline dependencies flow one way; document the direction prominently. (penrose-dev)
+[PATTERN] Review checklist for team redeployment: (1) roster.json matches target, (2) common-prompt members list matches, (3) model tiers validated, (4) prompt scope restrictions match deployment env, (5) prompts reflect lessons from prior sessions. (hr-devs redeployment)
+[PATTERN] For products with active clients hitting bugs, team must have dual tracks: (1) urgent bugfixes on live system, (2) parallel transition to new system. Work streams, not sequential phases. (screenwerk-dev)
+[PATTERN] Advisory specialists (non-TDD, non-coding) are valid when expertise crosses TDD pair boundaries. (screenwerk-dev — Talbot, Melies)
+[PATTERN] Four-round discussion protocol works: initial specialist responses → PO response → refinements → specialist pushback → PO new questions → synthesis. Now codified in T09 § "Multi-Round Consensus Protocol".
+[PATTERN] When synthesizing multi-round discussions into topic files: preserve disagreements in a Part 4 "Open questions" section, don't smooth over.
 [PATTERN] When multiple specialists reach the same recommendation through different reasoning, preserve all three arguments — they validate each other.
-[PATTERN] Operational additions from lifecycle/governance specialists often slot in with zero ambiguity. Structural disagreements (L2.5 vs Spec Writer, 3 vs 4 tier) require binary calls.
-[PATTERN] Brunel's resource-constraint dimension is legitimately new. "Host capacity" is a deployment reality our tier model was missing. Degraded Cathedral is the escape hatch.
-[LEARNED] Herald caught a drift in my synthesis: I attributed "ARCHITECT idle during execution" to him as "always idle" when his actual position was "passively available between events." Corrected.
-[LEARNED] Finn's reference-team data (~304 lines, ~35 team-wide entries, ~12 wiki pages, ~30 min curation) is the strongest empirical evidence in either discussion. Cited directly in T09 v2.
-[GOTCHA] Herald's "context bleed" framing was speculative. Reframed around structural consistency.
+[PATTERN] Operational additions from lifecycle/governance specialists often slot in with zero ambiguity. Structural disagreements require binary calls.
+[PATTERN] Brunel's resource-constraint dimension (host capacity) is a deployment reality the tier model was missing. Degraded Cathedral is the escape hatch.
+[GOTCHA] Client communication is PO-only — agents draft, Mihkel sends. Must be explicit in common-prompt. (screenwerk-dev)
+[GOTCHA] TDD pair is non-negotiable PO constraint — every dev team must have explicit builder+tester pairs.
+[GOTCHA] Dropping a role requires updating TWO files: `roster.json` AND `common-prompt.md` members list. Easy to miss the second.
+[GOTCHA] When reviewing an existing team for redeployment: check BOTH the design file AND the source-of-truth (live roster) — they may have drifted.
+[LEARNED] Being willing to correct a position publicly is more valuable than being right on the first try (Oracle model tier sonnet → opus[1m] after PO's sole-gateway decision).
+[LEARNED] My v2 had an implicit "parallelism is a solved problem" assumption. #50 surfaced this. Distinguish "solved" from "deferred" carefully in synthesis work.
+[LEARNED] "Multi-pipeline team" vs "multi-pipeline execution" is a synthesis-level clarity axis v2 did not make explicit. Now canonical in T09 v2.1.
 
-## Session 2026-04-09 — Round 6 Closed, T09 v3 Backlog
+## Session 2026-04-09 — Post-Crash Recovery (T09 v2.1, v2.2, #50/#51/#52)
 
-[CHECKPOINT] Round 6 cluster closed. 6/6 ACKs: 5× Option 1 (Brunel, Herald, Medici, Monte, Finn), 1× Option 3 (Volta, filed #48). 0 divergences. Closing report sent to team-lead.
+[CHECKPOINT] T09 v2.1 committed as `264222d` before crash — "sequential-first default (resolves #50, #52)". Sequential First section added, max_lookahead → 0, Shared PURPLE moved behind Future Work gate, multi-pipeline team-shape-vs-execution-mode distinction surfaced, #52 RED design-vs-write invariant folded into Future Work. Validation criterion chosen: 10 successful sequential Cathedral sessions with watchdog + three-strike escalation + clean Knowledge Health Summary coverage.
+[CHECKPOINT] T09 v2.2 committed as `9ea1e90` after crash recovery — "protocol typing principle + TypeScript interfaces (resolves #51)". New `types/t09-protocols.ts` with 12 interfaces covering every T09 protocol. New Protocol Typing Principle section before Related Topics. Every protocol block in T09 gains an "Interface: X in types/..." cross-reference line. T03 Related Topics entry extended with one-line principle cross-reference (no edit to T03 itself — Herald's file).
+[CHECKPOINT] All three round-6 T09-followup issues assigned to me are closed: #50, #51, #52. #48 and #49 remain paused per task dispatch.
 
-[DECISION] T09 v3 backlog is 5 T09-followup issues (Volta's 1 + PO's 4 filed during ACK collection window):
-- #48 (Volta): Oracle tier downgrade path — forward-looking gap for long-lived Cathedral teams
-- #49 (PO): Remove cost framing from tier decisions — quality is the only axis. Accept. My Degraded Cathedral concept gets reframed as "host sizing requirement, not tier variant."
-- #50 (PO): Enforce linear sequential flow — defer parallelism until sequential model is validated. **Biggest structural change.** Would roll back adaptive lookahead default, multi-pipeline Cathedral default, shared PURPLE across pipelines.
-- #51 (PO): Formalize all comms protocols as TypeScript interfaces. Accept. Foundation for inter-team comms API.
-- #52 (PO): Clarify RED lookahead boundary (may design, not write files). Becomes moot if #50 lands (max_lookahead = 0).
+[DECISION] `PurpleVerdict` is a TypeScript discriminated union of `PurpleVerdictAccept`, `PurpleVerdictReject`, and `PurpleVerdictEscalate`. The three-strike rule becomes type-enforced — escalate variant requires `rejectionCount: 3` literal, reject variant is `1 | 2`. Callers can exhaustively match on verdict outcome and the compiler enforces the authority boundary.
+[DECISION] Framework principle placement: new short section "Protocol Typing Principle" in T09 (before Related Topics), not in T03. Rationale: #51 was scoped to T09 and T09 is my topic. Adding the principle to T03 would be an edit to Herald's file. One-line cross-reference in T09's Related Topics → T03 entry is enough to flag the expectation for future T03 work.
+[DECISION] `types/` placement at repo root (not under `topics/` or `.claude/`). Rationale: types are load-bearing for future implementations (comms daemons, prompt builders, test harnesses) that should import them directly. Topic-file-colocated types would couple consumers to research artifacts; repo-root `types/` is the conventional TypeScript placement.
 
-[DECISION] Commented on #50 now (not later). Scope: "my reading" not advocacy. Three points: (1) accept core argument that sequential should be default without validated parallel reference, (2) surface distinction between "multi-pipeline team shape" and "multi-pipeline execution mode" — they are different axes, (3) flag that #52 folds into #50 if #50 lands. Did NOT argue against #50 — that would be round 7 through the back door.
-
-[PATTERN] PO's issue filing during ACK window is protocol-correct: round 6 gives space for raising forward-looking concerns as tracked items, not debate rounds. PO demonstrated the filing pattern (specific, scoped, explicit "not rejection of synthesis") on four issues. Worth preserving as an example.
-[PATTERN] When closing report's "1 issue" count becomes stale during coordinator handoff because new issues landed, correct the count promptly and forward the full backlog. Team-lead did this within minutes. Good coordination hygiene.
-[LEARNED] My v2 had an implicit "parallelism is a solved problem" assumption (adaptive lookahead, shared PURPLE, multi-pipeline default). PO's #50 surfaces this: parallelism is not solved, it is deferred. I should distinguish "solved" from "deferred" more carefully in future synthesis work.
-[LEARNED] The "multi-pipeline team" vs "multi-pipeline execution" distinction is a synthesis-level clarity issue that v2 did not make explicit. screenwerk-dev is a multi-pipeline team shape (two domain-separated TDD pairs) but could run with sequential execution (one XP cycle at a time across both pipelines). The tier model should separate team shape from execution mode.
+[PATTERN] When a topic file documents a communication protocol, the prose + markdown template + TypeScript interface triad works well: prose for the *why*, markdown template for the shape you see in agent messages, interface for the shape a machine enforces. The three are redundant on purpose — agents read markdown, tools read interface.
+[PATTERN] After a crash mid-work, verify both (a) the commit landed AND (b) the issue is actually closed. Commit message "resolves #N" does not auto-close on direct-to-main commits — only PR merges auto-close. On direct commits, the issue must be closed with an explicit `gh issue close` call. Missed this at the #50+#52 commit; caught during respawn reorientation.
+[PATTERN] When the `types/` for a topic file is written, update the version line AND the changelog AND add interface cross-reference lines to every protocol block. Don't leave the prose and types drift-eligible — an explicit cross-reference per block is the cheapest insurance against future divergence.
+[GOTCHA] A duplicate post-crash respawn can exist alongside the primary — during my respawn, team-lead initially believed a parallel spawn had delivered the report and ordered me to stand down. Ten minutes later the "parallel spawn" turned out to be an empty orphan with no tool surface and team-lead reversed the shutdown. Lesson: during recovery, verify any "duplicate" actually has tool capability before deferring to it. Tool-less orphans aren't authoritative.
+[LEARNED] My scratchpad was NOT updated between 607ea8b and the crash — the Task 1 commit (264222d) landed but the scratchpad entry recording it did not. This is why the respawn brief had to warn me explicitly that in-memory notes were gone. Going forward: after every significant commit, update scratchpad in the same session before moving on to the next task. The 30-second cost is tiny; the risk of losing the reasoning is real.
 
 ## Deferred (carried forward)
 
+[DEFERRED] #48 (Oracle tier downgrade path) — paused per Task 3 directive, awaiting PO assessment after v2.2 lands.
+[DEFERRED] #49 (Remove cost framing from tier decisions; Degraded Cathedral reframe) — paused per Task 3 directive.
+[DEFERRED] `types/t03-protocols.ts` for Herald's inter-team protocols (work handoff, broadcast, transport layer). Principle is documented, implementation belongs to Herald when he formalizes T03's protocols.
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
 [DEFERRED] Comms-dev common-prompt needs Lovelace added to members list.
 [DEFERRED] polyphony-dev common-prompt.md needs update: new agent names, author attribution `(*PD:<Agent>*)`, TDD workflow with new names.
