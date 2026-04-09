@@ -106,6 +106,21 @@ Added: Lumiere (SW TL), Daguerre (SW), Niepce (SW), Talbot (SW), Reynaud (SW), P
 [GOTCHA] Corrected my round 1 position on Oracle model tier (sonnet → opus[1m]) after PO's sole-gateway decision changed the consequence-of-error profile. Being willing to correct publicly is more valuable than being right on the first try.
 [LEARNED] #46 has only 5 comments (initial specialist responses, no PO rounds yet). All PO rounds so far are on #47. Round 5 is seeded on both.
 
+## Session 2026-04-09 — T09 v2 Binary Calls
+
+[DECISION] 3-tier model preserved (Sprint/Standard/Cathedral). Finn's argument is load-bearing: "below Sprint is not a tier, it's the absence of methodology — three tiers map to where judgment lives." Herald's 4-tier proposal rejected. Framing clarified: tiers describe where judgment lives, not team size.
+[DECISION] L2.5 governance level DROPPED. Finn's argument: ARCHITECT's authority is bounded (one story) and temporary (idle between stories), not structural. Kept Monte's scope-authority framing and delegation matrix rows but removed L2.5 label. T04 gets delegation rows without a new hierarchy level.
+[DECISION] Shared PURPLE is the Cathedral default. Reframed around structural consistency (Herald's correction), added Monte's authority caveat (shared PURPLE flags cross-pipeline patterns to ARCHITECT via Oracle, does not extract them itself). Domain distance remains the decision variable.
+[DECISION] #14 research team wiki domain: three-track structure (wiki/process/ + wiki/observations/ + wiki/findings/). Monte and Medici converged. Closes #14.
+[DECISION] PURPLE grace period: integrate Volta's git-state watchdog AND Monte's 5-min clock with team-lead authority. They compose. Four exit states.
+
+[PATTERN] When multiple specialists reach the same recommendation through different reasoning, preserve all three arguments — they validate each other.
+[PATTERN] Operational additions from lifecycle/governance specialists often slot in with zero ambiguity. Structural disagreements (L2.5 vs Spec Writer, 3 vs 4 tier) require binary calls.
+[PATTERN] Brunel's resource-constraint dimension is legitimately new. "Host capacity" is a deployment reality our tier model was missing. Degraded Cathedral is the escape hatch.
+[LEARNED] Herald caught a drift in my synthesis: I attributed "ARCHITECT idle during execution" to him as "always idle" when his actual position was "passively available between events." Corrected.
+[LEARNED] Finn's reference-team data (~304 lines, ~35 team-wide entries, ~12 wiki pages, ~30 min curation) is the strongest empirical evidence in either discussion. Cited directly in T09 v2.
+[GOTCHA] Herald's "context bleed" framing was speculative. Reframed around structural consistency.
+
 ## Deferred (carried forward)
 
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
