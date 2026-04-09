@@ -2,13 +2,20 @@
 
 ## Team
 
-- **Team name:** `raamatukoi-dev`
-- **Members:** manutius (coordinator), cassiodorus (ARCHITECT), jikji (RED/webstore), aldus (GREEN/webstore), erasmus (PURPLE/webstore), babbage (RED/rat-project), hypatia (GREEN/rat-project), khwarizmi (PURPLE/rat-project), bodley (oracle/librarian)
+- **Team:** raamatukoi-dev
 - **Mission:** Build quality infrastructure (tests, CI, linting) for Raamatukoi webstore and rat-project, then maintain through bug fixes and refactoring
-- **Pipeline tier:** Cathedral (separate PURPLEs — High domain distance)
-- **XP pipelines:**
-  - Webstore: Cassiodorus → Jikji (RED) → Aldus (GREEN) → Erasmus (PURPLE)
-  - Rat-project: Cassiodorus → Babbage (RED) → Hypatia (GREEN) → Khwarizmi (PURPLE)
+- **Deployment:** VPS container (TBD)
+- **Client:** Raamatukoi (Estonian bookstore, "Book Moth")
+- **Pipeline tier:** Cathedral (separate PURPLEs — High domain distance: different repos, different languages)
+
+### Members
+
+- manutius (coordinator), cassiodorus (ARCHITECT), jikji (RED/webstore), aldus (GREEN/webstore), erasmus (PURPLE/webstore), babbage (RED/rat-project), hypatia (GREEN/rat-project), khwarizmi (PURPLE/rat-project), bodley (oracle/librarian)
+
+### XP Pipelines
+
+- Webstore: Cassiodorus → Jikji (RED) → Aldus (GREEN) → Erasmus (PURPLE)
+- Rat-project: Cassiodorus → Babbage (RED) → Hypatia (GREEN) → Khwarizmi (PURPLE)
 - **Oracle:** Bodley (integration contracts, deployment, repo quirks)
 
 ## Workspace
@@ -17,7 +24,8 @@
 
 ```
 ~/workspace/tugigrupp/
-├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt
+├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki
+│   └── wiki/                        # Bodley's knowledge base
 ├── webstore/                        # submodule → Raamatukoi/webstore
 ├── rat-project/                     # submodule → Raamatukoi/rat-project
 └── docs/                            # team output
@@ -108,13 +116,7 @@ When writing tests that touch integration points, query Bodley first for the con
 
 ## XP Development Pipeline
 
-**Pipeline tier: Cathedral.** This team's entire mission is refactoring for quality — structural debt IS the problem being solved. Cathedral tier is triggered because (1) structural debt compounds irreversibly in both production repos, and (2) the team-lead cannot hold full refactoring context across two unrelated tech stacks.
-
-**Domain distance: High.** Different repos AND different languages (TypeScript vs Python). This means **separate PURPLEs** per pipeline.
-
-**Execution mode: Sequential (v2.1 default).** One pipeline runs at a time. The pipelines take turns at the cycle level.
-
-See `docs/tdd-pipeline.md` for the full XP cycle protocol, message types, and handoff procedures.
+**Cathedral tier, separate PURPLEs, sequential execution.** See design-spec §3 for full rationale. See `docs/tdd-pipeline.md` for the full XP cycle protocol, message types, and handoff procedures.
 
 ### The Cycle
 
@@ -149,13 +151,7 @@ See `docs/tdd-pipeline.md` for the full XP cycle protocol, message types, and ha
                         (3 strikes → escalate to ARCHITECT)
 ```
 
-### Key Rules
-
-1. **One test case at a time.** One write-lock holder at a time. Sequential handoff.
-2. **GREEN self-reports shortcuts.** The GREEN_HANDOFF message must include implementation notes — what's ugly, what was duplicated, what PURPLE should look at. This gives PURPLE context.
-3. **PURPLE has veto power.** Three consecutive rejections escalate to ARCHITECT for re-decomposition.
-4. **PURPLE submits patterns to Bodley at cycle completion.** Never mid-refactor.
-5. **Separate PURPLEs do not cross repos.** If Erasmus sees a cross-repo pattern, submit to Bodley — do not extract it.
+Full cycle details, message types, key rules, and PURPLE scope boundaries are in `docs/tdd-pipeline.md`.
 
 ## File Ownership (Temporal Ownership Model)
 

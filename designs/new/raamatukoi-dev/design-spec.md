@@ -1,10 +1,10 @@
 # Raamatukoi Tugigrupp — Design Spec
 
-**Team:** `raamatukoi-dev`
-**Mission:** Build quality infrastructure (tests, CI, linting) for the Raamatukoi webstore and rat-project repos, then maintain them through bug fixes and refactoring.
-**Deployment:** VPS container (TBD)
-**Client:** Raamatukoi (Estonian bookstore, "Book Moth")
-**Pipeline tier:** Cathedral (separate PURPLEs — High domain distance: different repos, different languages)
+- **Team:** `raamatukoi-dev`
+- **Mission:** Build quality infrastructure (tests, CI, linting) for the Raamatukoi webstore and rat-project repos, then maintain them through bug fixes and refactoring.
+- **Deployment:** VPS container (TBD)
+- **Client:** Raamatukoi (Estonian bookstore, "Book Moth")
+- **Pipeline tier:** Cathedral (separate PURPLEs — High domain distance: different repos, different languages)
 
 (*FR:Celes*)
 
@@ -56,7 +56,7 @@ Understanding these integration contracts is the Oracle's primary domain.
 
 ### Team Archetype
 
-**Development (maintenance variant)** — code output across two repos, with research needed to understand integration contracts. No new features — quality infrastructure and bug fixes only.
+**Development (maintenance variant)** — code output across two repos, with research needed to understand integration contracts.
 
 ### Data Flow
 
@@ -68,7 +68,8 @@ Agents work in submodules within [`Raamatukoi/tugigrupp`](https://github.com/Raa
 
 ```
 tugigrupp/
-├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt
+├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki
+│   └── wiki/                        # Bodley's knowledge base
 ├── webstore/                        # submodule → Raamatukoi/webstore
 ├── rat-project/                     # submodule → Raamatukoi/rat-project
 └── docs/                            # team output
@@ -111,22 +112,19 @@ This triggers **Cathedral tier**: ARCHITECT + RED + GREEN + PURPLE.
 
 ### XP Pipelines
 
-**Webstore pipeline:** Cassiodorus (ARCHITECT) → Jikji (RED) → Aldus (GREEN) → Erasmus (PURPLE)
-**Rat-project pipeline:** Cassiodorus (ARCHITECT) → Babbage (RED) → Hypatia (GREEN) → Khwarizmi (PURPLE)
+- **Webstore pipeline:** Cassiodorus (ARCHITECT) → Jikji (RED) → Aldus (GREEN) → Erasmus (PURPLE)
+- **Rat-project pipeline:** Cassiodorus (ARCHITECT) → Babbage (RED) → Hypatia (GREEN) → Khwarizmi (PURPLE)
 
 Pipelines execute **sequentially** (one at a time) per the v2.1 sequential-first default. The team-lead routes stories to ARCHITECT; ARCHITECT decomposes them into test plans; the appropriate pipeline executes the XP cycle.
 
 ### Model Rationale
 
-- **Manutius (opus):** Cross-repo coordination, PR reviews, story routing to ARCHITECT.
-- **Cassiodorus (opus):** ARCHITECT requires deep understanding of both codebases to decompose stories into testable sequences. Consequence of error: bad decomposition wastes entire cycles. Opus for judgment.
-- **Jikji (sonnet):** RED translates test plan items into test code. Execution role — verifiable by GREEN.
-- **Aldus (sonnet):** GREEN writes minimum implementation. Execution role — verifiable by tests.
-- **Erasmus (opus):** PURPLE refactors structure. Tests catch behavioral regression but NOT structural degradation. A sonnet can make tests pass while introducing duplication, God functions, and leaky abstractions. Opus prevents invisible, accumulating technical debt. Per T09: "The tests catch behavioral regression but not structural degradation."
-- **Babbage (sonnet):** RED for rat-project. Same rationale as Jikji.
-- **Hypatia (sonnet):** GREEN for rat-project. Same rationale as Aldus.
-- **Khwarizmi (opus):** PURPLE for rat-project. Same rationale as Erasmus — language-specific structural judgment for Python.
-- **Bodley (opus[1m]):** Oracle requires full context. Wrong integration knowledge cascades through both repos. No automated gate catches semantic errors in integration contracts.
+Per T09: "Opus handles the bookends, sonnet handles the volume."
+
+- **RED + GREEN (sonnet x4):** Execution roles. RED translates test plans into test code; GREEN writes minimum implementations. Both are verifiable by automated tests — low consequence of error.
+- **ARCHITECT + PURPLE (opus x3):** Judgment roles. ARCHITECT decomposes stories — bad decomposition wastes entire cycles. PURPLE refactors structure — tests catch behavioral regression but NOT structural degradation. Opus prevents invisible, accumulating technical debt.
+- **Team-lead (opus):** Cross-repo coordination, PR reviews, story routing.
+- **Oracle (opus[1m]):** Full-context knowledge curation. Wrong integration knowledge cascades through both repos. No automated gate catches semantic errors in integration contracts.
 
 ### Lore Theme: Pioneers of the Book
 
@@ -201,23 +199,50 @@ Raamatukoi means "Book Moth" — an Estonian bookstore. The team's mission is to
 
 **Owner:** Both XP pipelines (sequential — one at a time per v2.1)
 
-**Webstore pipeline:** Cassiodorus decomposes "set up test framework" into test plan → Jikji (RED) writes first test → Aldus (GREEN) configures runner + makes it pass → Erasmus (PURPLE) refactors test infrastructure for clean patterns
+**Webstore pipeline:**
 
-**Rat-project pipeline:** Cassiodorus decomposes "set up test framework" → Babbage (RED) writes first pytest → Hypatia (GREEN) configures pytest + makes it pass → Khwarizmi (PURPLE) refactors for clean fixture patterns + introduces ruff/mypy
+- Cassiodorus decomposes "set up test framework" into test plan
+- Jikji (RED) writes first test
+- Aldus (GREEN) configures runner + makes it pass
+- Erasmus (PURPLE) refactors test infrastructure for clean patterns
+
+**Rat-project pipeline:**
+
+- Cassiodorus decomposes "set up test framework"
+- Babbage (RED) writes first pytest
+- Hypatia (GREEN) configures pytest + makes it pass
+- Khwarizmi (PURPLE) refactors for clean fixture patterns + introduces ruff/mypy
 
 ### Stream 3: CI Pipeline (week 1-2)
 
 **Owner:** Both XP pipelines (sequential)
 
-**Webstore:** Cassiodorus decomposes CI setup → Jikji writes test for CI behavior → Aldus implements GitHub Actions → Erasmus reviews/refactors workflow structure
+**Webstore:**
 
-**Rat-project:** Cassiodorus decomposes CI setup → Babbage writes test for CI behavior → Hypatia implements GitHub Actions → Khwarizmi reviews/refactors workflow structure
+- Cassiodorus decomposes CI setup
+- Jikji writes test for CI behavior
+- Aldus implements GitHub Actions
+- Erasmus reviews/refactors workflow structure
+
+**Rat-project:**
+
+- Cassiodorus decomposes CI setup
+- Babbage writes test for CI behavior
+- Hypatia implements GitHub Actions
+- Khwarizmi reviews/refactors workflow structure
 
 ### Stream 4: Test Coverage Expansion (week 2-3)
 
 **Owner:** Both XP pipelines
 
-Full XP cycle per story: Cassiodorus decomposes → RED writes failing test → GREEN makes it pass → PURPLE refactors. Priority: integration points (Directo, PIM, RARA), then core business logic, then edge cases.
+Full XP cycle per story:
+
+- Cassiodorus decomposes
+- RED writes failing test
+- GREEN makes it pass
+- PURPLE refactors
+
+**Priority:** integration points (Directo, PIM, RARA), then core business logic, then edge cases.
 
 ### Stream 5: Knowledge Base (ongoing)
 
@@ -235,18 +260,7 @@ Full XP cycle per story: Cassiodorus decomposes → RED writes failing test → 
 
 ### Repo Structure
 
-**Team repo:** [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp) — the working directory for the team
-
-```
-tugigrupp/
-├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt
-├── webstore/                        # submodule → Raamatukoi/webstore
-├── rat-project/                     # submodule → Raamatukoi/rat-project
-└── docs/                            # team output
-    ├── test-plans/                  # ARCHITECT's test plan files
-    ├── integration/                 # Oracle's knowledge base
-    └── decisions/                   # Team-lead's ADRs
-```
+Workspace tree: see §2 Isolation Model.
 
 | Repo | Submodule path | Purpose | Access |
 |---|---|---|---|
@@ -270,44 +284,13 @@ tugigrupp/
 
 ## 6. Coordination Boundaries
 
-### File Ownership (Temporal Ownership Model)
+### File Ownership & PURPLE Scope
 
-Within each pipeline, agents hold the write-lock sequentially — one at a time. At any moment, exactly one agent writes. No merge conflicts, no partition table needed.
-
-| Domain | Write-lock holder | Coordination |
-|---|---|---|
-| `docs/test-plans/` (test plans) | Cassiodorus (ARCHITECT) | RED reads test plan, does not modify |
-| `webstore/__tests__/`, `webstore/*.test.*` | Jikji (RED) | Aldus reads tests to make them pass |
-| `webstore/src/`, `webstore/app/` (production code) | Aldus (GREEN) → Erasmus (PURPLE) | GREEN writes minimum; PURPLE refactors |
-| `rat-project/tests/` | Babbage (RED) | Hypatia reads tests to make them pass |
-| `rat-project/` (production code) | Hypatia (GREEN) → Khwarizmi (PURPLE) | GREEN writes minimum; PURPLE refactors |
-| `docs/integration/` | Bodley (Oracle) | Reference for all pipeline agents |
-| `docs/decisions/` | Manutius (Team-lead) | Architectural decision records |
-| `webstore/.github/workflows/`, `rat-project/.github/workflows/` | GREEN + PURPLE (within their pipeline) | CI config follows same temporal handoff |
-
-### PURPLE Scope Boundaries
-
-Per T09 v2.3:
-
-**PURPLE MAY:**
-
-- Rename local variables, extract private functions, restructure internal control flow
-- Eliminate duplication within a single module
-- Improve type signatures that do not change the public interface
-
-**PURPLE MAY NOT (must escalate to ARCHITECT):**
-
-- Change public interfaces (API surfaces, exported function signatures, database schemas)
-- Create new modules or files
-- Modify test files (RED's domain)
-- Delete code paths that are currently tested
-
-**Separate PURPLEs — no cross-pipeline authority.** Erasmus refactors webstore only. Khwarizmi refactors rat-project only. If either observes a pattern that would benefit both repos (e.g., a shared utility for Directo XML parsing), they submit it to Bodley (Oracle) as a cross-repo observation — they do not extract it themselves.
+**Temporal ownership model.** Within each pipeline, agents hold the write-lock sequentially — one at a time. No merge conflicts, no partition table needed. See common-prompt for the full file ownership table; see `docs/tdd-pipeline.md` for PURPLE scope boundaries.
 
 ### Integration Points
 
-1. **Directo ERP contract** — both webstore and rat-project interact with Directo. Bodley maintains the canonical documentation of the XML schema and field mappings. When any pipeline agent encounters Directo integration code, they query Bodley for semantic validation.
-2. **PIM/SKU contracts** — shared product identifiers. Bodley documents the format and consistency requirements. Both pipelines' tests should validate SKU format compliance where relevant.
+See §2 for the full list (Directo, PIM, SKU, RARA). Bodley maintains canonical documentation. Both pipelines query Bodley before touching integration code.
 
 ## 7. Deployment
 
