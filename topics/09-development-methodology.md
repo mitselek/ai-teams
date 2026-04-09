@@ -4,7 +4,7 @@ How development teams produce code and preserve the knowledge they generate. Syn
 
 (*FR:Celes*)
 
-**Version:** v2 (2026-04-09) — integrates round 5 feedback from Brunel, Finn, Herald, Medici, Monte, Volta. See [Changelog](#changelog) for binary calls and the reasoning behind them.
+**Version:** v2.1 (2026-04-09) — sequential-first default per PO directive on #50 and #52. Previous: v2 integrated round 5 feedback from Brunel, Finn, Herald, Medici, Monte, Volta. See [Changelog](#changelog) for binary calls and the reasoning behind them.
 
 ---
 
@@ -15,7 +15,9 @@ This topic defines two complementary systems that together shape how development
 1. **The XP Development Pipeline** — how code is produced: ARCHITECT decomposes stories, RED writes tests, GREEN implements, PURPLE refactors. Replaces the vague "both review for refactoring" pattern in earlier TDD pair designs.
 2. **The Oracle / Knowledge Base** — how the team's accumulated understanding is preserved, served, and measured. Solves the propagation gap: knowledge loss happens not at discovery but at propagation between agents and sessions.
 
-Both systems are **tiered** on the same axis: Sprint, Standard, and Cathedral. The tiers describe **where judgment lives** — Sprint keeps judgment in the developer, Standard adds a review gate, Cathedral delegates judgment to dedicated specialists. Each tier has a Brunel-style host-capacity constraint (see section on [Degraded Cathedral](#degraded-cathedral-resource-constrained-hosts)).
+Both systems are **tiered** on the same axis: Sprint, Standard, and Cathedral. The tiers describe **where judgment lives** — Sprint keeps judgment in the developer, Standard adds a review gate, Cathedral delegates judgment to dedicated specialists.
+
+**Sequential-first default (v2.1).** Until the sequential XP cycle has been validated in a deployed team, parallel execution modes (adaptive lookahead, multi-pipeline concurrent execution) are deferred to future work. Multi-pipeline *team shapes* (two or more domain-separated TDD pairs in one team) remain valid — the constraint is on *execution*, not on team composition. See [Sequential First — Parallel Execution Is Deferred](#sequential-first--parallel-execution-is-deferred) below for the validation criteria and the shape-vs-mode distinction.
 
 ---
 
@@ -26,6 +28,45 @@ Both systems are **tiered** on the same axis: Sprint, Standard, and Cathedral. T
 In all deployed and designed teams, the REFACTOR phase of TDD is the weakest link. REFACTOR is either absorbed into GREEN ("implements and cleans up"), vaguely assigned to "both partners review," or replaced by a separate reviewer who evaluates but does not rewrite. Nobody is accountable for structural improvement.
 
 The XP pipeline fixes this by adding two new roles (ARCHITECT and PURPLE) and distributing work across model tiers according to the consequence of error at each stage.
+
+### Sequential First — Parallel Execution Is Deferred
+
+**The XP pipeline is documented as a sequential state machine.** One test case at a time, one write-lock holder at a time, one cycle per pipeline. This is the current default, and it applies at every tier — Sprint, Standard, and Cathedral.
+
+Parallel execution modes — adaptive lookahead (RED writing T2 files while GREEN implements T1), concurrent multi-pipeline execution, and shared-PURPLE cross-pipeline pattern extraction — are **deferred to future work**. The design discussions that produced them are preserved (see [Future Work: Parallel Execution Mode](#future-work-parallel-execution-mode)), but they are not approved defaults until validation criteria are met.
+
+#### Team Shape vs. Execution Mode
+
+This distinction is load-bearing for the sequential-first default. **Multi-pipeline team shapes are valid and encouraged where applicable. Multi-pipeline execution mode is deferred.**
+
+| Concept | Definition | Status |
+|---|---|---|
+| **Multi-pipeline team shape** | A team with two or more domain-separated TDD pairs (e.g., screenwerk-dev with pipeline pair working on Node.js data transforms + player pair working on Vue composables). The pairs exist as separate team structures with separate agent rosters. | **Valid and encouraged** when domain separation justifies it. |
+| **Multi-pipeline execution mode** | Two or more XP pipeline instances (ARCHITECT + RED + GREEN + PURPLE quartets) running simultaneously — concurrent write-locks, concurrent PURPLE cycles, cross-pipeline authority handoffs. | **Deferred** until sequential model is validated. |
+
+A multi-pipeline team runs with sequential execution by having the pairs **take turns at the cycle level**: pipeline pair runs a full XP cycle, finishes, then player pair runs its cycle. No concurrent write-lock contention. No cross-pipeline authority dispute. The team shape is preserved; only the execution mode is constrained.
+
+**Why this matters:** Teams like screenwerk-dev stay valid Cathedral-tier configurations under the sequential-first default. The domain separation that justifies two pairs (different idioms, different files, independent work) does not require concurrent execution to justify itself — it requires distinct team structures, which the two-pair design provides.
+
+#### Validation Criteria for Unlocking Parallelism
+
+Parallel execution modes are unlocked when the sequential baseline has been validated. The validation criterion is:
+
+> **Ten successful sessions of a deployed Cathedral-tier team running pure sequential XP cycles** — with at least one mid-cycle shutdown handled cleanly by the watchdog protocol, at least one PURPLE three-strike escalation resolved through ARCHITECT re-decomposition, and a complete Knowledge Health Summary showing no structural pathologies (high churn, source concentration beyond 60%, or knowledge velocity inversion).
+
+Ten sessions is roughly two to four weeks of active development in a Cathedral-tier team. It is enough to accumulate real deployment experience across the failure modes the sequential model must handle, without being so many that "validation" becomes unreachable. The specific threshold is a judgment call — PO may adjust based on observed deployment behavior.
+
+When the criterion is met, the team lead flags it in a session report, PO approves the unlock, and the pipeline configuration may raise `max_lookahead > 0` and/or enable concurrent multi-pipeline execution. Unlocking is per-team, not framework-wide — one team's successful validation does not automatically unlock parallelism for other teams.
+
+#### What This Means for the Rest of Part 1
+
+The sections that follow document the full XP pipeline. Within that documentation:
+
+- **Temporal Ownership** (isolation model) remains as written — sequential handoff on a single branch is the foundation.
+- **Adaptive Lookahead** is preserved as design discussion but with `max_lookahead` default pinned to **0** until validation.
+- **Shared vs. Separate PURPLE** is preserved as design discussion but moved behind the Future Work gate.
+- **Team Composition Impact** shows both single-pipeline and multi-pipeline team shapes; multi-pipeline teams run with sequential execution by taking turns at the cycle level.
+- **RED lookahead boundary** (design vs. file writes, from round 6 issue #52) is documented in Future Work as the invariant RED must respect when parallelism is unlocked.
 
 ### The Cycle
 
@@ -237,24 +278,26 @@ In temporal ownership, agents write sequentially to the *same* files. At any mom
 - No worktree lifecycle overhead. No creation, cleanup, or stale pruning.
 - Throughput bounded by pipeline depth. Each stage must complete before the next starts.
 
-### Adaptive Lookahead (Volta, round 5)
+### Adaptive Lookahead (Volta, round 5) — Deferred
 
-RED can write the next test while GREEN implements the current one, as long as the test doesn't depend on GREEN's implementation shape. This is **lookahead**, and the depth should be **adaptive**, not static.
+> **Status: deferred until sequential validation criteria are met.** See [Sequential First — Parallel Execution Is Deferred](#sequential-first--parallel-execution-is-deferred). The design is preserved below as the target configuration once `max_lookahead > 0` is unlocked per-team.
 
-The team lead (or ARCHITECT) sets `max_lookahead` as an upper bound in pipeline configuration. The effective lookahead at any moment is determined by the rolling PURPLE rejection rate over the last 5 cycles:
+**Current default: `max_lookahead = 0` (pure sequential).** RED does not write test files while GREEN is executing. The write-lock rotates strictly: RED finishes T1, hands off to GREEN, GREEN implements T1, hands off to PURPLE, PURPLE refactors and commits, RED begins T2. One writer at any moment.
+
+**Deferred design: adaptive lookahead with rolling rejection rate.** Volta's round 5 proposal is preserved as future work. When parallelism is unlocked for a team, `max_lookahead` can be raised from 0 and the effective lookahead at any moment is determined by the rolling PURPLE rejection rate over the last 5 cycles:
 
 ```
 if rolling_rejection_rate < 10%:
     effective_lookahead = min(max_lookahead, 2)
 elif rolling_rejection_rate < 25%:
-    effective_lookahead = 1       # default
+    effective_lookahead = 1
 else:
-    effective_lookahead = 0       # sequential, no lookahead
+    effective_lookahead = 0       # sequential fallback
 ```
 
-**Default `max_lookahead = 1`** — Herald's original proposal. Teams with demonstrated low rejection rates can raise the ceiling. Teams with high rejection rates are automatically throttled to sequential execution, protecting in-flight work from repeated cancellation.
+Teams with demonstrated low rejection rates can raise the ceiling; teams with high rejection rates are automatically throttled back to sequential execution, protecting in-flight work from repeated cancellation.
 
-**Lookahead cancellation on first rejection: preserve.** When PURPLE rejects T1 for the first time, T2 lookahead work is preserved (the test may be valid independent of T1's shape). On a second rejection, ARCHITECT wakes up to review T1's state AND T2's test together (T2's assumptions may be contaminated by T1's rejected implementation). ARCHITECT decides whether T2 survives. This keeps the fast path fast and adds safety at the escalation point.
+**Lookahead cancellation on first rejection (future work).** When PURPLE rejects T1 for the first time, T2 lookahead work is preserved (the test may be valid independent of T1's shape). On a second rejection, ARCHITECT wakes up to review T1's state AND T2's test together (T2's assumptions may be contaminated by T1's rejected implementation). ARCHITECT decides whether T2 survives. This keeps the fast path fast and adds safety at the escalation point.
 
 ### Mid-Cycle Shutdown: Watchdog + Team Lead Authority
 
@@ -343,7 +386,9 @@ Brunel's round 5 contribution. The tier model assumes host capacity matches team
 
 The team lead takes on the PURPLE responsibility they would otherwise delegate. This reintroduces the bottleneck that motivates ARCHITECT in the first place, but it is better than either (a) pretending the codebase is Standard tier, or (b) blocking deployment until we get a bigger host. The team's design spec documents both the current state and the target state, so the upgrade path is recorded.
 
-### Shared vs. Separate PURPLE Across Pipelines
+### Shared vs. Separate PURPLE Across Pipelines — Deferred
+
+> **Status: deferred until sequential validation criteria are met.** See [Sequential First — Parallel Execution Is Deferred](#sequential-first--parallel-execution-is-deferred). Shared-PURPLE cross-pipeline pattern extraction is a *multi-pipeline execution mode* concern — it only matters when pipelines run concurrently. Under the sequential-first default, multi-pipeline teams run their pipelines one at a time, and a single PURPLE (or the team lead in Degraded Cathedral) handles refactoring for whichever pipeline currently holds the cycle. The discussion below is preserved as the target configuration once concurrent multi-pipeline execution is unlocked.
 
 Multi-pipeline teams face a choice: one shared PURPLE or one per pipeline?
 
@@ -378,17 +423,58 @@ Multi-pipeline teams face a choice: one shared PURPLE or one per pipeline?
 
 ### Team Composition Impact
 
-The pipeline changes how development teams are sized. For a two-pipeline team like screenwerk-dev:
+The pipeline changes how development teams are sized. **Team shape (how many pairs) is independent of execution mode (sequential vs parallel).** Under the sequential-first default, multi-pipeline teams run their pipelines one at a time — the pairs exist as distinct structures but take turns at the cycle level.
 
-| Configuration | Opus | Sonnet | Total |
-|---|---|---|---|
-| Current (no XP pipeline) | 3 (lead, pipeline builder, advisor) | 4 (testers, player builder, analyst) | 7 |
-| Standard tier (+ reviewer) | 3 | 5 | 8 |
-| Cathedral tier (+ ARCHITECT, shared PURPLE with caveat) | 5 | 4 | 9 |
-| Cathedral tier with separate PURPLEs (high distance only) | 6 | 4 | 10 |
-| Degraded Cathedral (resource-constrained host) | 4 | 4 | 8 (lead takes PURPLE responsibility) |
+For a two-pipeline team like screenwerk-dev (pipeline pair on Node.js data transforms, player pair on Vue composables — valid and encouraged multi-pipeline team shape):
 
-The cost increase is real. The tiered model ensures it is only paid when justified by the code's structural consequence AND the host can sustain it.
+| Configuration | Team shape | Execution mode | Opus | Sonnet | Total |
+|---|---|---|---|---|---|
+| Current (no XP pipeline) | 2 pairs | — | 3 (lead, pipeline builder, advisor) | 4 (testers, player builder, analyst) | 7 |
+| Standard tier (+ reviewer) | 2 pairs | Sequential (pairs take turns) | 3 | 5 | 8 |
+| Cathedral tier (ARCHITECT + shared PURPLE) | 2 pairs | **Sequential (current default)** | 5 | 4 | 9 |
+| Cathedral tier with separate PURPLEs | 2 pairs | **Parallel — deferred until validated** | 6 | 4 | 10 |
+| Degraded Cathedral (resource-constrained host) | 2 pairs | Sequential | 4 | 4 | 8 (lead takes PURPLE responsibility) |
+
+**Reading the table:** The current default for a screenwerk-dev-style Cathedral-tier team is row 3 — 2 pairs as the team shape, one shared PURPLE refactoring code for whichever pair currently holds the cycle, sequential execution across pairs. Row 4 (parallel execution, separate PURPLEs) becomes available only after the team has validated the sequential model per the [validation criteria](#validation-criteria-for-unlocking-parallelism).
+
+**The multi-pipeline team shape is preserved.** Teams are not flattened to single-pipeline configurations to fit the sequential-first default — domain separation (different idioms, different files, different agent rosters) remains a valid and encouraged reason to structure a team with two or more pairs. The pairs coordinate through the team lead and take turns at the XP cycle level.
+
+### Future Work: Parallel Execution Mode
+
+This section collects the parallel-execution design work from rounds 4 and 5 that is **deferred until sequential validation criteria are met**. The design is preserved here so that when a team's validation criteria unlock parallelism, the target configuration is already documented — no re-derivation is needed.
+
+**What is deferred:**
+- **Adaptive lookahead with `max_lookahead > 0`** (see [Adaptive Lookahead](#adaptive-lookahead-volta-round-5--deferred) section above)
+- **Concurrent multi-pipeline execution** — two or more XP pipeline instances advancing their cycles simultaneously
+- **Shared PURPLE cross-pipeline pattern extraction** (see [Shared vs. Separate PURPLE Across Pipelines](#shared-vs-separate-purple-across-pipelines--deferred) section above)
+- **`[PIPELINE-DISTANCE]` Oracle diagnostic** — only meaningful when shared PURPLE is active across concurrent pipelines
+
+**Validation criteria** (restated from [Sequential First](#validation-criteria-for-unlocking-parallelism)):
+
+> Ten successful sessions of a deployed Cathedral-tier team running pure sequential XP cycles — with at least one mid-cycle shutdown handled cleanly by the watchdog protocol, at least one PURPLE three-strike escalation resolved through ARCHITECT re-decomposition, and a complete Knowledge Health Summary showing no structural pathologies.
+
+**Unlocking is per-team, not framework-wide.** One team's successful validation does not automatically unlock parallelism for other teams. Each team demonstrates its own sequential baseline before raising its `max_lookahead` ceiling.
+
+#### Invariant to Respect When Parallelism Is Unlocked: RED Design vs File Writes
+
+Folded in from round 6 issue #52. When `max_lookahead > 0`, RED may work on the next test case while GREEN is executing the current one. The invariant:
+
+> **RED may design the next test case during GREEN's execution; RED must not write files to the working tree during GREEN's execution unless specifically tasked by ARCHITECT or team lead.**
+
+Specifically:
+
+| Allowed during GREEN's execution | Not allowed during GREEN's execution |
+|---|---|
+| Compose the next test case mentally | Commit test files to the working tree |
+| Draft test spec in scratchpad | Modify shared files |
+| Sketch acceptance criteria | Create new files in the test directory |
+| Query the Oracle for relevant test patterns | Stage or push any changes |
+
+**Transition:** Once GREEN signals `GREEN_HANDOFF` to PURPLE, the write lock rotates through PURPLE and back to RED. RED can commit the designed test file only after PURPLE releases the write lock (via `PURPLE_VERDICT: ACCEPT` with commit or `CYCLE_COMPLETE`).
+
+**Rationale.** This preserves Volta's adaptive lookahead concept — RED's design work reduces time-to-next-test-commit — without violating temporal ownership's "one write-lock holder at a time" invariant. Design is cognitive work that does not touch the working tree; commits are file work that does. The invariant distinguishes them.
+
+**This invariant only activates when parallelism is unlocked.** Under the current sequential-first default (`max_lookahead = 0`), RED simply waits for the cycle to complete before starting T2. The invariant is documented here so that when validation criteria are met and a team raises its `max_lookahead`, the RED prompt can reference this section as the authoritative statement of what "lookahead" is allowed to do.
 
 ---
 
@@ -1140,6 +1226,34 @@ The multi-round protocol works because (a) specialists form independent position
 ---
 
 ## Changelog
+
+### v2.1 (2026-04-09) — Sequential First Default (resolves #50 and #52)
+
+PO directive after round 6 ACK: "Multi-pipeline team shape is encouraged where applicable. Just avoid Multi-pipeline execution mode." This reverses one v2 binary call and clarifies another, without restructuring the document.
+
+**Reversal:**
+
+- **v2 binary call #3 (Shared PURPLE is Cathedral default)** is **deferred**, not reversed. The design discussion is preserved verbatim, now marked "Status: deferred until sequential validation criteria are met" and moved behind the new "Future Work: Parallel Execution Mode" gate at the end of Part 1. The round 5 convergence reasoning (Herald / Finn / Brunel / Monte) stands as the target configuration; it just is not the current default.
+- **Default `max_lookahead` changes from 1 to 0.** Adaptive lookahead design is preserved as future work. Teams run pure sequential XP cycles until their individual validation criterion is met.
+
+**Clarification:**
+
+- **Team shape vs execution mode** is now an explicit distinction in Part 1. Multi-pipeline teams (like screenwerk-dev with pipeline pair + player pair) remain valid Cathedral configurations — the pairs run *sequentially*, taking turns at the XP cycle level. "Multi-pipeline" in v2 conflated team structure with concurrency; v2.1 separates them. This was the distinction I surfaced in my round 6 comment on #50, and PO adopted it as the resolution.
+- **Sequential-first framing** gets its own section at the top of Part 1 ([Sequential First — Parallel Execution Is Deferred](#sequential-first--parallel-execution-is-deferred)) with the validation criterion: ten successful sessions of a deployed Cathedral-tier team running pure sequential XP cycles, with at least one mid-cycle shutdown handled by the watchdog, at least one PURPLE three-strike resolved through ARCHITECT re-decomposition, and a clean Knowledge Health Summary. The specific N=10 is a judgment call and may be adjusted by PO.
+
+**Folded in (resolves #52):**
+
+- **RED design vs file writes invariant** — from issue #52. Folded into the Future Work section as the invariant RED must respect when parallelism is unlocked. Under the current sequential-first default, RED simply waits for cycle completion before starting T2, so the invariant is dormant; it activates when a team's validation criteria unlock `max_lookahead > 0`.
+
+**What did NOT change in v2.1:**
+
+- The four-part structure (XP Pipeline / Oracle / Interaction / Open Questions + Future Work).
+- Single-pipeline Cathedral-tier configuration, ARCHITECT role, PURPLE scope boundary, three-strike escalation, temporal ownership, mid-cycle shutdown watchdog, dual-hub topology, Oracle role, four capabilities, Callimachus lore, three-track wiki for research teams, opus[1m] model tier, or any other v2 binary call except the shared-PURPLE default (deferred) and `max_lookahead = 1` default (now 0).
+- The Degraded Cathedral tier, which is governed by issue #49 (quality-only axis reframing) and is explicitly **out of scope** for v2.1. The section remains as in v2 until #49 is addressed.
+
+**Paused issues (not addressed in v2.1):** #48 (Oracle tier downgrade path) and #49 (cost framing removal) are paused pending PO assessment after v2.1 + the #51 TypeScript interfaces work land.
+
+**Commit:** this v2.1 commit references #50 and #52.
 
 ### v2 (2026-04-09) — Round 5 Integration
 
