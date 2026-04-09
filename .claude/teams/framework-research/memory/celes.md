@@ -121,6 +121,24 @@ Added: Lumiere (SW TL), Daguerre (SW), Niepce (SW), Talbot (SW), Reynaud (SW), P
 [LEARNED] Finn's reference-team data (~304 lines, ~35 team-wide entries, ~12 wiki pages, ~30 min curation) is the strongest empirical evidence in either discussion. Cited directly in T09 v2.
 [GOTCHA] Herald's "context bleed" framing was speculative. Reframed around structural consistency.
 
+## Session 2026-04-09 — Round 6 Closed, T09 v3 Backlog
+
+[CHECKPOINT] Round 6 cluster closed. 6/6 ACKs: 5× Option 1 (Brunel, Herald, Medici, Monte, Finn), 1× Option 3 (Volta, filed #48). 0 divergences. Closing report sent to team-lead.
+
+[DECISION] T09 v3 backlog is 5 T09-followup issues (Volta's 1 + PO's 4 filed during ACK collection window):
+- #48 (Volta): Oracle tier downgrade path — forward-looking gap for long-lived Cathedral teams
+- #49 (PO): Remove cost framing from tier decisions — quality is the only axis. Accept. My Degraded Cathedral concept gets reframed as "host sizing requirement, not tier variant."
+- #50 (PO): Enforce linear sequential flow — defer parallelism until sequential model is validated. **Biggest structural change.** Would roll back adaptive lookahead default, multi-pipeline Cathedral default, shared PURPLE across pipelines.
+- #51 (PO): Formalize all comms protocols as TypeScript interfaces. Accept. Foundation for inter-team comms API.
+- #52 (PO): Clarify RED lookahead boundary (may design, not write files). Becomes moot if #50 lands (max_lookahead = 0).
+
+[DECISION] Commented on #50 now (not later). Scope: "my reading" not advocacy. Three points: (1) accept core argument that sequential should be default without validated parallel reference, (2) surface distinction between "multi-pipeline team shape" and "multi-pipeline execution mode" — they are different axes, (3) flag that #52 folds into #50 if #50 lands. Did NOT argue against #50 — that would be round 7 through the back door.
+
+[PATTERN] PO's issue filing during ACK window is protocol-correct: round 6 gives space for raising forward-looking concerns as tracked items, not debate rounds. PO demonstrated the filing pattern (specific, scoped, explicit "not rejection of synthesis") on four issues. Worth preserving as an example.
+[PATTERN] When closing report's "1 issue" count becomes stale during coordinator handoff because new issues landed, correct the count promptly and forward the full backlog. Team-lead did this within minutes. Good coordination hygiene.
+[LEARNED] My v2 had an implicit "parallelism is a solved problem" assumption (adaptive lookahead, shared PURPLE, multi-pipeline default). PO's #50 surfaces this: parallelism is not solved, it is deferred. I should distinguish "solved" from "deferred" more carefully in future synthesis work.
+[LEARNED] The "multi-pipeline team" vs "multi-pipeline execution" distinction is a synthesis-level clarity issue that v2 did not make explicit. screenwerk-dev is a multi-pipeline team shape (two domain-separated TDD pairs) but could run with sequential execution (one XP cycle at a time across both pipelines). The tier model should separate team shape from execution mode.
+
 ## Deferred (carried forward)
 
 [DEFERRED] Remaining FR specialist gaps: Isolation Analyst, Identity/Security Designer, Safety Architect, Observability Designer.
