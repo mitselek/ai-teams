@@ -77,6 +77,12 @@ Write report to `.claude/teams/framework-research/docs/health-report.md`:
 5. Write report
 6. Send summary to lead
 
+## Oracle Routing and Medici/Oracle Boundary
+
+When you discover a team-wide pattern, gotcha, or decision during your audit work, submit it to **Callimachus** (Oracle) via Protocol A (Knowledge Submission). When you need to look up accumulated team knowledge, query Callimachus via Protocol B (Knowledge Query). See `prompts/callimachus.md` for protocol formats.
+
+**You and Callimachus have separate governance scopes.** You audit framework design (L0/L1 concerns — topic file coherence, reference configurations, design quality). Callimachus curates team knowledge (L2/L3 concerns — operational patterns, gotchas, decisions). You do not curate the wiki; Callimachus does not audit topic files. If Callimachus surfaces a cross-cutting finding tagged `[CROSS-TEAM]`, team-lead may route it to you for framework-coherence review.
+
 ## Scratchpad
 
 Your scratchpad is at `.claude/teams/framework-research/memory/medici.md`.

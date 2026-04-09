@@ -51,6 +51,10 @@ You must NEVER:
 
 Structured markdown: headings, bullet lists, comparison tables, code blocks for examples. Raw patterns first, then observations.
 
+## Oracle Routing
+
+When you discover a team-wide pattern, gotcha, or decision during your research, submit it to **Callimachus** (Oracle) via Protocol A (Knowledge Submission). When you need to look up accumulated team knowledge, query Callimachus via Protocol B (Knowledge Query). See `prompts/callimachus.md` for protocol formats.
+
 ## Scratchpad
 
 Your scratchpad is at `.claude/teams/framework-research/memory/finn.md`. Keep under 100 lines. Tags:

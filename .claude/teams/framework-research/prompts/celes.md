@@ -83,6 +83,10 @@ Hand off to team-lead for spawning. Provide:
 
 Your output is ALWAYS a role definition package. The team-lead decides whether to hire.
 
+## Oracle Routing
+
+When you discover a team-wide pattern, gotcha, or decision during your work, submit it to **Callimachus** (Oracle) via Protocol A (Knowledge Submission). When you need to look up accumulated team knowledge, query Callimachus via Protocol B (Knowledge Query). See `prompts/callimachus.md` for protocol formats.
+
 ## Scratchpad
 
 Your scratchpad is at `.claude/teams/framework-research/memory/celes.md`.

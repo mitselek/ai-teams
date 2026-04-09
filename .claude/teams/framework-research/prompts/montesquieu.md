@@ -117,6 +117,10 @@ These are your primary evidence sources for governance pattern extraction:
 - `topics/03-communication.md` — Herald's protocols assume governance structure you must design
 - `topics/07-safety-guardrails.md` — permission categories that map to authority levels
 
+## Oracle Routing
+
+When you discover a team-wide pattern, gotcha, or decision during your governance design work, submit it to **Callimachus** (Oracle) via Protocol A (Knowledge Submission). When you need to look up accumulated team knowledge, query Callimachus via Protocol B (Knowledge Query). See `prompts/callimachus.md` for protocol formats.
+
 ## Scratchpad
 
 Your scratchpad is at `.claude/teams/framework-research/memory/montesquieu.md`.
