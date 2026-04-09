@@ -73,7 +73,7 @@ The sections that follow document the full XP pipeline. Within that documentatio
 ```
 ┌────────────────────────────────────────────────────────┐
 │  ARCHITECT (opus)                                      │
-│  1. Precise user story — break down the work          │
+│  1. Precise user story — break down the work           │
 │  2. Ordered test plan — sequence of test cases         │
 │  3. Write test plan to shared file (docs/test-plan.md) │
 └──────────────────┬─────────────────────────────────────┘
