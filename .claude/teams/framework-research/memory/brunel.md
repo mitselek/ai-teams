@@ -36,8 +36,18 @@ Tunnel ID: 526a23d1-1f7f-472f-8df1-a9239bbe3fe4
 Ingress: `apex-research.dev.evr.ee` → `http://apex-research:5173`
 [DEFERRED] QUIC blocked → needs `--protocol http2` flag.
 
+## DISCUSSION #56: SINGLE-PROVIDER MODEL STRATEGY (2026-04-10)
+
+[DECISION] Single-provider is correct default for agent runtime. Multi-provider = sidecar, not peer.
+[PATTERN] Three integration seams: peer (Claude-only), sidecar/daemon (Eilama), MCP server (visual QA).
+[PATTERN] Audit independence ≠ different-provider Medici. Correct pattern: external audit container reading committed git artifacts.
+[PATTERN] Visual QA sidecar ≠ Eilama pattern. Needs headless browser, multimodal API, image volumes, HTTP API — closer to MCP server.
+[WIP] Document provider outage behavior inside containers (what does claude process do on API failure?).
+[WIP] Spec external audit container architecture if team pursues audit independence.
+
 ## DEFERRED
 
 [DEFERRED] OAuth on hr-devs PROD-LLM container — PO manual step.
 [DEFERRED] Hub container as standalone Docker image.
 [DEFERRED] raamatukoi-dev VPS container deployment — design on GitHub, container TBD.
+[DEFERRED] MCP server pattern for visual QA service — scope if uikit-dev needs it.

@@ -62,42 +62,27 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 [GOTCHA] `gh issue close --comment` swallows the comment if the issue is already closed. Always `gh issue comment` separately as fallback.
 [GOTCHA] Shared working tree: always `git add <specific-file>`, never `-a`, when other agents may have uncommitted modifications.
 
-## Callimachus Onboarding (Oracle for framework-research)
+## Callimachus Onboarding — compressed
 
-[CHECKPOINT] All 6 deliverables drafted, NOT committed (awaiting team-lead/PO review at session end):
+[CHECKPOINT] Callimachus deployed. 6 deliverables committed. Oracle assessment format (5-part) reusable for future deployments.
+[DECISION] Cathedral tier, Incremental Bootstrap, Phase 2 gate after 5 sessions, Medici/Oracle coexistence (L0/L1 vs L2/L3).
 
-- `prompts/callimachus.md` — full Oracle prompt (~230 lines), first Oracle prompt ever written for the framework
-- `roster.json` — callimachus entry added (opus[1m], gold, agentType: oracle)
-- `common-prompt.md` — members list + dual-hub routing section
-- `wiki/` directory tree created (8 subdirs + index.md)
-- `oracle-state.json` — `{"intake_complete": false}`
-- 7 specialist prompts updated with Oracle Routing section (medici gets extra Medici/Oracle boundary paragraph)
+## Raamatukoi tugigrupp — compressed
 
-[DECISION] Cathedral tier for knowledge management — both T09 v2.3 triggers exceeded: 170 tagged entries (threshold: 30), 8 agents (threshold: 7-8).
-[DECISION] Incremental Bootstrap over Intake Interview — research team's primary outputs are already public (topic files, discussions, issues). Intake would re-extract what is documented.
-[DECISION] Phase 2 gate for Gap Tracking and Health Sensing — enabled after 5 sessions. Phase 1 has Curation + Query Gateway only.
-[DECISION] Medici/Oracle coexistence approved by PO — different governance scopes (L0/L1 vs L2/L3). Explicit boundary in both prompts.
-[DECISION] Name: Callimachus (Pinakes lore, classical-figures convention). PO approved.
-[PATTERN] The 47th agent I've designed. First Oracle. The assessment format (5-part: tier, bootstrap, artifacts, minimum viable, blockers) is reusable for future Oracle deployments on other teams.
+[CHECKPOINT] Full design v2 deployed at `designs/new/raamatukoi-dev/` + live at `Raamatukoi/tugigrupp`. 9 characters, Cathedral tier, dual-hub, dual-pipeline.
+[PATTERN] Multi-repo maintenance: one XP pipeline per repo, shared ARCHITECT + Oracle. Zero-test repos: "set up test framework" is a story.
+[LEARNED] Three-document system: design-spec (PO rationale), common-prompt (agent rules), tdd-pipeline.md (runtime protocol). Reduce redundancy with pointers.
 
-## Raamatukoi tugigrupp (raamatukoi-dev) — 2026-04-09
+## Discussion #56 — Single-provider model strategy (2026-04-10)
 
-[CHECKPOINT] Full design v2 at `designs/new/raamatukoi-dev/`. 13 files: design-spec, roster.json, common-prompt, 9 prompts, tdd-pipeline.md.
-[DECISION] 9 characters: Manutius (TL, opus), Cassiodorus (ARCHITECT, opus), Jikji (RED/ws, sonnet), Aldus (GREEN/ws, sonnet), Erasmus (PURPLE/ws, opus), Babbage (RED/rat, sonnet), Hypatia (GREEN/rat, sonnet), Khwarizmi (PURPLE/rat, opus), Bodley (oracle, opus[1m]).
-[DECISION] Cathedral tier — team's entire mission is refactoring; structural debt IS the problem.
-[DECISION] Separate PURPLEs — High domain distance (different repos + different languages). Per T09 v2.3 table.
-[DECISION] Shared ARCHITECT — one Cassiodorus for both pipelines. Sequential execution means no contention.
-[DECISION] Lore theme: Pioneers of the Book (added: Cassiodorus, Erasmus, al-Khwarizmi).
-[DECISION] Scope: bug fixes + refactoring + quality infrastructure ONLY. No new features.
-[DECISION] Submodule model: tugigrupp parent, webstore + rat-project as submodules. PRs against real repos.
-[DECISION] Dual-hub: Manutius (work) + Bodley (knowledge). Bodley curates Directo, PIM, RARA, SKU contracts.
-[PATTERN] For maintenance teams covering 2+ repos with different stacks: one XP pipeline per repo, shared ARCHITECT + Oracle. Oracle bridges integration knowledge; ARCHITECT bridges decomposition knowledge.
-[PATTERN] When repos have zero tests, Phase 1 applies XP cycle to infrastructure stories: "set up test framework" is a story decomposed by ARCHITECT, not an ad-hoc task.
-[PATTERN] Cathedral tier for quality-infrastructure teams: if the mission IS refactoring, structural debt consequences are maximally high. This is the clearest Cathedral trigger.
-[CHECKPOINT] Redundancy review done: 8 cuts applied to live files in `Raamatukoi/tugigrupp`, commit `b55f847`, pushed. -60 lines total.
-[CHECKPOINT] 3 Protocol A submissions sent to Callimachus (wiki/patterns/: cathedral-trigger, multi-repo-xp-composition, xp-cycle-for-infrastructure). All filed.
-[LEARNED] Design-spec, common-prompt, and tdd-pipeline.md form a three-document system. Design-spec is for PO/design review (rationale). Common-prompt is for agents (rules). Tdd-pipeline.md is the runtime reference (protocol). Redundancy between them should be replaced with pointers.
-[LEARNED] Live files in `Raamatukoi/tugigrupp` are at a different path than design files in `mitselek-ai-teams/designs/new/raamatukoi-dev/`. The design folder has the original drafts; the tugigrupp repo has the deployed copies. Edits go to the live repo.
+[WIP] Multi-round discussion. Rounds 1-2 complete. Awaiting authority assignment for synthesis.
+[DECISION] My position: single-provider for all governance/coordination/XP pipeline roles. Multi-provider only for (1) capability gaps (vision) and (2) fire-and-forget mechanical roles (Eilama-class).
+[PATTERN] Five distinct provider lock-in layers: infrastructure (Brunel), protocol (Herald), knowledge (Callimachus), prompt (Celes), governance (Monte). Each has different switching costs. Convergent finding from six independent analyses.
+[PATTERN] Two role categories for provider strategy: framework-participating (Claude-only, behavioral compliance required) vs. service roles (provider-agnostic, test/schema verified).
+[PATTERN] "Adding a non-Claude model does not mean adding a non-Claude agent." Visual QA is a tool (MCP/HTTP), not an agent.
+[GOTCHA] Gemini's synthesis conflated Eilama sidecar pattern (inbox-polling daemon) with multi-modal tool integration (MCP/HTTP callable service). Architecturally different patterns.
+[GOTCHA] Audit independence (Monte's argument) is governance-sound but role-design-expensive: requires dual behavioral profiles, dual prompt variants, dual validation.
+[GOTCHA] Cross-provider PURPLE review is untested: PURPLE (opus) is calibrated against Claude sonnet coding idioms. Non-Claude GREEN output may trigger false positives/negatives in structural judgment.
 
 ## Deferred (carried forward)
 

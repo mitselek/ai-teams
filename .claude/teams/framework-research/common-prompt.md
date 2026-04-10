@@ -78,7 +78,7 @@ This team has two communication hubs:
 
 **Knowledge submissions go directly to Callimachus, NOT through team-lead.** Work reports go to team-lead as before. These are separate reporting lines.
 
-Protocol formats are documented in `prompts/callimachus.md` and typed in `types/t09-protocols.ts`.
+Protocol formats are documented in `prompts/callimachus.md` and typed in [`types/t09-protocols.ts`](https://github.com/mitselek/ai-teams/blob/main/types/t09-protocols.ts).
 
 ## Shutdown Protocol
 

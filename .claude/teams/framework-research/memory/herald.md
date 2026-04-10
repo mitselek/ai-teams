@@ -1,5 +1,25 @@
 # Herald Scratchpad
 
+## 2026-04-10 (session R12 — Discussion #56: single-provider model strategy)
+
+[CHECKPOINT] Discussion #56 — Round 1 and Round 2 complete. Discussion paused before authority assignment.
+
+[DECISION] Single-provider is a protocol-level design requirement, not just a convenience. Protocols (T03, T09) assume behavioral homogeneity — same pragmatic competence, same format compliance, same authority boundary interpretation. Multi-provider introduces protocol interpretation variance that is untestable in advance and undetectable until failure.
+
+[PATTERN] "Protocol interpretation variance" — the key risk of multi-provider. Different models have different tendencies around: format compliance (field interpretation), authority boundaries (cautious vs liberal), message relay fidelity (paraphrasing vs verbatim), and structured ACK generation. These differences are invisible until a protocol failure occurs, and then add "provider mismatch" as an additional debugging hypothesis.
+
+[PATTERN] Test-gated roles (RED/GREEN) are lowest-risk for multi-provider but not zero-risk. The risk is in GREEN_HANDOFF message quality (implementation notes that PURPLE uses for review calibration), not in code output. Binary test gates verify code correctness but not handoff message quality.
+
+[DECISION] Contract enforcement gap identified: the framework has no mechanism for defining, testing, or enforcing protocol compliance for non-Claude participants. Prompt-based enforcement and peer enforcement (T07 E1) do not apply to sidecars. An API contract layer (formal message specs, format validation, error state handling) is the prerequisite for scaling beyond Eilama's single-contract pattern.
+
+[PATTERN] Cross-provider audit independence (Montesquieu/Gemini) is governance-motivated but protocol-infeasible. A non-Claude Medici would need to interpret Claude-specific artifacts (inbox format, scratchpad conventions, behavioral baselines). False positives from provider-specific interpretation differences would masquerade as detected pathology.
+
+[LEARNED] Gemini's synthesis was competent but made three errors from Herald's perspective: (1) promoted audit independence from question to recommendation without protocol cost analysis, (2) conflated "test-gated" with "safe for multi-provider" (missing GREEN_HANDOFF quality), (3) omitted sequential-first constraint and debugging ambiguity tax entirely.
+
+[LEARNED] Team convergence on Discussion #56 was remarkably strong across 6 independent assessments. All agreed: single-provider default, Eilama/sidecar pattern for exceptions, test-gated execution as lowest-risk multi-provider niche. Divergence was in emphasis: Brunel on containers, Callimachus on knowledge layer, Celes on prompt library, Monte on governance, Finn on empirics, Herald on protocol compliance.
+
+[DEFERRED] Contract enforcement layer design — formal API contract specification for non-Claude participants. This is my domain (protocol design) and the natural next step if multi-provider ever advances beyond Eilama.
+
 ## 2026-04-09 (session R11 — rounds 4-5)
 
 [CHECKPOINT] R11 is wrapping with T09 synthesis by Celes: `topics/09-development-methodology.md`. My protocol work (four XP message types, three-strike escalation, three Librarian protocols, gap stubs, dual-hub topology, three-layer staleness net) preserved verbatim or with minimal editorial drift. T09 is structured exactly as I proposed: Part 1 (XP) + Part 2 (Oracle) + Part 3 (intersection) + Part 4 (open questions).
