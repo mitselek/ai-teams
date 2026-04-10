@@ -42,9 +42,10 @@ On every session start, read these files in this exact order:
 | 1 | **This file** (`startup.md`) | Paths, procedures, gotchas for this installation |
 | 2 | `roster.json` | Team members, models, roles |
 | 3 | `common-prompt.md` | Mission, communication rules, shutdown protocol |
-| 4 | `memory/team-lead.md` | Your prior session's decisions, WIP, warnings |
+| 4 | `prompts/aeneas.md` | Team-lead role, scope, coordination rules |
+| 5 | `memory/team-lead.md` | Your prior session's decisions, WIP, warnings |
 
-After these 4 reads, you know everything you need to execute the startup protocol. Zero exploration required.
+After these 5 reads, you know everything you need to execute the startup protocol. Zero exploration required.
 
 ## Startup Procedure
 

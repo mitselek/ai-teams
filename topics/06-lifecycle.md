@@ -358,6 +358,119 @@ Each agent, on receiving shutdown:
 
 **Expected outcome:** All agent processes terminated. Team lead is the only active process.
 
+#### Phase 3a: PURPLE grace period watchdog (_FR:Volta_ — 2026-04-09, from T09 v2)
+
+**Applies to:** Cathedral-tier teams running the XP development pipeline (T09). PURPLE (the Refactorer) may be mid-refactor when shutdown arrives, with tests temporarily broken while it migrates call sites. The standard `teammate_terminated` wait is insufficient — a naive wait risks hanging the shutdown indefinitely, and a naive timeout risks corrupting the working tree.
+
+**This subsection extends Phase 3 for PURPLE only.** All other agents follow the standard Phase 3 wait. PURPLE enters this state machine instead.
+
+**Spec source:** [T09 v2 "Mid-Cycle Shutdown: Watchdog + Team Lead Authority"](09-development-methodology.md). This amendment is faithful propagation from T09 into T06 — no new design decisions.
+
+##### The composed model
+
+Three round-5 contributions compose into one mechanism:
+
+1. **Git-state watchdog (Volta).** The watchdog monitors the git working tree, not wall-clock time. Polling every 10 seconds. A PURPLE that has not changed any files in 60 seconds is either done or stuck — both warrant action. A PURPLE that is actively modifying files is doing work, regardless of how long it takes.
+2. **5-minute soft boundary (Monte).** Inside 5 minutes from the shutdown request, PURPLE holds sovereignty over its atomic commit. At the 5-minute mark, team-lead termination authority activates and decides based on watchdog state.
+3. **`[DEFERRED-REFACTOR]` Oracle handoff (Medici).** Before PURPLE reverts uncommitted work, it submits the intended refactoring to the Oracle as a `[DEFERRED-REFACTOR]` entry — a description of what PURPLE was trying to do and why. The next session's PURPLE queries this entry and resumes from the reverted state. Memory bridge across the revert, not a replacement for the watchdog.
+
+##### Watchdog trigger
+
+After the team lead sends `shutdown_request` to PURPLE, the team lead begins polling git state every 10 seconds:
+
+```bash
+# Per-poll checks (run every 10 seconds after shutdown_request sent to PURPLE):
+MODIFIED_FILES=$(git status --short | wc -l)
+NEW_COMMITS=$(git log --since="$SHUTDOWN_REQUEST_TIME" --oneline | wc -l)
+```
+
+The poll does not wait on PURPLE; it observes the working tree independently. PURPLE may be idle, thinking, or mid-commit — the watchdog only cares what the tree shows.
+
+##### Four exit states
+
+| State | Signal | Action | Authority |
+|---|---|---|---|
+| **Clean exit** | `shutdown_approved` received (any time before 5-minute boundary) | Proceed with standard Phase 3 wait for `teammate_terminated`, then Phase 4. | PURPLE |
+| **Atomic commit completed** | Working tree clean AND ≥1 new commit since `shutdown_request`, but no `shutdown_approved` yet | Wait 30 seconds for `shutdown_approved`. If still not received, force-terminate cleanly (PURPLE finished its refactoring but got stuck on the shutdown handshake). | PURPLE |
+| **Hung** | Working tree unchanged for 60 seconds AND no new commits since `shutdown_request` | `git reset --hard HEAD` to revert any uncommitted changes. Force-terminate PURPLE. Next session's PURPLE starts from HEAD. | Team lead (via watchdog) |
+| **Stuck mid-refactor** | Files changing but no commits after 3 minutes | Team lead intervenes: either extend the grace period once (give PURPLE another 2 minutes) or force-revert if the changes look incoherent. Case-by-case judgment, not automated. | Team lead |
+
+**Why 60 seconds for the unchanged-files check.** An actively refactoring PURPLE touches files within any 60-second window. A PURPLE that has stopped touching files is either done (waiting to send `shutdown_approved`) or hung. Sixty seconds distinguishes these from momentary pauses (reading a file, planning a rename) without wasting shutdown time on a truly hung process. The value is tunable per deployment; the reasoning is what matters.
+
+**Why git state and not wall-clock time.** Refactoring duration is highly variable — a rename across N files can be 30 seconds or 5 minutes. A wall-clock budget either terminates legitimate work or waits too long on a stuck PURPLE. Worse, a wall-clock limit creates false urgency: PURPLE under time pressure may commit incomplete work to "beat the watchdog," which is exactly the failure mode the atomic-commit rule exists to prevent. Observing git state asks the right question — "is PURPLE making progress toward an atomic commit?" — rather than "has PURPLE used too much time?"
+
+##### Authority progression and escalation rule
+
+```
+t=0       shutdown_request sent to PURPLE
+          │
+          ├── PURPLE has sovereignty over its atomic commit
+          ├── Watchdog observes git state every 10 seconds
+          │
+t=0-300s  (inside the 5-minute soft boundary)
+          │   Watchdog may still trigger the Hung state at 60s unchanged,
+          │   which is a delegated team-lead authority baked into the
+          │   watchdog. Everything else: PURPLE decides.
+          │
+t=300s    5-minute soft boundary — team lead termination authority activates
+          │
+          ├── If state is Clean exit or Atomic commit → already proceeded
+          ├── If state is Hung → already handled by watchdog
+          └── If state is Stuck mid-refactor → team lead decides now
+              │
+              ├── Extend grace period once (additional 2 minutes), OR
+              └── Force revert (git reset --hard HEAD + force-terminate)
+```
+
+**Escalation rule:** At the 5-minute boundary, if the state is "stuck mid-refactor," the team lead forces termination. **PURPLE cannot refuse.** Execution authority (L3) does not override coordination authority (L2). This is the standard L3→L2 relationship from T04, made explicit for PURPLE because the refactoring context creates a temptation to claim "I'm about to finish — just a bit more."
+
+##### Oracle handoff before revert
+
+Before the team lead issues `git reset --hard HEAD` (in either the Hung state or the team-lead-forced revert from Stuck mid-refactor), PURPLE must submit a `[DEFERRED-REFACTOR]` entry to the Oracle. This is a brief description of what PURPLE was attempting and why:
+
+```markdown
+## Knowledge Submission
+- From: purple-<pipeline>
+- Type: pattern
+- Scope: team-wide
+- Urgency: standard
+- Tag: [DEFERRED-REFACTOR]
+
+### Content
+Refactoring intent: <what PURPLE was trying to do>
+Trigger: <why — e.g., "duplication across modules X and Y",
+          "leaky abstraction in module Z">
+State at revert: <files touched, call sites migrated, remaining work>
+
+### Evidence
+<files involved, CYCLE_COMPLETE of most recent successful cycle>
+```
+
+The next session's PURPLE queries the Oracle for `[DEFERRED-REFACTOR]` entries on first activation. If it finds one relevant to the current story, it resumes from the reverted state. The reverted work is not lost — only the in-progress code is gone, and the intent is preserved in the wiki. This is a **memory bridge**, not a replacement for the revert. The git state is clean; the knowledge of what to do next session is preserved.
+
+**If the team has no Oracle (Standard tier or below),** the `[DEFERRED-REFACTOR]` entry goes into the team-lead's scratchpad with a `[WIP]` tag. Less durable but still functional: the next session's team lead reads it during Phase 0 Orient and can brief PURPLE manually.
+
+##### Expected outcome
+
+- All agents (including PURPLE) terminated. Team lead is the only active process.
+- Working tree is clean: either PURPLE committed atomically, or the watchdog/team-lead reverted uncommitted changes.
+- If revert happened, an `[DEFERRED-REFACTOR]` entry exists in the Oracle (or team-lead scratchpad) describing the interrupted work.
+
+##### Failure modes
+
+| Failure | Cause | Mitigation |
+|---|---|---|
+| Watchdog terminates a legitimate long-running refactor | Refactor genuinely needs >60s of continuous file edits but took a brief pause | Tune the unchanged-files window per deployment (60s is a default, not a law). Document the tuning in team's `startup.md`. |
+| Team lead forgets to run the watchdog and standard Phase 3 wait hangs indefinitely | Human/protocol error — team lead treated PURPLE like any other agent | `startup.md` and team-lead prompt must explicitly list PURPLE in the watchdog path. Duplicate check at spawn: if roster contains PURPLE, the shutdown protocol must include Phase 3a. |
+| `[DEFERRED-REFACTOR]` entry is lost because Oracle crashed during submission | Oracle SPOF (see T09) | Team lead respawns Oracle (per T09's standard SPOF handling). PURPLE retries the submission. If that fails, the entry falls back to team-lead scratchpad. |
+| Next session's PURPLE does not check for `[DEFERRED-REFACTOR]` entries | PURPLE prompt gap | PURPLE prompt template must include "On activation, query Oracle for `[DEFERRED-REFACTOR]` entries matching current story." This is a T09 Cathedral-tier deployment checklist item. |
+
+##### Non-scope for this amendment
+
+- **Watchdog tooling implementation.** The mechanism is specified here, but the actual polling loop, git state detection, and integration with the spawning scripts are implementation work (not T06 design).
+- **Refactoring duration metrics.** The 60-second unchanged-files window and 3-minute stuck-mid-refactor threshold are documented defaults, not measured field values. Future field data may tune them.
+- **Non-PURPLE L3 agents with similar risk profiles.** If another role develops a similar mid-shutdown risk (e.g., a long-running data migration agent), this Phase 3a extension can be generalized — but that is future work, not this amendment.
+
 ### Phase 4: Persist (_FR:Volta_ — amended 2026-03-13, inbox durability)
 
 **Precondition:** All agents terminated. Task snapshot already created (Phase 2b).
@@ -630,11 +743,13 @@ Each agent reads another's output **immediately from the same checkout on trunk*
 **Mechanism:** Spawn with `isolation: "worktree"`. Each agent gets its own working tree on its own branch. Merges happen via PR when the work is complete.
 
 **Advantages:**
+
 - Git-level conflict prevention (impossible to touch the same file by accident)
 - Clean PR/review workflow per agent
 - Long-running work doesn't pollute main
 
 **Lifecycle implications:**
+
 - Phase 6 (Spawn): worktree must be created before or during agent spawn
 - Shutdown Phase 4: worktree branches must be either merged or preserved (stale worktrees accumulate)
 - Roster should encode `isolation: "worktree"` per agent so spawning scripts handle it automatically
@@ -661,6 +776,7 @@ Each agent reads another's output **immediately from the same checkout on trunk*
 ```
 
 **Advantages:**
+
 - Zero-latency data flow — each agent sees others' commits immediately
 - No merge ceremonies between pipeline stages
 - No worktree lifecycle overhead (creation, cleanup, stale worktree pruning)
@@ -669,6 +785,7 @@ Each agent reads another's output **immediately from the same checkout on trunk*
 **Failure mode if partition is violated:** Merge conflict on the conflicting file. This is visible and fixable — not data loss. The partition is enforced by prompt (behavioral), not by tooling (structural). Field evidence from 6 sessions shows prompt-based enforcement holds.
 
 **Lifecycle implications:**
+
 - Phase 6 (Spawn): no worktree creation needed. All agents share the main checkout.
 - Phase 0 (Orient): single `workDir` is sufficient — no worktree paths to track.
 - Resource partition table must be maintained in common-prompt.md. Changes to partition boundaries require team-lead approval and common-prompt update before the affected agent is (re)spawned.
@@ -691,11 +808,13 @@ Does any agent consume another agent's output in real-time (same session, no mer
 ### When to Reconsider the Chosen Strategy
 
 **Pipeline → upgrade to worktree when:**
+
 1. Two agents need to write to the same directory (partition breaks down)
 2. Git lock contention becomes frequent (concurrent `git commit` hitting `index.lock`)
 3. Long-running feature work needs isolation from trunk (multi-session branches)
 
 **Worktree → simplify to trunk when:**
+
 1. Merge ceremonies become the bottleneck (agents waiting for merges to see each other's output)
 2. All agents' write domains are naturally non-overlapping
 3. Team velocity matters more than branch safety (early-stage research, prototyping)
@@ -966,7 +1085,7 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 
 ---
 
-## Container Lifecycle (*FR:Brunel*)
+## Container Lifecycle (_FR:Brunel_)
 
 ### Problem
 

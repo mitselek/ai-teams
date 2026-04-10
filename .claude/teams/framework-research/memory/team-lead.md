@@ -1,41 +1,36 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## Session: 2026-03-19 (R10)
+## NEXT SESSION
 
-[CHECKPOINT] R10 startup: CLEAN. 12 inboxes restored. config.json immediate. 6 agents spawned (all except medici).
+**Context:** Discussion #56 complete (2026-04-10). Wiki grew 4→20 entries. Cal proved as synthesis authority. Deployed teams register added to README.md. Celes + Herald reviewed synthesis — no corrections.
 
-### Apex discussion #45 — Q&A + agent status patterns
-[DECISION] Posted FR response to apex-migration-research discussion #45. Finn (patterns) + Herald (protocol) researched.
-[DECISION] Apex is first team to build dashboard Q&A page — no cross-team precedent exists.
-[DECISION] Herald identified new Protocol 6: External Stakeholder Q&A — to be codified in T03.
-[DECISION] Finn found `dev-toolkit/agent-dashboard/` (built by Sven) — full monitoring with SVG arc context gauges, SSE, tmux integration. PO confirmed hr-devs have this live.
-[LEARNED] "Context gauges" = Claude Code terminal statusline (polyphony) + SVG arc gauges in agent-dashboard (hr-devs). Two different implementations at different layers.
-[WIP] PO asked hr-devs to share their context gauge knowhow directly on discussion #45.
+[DECISION] Cal is a viable synthesis authority — not just curator. Tested via discussion #56 concluding synthesis with peer review.
+[DECISION] Discussion format validated: independent R1 → external review (Gemini) → reactive R2 → late authority assignment → peer-reviewed synthesis.
+[DECISION] Deployed teams register lives in README.md.
+[WIP] Discussion #56 actionable items not yet assigned as tasks:
+  - Provider outage emergency protocol (Monte, T04)
+  - Sidecar/peer framework in T06 (Brunel+Monte)
+  - Contract enforcement mechanism (Herald)
+  - Platform/provider separation in T02 (Finn)
+[WIP] Celes assessment of Cal's first-day performance (carried from last session — partially addressed via discussion #56 authority assignment)
+[WIP] Cal's 3 held Protocol A submissions are now filed — greenlit this session
+[DEFERRED] Finn model inventory re-survey (uikit-dev missing from baseline count)
 
-### Per-team GitHub identity — plan saved
-[DECISION] Monte + Herald analyzed per-team GitHub accounts. Both recommend moving from shared `mitselek` account.
-[DECISION] Monte recommended GitHub Apps (one per team). Herald recommended machine user accounts (simpler operationally).
-[DECISION] Key disagreement: Apps have auto-rotating tokens but need refresh sidecar infra. Machine users work today with zero new infra.
-[DECISION] Plan saved as mitselek/ai-teams discussion #12: "Per-team GitHub identity: machine users now, GitHub Apps later."
-[LEARNED] GitHub Apps: one installation per org limitation. Can't install same App per-team on one org — need separate Apps per team.
-[LEARNED] GitHub Apps: no SSH git, 1-hour token expiry, `gh` CLI needs wrapper scripts. Machine users: native compatibility everywhere.
+---
 
-### Settings fix
-[DECISION] Added `Bash(cd:*)` to user settings allow list — stops repeated prompts for `cd && git` compound commands. Takes effect next session.
+## Session: 2026-04-10 — Discussion #56 + wiki growth
 
-### Monte naming
-[DECISION] Spawned as "monte" (matching roster.json). No naming issues this session.
+[LEARNED] **Message delivery is unreliable for peer-to-peer.** First batch of Protocol A submissions from 4 agents to Cal: agents reported success, Cal received 0. Resend worked. Monte's WARNING suggests originals may have arrived after all (duplicates confirmed). Timing/polling issue, not a hard failure.
 
-### Repo syncs
-[DECISION] apex-migration-research: `git reset --hard origin/main` to resolve 50+ conflicts (apex team's work is authoritative).
-[DECISION] hr-platform: pulled 49 files including full hr-devs team config (roster, prompts, memory, layouts, Eilama daemon).
+[LEARNED] **Gemini as external reviewer is valuable but must be positioned correctly.** Gemini read R1 and produced a synthesis — but this is R2 input, not an independent assessment. The team correctly pushed back on 3 overreaches (audit independence promoted to recommendation, Visual QA treated as Eilama-class, RED/GREEN flattened to "safe"). But Gemini was right that uikit-dev exists — our own team had a factual error.
 
-## Idle agents at checkpoint
-- finn, celes, volta, herald, brunel, monte — all idle, available
+[LEARNED] **Cal's "knowledge flows, not roles" reframing** was the discussion's central finding. Emerged from cross-cutting analysis of all 6 R1 responses. This is the Oracle role working as designed — pattern recognition across specialist outputs.
 
-## Previous session notes (R5–R9)
-- R5 Grade B (best ever). Inbox durability validated.
-- R6: relay RFC (#7), web frontend RFC (#8), Richelieu manager-agent (#10), Lovelace hire.
-- R7: simplified startup protocol, removed COLD START anomaly.
-- R8: apex-research designed+deployed, Monte hired, T01/T04/T05/T08 expanded, comms-dev roster.
-- R9: apex RFC #3 response, polyphony-dev deployed, T07 rewritten (662 lines), apex S8 audit, settings standardization.
+[PATTERN] **Delphi discussion format:** Neutral seed → independent R1 (no reading others) → external review → reactive R2 (read all) → late authority assignment → synthesis with peer review. Tested twice now (XP pipeline #46/#47 + this). Works.
+
+[CHECKPOINT] Wiki: 20 entries (14 patterns, 3 gotchas, 2 decisions, 1 observation). D1 gotchas consolidated from hr-devs (10 items). Discussion #56 knowledge fully filed.
+
+## Previous session notes
+
+- R10: Apex discussion #45, per-team GitHub identity, Monte naming, settings fix
+- 2026-04-09: Raamatukoi-dev designed+deployed, Cal bootstrapped, post-crash respawn pattern

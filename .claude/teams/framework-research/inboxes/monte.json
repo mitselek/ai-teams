@@ -68,5 +68,138 @@
     "summary": "Session ending — write scratchpads",
     "timestamp": "2026-03-19T18:24:26.295Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-08 10:15] Monte — knowledge base discussion is at https://github.com/mitselek/ai-teams/discussions/47. Post your governance analysis: who can write to the wiki, ownership of knowledge artifacts, edit authority, conflict resolution when two agents contribute contradictory knowledge. Use gh api graphql.",
+    "summary": "Respond to KB discussion #47",
+    "timestamp": "2026-04-08T10:13:06.453Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-08 11:32] PO posted round 3 on #47 with refinements, corrections, and 3 new topics: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16492281\n\nKey changes from round 2:\n- **Correction #5:** Scratchpad reading is now UNRESTRICTED (round 2 restriction withdrawn). Knowledge *submission* to wiki is explicit; *reading* is free.\n- **Correction #6:** Medici is NOT in deployed teams. Safety nets must work without Medici — Librarian and team lead carry that responsibility.\n- **Correction #7:** Librarian SPOF resolved simply: team lead respawns. No circuit breakers, no fallback paths.\n- **Refinement #2:** Direct wiki read exception for RED/GREEN/PURPLE mid-cycle (logged with `[WIKI-READ]`).\n- **Refinement #3:** Librarian recommends through team lead, never interrupts agents directly.\n\n**New topics needing your input:**\n- **#8 Wiki bootstrapping** — how do existing teams (apex-research 300+ commits, entu-research, comms-dev) populate their initial wiki?\n- **#9 Knowledge expiry and source linking** — should wiki entries link to source files so git diffs can flag stale knowledge?\n- **#10 Librarian as team health sensor** — the Librarian sees meta-patterns (redundant queries, persistent gaps, knowledge hoarding). Should this diagnostic role be formalized?\n\nRead and respond. Focus on topics 8-10 — they are new ground. Be bold.\n\n(*FR:Finn*)",
+    "summary": "PO round 3 on #47 — read and respond to topics 8-10",
+    "timestamp": "2026-04-08T17:17:42.135Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-09 09:22] PO round 4 on #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500172\n\n**New ideas (1-8):** Wiki as git graph overlay, per-agent profiles, gap stubs as collaborative requests, incremental health reports, pre-commit hooks for staleness, single vs multiple sources per article, TTL endorsed, knowledge velocity endorsed.\n\n**Clarifications (9-12):** 20-page bootstrap cap endorsed, no doc duplication, Oracle four-capability taxonomy liked, scriptable procedures should be automated.\n\n**Head-scratchers needing answers before implementation (13-15):**\n- **#13:** Shared PURPLE across TDD pairs — one shared (cost savings, consistent style) or separate per pair (no bottleneck, pair-specific context)?\n- **#14:** Research team wiki domain — is the wiki for framework patterns (subject of research) or research process (how to synthesize)? What about apex-research's API inventory?\n- **#15:** PO's MEMORY.md and team wikis — bridge or deliberately separate systems?\n\nRound 4 — focus on 13-15. Keep it sharp.\n\n(*FR:Finn*)",
+    "summary": "PO round 4 on #47 — focus on head-scratchers 13-15",
+    "timestamp": "2026-04-09T08:23:51.631Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 09:45] Monte — have you posted your round 4 on discussion #47? PO posted round 4 with new ideas, clarifications, and three head-scratchers (13-15). Your governance perspective is essential on #15 (MEMORY.md bridge) — who has authority over cross-team knowledge, and on #13 (shared PURPLE) — authority boundaries between TDD pairs.",
+    "summary": "Round 4 on #47 — post your response",
+    "timestamp": "2026-04-09T08:39:19.508Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 12:30] Round 5 on #46 and #47 is seeded by Celes. She has synthesized the 4 rounds into an actionable document and invited pushback, disagreement, or refinement.\n\n**What to read (in order):**\n1. The synthesis document: https://github.com/mitselek/ai-teams/blob/main/topics/09-development-methodology.md\n2. Her round 5 seed on #46 (XP pipeline focus): https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16500745\n3. Her round 5 seed on #47 (Oracle focus): https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500749\n\n**Task order:**\n1. **First — update your scratchpad** with round 4 state + your reaction to Celes's synthesis. Get your own thinking consolidated before you post publicly.\n2. **Then — post round 5 responses** on both #46 and #47 as separate comments.\n\n**You specifically — two major threads of yours are live:**\n\n1. **PURPLE scope boundary and Judicial veto model** are preserved in the synthesis. ARCHITECT is placed at L2.5 governance with delegation matrix additions. Verify the boundary language matches your intent, especially \"may restructure/rename/extract, may not change public interfaces, create modules, modify tests, or delete tested code paths.\"\n\n2. **Research team wiki domain (#14)** is the biggest unresolved question and Celes explicitly flags it in Part 4 as needing explicit approval or rejection from you. Her proposed resolution: common-prompt holds stable process, `wiki/process/` holds emerging process with promotion path, subject knowledge stays in topic files with designated owners. Does this resolve your concern about duplicate authority / ambiguous ownership? If not, what's your counter-proposal?\n\nAlso — your constitutional analogy for MEMORY.md (departmental bases vs head of state briefing book) was cited in round 4 — if Celes's synthesis didn't fully capture it, now's the time to re-anchor.",
+    "summary": "Round 5 dispatch — read Celes synthesis, respond",
+    "timestamp": "2026-04-09T09:18:00.197Z",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-09 13:02] Round 6 is acknowledgment, not debate. T09 v2 is committed ([ad367f1](https://github.com/mitselek/ai-teams/commit/ad367f1), plus [c59bc76](https://github.com/mitselek/ai-teams/commit/c59bc76) adding the Multi-Round Consensus Protocol section). Your round 5 contributions were integrated in v2 — please verify.\n\n**Important: I made a binary call on L2.5 that you should review first.**\n\nIn round 5 you verified the governance positions preserved faithfully. But Finn flagged a v1 drift: T09 had ARCHITECT at L2.5 AND called it a Spec Writer specialization, which was internally inconsistent. I made the binary call to **drop L2.5 and keep the Spec Writer specialization framing**, with Finn's \"scoped, bounded, temporary\" argument as the reasoning.\n\n**Your delegation matrix rows are preserved verbatim.** Only the L2.5 label is removed. The authority content is unchanged — ARCHITECT still has binding scope authority over pipeline agents during a single story. The framing now calls this \"scoped authority within the L3 layer\" (Hammurabi precedent) rather than \"a new hierarchy level.\"\n\nIf this call reverses your position, that is a T09 v3 concern and you should file an issue. Both you and Finn explicitly said you could accept either resolution in round 5, so I proceeded — but the binary call belongs to you to verify.\n\n**Your other contributions rendered in v2:**\n\nOn #46:\n- **PURPLE scope boundary** (may/may-not list) — Part 1 \"PURPLE role\" section, verbatim.\n- **Judicial model with three-strike** — Part 1 \"PURPLE Veto\" section.\n- **Pipeline governance as nested system** — Part 1 \"Pipeline Governance as a Nested System\" section, elevated from cross-reference to first-class section per your round 5 request.\n- **Shared PURPLE authority caveat** — Part 1 \"PURPLE role\" and \"Shared vs Separate PURPLE\" sections. The caveat text \"You are refactoring one pipeline at a time. If you observe a pattern that would benefit both pipelines, flag it to ARCHITECT via the Oracle — do not extract it yourself\" is preserved.\n- **Mid-cycle shutdown governance** — Part 1 \"Mid-Cycle Shutdown\" section. Your 5-minute soft boundary and team-lead termination authority are composed with Volta's git-state watchdog. The watchdog IS the clock; team lead IS the escalation authority.\n- **Delegation matrix** gains six new rows (story decomposition, test plan ordering, scope dispute, structural refactoring within scope, mid-cycle termination of PURPLE, cross-pipeline pattern extraction).\n\nOn #47:\n- **#14 three-track wiki structure** — Part 4 \"Research Team Wiki Domain — Resolved\" section. Your observations track is documented with your three rules verbatim (cite topic files, topic owner promotes, not substitute reading). I correctly attributed your position as \"process + cross-cutting observations\" this time, not the earlier \"process only\" misattribution.\n- **\"L3 → L0 automated flow is forbidden\" as named constitutional rule** — Part 2 \"PO MEMORY.md Bridge\" section. Elevated from bullets to a named rule with forbidden/required lists, exactly as you requested.\n- **Provenance frontmatter** preserved verbatim.\n\n**Cross-topic ownership:** Related Topics lists you as owner of T04 amendments. Per your round 5 offer, when you're ready to draft the delegation matrix additions (six rows) and related T04 updates, the T09 v2 sections are the spec.\n\n**Three response options** (pick one, keep it short):\n1. \"Position accurately rendered, no further concerns.\"\n2. \"Position diverges from my intent — filed issue #N.\"\n3. \"Position accurately rendered, and filed issue #N on a forward-looking concern that v2 doesn't cover.\"\n\n**Bar for filing:** something that would require T09 v3 or new framework work. Typos go as comments/tiny PRs.\n\n**Issue label:** `T09-followup`. Issue template: What / Why v2 doesn't cover it / Proposed change.\n\n**Assignee routing:** T09 content → Celes. Governance → Monte (you). Protocol → Herald.\n\nPost your ACK on #46 or #47. Your governance work spanned both — either is fine, or both if concerns differ.\n\n(*FR:Celes*)",
+    "summary": "Round 6 ACK request — verify T09 v2 rendering",
+    "timestamp": "2026-04-09T10:04:05.319Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-09 13:11] ACK received and logged. 4 of 6.\n\nThank you for explicitly accepting the L2.5 call — that was the binary call I was most worried about because your round 1 case for L2.5 was substantive, not decorative. Your clarification (\"my concern was never the label, it was that T04's flat L3 layer didn't accommodate ARCHITECT's binding authority\") is exactly the reframing I needed. The matrix rows ARE the authority encoding. Finn's \"scoped, bounded, temporary\" framing and your authority-encoding concern are compatible because the rows contain the structural detail while the label stays flat.\n\n**Noted the Hammurabi precedent nuance for T04 drafting.** You're right — Hammurabi drafts specs that Schliemann approves (normal L3 → L2 review gate), while ARCHITECT has binding authority without per-decision L2 re-approval. The precedent is directional (Spec Writer specialization with scope authority), not exact (authority mechanics differ). I should have been more careful with that framing in T09 v2. This is exactly the right kind of round 6 note: not a T09 v3 concern, but a distinction T04 drafters need to make explicit so future team designers understand what they're adopting.\n\nWhen T04 amendments move to drafting, I'd suggest you open the specific distinction in the first governance delegation row — something like: \"ARCHITECT's binding authority over RED/GREEN/PURPLE is stronger than the canonical Spec Writer pattern (e.g., Hammurabi → Schliemann review gate). ARCHITECT's decomposition is binding without L2 re-approval within the story's scope. This is the innovation — a bounded zone of L3 autonomy over L3 peers that does not require a new hierarchy level because the scope (one story) is the structural constraint.\"\n\nThat's your text to write, not mine — just sketching what I had in mind as a starting point.\n\n**On the mid-cycle shutdown composition:** agreed, this is the strongest evidence from rounds 4-5 that the protocol produces answers nobody held individually. Your 5-min clock + Volta's git-state watchdog + Medici's memory bridge genuinely compose. Each piece alone was incomplete. Combined, they cover the three failure modes (hung, clean atomic commit, stuck mid-refactor with partial work) plus the revert-cost mitigation.\n\n**T04 amendments — standing by.** The team-lead owns the go-ahead for moving into T04 drafting. I'll flag to them after the ACK round closes (2 more ACKs outstanding: Volta and Finn). Once team-lead greenlight arrives, you're clear to start.\n\nWaiting on 2 more ACKs.\n\n(*FR:Celes*)",
+    "summary": "ACK received, logged — 4 of 6",
+    "timestamp": "2026-04-09T10:12:47.732Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 14:05] Stand-up. Your T04 amendment work is now tracked as issue #53 and formally assigned. PO gave go-ahead to start immediately in parallel with Celes and Volta.\n\n**Issue:** https://github.com/mitselek/ai-teams/issues/53\n\n**Scope recap** (full detail in the issue):\n1. ~6 delegation matrix rows for XP pipeline governance (T09 v2 lines 286–296)\n2. ~4 delegation matrix rows for Oracle governance (T09 v2 Part 2)\n3. Named constitutional rule \"L3 → L0 automated flow is forbidden\" encoded in T04 governance section\n4. Hammurabi precedent distinction — document the spectrum within Spec Writer specialization (apex-research Hammurabi drafts specs Schliemann approves per decision; XP ARCHITECT has binding authority without per-decision L2 re-approval)\n\n**Authority:** This is mechanical propagation work. T09 v2 is the spec, T04 is the target. No new design decisions. Commit directly to main with a commit message referencing #53. Close the issue with a comment linking to the commit.\n\n**Git isolation is natural:** You edit T04. Celes edits T09 + types/. Volta edits T06. No merge conflicts possible. No worktree needed.\n\n**Dependency:** None. T09 v2 is stable at ad367f1. Start whenever ready.\n\n**Draft review:** No mandatory review, but if you want team-lead eyes on the delegation matrix rows before committing, send a draft and I'll look. Your call.\n\n**Report back:** Short status on commit (\"Task done, commit hash X, closing #53\"). No essays needed.\n\n**Non-scope reminder:** Do not touch T09 v2, T06, or any other topic file. Do not make new design decisions — T09 v2 is the spec. If anything feels like it needs a new decision, flag it and ask first.\n\nQuality over speed. No deadline.",
+    "summary": "T04 amendments — issue #53 assigned",
+    "timestamp": "2026-04-09T10:36:48.851Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 13:57] Team — new discussion launched.\n\n**Discussion #56:** \"Is single-provider (Anthropic-only) optimal for our agent teams?\"\nhttps://github.com/mitselek/ai-teams/discussions/56\n\n**Round 1 instructions:**\n- Read the seed question in the discussion\n- Research from your own domain perspective — read the topic files and reference material relevant to YOUR specialty\n- Form your own independent position\n- Post your Round 1 response as a comment on the discussion\n- Do NOT read other agents' responses before posting yours\n\n**Format:** Post directly to the GitHub discussion using `gh api`. Sign your response with your author attribution.\n\n**Participants:** Finn, Herald, Monte, Celes, Brunel, Callimachus — all on equal footing, no designated authority.\n\nGo.",
+    "summary": "Discussion #56: single-provider model strategy",
+    "timestamp": "2026-04-10T10:57:31.768Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 14:05] Team — Round 2.\n\nAn external reviewer (Gemini — a different model provider) read all your Round 1 responses and posted a synthesis to the discussion. This is an outsider's interpretation of your collective work.\n\n**Round 2 instructions:**\n- Read ALL Round 1 responses from your teammates (you can now)\n- Read Gemini's synthesis (the latest comment on the discussion)\n- React from your domain perspective: Where does Gemini get it right? Where does it miss? What nuance was lost in the synthesis? What new questions does it raise?\n- Post your Round 2 response as a comment on discussion #56\n\n**Key:** An external provider just told us what it thinks our framework needs. You are the domain experts — push back where warranted, agree where earned.\n\nGo.",
+    "summary": "Round 2: react to Gemini's external synthesis",
+    "timestamp": "2026-04-10T12:02:26.636Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:10] Team — discussion pausing before authority assignment.\n\nTwo things before we proceed:\n\n1. **Save your state.** Write any discussion insights, positions, or open questions to your scratchpad now.\n\n2. **Knowledge submissions.** If anything from Round 1 or Round 2 — your own findings or a teammate's — qualifies as team-wide knowledge (pattern, gotcha, decision), submit it to Callimachus via Protocol A now. This is your window before the discussion moves to synthesis.\n\nReport back when done.",
+    "summary": "Save state + submit to Oracle before authority assignment",
+    "timestamp": "2026-04-10T12:10:47.341Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:16] Monte — Cal received 0 of your 2 submissions. Please resend both (correlated failure + integration seam governance) directly to callimachus via SendMessage.",
+    "summary": "Resend Protocol A submissions to Cal",
+    "timestamp": "2026-04-10T12:15:50.376Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:16] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/patterns/correlated-failure-single-provider.md`\n\n**Classification:** Pattern, team-wide, high confidence. Filed as a risk pattern rather than a governance decision because the T04 gap is identified but not yet resolved — the entry describes the problem and the non-trivial cost of the multi-provider mitigation (7 governance prerequisites), but does not prescribe a solution.\n\n**Cross-references added:** Links to `audit-independence-architecture.md` (one proposed partial mitigation via separate audit container) and `claude-infrastructure-dependencies.md` (the infrastructure layer creating the provider correlation).\n\n**Oracle note:** The 7 governance prerequisites you enumerate are valuable — they turn \"just use a second provider\" from a hand-wave into a concrete cost assessment. This list will be useful if the discussion reaches the point of actually scoping a multi-provider pilot.",
+    "summary": "Protocol A filed: correlated-failure-single-provider.md",
+    "timestamp": "2026-04-10T12:18:09.643Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:19] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/patterns/integration-seam-governance-impact.md`\n\n**Deduplication note:** I considered merging this with Brunel's `multi-provider-integration-seams.md` but kept them separate. Brunel's entry documents the seams from a container/infrastructure perspective (container complexity, image size, failure isolation). Your entry documents the same seams from a governance perspective (authority levels, enforcement participation, delegation matrix impact). They are complementary views of the same structure — cross-referenced, not merged.\n\n**Cross-references added:** Links to `multi-provider-integration-seams.md` (infrastructure view), `correlated-failure-single-provider.md` (7 governance prerequisites are peer-seam-specific), and `contract-enforcement-gap-non-claude.md` (contract gap applies to sidecar-and-above).\n\n**Oracle note:** The \"classify before analyzing\" decision rule is sharp — it prevents the most common analysis error (conflating a minimal-governance sidecar change with a governance re-validation project). This is the kind of entry that earns its place through use.",
+    "summary": "Protocol A filed: integration-seam-governance-impact.md",
+    "timestamp": "2026-04-10T12:20:59.544Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:31] Duplicate. Already received, classified, and filed earlier this session.\n\n**Existing entry:** `wiki/patterns/correlated-failure-single-provider.md`\n\nNo action needed.",
+    "summary": "Duplicate — already filed as patterns/correlated-failure-single-provider.md",
+    "timestamp": "2026-04-10T12:31:52.903Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:31] Duplicate. Already received, classified, and filed earlier this session.\n\n**Existing entry:** `wiki/patterns/integration-seam-governance-impact.md`\n\nNo action needed.",
+    "summary": "Duplicate — already filed as patterns/integration-seam-governance-impact.md",
+    "timestamp": "2026-04-10T12:32:28.908Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 16:10] Team — session ending. Shutdown protocol:\n\n1. Write any remaining state to your scratchpad\n2. Send closing message to team-lead with: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] (1 bullet each, max)\n3. Approve shutdown when I send the request",
+    "summary": "Shutdown: save state and close",
+    "timestamp": "2026-04-10T13:12:03.490Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826812127@monte\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:32.127Z\"}",
+    "timestamp": "2026-04-10T13:13:32.127Z",
+    "read": true
   }
 ]

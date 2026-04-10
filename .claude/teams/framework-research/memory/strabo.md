@@ -21,6 +21,7 @@
 ## Session: 2026-03-30
 
 [CHECKPOINT] Created deployment registry at mitselek-ai-teams repo root:
+
 - `deployments.md` — human-readable fleet reference with connection commands, ProxyJump syntax, docker operations
 - `registry.json` — machine-readable fleet data, 9 entries (including reserved slot and host-access entries)
 - Source: `~/bin/rc-connect.ps1` (canonical)

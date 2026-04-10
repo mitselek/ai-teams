@@ -1,0 +1,9 @@
+[
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 15:26] Light assessment of the Raamatukoi repos — we need to understand what the incoming team will inherit.\n\nFor each of the three code repos (webstore, rat-project, TagHunt), check:\n\n1. **Tests** — do they exist? What framework? How many? Any CI running them?\n2. **Quality gates** — linting config (ESLint, Prettier, pylint, etc.)? Pre-commit hooks? Type checking?\n3. **CI/CD** — GitHub Actions or other? What do the workflows do?\n4. **Dependencies** — package.json / requirements.txt / build.gradle — anything notable (outdated, vulnerable)?\n5. **Documentation** — README quality, CLAUDE.md present?, any specs or docs folder?\n\nSkip `-TagHunt-sdk-libs` (just binaries).\n\nUse `gh` CLI to check repo contents, workflows, and key config files. Keep it light — directory listings and config file reads, not deep code review.\n\nReport structured per-repo. Under 400 words total.",
+    "summary": "Assess code quality across Raamatukoi repos",
+    "timestamp": "2026-04-09T12:32:37.813Z",
+    "read": true
+  }
+]

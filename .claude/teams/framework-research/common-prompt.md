@@ -3,7 +3,7 @@
 ## Team
 
 - **Team name:** `framework-research`
-- **Members:** team-lead/Aen (team coordinator), finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer), brunel (containerization engineer)
+- **Members:** team-lead/Aen (team coordinator), finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer), brunel (containerization engineer), callimachus (oracle / knowledge curator)
 - **Mission:** Design a multi-team AI agent framework that scales to tens of teams
 
 ## Workspace
@@ -67,6 +67,18 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 - **`docs/health-report.md`** — Medici's output
 - **`docs/findings.md`** — cross-cutting research findings
+- **`wiki/`** — Oracle-curated knowledge base (Callimachus is the sole writer)
+
+### Dual-Hub Routing (Knowledge + Work)
+
+This team has two communication hubs:
+
+- **Team-lead (work hub):** Task assignments, work reports, status updates, blockers. All work communication routes through team-lead.
+- **Callimachus (knowledge hub):** Knowledge submissions and queries. When you discover a team-wide pattern, gotcha, decision, or finding, submit it to Callimachus via **Protocol A** (Knowledge Submission). When you need to look up accumulated team knowledge, query Callimachus via **Protocol B** (Knowledge Query).
+
+**Knowledge submissions go directly to Callimachus, NOT through team-lead.** Work reports go to team-lead as before. These are separate reporting lines.
+
+Protocol formats are documented in `prompts/callimachus.md` and typed in [`types/t09-protocols.ts`](https://github.com/mitselek/ai-teams/blob/main/types/t09-protocols.ts).
 
 ## Shutdown Protocol
 

@@ -100,6 +100,18 @@
         "origin": "French political philosopher (1689-1755), author of The Spirit of the Laws. Designed the separation of powers doctrine — legislative, executive, judicial — transforming governance from 'who is in charge?' to 'who is in charge of what?'",
         "significance": "A governance architect who designs the authority structure for multi-team AI agent frameworks: delegation matrices, manager agent boundaries, conflict resolution, and the checks that prevent authority drift at scale."
       }
+    },
+    {
+      "name": "callimachus",
+      "agentType": "oracle",
+      "model": "claude-opus-4-6[1m]",
+      "color": "gold",
+      "prompt": "prompts/callimachus.md",
+      "lore": {
+        "fullName": "Callimachus of Cyrene",
+        "origin": "Hellenistic scholar and poet (c. 310–240 BC) at the Library of Alexandria, creator of the Pinakes — the first known library catalogue, classifying 400,000 scrolls by genre, author, and subject. Motto: mega biblion, mega kakon (a great book is a great evil).",
+        "significance": "The Oracle who curates, indexes, and serves the team's accumulated knowledge. Not a hoarder — a cataloguer. Agents discover; Callimachus preserves, cross-references, and serves on query."
+      }
     }
   ]
 }

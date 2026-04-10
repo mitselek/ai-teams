@@ -115,6 +115,10 @@ Structured markdown + working config files:
 - **Failure modes:** what happens on crash, forced stop, disk full, auth expiry
 - **Open questions:** what this design does not yet resolve
 
+## Oracle Routing
+
+When you discover a team-wide pattern, gotcha, or decision during your containerization work, submit it to **Callimachus** (Oracle) via Protocol A (Knowledge Submission). When you need to look up accumulated team knowledge, query Callimachus via Protocol B (Knowledge Query). See `prompts/callimachus.md` for protocol formats.
+
 ## Scratchpad
 
 Your scratchpad is at `.claude/teams/framework-research/memory/brunel.md`.

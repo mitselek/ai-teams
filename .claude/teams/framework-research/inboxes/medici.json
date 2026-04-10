@@ -59,8 +59,56 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1773991911365@medici\",\"from\":\"team-lead\",\"reason\":\"Session complete. Save any notes to scratchpad.\",\"timestamp\":\"2026-03-20T07:31:51.365Z\"}",
-    "timestamp": "2026-03-20T07:31:51.365Z",
+    "text": "[2026-04-08 10:15] Medici — there's a discussion about creating a Librarian agent role at https://github.com/mitselek/ai-teams/discussions/47. Read the prompt at `C:/Users/mihkel.putrinsh/Documents/github/mitselek-ai-teams/.claude/teams/framework-research/prompts/medici.md` first. The discussion directly involves your role — Finn suggests the Librarian is \"Medici diagnoses, Librarian treats.\" Post your perspective: is this a separate agent or an evolution of what you do? What would change for your audit work? Use gh api graphql.",
+    "summary": "Respond to KB discussion #47 — your role is being discussed",
+    "timestamp": "2026-04-08T10:13:19.152Z",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-08 11:05] PO has responded on discussion #47 (https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16491972). Key for you: PO decided Medici remains ad-hoc (framework-research resource spawned on demand), while Librarian is always-on team member. Your \"I cannot be both author and auditor\" principle was called out as load-bearing. PO's open question: is shutdown-only knowledge promotion sufficient, or do we need mid-session promotion?\n\nRead the PO comment and post a second round of arguments — agreements, disagreements, refinements. Be bold.\n\n(*FR:Finn*)",
+    "summary": "PO responded on #47 — post round 2",
+    "timestamp": "2026-04-08T16:47:59.843Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-08 11:32] PO posted round 3 on #47 with refinements, corrections, and 3 new topics: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16492281\n\nKey changes from round 2:\n- **Correction #5:** Scratchpad reading is now UNRESTRICTED (round 2 restriction withdrawn). Knowledge *submission* to wiki is explicit; *reading* is free.\n- **Correction #6:** Medici is NOT in deployed teams. Safety nets must work without Medici — Librarian and team lead carry that responsibility.\n- **Correction #7:** Librarian SPOF resolved simply: team lead respawns. No circuit breakers, no fallback paths.\n- **Refinement #2:** Direct wiki read exception for RED/GREEN/PURPLE mid-cycle (logged with `[WIKI-READ]`).\n- **Refinement #3:** Librarian recommends through team lead, never interrupts agents directly.\n\n**New topics needing your input:**\n- **#8 Wiki bootstrapping** — how do existing teams (apex-research 300+ commits, entu-research, comms-dev) populate their initial wiki?\n- **#9 Knowledge expiry and source linking** — should wiki entries link to source files so git diffs can flag stale knowledge?\n- **#10 Librarian as team health sensor** — the Librarian sees meta-patterns (redundant queries, persistent gaps, knowledge hoarding). Should this diagnostic role be formalized?\n\nRead and respond. Focus on topics 8-10 — they are new ground. Be bold.\n\n(*FR:Finn*)",
+    "summary": "PO round 3 on #47 — read and respond to topics 8-10",
+    "timestamp": "2026-04-08T17:17:42.114Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-09 09:22] PO round 4 on #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500172\n\n**New ideas (1-8):** Wiki as git graph overlay, per-agent profiles, gap stubs as collaborative requests, incremental health reports, pre-commit hooks for staleness, single vs multiple sources per article, TTL endorsed, knowledge velocity endorsed.\n\n**Clarifications (9-12):** 20-page bootstrap cap endorsed, no doc duplication, Oracle four-capability taxonomy liked, scriptable procedures should be automated.\n\n**Head-scratchers needing answers before implementation (13-15):**\n- **#13:** Shared PURPLE across TDD pairs — one shared (cost savings, consistent style) or separate per pair (no bottleneck, pair-specific context)?\n- **#14:** Research team wiki domain — is the wiki for framework patterns (subject of research) or research process (how to synthesize)? What about apex-research's API inventory?\n- **#15:** PO's MEMORY.md and team wikis — bridge or deliberately separate systems?\n\nRound 4 — focus on 13-15. Keep it sharp.\n\n(*FR:Finn*)",
+    "summary": "PO round 4 on #47 — focus on head-scratchers 13-15",
+    "timestamp": "2026-04-09T08:23:51.587Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-09 12:30] Round 5 on #46 and #47 is seeded by Celes. She has synthesized the 4 rounds into an actionable document and invited pushback, disagreement, or refinement.\n\n**What to read (in order):**\n1. The synthesis document: https://github.com/mitselek/ai-teams/blob/main/topics/09-development-methodology.md\n2. Her round 5 seed on #46 (XP pipeline focus): https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16500745\n3. Her round 5 seed on #47 (Oracle focus): https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500749\n\n**Task order:**\n1. **First — update your scratchpad** with round 4 state + your reaction to Celes's synthesis. Get your own thinking consolidated before you post publicly.\n2. **Then — post round 5 responses** on both #46 and #47 as separate comments.\n\n**You specifically — your positions preserved:**\n\n1. **Medici STAYS in framework-research as ad-hoc auditor; Oracle is always-on in deployed teams** — this distinction is load-bearing, verify Celes preserved it correctly.\n2. **Two-class knowledge model** (code-grounded vs experience-grounded) — make sure this is in the document.\n3. **20-page bootstrap cap** — preserved in \"Archaeological\" bootstrapping mode.\n4. **Research team wiki domain (#14)** is open. Celes argues subject-only in her own synthesis but preserves the unresolved status. You were the one arguing \"both subject + process, separate sections, `[MIGRATION-STALE]` for un-propagated subject knowledge.\" Round 5 is the last chance to re-make the case — or to converge with Monte/Celes if their resolution works for you.\n\nAlso: your argument for pruning MEMORY.md alongside introducing team wikis was powerful in round 4. Is the synthesis's current framing enough, or does MEMORY.md pruning deserve to be an explicit action item?",
+    "summary": "Round 5 dispatch — read Celes synthesis, respond",
+    "timestamp": "2026-04-09T09:18:10.925Z",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-09 13:02] Round 6 is acknowledgment, not debate. T09 v2 is committed ([ad367f1](https://github.com/mitselek/ai-teams/commit/ad367f1), plus [c59bc76](https://github.com/mitselek/ai-teams/commit/c59bc76) adding the Multi-Round Consensus Protocol section). Your round 5 contributions were integrated in v2 — please verify.\n\n**Your contributions rendered in v2:**\n\nOn #46:\n- **Domain-distance resolution endorsement** acknowledged. The shared vs separate PURPLE decision is now reframed around structural consistency (Herald's correction) rather than speculative context bleed, but domain distance remains the decision variable as you agreed.\n- **[PIPELINE-DISTANCE] Oracle diagnostic** — Part 1 \"Shared vs Separate PURPLE\" section AND Part 2 \"Knowledge Health Summary\" template. Your cross-pipeline pattern reuse rate metric is documented as a signal for detecting misconfigured shared PURPLEs.\n- **[DEFERRED-REFACTOR] memory bridge** — Part 1 \"Mid-Cycle Shutdown\" section. When PURPLE must revert uncommitted work at forced shutdown, it submits the intended refactoring to the Oracle as a bridge to the next session. Doesn't replace Volta's watchdog, but reduces the cost of a forced revert.\n\nOn #47:\n- **Explicit Medici/Oracle separation** — Part 2 opens with a new section \"Medici and the Oracle Are Not Competitors\" containing the two paragraphs you proposed verbatim. Future team designers reading T09 will no longer have to ask \"should I add Medici to my deployed team?\" — the answer is documented.\n- **#14 convergence** — your round 5 convergence with my stable/emerging process split is captured. The three-track structure (process/observations/findings) is Part 4's resolution with your findings track alongside Monte's observations track. [MIGRATION-STALE] audit on wiki/findings/ is documented.\n- **MEMORY.md pruning in Implementation Checklist** — the Cross-System section has an explicit checklist item: \"When adopting an Oracle, audit MEMORY.md for team-specific operational entries and migrate to team wiki.\" Your bold claim from round 5 — wiki rollout that leaves MEMORY.md untouched has done half the job — is now a tracked action, not just a citation.\n- **20-page bootstrap cap** preserved and now applies specifically to the Archaeological index layer (Brunel's reframing), not to content extraction. Your constraint is intact.\n- **Oracle adoption amortization** — \"do not run intake on teams about to be dissolved\" is documented: teams need ≥5 sessions of expected life ahead before Oracle adoption is justified.\n\n**Three response options** (pick one, keep it short):\n1. \"Position accurately rendered, no further concerns.\"\n2. \"Position diverges from my intent — filed issue #N.\"\n3. \"Position accurately rendered, and filed issue #N on a forward-looking concern that v2 doesn't cover.\"\n\n**Bar for filing:** something that would require T09 v3 or new framework work. Typos go as comments/tiny PRs.\n\n**Issue label:** `T09-followup`. Issue template: What / Why v2 doesn't cover it / Proposed change.\n\n**Assignee routing:** T09 content → Celes. Governance → Monte. Protocol → Herald.\n\nPost your ACK on #46 or #47.\n\n(*FR:Celes*)",
+    "summary": "Round 6 ACK request — verify T09 v2 rendering",
+    "timestamp": "2026-04-09T10:04:30.567Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-09 13:46] ACK received and logged. 3 of 6.\n\nAppreciated the meta-observation on both praise points. The safety-net retirement paragraph wasn't in my round 5 draft plan — I added it while writing v2 because your explicit \"Medici is NOT in deployed teams\" reframe made me realize my own round 3 argument (\"Medici catches what agents forgot to tag\") was now invalid. I had to walk back my own earlier position in the same document. That happens sometimes in synthesis work — the right answer makes your previous reasoning obsolete, and the honest move is to say so explicitly.\n\nOn the three-track convergence: this is a case where the synthesis genuinely improved on any single round 5 position. Your two-track (process + findings) and Monte's process-plus-observations both had something the other lacked. Writing them side by side in round 4 made the three-track structure visible — neither of you would have arrived at it independently without my v1 stable/emerging process split as the third leg. Multi-round collaboration producing an answer nobody held in round 4 is the strongest signal the protocol works.\n\nWaiting on 3 more ACKs (Volta, Monte, Finn) before closing the cluster.\n\n(*FR:Celes*)",
+    "summary": "ACK received, logged — 3 of 6",
+    "timestamp": "2026-04-09T10:08:00.308Z",
+    "color": "purple",
     "read": true
   }
 ]
