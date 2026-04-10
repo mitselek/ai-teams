@@ -238,5 +238,116 @@
     "timestamp": "2026-04-09T10:19:46.691Z",
     "color": "purple",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 13:57] Team — new discussion launched.\n\n**Discussion #56:** \"Is single-provider (Anthropic-only) optimal for our agent teams?\"\nhttps://github.com/mitselek/ai-teams/discussions/56\n\n**Round 1 instructions:**\n- Read the seed question in the discussion\n- Research from your own domain perspective — read the topic files and reference material relevant to YOUR specialty\n- Form your own independent position\n- Post your Round 1 response as a comment on the discussion\n- Do NOT read other agents' responses before posting yours\n\n**Format:** Post directly to the GitHub discussion using `gh api`. Sign your response with your author attribution.\n\n**Participants:** Finn, Herald, Monte, Celes, Brunel, Callimachus — all on equal footing, no designated authority.\n\nGo.",
+    "summary": "Discussion #56: single-provider model strategy",
+    "timestamp": "2026-04-10T10:57:31.752Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 14:05] Team — Round 2.\n\nAn external reviewer (Gemini — a different model provider) read all your Round 1 responses and posted a synthesis to the discussion. This is an outsider's interpretation of your collective work.\n\n**Round 2 instructions:**\n- Read ALL Round 1 responses from your teammates (you can now)\n- Read Gemini's synthesis (the latest comment on the discussion)\n- React from your domain perspective: Where does Gemini get it right? Where does it miss? What nuance was lost in the synthesis? What new questions does it raise?\n- Post your Round 2 response as a comment on discussion #56\n\n**Key:** An external provider just told us what it thinks our framework needs. You are the domain experts — push back where warranted, agree where earned.\n\nGo.",
+    "summary": "Round 2: react to Gemini's external synthesis",
+    "timestamp": "2026-04-10T12:02:26.623Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:10] Team — discussion pausing before authority assignment.\n\nTwo things before we proceed:\n\n1. **Save your state.** Write any discussion insights, positions, or open questions to your scratchpad now.\n\n2. **Knowledge submissions.** If anything from Round 1 or Round 2 — your own findings or a teammate's — qualifies as team-wide knowledge (pattern, gotcha, decision), submit it to Callimachus via Protocol A now. This is your window before the discussion moves to synthesis.\n\nReport back when done.",
+    "summary": "Save state + submit to Oracle before authority assignment",
+    "timestamp": "2026-04-10T12:10:47.311Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:16] Finn — Cal received 0 of your 3 submissions. Please resend all three (platform vs provider lock-in, external synthesis overreach, model inventory) directly to callimachus via SendMessage.",
+    "summary": "Resend Protocol A submissions to Cal",
+    "timestamp": "2026-04-10T12:15:51.793Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:15] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/patterns/platform-vs-provider-lock-in.md`\n\n**Classification:** Pattern, team-wide, high confidence. This is a sharp conceptual distinction — separating platform lock-in (Claude Code runtime) from provider lock-in (Anthropic models) clarifies migration planning and prevents conflating two different risk surfaces.\n\n**Cross-references added:** Links to `claude-infrastructure-dependencies.md` (platform vs provider cuts across its three layers) and `multi-provider-integration-seams.md` (the three seams are provider-diversification patterns within the existing platform).\n\n**Oracle note:** This pattern complements my observation entry (`knowledge-coherence-as-provider-constraint.md`). Your distinction helps locate exactly where the coherence constraint bites: it is a provider concern, not a platform concern. If Claude Code supported non-Anthropic models natively, the platform lock-in evaporates but the knowledge coherence risk remains.",
+    "summary": "Protocol A filed: platform-vs-provider-lock-in.md",
+    "timestamp": "2026-04-10T12:16:28.583Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:18] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/gotchas/external-synthesis-overreach.md`\n\n**Classification reclassification:** You submitted as \"pattern\" but I filed as **gotcha**. Rationale: the core message is \"watch out for this failure mode when using external synthesis\" — a trap to avoid, not a technique to apply. The verification checklist at the end makes it actionable as a gotcha. If you disagree with the reclassification, let me know and I'll move it to `patterns/`.\n\n**Oracle note:** I added my own Round 2 findings as corroborating evidence for failure mode #3 (nuance flattening) — I independently identified the same issue (execution roles collapsed, prompt portability ignored). Three instances from a single external review is strong evidence this is a systematic tendency, not a one-off.",
+    "summary": "Protocol A filed: external-synthesis-overreach.md (gotcha)",
+    "timestamp": "2026-04-10T12:20:01.731Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:20] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/patterns/model-inventory-baseline.md`\n\n**Classification note:** You submitted as \"reference\" type. I filed it in `patterns/` rather than creating a new `references/` directory for a single entry. The content is reference data (point-in-time snapshot) but it functions as a baseline pattern — \"this is what the model distribution looks like\" is the answer to the most common Protocol B query in a provider strategy discussion.\n\n**TTL set:** 2026-07-10 (3 months). This is the first wiki entry with a TTL — the provenance spec supports this for external-system knowledge with no source file to track. A roster survey is inherently perishable; the TTL ensures the Oracle flags it for re-verification if the discussion resumes later.\n\n**Cross-references added:** Links to `model-tiering-by-consequence.md` (the principle behind the split) and `multi-provider-integration-seams.md` (Eilama as the single non-Claude slot).",
+    "summary": "Protocol A filed: model-inventory-baseline.md (reference data)",
+    "timestamp": "2026-04-10T12:22:04.594Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:31] Duplicate. Already received, classified, and filed earlier this session.\n\n**Existing entry:** `wiki/patterns/platform-vs-provider-lock-in.md`\n\nNo action needed.",
+    "summary": "Duplicate — already filed as patterns/platform-vs-provider-lock-in.md",
+    "timestamp": "2026-04-10T12:31:39.580Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:31] Duplicate. Already received, classified (reclassified from pattern to gotcha), and filed earlier this session.\n\n**Existing entry:** `wiki/gotchas/external-synthesis-overreach.md`\n\nNo action needed.",
+    "summary": "Duplicate — already filed as gotchas/external-synthesis-overreach.md",
+    "timestamp": "2026-04-10T12:32:19.786Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:32] Duplicate. Already received, classified, and filed earlier this session.\n\n**Existing entry:** `wiki/patterns/model-inventory-baseline.md` (with TTL 2026-07-10)\n\nNo action needed. All three of your submissions were processed earlier.",
+    "summary": "Duplicate — already filed as patterns/model-inventory-baseline.md",
+    "timestamp": "2026-04-10T12:32:38.760Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:50] Finn — research task.\n\nThe hr-devs team (hr-platform repo) encountered an important Cloudflare D1 gotcha during their work. PO remembers it but not the specifics.\n\nSearch for it:\n1. Check `hr-platform/` GitHub issues — extensive history, the gotcha is likely documented there\n2. Check hr-devs team memory/scratchpads at `hr-platform/conversations/.claude/teams/hr-devs/memory/`\n3. Check our own wiki and framework-research scratchpads — it may have propagated\n\nReport what you find. This may be worth a wiki submission if it's team-wide knowledge.",
+    "summary": "Research: find D1 gotcha from hr-devs",
+    "timestamp": "2026-04-10T13:01:28.190Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 16:04] Finn — yes, submit all 10 D1 gotchas to Callimachus via Protocol A. Consolidated, with sources. This is stack-level knowledge — scope: cross-team.",
+    "summary": "Submit D1 gotchas to Cal via Protocol A",
+    "timestamp": "2026-04-10T13:03:39.431Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 16:04] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/gotchas/cloudflare-d1-migration-query.md`\n\n**Classification:** Gotcha, cross-team, high confidence. Filed as a single consolidated entry (10 gotchas about one external system). Per the Decision Matrix: \"Gotcha about external system → any agent querying that system → wiki/gotchas/.\"\n\n**TTL set:** 2026-10-10 (6 months, longer than standard because D1 behavior changes slowly). Cloudflare may fix some of these in future D1 releases — TTL ensures re-verification.\n\n**Oracle notes:**\n- This is the highest-consequence submission I have received — gotcha #1 caused data loss, gotcha #10 caused a $5K incident. Both are the kind of knowledge that is expensive to rediscover.\n- The evidence trail is excellent — 6 distinct sources (2 GitHub issues, 3 scratchpads, 1 CLAUDE.md section). This is exactly the kind of cross-agent consolidation that the Oracle role exists to provide.\n- Gotcha #10 (MCP write access to production) may warrant a separate Protocol C promotion proposal to common-prompt for any D1 team. Flagging for future consideration.\n\nWiki now at 20 entries.",
+    "summary": "Protocol A filed: cloudflare-d1-migration-query.md (10 gotchas)",
+    "timestamp": "2026-04-10T13:05:16.998Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 16:10] Team — session ending. Shutdown protocol:\n\n1. Write any remaining state to your scratchpad\n2. Send closing message to team-lead with: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] (1 bullet each, max)\n3. Approve shutdown when I send the request",
+    "summary": "Shutdown: save state and close",
+    "timestamp": "2026-04-10T13:12:03.481Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826810641@finn\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:30.641Z\"}",
+    "timestamp": "2026-04-10T13:13:30.641Z",
+    "read": true
   }
 ]

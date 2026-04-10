@@ -5,11 +5,5 @@
     "summary": "Assess code quality across Raamatukoi repos",
     "timestamp": "2026-04-09T12:32:37.813Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775746871531@raamatukoi-research\",\"from\":\"team-lead\",\"reason\":\"Session complete. You may shut down.\",\"timestamp\":\"2026-04-09T15:01:11.531Z\"}",
-    "timestamp": "2026-04-09T15:01:11.531Z",
-    "read": true
   }
 ]

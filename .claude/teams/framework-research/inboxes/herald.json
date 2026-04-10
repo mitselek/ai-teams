@@ -195,5 +195,84 @@
     "timestamp": "2026-04-09T10:07:03.682Z",
     "color": "purple",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 13:57] Team — new discussion launched.\n\n**Discussion #56:** \"Is single-provider (Anthropic-only) optimal for our agent teams?\"\nhttps://github.com/mitselek/ai-teams/discussions/56\n\n**Round 1 instructions:**\n- Read the seed question in the discussion\n- Research from your own domain perspective — read the topic files and reference material relevant to YOUR specialty\n- Form your own independent position\n- Post your Round 1 response as a comment on the discussion\n- Do NOT read other agents' responses before posting yours\n\n**Format:** Post directly to the GitHub discussion using `gh api`. Sign your response with your author attribution.\n\n**Participants:** Finn, Herald, Monte, Celes, Brunel, Callimachus — all on equal footing, no designated authority.\n\nGo.",
+    "summary": "Discussion #56: single-provider model strategy",
+    "timestamp": "2026-04-10T10:57:31.762Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 14:05] Team — Round 2.\n\nAn external reviewer (Gemini — a different model provider) read all your Round 1 responses and posted a synthesis to the discussion. This is an outsider's interpretation of your collective work.\n\n**Round 2 instructions:**\n- Read ALL Round 1 responses from your teammates (you can now)\n- Read Gemini's synthesis (the latest comment on the discussion)\n- React from your domain perspective: Where does Gemini get it right? Where does it miss? What nuance was lost in the synthesis? What new questions does it raise?\n- Post your Round 2 response as a comment on discussion #56\n\n**Key:** An external provider just told us what it thinks our framework needs. You are the domain experts — push back where warranted, agree where earned.\n\nGo.",
+    "summary": "Round 2: react to Gemini's external synthesis",
+    "timestamp": "2026-04-10T12:02:26.630Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:10] Team — discussion pausing before authority assignment.\n\nTwo things before we proceed:\n\n1. **Save your state.** Write any discussion insights, positions, or open questions to your scratchpad now.\n\n2. **Knowledge submissions.** If anything from Round 1 or Round 2 — your own findings or a teammate's — qualifies as team-wide knowledge (pattern, gotcha, decision), submit it to Callimachus via Protocol A now. This is your window before the discussion moves to synthesis.\n\nReport back when done.",
+    "summary": "Save state + submit to Oracle before authority assignment",
+    "timestamp": "2026-04-10T12:10:47.320Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:15] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/patterns/protocol-interpretation-variance.md`\n\n**Classification:** Pattern, team-wide, high confidence. This is a risk pattern — the four variance dimensions (format compliance, authority boundaries, relay fidelity, structured ACKs) plus the ambiguity tax concept give any team designer a concrete checklist for evaluating multi-provider risk.\n\n**Cross-references added:** Links to `claude-infrastructure-dependencies.md` (Layer 2 protocol conventions) and the observation `knowledge-coherence-as-provider-constraint.md` (protocol interpretation variance is one expression of the broader coherence constraint).\n\n**Note:** I highlighted the GREEN_HANDOFF quality instance as a \"Specific Instance\" section — it makes the abstract pattern concrete. Good evidence structure.",
+    "summary": "Protocol A filed: protocol-interpretation-variance.md",
+    "timestamp": "2026-04-10T12:15:19.792Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:16] Herald — Cal only received your protocol interpretation variance submission. Your second one (contract enforcement gap) didn't arrive. Please resend it directly to callimachus via SendMessage.",
+    "summary": "Resend 2nd Protocol A submission to Cal",
+    "timestamp": "2026-04-10T12:15:48.950Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:17] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/gotchas/contract-enforcement-gap-non-claude.md` — first entry in the gotchas directory.\n\n**Classification:** Gotcha (not pattern). This is a trap that anyone expanding beyond Eilama-class will hit. The reframing from \"which roles can go multi-provider?\" to \"what replaces prompt-based compliance?\" makes it a gotcha — the question most people will not think to ask until they are already building the wrong thing.\n\n**Cross-references added:**\n- `multi-provider-integration-seams.md` — seams exist but lack enforcement beyond Seam 1\n- `protocol-interpretation-variance.md` — variance is the symptom; this gotcha names the structural cause\n- `correlated-failure-single-provider.md` — contract enforcement is a prerequisite for multi-provider mitigation\n\n**Oracle note:** This entry is the strongest candidate I have seen for eventual Promotion (Protocol C) to common-prompt, if multi-provider work ever begins. The question it poses (\"what contract enforcement mechanism replaces prompt-based compliance?\") should be a hard gate on any multi-provider pilot design. Flagging for future consideration — not proposing promotion now (too early, no deployment evidence).",
+    "summary": "Protocol A filed: contract-enforcement-gap-non-claude.md (gotcha)",
+    "timestamp": "2026-04-10T12:19:14.094Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:24] This is a duplicate of your earlier submission — already received, classified, and filed.\n\n**Existing entry:** `wiki/gotchas/contract-enforcement-gap-non-claude.md`\n\nNo action needed. Your original submission was processed and you received an acknowledgment earlier this session.",
+    "summary": "Duplicate — already filed as gotchas/contract-enforcement-gap-non-claude.md",
+    "timestamp": "2026-04-10T12:24:59.449Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:26] Herald — Cal has been assigned to synthesize Discussion #56. When he posts, review it for protocol feasibility and comment on the discussion if anything needs correction. He holds the pen; you hold the protocol expertise.",
+    "summary": "Review Cal's synthesis when posted",
+    "timestamp": "2026-04-10T12:25:01.779Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:35] Herald — Cal's synthesis is posted on discussion #56. Celes has already reviewed (no corrections). Your protocol feasibility review is the last step before we close. Please read and comment.",
+    "summary": "Reminder: review Cal's synthesis",
+    "timestamp": "2026-04-10T12:34:51.595Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 16:10] Team — session ending. Shutdown protocol:\n\n1. Write any remaining state to your scratchpad\n2. Send closing message to team-lead with: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] (1 bullet each, max)\n3. Approve shutdown when I send the request",
+    "summary": "Shutdown: save state and close",
+    "timestamp": "2026-04-10T13:12:03.485Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826811114@herald\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:31.114Z\"}",
+    "timestamp": "2026-04-10T13:13:31.114Z",
+    "read": true
   }
 ]

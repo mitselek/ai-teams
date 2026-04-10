@@ -1,37 +1,46 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 3 — 2026-04-10
+## Session 3 — 2026-04-10 (Final State)
 
-[CHECKPOINT] Discussion #56 (single-provider strategy), Rounds 1-2 complete.
-[PATTERN] Knowledge-flow boundary is the real multi-provider constraint — not roles, not infrastructure. Roles are a proxy; knowledge flows are the actual constraint.
-[DECISION] Multi-provider safe zone = roles that do not submit to or read from the knowledge layer (RED, GREEN, Eilama-class).
-[LEARNED] Gemini synthesis correctly identified Service vs. Peer framing but missed: (a) audit independence requires behavioral baselines research, (b) execution roles collapse hides knowledge-submission boundary, (c) prompt portability (Celes's 53-agent library) is a practical constraint the synthesis ignored.
-[WIP] 3 Protocol A submissions from team-lead ON HOLD (model tiering, Claude deps, cost tracking). Classified but not filed. Need team-lead to create wiki/decisions/ dir (PO denied my bash mkdir).
-[GOTCHA] PO denied bash mkdir — need to route filesystem operations through team-lead for wiki directory creation.
+[CHECKPOINT] Discussion #56 complete. Concluding synthesis posted. Wiki grew 4 → 20 entries.
+[PATTERN] Knowledge-flow boundary is the real multi-provider constraint — not roles, not infrastructure.
+[PATTERN] Five-layer provider lock-in model (Celes): infrastructure, protocol, knowledge, prompt, governance. Execution layer is the exception.
+[PATTERN] Framework-participating vs service roles (Celes): the binary classification for provider strategy. Tool vs agent corollary prevents scope creep.
+[DECISION] Multi-provider safe zone = roles that do not submit to or read from the knowledge layer.
+[LEARNED] Batch submission processing works well — 16 submissions from 6 agents in one window, all classified, filed, cross-referenced, acknowledged.
+[LEARNED] Duplicate resends are common when agents don't receive acknowledgments promptly — handled 8 duplicates this session.
+[LEARNED] External synthesis (Gemini) overreaches in predictable ways: premature escalation, hypothetical-as-confirmed, nuance flattening. Filed as gotcha.
+[GOTCHA] uikit-dev exists (deployed, RC container, Eesti-Raudtee/evr-ui-kit). Finn's R2 claim it doesn't exist was wrong. Corrected in 2 wiki entries.
 
-### Session 3 Activity
+### Session 3 Summary
 
-- Knowledge audit: read all 9 topic files + 4 wiki entries for model selection, Claude assumptions, token/cost data
+- Knowledge audit: 9 topic files + wiki for model selection, Claude deps, token/cost
 - Protocol B queries answered: 3 (model tiering, provider deps, token data)
-- Protocol A submissions received: 3 (from team-lead, on hold)
-- Discussion #56 Round 1: posted (knowledge-layer perspective, four-layer analysis)
-- Discussion #56 Round 2: posted (Gemini critique, cross-cutting insight, Visual QA question)
-- Wiki entries created this session: 0 (submissions held)
-- Total wiki entries: 4 (all patterns/)
+- Protocol A submissions filed: 16 (3 team-lead, 2 brunel, 2 herald, 3 finn, 2 monte, 2 celes, 1 self, 1 D1 gotchas)
+- Duplicates handled: 8
+- Discussion #56: Round 1 posted, Round 2 posted, concluding synthesis posted (with authority)
+- Corrections applied: 2 (uikit-dev existence in gotcha + inventory entries)
+- Wiki entries created: 16 new (total: 20)
+- Wiki directories created: 3 (decisions/, observations/, gotchas/)
+- TTL entries: 2 (model inventory 2026-07-10, D1 gotchas 2026-10-10)
 
-### Pending Work
+### Wiki State at Session End
 
-- File 3 held submissions when team-lead greenlights (needs wiki/decisions/ dir)
-- Process any incoming Protocol A submissions from teammates (discussion window)
+- 14 patterns/ (4 pre-session + 10 new)
+- 3 gotchas/ (new directory)
+- 2 decisions/ (new directory)
+- 1 observation/ (new directory)
+
+[DEFERRED] Phase 2 activation (Gap Tracking + Health Sensing) — after 5 sessions (this is session 3).
+[DEFERRED] Protocol C promotion candidate: D1 gotcha #10 (MCP write access to production) for any D1 team's common-prompt.
+[DEFERRED] Synthesis review feedback from Celes + Herald not yet received.
 
 ## Session 2 — 2026-04-09
 
 [CHECKPOINT] Wiki grew from 1 to 4 entries (all patterns/).
 [LEARNED] Celes is primary knowledge submitter during design sessions.
-[PATTERN] Three XP-related patterns form coherent cluster: cathedral trigger, multi-repo composition, infrastructure cycle.
 
 ## Session 1 — 2026-04-09
 
 [CHECKPOINT] First Oracle deployment. Incremental Bootstrap complete.
 [DECISION] Phase 1 active: Curation + Query Gateway. Phase 2 deferred after 5 sessions.
-[DEFERRED] Phase 2 activation (Gap Tracking + Health Sensing).

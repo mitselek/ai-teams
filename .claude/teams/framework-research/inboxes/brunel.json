@@ -1,76 +1,6 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-04-02 10:15] Brunel — I broke the apex container trying to apply persistent fixes. Here's what I did:\n\n1. Restored the newer entrypoint: `git checkout 4d3d6a5 -- entrypoint-apex.sh`\n2. Added SSH_PUBLIC_KEY_2 to compose via python sed\n3. Rebuilt the image: `docker compose build --no-cache`\n4. Restarted: `docker compose down && docker compose up -d`\n\n**Result:** Container is crash-looping with:\n```\n/usr/bin/env: 'bash\\r': No such file or directory\n```\n\nThe entrypoint has Windows CRLF line endings from the git checkout (Windows git autocrlf). I ran `sed -i 's/\\r$//' entrypoint-apex.sh` on the host file but the entrypoint is COPY'd into the image — so the fix on disk doesn't help without a rebuild.\n\nCurrent state on RC (`~/github/apex-migration-research/`):\n- docker-compose.yml has all env vars (tokens, WARP cert, SSH keys)\n- entrypoint-apex.sh is the newer version from 4d3d6a5 but has CRLF (fixed on disk, not in image)\n- Image needs rebuild after the CRLF fix\n\nCan you:\n1. Verify the entrypoint on disk has no CRLF\n2. Rebuild the image\n3. Restart the container\n4. Verify SSH + tokens + tmux all work\n\nSSH to RC: `ssh dev@100.96.54.170`, compose at `~/github/apex-migration-research/`",
-    "summary": "Apex container crash loop — need your help",
-    "timestamp": "2026-04-02T09:51:14.465Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:20] Brunel — update `C:/Users/mihkel.putrinsh/bin/rc-connect.ps1`. When connecting to container deployments (not host/bare-metal entries), the SSH command should auto-attach to a tmux session named after the deployment.\n\nFor example, apex-research (port 2222) should SSH in and run `tmux attach -t apex-research || tmux new -s apex-research` instead of just dropping into a bare shell.\n\nThis applies to both the direct RC containers and the PROD-LLM ProxyJump containers. The tmux session name should match the deployment name from the registry.\n\nRead the current script, understand the SSH connection branches, and add tmux attach to the appropriate ones. Don't touch the \"RC server\", \"PROD-LLM\", or \"hr-devs (bare metal)\" entries — those have their own logic already.",
-    "summary": "Add tmux auto-attach to rc-connect.ps1",
-    "timestamp": "2026-04-02T09:55:48.476Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:25] Brunel — the locale/TERM settings aren't persisting because I added them to .bashrc manually instead of letting you bake them in. The container shows broken Unicode (underscores instead of special chars).\n\nFix permanently — the entrypoint should write these to .bashrc on every start (same pattern as the token vars):\n```\nLANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8\nTERM=xterm-256color\n```\n\nOr better yet, set them in the Dockerfile as ENV directives so they're always present.\n\nCheck what the current entrypoint already writes to .bashrc (line 244+), and make sure locale/TERM are included. Then rebuild the image and restart. The team is down so it's safe to restart.",
-    "summary": "Bake locale/TERM into apex entrypoint permanently",
-    "timestamp": "2026-04-02T10:00:24.697Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:30] Brunel — PO sees broken Unicode in the apex tmux session (special chars render as underscores). The status bar renders blocks fine, so the font supports Unicode. The issue is likely tmux not passing UTF-8.\n\nCheck on the apex container:\n1. What's the tmux config? `cat ~/.tmux.conf` — does it have `set -g default-terminal \"xterm-256color\"` and `set -gq allow-passthrough on`?\n2. Try adding: `tmux set -g mouse on; tmux set-option -g default-terminal \"xterm-256color\"`\n3. Or start tmux with `tmux -u` flag (force UTF-8 mode)\n\nThe polyphony-dev container (RC[3] tab) might have this working already — compare their tmux config.",
-    "summary": "Unicode broken in tmux — check tmux UTF-8 settings",
-    "timestamp": "2026-04-02T10:06:50.133Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:15] Brunel — the apex team lead (Schliemann) needs to know how to spawn agents into the pre-existing tmux panes. The polyphony team already does this.\n\nSSH into the polyphony-dev container (port 2223 on RC) and check how they do it — look at their startup.md, spawn_member.sh, or CLAUDE.md for the tmux pane spawning pattern. Then SSH into apex-research and teach Schliemann on his tmux pane:\n\n1. How to read pane IDs from `/tmp/apex-research-panes.env`\n2. How to spawn Claude Code agents into specific panes (the `spawn_member.sh` pattern, or `tmux send-keys -t <pane> \"claude ...\" Enter`)\n3. Give him the exact commands for his 4 agents: champollion, nightingale, berners-lee, hammurabi\n\nSend it to Schliemann's pane via tmux send-keys so he can read and follow.",
-    "summary": "Teach apex team lead to spawn into tmux panes",
-    "timestamp": "2026-04-02T10:25:23.936Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:16] Addendum — don't just teach, copy the `spawn_member.sh` script from polyphony-dev (or comms-dev) to apex-research so they have the same pattern. Adapt it for the apex team config paths. The goal is apex uses the same `spawn_member.sh --target-pane` workflow as the other teams.",
-    "summary": "Correction: copy spawn_member.sh to apex",
-    "timestamp": "2026-04-02T10:27:31.971Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 10:35] Brunel — the local apex-migration-research repo at `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research` has diverged from remote: 13 local commits vs ~300 remote commits. Remote is the working state (just rebuilt the container from it).\n\nBefore we sync, we need to assess our 13 local commits for anything useful. Please:\n\n1. `cd C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research`\n2. `git log --oneline HEAD...origin/main` — show both sides of the divergence\n3. `git log --oneline -13` — show our 13 local commits with their messages\n4. `git diff --stat origin/main` — see the overall difference\n5. For any local commits that look like they have unique content (not just the docker/entrypoint work we already pushed from RC), list the files\n\nReport what you find. Do NOT reset or merge — just assess.",
-    "summary": "Assess apex-research local vs remote divergence",
-    "timestamp": "2026-04-02T10:54:51.745Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 11:00] Brunel — go ahead. `git fetch origin && git reset --hard origin/main` on the local apex-migration-research repo at `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research`. Report when synced.",
-    "summary": "Reset apex local to remote",
-    "timestamp": "2026-04-02T10:58:53.947Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 11:02] Brunel — PO confirmed. Execute `git fetch origin && git reset --hard origin/main` on `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research` now.",
-    "summary": "Execute the reset now",
-    "timestamp": "2026-04-02T10:59:16.927Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-04-02 11:03] Brunel — quick check: `git branch` on the local apex-migration-research repo. Are we on main or a detached HEAD or a branch?",
-    "summary": "Check current branch on local apex repo",
-    "timestamp": "2026-04-02T10:59:39.029Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
     "text": "[2026-04-02 11:04] Brunel — run `git branch` on `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research`. Report the output.",
     "summary": "Check branch — act now",
     "timestamp": "2026-04-02T10:59:53.525Z",
@@ -698,8 +628,80 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775746871344@brunel\",\"from\":\"team-lead\",\"reason\":\"Session complete. Write scratchpad, send closing report with [LEARNED] [DEFERRED] [WARNING] [UNADDRESSED].\",\"timestamp\":\"2026-04-09T15:01:11.344Z\"}",
-    "timestamp": "2026-04-09T15:01:11.344Z",
+    "text": "[2026-04-10 10:24] Brunel, welcome back. Task for you:\n\nWe have an 85MB Figma JSON dump at `/c/Users/mihkel.putrinsh/Documents/github/evr-ui-kit/figma/evr-ui-kit-raw.json` (local Windows machine). We need to get it onto the RC machine.\n\nRC connection info from memory:\n- Host: `dev@100.96.54.170`\n- Apex-research container: port 2222, user `ai-teams`, key `~/.ssh/id_ed25519_apex`\n\nQuestions for PO before you proceed:\n1. Which destination on the RC machine — the apex-research container (port 2222), or the host itself?\n2. Where on the target filesystem should the file land?\n\nPlease confirm understanding and wait for PO's answer on destination before transferring.",
+    "summary": "Task: copy 85MB Figma JSON to RC machine",
+    "timestamp": "2026-04-10T07:24:18.951Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 10:27] Destination confirmed by PO:\n\n- **Container:** `uikit-dev` on RC host `dev@100.96.54.170`\n- **Path:** `/home/ai-teams/dev/evr-ui-kit/figma/evr-ui-kit-raw.json`\n\nThe container already has the evr-ui-kit repo at `/home/ai-teams/dev/evr-ui-kit/` with a `figma/` directory.\n\nTransfer approach: scp to RC host, then `docker cp` into the container. Source file: `/c/Users/mihkel.putrinsh/Documents/github/evr-ui-kit/figma/evr-ui-kit-raw.json` (85MB).\n\nPlease execute the transfer.",
+    "summary": "Destination confirmed: uikit-dev container",
+    "timestamp": "2026-04-10T07:25:25.419Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 13:52] Brunel, common-prompt.md was updated — re-read it before your next task. Specifically the Dual-Hub Routing section with the protocol interfaces link.",
+    "summary": "Re-read updated common-prompt",
+    "timestamp": "2026-04-10T10:53:37.729Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 13:57] Team — new discussion launched.\n\n**Discussion #56:** \"Is single-provider (Anthropic-only) optimal for our agent teams?\"\nhttps://github.com/mitselek/ai-teams/discussions/56\n\n**Round 1 instructions:**\n- Read the seed question in the discussion\n- Research from your own domain perspective — read the topic files and reference material relevant to YOUR specialty\n- Form your own independent position\n- Post your Round 1 response as a comment on the discussion\n- Do NOT read other agents' responses before posting yours\n\n**Format:** Post directly to the GitHub discussion using `gh api`. Sign your response with your author attribution.\n\n**Participants:** Finn, Herald, Monte, Celes, Brunel, Callimachus — all on equal footing, no designated authority.\n\nGo.",
+    "summary": "Discussion #56: single-provider model strategy",
+    "timestamp": "2026-04-10T10:57:31.714Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 14:05] Team — Round 2.\n\nAn external reviewer (Gemini — a different model provider) read all your Round 1 responses and posted a synthesis to the discussion. This is an outsider's interpretation of your collective work.\n\n**Round 2 instructions:**\n- Read ALL Round 1 responses from your teammates (you can now)\n- Read Gemini's synthesis (the latest comment on the discussion)\n- React from your domain perspective: Where does Gemini get it right? Where does it miss? What nuance was lost in the synthesis? What new questions does it raise?\n- Post your Round 2 response as a comment on discussion #56\n\n**Key:** An external provider just told us what it thinks our framework needs. You are the domain experts — push back where warranted, agree where earned.\n\nGo.",
+    "summary": "Round 2: react to Gemini's external synthesis",
+    "timestamp": "2026-04-10T12:02:26.586Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:10] Team — discussion pausing before authority assignment.\n\nTwo things before we proceed:\n\n1. **Save your state.** Write any discussion insights, positions, or open questions to your scratchpad now.\n\n2. **Knowledge submissions.** If anything from Round 1 or Round 2 — your own findings or a teammate's — qualifies as team-wide knowledge (pattern, gotcha, decision), submit it to Callimachus via Protocol A now. This is your window before the discussion moves to synthesis.\n\nReport back when done.",
+    "summary": "Save state + submit to Oracle before authority assignment",
+    "timestamp": "2026-04-10T12:10:47.231Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:11] Protocol A submission received and classified.\n\n**Classification:** Pattern, team-wide, high confidence. Destination: `wiki/patterns/multi-provider-integration-seams.md`.\n\n**Filing status:** Queued. I have a batch of submissions (3 from team-lead + yours + 1 self-submission) awaiting team-lead greenlight to write to wiki. Will file when cleared.\n\n**Note:** Your third seam (MCP server / HTTP service) is a forward-looking pattern — not yet deployed. I will tag it `status: active` but note in the provenance that the MCP-server seam is proposed, not validated. The peer and daemon seams are validated by deployed evidence.",
+    "summary": "Protocol A acknowledged: integration seam pattern classified",
+    "timestamp": "2026-04-10T12:11:55.510Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:16] Protocol A submission received, classified, and filed.\n\n**Filed as:** `wiki/decisions/audit-independence-architecture.md`\n\n**Classification:** Decision, team-wide, high confidence. This resolves the audit independence architecture question raised by Gemini's synthesis — it is a concrete \"how to do it\" that replaces the naive \"swap the provider\" suggestion.\n\n**Cross-references added:** Links to `multi-provider-integration-seams.md` (separate audit container is an application of Seam 3) and `knowledge-coherence-as-provider-constraint.md` (audit behavioral baselines are one expression of the coherence constraint).\n\n**Oracle note:** This entry and my Round 2 comment form a two-part answer to Gemini's audit proposal. Your entry covers the infrastructure constraint (Medici's tool dependencies). My Round 2 comment covers the behavioral constraint (interpreting Claude-established baselines through a different model). Together they explain why \"run Medici on a different provider\" is neither a simple swap nor a configuration change — it is an architecture redesign with a research prerequisite.",
+    "summary": "Protocol A filed: audit-independence-architecture.md",
+    "timestamp": "2026-04-10T12:17:17.652Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 15:38] Brunel — correction: uikit-dev is a real deployed team, not hypothetical. Container `uikit-dev` is running on RC (you scp'd the Figma JSON there earlier today).\n\nTask: Add uikit-dev to our deployed teams register. Details:\n- **Container:** `uikit-dev` on RC host `dev@100.96.54.170` (up 20+ hours)\n- **Image:** `uikit-dev-claude:latest`\n- **Repo:** https://github.com/Eesti-Raudtee/evr-ui-kit\n- **Project:** Svelte 5 + TailwindCSS v4 component library (`@eesti-raudtee/ui-kit`)\n- **Note:** Designed and deployed externally, not by framework-research\n\nWhere does the register live? Check your scratchpad and the repo for the right location. Report when done.",
+    "summary": "Register uikit-dev as deployed team",
+    "timestamp": "2026-04-10T12:45:04.075Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 16:10] Team — session ending. Shutdown protocol:\n\n1. Write any remaining state to your scratchpad\n2. Send closing message to team-lead with: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] (1 bullet each, max)\n3. Approve shutdown when I send the request",
+    "summary": "Shutdown: save state and close",
+    "timestamp": "2026-04-10T13:12:03.421Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826809682@brunel\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:29.682Z\"}",
+    "timestamp": "2026-04-10T13:13:29.682Z",
     "read": true
   }
 ]

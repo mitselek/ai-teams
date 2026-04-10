@@ -18,7 +18,9 @@
 
 [LEARNED] Team convergence on Discussion #56 was remarkably strong across 6 independent assessments. All agreed: single-provider default, Eilama/sidecar pattern for exceptions, test-gated execution as lowest-risk multi-provider niche. Divergence was in emphasis: Brunel on containers, Callimachus on knowledge layer, Celes on prompt library, Monte on governance, Finn on empirics, Herald on protocol compliance.
 
-[DEFERRED] Contract enforcement layer design — formal API contract specification for non-Claude participants. This is my domain (protocol design) and the natural next step if multi-provider ever advances beyond Eilama.
+[DEFERRED] Contract enforcement layer design — three-part problem: contract definition (API spec), contract validation (conformance test suite), contract monitoring (runtime format validation at integration seam). Assigned to Herald in Discussion #56 actionable item #3.
+
+[CHECKPOINT] R12 complete. Discussion #56 closed: Round 1 (independent), Round 2 (react to Gemini), state save + 2 Protocol A submissions to Oracle, protocol feasibility review of Cal's synthesis (approved, no corrections). 3 discussion comments posted, 2 wiki entries filed.
 
 ## 2026-04-09 (session R11 — rounds 4-5)
 

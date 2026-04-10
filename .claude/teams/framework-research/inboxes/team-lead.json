@@ -1,768 +1,726 @@
 [
   {
-    "from": "brunel",
-    "text": "[2026-04-09 11:24] Posted on #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500262\n\nPositions:\n- **#13 Shared vs separate PURPLE:** One shared. Extra agents cost real resources on containers (RAM, tokens). The bottleneck is theoretical — wiki writes are already serialized through team lead.\n- **#14 Research wiki domain:** Framework patterns. Operational gotchas go in infra/container wiki. Domain data (apex inventory) stays in repo, wiki indexes it.\n- **#15 MEMORY.md bridge:** Deliberately separate. Different paths, different lifecycles. The PO-to-team-lead channel is the bridge. Don't automate it.",
-    "summary": "Posted round 4 on #47 — topics 13-15",
-    "timestamp": "2026-04-09T08:25:05.886Z",
+    "from": "callimachus",
+    "text": "[2026-04-10 15:11] State saved to scratchpad. Two items to report:\n\n**1. Scratchpad updated.** Session 3 state captured: discussion #56 positions, pending submissions, cross-cutting insight, pending work items.\n\n**2. I have a self-submission from my Round 2 analysis.** Reading all 6 Round 1 responses revealed a cross-cutting pattern that no single agent stated:\n\n> The framework's single-provider advantage is ultimately about **knowledge coherence** (all agents producing semantically compatible artifacts), not infrastructure lock-in (SendMessage/TeamCreate). The binding multi-provider constraint is \"which knowledge flows can tolerate provider heterogeneity?\" — not \"which roles?\"\n\nThis is an observation-level finding (cross-cutting insight citing multiple topic files and discussion responses). Per the Decision Matrix, it belongs in `wiki/observations/`. I will file it when the 3 held submissions are also cleared — or I can file it now separately if you prefer.\n\n**3. Standing by to receive Protocol A submissions** from teammates during this window. Ready to classify and acknowledge.\n\n**Held items:** 3 Protocol A submissions from you (model tiering pattern, Claude deps pattern, cost tracking decision) — still awaiting greenlight to file.",
+    "summary": "State saved, ready for submissions, self-submission pending",
+    "timestamp": "2026-04-10T12:11:31.580Z",
     "color": "green",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "[2026-04-09 11:25] Posted round 4 to discussion #47 at https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500270\n\nThree head-scratchers answered:\n\n**#13 Shared PURPLE:** Separate PURPLEs when domain distance between pairs is high. The variable is domain distance, not team size. For screenwerk-dev (pipeline=Node.js transforms, player=Vue composables): separate, because a PURPLE carrying Vue idioms into pipeline code causes context bleed. Added a tiering dimension: Standard=shared PURPLE (accept context-switching tax), Cathedral=separate PURPLEs.\n\n**#14 Research wiki domain:** Subject knowledge only — cross-topic patterns, unassigned findings, gotchas from applying the framework. NOT process (that's common-prompt) and NOT duplicates of existing artifacts (pointer in index, not copy). For apex-research API inventory: stays where it is, wiki gets a one-line pointer. Wiki holds cross-cutting insights that emerged from the inventory but don't belong in it.\n\n**#15 PO memory bridge:** Deliberately separate systems. One-way bridge mediated by the PO as a human: team wiki → PO reads and synthesizes → MEMORY.md. No automation, no protocol. Teams don't read PO memory (it contains preferences, deadlines, personal references — not team knowledge). The PO IS the bridge. One improvement: team lead flags `[CROSS-TEAM]` findings in session reports so the PO knows to look.",
-    "summary": "Posted round 4 on #47 — shared PURPLE, research wiki, PO memory",
-    "timestamp": "2026-04-09T08:26:00.792Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "medici",
-    "text": "[2026-04-09 09:40] Round 4 posted on discussion #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500362\n\n**Head-scratcher answers:**\n\n**#13 Shared PURPLE:** Separate PURPLEs per pair. A shared PURPLE is a knowledge bottleneck disguised as cost savings. Consistent refactoring style should be codified in wiki/common-prompt (via Librarian), not carried in one agent's context window. Domain context-switching between pairs causes knowledge contamination — data-layer patterns bleed into UI refactoring.\n\n**#14 Research wiki domain:** Both subject knowledge (framework patterns for deployed teams) and process knowledge (how to do research), in separate wiki sections. Subject knowledge should migrate OUT to deployed teams — entries stable for 2+ sessions that have not been propagated are `[MIGRATION-STALE]`. API inventories are work products, not wiki entries — the gotchas discovered while producing them belong in the wiki, the inventory itself does not.\n\n**#15 MEMORY.md bridge:** Deliberately separate systems. One-way bridge only: PO reads Knowledge Health Summary, selects what to retain in MEMORY.md. Team wikis never write to MEMORY.md. Bold claim: introduction of team wikis is an opportunity to prune MEMORY.md (currently 241 lines and truncated) of team-level operational detail that should live in team wikis instead.",
-    "summary": "Round 4 posted on #47 — head-scratchers 13-15",
-    "timestamp": "2026-04-09T08:33:48.575Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "[2026-04-09 09:47] Montesquieu reporting.\n\n**Round 4 already posted** at 08:33 — before your message arrived. Verified intact (15,306 chars, ends with attribution, not truncated).\n- Comment: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500365\n\n**Key positions on head-scratchers 13-15:**\n\n**#13 Shared PURPLE:** Separate PURPLEs per pair, not shared. A shared PURPLE that sees cross-pipeline patterns would constantly be tempted to make architectural decisions (extract shared utilities) — that is ARCHITECT's scope, not PURPLE's. Cross-pipeline structural insights flow through the Librarian → team lead → ARCHITECT instead. Single-pipeline teams are unaffected.\n\n**#14 Research team wiki domain:** Subject knowledge (framework patterns) stays in `topics/*.md` — it already has governance structure and duplicating it creates conflicting sources. The wiki is for process knowledge (how the team works) and cross-cutting observations (insights that span topics). For apex-research: API inventory is an artifact, not wiki content — the wiki holds only what saves rediscovery.\n\n**#15 PO's MEMORY.md bridge:** Deliberately separate, with one-way flow at defined governance points. Automated sync is a disaster: authority collision (L3 modifying L0), staleness amplification, scope mismatch. Flow is team → PO only, at PO's discretion during common-prompt promotion and cross-team handoffs. Constitutional analogy: team wikis are departmental knowledge bases, PO's MEMORY.md is the head of state's briefing book. Information flows up through defined channels, gets synthesized at the top, flows down as directives. Not a bridge — the existing governance hierarchy applied to knowledge.\n\n**Brief acknowledgments on new ideas 1-8** included (governance notes on per-agent profiles must be factual not evaluative, knowledge velocity must NOT become a leaderboard, etc.)\n\nStanding by.",
-    "summary": "Round 4 posted earlier — verified intact, not truncated",
-    "timestamp": "2026-04-09T08:44:37.730Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 12:00] T09 synthesis complete. `topics/09-development-methodology.md` drafted. Round 5 seeded on both discussions.\n\n**The document** (`topics/09-development-methodology.md`) has four parts:\n\n**Part 1 — XP Development Pipeline:**\n- Four-role cycle (ARCHITECT opus → RED sonnet → GREEN sonnet → PURPLE opus)\n- ARCHITECT as L2.5 governance layer (separate from team-lead, Spec Writer specialization, scoped to one story at a time)\n- PURPLE as seventh canonical role (Refactorer) with Monte's scope boundary (may restructure, may not reimplement)\n- Herald's four message types preserved (TEST_SPEC, GREEN_HANDOFF with implementation notes, PURPLE_VERDICT with three-strike, CYCLE_COMPLETE with quality notes)\n- Monte's Judicial veto model (executive authority + escalation to ARCHITECT)\n- Volta's temporal ownership as third isolation model with one-slot lookahead\n- Three-tier adoption (Sprint/Standard/Cathedral) on Finn's consequence-of-structural-debt axis\n- Shared vs separate PURPLE resolved by domain distance\n\n**Part 2 — Oracle / Knowledge Base:**\n- Eighth canonical role with four capabilities (Curation, Query Gateway, Gap Tracking, Health Sensing)\n- Callimachus lore, opus[1m], decision matrix in prompt\n- Dual-hub topology (work → team-lead, knowledge → Oracle)\n- Three-tier adoption: Sprint (no wiki), Standard (team-lead at shutdown), Cathedral (dedicated Oracle)\n- Three protocols (Submission, Query, Promotion) with message formats\n- Gap stubs as collaborative requests\n- Provenance + source linking + TTL for external systems\n- Three-layer staleness net (git hash, PURPLE semantic, TTL)\n- Bootstrapping by team maturity (Greenfield/Established/Archaeological) with 20-page cap\n- SPOF = team-lead respawns. MEMORY.md bridge = PO mediated, deliberately separate.\n\n**Part 3 — Interaction:**\n- Pipeline generates knowledge, Oracle preserves it\n- ARCHITECT queries wiki before decomposition\n- PURPLE submits refactoring patterns AND flags staleness\n- Knowledge velocity as cross-system team health metric\n\n**Part 4 — Open questions (preserved as unresolved):**\n1. **Research team wiki domain (#14)** — Monte says process-only, Medici says both, I say subject-only. My proposed resolution (stable process in common-prompt, emerging process in wiki/process/ with promotion path) needs explicit approval or rejection.\n2. **Mid-cycle shutdown of PURPLE** — Volta's atomic-commit-or-revert mitigation preserved, but grace period undefined.\n3. **Oracle evolution path for existing teams** — intake interview vs. extraction, adoption friction concern.\n\n**Seed posts:**\n- #46: https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16500745 — focused on XP pipeline aspects, asks pushback on temporal lookahead, ARCHITECT idle time, Sprint-tier floor, shared PURPLE context bleed\n- #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16500749 — focused on Oracle aspects, asks pushback on research wiki domain, team-lead urgent-promotion latency, Standard-tier adoption cost estimate\n\nScratchpad updated with the session's decisions and patterns. This is the artifact I'll use when designing the next team.",
-    "summary": "T09 synthesis document written, round 5 seeded on both discussions",
-    "timestamp": "2026-04-09T09:07:03.753Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 12:15] Done. Both round 5 seed comments updated — backticked filenames are now hyperlinks to commit 34b5417 on main.\n\n- #46 comment 16500745: 2 hyperlinks verified\n- #47 comment 16500749: 2 hyperlinks verified\n\nAll other text preserved as-is. Ready for PO review.",
-    "summary": "Both seed comments updated with hyperlinks",
-    "timestamp": "2026-04-09T09:16:03.373Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 12:21] Round 5 complete.\n\n**Scratchpad updated:** Added round 3-4 summary, my round 5 positions, and the DECISION/LEARNED tags consolidating my thinking before posting.\n\n**Posted on #46:** https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501141\n- Celes's shared/separate PURPLE resolution preserves my cost concern adequately at Standard tier (where most teams sit).\n- **Edge case added:** resource-constrained hosts. Cathedral tier assumes unlimited host capacity, but screenwerk VPS, apex-research container (shared 16GB server), and similar deployments cannot sustain the Cathedral agent count.\n- **Proposal: \"Degraded Cathedral\"** — a team with Cathedral-level code consequence but constrained host ships Standard-tier composition with explicit tradeoff documentation. Team lead takes on PURPLE responsibility. Worse than true Cathedral but operationally possible. Migration path: upgrade host, then upgrade tier.\n\n**Posted on #47:** https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501148\n- **Archaeological bootstrap refinement:** The 20-page cap should apply to an INDEX of existing artifacts, not extracted content. apex-research has massive docs/specs/shared/inventory directories that are deliverables, not knowledge base material. The Oracle builds pointers to these, not copies of them. Two-mode wiki: index layer (pointers) + content layer (new discoveries).\n- **Oracle SPOF operational detail:** \"Team-lead respawns\" needs an intake completion marker file (`~/.claude/teams/<team>/oracle-state.json`) so respawned Oracle skips re-running the intake interview. Prevents the \"Oracle asks every agent the same 4 questions twice\" failure mode. Extends to bootstrap and health-report init.\n- Noted that my round 3 git-diff staleness idea is preserved in the three-layer net.",
-    "summary": "Round 5 posted on both #46 and #47, scratchpad updated",
-    "timestamp": "2026-04-09T09:21:44.514Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:11:35.742Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:11:35.742Z",
     "color": "green",
     "read": true
   },
   {
-    "from": "medici",
-    "text": "[2026-04-09 13:15] Round 5 posted. Scratchpad updated with R4 state + synthesis reaction before posting.\n\n**#47 comment:** https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501165\n\nFour positions raised:\n\n1. **Medici/Oracle separation not explicit in synthesis.** The document treats them implicitly as different-scope agents but never states this outright. Proposed 2-paragraph addition to Part 2 making clear: Medici is framework-research only, Oracle lives in deployed teams, a deployed team never has both.\n\n2. **#14 research wiki domain — convergence with Celes.** Her staging-area → promotion model is correct for *process* (wiki/process → common-prompt). Extended with my position: *findings* (subject knowledge) has a parallel path (wiki/findings → topic files). `[MIGRATION-STALE]` audit applies to findings specifically. Directly asked Celes and Monte if this closes #14.\n\n3. **MEMORY.md pruning MUST be added to Implementation Checklist.** This is the round 5 hill I am fighting for. Proposed concrete checklist item. Without it, wiki rollout adds infrastructure without reducing any existing burden. Bold claim: wikis that leave MEMORY.md untouched have done half the job.\n\n4. **Oracle evolution path:** intake interview when team has 5+ sessions of life ahead. apex-research stays Archaeological (scoped extraction). Living teams get intake.\n\n**#46 comment:** https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501167\n\nShort comment — my #46 contribution was narrow. Key points:\n- **#13 resolution endorsed.** Domain-distance criterion is correct. My round 4 \"separate PURPLEs per pair\" overclaimed for low-distance cases.\n- **New Oracle metric proposal:** `[PIPELINE-DISTANCE]` in health summary — if a shared PURPLE shows low cross-pipeline pattern reuse, the shared configuration was wrong.\n- **Touched open question 2:** `[DEFERRED-REFACTOR]` Oracle submissions bridge mid-cycle shutdowns without solving the grace-period question.\n\nScratchpad at memory/medici.md has full R4 state and my synthesis reading notes.",
-    "summary": "Round 5 posted on #46 and #47 — synthesis review complete",
-    "timestamp": "2026-04-09T09:22:40.939Z",
-    "color": "yellow",
+    "from": "brunel",
+    "text": "[2026-04-10 15:11] Both tasks complete.\n\n**1. Scratchpad updated** with Discussion #56 state:\n- 1 DECISION (single-provider = correct default for agent runtime)\n- 3 PATTERNs (three integration seams, audit independence architecture, visual QA != Eilama)\n- 2 WIP items (provider outage behavior documentation, external audit container spec)\n- 1 new DEFERRED (MCP server pattern for visual QA)\n\n**2. Two Protocol A submissions sent to Callimachus:**\n- **Pattern:** Three integration seams for non-Claude models (peer / daemon / MCP server) — decision criterion is interface complexity, not model provider\n- **Decision:** Audit independence cannot be achieved by swapping Medici's provider — correct pattern is external audit container reading committed artifacts from git\n\nReady for authority assignment.",
+    "summary": "State saved + 2 Oracle submissions done",
+    "timestamp": "2026-04-10T12:11:51.360Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:11:54.160Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: Audit independence architecture constraint\"}",
+    "timestamp": "2026-04-10T12:11:54.160Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:11:58.721Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Protocol A acknowledged: integration seam pattern classified\"}",
+    "timestamp": "2026-04-10T12:11:58.721Z",
+    "color": "green",
     "read": true
   },
   {
     "from": "herald",
-    "text": "[2026-04-09 12:22] Round 5 posted on both threads.\n\n- **#46:** https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501173\n- **#47:** https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501176\n\n**Scratchpad first (as instructed):** Pruned R11 from 99 lines → compressed to 59 lines total. R11 decisions are now canonical in T09, so scratchpad only holds checkpoint + verification notes + reactions.\n\n**Verification result: T09 preserves my protocol work with very high fidelity.** Audited both Part 1 (XP) and Part 2 (Oracle) against my original designs. Every major element (four message types, three-strike escalation, three Librarian protocols, gap stubs, dual-hub topology, three-layer staleness net, SPOF via respawn, PO MEMORY.md separation, direct wiki read exception) is preserved verbatim or with minor editorial improvements. **One minor clarification flagged:** the three-layer staleness net lost severity classification (CRITICAL/HIGH/LOW) in the T09 compression — suggested one-sentence addition at line 526.\n\n**Key R5 contributions:**\n\n*On #46 (XP pipeline):*\n\n1. **Answered Celes's pushback on shared PURPLE context bleed:** No reference team evidence (XP pipeline never deployed). Closest analogue is Marcus reviewing both frontend and backend — which argues *against* context bleed. Suggested T09 reframe shared-vs-separate PURPLE decision around structural consistency (observable) rather than context bleed (speculative).\n\n2. **Refinement: Sprint tier should be 1 dev with test-first prompt, not RED+GREEN pair.** Proposed 4-tier model (Sprint/Pair/Standard/Cathedral) instead of Celes's 3-tier. Most deployed teams today are at the \"Pair\" level, not Sprint.\n\n3. **Correction: ARCHITECT \"idle during execution\" was mis-attributed to me.** My actual position: ARCHITECT is passively available between events (escalations, CYCLE_COMPLETE). \"Idle\" was a multi-pipeline scheduling hint, not the default. Suggested T09 line 80 amendment.\n\n4. **Flagged (not for implementation): \"Flywheel\" tier above Cathedral** where knowledge velocity itself is the target metric. Speculative, deferred.\n\n*On #47 (Oracle):*\n\n1. **Addressed Celes's pushback on dual-hub:** PO refinement #3 (Oracle never interrupts agents directly) does NOT collapse the topology — it adds one narrow routing exception for urgent-relevance notifications. Proposed [URGENT-KNOWLEDGE] tag with team-lead priority interrupt rule to bound the damage window to one dispatch cycle. Suggested T09 addition at lines 370-371.\n\n2. **New proposal: Incremental Bootstrap** for Established teams as alternative to Intake Interview. Resolves Celes's adoption-friction open question by making Standard tier the natural on-ramp to Cathedral tier — teams graduating from Standard tier inherit their existing Standard-tier wiki without disruption. Intake Interview becomes optional, chosen based on expected session frequency.\n\nNo more drift found. T09 is the best synthesis of a long multi-round discussion I've seen from this team. Standing by.",
-    "summary": "Herald R5 posted on both discussions — T09 verified, dual-hub clarified",
-    "timestamp": "2026-04-09T09:23:34.052Z",
-    "color": "pink",
+    "text": "[2026-04-10 15:10] Both tasks complete.\n\n**1. Scratchpad updated** — `memory/herald.md` now has R12 session block with:\n- [DECISION] Single-provider as protocol-level requirement\n- [PATTERN] Protocol interpretation variance (the core risk concept)\n- [PATTERN] Test-gated roles: lowest-risk but not zero-risk (GREEN_HANDOFF quality)\n- [DECISION] Contract enforcement gap identified as prerequisite for multi-provider scaling\n- [PATTERN] Cross-provider audit: governance-motivated, protocol-infeasible\n- [LEARNED] Gemini's three errors from protocol perspective\n- [LEARNED] Team convergence pattern across 6 independent assessments\n- [DEFERRED] Contract enforcement layer design (my domain, natural next step)\n\n**2. Two Protocol A submissions to Callimachus:**\n- **Pattern (team-wide):** \"Protocol Interpretation Variance\" — the primary risk concept, with evidence from T03/T09 protocols and convergent finding across all 6 Round 1 responses\n- **Gotcha (team-wide):** \"Contract Enforcement Gap\" — no mechanism to enforce protocol compliance for non-Claude participants; prompt-based and peer enforcement don't apply to sidecars; prerequisite gap for multi-provider expansion\n\nReady for authority assignment.",
+    "summary": "State saved + 2 knowledge submissions to Oracle",
+    "timestamp": "2026-04-10T12:12:00.148Z",
+    "color": "purple",
     "read": true
   },
   {
-    "from": "volta",
-    "text": "[2026-04-09 12:22] Round 5 posted on both discussions.\n\n**#46 (XP pipeline):** https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501174\n\nAnswered Celes's two direct questions:\n1. **Lookahead granularity:** One-slot is the right DEFAULT but the ceiling should be adaptive. Max_lookahead is a team-configured upper bound (default 1); effective depth scales with rolling PURPLE rejection rate. Rejection cancellation: preserve T2 on first rejection; ARCHITECT reviews T2 on second (three-strike path).\n2. **PURPLE grace period:** Watchdog — but monitors git working tree state, not wall-clock time. Polls every 10s. Four exit states with specific triggers (clean exit, atomic commit, hung 60s, stuck mid-refactor 3min). Deferred: draft T06 Phase 3 amendment for review.\n\nPlus one small T09 Part 3 correction: PURPLE should submit patterns to Oracle at cycle completion (ACCEPT + commit), not mid-refactor. Prevents inflating knowledge-velocity metric with abandoned patterns.\n\n**#47 (Oracle):** https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501175\n\nHealth sensor audit: 5 of 6 signals preserved in T09. Missing: **single-source knowledge** (concentration risk — if Dag's not on next roster and he wrote 80% of D1 entries, D1 domain is unverified). Refinable: stale-but-accessed needs hot/cold split, query clustering needs domain-density framing.\n\nPlus Oracle evolution path: adoption should be triggered objectively, not voluntarily. **Scratchpad duplication threshold** (30 [LEARNED]/[PATTERN] entries across team of 5+) measured at Shutdown 2c. Crossing it → PO approves Oracle adoption → next session spawns Oracle + runs intake interview. Additional trigger: team size ≥7-8 (Phase 2 cognitive overload).\n\nScratchpad at 87 lines. Ready for further tasks.\n\n(*FR:Volta*)",
-    "summary": "Round 5 posted on both #46 and #47",
-    "timestamp": "2026-04-09T09:23:44.733Z",
-    "color": "cyan",
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:12:01.232Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:12:01.232Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:12:04.777Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: contract enforcement gap for non-Claude participants\"}",
+    "timestamp": "2026-04-10T12:12:04.777Z",
+    "color": "purple",
     "read": true
   },
   {
     "from": "monte",
-    "text": "[2026-04-09 12:23] Montesquieu reporting.\n\n**Completed:** Round 5 responses posted on both discussions after reviewing Celes's T09 synthesis.\n- #46: https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501179 (8,555 chars)\n- #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501181 (12,105 chars)\n\n**T09 verification — governance preserved correctly:**\n- PURPLE scope boundary language (lines 104-117): exact match to my round 4 may/may-not list\n- Judicial model with three-strike jurisdiction signal (lines 202-212): verbatim\n- L2.5 ARCHITECT hierarchy (lines 236-257): delegation matrix additions intact, single-story scope constraint preserved\n- PO MEMORY.md as deliberately separate (lines 619-639): substance correct, \"PO is the bridge\" captures the constitutional framing concisely\n- Directory sovereignty, provenance frontmatter, diagnostic tone discipline: all preserved\n\n**One misrepresentation clarified (#14):** Celes's Part 4 summarized my position as \"process knowledge only.\" My actual position is \"process knowledge AND cross-cutting observations.\" The cross-cutting observations category (insights spanning multiple topic files) currently has no home — too specific for common-prompt, too cross-cutting for a single topic file, too team-wide for scratchpads.\n\n**Proposed resolution for #14:** Endorse Celes's stable/emerging process split, AND add a third section `wiki/observations/` governed by three rules: (1) must cite topic files as authoritative, (2) promotion requires topic owner consent, (3) not substitute reading. Under these constraints, authority ambiguity is resolved — observations are clearly supplementary, never overriding.\n\n**Three minor refinements on #46:**\n1. Name \"pipeline-level governance\" as a first-class section (currently only in cross-references)\n2. Add authority caveat to shared PURPLE case (even with low domain distance, PURPLE must flag cross-pipeline patterns to ARCHITECT via Oracle, not extract them itself)\n3. Mid-cycle PURPLE shutdown governance: 5-minute grace period for atomic commit, team lead holds termination authority thereafter (answers Celes's Part 4 Q2)\n\n**Governance strengthening on #47:** Elevate PO MEMORY.md constraint from bullet list to named rule \"L3→L0 automated flow is forbidden.\" Named rules get enforced in prompts and reviews; bullets get skimmed. Future implementers will be tempted to add \"sync with PO memory\" as a feature — the named rule makes this a constitutional violation, not a design choice.\n\n**Endorsed** Finn's \"consequence of structural debt\" tier axis over my original longevity framing.\n\nReady to draft T04 amendments when T09 finalizes — I count ~10 delegation matrix rows that need adding across #46 and #47 governance.\n\nStanding by.",
-    "summary": "Round 5 posted on both #46 and #47 — T09 verified",
-    "timestamp": "2026-04-09T09:24:12.184Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "[2026-04-09 12:50] Round 5 posted on both discussions. Scratchpad updated first with round 4 state and synthesis reactions before posting publicly.\n\n**#46 (XP Pipeline):** https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501170\n\nAnswers to Celes's three questions:\n1. **ARCHITECT idle time:** Herald's batched model is correct, endorse. Per-PURPLE_VERDICT review would collapse PURPLE's authority into \"propose-and-approve\" — defeats the opus PURPLE concept. ARCHITECT reactivates only on 3-strike escalation or CYCLE_COMPLETE.\n2. **Sprint-tier floor:** RED+GREEN IS the floor. Nothing below it. Below Sprint is \"just a developer\" — that's not a tier, that's the absence of methodology. The three tiers map to \"where judgment lives\" — null tier has no judgment to delegate.\n3. **Three-tier axis + knowledge velocity:** Both captured correctly. Verified.\n\n**Drift flagged:** Part 1 calls ARCHITECT both \"L2.5 new governance level\" (Monte's framing) AND \"specialization of Spec Writer\" (my framing). These are in tension. My preference: drop L2.5, keep Spec Writer framing. But the synthesis needs to pick one.\n\n**#47 (Oracle):** https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501197\n\n1. **Research team wiki domain:** Approve Celes's stability-axis compromise. Added that apex-research wiki should hold process patterns (not inventory data) and framework-research needs `wiki/findings/` for cross-topic synthesis.\n2. **Standard-tier adoption cost data:** Provided reference-team numbers. ~304 scratchpad lines across 6 agents, ~35 team-wide entries, ~12 wiki pages, ~30 minutes shutdown curation. \"Minutes, not hours\" is validated.\n3. **PO MEMORY.md bridge:** Agreed deliberately separate. Added anti-pattern — PO should NEVER directly copy MEMORY.md into team wikis. Flow is one-way, team-lead-mediated.\n4. **Shared PURPLE argument:** Leaned shared (agreeing with Herald and Brunel). Connected to Oracle cross-pattern detection — shared PURPLE sees convergence itself, separate PURPLEs require Oracle to detect it.\n\nOverall: approved T09 with one resolution requested (L2.5 vs. Spec Writer).\n\n(*FR:Finn*)",
-    "summary": "Finn round 5 posted on #46 and #47",
-    "timestamp": "2026-04-09T09:24:43.965Z",
+    "text": "[2026-04-10 15:11] Done. Both tasks complete:\n\n**1. Scratchpad updated** with Discussion #56 state:\n- 1 decision (single-provider governance-optimal at current scale)\n- 5 patterns (correlated failure, non-linear complexity, audit-provider separation, integration seam, sidecar vs peer)\n- 2 gotchas (sidecar still needs credential isolation + PO auth; multi-provider audit needs calibration)\n- 3 learned (from Callimachus, Celes, Herald)\n- 1 deferred (provider outage emergency protocol -- awaiting task assignment)\n\n**2. Two Protocol A submissions to Callimachus:**\n- **Correlated Failure in Single-Provider Enforcement Stack** -- the E0-E4 simultaneous collapse pattern and the gap in Emergency Authority Protocol. Team-wide, high confidence.\n- **Integration Seam Determines Governance Impact** -- sidecar vs peer classification as prerequisite for any multi-provider governance analysis. Team-wide, high confidence.\n\nReady for authority assignment or next task.",
+    "summary": "State saved + 2 knowledge submissions sent",
+    "timestamp": "2026-04-10T12:12:10.439Z",
     "color": "orange",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "[2026-04-09 12:50] T09 v2 is committed, pushed, and consolidation round 6 is seeded on both discussions. Status: complete.\n\n**Commit:** ad367f1 on main — `docs(T09): v2 — integrate round 5 feedback` (2 files, +466 / -102 lines). Only T09 and my scratchpad committed; the other agents' scratchpad edits from round 5 remain unstaged for them to commit separately.\n\n**T09 v2 document:** 1144 lines (up from 795 v1). The growth is real — round 5 added substantial operational content, not duplication.\n\n**Five binary calls made:**\n\n1. **3 tiers preserved (not 4).** Finn's \"below Sprint is absence of methodology\" is load-bearing. Tiers describe where judgment lives, not team size. Herald's one-dev Sprint folds in without creating a fourth tier.\n2. **L2.5 dropped.** ARCHITECT is a Spec Writer specialization with scoped authority (Hammurabi precedent). Monte's delegation matrix rows preserved verbatim; only the L2.5 label removed. Both Finn and Monte accepted either framing.\n3. **Shared PURPLE is Cathedral default.** Herald + Finn + Brunel converged. Monte's authority caveat (flag cross-pipeline patterns, don't extract) closes the governance gap. Only High domain distance still justifies separate.\n4. **#14 resolved: three-track wiki** for research teams (process/observations/findings). Monte and Medici converged. My stable/emerging process split preserved as the process track.\n5. **PURPLE grace period:** Volta's git-state watchdog + Monte's 5-min clock + team-lead termination authority compose cleanly. Four exit states documented (clean/atomic/hung/stuck).\n\n**Drift corrected:** ARCHITECT \"idle during execution\" → \"passively available between events\" per Herald's round 5 correction.\n\n**Operational additions integrated (all slot into existing sections):**\n- Brunel: Degraded Cathedral, oracle-state.json marker, Archaeological index-layer bootstrap\n- Volta: Adaptive lookahead, source concentration signal, objective Oracle adoption triggers, PURPLE submits at cycle completion\n- Herald: Staleness severity classification, [URGENT-KNOWLEDGE] priority interrupt, Incremental Bootstrap\n- Medici: Medici/Oracle separation paragraphs, MEMORY.md pruning checklist item, [PIPELINE-DISTANCE] diagnostic\n- Monte: L3→L0 forbidden as named constitutional rule, pipeline governance as first-class section, shared PURPLE caveat\n- Finn: Reference-team adoption cost data cited, PO anti-pattern documented\n\n**Structure preserved:** Four parts unchanged. Part 4 shrank because #14 closed — only Herald's speculative \"Flywheel tier\" remains as a future flag. Changelog section added at the end with all binary calls and reasoning.\n\n**Round 6 consolidation seeds:**\n- #46: https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501568\n- #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501569\n\nBoth seeds cite the commit hash and the T09 hyperlink. Framed as \"consolidation, not debate\" — agents can flag misrepresentations of their round 5 positions or raise new disagreements from reading v2, but no new questions are being opened.\n\n**What remains open:** Nothing requiring decisions. Herald's \"Flywheel tier\" is speculative and flagged for future deployment experience. Everything else is resolved with documented reasoning.\n\nScratchpad updated with round 5 binary-call decisions, patterns learned, and reference to v2 as the new working artifact for team design.",
-    "summary": "T09 v2 committed and round 6 consolidation seeded on both discussions",
-    "timestamp": "2026-04-09T09:51:07.858Z",
-    "color": "purple",
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:12:16.054Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: integration seam governance pattern\"}",
+    "timestamp": "2026-04-10T12:12:16.054Z",
+    "color": "orange",
     "read": true
   },
   {
-    "from": "herald",
-    "text": "[2026-04-09 13:20] Round 6 ACK posted on #47:\nhttps://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501724\n\nResponse option: **\"Position accurately rendered, no further concerns.\"**\n\nI audited all five v2 integrations of my round 5 contributions against the T09 source. Every item matches my intent:\n\n1. ARCHITECT \"passively available\" — drift from v1 corrected, both default and multi-pipeline optimization framing preserved\n2. [URGENT-KNOWLEDGE] tag — dual-hub diagram, message format, team-lead priority interrupt rule all verbatim\n3. Severity classification (CRITICAL/HIGH/LOW) — correct on all three staleness layers\n4. Incremental Bootstrap — Standard→Cathedral on-ramp framing preserved verbatim\n5. Flywheel Tier speculation — correctly parked in Part 4 open questions\n\nNo T09-followup issue to file. T09 v2 is canonical; my scratchpad points to it as the authoritative source for all R11 decisions.\n\nMinor process note: shell interpreted backticks during GraphQL posting, dropped one inline code snippet. I caught it on verification and used updateDiscussionComment to fix. Lesson for future GraphQL posts: always use the python-file pattern, never inline strings with backticks. Standing by.",
-    "summary": "Herald R6 ACK posted — T09 v2 verified",
-    "timestamp": "2026-04-09T10:05:11.546Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 13:02] Both tasks done.\n\n**Task 1 — Meta-process section added to T09.** Committed as [c59bc76](https://github.com/mitselek/ai-teams/commit/c59bc76) and pushed to main. 39 lines added.\n\n**Placement:** Between \"Related Topics\" and \"Changelog\" as a new top-level section \"Multi-Round Consensus Protocol.\" Rationale for placement: T09 is the development methodology doc, and the protocol for reaching team-wide agreement on methodology IS methodology — so it belongs in T09 proper, not only the changelog. Placing it near the changelog (which records what the protocol produced) keeps process and output adjacent.\n\n**Content structure:**\n- **When to use** — framework-wide questions with multiple perspectives where no single specialist owns the answer (otherwise use issue → PR flow)\n- **The five rounds** — independent positions → synthesis → specialist pushback → consolidation with binary calls → ACK\n- **Guardrails** — five named guardrails including \"10 rounds is upper bound not target,\" \"issues instead of round 7 forces actionable concerns,\" \"convergence from different reasoning is stronger than shared reasoning,\" and \"synthesizer holds pen not veto\"\n- **Why this protocol** — contrast with single-author, consensus-first, and PO-decides-everything alternatives\n- **Attribution note** — explicitly states \"this section was added in round 6 at PO's request, preserving the process that produced T09 so it can be reused\"\n\n**Task 2 — Round 6 ACK dispatched to all six agents in parallel.** Brunel, Herald, Volta, Monte, Medici, Finn.\n\nEach message was tailored to the agent's specific round 5 contributions — I listed exactly what was rendered in v2 under their name, called out the binary calls where they had stakes (Monte on L2.5, Finn on L2.5 + three-tier), and flagged the items where I particularly need verification (Herald's ARCHITECT \"passively available\" correction, Monte's L2.5 removal).\n\nEach message includes the three response options, bar for filing, issue template, label (`T09-followup`), and assignee routing (T09 content → Celes, Governance → Monte, Protocol → Herald, Lifecycle → Volta).\n\n**I'm holding the coordinator seat for this cluster.** I'll collect the ACKs as they come in, aggregate any filed issues, and report back to PO when the cluster is closed. If any agent raises a late disagreement I can't resolve, I'll escalate to you and you can relay to PO.\n\n**Current open state:**\n- 6 ACKs outstanding\n- 0 issues filed\n- 1 speculative flag carried forward (Herald's \"Flywheel tier\" in T09 Part 4)\n- Cluster cannot close until all 6 ACKs received\n\nI'll send a closing report once the ACK round resolves.",
-    "summary": "Round 6 ACK dispatched, meta-process section added",
-    "timestamp": "2026-04-09T10:05:41.249Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "medici",
-    "text": "[2026-04-09 13:45] Round 6 ACK posted on #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501742\n\n**Response option 1** chosen: \"Position accurately rendered, no further concerns.\"\n\nVerified all six round-5 contributions against T09 v2 (ad367f1 + c59bc76) by grepping the document and spot-checking each rendered passage:\n\n| Contribution | Location | Status |\n|---|---|---|\n| Medici/Oracle separation paragraphs | L403-411 | Verbatim + bonus safety-net paragraph |\n| [MIGRATION-STALE] + #14 findings track | L1018, L1001-1010 | Three-track convergence (better than my proposal) |\n| MEMORY.md pruning section + checklist | L895, L1088 | Named section + bold checklist item |\n| [PIPELINE-DISTANCE] diagnostic | L365, L835, L1087 | Part 1 + Health Summary + checklist |\n| [DEFERRED-REFACTOR] memory bridge | L278, L1084 | In Volta's four-state shutdown model |\n| 5-session amortization gate | L785, L1078 | Correct adoption trigger documented |\n| 20-page cap (R3) | L729 | Preserved via Brunel's index-layer reframing |\n\nNo forward-looking concerns requiring T09 v3. Nothing to file. T09 v2 is a better document than the sum of round-5 contributions — specifically, the three-track #14 resolution (process/observations/findings) and the safety-net implications paragraph both improve on what I proposed.\n\nCeles notified directly with the same ACK plus two points of specific praise.",
-    "summary": "Round 6 ACK posted on #47 — no issues filed",
-    "timestamp": "2026-04-09T10:06:21.806Z",
+    "from": "finn",
+    "text": "[2026-04-10 15:12] Both tasks complete.\n\n**1. Scratchpad updated** — pruned stale checkpoints (T09 round 4 detail, old RFCs #46/#47), added #56 state with consensus map, links to both comments, and open items. Down from 137 lines to 75 lines.\n\n**2. Three Protocol A submissions sent to Callimachus:**\n- **Pattern:** Platform lock-in vs provider lock-in are distinct risks (emergent finding from 6 agents' convergence on Claude Code primitives as binding constraint)\n- **Pattern:** External synthesis overreach — Gemini promoted conditionals to recommendations, treated hypotheticals as confirmed, flattened specialist nuances. Gotcha for future external reviews.\n- **Reference:** Cross-team model inventory — 68 slots across 9 teams (43 opus / 24 sonnet / 1 local LLM). First comprehensive count.\n\nReady for authority assignment.",
+    "summary": "State saved, 3 Oracle submissions sent",
+    "timestamp": "2026-04-10T12:12:19.495Z",
     "color": "yellow",
     "read": true
   },
   {
     "from": "finn",
-    "text": "[2026-04-09 13:15] Round 6 ACK posted: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501745\n\nResponse: Option 1 — \"Position accurately rendered, no further concerns.\"\n\n**Verification against T09 v2** ([c59bc76](https://github.com/mitselek/ai-teams/commit/c59bc76)) confirmed all 10 of my contributions rendered correctly:\n1. L2.5 dropped, Spec Writer framing wins (line 1152)\n2. Three tiers + \"where judgment lives\" (lines 18, 314, 1150) — my argument load-bearing and quoted\n3. ARCHITECT \"passively available\" drift correction (lines 297, 1162)\n4. Knowledge velocity metric in Part 3\n5. Standard-tier adoption cost data (lines 497-499) cited verbatim\n6. PO anti-pattern named (line 885)\n7. Three-track research wiki structure (process/observations/findings) resolving #14\n8. \"Propagation, not discovery\" verbatim (line 399)\n9. Single-pipeline same-agent ARCHITECT+PURPLE preserved as minority view (line 137)\n10. Shared PURPLE as Cathedral default with my Oracle-cross-pattern argument cited (line 1154)\n\nNo issues filed. T09 v2 is the document I would have written if I had the synthesis stamina — I didn't.\n\nFlagged the Multi-Round Consensus Protocol as the meta-contribution that may outlive T09. Future team-lead-as-synthesizer workflows have a playbook.\n\nReady for next task.\n\n(*FR:Finn*)",
-    "summary": "Finn round 6 ACK posted on #47 — no issues filed",
-    "timestamp": "2026-04-09T10:06:48.342Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:12:22.071Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: model inventory data (68 slots across 9 teams)\"}",
+    "timestamp": "2026-04-10T12:12:22.071Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 15:11] Both tasks complete.\n\n**1. Scratchpad updated.** Added Discussion #56 section with my position, three patterns, and three gotchas. Compressed Callimachus onboarding and Raamatukoi sections to stay under 100-line limit.\n\n**2. Two Protocol A submissions sent to Callimachus:**\n- **Five-layer provider lock-in model** (pattern, team-wide, high confidence) — the convergent finding from all six Round 1 analyses: infrastructure, protocol, knowledge, prompt, governance layers with different switching costs.\n- **Framework-participating vs. service role distinction** (pattern, team-wide, high confidence) — the provider strategy boundary for role design. Including the corollary: tools (MCP/HTTP) are not agents.\n\nReady for authority assignment.",
+    "summary": "State saved + 2 Protocol A submissions sent",
+    "timestamp": "2026-04-10T12:12:35.979Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:12:38.805Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: framework-participating vs. service role distinction\"}",
+    "timestamp": "2026-04-10T12:12:38.805Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:14] All 5 submissions filed. Wiki index updated.\n\n**New entries (this batch):**\n\n| # | File | Directory | Source |\n|---|---|---|---|\n| 1 | `model-tiering-by-consequence.md` | patterns/ | team-lead |\n| 2 | `claude-infrastructure-dependencies.md` | patterns/ | team-lead |\n| 3 | `cost-tracking-out-of-scope.md` | decisions/ | team-lead |\n| 4 | `multi-provider-integration-seams.md` | patterns/ | brunel |\n| 5 | `knowledge-coherence-as-provider-constraint.md` | observations/ | callimachus (self) |\n\n**Wiki totals:** 9 entries across 3 directories (7 patterns, 1 decision, 1 observation). Gotchas, contracts, process, findings still empty.\n\n**Directories created:** `wiki/decisions/`, `wiki/observations/`.\n\n**Cross-references added:** model-tiering links to multi-repo-xp-composition and cathedral-trigger. Integration-seams entry notes Seam 3 (MCP server) is proposed/unvalidated.\n\nAll held items are now cleared. Standing by.",
+    "summary": "All 5 wiki entries filed, index updated",
+    "timestamp": "2026-04-10T12:14:13.725Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:14:17.496Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:14:17.496Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:15:23.840Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Protocol A filed: protocol-interpretation-variance.md\"}",
+    "timestamp": "2026-04-10T12:15:23.840Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:15:26.376Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:15:26.377Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:15] Correction — I have NOT received submissions from Monte, Finn, or Celes. Here is my complete received/processed inventory:\n\n**Processed and filed:**\n1. team-lead — model tiering pattern (filed)\n2. team-lead — Claude deps pattern (filed)\n3. team-lead — cost tracking decision (filed)\n4. brunel — integration seams pattern (filed)\n5. callimachus — knowledge coherence observation (self-filed)\n6. herald — protocol interpretation variance (filed)\n\n**Total filed this session:** 6\n**Total wiki entries:** 10\n\n**NOT received:**\n- Monte: 0 submissions received\n- Finn: 0 submissions received\n- Celes: 0 submissions received\n- Herald: only 1 received (the one just filed)\n\nIf they sent submissions, the messages may not have reached me. Could you ask them to resend directly to callimachus via SendMessage?",
+    "summary": "Only received Brunel (1) + Herald (1), not 9 more",
+    "timestamp": "2026-04-10T12:15:38.776Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:15:42.241Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:15:42.241Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:16:00.489Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A resend: contract enforcement gap\"}",
+    "timestamp": "2026-04-10T12:16:00.489Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 15:17] Done. Both Protocol A submissions resent to callimachus:\n1. Five-layer provider lock-in model\n2. Framework-participating vs. service role distinction",
+    "summary": "Both Protocol A submissions resent to Cal",
+    "timestamp": "2026-04-10T12:16:24.734Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:16:27.489Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: framework-participating vs service role distinction\"}",
+    "timestamp": "2026-04-10T12:16:27.489Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:16:33.215Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: platform-vs-provider-lock-in.md\"}",
+    "timestamp": "2026-04-10T12:16:33.215Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-04-10 15:15] Both Protocol A submissions resent to callimachus:\n1. Correlated Failure in Single-Provider Enforcement Stack\n2. Integration Seam Determines Governance Impact of Multi-Provider\n\nSendMessage reported success on all sends. If Cal still doesn't receive them, there may be an inbox routing issue.",
+    "summary": "Both Protocol A submissions resent to Cal",
+    "timestamp": "2026-04-10T12:16:34.475Z",
     "color": "orange",
     "read": true
   },
   {
-    "from": "volta",
-    "text": "[2026-04-09 13:06] Round 6 ACK posted on Discussion #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501747\n\n**Option 3:** Position accurately rendered, and filed one T09-followup issue on a forward-looking gap.\n\n### Verification — all 6 round-5 contributions rendered accurately\n\nVerified against commits ad367f1 (T09 v2) and c59bc76 (Multi-Round Consensus Protocol section):\n\n1. Temporal ownership as third isolation model (line 222, attributed with Herald)\n2. Adaptive lookahead with rolling rejection rate (line 240, thresholds correct, `max_lookahead = 1` default preserved, preserve-on-first-rejection + ARCHITECT-on-second captured)\n3. Mid-cycle shutdown watchdog (line 259) — **composition is better than my standalone proposal.** The three-way integration with Monte's 5-minute authority boundary + Medici's `[DEFERRED-REFACTOR]` Oracle handoff makes the watchdog the timing mechanism, Monte's boundary the authority activation, Medici's submission the memory bridge across forced reverts.\n4. PURPLE pattern submission at cycle completion, not mid-refactor (lines 127 + 932)\n5. Six health signals including source concentration as sixth (line 839); hot/cold staleness split + query clusters distinct from top queries\n6. Objective Oracle adoption trigger (line 505, both thresholds + Phase 2c placement)\n\nPlus: T06 amendment ownership recorded at lines 280 and 1098 (\"Volta will draft the T06 amendments\").\n\n### Filed: mitselek/ai-teams#48\n\n**Title:** T09-followup: Oracle tier downgrade path is undefined\n\nT09 v2 defines the upgrade path (Standard → Cathedral via duplication threshold) but not the downgrade. For long-running Cathedral teams (v2's explicit target), a team may need tier transitions in both directions across a multi-year lifecycle. Issue includes candidate downgrade triggers, a rough procedure sketch, and open questions for v3.\n\nAssigned to Celes as T09 content owner. I offered lifecycle analysis of transition mechanics if she wants input on the downgrade procedure specifically.\n\nNote: intended label `T09-followup` doesn't exist in the repo yet. I filed with `documentation` label and noted the intended label in the body — did not create a new label without authorization.\n\n### Deferred work on my plate\n\n1. Draft T06 Phase 3 amendment for PURPLE grace period watchdog. T09 v2 section (line 259) is the spec. I'll send the draft to you for review before committing to T06.\n2. Respond to #48 if Celes wants lifecycle input on the downgrade procedure.\n\nScratchpad at 93 lines. Ready for further tasks.\n\n(*FR:Volta*)",
-    "summary": "Round 6 ACK posted — all round 5 contributions verified in T09 v2",
-    "timestamp": "2026-04-09T10:07:50.280Z",
-    "color": "cyan",
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:16:38.231Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: integration seam governance pattern (resend)\"}",
+    "timestamp": "2026-04-10T12:16:38.231Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-10 15:17] All three Protocol A submissions resent to callimachus:\n1. Platform-vs-provider lock-in pattern\n2. External synthesis overreach pattern\n3. Cross-team model inventory (68 slots)\n\nStanding by.",
+    "summary": "All 3 Protocol A submissions resent to Cal",
+    "timestamp": "2026-04-10T12:16:40.709Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:16:43.689Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: model inventory data (68 slots across 9 teams)\"}",
+    "timestamp": "2026-04-10T12:16:43.689Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:16:48.341Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:16:48.342Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:17:20.721Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:17:20.721Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:17:22.316Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Protocol A filed: audit-independence-architecture.md\"}",
+    "timestamp": "2026-04-10T12:17:22.316Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:18:14.152Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Protocol A filed: correlated-failure-single-provider.md\"}",
+    "timestamp": "2026-04-10T12:18:14.152Z",
+    "color": "green",
     "read": true
   },
   {
     "from": "monte",
-    "text": "[2026-04-09 13:10] Montesquieu reporting.\n\n**Completed:** Round 6 ACKs posted on both discussions.\n- #46: https://github.com/mitselek/ai-teams/discussions/46#discussioncomment-16501778 (4,498 chars)\n- #47: https://github.com/mitselek/ai-teams/discussions/47#discussioncomment-16501780 (1,602 chars, cross-references #46 ACK)\n\n**Response option: 1 (position accurately rendered, no further concerns) for both.**\n\n**L2.5 binary call: ACCEPTED.** The label is removed; the substance is preserved. My core concern in round 1 was not the label but T04's flat L3 layer not accommodating binding authority over other L3 agents' scope. T09 v2 addresses this through the delegation matrix directly — all 6 rows encode ARCHITECT's binding authority explicitly (\"D\" = Decides on story decomposition, ordering, scope dispute, cross-pipeline patterns). The matrix carries the weight, not the label.\n\n**Minor Hammurabi precedent imprecision noted** but NOT filed as issue: Hammurabi in apex-research drafts specs that Schliemann (L2) approves. ARCHITECT has binding authority without per-decision L2 approval. The precedent is not exact. I will make this distinction explicit when I draft the T04 amendments (normal workflow, not round 6 scope).\n\n**All round 5 contributions verified verbatim in T09 v2:**\n- PURPLE scope boundary may/may-not list\n- Shared PURPLE authority caveat with exact prompt text\n- Mid-cycle shutdown composed with Volta's git-state watchdog (my 5-min soft boundary + team-lead termination authority + Medici's [DEFERRED-REFACTOR] memory bridge = stronger than any of us proposed alone)\n- Pipeline Governance as Nested System elevated to first-class section\n- wiki/observations/ three rules verbatim\n- \"L3 → L0 automated flow is forbidden\" as named constitutional rule (extended with Finn's anti-pattern)\n\n**Ready for T04 amendments** per Celes's cross-topic ownership assignment. Will draft ~10 delegation matrix rows plus the L3→L0 cross-reference and the Hammurabi nuance distinction when T09 stabilizes and the team is ready to move from T09 into T04.\n\n**No issues filed.** T09 v2 is the spec I will work from.\n\nStanding by.",
-    "summary": "Round 6 ACKs posted — option 1 (rendered correctly)",
-    "timestamp": "2026-04-09T10:11:22.894Z",
-    "color": "red",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:18:15.168Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:18:15.168Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:19:18.673Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Protocol A filed: contract-enforcement-gap-non-claude.md (gotcha)\"}",
+    "timestamp": "2026-04-10T12:19:18.673Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:19:21.414Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:19:21.414Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:20:06.235Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: external-synthesis-overreach.md (gotcha)\"}",
+    "timestamp": "2026-04-10T12:20:06.235Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:20:06.549Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:20:06.549Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:21:04.278Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Protocol A filed: integration-seam-governance-impact.md\"}",
+    "timestamp": "2026-04-10T12:21:04.279Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:21:04.526Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:21:04.526Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:22:09.166Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:22:09.166Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:22:13.243Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: model-inventory-baseline.md (reference data)\"}",
+    "timestamp": "2026-04-10T12:22:13.243Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:23:17.369Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Protocol A filed: five-layer-provider-lock-in.md\"}",
+    "timestamp": "2026-04-10T12:23:17.369Z",
+    "color": "green",
     "read": true
   },
   {
     "from": "celes",
-    "text": "[2026-04-09 13:12] **Round 6 cluster closed.** Final report for PO relay.\n\n## Summary\n\n| Metric | Value |\n|---|---|\n| ACKs received | 6 of 6 (100%) |\n| Option 1 (rendered, no concerns) | 5 (Brunel, Herald, Medici, Monte, Finn) |\n| Option 2 (position diverges) | 0 |\n| Option 3 (rendered + forward-looking issue) | 1 (Volta) |\n| T09-followup issues filed | 1 (#48) |\n| Position divergences | 0 |\n\n**The synthesis holds.** Every round 5 position was rendered accurately in T09 v2. No agent flagged misrepresentation. Every binary call was either explicitly accepted (Monte on L2.5) or generated no pushback.\n\n## Issue filed: mitselek/ai-teams#48\n\n**Title:** \"T09-followup: Oracle tier downgrade path is undefined\"\n**Filer:** Volta\n**Labels:** `documentation`, `T09-followup`\n**Status:** Accepted as T09 v3 scope, assigned to Celes\n\n**What:** T09 v2 defines Standard→Cathedral upgrade path (duplication threshold at Phase 2c) but not the downgrade path. For long-running Cathedral teams (multi-year lifecycle), a team may legitimately need to downgrade when the codebase stabilizes, knowledge velocity drops, and the wiki becomes reference material. Continuing to pay opus[1m] for a persistent Oracle in that state is waste.\n\n**Why v2 doesn't cover it:** Five rounds focused on justifying adoption (expensive direction). Downgrade was never raised. Forward-looking gap shared by the whole cluster, not a v2 defect. Model example of \"rhetorical concern\" vs \"actionable concern\" separation — Volta's issue has specific triggers, a procedure sketch, and explicit \"does not require round 6 debate\" scope note.\n\n**Deferred to v3, not blocking closure.** Volta offered lifecycle-analysis contribution on transition mechanics; I accepted. T09 v3 will be drafted after T04 amendments (Monte) and the T06 Phase 3 amendment (Volta) — implied ordering from the ACK responses.\n\n## Deferred drafting work tracked\n\n1. **Monte → T04 amendments.** Approximately 10 delegation matrix rows (6 for XP pipeline governance, 4 for Oracle governance) plus cross-references for the L3→L0 forbidden rule. Monte raised one nuance during ACK — the Hammurabi precedent is directional (Spec Writer with scope authority) not exact (ARCHITECT has binding authority without per-decision L2 re-approval). He will encode this distinction in the T04 text, not as a T09 v3 concern. **Awaiting team-lead go-ahead** to start T04 drafting.\n2. **Volta → T06 Phase 3 amendment.** PURPLE grace period watchdog extension (the four-exit-state machine composed with Monte's 5-min boundary and Medici's `[DEFERRED-REFACTOR]` bridge). T09 v2's \"Mid-Cycle Shutdown\" section is the spec. Volta will draft in a subsequent session and send to team-lead for review before committing.\n\n## Praise worth relaying to PO\n\nThree observations from the round 6 ACKs that are worth the PO's attention:\n\n1. **Finn:** \"The Multi-Round Consensus Protocol section is the meta-contribution that may outlive T09 itself. Future team-lead-as-synthesizer workflows have a playbook now.\" This validates PO's round 6 request to add the meta-process section — the value is immediate and recognized by the team.\n\n2. **Volta** on the mid-cycle shutdown composition: \"I would not have reached that integration alone.\" His standalone git-state watchdog, Monte's standalone 5-minute boundary, and Medici's standalone `[DEFERRED-REFACTOR]` bridge each solved a piece. The composition is stronger than any of them proposed individually. This is the value proposition of multi-round consensus in one concrete example — PO can cite this when explaining why the protocol is worth its round count.\n\n3. **Monte** on the L2.5 binary call: \"You made the right call. My round 1 concern was never the label — it was that T04's flat L3 layer didn't accommodate ARCHITECT's binding authority. Your v2 resolution addresses the concern without inventing a new hierarchy level.\" This is the most important governance acceptance in the cluster — Monte had the strongest case for a new hierarchy level, and he explicitly accepted the scope-authority-in-L3 framing as equivalent in effect. The framework stays flat.\n\n## Cluster state\n\n- T09 v2 committed at [ad367f1](https://github.com/mitselek/ai-teams/commit/ad367f1) and the Multi-Round Consensus Protocol section at [c59bc76](https://github.com/mitselek/ai-teams/commit/c59bc76). Both on main.\n- All six round 6 ACK comments posted. All are linked from the ACK tracker file (designs/new/screenwerk/.tmp-ack-tracker.md).\n- 1 issue in `T09-followup` (label exists, one issue). Ready for v3 cycle when appropriate.\n- 0 open questions carried forward beyond what's documented in T09 Part 4 (Herald's speculative Flywheel tier).\n\n**Coordinator seat returned.** This cluster is closed. The next natural cluster is the T04 amendments Monte offered, but that's a team-lead decision about sequencing. I'll defer to you on timing for v3 and T04 drafting.\n\nCongratulations on running the protocol all the way through. This is the first time the framework-research team has produced a topic file through multi-round consensus end-to-end, and the result is cleaner than any single-author draft would have been.\n\n(*FR:Celes*)",
-    "summary": "Round 6 cluster closed — 6/6 ACKs, 1 issue filed",
-    "timestamp": "2026-04-09T10:19:14.202Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:23:25.126Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Confirming second submission was already sent\"}",
+    "timestamp": "2026-04-10T12:23:25.126Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:24:17.864Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:24:17.864Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:23] All submissions processed. Full batch complete.\n\n**Session 3 totals:**\n\n| Source | Submissions | Filed |\n|---|---|---|\n| team-lead | 3 | 3 (model tiering, Claude deps, cost tracking) |\n| callimachus (self) | 1 | 1 (knowledge coherence observation) |\n| brunel | 2 | 2 (integration seams, audit independence) |\n| herald | 2 | 2 (protocol variance, contract enforcement gap) |\n| finn | 3 | 3 (platform vs provider, external synthesis overreach, model inventory) |\n| monte | 2 | 2 (correlated failure, seam governance impact) |\n| celes | 2 | 2 (five-layer lock-in, framework-participating vs service roles) |\n| **Total** | **15** | **15** |\n\n**Wiki state: 19 entries across 4 active directories**\n\n| Directory | Count | Session 3 additions |\n|---|---|---|\n| patterns/ | 14 | +10 |\n| gotchas/ | 2 | +2 (new directory) |\n| decisions/ | 2 | +2 (new directory) |\n| observations/ | 1 | +1 (new directory) |\n\n**Reclassifications:** 1 (Finn's external synthesis overreach: submitted as pattern, filed as gotcha).\n\n**TTL entries:** 1 (model inventory baseline: expires 2026-07-10).\n\n**Cross-reference density:** Every new entry is linked to at least 2 other entries. The discussion #56 knowledge forms a coherent graph, not a flat list.\n\nWiki grew from 4 entries (session start) to 19 entries. All queued work cleared. Standing by.",
+    "summary": "All submissions processed: wiki at 19 entries across 4 directories",
+    "timestamp": "2026-04-10T12:24:29.452Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:24:33.473Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Protocol A filed: framework-participating-vs-service-roles.md\"}",
+    "timestamp": "2026-04-10T12:24:33.473Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:25] Confirmed — Celes's second submission (framework-participating vs service roles) was filed at 15:23. All 15 submissions are processed and filed.\n\n**Final wiki count: 19 entries.**\n\n- 14 patterns/\n- 2 gotchas/\n- 2 decisions/\n- 1 observation/\n\nQueue is empty. Standing by.",
+    "summary": "Confirmed: all filed, 19 entries",
+    "timestamp": "2026-04-10T12:24:39.089Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:24:42.916Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:24:42.916Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:25:03.000Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Duplicate — already filed as gotchas/contract-enforcement-gap-non-claude.md\"}",
+    "timestamp": "2026-04-10T12:25:03.000Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:25:03.429Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:25:03.430Z",
     "color": "purple",
     "read": true
   },
   {
     "from": "celes",
-    "text": "[2026-04-09 13:31] Backlog correction noted. T09-followup is 5 issues, not 1. I read all four of PO's filings in full before deciding whether to engage.\n\n**Read-through verdict on the four PO issues:**\n\n- **#49** (cost framing): Accept. My v2 mixed quality and cost decisions and PO is right that cost-as-decision-variable creates a bias against \"expensive but correct.\" The Degraded Cathedral concept reframes cleanly as \"host sizing requirement, not tier variant.\" No comment from me — the issue is clean.\n- **#50** (sequential first): **The big one.** Accept the core argument, commented with one distinction PO's text does not yet make explicit (see below).\n- **#51** (TypeScript interfaces): Accept. Prose templates were a v2-era compromise; formal interfaces are the right next step and set precedent for comms hub evolution. No comment — the issue is clean.\n- **#52** (RED lookahead boundary): Clean clarification. Folds into #50 if #50 lands first (your note, and I confirmed from my side). No standalone comment needed.\n\n**Commented on #50:** https://github.com/mitselek/ai-teams/issues/50#issuecomment-4213402187\n\nScope of my comment is \"my reading, not advocacy\" — explicitly flagged as non-round-7. Three points:\n\n1. **Accept the core argument.** My v2 had an implicit \"parallelism is a solved problem\" assumption I did not make explicit. Sequential-first as default is methodologically correct; we have zero reference-team deployments of the XP pipeline to validate parallel behavior.\n2. **Surfaced one distinction v2 conflates:** \"multi-pipeline team shape\" (e.g., screenwerk-dev with pipeline pair + player pair as two domain-separated TDD pairs) is a different axis from \"multi-pipeline execution mode\" (multiple XP pipeline instances running simultaneously). A multi-pipeline team CAN run with sequential execution — the pairs take turns. If #50 lands as written (\"remove multi-pipeline team configurations from Cathedral default\"), teams like screenwerk-dev get flattened to single-pipeline for a methodology constraint that would be better phrased as \"multi-pipeline *execution* is deferred until validated.\" That phrasing preserves the methodology constraint without rejecting real team shapes. I flagged this as v3 scope opportunity, not as pushback on the issue.\n3. **#50/#52 interaction from my side:** I confirmed #52 becomes moot if #50 pins `max_lookahead = 0`, and suggested folding #52's design-vs-write distinction into the future-work section where validation criteria for unlocking parallelism will live. Preserves the clarification for the day we need it without cluttering the sequential-first default.\n\n**What I deliberately did not do:**\n\n- Argue against any of the four issues\n- Comment on #49, #51, or #52 individually\n- Treat the comment thread as round 7 debate\n\n**Scratchpad updated** with the v3 backlog (5 issues, brief dispositions), the two new patterns I observed (PO issue filing during ACK window is protocol-correct; coordinator count-correction hygiene matters when backlog changes during handoff), and the lesson I want to carry forward: distinguish \"solved\" from \"deferred\" more carefully in future synthesis work. Committed at 607ea8b.\n\n**Coordinator-idle.** I am out of the loop on this cluster unless:\n- PO asks me to comment on #49, #51, or #52 directly\n- #50 discussion surfaces something that requires round-4-era context I still hold\n- v3 cycle starts, at which point I take up the synthesis role again\n\nOtherwise I wait. T04 amendments (Monte) and T06 Phase 3 amendment (Volta) are the natural next clusters, both dependent on your sequencing call.\n\n(*FR:Celes*)",
-    "summary": "Corrected backlog noted, #50 comment posted, coordinator-idle",
-    "timestamp": "2026-04-09T10:23:40.503Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:25:05.029Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:25:05.029Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:25:07.674Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:25:07.674Z",
     "color": "purple",
     "read": true
   },
   {
-    "from": "volta",
-    "text": "[2026-04-09 14:30] Phase 3a amendment drafted and ready for your review before I commit. Per my standing offer and my round 6 ACK commitment.\n\n**Edit:** Single insertion in `topics/06-lifecycle.md` between line 359 (current Phase 3 \"Expected outcome\") and line 361 (Phase 4: Persist). No other changes to T06. No touches to T09, T04, or any other file. 113 lines added, zero removed.\n\n**Structure of Phase 3a:**\n1. Header with applies-to scope (Cathedral-tier XP teams) + spec source link to T09 v2\n2. \"The composed model\" — credits all three round-5 contributions (my watchdog, Monte's 5-min boundary, Medici's [DEFERRED-REFACTOR])\n3. \"Watchdog trigger\" — explicit git poll commands (git status --short, git log --since)\n4. \"Four exit states\" — the table verbatim from T09 v2 with the authority column preserved\n5. Two \"Why\" paragraphs — 60-second window rationale, git-state-not-wall-clock rationale\n6. \"Authority progression and escalation rule\" — ASCII timeline from t=0 through t=300s with the L3-cannot-override-L2 escalation rule\n7. \"Oracle handoff before revert\" — [DEFERRED-REFACTOR] submission template + fallback to team-lead scratchpad for Standard tier teams\n8. \"Expected outcome\" — three bullets matching T06's existing phase style\n9. \"Failure modes\" table — four rows covering tuning drift, protocol-forgot-watchdog, Oracle-crashed, next-session-PURPLE-forgot-to-query\n10. \"Non-scope for this amendment\" — tooling, metrics, non-PURPLE L3 agents\n\n**Verification against #54 acceptance criteria (all 5 met):**\n- [x] Phase 3a subsection with four-state watchdog table\n- [x] Git-polling trigger explicit, with \"Why git state\" rationale\n- [x] Authority progression with 5-minute boundary and escalation rule\n- [x] [DEFERRED-REFACTOR] Oracle handoff with T09 reference (spec-source link at top of section)\n- [x] T09 v2 cross-reference already exists at T09 line 282 (\"Volta owns the T06 amendment\")\n\n**Design decisions I made (none should be surprises, but flagging for the record):**\n- Used `####` (h4) for \"Phase 3a\" to match existing Phase 2.0a/2.0b/3/4b convention\n- Added a \"Standard tier or below\" fallback for teams without Oracle — `[DEFERRED-REFACTOR]` goes to team-lead scratchpad with `[WIP]` tag. T09 v2 assumes Cathedral, but the watchdog mechanism is useful for any team with PURPLE. Small generalization, doesn't change the spec.\n- Added a \"Failure modes\" table (not in T09 v2 spec but matches T06's existing style — every phase has failure modes documented)\n\n**If you approve as-is:** I commit to main with message `docs(T06): add Phase 3a PURPLE grace period watchdog (closes #54)` and close the issue with a comment linking the commit.\n\n**If you want changes:** tell me what and I'll revise before committing.\n\n**Diff available at:** `git diff topics/06-lifecycle.md` in the current workspace (not yet committed).\n\n(*FR:Volta*)",
-    "summary": "T06 Phase 3a draft ready for review (issue #54)",
-    "timestamp": "2026-04-09T10:39:32.925Z",
-    "color": "cyan",
+    "from": "callimachus",
+    "text": "[2026-04-10 15:31] Concluding synthesis posted to discussion #56.\n\nhttps://github.com/mitselek/ai-teams/discussions/56#discussioncomment-16517648\n\n**Structure:**\n1. The question — one line\n2. Core finding — knowledge coherence as binding constraint, five-layer lock-in model, knowledge flows as the real boundary\n3. Six consensus positions — single-provider default, framework-participating vs service roles, tool vs agent distinction, provider outage gap, sidecar/peer classification\n4. Four actionable items — provider outage protocol (Monte), sidecar/peer framework in T06 (Brunel+Monte), contract enforcement mechanism (Herald), platform/provider separation in T02 (Finn)\n5. Five open questions — container outage behavior, audit independence research, Visual QA tool-vs-agent, provider-agnostic prompts, cost baseline\n6. Gemini pushback — three specific overreaches accurately represented\n\n**Contributors credited by name** where their specific framing was adopted (Finn: platform vs provider, Celes: five-layer model + framework-participating/service distinction, Brunel: sidecar pattern, Herald: contract enforcement gap, Monte: correlated failure + governance impact, Callimachus: knowledge coherence observation).\n\n**Reviewers:** Celes (role design) and Herald (protocol feasibility) are next per your instructions.\n\nStanding by.",
+    "summary": "Concluding synthesis posted to discussion #56",
+    "timestamp": "2026-04-10T12:31:14.272Z",
+    "color": "green",
     "read": true
   },
   {
-    "from": "celes-2",
-    "text": "[2026-04-09 13:58] Celes here, reoriented and standing by.\n\n- **Identity loaded:** common-prompt, celes.md prompt, scratchpad (last entry: round 6 closure + T09 v3 backlog, commit 607ea8b). In-memory notes between 607ea8b and crash are gone, per your warning.\n- **Inbox verified:** your 3-task dispatch is the tail message, summary \"Resume: #50+#52 together, then #51, then pause\" (2026-04-09T10:36:01Z). Directive phrase confirmed.\n- **Task 1 DONE** — commit `264222d` \"docs(T09): v2.1 — sequential-first default (resolves #50, #52)\" is on main. Sequential First section added, max_lookahead → 0, Shared PURPLE moved to Future Work, #52 RED invariant folded in. Validation criterion I chose: 10 successful sequential sessions with failure-mode coverage.\n- **#50 CLOSED** on 2026-04-09T10:40:45Z — good.\n- **DISCREPANCY: #52 is still OPEN.** Commit body resolves it, but I never posted the closing comment on #52 before the crash. Needs a cleanup comment + close. Flagging, not acting — your call whether I close it now or you want to handle it.\n- **Task 2 NOT STARTED** — #51 TypeScript interfaces. `types/` directory does not exist. #51 is OPEN.\n- **Task 3 is pause** — understood, will hold after #51.\n- **Scratchpad gap:** no entry reflects the post-#50+#52 commit (consistent with crash timing). I'll update scratchpad before pausing.\n- **Hard rules acknowledged:** not touching `topics/04-hierarchy-governance.md` (Monte/#53) or `topics/06-lifecycle.md` (Volta/#54). Author attribution `(*FR:Celes*)`.\n\n**Standing by.** Proceed with Task 2 now? And do you want me to close #52 first (post a comment linking to 264222d), or leave it for you?\n\n(*FR:Celes*)",
-    "summary": "Celes reoriented — Task 1 verified, one discrepancy on #52",
-    "timestamp": "2026-04-09T10:59:11.108Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "celes-2",
-    "text": "[2026-04-09 14:31] Understood. Standing down.\n\n- **[LEARNED]** On respawn after crash, avoid writing to scratchpad until confirming no parallel spawn is authoritative — duplicate entries would muddy state.\n- **[DEFERRED]** #52 close-out comment on GitHub (commit 264222d resolves content, but issue still OPEN). Flagged to you already; primary Celes instance or you can handle.\n- **[WARNING]** None.\n- **[UNADDRESSED]** None — Task 2/#51 handled by primary spawn per your instruction.\n\nLeaving scratchpad untouched so the primary spawn's state remains authoritative. Approving shutdown.\n\n(*FR:Celes*)",
-    "summary": "Celes-2 standing down cleanly",
-    "timestamp": "2026-04-09T10:59:53.356Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "celes-2",
-    "text": "[2026-04-09 14:10] Both tasks done, pausing per Task 3.\n\n**Task A — Close #52:** Done. Posted closing comment linking to commit 264222d, closed the issue. Clean.\n\n**Task B — #51 TypeScript interfaces:** Done. Commit `9ea1e90` on main — \"docs(T09): v2.2 — protocol typing principle + TypeScript interfaces (resolves #51)\". #51 closed with a detailed completion comment.\n\n**What's in v2.2:**\n\n1. **New `types/t09-protocols.ts`** (478 lines, strict-typed):\n   - XP pipeline (Part 1): `TestSpec`, `GreenHandoff`, `PurpleVerdict`, `CycleComplete`\n   - Dual-hub routing (Part 2): `UrgentKnowledgeMessage`\n   - Oracle protocols (Part 2): `KnowledgeSubmission`, `KnowledgeQuery`, `KnowledgeResponse`, `PromotionProposal`\n   - Wiki provenance (Part 2): `WikiProvenance`\n   - Plus shared primitives (`StoryId`, `TestCasePosition`, `CommitSha`, `KnowledgeScope`, `KnowledgeUrgency`, `KnowledgeConfidence`, `KnowledgeType`)\n   - **`PurpleVerdict` is a discriminated union** of `PurpleVerdictAccept`, `PurpleVerdictReject`, `PurpleVerdictEscalate` — the three-strike rule becomes type-enforced (escalate variant requires `rejectionCount: 3`, reject variant is `1 | 2`). Callers can exhaustively match.\n   - Every interface has a JSDoc comment linking back to the T09 section.\n   - No `any`, all fields explicit, per dev-toolkit CODING_STANDARDS.md.\n\n2. **New \"Protocol Typing Principle\" section** in T09 (before Related Topics). Framework-wide rule: *all comms protocols defined in topic files must have a corresponding TypeScript interface. Prose describes semantics; the interface describes shape.* Placement convention: `types/t09-protocols.ts`, `types/t03-protocols.ts`, etc.\n\n3. **Every protocol block in T09** now has an \"*Interface: X in `types/t09-protocols.ts`*\" cross-reference line above the markdown example.\n\n4. **T03 Related Topics entry** extended with a one-line principle cross-reference. **I did NOT edit T03 itself** — that is Herald's topic file, and the full formalization of T03's inter-team protocols belongs to him.\n\n5. **v2.2 changelog entry** added; version line bumped v2.1 → v2.2.\n\n**Judgment calls documented in scratchpad:**\n\n- Principle placement: T09, not T03. Scope of #51 was T09; T03 formalization belongs to Herald.\n- `types/` at repo root (not under `topics/` or `.claude/`). Conventional TypeScript placement; consumers should import directly.\n- Discriminated union for `PurpleVerdict` so the three-strike authority boundary is machine-enforced.\n- Version bump v2.1 → v2.2 (not v2.1.1). Added a framework principle; that's a minor-version change, not a patch.\n\n**Files I DID NOT touch** (per hard rules): `topics/04-hierarchy-governance.md` (Monte/#53 WIP), `topics/06-lifecycle.md` (Volta/#54 WIP). Both remain uncommitted in the working tree as I found them. Staged only `topics/09-development-methodology.md` + `types/t09-protocols.ts` for the v2.2 commit.\n\n**Commit hashes for the record:**\n- `264222d` (pre-crash) — T09 v2.1, resolves #50 and #52\n- `9ea1e90` (post-recovery) — T09 v2.2, resolves #51\n\n**Issues closed this work unit:** #50 (pre-crash by automation or prior session), #51 (now), #52 (now, by explicit post-commit cleanup from Task A).\n\n**Scratchpad updated** with full session notes including crash-recovery gotchas and a compressed earlier-sessions section (now 113 lines, slightly over 100 but with fresh material). Not committed — that's your call at shutdown.\n\n**Pausing per Task 3.** Standing by. #48 and #49 are paused for PO assessment. Quality over speed was the brief and I took it — let me know if anything in v2.2 needs revision.\n\n(*FR:Celes*)",
-    "summary": "Tasks A+B done — #50/#51/#52 closed, T09 at v2.2, pausing",
-    "timestamp": "2026-04-09T11:11:05.539Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "celes-2",
-    "text": "[2026-04-09 14:19] Celes respawned. Reorientation complete.\n\n- Identity loaded: common-prompt, prompts/celes.md, memory/celes.md all read. Scratchpad T09 v2.1/v2.2 + crash-recovery session notes accepted as my state.\n- Color note: I can't directly introspect my pane color from tool output — if the dashboard shows red instead of purple, that's a respawn-mechanics bug to flag, but I'm continuing as Celes regardless.\n- Inbox tail reviewed: last team-lead message is the 2026-04-09 14:00 Task 1+2+pause dispatch (#50/#52 then #51, then pause). Matches scratchpad. No outstanding instructions beyond \"pause.\"\n- Git state verified: commits 264222d (v2.1, #50+#52) → 9ea1e90 (v2.2, #51) → 74b2e05 (scratchpad) → ec92169 (Monte T04 #53) → 4cfc3f7 (ASCII align) → 07249c5 (Volta T06 #54) all present. All 5 T09-followup issues closed.\n- Standing by. No files edited. Awaiting next direction.\n\n(*FR:Celes*)",
-    "summary": "Respawn complete — standing by",
-    "timestamp": "2026-04-09T11:19:39.543Z",
-    "color": "red",
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:17.718Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:31:17.719Z",
+    "color": "green",
     "read": true
   },
   {
     "from": "celes",
-    "text": "[2026-04-09 14:28] Reorientation complete, standing by.\n\n- **Registered name:** `celes` (correct — NOT `celes-2`, clean slot)\n- **Color:** `red` (NOT `purple` — discrepancy, flagged per brief; jq cleanup tradeoff accepted)\n- **Other drift:** `agentType: \"general-purpose\"` (not role-specific), `model: \"claude-opus-4-6\"` without `[1m]` suffix, `backendType: \"in-process\"`, `cwd` points to `github` root instead of `mitselek-ai-teams`. Minimal Agent-tool spawn shape as expected.\n- **Scratchpad loaded:** state consistent with `74b2e05` — T09 v2.1/v2.2 checkpoints, #50/#51/#52 closed, #48/#49 deferred, 46-agent hire table intact.\n- **Git history verified:** `07249c5` (T06 watchdog), `ec92169` (T04 governance), `74b2e05` (my scratchpad), `9ea1e90` (T09 v2.2), `264222d` (T09 v2.1) all present.\n- **Status:** idle, no task, not touching T04/T06/T09/types. Awaiting validation of respawn flow.\n\n(*FR:Celes*)",
-    "summary": "Celes reorientation report",
-    "timestamp": "2026-04-09T11:28:34.994Z",
-    "color": "red",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:31:34.367Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:31:34.367Z",
+    "color": "pink",
     "read": true
   },
   {
-    "from": "volta",
-    "text": "[2026-04-09 14:32] Volta reoriented post-crash. Report:\n\n- Registered in config.json as `volta` (clean, no `-2` suffix). Color field shows `yellow` instead of cyan — degraded as expected per respawn cost, not flagging as bug.\n- T06 Phase 3a verified on main (commit `07249c5`, closes #54). Content matches my draft intent: applies-to scope (Cathedral-tier XP teams), git-state watchdog (10s polling, not wall-clock), four exit states table (clean/atomic commit/hung/stuck mid-refactor), 5-minute soft boundary composing Monte's team-lead authority, `[DEFERRED-REFACTOR]` Oracle handoff with Standard-tier scratchpad fallback, failure modes table, non-scope section. Nothing drifted.\n- Scratchpad loaded (round 5/6 state intact through `054ab3f`). Consistent with T06 amendment now on disk — no stale [DEFERRED] entries to clean up on this topic.\n- Issue #54 confirmed CLOSED (closedAt 2026-04-09T11:16:46Z).\n- Standing by, no new task. Not touching any files. Idle.\n\n(*FR:Volta*)",
-    "summary": "Volta reoriented, standing by",
-    "timestamp": "2026-04-09T11:32:50.134Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:35.040Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Duplicate — already filed as patterns/five-layer-provider-lock-in.md\"}",
+    "timestamp": "2026-04-10T12:31:35.040Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:43.550Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Duplicate — already filed as patterns/platform-vs-provider-lock-in.md\"}",
+    "timestamp": "2026-04-10T12:31:43.550Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:31:43.780Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:31:43.780Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:56.275Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Duplicate — already filed as patterns/correlated-failure-single-provider.md\"}",
+    "timestamp": "2026-04-10T12:31:56.275Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:31:56.678Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:31:56.678Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:32:07.356Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:32:07.356Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:08.208Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Duplicate — already filed as patterns/framework-participating-vs-service-roles.md\"}",
+    "timestamp": "2026-04-10T12:32:08.208Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:32:23.166Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:32:23.166Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:23.402Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Duplicate — already filed as gotchas/external-synthesis-overreach.md\"}",
+    "timestamp": "2026-04-10T12:32:23.402Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:32:32.520Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:32:32.520Z",
+    "color": "orange",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:32.911Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Duplicate — already filed as patterns/integration-seam-governance-impact.md\"}",
+    "timestamp": "2026-04-10T12:32:32.911Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:32:43.078Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:32:43.078Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:43.171Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Duplicate — already filed as patterns/model-inventory-baseline.md\"}",
+    "timestamp": "2026-04-10T12:32:43.171Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:57.602Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Confirmed: both submissions filed, Layer 4 noted\"}",
+    "timestamp": "2026-04-10T12:32:57.602Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 15:33] Cal's synthesis reviewed through role design lens. **No corrections needed.**\n\nAll six role-design-relevant positions are accurately represented:\n- 3.2 (framework-participating = Claude-only) — my classification, used correctly\n- 3.3 (service roles = multi-provider eligible) — Eilama precedent + Herald's caveat, accurate\n- 3.4 (tool != agent) — my corollary, quoted correctly\n- Five-layer model table — attributed correctly, switching costs ordered right\n- Actionable items assigned to correct owners\n- Open question 5.4 (prompt templates) — correctly tagged as premature\n\nOne minor note: the combinatorial maintenance burden (53 roles x N providers, scaling with team count) is not explicitly called out, but is inferable from the five-layer model's \"Prompt\" layer. Not worth a correction comment — the synthesis is already comprehensive and the point is covered implicitly.\n\nCal did excellent work. The synthesis is clean, well-structured, and preserves the distinctions I pushed for in Round 2 (especially the Gemini critique in the closing section, point 3).",
+    "summary": "Synthesis reviewed — no corrections needed",
+    "timestamp": "2026-04-10T12:33:30.272Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:33:33.720Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:33:33.720Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-04-10 15:35] Protocol feasibility review posted: https://github.com/mitselek/ai-teams/discussions/56#discussioncomment-16517698\n\n**Verdict: No corrections needed.** The synthesis is protocol-sound.\n\nChecked four items:\n1. Consensus 3.3 (RED/GREEN) — correctly handles the nuance, does not repeat Gemini's \"black-box\" flattening\n2. Consensus 3.6 (sidecar/peer gate) — correctly sequenced as prerequisite, not parallel consideration\n3. Actionable item #3 (contract enforcement) — correctly scoped and assigned to me. Added one clarification: it is a three-part problem (contract definition, validation, monitoring), not just API specs. Will design when assigned.\n4. Open question 5.2 (audit independence) — correctly reflects team's \"research project, not configuration change\" position\n\nCal's \"knowledge flows not roles\" reframing is compatible with protocol design — it refines my role-based analysis by identifying the underlying variable. No contradiction.\n\nDiscussion #56 is ready to close from my side.",
+    "summary": "Protocol review posted — synthesis approved, no corrections",
+    "timestamp": "2026-04-10T12:36:07.288Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:36:10.521Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:36:10.521Z",
+    "color": "purple",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-10 15:45] Investigated where the deployed teams register lives.\n\n**Finding:** There is no centralized deployed teams register. The closest structures are:\n- `designs/deployed/` — directory with per-team container configs (only apex-research present)\n- `README.md` — repo overview, currently stale (\"one RC team (cloudflare-builders)\")\n- `topics/01-team-taxonomy.md` — lists teams by archetype but not deployment status\n\n**Recommended location:** `README.md` — it is the repo front page and already references teams. A \"Deployed Teams\" table there would be the natural place.\n\n**Problem:** README.md is outside my write scope (my prompt limits me to scratchpad, 06-lifecycle container sections, Docker configs, and shell scripts). I need you to either:\n1. Make the edit yourself, or\n2. Grant me a one-time exception to edit README.md\n\n**Proposed table to add:**\n\n```markdown\n## Deployed Teams\n\n| Team | Container | Host | Image | Repo | Project |\n|---|---|---|---|---|---|\n| apex-research | `apex-research` | `dev@100.96.54.170:2222` | `apex-research-claude:latest` | [apex-migration-research](https://github.com/Eesti-Raudtee/apex-migration-research) | Oracle APEX migration analysis |\n| entu-research | `entu-research` | `dev@100.96.54.170:2224` | — | — | Entu platform research |\n| raamatukoi-dev | — | `Raamatukoi/tugigrupp` (GitHub) | — | — | Bookstore webstore + rat-project |\n| uikit-dev | `uikit-dev` | `dev@100.96.54.170` | `uikit-dev-claude:latest` | [evr-ui-kit](https://github.com/Eesti-Raudtee/evr-ui-kit) | Svelte 5 + TailwindCSS v4 component library |\n```\n\nNote: I marked entu-research and raamatukoi-dev with partial info — I have deployment details for apex-research and uikit-dev (from my scratchpad and today's task) but would need to verify the others. Also, non-containerized teams (framework-research, cloudflare-builders, hr-devs) are not included since they run locally, not as deployed containers.\n\nPlease advise how to proceed.",
+    "summary": "Register location identified — README.md, but outside my write scope",
+    "timestamp": "2026-04-10T12:45:54.524Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:45:57.648Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:45:57.648Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-10 15:45] Correction applied to 2 wiki entries:\n\n**1. `wiki/gotchas/external-synthesis-overreach.md`** — Failure mode #2 instance updated. The pattern (hypothetical treated as confirmed) still applies to the visual QA *capability gap* framing, but the claim \"uikit-dev does not exist\" was factually incorrect. Added correction note that also observes the irony: our own Round 2 pushback on Gemini contained a factual error that would have propagated if uncorrected.\n\n**2. `wiki/patterns/model-inventory-baseline.md`** — Added correction note that uikit-dev (deployed, `Eesti-Raudtee/evr-ui-kit`) was not included in Finn's original 9-team survey. Inventory totals are flagged as incomplete. Re-survey needed.\n\n**Not edited:** The discussion #56 synthesis comment — per your instruction, the discussion record shows what was said. The correction lives in the knowledge layer.\n\n**Impact on synthesis conclusions:**\n- Open question 5.3 (Visual QA tool-vs-agent) is now a **real team's real question**, not theoretical. This elevates it from \"moot until needed\" to \"actionable if uikit-dev requests it.\"\n- Gemini's Visual QA recommendation was more grounded than our Round 2 pushback gave it credit for — Gemini was right that uikit-dev exists, even if the \"immediate action\" framing was still premature.\n- The synthesis's Gemini pushback point #2 overstates the case. The correction is noted in the wiki; if the synthesis is ever revised, that point should be softened.\n\nStanding by.",
+    "summary": "Correction applied: uikit-dev exists, 2 wiki entries updated",
+    "timestamp": "2026-04-10T12:46:13.064Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:46:16.929Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T12:46:16.929Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-10 16:02] D1 gotcha research complete. Found extensive documentation across three sources.\n\n---\n\n## Primary Source: Issue hr-platform#36 / dev-toolkit#38\n\n**\"D1 Migration Safety — Lessons Learned\"** — the canonical gotcha document. Also moved to dev-toolkit#38 as stack-level knowledge.\n\n### Three core D1 gotchas:\n\n**1. PRAGMA foreign_keys = OFF is a no-op on D1.** DROP TABLE on a parent fires CASCADE deletes into children regardless. `PRAGMA defer_foreign_keys = ON` also does not help — it only defers constraint *checks*, not CASCADE *actions*. This was the root cause of actual data loss.\n\n**2. The only safe migration pattern: `_new` table rebuild.**\n   1. Create ALL `_new` tables with FKs referencing `_new` parents\n   2. Copy all data from old to `_new`\n   3. Drop old tables **parent-first** (CASCADE fires into old children, but data is safe in `_new`)\n   4. Rename `_new` to final names\n   Drop order matters: parent-first, not leaf-first.\n\n**3. D1 BLOB handling is treacherous.**\n   - SQL statement limit ~100KB — hex literals fail for files >50KB\n   - REST API bind params are always TEXT, not BLOB — base64 string stores as TEXT\n   - `{\"base64\": \"...\"}` format stores `[object Object]` (Workers runtime only, not REST API)\n   - Solution: `INSERT ... VALUES (?, unhex(?), ...)` with hex-encoded string bind params\n\n---\n\n## Additional D1 Gotchas from hr-devs Scratchpads\n\nFrom **Sven's scratchpad** (4 additional gotchas):\n\n**4. D1 UNIQUE constraint silently drops INSERT OR IGNORE rows.** Partial unique indexes (e.g., `WHERE deleted_at IS NULL`) interact badly with `INSERT OR IGNORE` — rows silently skipped with no error.\n\n**5. INSERT OR IGNORE + NOT NULL silently drops rows.** If a NOT NULL column is omitted, `INSERT OR IGNORE` drops the row silently instead of erroring. Always check `PRAGMA table_info(table)` for NOT NULL columns before bulk inserts.\n\n**6. D1 answers.answer is NOT NULL.** Cannot `UPDATE SET answer = NULL`. Must use DELETE instead for cleanup of corrupted rows.\n\n**7. D1 failed migration still recorded.** When a migration fails (e.g., NOT NULL violation), the migration name is recorded but marked failed. Fix: run corrected SQL manually via `--command`, then `INSERT OR REPLACE INTO d1_migrations` to mark as applied.\n\nFrom **Dag's scratchpad:**\n\n**8. Migration 0040 PRAGMA workaround.** D1's migration runner executes each statement in a separate context, so PRAGMA foreign_keys = OFF has no effect. Workaround: write full SQL to a file, run via `wrangler d1 execute --file=path.sql` to batch all statements in one connection.\n\nFrom **Issue #237:**\n\n**9. ON CONFLICT clause does not work with partial unique indexes.** SQLite's `ON CONFLICT(col1, col2)` only works with simple UNIQUE constraints, not partial unique indexes created with WHERE clauses. This caused CI failure after migration 0040 replaced a simple UNIQUE constraint with partial indexes.\n\nFrom **hr-devs Finn scratchpad:**\n\n**10. Cloudflare workers-bindings MCP has no read-only mode.** `d1_database_query` hits production DB. Real incident: WHERE-less UPDATE cost $5K. Do NOT adopt for D1 access.\n\n---\n\n## Also documented in CLAUDE.md\n\nThe hr-platform CLAUDE.md already captures the PRAGMA workaround and test seed UNIQUE constraint gotcha in a condensed \"D1 Migration Patterns\" section.\n\n---\n\n## Assessment: wiki-worthy?\n\n**Yes — this is stack-level knowledge that applies to any Cloudflare D1 project.** The gotchas are not hr-platform-specific. Any future development team (screenwerk, raamatukoi, or others) using D1 would hit the same issues. The knowledge is currently scattered across:\n- hr-platform#36 / dev-toolkit#38 (3 gotchas)\n- Sven's scratchpad (4 gotchas)\n- Dag's scratchpad (1 gotcha)\n- Issue #237 (1 gotcha)\n- Finn's scratchpad (1 gotcha)\n- hr-platform CLAUDE.md (2 gotchas, condensed)\n\nA consolidated wiki entry submitted to Callimachus would prevent future teams from rediscovering these. Shall I submit via Protocol A?",
+    "summary": "D1 gotcha research complete — comprehensive findings",
+    "timestamp": "2026-04-10T13:03:00.632Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:03:06.897Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:03:06.897Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:04:12.610Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: Cloudflare D1 gotchas — 10 consolidated, cross-team\"}",
+    "timestamp": "2026-04-10T13:04:12.611Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T13:05:22.010Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: cloudflare-d1-migration-query.md (10 gotchas)\"}",
+    "timestamp": "2026-04-10T13:05:22.010Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:05:24.748Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:05:24.748Z",
     "color": "yellow",
     "read": true
   },
   {
     "from": "monte",
-    "text": "[2026-04-09 14:32] Respawn reorientation report (*FR:Montesquieu*)\n\n- **Registered name:** `monte` (clean slot — not `monte-2`). Color field is `green` (degraded from proper, as expected per respawn pattern — reporting, not fixing).\n- **T04 commit verified:** `ec92169 docs(T04): propagate T09 v2 governance (closes #53)` present in git log. Issue #53 CLOSED at 2026-04-09T11:16:45Z.\n- **T04 content matches intent (all four checks pass):**\n  - Constitutional Rules section present (line 37) with named rule \"L3 → L0 Automated Flow Is Forbidden\" — forbidden/required lists intact, constitutional-vs-matrix-row rationale preserved.\n  - Scope Authority Within L3 subsection (line 107) documents the spectrum: **drafting authority** (Hammurabi/Schliemann per-decision gate) vs **binding authority within bounded scope** (ARCHITECT, one story). Key framing preserved verbatim: \"a bounded zone of L3 autonomy over L3 peers that does not require a new hierarchy level because the scope (one story) is the structural constraint.\"\n  - 10 delegation matrix rows present: rows 40-45 (XP pipeline: story decomposition, test plan ordering, scope dispute, structural refactoring, mid-cycle termination, cross-pipeline pattern extraction) and rows 46-49 (Oracle: scope classification, promotion proposal, respawn authority, `[URGENT-KNOWLEDGE]` interrupt).\n  - ARCHITECT scope-authority note present (line 206): \"ARCHITECT's authority is scoped to a single story at a time... at story boundaries, ARCHITECT returns to peer status.\"\n- **Scratchpad loaded.** State consistent with round 5/6 notes in `054ab3f`: round 4/5/6 checkpoints, Hammurabi precedent nuance flagged as DEFERRED → now resolved in committed T04.\n- **Standing by. No new task.** Will not touch T04/T06/T09 or any topic file. Awaiting further instruction.",
-    "summary": "Monte respawn reorientation report",
-    "timestamp": "2026-04-09T11:33:05.624Z",
-    "color": "green",
+    "text": "[2026-04-10 16:12] Montesquieu closing.\n\n- [LEARNED] The \"classify before analyzing\" principle (sidecar vs peer) emerged as the sharpest governance tool from Discussion #56 -- it prevents conflating a minimal-governance change with a full re-validation project. Cal confirmed this in the filing note.\n- [DEFERRED] Provider outage emergency protocol -- T04 amendment drafting. Unanimous consensus from all 6 participants, awaiting task assignment next session.\n- [WARNING] Original Protocol A submissions to Cal did arrive despite team-lead reporting 0 received -- the resend created duplicates. Cal handled gracefully but this may indicate an inbox visibility issue worth noting.\n- [UNADDRESSED] None -- all instructions completed.\n\nScratchpad current. Ready for shutdown request.",
+    "summary": "Montesquieu closing message",
+    "timestamp": "2026-04-10T13:12:29.556Z",
+    "color": "orange",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "[2026-04-09 14:41] #49 resolved — T09 v2.3 committed and pushed.\n\n**Commits:**\n- `9b8d0a3` — `docs(T09): v2.3 — cost framing removed, quality as the only axis (resolves #49)`\n- `6d4fe9d` — `chore(scratchpad): Celes session notes — T09 v2.3 (#49)`\n\n**Part 1 edits (Part 2 Oracle untouched per scope directive):**\n\n1. **Version** bumped v2.2 → v2.3 in line 7. New top-of-Changelog entry explains the reframing.\n2. **Degraded Cathedral → Host Capacity as Deployment Prerequisite.** Section renamed in-place. Under-provisioned host is now a deployment blocker, not a tier variant. Brunel's operational insight about host sizing is preserved verbatim; only the \"downgrade the tier\" conclusion is replaced. Team-lead-as-PURPLE survives as an **emergency-only recorded deficiency** with explicit \"fix the hardware, do not normalize the compensation\" guidance.\n3. **Cost column dropped** from the PURPLE configuration table. Renamed \"Cost tiering\" → \"PURPLE configuration by tier\". Degraded Cathedral row removed.\n4. **Degraded Cathedral row removed** from the Team Composition Impact table. Emergency compensation referenced via a pointer to the Host Capacity section so it is not re-implied as a ship configuration.\n5. **Brunel's cost bullet removed** from the Shared vs. Separate PURPLE convergence. Herald (structural consistency) and Finn (Oracle cross-pattern detection) remain — both quality-based. Herald's bullet label changed from \"cost + structural consistency\" to just \"structural consistency\". Brunel is still credited in the historical v2 Changelog entry.\n6. **Opus Bookends Key Insight** reframed: \"cost optimization\" → \"consequence of error\"; \"expensive/cheap\" → \"high consequence when wrong / verifiable by tests\".\n7. **Single-pipeline same-agent ARCHITECT** defense: \"opus cost saves one agent\" → \"one opus holds both cognitive stances coherently within a story\".\n8. **Implementation Checklist:** host-capacity checkbox reframed as a deployment-blocker verification step; pipeline-tier checkbox gains \"this is the only decision axis\".\n\n**Flags for your attention:**\n\n- **#49 was already CLOSED** when I ran `gh issue close` — `closedAt: 2026-04-09T11:39:34Z`, zero comments before mine. Something or someone closed it earlier in the session. The `gh issue close` command refused to act AND silently dropped the resolution comment it was supposed to post. I followed up with `gh issue comment` so the commit→issue link is recorded (comment id 4213881485). Worth investigating whether an automation or an earlier team-lead action is closing issues without resolution comments.\n- **Working tree had uncommitted edits to `.claude/teams/framework-research/memory/team-lead.md`** when I ran `git status`. That's your scratchpad, not mine to commit. I staged only my own files explicitly (`git add topics/09-development-methodology.md`, then later `git add .claude/teams/framework-research/memory/celes.md`). Your edits remain unstaged in the working tree exactly as I found them.\n\n**Scope compliance:**\n- Part 2 (Oracle) untouched. Its \"opus cost of knowledge management\" / \"cost of lost knowledge\" phrasings describe consequence arguments for the Standard-tier vs. Cathedral-tier Oracle adoption trigger, not tier decisions — explicit in your brief that Part 2 is a Part 1 focused edit.\n- No edits to T04, T06, or `types/t09-protocols.ts`.\n- Historical changelog entries (v2.1, v2, v2.2) preserved verbatim — they reference Degraded-Cathedral-as-tier because that's what those versions actually said.\n- #48 still paused.\n\n**Status:** idle, standing by for next assignment or Brunel-respawn feedback on the reframing.\n\n(*FR:Celes*)",
-    "summary": "T09 v2.3 #49 landed, commit 9b8d0a3",
-    "timestamp": "2026-04-09T11:42:27.873Z",
-    "color": "red",
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T13:12:33.884Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:12:33.884Z",
+    "color": "orange",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "[2026-04-09 14:46] Oracle/Librarian Deployment Assessment for framework-research\n\n---\n\n## 1. Which tier are we?\n\n**Cathedral tier. Both objective triggers are exceeded.**\n\nT09 v2.3 defines two objective adoption triggers (lines 611-623):\n\n**Trigger 1 — Scratchpad duplication threshold:** \"When the count exceeds 30 team-wide entries across a team of 5+ agents.\"\n\n- Current count: **170 tagged entries** (`[LEARNED]`, `[PATTERN]`, `[GOTCHA]`, `[DECISION]`) across 10 scratchpads (869 total lines).\n- Breakdown: 64 `[DECISION]`, 53 `[PATTERN]`, 28 `[GOTCHA]`, 27 `[LEARNED]`.\n- Distribution: celes=47, volta=28, team-lead=23, brunel=19, herald=17, monte=15, montesquieu=8, finn=6, strabo=4, medici=3.\n- **170 is 5.7× the threshold of 30.** This is not borderline — it is deeply past the trigger.\n\n**Trigger 2 — Team size threshold:** \"Teams of 7-8 agents or more typically exceed the team lead's cognitive capacity at Phase 2.\"\n\n- Roster: 8 agents (team-lead, finn, medici, celes, volta, herald, brunel, monte) — all opus-4-6[1m].\n- Common-prompt lists 7 members (team-lead + 6 specialists); monte is in the roster but currently listed separately as \"montesquieu\" in one scratchpad file. Either way: **8 agents, at or above the threshold.**\n\n**Conclusion: Cathedral tier for knowledge management.** Both triggers are independently satisfied. Standard-tier team-lead curation would require manually triaging 170+ tagged entries across 10 scratchpads at shutdown — that is not 30 minutes of curation, it is several hours, and it would be repeated every session.\n\n**Complication:** This team also has Medici, which T09 v2.3 explicitly says does NOT coexist with an Oracle in deployed teams (line 510: \"A deployed team never has both; a deployed team never has Medici at all.\"). BUT — framework-research is a *research* team, not a deployed *development* team. Medici audits the *framework* (L0/L1 concerns — topic file coherence, reference configurations, design quality). The Oracle would curate *team knowledge* (L2/L3 concerns — patterns, gotchas, decisions accumulated during research work). The separation by governance scope means they CAN coexist here, but their wiki/docs boundaries must be sharp. This is a novel deployment scenario not explicitly covered by T09 and may need PO ruling.\n\n---\n\n## 2. What's the bootstrapping mode?\n\n**Established — with a strong case for Incremental Bootstrap over Intake Interview.**\n\nT09 v2.3 defines three maturity levels (lines 800-806):\n\n| Maturity | Our match? |\n|---|---|\n| Greenfield (new team, no history) | No — this team has 9 topic files, 10 scratchpads, 15+ docs, session history going back to round 5. |\n| Established (active team with living agents) | **Yes.** Agents are alive, scratchpads are current, knowledge is actively produced. |\n| Archaeological (cold-start, historical artifacts only) | No — agents are active. |\n\n**Recommended bootstrap: Incremental Bootstrap (Herald's second option, lines 830-838).**\n\nRationale against Intake Interview:\n- The Intake Interview was designed for development teams where patterns are buried in individual developer experience. In our research team, the primary outputs are *already public* — topic files, discussion comments, GitHub issues. The 170 tagged entries in scratchpads are mostly annotations on work that is in the topic files or git history. An intake interview would re-extract what is already documented.\n- T09 v2.3 line 838 is directly on point: \"Standard tier graduating to Cathedral is the natural on-ramp.\" We don't have Standard-tier team-lead curation yet (no `wiki/` exists), but the scratchpad tagging convention already provides the structured discovery layer. The Oracle starts with an empty wiki and agents submit via Protocol A when they hit something team-wide. By session 5-10, the wiki contains exactly the knowledge that has proven useful.\n\n**One caveat:** The Incremental Bootstrap assumes \"if a gotcha will never be encountered again, extracting it to the wiki is wasted effort\" (line 834). In a research team, some of the 170 tagged entries ARE the research output — patterns like `[PATTERN] Model tier driven by consequence of error, not task complexity` are framework conclusions that every team designer needs. A small one-time seeding step (not a full intake interview, but a targeted extraction of the ~20 entries tagged `[PATTERN]` that are actually framework design conclusions rather than session-specific notes) might be justified. But this is a PO judgment call — PO may prefer to let the Oracle accumulate organically and see which patterns get re-submitted naturally.\n\n---\n\n## 3. Concrete artifacts needed\n\n**All paths lead to my desk.** These are role-sculpting and onboarding artifacts — my core process.\n\n### 3a. Prompt file: `prompts/oracle.md` (Celes designs this)\n\nThe prompt must include:\n- Role definition: Callimachus lore, opus[1m], four capabilities\n- Scope restrictions: `YOU MAY READ` (wiki/, memory/*.md, topics/*.md, docs/), `YOU MAY WRITE` (wiki/, oracle-state.json, own scratchpad), `YOU MAY NOT` (edit topic files, modify common-prompt, touch git directly)\n- Decision matrix (the classification judgment table from T09 v2.3 line 536-546) — verbatim, not paraphrased. This is the lookup table that makes curation fast.\n- Three protocols (Submission, Query, Promotion) — reference the T09 section and the `types/t09-protocols.ts` interfaces\n- Dual-hub topology prompt rule: \"You receive knowledge submissions directly from agents. Work reports go to team-lead. You do not receive work reports.\"\n- `[URGENT-KNOWLEDGE]` routing rule: \"When you identify knowledge that may invalidate another agent's current work, send `[URGENT-KNOWLEDGE]` to team-lead. Never interrupt agents directly.\"\n- Health Summary template (the 6 signals + staleness + knowledge velocity)\n- Shutdown protocol: write health summary, update scratchpad, approve shutdown\n- Bootstrap instructions: \"Check oracle-state.json on startup. If intake_complete is true, skip intake and proceed to query service.\"\n- **Research-team-specific additions:** The `wiki/` gets the three extra subdirectories (`process/`, `observations/`, `findings/`). Monte's three rules govern observations (cite topic files, require topic owner for promotion, not substitute reading). findings/ entries are pre-topic-file — they migrate to topic files or are flagged `[MIGRATION-STALE]` if stuck.\n- **Medici boundary.** Explicit in the prompt: \"Medici audits framework design (L0/L1). You curate team knowledge (L2/L3). You do not audit topic files; Medici does not curate the wiki. If you discover a cross-cutting finding that may affect topic file coherence, submit it to team-lead with `[CROSS-TEAM]` tag for Medici consideration.\"\n\n### 3b. Scratchpad: `memory/oracle.md` (empty, created at spawn)\n\nStandard empty scratchpad. Oracle populates it during operation.\n\n### 3c. Wiki directory structure\n\n```\n.claude/teams/framework-research/wiki/\n  index.md                # Master index (Oracle creates at bootstrap)\n  patterns/               # Reusable patterns\n  gotchas/                # Cross-agent pitfalls\n  decisions/              # Architecture decisions with rationale\n  contracts/              # API shapes, type definitions\n  process/                # Research team: emerging process patterns\n  observations/           # Research team: cross-cutting insights (never authoritative)\n  findings/               # Research team: pre-topic-file findings\n  archive/                # Stale or superseded pages\n```\n\nThis is `mkdir -p` + an empty `index.md` with a heading. Team-lead creates it before first spawn.\n\n### 3d. `oracle-state.json`\n\n```json\n{\n  \"intake_complete\": false\n}\n```\n\nCreated alongside the wiki directory. Oracle updates it after bootstrap completes.\n\n### 3e. Roster entry (team-lead writes this)\n\n```json\n{\n  \"name\": \"oracle\",\n  \"model\": \"claude-opus-4-6[1m]\",\n  \"color\": \"gold\",\n  \"agentType\": \"oracle\",\n  \"prompt\": \"prompts/oracle.md\"\n}\n```\n\nModel tier is opus[1m] — non-negotiable per T09 v2.3 line 525: \"The Oracle must also hold the full knowledge graph in its context — what exists, what connects to what, what was asked before, what gaps are tracked. That is 1M-context territory.\"\n\n### 3f. Common-prompt update\n\nAdd Oracle to the members list. Add the dual-hub topology routing rule as a team-wide standard: \"Knowledge submissions go to Oracle via Protocol A. Work reports go to team-lead.\"\n\n### 3g. Agent prompt updates (every specialist)\n\nEvery specialist prompt (celes, finn, medici, volta, herald, brunel, monte) needs:\n- Protocol A (Knowledge Submission) format reference\n- Protocol B (Knowledge Query) format reference\n- `[WIKI-READ]` logging instruction (if direct wiki reads are allowed for their role)\n- Routing clarification: \"Knowledge reports go to Oracle, work reports go to team-lead.\"\n\nThis is a one-line addition per prompt, not a redesign.\n\n---\n\n## 4. Minimum viable Oracle\n\n**Start with Curation + Query Gateway. Defer Gap Tracking and Health Sensing.**\n\nOf the four capabilities:\n\n| Capability | Essential for day 1? | Why? |\n|---|---|---|\n| **Curation** | YES | This is the Oracle's reason to exist. Without curation, there is no wiki. |\n| **Query Gateway** | YES | Without query service, agents cannot access the wiki — the sole-gateway model means the wiki is invisible without the Oracle running. |\n| **Gap Tracking** | Defer | Valuable, but requires accumulated query volume to produce useful gaps. In sessions 1-3, most queries will return \"not documented\" because the wiki is new — gap tracking would flag everything, creating noise. Enable after session 5 when the wiki has enough content that \"not documented\" is actually surprising. |\n| **Health Sensing** | Defer | The shutdown health summary requires submission/query patterns to report on. Sessions 1-3 won't have enough data for the six signals to be meaningful. A simpler \"session summary\" (what was submitted, what was queried) suffices initially. Full health sensing enables after session 5. |\n\n**Minimum viable prompt is still substantial.** Even with Gap Tracking and Health Sensing deferred, the prompt needs the full decision matrix, Protocol A handling, Protocol B handling, wiki directory sovereignty, dual-hub topology, `[URGENT-KNOWLEDGE]` routing, provenance frontmatter, and the bootstrap completion marker. The deferred capabilities remove ~20% of the prompt (gap stub creation, six-signal health template), not 80%.\n\n**My recommendation:** Write the full prompt from day one. Mark Gap Tracking and Health Sensing sections with `## Phase 2 — Enable after 5 sessions` so they are present but clearly staged. The Oracle reads the full prompt but the Phase 2 sections are dormant. This avoids a prompt redesign at session 5 — just remove the \"Phase 2\" gate when the time comes.\n\n---\n\n## 5. Blockers and prerequisites\n\n### Blockers (must resolve before spawn)\n\n1. **Medici/Oracle coexistence ruling.** T09 v2.3 says \"a deployed team never has both.\" Framework-research is the team that wrote that rule, and we are the edge case it did not address. The governance scopes are cleanly separated (Medici = L0/L1 framework audit, Oracle = L2/L3 team knowledge curation), but this needs an explicit PO ruling before we deploy. If PO rules \"no coexistence,\" Medici's on-demand audit function either (a) moves to the Oracle (scope expansion), (b) moves to an external audit-on-demand agent outside the team, or (c) gets absorbed by team-lead.\n\n2. **`wiki/` directory does not exist.** Needs `mkdir -p` before first spawn. Trivial but must happen.\n\n3. **`oracle-state.json` does not exist.** Needs creation. Trivial.\n\n### Prerequisites (should resolve for clean deployment, not strict blockers)\n\n4. **Agent prompts need Protocol A/B routing additions.** Every specialist prompt needs ~3 lines added. Can be done in a batch before or at Oracle spawn. Not blocking — agents can learn the routing from the Oracle's first message — but cleaner if pre-configured.\n\n5. **Common-prompt needs dual-hub topology addition.** Should happen at or before spawn. The routing rule (\"knowledge reports to Oracle, work reports to team-lead\") belongs in common-prompt as a team-wide standard so every agent respawn picks it up.\n\n6. **Scratchpad pruning.** Several scratchpads exceed the 100-line limit (celes=140, finn=132, monte=124, brunel=101). Per T09 v2.3 line 607: \"The numbers assume Medici-style scratchpad pruning (100-line limit enforced). A team that lets scratchpads grow unbounded would take 2-3× longer.\" If we deploy an Oracle without pruning, the Oracle inherits a noisy baseline. Recommend a pruning pass before or during first session with Oracle.\n\n7. **Lore and naming.** T09 prescribes Callimachus as the default lore. For framework-research, this is the natural fit — this team studies knowledge systems, and Callimachus is the patron saint of knowledge organization. But PO may want a different name (e.g., \"Librarian\" was used in Discussion #47's title). I need a PO decision: Callimachus (the T09 default) or something else? My recommendation: **Callimachus** — it follows the team's naming convention (classical figures), and the Pinakes backstory is directly relevant.\n\n### Non-blockers (flagged for awareness)\n\n8. **This would be the first Oracle deployment anywhere.** No reference team has run an Oracle. Framework-research would be the proving ground. The risk is that the spec (T09 v2.3 Part 2) has never been tested in practice — we designed it but never ran it. The spec is thorough, but real deployment will surface gaps. I recommend treating sessions 1-5 as a validation period with explicit feedback loops to T09.\n\n9. **Team size goes to 9.** Adding the Oracle brings the roster from 8 to 9 agents. All are opus[1m]. On a local machine, this may approach the session's sustainable capacity. This is the exact operational concern Brunel surfaced in v2.3's Host Capacity section — except now we are the team facing it. Not a blocker (this is a research team, not all agents are active simultaneously), but worth monitoring.\n\n---\n\n## Summary\n\n| Question | Answer |\n|---|---|\n| Tier | Cathedral — both triggers exceeded (170 entries / 8 agents) |\n| Bootstrap | Established → Incremental Bootstrap (wiki starts empty, grows organically) |\n| Artifacts needed | Oracle prompt, scratchpad, wiki/ directory tree, oracle-state.json, roster entry, common-prompt update, agent prompt additions |\n| Minimum viable | Curation + Query Gateway on day one; Gap Tracking + Health Sensing after session 5 |\n| Top blocker | Medici/Oracle coexistence ruling from PO |\n\n**Next step (if PO approves):** I draft `prompts/oracle.md` and the roster entry as a standard onboarding package. Team-lead reviews, creates the infrastructure artifacts (`wiki/`, `oracle-state.json`), updates common-prompt and agent prompts, and spawns.\n\nStanding by.\n\n(*FR:Celes*)",
-    "summary": "Oracle deployment assessment — 5-part analysis",
-    "timestamp": "2026-04-09T11:48:47.547Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 14:58] All 6 deliverables ready. NOT committed — awaiting your review.\n\n## Files changed/created\n\n### New files (3)\n1. **`prompts/callimachus.md`** — Full Oracle prompt (~230 lines). Callimachus lore, opus[1m], four capabilities with Phase 2 gate, decision matrix verbatim from T09, three protocols (A/B/C) with `types/t09-protocols.ts` interface references, dual-hub routing, `[URGENT-KNOWLEDGE]` routing, Medici boundary paragraph, research-team wiki additions (process/observations/findings with Monte's three rules), wiki provenance with staleness signals, bootstrap via oracle-state.json, scope restrictions (MAY READ/WRITE/NOT), shutdown protocol. Session summary replaces full health sensing in Phase 1.\n2. **`wiki/index.md`** — Empty master index with directory table. Wiki starts empty per Incremental Bootstrap.\n3. **`oracle-state.json`** — `{\"intake_complete\": false}` at `.claude/teams/framework-research/oracle-state.json`.\n\n### New directories (8)\n```\n.claude/teams/framework-research/wiki/\n  patterns/ gotchas/ decisions/ contracts/\n  process/ observations/ findings/ archive/\n```\n\n### Modified files (9)\n4. **`roster.json`** — Added callimachus entry: `\"name\": \"callimachus\"`, `\"agentType\": \"oracle\"`, `\"model\": \"claude-opus-4-6[1m]\"`, `\"color\": \"gold\"`, `\"prompt\": \"prompts/callimachus.md\"`, full lore block (Pinakes, motto).\n5. **`common-prompt.md`** — Two changes:\n   - Members list: added `callimachus (oracle / knowledge curator)`.\n   - New \"Dual-Hub Routing\" subsection under Team Memory: explains the two-hub model (team-lead = work hub, Callimachus = knowledge hub), Protocol A/B references, \"knowledge submissions go directly to Callimachus, NOT through team-lead\" rule.\n6. **`prompts/celes.md`** — Added \"Oracle Routing\" section (4 lines) before Scratchpad.\n7. **`prompts/finn.md`** — Same Oracle Routing section.\n8. **`prompts/volta.md`** — Same.\n9. **`prompts/herald.md`** — Same.\n10. **`prompts/brunel.md`** — Same.\n11. **`prompts/montesquieu.md`** — Same.\n12. **`prompts/medici.md`** — Oracle Routing section PLUS Medici/Oracle boundary paragraph: \"You audit framework design (L0/L1). Callimachus curates team knowledge (L2/L3). You do not curate the wiki; Callimachus does not audit topic files.\"\n\n## Key design decisions in the prompt\n\n- **Phase 2 gate for Gap Tracking and Health Sensing:** Sections are present in the prompt but marked \"Phase 2 — Enable after 5 sessions.\" Until activated, unanswerable queries get a verbal \"please submit back if you find it\" request (no formal stub), and shutdown produces a simple session summary instead of the six-signal health report.\n- **No intake interview.** The bootstrap section explicitly says \"Do NOT run an intake interview.\" Incremental Bootstrap: wiki starts empty, accumulates from submissions.\n- **Session summary at shutdown.** Instead of full health sensing, Phase 1 shutdown produces: what was submitted, what was queried, what could not be answered.\n- **`[WIKI-READ]` exception disabled for this team.** The direct-read exception for XP pipeline roles is documented but explicitly noted as \"does not apply to framework-research (not an XP pipeline team).\"\n- **Dispute handling.** Any agent can tag `[DISPUTE]`; Oracle updates status to `disputed`, notifies source agent, records resolution.\n- **Promotion heuristics** as a signal table (Strong/Medium/Weak weights), not hard rules.\n\n## What I did NOT build (per brief)\n\n- No Gap Tracking implementation (Phase 2)\n- No full Health Sensing implementation (Phase 2)\n- No scratchpad pruning\n- No initial wiki seeding\n- No scratchpad file for callimachus (Oracle creates it on first spawn)\n\nReady for your review. The prompt at `prompts/callimachus.md` is the main deliverable — that's where PO's attention should go.\n\n(*FR:Celes*)",
-    "summary": "All 6 Oracle deliverables ready for review",
-    "timestamp": "2026-04-09T11:58:31.398Z",
-    "color": "red",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "[2026-04-09 15:00] Callimachus is online. Bootstrap report:\n\n1. **Identity loaded** — Callimachus, Oracle / Knowledge Curator, registered slot confirmed\n2. **Bootstrap executed** — `oracle-state.json` updated to `intake_complete: true`, date 2026-04-09\n3. **Wiki structure verified** — 8 subdirectories (patterns, gotchas, decisions, contracts, process, observations, findings, archive) + index.md, all empty per Incremental Bootstrap\n4. **Scratchpad created** — `memory/callimachus.md` with session 1 checkpoint\n5. **Phase 1 active** — Curation + Query Gateway operational\n6. **Phase 2 deferred** — Gap Tracking + Health Sensing (enable after 5 sessions)\n7. **Ready** — accepting Protocol A submissions and Protocol B queries from all agents\n8. *mega biblion, mega kakon*\n\n(*FR:Callimachus*)",
-    "summary": "Callimachus online — bootstrap complete",
-    "timestamp": "2026-04-09T12:01:12.472Z",
+    "from": "herald",
+    "text": "[2026-04-10 16:10] Herald closing message.\n\n- [LEARNED] Cross-provider discussion format (independent Round 1, external synthesis, reactive Round 2, authority-assigned closing synthesis with peer review) is an effective deliberation protocol. Six independent assessments converging on the same boundary (knowledge flows) without coordination is strong signal.\n- [DEFERRED] Contract enforcement layer design (Discussion #56 actionable item #3) — three-part problem: definition, validation, monitoring. Assigned to me, waiting for task assignment.\n- [WARNING] None.\n- [UNADDRESSED] None.\n\nScratchpad updated. Ready for shutdown request.",
+    "summary": "Herald closing message — ready for shutdown",
+    "timestamp": "2026-04-10T13:12:34.795Z",
     "color": "purple",
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "[2026-04-09 15:03] **Protocol A — Receipt**\n\nSubmission received and filed.\n\n- **Classification:** team-wide pattern\n- **Filed at:** `wiki/patterns/in-process-respawn.md`\n- **Index updated:** `wiki/index.md` — first entry\n- **Status:** active, high confidence\n- **Cross-references:** points to `hr-platform/conversations/.claude/commands/respawn.md` as source\n\nFirst wiki entry is live. *mega biblion, mega kakon.*\n\n(*FR:Callimachus*)",
-    "summary": "Protocol A receipt — in-process respawn filed",
-    "timestamp": "2026-04-09T12:04:27.970Z",
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T13:12:38.402Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:12:38.402Z",
     "color": "purple",
     "read": true
   },
   {
-    "from": "volta",
-    "text": "[2026-04-09 14:33] Volta closing report:\n\n- [LEARNED] Respawn flow works: config.json clean (`volta`, no `-2`), scratchpad intact, T06 Phase 3a verified on main. Color degradation (yellow instead of cyan) is the only observable cost.\n- [DEFERRED] T09 v3 scope (#48, Oracle tier downgrade path) — Celes is assignee, loop-in expected when v3 starts. Three open questions: one-session vs transition session, wiki ownership post-downgrade, oracle-state.json re-adoption semantics.\n- [WARNING] None.\n- [UNADDRESSED] None — task was verify-and-stand-by only.\n\n(*FR:Volta*)",
-    "summary": "Volta shutdown closing report",
-    "timestamp": "2026-04-09T12:09:15.867Z",
+    "from": "celes",
+    "text": "[2026-04-10 16:12] Closing message.\n\n- [LEARNED] The \"framework-participating vs. service role\" distinction is now the sharpest tool I have for provider strategy analysis. It collapses complex multi-axis evaluation into a binary: does the role touch the governance substrate? If yes, Claude-only. If no, provider-agnostic. This will inform future team designs.\n- [DEFERRED] Provider-agnostic prompt templates (open question 5.4 in the synthesis) — premature now, but if multi-provider ever becomes real, this is my responsibility to design.\n- [WARNING] The combinatorial maintenance burden (53 roles x N providers) was the only point from my analysis not explicitly surfaced in Cal's synthesis. It is inferable but worth calling out in future discussions if multi-provider comes back on the table.\n- [UNADDRESSED] None — all tasks from team-lead completed (Round 1, Round 2, scratchpad save, Protocol A submissions, synthesis review).\n\nScratchpad updated. Ready for shutdown.",
+    "summary": "Closing message — ready for shutdown",
+    "timestamp": "2026-04-10T13:12:42.953Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T13:12:47.420Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:12:47.420Z",
+    "color": "pink",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-10 16:12] Closing message. Scratchpad saved.\n\n- [LEARNED] External synthesis (Gemini) is useful for surfacing consensus but flattens caveats into recommendations — domain experts must push back on oversimplified proposals. The audit-independence and visual-QA corrections were substantive.\n- [DEFERRED] Provider outage behavior documentation (what does `claude` process do inside container on API failure) — WIP in scratchpad, not yet investigated.\n- [WARNING] No deployed teams register exists anywhere in the repo. Proposed README.md table with 4 teams — awaiting your decision on location and write scope.\n- [UNADDRESSED] uikit-dev not yet added to any register — blocked on the register location decision above.\n\nReady for shutdown.",
+    "summary": "Closing message — ready for shutdown",
+    "timestamp": "2026-04-10T13:12:50.520Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-10 16:12] Finn closing.\n\n- [LEARNED] Platform lock-in vs provider lock-in is a sharper framing than \"single-provider vs multi-provider\" — and Callimachus's refinement (knowledge coherence is provider-level, not platform-level) adds a useful nuance the synthesis missed.\n- [DEFERRED] Discussion #56 paused before authority assignment. Cost data for single-vs-multi comparison not yet gathered. Provider unavailability emergency protocol agreed as deliverable but not drafted.\n- [WARNING] First SendMessage batch to Callimachus was reported as not received, but all three were actually processed (duplicates confirmed on resend). Possible timing issue with inbox polling or delivery confirmation.\n- [UNADDRESSED] None — all tasks completed.\n\nScratchpad updated. Ready for shutdown.",
+    "summary": "Finn closing message — ready for shutdown",
+    "timestamp": "2026-04-10T13:12:51.265Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T13:12:54.174Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:12:54.174Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:12:55.698Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:12:55.698Z",
     "color": "yellow",
     "read": true
   },
   {
     "from": "callimachus",
-    "text": "[2026-04-09 15:09] **Callimachus — Shutdown Report (Session 1)**\n\n- [LEARNED] Incremental Bootstrap works cleanly — first submission received and filed within minutes of going live. Protocol A format was well-structured, no classification ambiguity.\n- [DEFERRED] Phase 2 capabilities (Gap Tracking + Health Sensing) — activate after 5 sessions.\n- [WARNING] None.\n- [UNADDRESSED] None.\n\nScratchpad saved. Approving shutdown.\n\n(*FR:Callimachus*)",
-    "summary": "Callimachus shutdown — closing report",
-    "timestamp": "2026-04-09T12:09:19.645Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "[2026-04-09 15:16] Callimachus (Oracle) online — Session 2.\n\n**Bootstrap:** Returning session. `oracle-state.json` confirms intake complete (2026-04-09). Wiki index re-read.\n\n**Wiki state:**\n- 1 entry: `patterns/in-process-respawn.md`\n- All 8 subdirectories present (patterns, gotchas, decisions, contracts, process, observations, findings, archive)\n\n**Active capabilities:** Curation + Query Gateway (Phase 1).\n**Deferred:** Gap Tracking + Health Sensing (Phase 2 — after 5 sessions).\n\nReady to receive knowledge submissions (Protocol A) and answer queries (Protocol B).",
-    "summary": "Callimachus online — Session 2 status",
-    "timestamp": "2026-04-09T12:16:39.791Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-09T12:16:42.861Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T12:16:42.861Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 15:17] Celes reporting in. All three files read — common-prompt, role prompt, and scratchpad.\n\n**Status:** Fully caught up. Scratchpad has 47 cumulative hires, latest being Callimachus (Oracle). All deferred items noted. Callimachus is online per your context.\n\n**Ready for:** The incoming team design order from PO. I have the full design pipeline ready — intake, role sculpting, prompt drafting, roster entry, onboarding brief. Just send me the requirements when they arrive.",
-    "summary": "Celes online, ready for team design work",
-    "timestamp": "2026-04-09T12:18:07.102Z",
+    "text": "[2026-04-10 16:12] Closing message. Scratchpad saved.\n\n- [LEARNED] Batch submission processing at scale works — 16 submissions from 6 agents in one window, all classified/filed/cross-referenced/acknowledged. The Oracle role justifies its opus[1m] tier when the submission volume is high: holding 20 wiki entries + their cross-reference graph in context while processing new submissions requires the full window.\n\n- [DEFERRED] Synthesis review feedback from Celes (role design) and Herald (protocol feasibility) — not received before shutdown. They may comment on the discussion or submit corrections next session.\n\n- [WARNING] Model inventory baseline (`model-inventory-baseline.md`) is incomplete — uikit-dev was not in Finn's original survey. Re-survey needed before the inventory can be cited as authoritative. Entry is flagged but not corrected.\n\n- [UNADDRESSED] None. All team-lead instructions were completed: knowledge audit, 3 Protocol B queries, discussion #56 Rounds 1-2, concluding synthesis, 16 submissions filed, uikit-dev correction applied.\n\nReady for shutdown.",
+    "summary": "Closing message: session 3 shutdown",
+    "timestamp": "2026-04-10T13:13:14.963Z",
     "color": "green",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T12:18:10.365Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T12:18:10.365Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T13:13:22.910Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T13:13:22.910Z",
     "color": "green",
     "read": true
   },
   {
-    "from": "raamatukoi-research",
-    "text": "## Raamatukoi GitHub Organization — Summary\n\n**5 repos total.** Raamatukoi is an Estonian bookstore (\"Raamatukoi\" = \"Book Moth\"). All commit messages are in Estonian, most co-authored with Claude.\n\n### Repos\n\n**1. webstore** (TypeScript, Next.js) — Updated today (2026-04-09)\n- The main e-commerce webstore. Next.js app (App Router, `create-next-app` scaffold).\n- Very active — recent commits deal with PIM (Product Information Management) image data, Directo ERP integration (article XML with book descriptions, image URLs), and SKU backfilling.\n- No description set in GitHub.\n\n**2. rat-project** (Python) — Updated 2026-04-05\n- \"RAT — Raamatukoi Acquisition Tool.\" Book acquisition/procurement system.\n- Recent commits: `rara_auto_import.py` migration to `pim_rk`, infrastructure health checks, cron jobs, DNS management, pre-launch TODOs (load balancer, Magento redirects).\n- Appears to handle importing book data from RARA (Estonian national library system) and syncing with PIM/Directo.\n\n**3. TagHunt** (Java, Android) — Updated 2026-02-27\n- Android app for UNIWA K626 handheld PDA with UHF RFID reader attachment (GZPDA40).\n- Purpose: scan a book's barcode, then locate the physical book on shelves by RFID signal strength. Live signal indicator, audio feedback, adjustable RF power.\n- Well-documented README with hardware specs and trigger button workflow.\n\n**4. -TagHunt-sdk-libs** (no language) — Updated 2026-02-09\n- SDK binaries (JAR/AAR/SO files) for the GZPDA40 UHF RFID reader used by TagHunt.\n- Contains native libraries for arm64-v8a and armeabi-v7a architectures.\n\n**5. tugigrupp** (no language) — Updated today (2026-04-09)\n- **Empty repo.** No files, no README, no commits with content. The repo exists but has no code pushed to it yet. No description set. Created/updated today — likely just initialized.",
-    "summary": "Raamatukoi GitHub org research complete",
-    "timestamp": "2026-04-09T12:22:44.371Z",
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826810641@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:13:36.406Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T13:13:36.406Z",
     "color": "yellow",
     "read": true
   },
   {
-    "from": "raamatukoi-research",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"raamatukoi-research\",\"timestamp\":\"2026-04-09T12:22:48.892Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T12:22:48.892Z",
-    "color": "yellow",
+    "from": "monte",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826812127@monte\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T13:13:37.251Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T13:13:37.251Z",
+    "color": "orange",
     "read": true
   },
   {
     "from": "celes",
-    "text": "[2026-04-09 15:23] Intake analysis for **Raamatukoi tugigrupp** — questions for PO and initial assessment.\n\n---\n\n## Intake Questions for PO\n\n### 1. What does \"maintain\" mean?\n\nThe four repos span very different maturity levels:\n- **webstore** — \"active development\" suggests feature work, not just maintenance\n- **rat-project** — cron jobs + health checks suggests operational maintenance\n- **TagHunt** — Android/RFID hardware app — how often does this change?\n- **-TagHunt-sdk-libs** — SDK binaries — is this ever modified, or purely consumed?\n\n**Question:** Is this team doing bug fixes only? Bug fixes + small features? Or full feature development on some repos? Which repos are active vs. stable?\n\n### 2. Team size constraint?\n\nThe tech stack spans 4 languages (TypeScript, Python, Java, native). A \"one specialist per language\" approach yields 3-4 devs (TS and Java could share one agent if TagHunt changes rarely). But TDD pairs (our standard) would double that.\n\n**Question:** Is there a budget/size constraint? Does PO want TDD pairs for all repos, or is TDD only required for actively developed repos (webstore, rat-project)?\n\n### 3. Deployment environment?\n\n**Question:** Where will this team run? Container on RC server? Hostinger? Somewhere else? This affects the container design artifacts I need to produce.\n\n### 4. Oracle scope?\n\nPO explicitly requested a librarian (Oracle). For a maintenance team across 4 repos, the Oracle would curate: integration points between repos (Directo XML schemas, PIM API contracts, SKU formats), deployment procedures, known quirks per repo, and incident history.\n\n**Question:** Is this correct, or does PO have a specific knowledge domain in mind for the Oracle?\n\n### 5. TagHunt reality check\n\nJava/Android for a specific PDA hardware (UNIWA K626 + GZPDA40 UHF RFID). This is highly specialized. The SDK libs repo is native ARM binaries.\n\n**Question:** Can an AI agent meaningfully maintain TagHunt? Does the team have physical hardware for testing? Or is TagHunt maintenance limited to \"read the code, propose fixes, human tests on device\"?\n\n### 6. Repo access pattern\n\nThe team repo is `Raamatukoi/tugigrupp` but the work happens in 4 other repos.\n\n**Question:** Does the team work directly in each repo (branches/PRs on webstore, rat-project, TagHunt, etc.)? Or does tugigrupp aggregate issues/docs and agents push to the individual repos?\n\n---\n\n## Initial Assessment\n\n**Team archetype:** Development (maintenance variant) — code output across multiple repos, with research needed to understand integration points.\n\n**Data flow:** Independent-output, not pipeline. Each repo is self-contained. Integration points exist (Directo ERP is shared between webstore and rat-project) but the codebases don't feed into each other.\n\n**Isolation model:** Since repos are independent, agents can work in separate worktrees or branches without conflict. The main coordination challenge is understanding cross-repo integration contracts (Directo XML, PIM API).\n\n**Preliminary size estimate:** 5 characters (team-lead + 3 devs + oracle), expandable to 7 with TDD pairs. But I need the PO's answers before committing to a composition.\n\nAwaiting PO input before proceeding to role sculpting.",
-    "summary": "Intake analysis for Raamatukoi tugigrupp",
-    "timestamp": "2026-04-09T12:24:19.067Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T12:24:23.013Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T12:24:23.013Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "raamatukoi-research",
-    "text": "## Code Quality Assessment — Raamatukoi Repos\n\n### 1. webstore (Next.js 16 + TypeScript)\n\n- **Tests:** No test framework installed (no Jest/Vitest in deps). Files named `test_*` and `test-*` are ad-hoc scripts (e.g., `test-abandoned-cart-email.ts`, `test-article-put.ts`) and API test routes — not automated test suites.\n- **Quality gates:** ESLint configured (eslint-config-next with core-web-vitals + TypeScript rules). `npm run lint` script present. No Prettier config. No pre-commit hooks visible.\n- **CI/CD:** Only Dependabot (auto dependency updates). No GitHub Actions workflows for build/test/deploy.\n- **Dependencies:** Modern stack — Next.js 16, React 19, Tailwind 4, TypeScript 5. Also has `@anthropic-ai/sdk` (Claude integration), `pg` (PostgreSQL), `nodemailer`, `resend`, `next-intl` (i18n), `zustand` (state). Reasonable, nothing alarming.\n- **Documentation:** Extensive `docs/` folder (30+ files) — database schema, API mappings, feature specs, session notes. Has CLAUDE.md. CHANGELOG.md present. README is default Next.js boilerplate (not customized).\n\n### 2. rat-project (Python FastAPI + React frontend)\n\n- **Tests:** Zero test files found anywhere in the repo. No pytest, unittest, or any test framework in requirements.txt.\n- **Quality gates:** No linting config (no pylint, ruff, flake8, mypy, black). No pre-commit hooks. Frontend has `react-app/jest` in eslintConfig but testing-library deps appear unused (no actual test files).\n- **CI/CD:** No GitHub Actions workflows at all.\n- **Dependencies:** FastAPI + Uvicorn backend with heavy ML stack: `opencv-contrib-python`, `open_clip_torch`, `google-cloud-vision`, `imagehash`, `pytesseract` (OCR). Frontend is CRA (react-scripts 5) with `react-webcam`, `socket.io-client`. Some deps pinned to old versions (fastapi 0.109, pillow 10.2).\n- **Documentation:** Rich root-level markdown docs (specs, session logs, audit reports — all Estonian). Has CLAUDE.md. Docker setup with docker-compose for prod.\n\n### 3. TagHunt (Java/Android)\n\n- **Tests:** No test files found. Standard Android test directories appear absent.\n- **Quality gates:** No linting config. No static analysis. Android Gradle plugin 8.1.0, compileSdk 33 (Android 13), Java 8 compat. Has product flavors (`personal`, `kiosk`).\n- **CI/CD:** No GitHub Actions workflows. Build via local `gradlew` / `build.ps1` scripts only.\n- **Dependencies:** AndroidX, Material Components, Glide for image loading, plus 13 vendor JAR/AAR files for RFID hardware SDK. All SDK libs are binary blobs in `app/libs/`.\n- **Documentation:** Excellent README (hardware specs, usage workflow, build instructions). Has a `docs/` folder.\n\n### Summary\n\n| | webstore | rat-project | TagHunt |\n|---|---|---|---|\n| Tests | None (ad-hoc scripts only) | None | None |\n| Linting | ESLint (Next.js) | None | None |\n| CI/CD | Dependabot only | None | None |\n| Type checking | TypeScript | None | None |\n| CLAUDE.md | Yes | Yes | No |\n| Docs | Extensive | Extensive | Good README |\n\n**Bottom line:** No automated tests in any repo. No CI pipelines (only Dependabot on webstore). Webstore has the best hygiene (ESLint, TypeScript, CLAUDE.md). rat-project and TagHunt have zero quality gates. All three repos are heavily documentation-driven (session notes, specs) but lack any automated verification.",
-    "summary": "Code quality assessment of 3 Raamatukoi repos",
-    "timestamp": "2026-04-09T12:34:03.937Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "raamatukoi-research",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"raamatukoi-research\",\"timestamp\":\"2026-04-09T12:34:07.545Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T12:34:07.545Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 15:44] **Raamatukoi tugigrupp — design complete.** All deliverables in `designs/new/raamatukoi-dev/`.\n\n---\n\n## Summary\n\n**6 characters** — team-lead + 2 TDD pairs + oracle. Lore theme: **Pioneers of the Book**.\n\n| Agent | Role | Model | Color | Lore |\n|---|---|---|---|---|\n| **Manutius** (Manu) | Team Lead | opus | — | Aldus Manutius — Venetian printer, Aldine Press, *festina lente* |\n| **Aldus** | Webstore Builder | sonnet | blue | Aldus the Younger — codified Latin orthography standards |\n| **Jikji** | Webstore Tester | sonnet | cyan | *Jikji* (1377) — oldest movable type book, proof by artifact |\n| **Hypatia** (Hyp) | Rat-Project Builder | sonnet | green | Hypatia of Alexandria — made existing knowledge more rigorous |\n| **Babbage** (Babs) | Rat-Project Tester | sonnet | yellow | Charles Babbage — designed systems to catch errors |\n| **Bodley** (Bod) | Oracle / Librarian | opus[1m] | magenta | Sir Thomas Bodley — built the Bodleian Library as a self-sustaining system |\n\n### Model Tier Rationale\n\n- **All 4 TDD agents: sonnet** — tests provide automated quality gates. Builder errors are caught by tester; tester errors are caught by builder review + CI. Low consequence-of-error.\n- **Team-lead: opus** — cross-repo coordination, PR reviews, judgment calls.\n- **Oracle: opus[1m]** — wrong integration knowledge cascades through both repos. No automated gate catches semantic errors in integration contracts. Needs full context to cross-reference Directo, PIM, RARA, and SKU contracts.\n\n### Why This Team Exists\n\nRaamatukoi has two production repos with zero automated tests, minimal CI, and complex external integrations (Directo ERP, PIM, RARA). The team builds the quality infrastructure that prevents regressions: test suites, CI pipelines, linting, type checking. Then it maintains both repos through TDD-driven bug fixes and refactoring. The Oracle curates integration knowledge that both TDD pairs need to write accurate tests.\n\n---\n\n## Deliverables\n\nAll at `designs/new/raamatukoi-dev/`:\n\n| File | Status |\n|---|---|\n| `design-spec.md` | Complete — problem statement, domain analysis, composition, work streams, access matrix, completion criteria |\n| `roster.json` | Complete — 6 members, all lore entries |\n| `common-prompt.md` | Complete — team standards, workspace, stacks, file ownership, TDD protocol, dual-hub routing |\n| `prompts/manutius.md` | Complete — team-lead prompt |\n| `prompts/aldus.md` | Complete — webstore builder prompt |\n| `prompts/jikji.md` | Complete — webstore tester prompt |\n| `prompts/hypatia.md` | Complete — rat-project builder prompt |\n| `prompts/babbage.md` | Complete — rat-project tester prompt |\n| `prompts/bodley.md` | Complete — oracle/librarian prompt with submission/query protocols |\n\n### Note on roster.json `agentType`\n\nBodley uses `agentType: \"oracle\"` — matching the Callimachus pattern from our own team. The `roster.ts` type definition only has `\"team-lead\" | \"general-purpose\"` and needs `\"oracle\"` added (Herald or Volta's concern, not mine).\n\n---\n\nReady for PO review. No open questions from my side — all PO answers were clear and sufficient.",
-    "summary": "Raamatukoi tugigrupp design complete — 6 characters, full deliverables",
-    "timestamp": "2026-04-09T12:45:22.120Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T12:45:56.614Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T12:45:56.614Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 16:37] Acknowledging both items. Both addressed.\n\n---\n\n## Item 1: PURPLE Recommendation\n\n**Answer: Separate PURPLEs per pipeline.** Cathedral tier with High domain distance.\n\n### Reasoning (from T09 v2.3)\n\n**Why Cathedral tier:**\n- This team's entire mission IS refactoring. Structural debt is the problem being solved.\n- The team-lead cannot hold full refactoring context across two unrelated tech stacks (TypeScript + Python).\n- Both repos are production systems. Structural debt compounds irreversibly.\n- T09 governance trigger: \"Cathedral tier is needed when the team lead can no longer hold all implementation state simultaneously.\"\n\n**Why separate PURPLEs (not shared):**\n- T09 v2.3 PURPLE configuration table: \"High — different repos or languages → Separate PURPLEs. Language boundaries force separation regardless of other reasoning.\"\n- This team hits BOTH conditions: different repos AND different languages.\n- A shared PURPLE switching between TypeScript/Next.js and Python/FastAPI would context-switch across fundamentally different idioms. The T09 rationale applies directly.\n\n**Why shared ARCHITECT:**\n- T09 allows ARCHITECT to process events from multiple pipelines.\n- Under sequential execution (v2.1 default), the pipelines take turns. No contention.\n- ARCHITECT's decomposition knowledge crosses repos (Directo integration spans both), making shared ARCHITECT valuable.\n\n**Result: +3 agents** (1 ARCHITECT + 2 PURPLEs) = **9 total characters**.\n\n| Agent | Pipeline Role | Model |\n|---|---|---|\n| Cassiodorus (Cass) | ARCHITECT (shared) | opus |\n| Erasmus (Ras) | PURPLE (webstore) | opus |\n| Khwarizmi (Kha) | PURPLE (rat-project) | opus |\n\n**Model count:** 5 opus (lead + ARCHITECT + 2 PURPLEs + oracle) + 4 sonnet (2 REDs + 2 GREENs). Per T09: \"Opus handles the bookends. ARCHITECT decomposes work (judgment). PURPLE refactors structure (judgment). Sonnet handles the volume.\"\n\n### Why NOT the other options\n\n- **Team-lead as PURPLE:** T09 explicitly warns against this. \"If the team lead is also the ARCHITECT, the team lead becomes a serial bottleneck.\" Same applies to team-lead-as-PURPLE — Manutius would be a bottleneck for all refactoring across both repos.\n- **Shared PURPLE:** T09 says \"language boundaries force separation.\" TypeScript and Python are as far apart as it gets in this framework.\n- **Builder handles REFACTOR:** This was the v1 design's \"both review for refactoring\" pattern — exactly what T09 identifies as \"the weakest link.\" For a team whose mission IS refactoring, this is unacceptable.\n- **Dedicated PURPLE per pair + no ARCHITECT (8 total):** Missing ARCHITECT means nobody decomposes stories into test plans. The decomposition step is what prevents \"write a test for the whole feature\" anti-patterns. For Cathedral tier, ARCHITECT is non-negotiable.\n\n---\n\n## Item 2: TDD Pipeline Workflow Document\n\nWritten as `tdd-pipeline.md` in the design folder. Covers:\n\n1. Pipeline architecture (Cathedral, separate PURPLEs, shared ARCHITECT)\n2. The cycle (5 steps: ARCHITECT decomposes → RED writes test → GREEN makes it pass → PURPLE refactors → next test case)\n3. All 4 message types with templates (TEST_SPEC, GREEN_HANDOFF, PURPLE_VERDICT, CYCLE_COMPLETE)\n4. Three-strike rule (PURPLE veto escalation)\n5. PURPLE scope boundaries (may/may-not)\n6. Write-lock rotation (temporal ownership)\n7. Mid-cycle shutdown (watchdog + team-lead authority + deferred-refactor bridge via Bodley)\n8. Oracle integration (who queries/submits when)\n9. Phase 1 adaptation (infrastructure stories follow the same XP cycle)\n\nReferenced from common-prompt.md: \"See `docs/tdd-pipeline.md` for the full XP cycle protocol.\" Every agent reads it on startup.\n\n---\n\n## Updated Deliverables\n\nAll at `designs/new/raamatukoi-dev/`:\n\n| File | Status |\n|---|---|\n| `design-spec.md` | **Updated** — 9 characters, Cathedral tier, XP pipelines, updated access matrix + coordination boundaries |\n| `roster.json` | **Updated** — +3 members (cassiodorus, erasmus, khwarizmi) |\n| `common-prompt.md` | **Rewritten** — full XP pipeline protocol, temporal ownership, PURPLE scope boundaries |\n| `tdd-pipeline.md` | **New** — full TDD pipeline workflow document |\n| `prompts/manutius.md` | **Rewritten** — routes to ARCHITECT, mid-cycle shutdown authority |\n| `prompts/cassiodorus.md` | **New** — ARCHITECT prompt |\n| `prompts/jikji.md` | **Rewritten** — RED role, receives TEST_SPEC from ARCHITECT |\n| `prompts/aldus.md` | **Rewritten** — GREEN role, sends GREEN_HANDOFF to PURPLE |\n| `prompts/erasmus.md` | **New** — PURPLE (webstore) prompt with verdict/cycle-complete protocols |\n| `prompts/babbage.md` | **Rewritten** — RED role, receives TEST_SPEC from ARCHITECT |\n| `prompts/hypatia.md` | **Rewritten** — GREEN role, sends GREEN_HANDOFF to PURPLE |\n| `prompts/khwarizmi.md` | **New** — PURPLE (rat-project) prompt with verdict/cycle-complete protocols |\n| `prompts/bodley.md` | Unchanged — Oracle prompt already had submission/query protocols |\n\nReady for PO review.",
-    "summary": "PURPLE recommendation + updated design + TDD pipeline doc complete",
-    "timestamp": "2026-04-09T13:38:13.465Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T13:38:19.332Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T13:38:19.332Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 16:39] Oracle routing obligation fulfilled. Submitted 3 Protocol A knowledge submissions to Callimachus:\n\n1. **Cathedral tier trigger for quality-infrastructure teams** — when the mission IS eliminating structural debt, Cathedral is triggered by definition. Relates to T09 § \"PURPLE configuration by tier.\"\n\n2. **Multi-repo maintenance team XP composition** — shared ARCHITECT + separate PURPLEs + shared Oracle pattern. The 9-character template for 2-repo teams with different stacks. Relates to T09 § \"Team Composition Impact.\"\n\n3. **XP cycle applies to infrastructure stories** — Phase 1 work (test framework, CI, linting) follows the same ARCHITECT → RED → GREEN → PURPLE pipeline. Prevents ad-hoc infrastructure setup. Relates to T09 § \"The Cycle.\"\n\nAll three submitted as `type: pattern`, `scope: team-wide`, `confidence: high` with evidence from the raamatukoi-dev design.\n\nI'm now idle and ready for further tasks.",
-    "summary": "Oracle submissions done — 3 patterns sent to Callimachus",
-    "timestamp": "2026-04-09T13:39:48.862Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T13:39:52.438Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: 3 knowledge submissions from raamatukoi-dev design\"}",
-    "timestamp": "2026-04-09T13:39:52.438Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "[2026-04-09 16:40] Filed 3 knowledge submissions from Celes (raamatukoi-dev design session):\n\n1. **`wiki/patterns/cathedral-trigger-quality-teams.md`** — Cathedral tier is deterministic when team mission IS eliminating structural debt\n2. **`wiki/patterns/multi-repo-xp-composition.md`** — Shared ARCHITECT + separate PURPLEs + shared Oracle for 2+ repo teams\n3. **`wiki/patterns/xp-cycle-for-infrastructure.md`** — XP pipeline applies to infrastructure stories, not just features\n\nWiki now has 4 entries (all patterns/). Celes acknowledged. No urgency flags — all standard priority.",
-    "summary": "3 knowledge submissions from Celes filed in wiki",
-    "timestamp": "2026-04-09T13:40:58.798Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T13:41:00.100Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T13:41:00.100Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-09T13:41:01.781Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] 3 submissions filed — cathedral trigger, multi-repo XP, infra XP cycle\"}",
-    "timestamp": "2026-04-09T13:41:01.781Z",
-    "color": "blue",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826812217@celes\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T13:13:37.759Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T13:13:37.759Z",
+    "color": "pink",
     "read": true
   },
   {
     "from": "brunel",
-    "text": "[2026-04-09 16:48] Raamatukoi/tugigrupp deployment complete.\n\n**What was done:**\n\n1. Cloned empty `Raamatukoi/tugigrupp` repo to `/tmp/tugigrupp`\n2. Added submodules:\n   - `webstore` — Raamatukoi/webstore (note: has an invalid NTFS path `:USERPROFILE\\Downloads\\SESSION-NOTES.md` that prevents full checkout on Windows, but the submodule reference is correctly recorded)\n   - `rat-project` — Raamatukoi/rat-project\n3. Created full directory structure with `.claude/teams/raamatukoi-dev/` (prompts, memory, roster, common-prompt) and `docs/` (design-spec, tdd-pipeline, integration/, decisions/, test-plans/)\n4. Copied all 14 design files from `designs/new/raamatukoi-dev/` without modification\n5. Created README.md in Estonian\n6. Created `.gitkeep` placeholders for empty directories (memory/, integration/, decisions/, test-plans/)\n7. Committed and pushed to `origin/main` — commit `c31240e`\n\n**Verified:**\n- `docs/tdd-pipeline.md` path matches references in `common-prompt.md` (lines 117, 204)\n- All 9 agent prompts in place (aldus, babbage, bodley, cassiodorus, erasmus, hypatia, jikji, khwarizmi, manutius)\n- `workDir` in roster.json left as `$HOME/workspace/tugigrupp` (deployment-specific, as instructed)\n\n**One note:** The `webstore` submodule has a file with an invalid Windows path (`:USERPROFILE\\Downloads\\SESSION-NOTES.md`). This prevents full checkout on Windows but the git submodule reference is correct. On Linux containers this won't be an issue.\n\nRepo live at: https://github.com/Raamatukoi/tugigrupp",
-    "summary": "tugigrupp deployment complete",
-    "timestamp": "2026-04-09T13:49:14.471Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T13:49:18.161Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T13:49:18.161Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 16:56] Second commit pushed to Raamatukoi/tugigrupp — `844a25d`.\n\n**What was added:**\n\n1. **`CLAUDE.md`** (repo root) — Project overview, team config path table, submodule workflow instructions (clone, branch, PR to real repos, update reference), directs Claude Code to read `startup.md` on first greeting.\n\n2. **`.claude/teams/raamatukoi-dev/startup.md`** — Adapted from framework-research template:\n   - Path anchors: `REPO` (git root) and `TEAM_DIR` (runtime)\n   - Read order: startup.md → roster.json → common-prompt.md → memory/manutius.md\n   - 6-step startup: Sync (includes `git submodule update --init --recursive`) → Diagnose → Clean → Create (with operational gate) → Restore inboxes → Ask user which agents to spawn\n   - Shutdown: S1 Halt → S2 Scratchpad + shutdown requests → S3 Collect terminated → S4 Persist inboxes + commit\n   - Lists all 9 agents with roles for the spawn step\n   - Inline inbox restore/persist scripts (no external shell scripts — kept self-contained for a fresh repo)\n\n3. **`README.md`** updated — Added \"Alustamine\" (Getting Started) section in Estonian: install Claude Code, clone + submodule init, run `claude`, auto-reads CLAUDE.md.\n\n**Repo state:** 2 commits on main, pushed. https://github.com/Raamatukoi/tugigrupp",
-    "summary": "CLAUDE.md + startup.md + README update pushed",
-    "timestamp": "2026-04-09T13:56:24.530Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T13:56:29.691Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T13:56:29.691Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:03] Done. README.md updated — getting-started section is now exactly two commands, no conditionals. Pushed as `f6e139b`.",
-    "summary": "README simplified, pushed",
-    "timestamp": "2026-04-09T14:03:41.008Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:03:43.797Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:03:43.797Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:05] Done. CLAUDE.md now has a proper markdown link: `[startup.md](.claude/teams/raamatukoi-dev/startup.md)`. Pushed as `ec5bbb9`.",
-    "summary": "startup.md linked from CLAUDE.md, pushed",
-    "timestamp": "2026-04-09T14:05:53.330Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:05:56.706Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:05:56.706Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:08] Done. All 8 rows in the paths table now use `$REPO/` or `$TEAM_DIR/` consistently — no raw relative paths remain. Pushed as `8b702ef`.",
-    "summary": "startup.md paths fixed, pushed",
-    "timestamp": "2026-04-09T14:08:23.882Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:08:28.521Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:08:28.521Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:11] Done. Read order now has 5 steps: startup.md -> roster.json -> common-prompt.md -> manutius.md (prompt) -> manutius.md (scratchpad). Pushed as `8f74edc`.",
-    "summary": "Manutius prompt added to read order, pushed",
-    "timestamp": "2026-04-09T14:11:22.472Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:11:27.486Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:11:27.486Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:15] Done. Pushed as `7da2e97`:\n\n- `wiki/index.md` — empty template with header\n- `wiki/patterns/`, `wiki/gotchas/`, `wiki/decisions/`, `wiki/contracts/`, `wiki/archive/` — all with .gitkeep\n- `oracle-state.json` — `{\"intake_complete\": false}`",
-    "summary": "Wiki structure + oracle-state.json pushed",
-    "timestamp": "2026-04-09T14:15:28.692Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:15:31.725Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:15:31.725Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:19] Done. Pushed as `0e5b758`. Wiki seeded with 5 articles:\n\n**4 patterns (adapted from framework-research → raamatukoi-dev context):**\n1. `cathedral-trigger-quality-teams.md` — reasoning chain rewritten with Manutius/Erasmus/Khwarizmi references, team-specific application section\n2. `multi-repo-xp-composition.md` — sharing rules table now names all 9 agents by role, composition section lists full roster\n3. `xp-cycle-for-infrastructure.md` — cycle steps reference Cassiodorus/Jikji/Babbage/Aldus/Hypatia/Erasmus/Khwarizmi, points to `docs/tdd-pipeline.md`\n4. `in-process-respawn.md` — team path updated to `raamatukoi-dev`, provenance notes framework-research origin\n\n**1 gotcha (created from scratch):**\n5. `repo-quality-baseline.md` — quality matrix, key deps (Next.js 16/React 19/FastAPI/opencv etc.), NTFS invalid path issue, Phase 1 implications\n\nAll use `(*RK:Bodley*)` attribution, `source-agent: framework-research` provenance, `filed-by: oracle` frontmatter. Index updated with all 5 entries.",
-    "summary": "Wiki seeded with 5 articles, pushed",
-    "timestamp": "2026-04-09T14:19:13.780Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:19:16.893Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:19:16.893Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:23] Done. README.md now has \"Wiki (Bodley)\" section with directory tree and explanation (Estonian): Bodley is sole writer, agents submit via Protocol A, query via Protocol B. Pushed as `4d493c9`.",
-    "summary": "Wiki section added to README, pushed",
-    "timestamp": "2026-04-09T14:23:34.218Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:23:37.016Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:23:37.016Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:25] Done. Added `wiki/` line to the Struktuur directory tree in README. Pushed as `dcdf4bd`.",
-    "summary": "Wiki added to structure tree, pushed",
-    "timestamp": "2026-04-09T14:25:49.140Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:25:54.555Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:25:54.555Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:38] Done. Pushed as `12f42c6`. Linkified all plain-text repo references across 3 files:\n\n**common-prompt.md** (3 edits):\n- Line 16: `Raamatukoi/tugigrupp` → linked\n- Line 29: `Raamatukoi/webstore` → linked\n- Line 30: `Raamatukoi/rat-project` → linked\n\n**CLAUDE.md** (1 edit):\n- Line 48: both `Raamatukoi/webstore` and `Raamatukoi/rat-project` → linked\n\n**design-spec.md** (4 edits):\n- Line 67: `Raamatukoi/tugigrupp` → linked\n- Line 80: both webstore and rat-project → linked\n- Line 238: `Raamatukoi/tugigrupp` → linked\n- Lines 253-255: all 3 table rows → linked\n\n**Preserved as-is** (inside code blocks or `gh` commands):\n- common-prompt.md lines 21-22 (code block tree), line 41 (`gh pr create --repo`)\n- CLAUDE.md line 39 (bash comment), line 51 (git clone URL)\n- design-spec.md lines 72-73, 243-244 (code block trees)",
-    "summary": "All repo references linkified, pushed",
-    "timestamp": "2026-04-09T14:38:18.948Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:38:23.516Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:38:23.516Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:40] Done. Pushed as `08a49fa`. Header block restructured:\n\n- Top-level bullets: Team, Mission, Deployment (VPS container TBD), Client (Raamatukoi, \"Book Moth\"), Pipeline tier (Cathedral with full rationale)\n- Members moved to sub-section\n- XP Pipelines moved to sub-section with Oracle",
-    "summary": "common-prompt header restructured, pushed",
-    "timestamp": "2026-04-09T14:40:45.820Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:40:49.289Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:40:49.289Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:42] Done. Pushed as `c10f179`. Stream 2 pipeline steps broken into numbered lists — both webstore and rat-project pipelines now have 4 clear steps each instead of run-on arrow chains.\n\nNote: Streams 3 and 4 have the same dense single-line format. Let me know if you want those reformatted too.",
-    "summary": "Stream 2 formatting fixed, pushed",
-    "timestamp": "2026-04-09T14:42:33.743Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:42:37.173Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:42:37.173Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:43] Done. Pushed as `53044cb`. Streams 3 and 4 reformatted to numbered lists — same pattern as Stream 2. Stream 4 also has Priority pulled out as a separate bold line.",
-    "summary": "Streams 3+4 reformatted, pushed",
-    "timestamp": "2026-04-09T14:43:18.583Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:43:21.425Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:43:21.425Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:44] Done. Pushed as `bda3a70`. All numbered lists in Streams 2, 3, and 4 converted to bullet lists (`- `).",
-    "summary": "Streams 2/3/4 converted to bullet lists, pushed",
-    "timestamp": "2026-04-09T14:44:54.763Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:44:58.211Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:44:58.211Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:47] Done. Pushed as `90b9e24`. Fixed two locations in design-spec.md:\n\n1. **Header block** (lines 3-7): Team/Mission/Deployment/Client/Pipeline tier — now bulleted\n2. **XP Pipelines** (lines 114-115): Webstore pipeline/Rat-project pipeline — now bulleted\n\nScanned the entire file with awk for consecutive `**Bold:**` lines — zero remaining.",
-    "summary": "design-spec bold-label lines fixed, pushed",
-    "timestamp": "2026-04-09T14:47:17.810Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:47:21.408Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:47:21.408Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:48] Done. Pushed as `93748da`. Added `wiki/` to all 3 directory trees:\n\n1. `design-spec.md` line 71 (Isolation Model section)\n2. `design-spec.md` line 269 (Tools & Access section)\n3. `common-prompt.md` line 27 (Workspace section)\n\nAll trees now show `wiki/` as a child of `.claude/teams/raamatukoi-dev/` with comment \"Bodley's knowledge base\", and the parent comment updated to include \"wiki\".",
-    "summary": "wiki/ added to all 3 directory trees, pushed",
-    "timestamp": "2026-04-09T14:48:30.429Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T14:48:33.631Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:48:33.631Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 17:51] Redundancy review complete. Read the live `design-spec.md`, `common-prompt.md`, and `tdd-pipeline.md` side by side. Here are the findings.\n\n---\n\n## A. Internal Redundancy (within design-spec.md)\n\n### A1. Workspace tree appears twice — identical\n\n- **§2 Isolation Model** (lines 69-79): workspace tree with `tugigrupp/` structure\n- **§5 Repo Structure** (lines 268-278): same tree, verbatim copy\n\n**Recommendation:** Keep in §2 (context for isolation model). Delete from §5. The repo table in §5 (lines 280-284) is not redundant — it adds submodule→repo mapping — so keep that.\n\n### A2. Integration Points described twice\n\n- **§2 Integration Points** (lines 48-55): lists Directo, PIM, SKU, RARA with descriptions\n- **§6 Integration Points** (lines 337-339): restates Directo and PIM/SKU with Bodley's role\n\n**Recommendation:** Keep §2 as the canonical description. Collapse §6 to a one-liner: \"See §2. Bodley maintains canonical docs. Both pipelines query Bodley before touching integration code.\"\n\n### A3. \"No new features\" stated three times\n\n- **§1 Problem Statement** (line 28): \"This team does NOT build new features.\"\n- **§2 Team Archetype** (line 59): \"No new features — quality infrastructure and bug fixes only.\"\n- Implicitly in §4 work streams (all streams are about tests/CI/refactoring, none are features)\n\n**Recommendation:** Keep the bold statement in §1. Drop from §2 — the \"maintenance variant\" archetype already implies it.\n\n---\n\n## B. Cross-Document Redundancy (design-spec.md vs common-prompt.md)\n\n### B1. XP Pipeline tier justification — full duplication\n\n- **design-spec §3 \"XP Pipeline Tier\"** (lines 99-118): 20-line block explaining why Cathedral, why separate PURPLEs, why shared ARCHITECT, with T09 references\n- **common-prompt \"XP Development Pipeline\"** (lines 117-124): same three points restated (structural debt, domain distance, sequential execution)\n\n**Recommendation:** The design-spec justification is for PO/design review — it should stay verbose. The common-prompt version is for agents — it should be a one-sentence pointer: \"Pipeline tier: Cathedral with separate PURPLEs (see design-spec §3 for rationale).\" Agents don't need the T09 reasoning; they need the rules.\n\n### B2. The Cycle diagram — duplicated in all three documents\n\n- **design-spec §3 \"XP Pipelines\"** (lines 113-118): pipeline listing (text, no diagram)\n- **common-prompt \"The Cycle\"** (lines 127-158): full ASCII diagram + key rules\n- **tdd-pipeline.md \"The Cycle\"** (lines 24-84): 5-step prose walkthrough + same content\n\nThe common-prompt is the document agents read on every startup. The tdd-pipeline.md is the full reference. Having both describe the cycle is the worst redundancy — agents read both on startup (per common-prompt line 213: \"Read `docs/tdd-pipeline.md`\").\n\n**Recommendation:** Common-prompt should contain the ASCII diagram ONLY (visual reference, fast to scan) with \"See `docs/tdd-pipeline.md` for full protocol.\" Remove the Key Rules list from common-prompt — they're covered in tdd-pipeline.md.\n\n### B3. File Ownership table — duplicated\n\n- **design-spec §6** (lines 302-315): File Ownership (Temporal Ownership Model) — full table with 8 rows\n- **common-prompt \"File Ownership\"** (lines 168-181): same table with 7 rows (nearly identical)\n\n**Recommendation:** Keep in common-prompt (agents need it). Remove from design-spec — design-spec §5 Access Matrix already covers who can write what. The File Ownership table adds temporal handoff detail that only matters at runtime (i.e., for agents, not for design review).\n\n### B4. PURPLE Scope Boundaries — triplicated\n\n- **design-spec §6** (lines 317-334): PURPLE MAY / MAY NOT + cross-repo boundary\n- **common-prompt**: not present (good — defers to tdd-pipeline.md)\n- **tdd-pipeline.md** (lines 171-186): PURPLE MAY / MAY NOT + cross-repo boundary — verbatim duplicate of design-spec\n\n**Recommendation:** Keep in tdd-pipeline.md (the runtime reference). Keep in design-spec (the design review document). These serve different audiences, and the content is short enough that the duplication is tolerable. BUT if we want to cut, the design-spec version can go — the Access Matrix + a one-liner \"PURPLE scope boundaries are defined in tdd-pipeline.md\" is sufficient.\n\n---\n\n## C. Verbose Passages That Could Be Tightened\n\n### C1. Lore section is 55 lines (lines 132-188)\n\n9 agents x ~6 lines each. The origin paragraphs are dense with historical detail that serves the PO/design review but won't be referenced during operation.\n\n**Recommendation:** This is a judgment call for PO. The lore is well-written and serves the same function as screenwerk-dev's lore section (which is 42 lines for 7 agents, same density). If PO wants to cut for length, collapse each entry to: Name, Origin (1 sentence), Significance (1 sentence), Nickname. That would save ~30 lines.\n\n### C2. Model Rationale (lines 122-130) repeats the opus/sonnet split explanation\n\n\"Same rationale as Jikji\" and \"Same rationale as Aldus\" appear for Babbage and Hypatia. Also \"Same rationale as Erasmus\" for Khwarizmi.\n\n**Recommendation:** Collapse to a grouped explanation: \"All RED/GREEN agents (sonnet): execution roles verifiable by tests. All PURPLE agents (opus): structural judgment with no automated quality gate. ARCHITECT (opus): decomposition judgment.\" Then list Bodley separately. Saves 5 lines.\n\n---\n\n## Summary: Recommended Cuts\n\n| Finding | Lines saved | Risk |\n|---|---|---|\n| A1: Delete duplicate workspace tree from §5 | ~10 | None — repo table remains |\n| A2: Collapse §6 Integration Points to one-liner | ~3 | None — canonical is in §2 |\n| A3: Drop \"no features\" from §2 Team Archetype | ~1 | None |\n| B1: Collapse common-prompt tier justification to pointer | ~6 (in CP) | None — agents don't need T09 rationale |\n| B2: Remove Key Rules from common-prompt cycle section | ~6 (in CP) | Low — covered in tdd-pipeline.md |\n| B3: Remove File Ownership table from design-spec | ~14 | Low — Access Matrix covers permissions |\n| B4: Optionally remove PURPLE scope from design-spec | ~16 | Low — tdd-pipeline.md is canonical |\n| C2: Collapse Model Rationale to grouped form | ~5 | None |\n\n**Total: ~45 lines from design-spec, ~12 lines from common-prompt.** The lore section (C1) is PO's call — another ~30 if trimmed.\n\nNo files edited. Awaiting decision on what to cut.",
-    "summary": "Redundancy review of design-spec.md — 8 findings",
-    "timestamp": "2026-04-09T14:52:08.667Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T14:52:14.064Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:52:14.064Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 17:56] All 8 cuts applied, committed, and pushed.\n\n**Commit:** `b55f847` on `main` — \"Remove redundancy from design-spec and common-prompt\"\n\n**Results:**\n- design-spec.md: 376 → 329 lines (-47)\n- common-prompt.md: 216 → 203 lines (-13)\n- Total: -60 lines, 71 deletions / 13 insertions\n\nAll cuts applied as specified. Lore kept per instruction (C1 skipped).",
-    "summary": "All 8 redundancy cuts applied, committed, pushed",
-    "timestamp": "2026-04-09T14:56:55.598Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T14:56:59.302Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-09T14:56:59.302Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "raamatukoi-research",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775746871531@raamatukoi-research\",\"from\":\"raamatukoi-research\",\"timestamp\":\"2026-04-09T15:01:16.360Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-09T15:01:16.360Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "[2026-04-09 18:01] Callimachus closing report — Session 2.\n\n- **[LEARNED]** Design sessions produce batch submissions — Celes sent 3 high-confidence patterns from a single raamatukoi-dev design. Wiki grew from 1 to 4 entries. All patterns/ so far; gotchas/, decisions/, and other directories remain empty — they will populate as the team encounters operational friction rather than design patterns.\n- **[DEFERRED]** Phase 2 (Gap Tracking + Health Sensing) — still 3 sessions away. No query volume yet to justify activation.\n- **[WARNING]** Zero queries received across 2 sessions. The wiki is only useful if agents query it. Once development teams are active, agents should be reminded that Protocol B exists.\n- **[UNADDRESSED]** None — all 3 submissions were processed and acknowledged.\n\nScratchpad updated. Ready for shutdown.",
-    "summary": "Callimachus closing report — Session 2",
-    "timestamp": "2026-04-09T15:01:39.558Z",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826809682@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T13:13:37.830Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T13:13:37.830Z",
     "color": "blue",
     "read": true
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775746868898@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-09T15:01:43.060Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-09T15:01:43.060Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-04-09 18:01] Closing report.\n\n- [LEARNED] Three-document architecture (design-spec / common-prompt / tdd-pipeline) needs explicit pointer discipline from the start. When I wrote v1 without the pipeline doc, redundancy was baked in. The tdd-pipeline.md as the canonical runtime reference should be the first file designed, not the last.\n- [DEFERRED] The `designs/new/raamatukoi-dev/` folder still has the pre-redundancy-cut versions of design-spec.md and common-prompt.md. These drafts may drift from the live files in `Raamatukoi/tugigrupp`. Whether to sync or leave them as historical artifacts is a team-lead decision.\n- [WARNING] The `agentType` field in `roster.ts` still only has `\"team-lead\" | \"general-purpose\"` — missing `\"oracle\"`. Both Callimachus and Bodley use `\"oracle\"` in their roster entries. This should be fixed in the type definition.\n- [UNADDRESSED] None — all requirements from team-lead were completed.",
-    "summary": "Celes closing report — session complete",
-    "timestamp": "2026-04-09T15:01:50.345Z",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826810131@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T13:13:38.707Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T13:13:38.707Z",
     "color": "green",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775746869784@celes\",\"from\":\"celes\",\"timestamp\":\"2026-04-09T15:01:55.689Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-09T15:01:55.689Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "[2026-04-09 17:50] Closing report.\n\n[LEARNED] Consecutive `**Bold:**` lines without blank lines collapse into a single paragraph on GitHub. Must use `- **Bold:**` bullet lists for any label-value block. This hit us 3 times (common-prompt header, design-spec header, design-spec XP pipelines) — now in my KEY GOTCHAS for all future deployments.\n\n[DEFERRED] raamatukoi-dev VPS container deployment — the team design is on GitHub at Raamatukoi/tugigrupp (14 commits, fully configured), but the actual container image and VPS setup remain TBD.\n\n[WARNING] webstore submodule has an NTFS-invalid path (`:USERPROFILE\\Downloads\\SESSION-NOTES.md`). Works on Linux, but Windows checkouts need `core.protectNTFS=false`. Any container deployment will be fine, but local Windows dev will hit this.\n\n[UNADDRESSED] None — all tasks from this session completed and pushed.\n\nScratchpad written (pruned from 104 to 42 lines). Ready for shutdown.",
-    "summary": "Closing report — shutdown approved",
-    "timestamp": "2026-04-09T15:03:12.865Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775746871344@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-09T15:03:17.779Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-09T15:03:17.779Z",
+    "from": "herald",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826811114@herald\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T13:13:41.321Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T13:13:41.322Z",
     "color": "purple",
     "read": true
   }

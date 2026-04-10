@@ -17,11 +17,15 @@ evr-ai-base:latest = Debian bookworm-slim + Node 22 + Claude Code + gh + gosu + 
 VJS2-AI-teams repo: `C:/Users/mihkel.putrinsh/Documents/github/VJS2-AI-teams/`
 Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 
+## UIKIT-DEV (2026-04-10)
+
+[CHECKPOINT] 82MB Figma JSON transferred to `uikit-dev` container: scp→host→docker cp→chown.
+[CHECKPOINT] Container: `uikit-dev` on `dev@100.96.54.170`, image `uikit-dev-claude:latest`, repo `Eesti-Raudtee/evr-ui-kit`.
+[LEARNED] No deployed teams register exists. Proposed README.md table — outside write scope, awaiting team-lead.
+
 ## RAAMATUKOI-DEV (2026-04-09)
 
-[CHECKPOINT] Deployed to `Raamatukoi/tugigrupp` — 14 commits (`c31240e`..`93748da`).
-[CHECKPOINT] Submodules: webstore (NTFS invalid path — `core.protectNTFS=false`), rat-project (clean).
-[CHECKPOINT] Full config: roster, common-prompt, startup.md, 9 prompts, oracle-state.json, wiki (4 patterns + 1 gotcha).
+[CHECKPOINT] Deployed to `Raamatukoi/tugigrupp` — 14 commits, full config.
 [LEARNED] GitHub markdown gotcha hit 3 times — now in KEY GOTCHAS above.
 
 ## COMMS HUB (2026-03-31)
