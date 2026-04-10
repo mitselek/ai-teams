@@ -25,7 +25,7 @@ Conditional proposals are promoted to unconditional recommendations.
 
 Speculative future scenarios are treated as confirmed capability gaps with specific deployment targets.
 
-**Instance:** Finn mentioned visual QA as a hypothetical future niche. Gemini recommended deploying a visual QA agent against uikit-dev — a team that does not exist — treating the hypothetical as a confirmed need.
+**Instance:** Finn mentioned visual QA as a hypothetical future niche. Gemini recommended deploying a visual QA agent on uikit-dev, treating the hypothetical capability gap as a confirmed need. **Correction (2026-04-10):** uikit-dev is a real deployed team (container running on RC, repo `Eesti-Raudtee/evr-ui-kit`). Finn's Round 2 claim that "uikit-dev does not exist" was factually incorrect. The failure mode pattern (hypothetical promoted to recommendation) still applies to the visual QA *capability gap* framing, but the team existence claim was wrong — which itself illustrates the gotcha: our own Round 2 pushback on Gemini contained a factual error that would have propagated if uncorrected.
 
 ### 3. Nuance Flattening
 
