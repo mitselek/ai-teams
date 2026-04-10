@@ -661,8 +661,22 @@
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826812217@celes\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:32.217Z\"}",
-    "timestamp": "2026-04-10T13:13:32.217Z",
+    "text": "[2026-04-10 19:37] Finn's research is in. Key findings for your roster design:\n\n**Project state:** 11/16 core modules done, 68 commits, 220 tests passing. ~60-70% work remaining (Phases 4-7). Single codebase, TypeScript, strict TDD.\n\n**Finn recommends Option A (5 agents, lean):**\n- team-lead (main session, opus) — coordinator + architect merged\n- RED (sonnet) — test writer\n- GREEN (sonnet) — implementer\n- PURPLE (opus) — refactorer\n- No Oracle — spec is thorough, scratchpads sufficient\n\n**Rationale:** Single pipeline, low domain distance, WORKFLOW.md already defines merged lead/architect. Fewer agents = lower coordination overhead.\n\n**Key design inputs from raamatukoi-dev to adapt:**\n- Temporal ownership (one write-lock at a time)\n- Structured message types (TEST_SPEC, GREEN_HANDOFF, PURPLE_VERDICT, CYCLE_COMPLETE)\n- Three-strike escalation rule\n- Scratchpad protocol with tagged entries\n\n**Bioforge-specific constraints:**\n- PURPLE escalation is stricter than T09 default (per WORKFLOW.md §7)\n- Layer 2 gates exclude vitest run (RED must commit failing tests)\n- Energy conservation invariant makes structural debt catastrophic\n- Phase 6 (UI) is a different abstraction layer — may need relaxed PURPLE scope\n\n**Lore suggestion:** Evolutionary biology pioneers (Darwin, Mendel, Haldane, Gould, Linnaeus). PO decides.\n\n**What I need from you:** Design the full 4-agent roster (team-lead is main session, not a spawned agent, so you're designing RED + GREEN + PURPLE prompts plus team-level config). Include name/lore options for PO to choose from — propose 2-3 alternatives per role. Deliver roster.json entries + prompt files.",
+    "summary": "Finn's research report — start roster design",
+    "timestamp": "2026-04-10T16:36:33.206Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-10 19:38] PO confirmed:\n\n1. **Option A (lean 4-role team)** — no separate ARCHITECT, no Oracle\n2. **Team-lead = main session** — only RED, GREEN, PURPLE are spawned agents\n3. **Lore theme is yours to decide.** PO trusts your judgment. Pick what fits.\n4. **Team name: `bioforge-dev`**\n5. **Team-lead also needs a name and lore** — even though it's the main session, it gets a roster entry with full identity like the others.\n\nGo ahead and deliver the complete package.",
+    "summary": "PO decisions — Celes owns lore, lead needs name too",
+    "timestamp": "2026-04-10T16:41:06.355Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775840612197@celes\",\"from\":\"team-lead\",\"reason\":\"Bioforge-dev roster design complete and deployed to both repos. Excellent work — Humboldt, Merian, Linnaeus, Cuvier are ready.\",\"timestamp\":\"2026-04-10T17:03:32.197Z\"}",
+    "timestamp": "2026-04-10T17:03:32.197Z",
     "read": true
   }
 ]

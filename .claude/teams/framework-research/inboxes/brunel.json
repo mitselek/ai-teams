@@ -697,11 +697,5 @@
     "summary": "Shutdown: save state and close",
     "timestamp": "2026-04-10T13:12:03.421Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826809682@brunel\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:29.682Z\"}",
-    "timestamp": "2026-04-10T13:13:29.682Z",
-    "read": true
   }
 ]

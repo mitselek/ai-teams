@@ -20,7 +20,7 @@
 
 ## Hires Delivered (cumulative — 53 agents)
 
-Full table in git history (commit `74b2e05`). Teams: FR(8+TL), CD(5+TL), AR(5+TL), PD(7+TL), ER(4+TL), BT(3+TL), PEN(5+TL), L1-mgr(1), RK(8+TL). Latest: Raamatukoi tugigrupp v2 (9 characters with full XP pipeline, 2026-04-09).
+Full table in git history (commit `74b2e05`). Teams: FR(8+TL), CD(5+TL), AR(5+TL), PD(7+TL), ER(4+TL), BT(3+TL), PEN(5+TL), L1-mgr(1), RK(8+TL), BF(3+TL). Latest: BioForge-dev (4 characters — Humboldt/Merian/Linnaeus/Cuvier, 2026-04-10).
 
 ## Patterns from earlier sessions (compressed 2026-04-09)
 

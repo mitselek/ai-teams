@@ -78,6 +78,15 @@ Consolidated 10 D1 gotchas from 6 sources (hr-platform#36, dev-toolkit#38, sven/
 
 Cal reclassified my "external synthesis overreach" from pattern to gotcha — correct call. Gotchas are traps to avoid, patterns are techniques to apply. Check before submitting.
 
+## [CHECKPOINT] 2026-04-10 — Bioforge roster research — COMPLETE
+
+Researched bioforge project (`~/Documents/github/mitselek/projects/bioforge/`) for XP roster design. Key findings delivered to team-lead:
+- Project at end of Phase 3 (11/16 core modules done, 220 tests passing, 68 commits)
+- Recommended Cathedral tier, single pipeline, 5 agents (team-lead+ARCHITECT merged, RED sonnet, GREEN sonnet, PURPLE opus, optional Oracle)
+- Used raamatukoi-dev as primary reference design (9-agent Cathedral with dual pipelines)
+- T09 v2.3 "opus bookends, sonnet executes" applied to model tier recommendations
+- Team-lead confirmed research shaped the final deployed design
+
 ## [DEFERRED] Open questions
 
 - Polyphony team roster redesign — awaiting PO approval

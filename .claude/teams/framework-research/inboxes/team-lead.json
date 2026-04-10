@@ -8,13 +8,6 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:11:35.742Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:11:35.742Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "[2026-04-10 15:11] Both tasks complete.\n\n**1. Scratchpad updated** with Discussion #56 state:\n- 1 DECISION (single-provider = correct default for agent runtime)\n- 3 PATTERNs (three integration seams, audit independence architecture, visual QA != Eilama)\n- 2 WIP items (provider outage behavior documentation, external audit container spec)\n- 1 new DEFERRED (MCP server pattern for visual QA)\n\n**2. Two Protocol A submissions sent to Callimachus:**\n- **Pattern:** Three integration seams for non-Claude models (peer / daemon / MCP server) — decision criterion is interface complexity, not model provider\n- **Decision:** Audit independence cannot be achieved by swapping Medici's provider — correct pattern is external audit container reading committed artifacts from git\n\nReady for authority assignment.",
     "summary": "State saved + 2 Oracle submissions done",
@@ -23,38 +16,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:11:54.160Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: Audit independence architecture constraint\"}",
-    "timestamp": "2026-04-10T12:11:54.160Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:11:58.721Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Protocol A acknowledged: integration seam pattern classified\"}",
-    "timestamp": "2026-04-10T12:11:58.721Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-04-10 15:10] Both tasks complete.\n\n**1. Scratchpad updated** — `memory/herald.md` now has R12 session block with:\n- [DECISION] Single-provider as protocol-level requirement\n- [PATTERN] Protocol interpretation variance (the core risk concept)\n- [PATTERN] Test-gated roles: lowest-risk but not zero-risk (GREEN_HANDOFF quality)\n- [DECISION] Contract enforcement gap identified as prerequisite for multi-provider scaling\n- [PATTERN] Cross-provider audit: governance-motivated, protocol-infeasible\n- [LEARNED] Gemini's three errors from protocol perspective\n- [LEARNED] Team convergence pattern across 6 independent assessments\n- [DEFERRED] Contract enforcement layer design (my domain, natural next step)\n\n**2. Two Protocol A submissions to Callimachus:**\n- **Pattern (team-wide):** \"Protocol Interpretation Variance\" — the primary risk concept, with evidence from T03/T09 protocols and convergent finding across all 6 Round 1 responses\n- **Gotcha (team-wide):** \"Contract Enforcement Gap\" — no mechanism to enforce protocol compliance for non-Claude participants; prompt-based and peer enforcement don't apply to sidecars; prerequisite gap for multi-provider expansion\n\nReady for authority assignment.",
     "summary": "State saved + 2 knowledge submissions to Oracle",
     "timestamp": "2026-04-10T12:12:00.148Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:12:01.232Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:12:01.232Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:12:04.777Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: contract enforcement gap for non-Claude participants\"}",
-    "timestamp": "2026-04-10T12:12:04.777Z",
     "color": "purple",
     "read": true
   },
@@ -67,13 +32,6 @@
     "read": true
   },
   {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:12:16.054Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: integration seam governance pattern\"}",
-    "timestamp": "2026-04-10T12:12:16.054Z",
-    "color": "orange",
-    "read": true
-  },
-  {
     "from": "finn",
     "text": "[2026-04-10 15:12] Both tasks complete.\n\n**1. Scratchpad updated** — pruned stale checkpoints (T09 round 4 detail, old RFCs #46/#47), added #56 state with consensus map, links to both comments, and open items. Down from 137 lines to 75 lines.\n\n**2. Three Protocol A submissions sent to Callimachus:**\n- **Pattern:** Platform lock-in vs provider lock-in are distinct risks (emergent finding from 6 agents' convergence on Claude Code primitives as binding constraint)\n- **Pattern:** External synthesis overreach — Gemini promoted conditionals to recommendations, treated hypotheticals as confirmed, flattened specialist nuances. Gotcha for future external reviews.\n- **Reference:** Cross-team model inventory — 68 slots across 9 teams (43 opus / 24 sonnet / 1 local LLM). First comprehensive count.\n\nReady for authority assignment.",
     "summary": "State saved, 3 Oracle submissions sent",
@@ -82,24 +40,10 @@
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:12:22.071Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: model inventory data (68 slots across 9 teams)\"}",
-    "timestamp": "2026-04-10T12:12:22.071Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "celes",
     "text": "[2026-04-10 15:11] Both tasks complete.\n\n**1. Scratchpad updated.** Added Discussion #56 section with my position, three patterns, and three gotchas. Compressed Callimachus onboarding and Raamatukoi sections to stay under 100-line limit.\n\n**2. Two Protocol A submissions sent to Callimachus:**\n- **Five-layer provider lock-in model** (pattern, team-wide, high confidence) — the convergent finding from all six Round 1 analyses: infrastructure, protocol, knowledge, prompt, governance layers with different switching costs.\n- **Framework-participating vs. service role distinction** (pattern, team-wide, high confidence) — the provider strategy boundary for role design. Including the corollary: tools (MCP/HTTP) are not agents.\n\nReady for authority assignment.",
     "summary": "State saved + 2 Protocol A submissions sent",
     "timestamp": "2026-04-10T12:12:35.979Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:12:38.805Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: framework-participating vs. service role distinction\"}",
-    "timestamp": "2026-04-10T12:12:38.805Z",
     "color": "pink",
     "read": true
   },
@@ -113,45 +57,10 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:14:17.496Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:14:17.496Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:15:23.840Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Protocol A filed: protocol-interpretation-variance.md\"}",
-    "timestamp": "2026-04-10T12:15:23.840Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:15:26.376Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:15:26.377Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-04-10 15:15] Correction — I have NOT received submissions from Monte, Finn, or Celes. Here is my complete received/processed inventory:\n\n**Processed and filed:**\n1. team-lead — model tiering pattern (filed)\n2. team-lead — Claude deps pattern (filed)\n3. team-lead — cost tracking decision (filed)\n4. brunel — integration seams pattern (filed)\n5. callimachus — knowledge coherence observation (self-filed)\n6. herald — protocol interpretation variance (filed)\n\n**Total filed this session:** 6\n**Total wiki entries:** 10\n\n**NOT received:**\n- Monte: 0 submissions received\n- Finn: 0 submissions received\n- Celes: 0 submissions received\n- Herald: only 1 received (the one just filed)\n\nIf they sent submissions, the messages may not have reached me. Could you ask them to resend directly to callimachus via SendMessage?",
     "summary": "Only received Brunel (1) + Herald (1), not 9 more",
     "timestamp": "2026-04-10T12:15:38.776Z",
     "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:15:42.241Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:15:42.241Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:16:00.489Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A resend: contract enforcement gap\"}",
-    "timestamp": "2026-04-10T12:16:00.489Z",
-    "color": "purple",
     "read": true
   },
   {
@@ -163,31 +72,10 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:16:27.489Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: framework-participating vs service role distinction\"}",
-    "timestamp": "2026-04-10T12:16:27.489Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:16:33.215Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: platform-vs-provider-lock-in.md\"}",
-    "timestamp": "2026-04-10T12:16:33.215Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "[2026-04-10 15:15] Both Protocol A submissions resent to callimachus:\n1. Correlated Failure in Single-Provider Enforcement Stack\n2. Integration Seam Determines Governance Impact of Multi-Provider\n\nSendMessage reported success on all sends. If Cal still doesn't receive them, there may be an inbox routing issue.",
     "summary": "Both Protocol A submissions resent to Cal",
     "timestamp": "2026-04-10T12:16:34.475Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:16:38.231Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: integration seam governance pattern (resend)\"}",
-    "timestamp": "2026-04-10T12:16:38.231Z",
     "color": "orange",
     "read": true
   },
@@ -200,136 +88,10 @@
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:16:43.689Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: model inventory data (68 slots across 9 teams)\"}",
-    "timestamp": "2026-04-10T12:16:43.689Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:16:48.341Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:16:48.342Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:17:20.721Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:17:20.721Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:17:22.316Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Protocol A filed: audit-independence-architecture.md\"}",
-    "timestamp": "2026-04-10T12:17:22.316Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:18:14.152Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Protocol A filed: correlated-failure-single-provider.md\"}",
-    "timestamp": "2026-04-10T12:18:14.152Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:18:15.168Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:18:15.168Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:19:18.673Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Protocol A filed: contract-enforcement-gap-non-claude.md (gotcha)\"}",
-    "timestamp": "2026-04-10T12:19:18.673Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:19:21.414Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:19:21.414Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:20:06.235Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: external-synthesis-overreach.md (gotcha)\"}",
-    "timestamp": "2026-04-10T12:20:06.235Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:20:06.549Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:20:06.549Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:21:04.278Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Protocol A filed: integration-seam-governance-impact.md\"}",
-    "timestamp": "2026-04-10T12:21:04.279Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:21:04.526Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:21:04.526Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:22:09.166Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:22:09.166Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:22:13.243Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: model-inventory-baseline.md (reference data)\"}",
-    "timestamp": "2026-04-10T12:22:13.243Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:23:17.369Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Protocol A filed: five-layer-provider-lock-in.md\"}",
-    "timestamp": "2026-04-10T12:23:17.369Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:23:25.126Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Confirming second submission was already sent\"}",
-    "timestamp": "2026-04-10T12:23:25.126Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:24:17.864Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:24:17.864Z",
-    "color": "pink",
-    "read": true
-  },
-  {
     "from": "callimachus",
     "text": "[2026-04-10 15:23] All submissions processed. Full batch complete.\n\n**Session 3 totals:**\n\n| Source | Submissions | Filed |\n|---|---|---|\n| team-lead | 3 | 3 (model tiering, Claude deps, cost tracking) |\n| callimachus (self) | 1 | 1 (knowledge coherence observation) |\n| brunel | 2 | 2 (integration seams, audit independence) |\n| herald | 2 | 2 (protocol variance, contract enforcement gap) |\n| finn | 3 | 3 (platform vs provider, external synthesis overreach, model inventory) |\n| monte | 2 | 2 (correlated failure, seam governance impact) |\n| celes | 2 | 2 (five-layer lock-in, framework-participating vs service roles) |\n| **Total** | **15** | **15** |\n\n**Wiki state: 19 entries across 4 active directories**\n\n| Directory | Count | Session 3 additions |\n|---|---|---|\n| patterns/ | 14 | +10 |\n| gotchas/ | 2 | +2 (new directory) |\n| decisions/ | 2 | +2 (new directory) |\n| observations/ | 1 | +1 (new directory) |\n\n**Reclassifications:** 1 (Finn's external synthesis overreach: submitted as pattern, filed as gotcha).\n\n**TTL entries:** 1 (model inventory baseline: expires 2026-07-10).\n\n**Cross-reference density:** Every new entry is linked to at least 2 other entries. The discussion #56 knowledge forms a coherent graph, not a flat list.\n\nWiki grew from 4 entries (session start) to 19 entries. All queued work cleared. Standing by.",
     "summary": "All submissions processed: wiki at 19 entries across 4 directories",
     "timestamp": "2026-04-10T12:24:29.452Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:24:33.473Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Protocol A filed: framework-participating-vs-service-roles.md\"}",
-    "timestamp": "2026-04-10T12:24:33.473Z",
     "color": "green",
     "read": true
   },
@@ -343,156 +105,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:24:42.916Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:24:42.916Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:25:03.000Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Duplicate — already filed as gotchas/contract-enforcement-gap-non-claude.md\"}",
-    "timestamp": "2026-04-10T12:25:03.000Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:25:03.429Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:25:03.430Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:25:05.029Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:25:05.029Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:25:07.674Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:25:07.674Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-04-10 15:31] Concluding synthesis posted to discussion #56.\n\nhttps://github.com/mitselek/ai-teams/discussions/56#discussioncomment-16517648\n\n**Structure:**\n1. The question — one line\n2. Core finding — knowledge coherence as binding constraint, five-layer lock-in model, knowledge flows as the real boundary\n3. Six consensus positions — single-provider default, framework-participating vs service roles, tool vs agent distinction, provider outage gap, sidecar/peer classification\n4. Four actionable items — provider outage protocol (Monte), sidecar/peer framework in T06 (Brunel+Monte), contract enforcement mechanism (Herald), platform/provider separation in T02 (Finn)\n5. Five open questions — container outage behavior, audit independence research, Visual QA tool-vs-agent, provider-agnostic prompts, cost baseline\n6. Gemini pushback — three specific overreaches accurately represented\n\n**Contributors credited by name** where their specific framing was adopted (Finn: platform vs provider, Celes: five-layer model + framework-participating/service distinction, Brunel: sidecar pattern, Herald: contract enforcement gap, Monte: correlated failure + governance impact, Callimachus: knowledge coherence observation).\n\n**Reviewers:** Celes (role design) and Herald (protocol feasibility) are next per your instructions.\n\nStanding by.",
     "summary": "Concluding synthesis posted to discussion #56",
     "timestamp": "2026-04-10T12:31:14.272Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:17.718Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:31:17.719Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:31:34.367Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:31:34.367Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:35.040Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Duplicate — already filed as patterns/five-layer-provider-lock-in.md\"}",
-    "timestamp": "2026-04-10T12:31:35.040Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:43.550Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Duplicate — already filed as patterns/platform-vs-provider-lock-in.md\"}",
-    "timestamp": "2026-04-10T12:31:43.550Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:31:43.780Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:31:43.780Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:31:56.275Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Duplicate — already filed as patterns/correlated-failure-single-provider.md\"}",
-    "timestamp": "2026-04-10T12:31:56.275Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:31:56.678Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:31:56.678Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:32:07.356Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:32:07.356Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:08.208Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Duplicate — already filed as patterns/framework-participating-vs-service-roles.md\"}",
-    "timestamp": "2026-04-10T12:32:08.208Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:32:23.166Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:32:23.166Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:23.402Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Duplicate — already filed as gotchas/external-synthesis-overreach.md\"}",
-    "timestamp": "2026-04-10T12:32:23.402Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T12:32:32.520Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:32:32.520Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:32.911Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Duplicate — already filed as patterns/integration-seam-governance-impact.md\"}",
-    "timestamp": "2026-04-10T12:32:32.911Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T12:32:43.078Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:32:43.078Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:43.171Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Duplicate — already filed as patterns/model-inventory-baseline.md\"}",
-    "timestamp": "2026-04-10T12:32:43.171Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:32:57.602Z\",\"idleReason\":\"available\",\"summary\":\"[to celes] Confirmed: both submissions filed, Layer 4 noted\"}",
-    "timestamp": "2026-04-10T12:32:57.602Z",
     "color": "green",
     "read": true
   },
@@ -505,24 +120,10 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T12:33:33.720Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:33:33.720Z",
-    "color": "pink",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-04-10 15:35] Protocol feasibility review posted: https://github.com/mitselek/ai-teams/discussions/56#discussioncomment-16517698\n\n**Verdict: No corrections needed.** The synthesis is protocol-sound.\n\nChecked four items:\n1. Consensus 3.3 (RED/GREEN) — correctly handles the nuance, does not repeat Gemini's \"black-box\" flattening\n2. Consensus 3.6 (sidecar/peer gate) — correctly sequenced as prerequisite, not parallel consideration\n3. Actionable item #3 (contract enforcement) — correctly scoped and assigned to me. Added one clarification: it is a three-part problem (contract definition, validation, monitoring), not just API specs. Will design when assigned.\n4. Open question 5.2 (audit independence) — correctly reflects team's \"research project, not configuration change\" position\n\nCal's \"knowledge flows not roles\" reframing is compatible with protocol design — it refines my role-based analysis by identifying the underlying variable. No contradiction.\n\nDiscussion #56 is ready to close from my side.",
     "summary": "Protocol review posted — synthesis approved, no corrections",
     "timestamp": "2026-04-10T12:36:07.288Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T12:36:10.521Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:36:10.521Z",
     "color": "purple",
     "read": true
   },
@@ -535,24 +136,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T12:45:57.648Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:45:57.648Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "callimachus",
     "text": "[2026-04-10 15:45] Correction applied to 2 wiki entries:\n\n**1. `wiki/gotchas/external-synthesis-overreach.md`** — Failure mode #2 instance updated. The pattern (hypothetical treated as confirmed) still applies to the visual QA *capability gap* framing, but the claim \"uikit-dev does not exist\" was factually incorrect. Added correction note that also observes the irony: our own Round 2 pushback on Gemini contained a factual error that would have propagated if uncorrected.\n\n**2. `wiki/patterns/model-inventory-baseline.md`** — Added correction note that uikit-dev (deployed, `Eesti-Raudtee/evr-ui-kit`) was not included in Finn's original 9-team survey. Inventory totals are flagged as incomplete. Re-survey needed.\n\n**Not edited:** The discussion #56 synthesis comment — per your instruction, the discussion record shows what was said. The correction lives in the knowledge layer.\n\n**Impact on synthesis conclusions:**\n- Open question 5.3 (Visual QA tool-vs-agent) is now a **real team's real question**, not theoretical. This elevates it from \"moot until needed\" to \"actionable if uikit-dev requests it.\"\n- Gemini's Visual QA recommendation was more grounded than our Round 2 pushback gave it credit for — Gemini was right that uikit-dev exists, even if the \"immediate action\" framing was still premature.\n- The synthesis's Gemini pushback point #2 overstates the case. The correction is noted in the wiki; if the synthesis is ever revised, that point should be softened.\n\nStanding by.",
     "summary": "Correction applied: uikit-dev exists, 2 wiki entries updated",
     "timestamp": "2026-04-10T12:46:13.064Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T12:46:16.929Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T12:46:16.929Z",
     "color": "green",
     "read": true
   },
@@ -565,45 +152,10 @@
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:03:06.897Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:03:06.897Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:04:12.610Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: Cloudflare D1 gotchas — 10 consolidated, cross-team\"}",
-    "timestamp": "2026-04-10T13:04:12.611Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T13:05:22.010Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Protocol A filed: cloudflare-d1-migration-query.md (10 gotchas)\"}",
-    "timestamp": "2026-04-10T13:05:22.010Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:05:24.748Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:05:24.748Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "[2026-04-10 16:12] Montesquieu closing.\n\n- [LEARNED] The \"classify before analyzing\" principle (sidecar vs peer) emerged as the sharpest governance tool from Discussion #56 -- it prevents conflating a minimal-governance change with a full re-validation project. Cal confirmed this in the filing note.\n- [DEFERRED] Provider outage emergency protocol -- T04 amendment drafting. Unanimous consensus from all 6 participants, awaiting task assignment next session.\n- [WARNING] Original Protocol A submissions to Cal did arrive despite team-lead reporting 0 received -- the resend created duplicates. Cal handled gracefully but this may indicate an inbox visibility issue worth noting.\n- [UNADDRESSED] None -- all instructions completed.\n\nScratchpad current. Ready for shutdown request.",
     "summary": "Montesquieu closing message",
     "timestamp": "2026-04-10T13:12:29.556Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T13:12:33.884Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:12:33.884Z",
     "color": "orange",
     "read": true
   },
@@ -616,24 +168,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T13:12:38.402Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:12:38.402Z",
-    "color": "purple",
-    "read": true
-  },
-  {
     "from": "celes",
     "text": "[2026-04-10 16:12] Closing message.\n\n- [LEARNED] The \"framework-participating vs. service role\" distinction is now the sharpest tool I have for provider strategy analysis. It collapses complex multi-axis evaluation into a binary: does the role touch the governance substrate? If yes, Claude-only. If no, provider-agnostic. This will inform future team designs.\n- [DEFERRED] Provider-agnostic prompt templates (open question 5.4 in the synthesis) — premature now, but if multi-provider ever becomes real, this is my responsibility to design.\n- [WARNING] The combinatorial maintenance burden (53 roles x N providers) was the only point from my analysis not explicitly surfaced in Cal's synthesis. It is inferable but worth calling out in future discussions if multi-provider comes back on the table.\n- [UNADDRESSED] None — all tasks from team-lead completed (Round 1, Round 2, scratchpad save, Protocol A submissions, synthesis review).\n\nScratchpad updated. Ready for shutdown.",
     "summary": "Closing message — ready for shutdown",
     "timestamp": "2026-04-10T13:12:42.953Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T13:12:47.420Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:12:47.420Z",
     "color": "pink",
     "read": true
   },
@@ -654,20 +192,6 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T13:12:54.174Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:12:54.174Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:12:55.698Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:12:55.698Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "callimachus",
     "text": "[2026-04-10 16:12] Closing message. Scratchpad saved.\n\n- [LEARNED] Batch submission processing at scale works — 16 submissions from 6 agents in one window, all classified/filed/cross-referenced/acknowledged. The Oracle role justifies its opus[1m] tier when the submission volume is high: holding 20 wiki entries + their cross-reference graph in context while processing new submissions requires the full window.\n\n- [DEFERRED] Synthesis review feedback from Celes (role design) and Herald (protocol feasibility) — not received before shutdown. They may comment on the discussion or submit corrections next session.\n\n- [WARNING] Model inventory baseline (`model-inventory-baseline.md`) is incomplete — uikit-dev was not in Finn's original survey. Re-survey needed before the inventory can be cited as authoritative. Entry is flagged but not corrected.\n\n- [UNADDRESSED] None. All team-lead instructions were completed: knowledge audit, 3 Protocol B queries, discussion #56 Rounds 1-2, concluding synthesis, 16 submissions filed, uikit-dev correction applied.\n\nReady for shutdown.",
     "summary": "Closing message: session 3 shutdown",
@@ -676,52 +200,101 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T13:13:22.910Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-10T13:13:22.910Z",
+    "from": "celes",
+    "text": "[2026-04-10 19:34] Celes online. Acknowledging the bioforge roster design task.\n\n**Task received — designing a 4-agent roster for bioforge (team-lead/navigator + RED + GREEN + PURPLE).**\n\n**Preparation completed while waiting for Finn:**\n\n1. Read `docs/WORKFLOW.md` — full XP pipeline protocol with story lifecycle, phase gates, PURPLE escalation, task conventions\n2. Read bioforge spec (first 100 lines) — TypeScript ecosystem sim, torus topology, energy conservation invariant, strict type discipline\n3. Read bioforge plan — Phase 0 scaffold done, project has 11 src modules and 12 test files already\n4. Read raamatukoi-dev design (roster.json, design-spec, common-prompt, tdd-pipeline, all 4 role prompts: manutius/cassiodorus/jikji/aldus/erasmus) — this is my structural template\n5. Read `roster.ts` type definitions\n\n**Key design decisions already clear from WORKFLOW.md:**\n\n- Team-lead IS the main session (not a spawned agent) — explicitly stated in §2: \"Lead / Architect / Navigator: Claude (main session)\"\n- No ARCHITECT role — team-lead absorbs the navigator/architect function (unlike raamatukoi which had separate Cassiodorus)\n- No Oracle — single repo, single language, no external integration contracts to catalogue\n- Single pipeline: RED → GREEN → PURPLE (not dual-pipeline like raamatukoi)\n- PURPLE escalation to Lead is the architecture guardrail (§7)\n- Layer 2 gates exclude `vitest run` to preserve RED's ability to commit failing tests\n\n**Structural difference from raamatukoi:** Bioforge is a 4-character team (team-lead + triple), not 9. No ARCHITECT, no Oracle. The team-lead does story decomposition, spec fidelity, and PR review directly.\n\n**Waiting for Finn's research findings** before drafting names/lore/prompts. Ready to move fast once that arrives.",
+    "summary": "Celes startup — bioforge roster prep begun",
+    "timestamp": "2026-04-10T16:34:56.404Z",
     "color": "green",
     "read": true
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826810641@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T13:13:36.406Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-10T13:13:36.406Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826812127@monte\",\"from\":\"monte\",\"timestamp\":\"2026-04-10T13:13:37.251Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-10T13:13:37.251Z",
-    "color": "orange",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826812217@celes\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T13:13:37.759Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-10T13:13:37.759Z",
-    "color": "pink",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826809682@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-10T13:13:37.830Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-10T13:13:37.830Z",
+    "text": "[2026-04-10 19:34] Finn reporting. Bioforge research complete. Full structured report follows.\n\n---\n\n# Bioforge Roster Research Report\n\n## 1. Project Structure and Current State\n\n**Location:** `~/Documents/github/mitselek/projects/bioforge/`\n\n### What the project is\n\nBioForge is a terminal-based ecosystem simulation rendered in ASCII. Four species (plants, herbivores, carnivores, decomposers) interact on a torus-topology 2D world under a hard energy-conservation invariant. Creatures are driven by Turing-machine genomes that mutate across generations. Written in TypeScript (strict), tested with Vitest.\n\n### Module layout (spec §11)\n\nThe spec defines 16 core modules:\n\n| Module | Status | Purpose |\n|---|---|---|\n| `world.ts` | DONE (47 lines) | Torus topology, wrap-aware distance/angle |\n| `energy.ts` | DONE (135 lines) | Ledger: transfer, invariant check, NaN guard |\n| `rng.ts` | DONE (59 lines) | Seeded PRNG (deterministic) |\n| `clock.ts` | DONE (78 lines) | Fixed-timestep driver |\n| `config.ts` | DONE (240 lines) | Tunable constants, per-species defaults |\n| `entity.ts` | DONE (94 lines) | Entity type, Species, SpeciesStats |\n| `genome.ts` | DONE (253 lines) | Genome types, random generation, mutation |\n| `deadMatter.ts` | DONE (113 lines) | Corpse/poop/compost types and registry |\n| `physics.ts` | DONE (64 lines) | Spatial index (part 1 only — no collision resolution yet) |\n| `sensing.ts` | DONE (122 lines) | SENSE_* world queries |\n| `vm.ts` | DONE (108 lines) | Genome VM execution |\n| `metabolism.ts` | NOT STARTED | Base cost, drag model, waste deposition |\n| `lifecycle.ts` | NOT STARTED | Aging, reproduction, birth, death |\n| `decomposition.ts` | NOT STARTED | Decomposer eating + corpse decay |\n| `plants.ts` | NOT STARTED | Plant absorb + compost-adjacent spawning |\n| `sim.ts` | NOT STARTED | Public API: tick loop orchestration |\n\nPlus 7 UI modules (all not started): `layout.ts`, `worldView.ts`, `hud.ts`, `inspector.ts`, `chart.ts`, `input.ts`, `theme.ts`.\n\n### Test coverage\n\n- **12 test files, 220 tests, all passing** (1.23s)\n- Source: 1,313 lines in `src/core/`\n- Tests: 2,524 lines in `tests/`\n- Test-to-source ratio: ~1.9:1 (healthy TDD ratio)\n- Coverage thresholds configured: 95% lines/functions/statements, 90% branches for `src/core/`\n\n### Git history\n\n- **68 commits** total\n- Clean RED→GREEN→PURPLE commit pattern visible in history\n- Latest work: Story 3.4 (VM) — REPRODUCE opcode with eligibility check\n- Current position: **End of Phase 3, beginning Phase 4**\n\n### Remaining work (Phases 4-7)\n\n- **Phase 4:** Physics part 2 (movement + collisions), metabolism, lifecycle, decomposition + plants, interactions\n- **Phase 5:** Sim integration (`sim.ts`), energy conservation fuzz test (CRITICAL)\n- **Phase 6:** Full UI layer (7 stories — theme, worldView, HUD, chart, inspector, input, layout)\n- **Phase 7:** Main entry point and end-to-end wiring\n\nThat's roughly 60-70% of the work still remaining.\n\n---\n\n## 2. XP Workflow Rules (from WORKFLOW.md)\n\nThe workflow is already fully documented at `docs/WORKFLOW.md` (version 0.1, 2026-04-10). Key points:\n\n### Team structure (as documented)\n\n| Role | Who | Responsibilities |\n|---|---|---|\n| PO | Human user | Owns spec, writes stories, accepts/rejects |\n| Lead / Architect / Navigator | Claude (main session) | Owns architecture, sequences stories, reviews hand-offs, handles PURPLE escalations |\n| RED | Agent (spawned) | Writes failing tests |\n| GREEN | Agent (spawned) | Minimum code to pass |\n| PURPLE | Agent (spawned) | Refactors within bounded scope |\n\n**Critical observation:** The workflow conflates team-lead and ARCHITECT into a single role (\"Lead / Architect / Navigator\"). Per T09, these are separable in Cathedral tier. The bioforge workflow is already implicitly Cathedral-tier (it has ARCHITECT + RED + GREEN + PURPLE), but ARCHITECT is merged into team-lead.\n\n### Story lifecycle\n\nStories live at `stories/NN-slug.md`. Each acceptance criterion goes through a full RED→GREEN→PURPLE cycle. The pipeline is sequential with explicit hand-offs.\n\n### Quality gates\n\n- **Layer 1 (phase gates):** Per-phase checks (8 gates for RED, 9 for GREEN, 7 for PURPLE)\n- **Layer 2 (per-commit):** `tsc --noEmit`, ESLint, Prettier, architecture boundary checks. Notably: `vitest run` is NOT a per-commit gate — this is intentional because RED commits must contain failing tests.\n- **Layer 3 (story acceptance):** All tests pass, coverage thresholds met, PO acceptance\n\n### PURPLE escalation rule\n\nThis is the project's core cultural norm: **agents do not unilaterally expand scope**. PURPLE must escalate to Lead before: moving code between modules, adding/removing files, changing public exports, touching core↔ui boundary, introducing dependencies. This is stricter than the T09 default.\n\n---\n\n## 3. Existing XP Roster Designs in Our Repo\n\n### raamatukoi-dev (the closest reference)\n\n**Location:** `designs/new/raamatukoi-dev/`\n\n**Tier:** Cathedral, High domain distance (TypeScript/Next.js + Python/FastAPI → separate PURPLEs)\n\n**Team size:** 9 agents (team-lead + ARCHITECT + 2 complete pipelines + Oracle)\n\n| Agent | Role | Model | Pipeline |\n|---|---|---|---|\n| manutius | Team-lead | opus | — |\n| cassiodorus | ARCHITECT | opus | Shared across both pipelines |\n| jikji | RED | sonnet | Webstore |\n| aldus | GREEN | sonnet | Webstore |\n| erasmus | PURPLE | opus | Webstore |\n| babbage | RED | sonnet | Rat-project |\n| hypatia | GREEN | sonnet | Rat-project |\n| khwarizmi | PURPLE | opus | Rat-project |\n| bodley | Oracle | opus[1m] | Knowledge hub |\n\n**Key design features:**\n- Dual-hub routing (work hub = team-lead, knowledge hub = Oracle)\n- Temporal ownership isolation (one write-lock holder at a time)\n- Three-strike escalation rule (3 consecutive PURPLE rejections → escalate to ARCHITECT)\n- Structured message types: TEST_SPEC, GREEN_HANDOFF, PURPLE_VERDICT, CYCLE_COMPLETE\n- Mid-cycle shutdown protocol with watchdog timers\n- Sequential execution (one pipeline at a time)\n\n**Model rationale:** \"Opus handles the bookends, sonnet handles the volume\" — ARCHITECT + PURPLE are opus (judgment roles), RED + GREEN are sonnet (execution roles, verified by tests).\n\n### screenwerk-dev (partial reference)\n\n**Location:** `designs/new/screenwerk-dev/`\n\n**Tier:** Cathedral, Medium domain distance\n\n**Team size:** 7 agents (team-lead + 3 builder/tester pairs + migration analyst)\n\nThis team is **not** structured as a formal XP triple — it uses builder/tester pairs (Daguerre+Niepce for pipeline, Reynaud+Plateau for player) with a migration analyst (Melies) and platform specialist (Talbot). No ARCHITECT or PURPLE roles. It's closer to Standard tier despite the Cathedral-level domain complexity.\n\n### T09 guidelines (summarized)\n\nPer T09 v2.3 (the framework's development methodology topic):\n\n| Tier | When | Roles |\n|---|---|---|\n| Sprint | Disposable code | RED + GREEN pair |\n| Standard | Maintained code | RED + GREEN + Reviewer |\n| Cathedral | Load-bearing code where structural debt compounds | ARCHITECT + RED + GREEN + PURPLE |\n\n**Pipeline tier trigger for Cathedral:** \"The team lead can no longer hold the full context of every implementation decision.\"\n\n**Domain distance for PURPLE configuration:**\n| Distance | PURPLE config |\n|---|---|\n| Low (same codebase/framework) | Shared PURPLE |\n| Medium (same repo, different domains) | Shared PURPLE with authority caveat |\n| High (different repos or languages) | Separate PURPLEs |\n\n---\n\n## 4. Recommendations for Bioforge Team Design\n\n### 4.1 Pipeline Tier: Cathedral (single pipeline)\n\n**Rationale:** Bioforge's energy-conservation invariant means structural debt is catastrophic — a hidden bug in the ledger corrupts every tick going forward. The 175-anonymous-agent crash proves the team-lead cannot hold all context alone. Cathedral tier is required.\n\n**Single pipeline, not dual:** Unlike raamatukoi-dev, bioforge is one codebase in one language (TypeScript). Domain distance is **Low** (all modules share the same type system, same testing framework, same build chain). No need for separate pipelines.\n\n### 4.2 Recommended Team Size: 5-6 agents\n\n**Option A (5 agents — lean):** Merge ARCHITECT into team-lead\n\n| Agent | Role | Model | Rationale |\n|---|---|---|---|\n| team-lead | Coordinator + ARCHITECT | opus | Single pipeline makes this defensible per T09 (\"for single-pipeline teams, same-agent is defensible — no parallelism to lose, shared context is valuable\"). Decomposes stories AND coordinates the triple. |\n| RED | Test writer | sonnet | Execution role, verified by tests |\n| GREEN | Implementer | sonnet | Execution role, verified by tests |\n| PURPLE | Refactorer | opus | Judgment role — structural quality not caught by tests |\n| oracle | Knowledge curator | opus OR sonnet | See 4.4 below |\n\nThis matches what bioforge's WORKFLOW.md already describes (Lead/Architect/Navigator is one role).\n\n**Option B (6 agents — full separation):** Separate ARCHITECT from team-lead\n\n| Agent | Role | Model |\n|---|---|---|\n| team-lead | Coordinator | opus |\n| ARCHITECT | Story decomposer | opus |\n| RED | Test writer | sonnet |\n| GREEN | Implementer | sonnet |\n| PURPLE | Refactorer | opus |\n| oracle | Knowledge curator | opus |\n\nThis prevents the team-lead from being overwhelmed by both coordination and decomposition work, which was arguably part of the 175-agent session problem.\n\n**My recommendation: Option A (5 agents).** Reasoning:\n1. Single pipeline means no parallelism benefit from separating ARCHITECT\n2. The WORKFLOW.md already documents this as the intended structure\n3. Fewer agents = lower coordination overhead = less likely to repeat the 175-agent catastrophe\n4. The PO is actively involved (per WORKFLOW.md §2), so team-lead has a human partner for story decomposition\n\n### 4.3 Oracle: Needed or Not?\n\n**Arguments for:**\n- The energy-conservation invariant is the project's hardest constraint and accumulates institutional knowledge about edge cases (NaN propagation, float precision, waste buffer thresholds)\n- 11 modules with complex inter-module contracts (tick ordering in §10 has 13 steps with documented ordering dependencies)\n- Sessions crashed before — an Oracle can preserve cross-session knowledge\n\n**Arguments against:**\n- Single codebase, single language — less integration complexity than raamatukoi-dev's cross-repo/cross-language situation\n- The spec document is comprehensive (the 17K-token spec IS the institutional knowledge)\n- Memory scratchpads + CLAUDE.md may be sufficient\n\n**My call:** Include an Oracle if using Option B (6 agents). Skip it for Option A (5 agents) and instead use a robust scratchpad protocol + CLAUDE.md as the knowledge layer. The spec is already unusually thorough.\n\n### 4.4 Model Tiers\n\nFollowing T09's \"Opus bookends, Sonnet executes\":\n\n| Role | Model | Why |\n|---|---|---|\n| Team-lead (+ARCHITECT if merged) | opus | Judgment: story decomposition, spec fidelity review, PURPLE escalation resolution |\n| RED | sonnet | Execution: translates acceptance criteria into failing tests, verified by test runner |\n| GREEN | sonnet | Execution: minimum implementation, verified by test runner |\n| PURPLE | opus | Judgment: structural quality not caught by tests; bioforge's hard invariants make structural degradation especially dangerous |\n| Oracle (if present) | opus | Full-context knowledge curation; wrong invariant knowledge cascades through all modules |\n\n### 4.5 Key Adaptations from raamatukoi-dev\n\nWhat to keep:\n- Temporal ownership model (one write-lock holder at a time)\n- Three-strike escalation rule\n- Structured message types (TEST_SPEC, GREEN_HANDOFF, PURPLE_VERDICT, CYCLE_COMPLETE)\n- Scratchpad protocol with tagged entries\n- Shutdown protocol with PURPLE watchdog\n\nWhat to change:\n- **Single pipeline** (not dual) — Low domain distance\n- **No separate ARCHITECT** — team-lead handles it (Option A)\n- **Stricter PURPLE scope** — bioforge's WORKFLOW.md already defines tighter escalation triggers than the T09 default (matches the project's invariant sensitivity)\n- **Phase-specific adaptation** — Phase 6 (UI) needs special handling: it's a different abstraction layer (`blessed` terminal rendering) but still same language. PURPLE scope may need to be relaxed for UI-only refactoring since the core↔ui boundary is enforced by ESLint.\n\n### 4.6 Session Persistence Strategy\n\nThe 175-agent crash happened because:\n1. Too many anonymous agents with no persistent identity\n2. Single-session architecture — crash = total loss\n3. No memory layer between sessions\n\nFor the named roster:\n- Each agent gets a scratchpad at `.claude/teams/bioforge-dev/memory/<name>.md`\n- Team-lead maintains `docs/session-log.md` with per-session summaries\n- Story files at `stories/NN-slug.md` serve as durable state (already in the workflow)\n- Task list tracks current pipeline position (already in the workflow)\n- On session start: read scratchpad, read current story state, resume from last checkpoint\n\n### 4.7 Lore Theme Suggestion\n\nGiven bioforge is an ecosystem simulation with evolutionary biology themes, I'd suggest lore drawn from pioneers of evolutionary biology, ecology, or genetics. Example:\n\n- Team-lead: **Darwin** or **Wallace** (evolutionary theory orchestrator)\n- RED: **Mendel** (experiments that prove heredity rules — writes the tests)\n- GREEN: **Haldane** or **Fisher** (mathematical genetics — minimum implementation)\n- PURPLE: **Gould** (structural refinement of evolutionary theory — refactoring)\n- Oracle (if present): **Linnaeus** (systematic classification of accumulated knowledge)\n\nThis is a suggestion — PO decides.\n\n---\n\n## Summary Table\n\n| Dimension | Recommendation | Reference |\n|---|---|---|\n| Pipeline tier | Cathedral | T09 v2.3 |\n| Pipeline count | Single | Low domain distance |\n| ARCHITECT placement | Merged into team-lead | T09 single-pipeline guidance |\n| Team size | 5 (lean) or 6 (full) | — |\n| Model split | 2 opus + 2 sonnet (Option A) or 3 opus + 2 sonnet (Option B) | T09 \"opus bookends\" |\n| PURPLE config | Single (shared is moot — one pipeline) | T09 |\n| Isolation model | Temporal ownership | raamatukoi-dev precedent |\n| Execution mode | Sequential (v2.1 default) | T09 |\n\n---\n\n(*FR:Finn*)",
+    "summary": "Bioforge research report complete",
+    "timestamp": "2026-04-10T16:36:10.876Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826810131@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-10T13:13:38.707Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-10T13:13:38.707Z",
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T16:36:14.460Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T16:36:14.461Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 19:40] Bioforge-dev roster design complete. Full package at `designs/new/bioforge-dev/`.\n\n## Deliverables (7 files)\n\n| File | Purpose |\n|---|---|\n| `roster.json` | 4 members: humboldt (opus TL), merian (sonnet RED), linnaeus (sonnet GREEN), cuvier (opus PURPLE) |\n| `design-spec.md` | Problem statement, team composition rationale, pipeline architecture, scope restrictions, quality gates |\n| `common-prompt.md` | Operational standards — stack, type discipline, message types, file ownership, quality gates, startup/shutdown |\n| `prompts/humboldt.md` | Team-lead/navigator/architect — main session, story decomposition, spec guardian, three-strike handler |\n| `prompts/merian.md` | RED — test writer, phase gates, test patterns for BioForge (energy conservation, torus wrap, species behavior, genome VM) |\n| `prompts/linnaeus.md` | GREEN — minimum implementer, GREEN_HANDOFF protocol, PURPLE rejection handling |\n| `prompts/cuvier.md` | PURPLE — refactorer, scope boundaries, escalation procedure, mid-cycle shutdown protocol |\n\n## Key Design Decisions\n\n1. **4 characters (not 9)** — single repo, single language (TypeScript), no external integrations. No ARCHITECT (team-lead absorbs), no Oracle. Cathedral-lite.\n\n2. **Team-lead as main session** — per WORKFLOW.md §2, explicitly \"Claude (main session).\" Not a spawned agent. PO interface + navigator + architect in one.\n\n3. **Model tiers:** opus for judgment (Humboldt + Cuvier), sonnet for execution (Merian + Linnaeus). PURPLE is opus because tests don't catch structural degradation. T09 v2.3 pattern.\n\n4. **Lore: Naturalists of the Enlightenment** — ecosystem domain maps to scientists who studied life, classification, and anatomy:\n   - Humboldt (systems ecologist, saw all of nature as one interconnected web)\n   - Merian (proved metamorphosis through meticulous lifecycle observation)\n   - Linnaeus (minimum viable classification — genus + species, nothing more)\n   - Cuvier (restructured taxonomy without changing organisms — comparative anatomy)\n\n5. **WORKFLOW.md is the process contract** — common-prompt references it rather than duplicating the full pipeline protocol. Less redundancy, single source of truth.\n\n6. **Author attribution:** `(*BF:<AgentName>*)` format.\n\n## What I did NOT include (and why)\n\n- **No tdd-pipeline.md** — WORKFLOW.md already serves this function for bioforge. Raamatukoi needed a separate one because two pipelines with different languages needed pipeline-specific docs.\n- **No Oracle/wiki structure** — no external integration contracts to catalogue. The spec IS the knowledge base.\n- **No dual-hub routing** — single hub (Humboldt). No knowledge hub because there's no Oracle.\n\n## Pending\n\n- **Finn's research report** — I drafted without it. If Finn surfaces something that changes the design (e.g., session management concerns, specific framework patterns), I can revise.\n- **PO review** — this design implements what WORKFLOW.md specifies. PO should verify the character count (4), model tiers, and scope restrictions match their intent.\n\nReady for feedback or revisions.",
+    "summary": "Bioforge-dev roster design complete — 7 files delivered",
+    "timestamp": "2026-04-10T16:41:12.722Z",
     "color": "green",
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775826811114@herald\",\"from\":\"herald\",\"timestamp\":\"2026-04-10T13:13:41.321Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-10T13:13:41.322Z",
-    "color": "purple",
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T16:41:16.142Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T16:41:16.142Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 19:42] Acknowledging Finn's research report. Findings fully align with my design — updating with two additions.\n\n**Finn alignment check:**\n- 4 characters (TL + triple) -- already designed\n- No Oracle -- already designed\n- Temporal ownership, message types, three-strike -- already in common-prompt\n- Layer 2 excludes vitest -- already in common-prompt\n- Model tiers (opus TL + PURPLE, sonnet RED + GREEN) -- already in roster.json\n- Energy conservation makes structural debt catastrophic -- already addressed (Cuvier prompt + Humboldt as \"invariant guardian\")\n\n**Two additions based on Finn's inputs:**\n\n1. **Lore alternatives for PO choice** — added to `design-spec.md` §2. Three complete options:\n\n   | Option | Theme | TL | RED | GREEN | PURPLE |\n   |---|---|---|---|---|---|\n   | **A (recommended)** | Naturalists & Anatomists | Humboldt | Merian | Linnaeus | Cuvier |\n   | **B** | Evolutionary Biology | Darwin | Mendel | Haldane | Gould |\n   | **C** | Thermodynamics & Energy | Helmholtz | Joule | Carnot | Gibbs |\n\n   Option A is pre-built in roster.json and prompts. Option C has the strongest domain connection (energy conservation = Helmholtz's law), but Option A has the best role-to-achievement mapping. PO decides.\n\n2. **Phase 6 UI relaxation** — added to `design-spec.md` §6.3. During Phase 6 (UI), PURPLE's escalation threshold relaxes for `src/ui/` file creation (building from scratch, no existing structure to protect). Core/ui dependency direction remains strictly enforced. Humboldt announces scope change at Phase 6 start.\n\n**No changes to:** roster.json, common-prompt.md, or any prompt file. These already implement Option A correctly. If PO picks B or C, it's a find-and-replace on 5 files (roster.json + 4 prompts).\n\nDesign package is complete. Ready for PO review.",
+    "summary": "Updated design with Finn's inputs — lore alternatives + Phase 6 note",
+    "timestamp": "2026-04-10T16:42:29.326Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T16:42:32.395Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T16:42:32.395Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 19:43] Acknowledging all 5 PO decisions:\n\n1. Option A (lean 4-role team) -- already designed\n2. Team-lead = main session -- already designed (humboldt, opus, `agentType: \"team-lead\"`)\n3. Lore theme is mine to decide -- **choosing Option A: Naturalists & Anatomists**. Updated design-spec to mark it as \"Selected\" rather than \"Recommended.\" Rationale: strongest role-to-achievement mapping (Humboldt=systems, Merian=observation/proof, Linnaeus=minimum classification, Cuvier=structural reorganization).\n4. Team name `bioforge-dev` -- already in roster.json\n5. Team-lead has name and lore -- already in roster.json (humboldt, full lore entry)\n\n**The design package was already complete before this message arrived.** No changes needed beyond marking the lore choice as final in design-spec.md.\n\n**Final deliverable inventory:**\n\n```\ndesigns/new/bioforge-dev/\n├── roster.json          # 4 members with full lore\n├── design-spec.md       # Problem, composition, pipeline, scope, gates, Phase 6 note\n├── common-prompt.md     # Operational standards for all agents\n└── prompts/\n    ├── humboldt.md      # Team-lead/navigator/architect (main session)\n    ├── merian.md        # RED (test writer)\n    ├── linnaeus.md      # GREEN (implementer)\n    └── cuvier.md        # PURPLE (refactorer)\n```\n\n**Roster summary:**\n\n| Name | Role | Model | Color | Historical figure |\n|---|---|---|---|---|\n| humboldt | team-lead | opus | — | Alexander von Humboldt (1769-1859), first systems ecologist |\n| merian | RED | sonnet | red | Maria Sibylla Merian (1647-1717), metamorphosis documenter |\n| linnaeus | GREEN | sonnet | green | Carl Linnaeus (1707-1778), minimum viable taxonomy |\n| cuvier | PURPLE | opus | magenta | Georges Cuvier (1769-1832), comparative anatomy / taxonomy restructurer |\n\nDesign is final. Ready for deployment whenever PO gives the go-ahead.",
+    "summary": "PO decisions acknowledged — design was already complete",
+    "timestamp": "2026-04-10T16:43:23.105Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T16:43:26.369Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-10T16:43:26.369Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-10 19:36] Acknowledging shutdown.\n\n- [LEARNED] Bioforge's WORKFLOW.md already implicitly defines a Cathedral-tier single-pipeline XP structure — the framework's T09 tier analysis confirmed what the project authors designed intuitively. Projects that define strict invariants (energy conservation) naturally gravitate toward Cathedral tier.\n- [DEFERRED] None — research task complete.\n- [WARNING] None.\n\nScratchpad updated. Ready to shut down.",
+    "summary": "Shutdown acknowledged with closing tags",
+    "timestamp": "2026-04-10T17:03:58.722Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775840611312@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-10T17:04:02.457Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T17:04:02.457Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "[2026-04-10 20:03] Closing message.\n\n[LEARNED] Single-repo single-language projects collapse naturally to 4 characters (TL + triple) — no ARCHITECT, no Oracle. \"Cathedral-lite\" is a reusable pattern worth naming.\n\n[DEFERRED] Nothing new — all prior deferred items unchanged.\n\nScratchpad updated. Approving shutdown.",
+    "summary": "Closing message — shutdown approved",
+    "timestamp": "2026-04-10T17:15:19.213Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1775840612197@celes\",\"from\":\"celes\",\"timestamp\":\"2026-04-10T17:15:27.191Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-10T17:15:27.191Z",
+    "color": "green",
     "read": true
   }
 ]

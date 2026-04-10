@@ -272,11 +272,5 @@
     "summary": "Shutdown: save state and close",
     "timestamp": "2026-04-10T13:12:03.476Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826810131@callimachus\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:30.131Z\"}",
-    "timestamp": "2026-04-10T13:13:30.131Z",
-    "read": true
   }
 ]

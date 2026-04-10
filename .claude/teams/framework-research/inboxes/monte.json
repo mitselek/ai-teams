@@ -195,11 +195,5 @@
     "summary": "Shutdown: save state and close",
     "timestamp": "2026-04-10T13:12:03.490Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775826812127@monte\",\"from\":\"team-lead\",\"reason\":\"Session ending\",\"timestamp\":\"2026-04-10T13:13:32.127Z\"}",
-    "timestamp": "2026-04-10T13:13:32.127Z",
-    "read": true
   }
 ]
