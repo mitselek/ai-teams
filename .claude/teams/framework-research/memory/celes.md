@@ -84,6 +84,15 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 [GOTCHA] Audit independence (Monte's argument) is governance-sound but role-design-expensive: requires dual behavioral profiles, dual prompt variants, dual validation.
 [GOTCHA] Cross-provider PURPLE review is untested: PURPLE (opus) is calibrated against Claude sonnet coding idioms. Non-Claude GREEN output may trigger false positives/negatives in structural judgment.
 
+## Bioforge-dev roster (2026-04-10)
+
+[CHECKPOINT] Complete design package at `designs/new/bioforge-dev/` — 7 files: roster.json, design-spec.md, common-prompt.md, 4 prompts (humboldt/merian/linnaeus/cuvier).
+[DECISION] 4-character team: Humboldt (opus, team-lead/navigator/architect as main session), Merian (sonnet, RED), Linnaeus (sonnet, GREEN), Cuvier (opus, PURPLE). No ARCHITECT, no Oracle — single repo, single language.
+[DECISION] Lore theme: Naturalists of the Enlightenment — scientists who studied ecosystems, classification, and structural biology. Connects to BioForge's domain (ecosystem simulation, energy conservation, species evolution).
+[DECISION] Team-lead is main session per WORKFLOW.md §2 — not a spawned agent. PO communicates directly through main session.
+[PATTERN] When project has single repo + single language: collapse ARCHITECT into team-lead, drop Oracle. 4 characters not 9. Cathedral-lite.
+[PATTERN] WORKFLOW.md already specifies the full pipeline protocol — common-prompt can reference it rather than duplicating. Keep common-prompt as operational config, WORKFLOW.md as the process contract.
+
 ## Deferred (carried forward)
 
 [DEFERRED] #48 (Oracle tier downgrade path) — paused per Task 3 directive, awaiting PO assessment. Now the last issue in the #48/#49 pair — #49 landed in v2.3.

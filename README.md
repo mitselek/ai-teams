@@ -26,7 +26,7 @@ Multi-team AI agent framework for Eesti Raudtee. Designing how tens of AI agent 
 | polyphony-dev | `polyphony-dev` | `dev@100.96.54.170` | — | Polyphony framework development |
 | raamatukoi-dev | — | GitHub (not containerized) | [tugigrupp](https://github.com/Raamatukoi/tugigrupp) | Bookstore webstore + rat-project quality infra |
 
-**Local teams** (not containerized): framework-research, cloudflare-builders (hr-devs)
+**Local teams** (not containerized): framework-research, cloudflare-builders (hr-devs), bioforge-dev
 
 ## Context
 
