@@ -38,6 +38,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Oracle).
 
 - [`contract-enforcement-gap-non-claude.md`](gotchas/contract-enforcement-gap-non-claude.md) — No mechanism to define, test, or enforce protocol compliance for non-Claude participants; prerequisite gap for multi-provider expansion
 - [`external-synthesis-overreach.md`](gotchas/external-synthesis-overreach.md) — External reviewers promote conditionals to recommendations, treat hypotheticals as confirmed, and flatten specialist nuance; verify after any outsider synthesis
+- [`cloudflare-d1-migration-query.md`](gotchas/cloudflare-d1-migration-query.md) — 10 D1 gotchas from hr-devs: CASCADE ignores PRAGMA, safe `_new` rename pattern, BLOB traps, silent row drops, MCP write access ($5K incident)
 
 ### decisions/
 
