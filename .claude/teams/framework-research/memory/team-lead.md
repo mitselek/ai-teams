@@ -6,10 +6,11 @@
 
 [DECISION] **Phase 1 Oracle→Librarian rename is COMPLETE.** Framework-level T09/T04/T06/types/common-prompt, Callimachus prompt + 20 wiki entries, Eratosthenes v2.7.1 deployed. Committed 86e5e98 (framework-research) + apex-research PRs #57, #58 merged.
 [DEFERRED] **Phase 2 inventory (machine identifier rename, coordinated batch, future session):**
-  - `agentType: "oracle"` → `"librarian"` in roster.json (framework-research + apex-research)
-  - `filed-by: oracle` → `filed-by: librarian` in Callimachus + Eratosthenes prompts + 20 wiki entries
-  - `oracle-state.json` → `librarian-state.json` filename + all references
-  - TS literal `from: "Oracle"` in `types/t09-protocols.ts` (needs AST-aware tooling, not search-and-replace)
+
+- `agentType: "oracle"` → `"librarian"` in roster.json (framework-research + apex-research)
+- `filed-by: oracle` → `filed-by: librarian` in Callimachus + Eratosthenes prompts + 20 wiki entries
+- `oracle-state.json` → `librarian-state.json` filename + all references
+- TS literal `from: "Oracle"` in `types/t09-protocols.ts` (needs AST-aware tooling, not search-and-replace)
 [DEFERRED] **Callimachus Path Convention patch.** Celes drafted wording, handed to Cal at 14:31 for self-application. Unknown whether it landed before session close. Next-session resume: check `prompts/callimachus.md` for Path Convention section, verify cross-ref integrity with `wiki/gotchas/dual-team-dir-ambiguity.md`.
 [WIP] **Structural-discipline cluster Protocol C promotion.** 4 confirmed members (Pass 1/Pass 2, within-doc grep, protocol-shapes-typed-contracts, dual-team-dir-ambiguity) + 1 pending (Brunel's prompt-to-artifact cross-verification). Cal's gate-mapping observation is the load-bearing justification. Brunel's wait-for-2-sessions calibration is the right discipline — do NOT draft promotion proposal before at least one more session passes with the cluster intact.
 [WIP] **Cal's steal-back inventory: 12 patterns** from Eratosthenes lessons to port to Callimachus in next patch window.
@@ -49,15 +50,16 @@
 
 ---
 
-## Previous session notes
+## Carryovers from prior sessions
 
 [DECISION] Bioforge-dev team: 4-character Cathedral-lite — Humboldt (TL/opus), Merian (RED/sonnet), Linnaeus (GREEN/sonnet), Cuvier (PURPLE/opus). Naturalists of the Enlightenment lore. Designed by Celes, research by Finn.
 [DECISION] "Cathedral-lite" = Cathedral tier with ARCHITECT merged into team-lead. Valid for single-repo, single-language, single-pipeline projects.
 [WIP] Discussion #56 actionable items not yet assigned as tasks:
-  - Provider outage emergency protocol (Monte, T04)
-  - Sidecar/peer framework in T06 (Brunel+Monte)
-  - Contract enforcement mechanism (Herald)
-  - Platform/provider separation in T02 (Finn)
+
+- Provider outage emergency protocol (Monte, T04)
+- Sidecar/peer framework in T06 (Brunel+Monte)
+- Contract enforcement mechanism (Herald)
+- Platform/provider separation in T02 (Finn)
 [WIP] Celes assessment of Cal's first-day performance (carried from last session)
 [DEFERRED] Finn model inventory re-survey (uikit-dev missing from baseline count)
 [DEFERRED] **Timestamping convention — promote to T03 + investigate cheaper implementation.** Session 2026-04-13: the `[YYYY-MM-DD HH:MM]` prefix convention (currently per-team in common-prompt) proved load-bearing for tracking crossed messages, ordering sub-second dispatches, and debugging coordination. Two actions: (1) propose promotion to framework-wide rule in T03 (Communication) so cross-team threads stay legible; (2) investigate cheaper timestamping — current agent workflow requires `date '+%Y-%m-%d %H:%M'` bash call before every SendMessage, which takes noticeable time per message. Options to explore: auto-injection at message send (framework-level, zero agent cost), cached timestamp with staleness check, or lighter format (HH:MM only for intra-session, full only when crossing date boundaries). Discuss with Herald (protocol) and Brunel (infrastructure).

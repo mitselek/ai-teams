@@ -78,6 +78,19 @@ This team has two communication hubs:
 
 **Knowledge submissions go directly to Callimachus, NOT through team-lead.** Work reports go to team-lead as before. These are separate reporting lines.
 
+#### What goes to Callimachus vs. team-lead
+
+| Send to Callimachus | Send to team-lead |
+|---|---|
+| "I discovered that D1 cascades ignore PRAGMA" (pattern) | "I finished the T04 review, posted to wiki" (work report) |
+| "Running respawn without jq cleanup leaves zombie config entries" (gotcha) | "I'm blocked on missing topic-file context" (blocker) |
+| "We decided opus-only for knowledge-layer roles" (decision) | "Which topic should I audit next?" (task question) |
+| "Protocol A field-set must match Protocol B consumer shape" (contract) | "Review my patch for common-prompt" (review request) |
+
+The four left-column rows correspond 1:1 to four of Callimachus's primary wiki subdirs (`patterns/`, `gotchas/`, `decisions/`, `contracts/`) — the examples are not arbitrary, they're the canonical shape of each kind of submission.
+
+This table is co-located in `prompts/callimachus.md` by design. The same content lives in two places — here (which all specialists read at startup) and Callimachus's prompt (which is loaded once into his system context and stays there). That's intentional reinforcement, not duplication: specialists never read Callimachus's prompt, and he won't re-read common-prompt every message. If the examples ever update, both copies update together.
+
 Protocol formats are documented in `prompts/callimachus.md` and typed in [`types/t09-protocols.ts`](https://github.com/mitselek/ai-teams/blob/main/types/t09-protocols.ts).
 
 ## Shutdown Protocol

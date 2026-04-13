@@ -36,6 +36,10 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`pass1-pass2-rename-separation.md`](patterns/pass1-pass2-rename-separation.md) — Framework-wide identifier renames separate into Pass 1 (prose, ship now) and Pass 2 (machine identifiers, batch later); schema changes ship in Pass 1 because they enable new behavior
 - [`within-document-rename-grep-discipline.md`](patterns/within-document-rename-grep-discipline.md) — Grep the whole document before editing the declaration site; references live in the body, not the schema block. Sibling to pass1-pass2-rename-separation at file scope
 - [`protocol-shapes-are-typed-contracts.md`](patterns/protocol-shapes-are-typed-contracts.md) — Field-set divergence between independently-drafted producer/consumer specs breaks protocols silently; cross-read both ends, lift consumer's field set verbatim. Cross-team scope
+- [`convention-as-retroactive-telemetry.md`](patterns/convention-as-retroactive-telemetry.md) — Consistently-enforced conventions produce retroactive telemetry as a byproduct with zero instrumentation cost; the discipline IS the instrumentation
+- [`rule-erosion-via-reasonable-exceptions.md`](patterns/rule-erosion-via-reasonable-exceptions.md) — Exceptions to hard rules are corrosion vectors; "prudent pause beats permission grant" — permission removes one blocker, not all of them
+- [`named-concepts-beat-descriptive-phrases.md`](patterns/named-concepts-beat-descriptive-phrases.md) — Named concepts (citable, reusable, harder to misremember) beat descriptive phrases for cross-artifact references; naming signal is repeated multi-word description across contexts
+- [`why-this-section-exists-incident-docs.md`](patterns/why-this-section-exists-incident-docs.md) — Prompt sections added after incidents must name the incident inline; prevents future readers from deleting the fix as "redundant"
 
 ### gotchas/
 

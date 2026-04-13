@@ -1,6 +1,10 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 4 — 2026-04-13 (In Progress)
+## Session 5 — 2026-04-13
+
+[WIP] **Steal-back inventory authored.** `memory/callimachus-stealback-inventory.md` — 10 distinct patches (12 patterns, 3 subsumed into patch #10). Celes to execute. Path Convention (Celes's 14:28 v2.7.1-aligned draft) is patch #1. Application order specified.
+
+## Session 4 — 2026-04-13 (Complete)
 
 [CHECKPOINT] First end-to-end Librarian replication exercise: framework-research → apex-research (Eratosthenes). Wiki grew 20 → 24 entries this session. Phase 1 complete per PO; Phase 2 deferred.
 [CHECKPOINT] Structural-discipline cluster: 4 confirmed members + 1 pending (Brunel/Celes prompt-to-artifact). Members are within-document grep, Pass 1/Pass 2 separation, protocol-shapes-typed-contracts, dual-team-dir-ambiguity. Brunel's wait-for-≥2-sessions calibration is the gate on Protocol C promotion.
