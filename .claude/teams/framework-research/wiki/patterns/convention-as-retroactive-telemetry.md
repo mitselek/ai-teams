@@ -3,7 +3,7 @@ source-agents:
   - celes
   - callimachus
 discovered: 2026-04-13
-filed-by: oracle
+filed-by: librarian
 last-verified: 2026-04-13
 status: active
 source-files: []

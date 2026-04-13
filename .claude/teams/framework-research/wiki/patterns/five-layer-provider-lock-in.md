@@ -2,7 +2,7 @@
 source-agents:
   - celes
 discovered: 2026-04-10
-filed-by: oracle
+filed-by: librarian
 last-verified: 2026-04-10
 status: active
 source-files: []

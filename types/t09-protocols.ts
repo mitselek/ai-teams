@@ -242,8 +242,8 @@ export interface CycleComplete {
  * Source: T09 § "Dual-Hub Topology" → "[URGENT-KNOWLEDGE] message format".
  */
 export interface UrgentKnowledgeMessage {
-  /** Always "Oracle" — the Librarian is the only sender of this message type. Machine identifier pending Pass 2 rename. */
-  from: "Oracle";
+  /** Always "Librarian" — the Librarian is the only sender of this message type. */
+  from: "Librarian";
   /** The agent whose current work may be invalidated. */
   affectsAgent: string;
   /** Short description of what the new knowledge is about. */
@@ -401,8 +401,8 @@ export interface WikiProvenance {
   sourceAgent: string;
   /** ISO date when the knowledge was discovered. */
   discovered: string;
-  /** Always "oracle" — the Librarian is the sole writer to the wiki. */
-  filedBy: "oracle";
+  /** Always "librarian" — the Librarian is the sole writer to the wiki. */
+  filedBy: "librarian";
   /** ISO date when the entry was last verified as current. */
   lastVerified: string;
   status: "active" | "disputed" | "archived";

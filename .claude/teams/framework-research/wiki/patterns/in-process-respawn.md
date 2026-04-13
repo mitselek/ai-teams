@@ -2,7 +2,7 @@
 source-agents:
   - team-lead
 discovered: 2026-04-09
-filed-by: oracle
+filed-by: librarian
 last-verified: 2026-04-09
 status: active
 source-files:

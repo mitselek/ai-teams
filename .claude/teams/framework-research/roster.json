@@ -103,7 +103,7 @@
     },
     {
       "name": "callimachus",
-      "agentType": "oracle",
+      "agentType": "librarian",
       "model": "claude-opus-4-6[1m]",
       "color": "gold",
       "prompt": "prompts/callimachus.md",
