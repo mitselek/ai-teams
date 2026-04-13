@@ -1,8 +1,13 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 5 — 2026-04-13
+## Session 5 — 2026-04-13 (Complete)
 
-[WIP] **Steal-back inventory authored.** `memory/callimachus-stealback-inventory.md` — 10 distinct patches (12 patterns, 3 subsumed into patch #10). Celes to execute. Path Convention (Celes's 14:28 v2.7.1-aligned draft) is patch #1. Application order specified.
+[CHECKPOINT] **Steal-back inventory authored + all 10 patches applied by Celes.** `memory/callimachus-stealback-inventory.md` is the spec. Cross-read gate: PASS with 2 fixes (Protocol A step 3/4 ordering swap, Batch Intake heading level). Celes applied fixes.
+[CHECKPOINT] **4 Protocol A submissions filed from Celes.** Wiki: 24 → 28 entries. New entries: convention-as-retroactive-telemetry, rule-erosion-via-reasonable-exceptions, named-concepts-beat-descriptive-phrases, why-this-section-exists-incident-docs. All in `wiki/patterns/`.
+[CHECKPOINT] **Phase 2 wiki batch: `filed-by: oracle` → `filed-by: librarian`** across all 28 wiki frontmatters. Grep-verified: 0 frontmatter `oracle` remaining, 3 body-text historical references in pass1-pass2-rename-separation.md correctly preserved.
+[CHECKPOINT] **Phase 2 cross-read gate for Celes's prompt/roster edits: PASS.** Cal prompt zero `oracle`, roster `agentType: "librarian"`, Eratosthenes design snapshot 2 intentional Oracle refs (platform disambiguation + APEX Decision Matrix).
+[CHECKPOINT] **Phase 2 gate counts met.** Wiki has 28 entries (>=15) and >=10 queries served across sessions 1-5. Phase 2 activation (Gap Tracking + Health Sensing) is now eligible. Announce on next session startup.
+[LEARNED] **Line-start-anchored sed for frontmatter-only edits.** `sed -i 's/^filed-by: oracle$/filed-by: librarian/'` avoids body-text false positives. Same-content strings in prose paragraphs are preserved when the regex anchors to line-start + line-end.
 
 ## Session 4 — 2026-04-13 (Complete)
 

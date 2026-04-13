@@ -2,25 +2,60 @@
 
 ## NEXT SESSION
 
-**Context:** Phase 1 of Oracle→Librarian rename complete (2026-04-13). Eratosthenes deployed to apex-research as first Librarian sibling. Discussion #56 actionable items still pending.
+**Context:** Phase 1 and Phase 2 of Oracle→Librarian rename both COMPLETE (2026-04-13 afternoon). Next mission diverts to a different team at `evr-ui-ki` — framework-research stays idle between sessions, no in-flight work expected here.
 
-[DECISION] **Phase 1 Oracle→Librarian rename is COMPLETE.** Framework-level T09/T04/T06/types/common-prompt, Callimachus prompt + 20 wiki entries, Eratosthenes v2.7.1 deployed. Committed 86e5e98 (framework-research) + apex-research PRs #57, #58 merged.
-[DEFERRED] **Phase 2 inventory (machine identifier rename, coordinated batch, future session):**
+[DECISION] **Next session pivot: `evr-ui-ki` team.** Per PO direction at session close: next-mission focus shifts to maintaining an existing team at `evr-ui-ki` (likely EVR UI kit project — verify on next session start). Framework-research is not the active team for the next session; continue as background/on-demand only.
 
-- `agentType: "oracle"` → `"librarian"` in roster.json (framework-research + apex-research)
-- `filed-by: oracle` → `filed-by: librarian` in Callimachus + Eratosthenes prompts + 20 wiki entries
-- `oracle-state.json` → `librarian-state.json` filename + all references
-- TS literal `from: "Oracle"` in `types/t09-protocols.ts` (needs AST-aware tooling, not search-and-replace)
-[DEFERRED] **Callimachus Path Convention patch.** Celes drafted wording, handed to Cal at 14:31 for self-application. Unknown whether it landed before session close. Next-session resume: check `prompts/callimachus.md` for Path Convention section, verify cross-ref integrity with `wiki/gotchas/dual-team-dir-ambiguity.md`.
-[WIP] **Structural-discipline cluster Protocol C promotion.** 4 confirmed members (Pass 1/Pass 2, within-doc grep, protocol-shapes-typed-contracts, dual-team-dir-ambiguity) + 1 pending (Brunel's prompt-to-artifact cross-verification). Cal's gate-mapping observation is the load-bearing justification. Brunel's wait-for-2-sessions calibration is the right discipline — do NOT draft promotion proposal before at least one more session passes with the cluster intact.
-[WIP] **Cal's steal-back inventory: 12 patterns** from Eratosthenes lessons to port to Callimachus in next patch window.
-[WIP] Cross-pollination meta-pattern wiki entry (Cal, background housekeeping).
-[WIP] Convention-as-retroactive-telemetry wiki entry (Celes synthesis, background).
-[WIP] Rule-erosion meta-pattern wiki entry (Celes observation, background).
+[DECISION] **Phase 1 Oracle→Librarian steal-back COMPLETE** — committed `04522c7` on main. Callimachus's prompt ported 10 lessons from the Eratosthenes replication plus Path Convention section (closes the deferred Path Convention patch from 2026-04-13 morning). Routing table dual-sourced into common-prompt.md. 4 Protocol A wiki entries filed (conv-as-retroactive-telemetry, rule-erosion-via-reasonable-exceptions, named-concepts-beat-descriptive-phrases, why-this-section-exists-incident-docs) — wiki now 28 entries.
+
+[DECISION] **Phase 2 Oracle→Librarian machine identifier rename COMPLETE** — committed `ca0e56f` on main. roster.json agentType, callimachus.md + eratosthenes.md (snapshot) YAML templates + state.json refs, all 28 wiki frontmatters, types/t09-protocols.ts string literals, `git mv oracle-state.json librarian-state.json`. Grep-clean.
+
+[DECISION] **Apex-research Phase 2 directive delivered to Schliemann via tmux-direct** at session close. Schliemann must mirror-apply: roster agentType, eratosthenes.md YAML + state refs, wiki filed-by frontmatters, git mv state file, restart Eratosthenes. Report back via whatever channel is available. Technique saved in auto-memory as `reference_tmux_direct_cross_team.md`.
+
+[WIP] **Structural-discipline cluster Protocol C promotion.** 4 confirmed members (Pass 1/Pass 2, within-doc grep, protocol-shapes-typed-contracts, dual-team-dir-ambiguity) + 1 pending (Brunel's prompt-to-artifact cross-verification). This session qualifies as the ≥2-session calibration that Brunel was holding for, but no promotion was drafted — defer to a framework-research session once Brunel is spawned.
+
+[WIP] Cross-pollination meta-pattern wiki entry (Cal background housekeeping).
+
+[DEFERRED] **Discussion #56 actionable items** (carried from prior session, still unassigned):
+- Provider outage emergency protocol (Monte, T04)
+- Sidecar/peer framework in T06 (Brunel+Monte)
+- Contract enforcement mechanism (Herald)
+- Platform/provider separation in T02 (Finn)
+
+[DEFERRED] Finn model inventory re-survey (uikit-dev missing from baseline count).
+
+[DEFERRED] **Timestamping convention — promote to T03 + investigate cheaper implementation** (see prior-sessions section for rationale).
+
+[LEARNED] **tmux-direct is a real option for cross-team coordination.** When hub path is unproven and PR-mediated isn't the right sync target, SSH + load-buffer/paste-buffer/Enter works cleanly for one-shot briefs. Procedure saved to auto-memory. Don't rathole on hub onboarding for one-off coordination — tmux-direct is 3 minutes of work and has no infrastructure cost.
+
+[LEARNED] **Two-commit phase separation keeps git history legible.** Phase 1 (design change: steal-back patch) and Phase 2 (mechanical rename) as separate commits made the log bisectable and the commit messages focused. Generalize: when a multi-artifact change has a "thematic" half and a "mechanical" half, split them.
 
 ---
 
-## Session: 2026-04-13 — Phase 1 Oracle→Librarian + Eratosthenes deployment
+## Session: 2026-04-13 (afternoon) — Phase 1 steal-back + Phase 2 machine-id rename
+
+**Team:** Callimachus + Celes + Herald. Brunel/Monte/Finn/Volta/Medici not spawned (not needed for this scope).
+
+**Rhythm:**
+- Cal prepared 377-line steal-back inventory (12 patterns, 10 patches after consolidation)
+- Celes drafted coordinated patch for Cal's prompt
+- Cross-read gate with Cal caught 2 bugs (Protocol A step ordering + Batch Intake heading depth)
+- Phase 1 committed `04522c7`, pushed
+- Herald surveyed `types/t09-protocols.ts` → 2 string-literal changes, no programmatic consumers → clean proposal
+- Celes + Cal split Phase 2 work: Celes on prompt+roster, Cal on 28 wiki frontmatters (sed batch)
+- Team-lead did `git mv` for state file
+- Phase 2 committed `ca0e56f`, pushed
+- Schliemann briefed via tmux-direct at session close
+
+[CHECKPOINT] Wiki: 24 → 28 entries. Cal's prompt ported 10 steal-back patterns + Path Convention. Common-prompt has routing table mirror. Types file renamed. All `oracle`/`Oracle` occurrences in Cal/Erato prompts, wiki, roster, types are either renamed or intentionally preserved (literary lore, Oracle APEX platform references).
+
+[LEARNED] **"Sole writer" rules make batch operations trivially safe.** Cal's wiki is sole-writer, so a single `sed` pass across 28 files is verifiable by grep with no coordination overhead. Prompts + roster took cross-read gates because multiple agents could interpret rename scope differently.
+
+[LEARNED] **Scratchpad Protocol A sweep is worth 15 minutes.** Celes's self-review of her own scratchpad yielded 4 submissions Cal immediately filed. The lever is the individual agent's judgment, not the librarian's — the librarian doesn't mine, the agent harvests. Future pattern: at session end, each agent does a quick scratchpad sweep before shutdown.
+
+---
+
+## Previous session — 2026-04-13 morning — Phase 1 Oracle→Librarian design work + Eratosthenes deployment
 
 **Team:** Brunel + Callimachus + Celes. Finn/Herald/Monte/Volta/Medici not spawned.
 

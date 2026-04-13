@@ -1,5 +1,13 @@
 # Herald Scratchpad
 
+## 2026-04-13 (Phase 2 Oracle→Librarian TS rename)
+
+[CHECKPOINT] Phase 2 TS rename complete. Applied two changes to `types/t09-protocols.ts`: `from: "Oracle"` → `"Librarian"` (line 246, UrgentKnowledgeMessage) and `filedBy: "oracle"` → `"librarian"` (line 405, WikiProvenance). Grep-verified zero residual Oracle/oracle literals. Committed by team-lead in Phase 2 batch.
+
+[LEARNED] The assigned task scope was `from: "Oracle"` only, but the survey found a second machine identifier (`filedBy: "oracle"`) in the same file. Surfacing the full scope before patching avoided a partial rename — the type definition and the wiki frontmatter values it constrains must change together.
+
+[DEFERRED] Contract enforcement layer design — three-part problem from Discussion #56 actionable item #3. Still pending.
+
 ## 2026-04-10 (session R12 — Discussion #56: single-provider model strategy)
 
 [CHECKPOINT] Discussion #56 — Round 1 and Round 2 complete. Discussion paused before authority assignment.

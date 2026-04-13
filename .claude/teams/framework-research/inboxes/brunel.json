@@ -703,11 +703,5 @@
     "summary": "Session wind-down — save state, closing reports, shutdown",
     "timestamp": "2026-04-13T10:41:39.849Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776077017866@brunel\",\"from\":\"team-lead\",\"reason\":\"session wind-down\",\"timestamp\":\"2026-04-13T10:43:37.867Z\"}",
-    "timestamp": "2026-04-13T10:43:37.867Z",
-    "read": true
   }
 ]
