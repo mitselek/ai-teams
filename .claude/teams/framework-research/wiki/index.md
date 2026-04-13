@@ -40,6 +40,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`rule-erosion-via-reasonable-exceptions.md`](patterns/rule-erosion-via-reasonable-exceptions.md) — Exceptions to hard rules are corrosion vectors; "prudent pause beats permission grant" — permission removes one blocker, not all of them
 - [`named-concepts-beat-descriptive-phrases.md`](patterns/named-concepts-beat-descriptive-phrases.md) — Named concepts (citable, reusable, harder to misremember) beat descriptive phrases for cross-artifact references; naming signal is repeated multi-word description across contexts
 - [`why-this-section-exists-incident-docs.md`](patterns/why-this-section-exists-incident-docs.md) — Prompt sections added after incidents must name the incident inline; prevents future readers from deleting the fix as "redundant"
+- [`prompt-to-artifact-cross-verification.md`](patterns/prompt-to-artifact-cross-verification.md) — Before deploying a prompt, verify every referenced artifact exists at the declared path with the declared structure; pre-deployment gate in the structural-discipline cluster
 
 ### gotchas/
 

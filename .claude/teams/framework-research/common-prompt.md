@@ -43,6 +43,20 @@ All persistent text output must carry the author agent's name in the format `(*F
 - All findings go into `topics/*.md` files
 - Git commits to `mitselek/ai-teams` repo
 
+## Structural Change Discipline
+
+When editing prompts, protocols, wiki entries, or cross-team artifacts, apply these five verification gates in order. Each gate catches a different class of silent failure. Skipping a gate does not produce an error — it produces a defect that surfaces later.
+
+1. **Grep before editing.** Before renaming any field, identifier, or structural element in a document, grep the entire document for all occurrences of the old name. Edit all references in one pass. Re-grep afterward — zero hits is the only acceptable result. (`wiki/patterns/within-document-rename-grep-discipline.md`)
+
+2. **Cross-read producer against consumer.** When two agents share a protocol, the field set is a typed contract. Before merging any protocol change, read both the producer-side and consumer-side specs and verify every field name matches. Tonal variation is fine; field-set divergence is a bug. (`wiki/patterns/protocol-shapes-are-typed-contracts.md`)
+
+3. **Separate prose renames from machine-identifier renames.** When renaming a concept across teams, default to prose-only (Pass 1). Machine identifiers (filenames, frontmatter values, `agentType`, config keys, TypeScript literals) ship as a separate coordinated batch (Pass 2) only after all consumers are inventoried. Partial Pass 2 is worse than no Pass 2. (`wiki/patterns/pass1-pass2-rename-separation.md`)
+
+4. **Verify prompt-to-artifact correspondence.** Before deploying any prompt that references external artifacts (files, configs, directories, schemas), verify each referenced artifact exists at the declared path with the declared structure. Missing artifacts are bootstrap dependencies — ship them alongside the prompt or document the first-run creation path. (`wiki/patterns/prompt-to-artifact-cross-verification.md`)
+
+5. **Anchor bare paths explicitly.** Every prompt that references `.claude/teams/<team>/` paths must declare which root bare paths resolve to (`$REPO` or `$HOME`). Add a leading Path Convention section to anchor all body references. Verify with `pwd` before any file write. (`wiki/gotchas/dual-team-dir-ambiguity.md`)
+
 ## Agent Spawning Rule
 
 Agents MUST be spawned with `run_in_background: true`.

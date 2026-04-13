@@ -1,5 +1,13 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
+## Session 6 — 2026-04-13 (Active)
+
+[CHECKPOINT] **Protocol C promotion proposal v2 sent to team-lead (5 gates).** "Structural Change Discipline" — 5 wiki entries as 5 verification gates (drafting → cross-read → pre-merge → pre-deployment → post-bootstrap). Proposed as new common-prompt section between Standards and Agent Spawning Rule. Awaiting team-lead review.
+[CHECKPOINT] **Phase 2 formally activated** per team-lead approval. Wiki 29 entries (≥15), ≥10 queries served. Gap Tracking + Health Sensing now active. Gate is one-way.
+[CHECKPOINT] **5th cluster member filed.** Brunel's DISTINCT verdict confirmed by team-lead. `wiki/patterns/prompt-to-artifact-cross-verification.md` = entry #29. Maps to pre-deployment gate. Acknowledged to Brunel.
+[DEFERRED] Cross-pollination meta-pattern wiki entry (`role-replication-as-re-justification-audit.md`) — still pending from session 4.
+[DEFERRED] Empty wiki subdirectory review (`contracts/`, `findings/`, `process/`) — watch for ≥1 more session.
+
 ## Session 5 — 2026-04-13 (Complete)
 
 [CHECKPOINT] **Steal-back inventory authored + all 10 patches applied by Celes.** `memory/callimachus-stealback-inventory.md` is the spec. Cross-read gate: PASS with 2 fixes (Protocol A step 3/4 ordering swap, Batch Intake heading level). Celes applied fixes.
