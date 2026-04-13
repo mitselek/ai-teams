@@ -1,0 +1,40 @@
+# framework-research tmux layout — 8 panes.
+#
+#  +-----------+-----------+-----------+
+#  |    Cal    |    Cel    |   Brun    |   featured row (~30% height)
+#  +-----------+-----+-----+-----------+
+#  |                 | Med   | Vol     |
+#  |   team-lead     +-------+---------+
+#  |                 | Her   | Mon     |
+#  +-----------------+-------+---------+
+#
+# team-lead runs claude; others are bare shells.
+# Upgrade a pane later with, e.g.:
+#   command: "tail -F .claude/teams/framework-research/memory/<name>.md"
+
+initial: callimachus
+
+splits:
+  # separate top strip from bottom area (top 30%, bottom 70%)
+  - { from: callimachus, below: team-lead, size: 70% }
+  # top row columns: Cal | Cel | Brun
+  - { from: callimachus, right: celes,     size: 67% }
+  - { from: celes,       right: brunel,    size: 50% }
+  # bottom: team-lead (left 50%) | 2x2 quadrant (right 50%)
+  - { from: team-lead,   right: medici,    size: 50% }
+  # 2x2 quadrant: split into top/bottom halves, then each into left/right
+  - { from: medici,      below: herald,    size: 50% }
+  - { from: medici,      right: volta,     size: 50% }
+  - { from: herald,      right: monte,     size: 50% }
+
+panes:
+  callimachus: { label: Callimachus }
+  celes:       { label: Celes }
+  brunel:      { label: Brunel }
+  team-lead:   { label: team-lead, command: "claude --dangerously-skip-permissions --continue", send_after: hello }
+  medici:      { label: Medici }
+  volta:       { label: Volta }
+  herald:      { label: Herald }
+  monte:       { label: Monte }
+
+focus: team-lead
