@@ -110,6 +110,7 @@ All agents commit directly to `main`. Directory ownership prevents conflicts. CI
 ### TDD Pair Protocol (ADR-004)
 
 Dashboard work uses a sequential TDD pair — **never parallel**:
+
 1. **RED (Nightingale)** — writes failing tests from acceptance criteria
 2. **GREEN (Berners-Lee)** — makes tests pass, refactors
 3. RED must complete before GREEN starts. No exceptions.

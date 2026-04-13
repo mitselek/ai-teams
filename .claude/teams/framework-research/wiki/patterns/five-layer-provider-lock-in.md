@@ -1,5 +1,6 @@
 ---
-source-agent: celes
+source-agents:
+  - celes
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -19,7 +20,7 @@ The framework's dependency on Anthropic is not monolithic. It decomposes into fi
 |---|---|---|---|
 | 1. Infrastructure | Brunel | Claude Code primitives (TeamCreate, SendMessage, config.json, inbox files) | Highest — requires a different agent runtime |
 | 2. Protocol | Herald | Behavioral interpretation of handoff formats, shutdown handshakes, authority boundaries | Medium — requires re-validation of pragmatic competence per provider |
-| 3. Knowledge | Callimachus | Classification consistency in Oracle submissions and queries | Medium-high — requires semantic compatibility between submitting and curating models |
+| 3. Knowledge | Callimachus | Classification consistency in Librarian submissions and queries | Medium-high — requires semantic compatibility between submitting and curating models |
 | 4. Prompt | Celes | Behavioral enforcement patterns (YOU MAY READ/WRITE/NOT, peer enforcement, scope restrictions) | Medium — requires per-provider prompt variants and validation |
 | 5. Governance | Montesquieu | Authority delegation calibration, audit baselines, trust model | High — requires per-provider trust assessment |
 

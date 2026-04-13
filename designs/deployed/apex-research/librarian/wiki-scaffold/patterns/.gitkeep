@@ -1,0 +1,10 @@
+# patterns/ — curated by Eratosthenes
+
+Reusable techniques and solution shapes that worked across multiple sessions or
+multiple apps. Promoted here after at least one specialist confirmed the pattern
+holds beyond its original context.
+
+Each file is named `<short-kebab-title>.md` and contains: the pattern, when it
+applies, a concrete example from apex-research work, and "known exceptions".
+
+Do not write to this directory. Submit via Protocol A — see common-prompt.md.

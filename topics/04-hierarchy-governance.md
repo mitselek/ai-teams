@@ -40,21 +40,21 @@ Named rules that constrain governance across layers. Unlike delegation matrix ro
 
 #### Rule: L3 → L0 Automated Flow Is Forbidden
 
-Knowledge produced at L3 (specialists, team wikis, Oracle-curated content) must not automatically propagate to L0 (workspace MEMORY.md, constitutional artifacts). The hierarchy must be preserved: information flows up through explicit governance review (team lead's session report, PO's cross-team context-gathering), gets synthesized by the human at L0, and flows back down through common-prompt edits or direct team-lead directives.
+Knowledge produced at L3 (specialists, team wikis, Librarian-curated content) must not automatically propagate to L0 (workspace MEMORY.md, constitutional artifacts). The hierarchy must be preserved: information flows up through explicit governance review (team lead's session report, PO's cross-team context-gathering), gets synthesized by the human at L0, and flows back down through common-prompt edits or direct team-lead directives.
 
 **Forbidden:**
 
 - Automated sync of team wiki entries to workspace MEMORY.md
 - Agents reading workspace MEMORY.md directly
-- PO editing team wikis directly (PO messages team lead, who instructs the Oracle)
+- PO editing team wikis directly (PO messages team lead, who instructs the Librarian)
 - PO copying MEMORY.md entries into team wikis (if PO knowledge needs to reach a team, it goes through team-lead, who submits it as a normal Knowledge Submission with PO attribution)
 
 **Required:**
 
-- Cross-team-relevant wiki entries are tagged `[CROSS-TEAM]` in the Oracle's session report
+- Cross-team-relevant wiki entries are tagged `[CROSS-TEAM]` in the Librarian's session report
 - Team lead includes tagged findings in session report to PO
 - PO decides at own discretion whether to record in MEMORY.md
-- PO directives to teams flow through common-prompt, team-lead messages, or explicit Knowledge Submissions to the Oracle (with attribution), never through direct wiki edits
+- PO directives to teams flow through common-prompt, team-lead messages, or explicit Knowledge Submissions to the Librarian (with attribution), never through direct wiki edits
 
 **Why this is a constitutional rule, not a delegation matrix row.** The matrix specifies who *may* decide something. This rule specifies a flow that *no one* may authorize — not even the PO, because the L0 ↔ L3 gap exists by design. Preserving it preserves the hierarchy's synthesis-at-the-top property: the PO's context is deliberately curated, not flooded with raw team output.
 
@@ -194,14 +194,14 @@ This is the central governance artifact. For any decision type, it specifies: wh
 | 42 | Scope dispute within pipeline (RED/GREEN/PURPLE disagrees with test spec) | — | — | Escalation target | D (ARCHITECT, first instance); C (disputing agent) | Unresolvable after ARCHITECT ruling → escalate to team-lead (L2) → PO (L0) |
 | 43 | Structural refactoring within PURPLE scope (rename, extract, restructure) | — | — | I | D (PURPLE); C (ARCHITECT) | Restructuring that would cross PURPLE's scope boundary (interface change, new module, test file edit) → escalate to ARCHITECT |
 | 44 | Mid-cycle termination of PURPLE (forced shutdown during refactoring) | — | — | D (team-lead) | C (ARCHITECT); C (PURPLE) | Watchdog detects hung/stuck state at 5-minute soft boundary; team-lead authority activates; PURPLE cannot refuse |
-| 45 | Cross-pipeline pattern extraction (shared utility across pipelines) | — | — | I | D (ARCHITECT); C (PURPLE flags via Oracle) | Shared PURPLE observing cross-pipeline pattern MUST flag to ARCHITECT via Oracle; may not extract unilaterally |
-| **Knowledge base (Oracle) governance** | | | | | | |
-| 46 | Knowledge submission scope classification (agent-only / team-wide / cross-team) | — | — | I | D (Oracle); C (submitting agent) | Submitting agent proposes scope; Oracle decides on filing; team-lead reviews disputes |
-| 47 | Knowledge promotion proposal acceptance (wiki entry → common-prompt candidate) | I | — | D | C (Oracle proposes) | Team-lead decides whether to forward to PO; final common-prompt amendment is Row 37 |
-| 48 | Oracle respawn authority (SPOF recovery) | — | — | D | — | Normal agent lifecycle per Rows 4-5; no special authority. Oracle state marker prevents re-running bootstrap. |
-| 49 | `[URGENT-KNOWLEDGE]` interrupt decision (whether to interrupt an affected agent with new knowledge) | — | — | D | C (Oracle flags relevance); C (affected agent receives) | Oracle never interrupts agents directly. Team-lead is the traffic controller. |
+| 45 | Cross-pipeline pattern extraction (shared utility across pipelines) | — | — | I | D (ARCHITECT); C (PURPLE flags via Librarian) | Shared PURPLE observing cross-pipeline pattern MUST flag to ARCHITECT via Librarian; may not extract unilaterally |
+| **Knowledge base (Librarian) governance** | | | | | | |
+| 46 | Knowledge submission scope classification (agent-only / team-wide / cross-team) | — | — | I | D (Librarian); C (submitting agent) | Submitting agent proposes scope; Librarian decides on filing; team-lead reviews disputes |
+| 47 | Knowledge promotion proposal acceptance (wiki entry → common-prompt candidate) | I | — | D | C (Librarian proposes) | Team-lead decides whether to forward to PO; final common-prompt amendment is Row 37 |
+| 48 | Librarian respawn authority (SPOF recovery) | — | — | D | — | Normal agent lifecycle per Rows 4-5; no special authority. Librarian state marker prevents re-running bootstrap. |
+| 49 | `[URGENT-KNOWLEDGE]` interrupt decision (whether to interrupt an affected agent with new knowledge) | — | — | D | C (Librarian flags relevance); C (affected agent receives) | Librarian never interrupts agents directly. Team-lead is the traffic controller. |
 
-**Reading the ARCHITECT, PURPLE, and Oracle rows.** Rows 40-49 use the existing 5-column format with role qualifiers in the Specialist (L3) column. ARCHITECT, PURPLE, and Oracle are all L3 specialists with scoped authority — they are not a new hierarchy level (see §Level 3: Scope Authority Within L3). The qualifier in parentheses identifies which L3 role holds the specified authority. Cross-reference `topics/09-development-methodology.md` Part 1 (Authority Boundaries, lines 284-299) for the 6-column view that isolates ARCHITECT into its own column for easier reading within the XP pipeline context.
+**Reading the ARCHITECT, PURPLE, and Librarian rows.** Rows 40-49 use the existing 5-column format with role qualifiers in the Specialist (L3) column. ARCHITECT, PURPLE, and Librarian are all L3 specialists with scoped authority — they are not a new hierarchy level (see §Level 3: Scope Authority Within L3). The qualifier in parentheses identifies which L3 role holds the specified authority. Cross-reference `topics/09-development-methodology.md` Part 1 (Authority Boundaries, lines 284-299) for the 6-column view that isolates ARCHITECT into its own column for easier reading within the XP pipeline context.
 
 **ARCHITECT's authority is scoped to a single story at a time.** Between stories, ARCHITECT has no scope authority — it is passively available until the team-lead assigns the next story. This prevents authority creep. See T09 v2 Part 1, "Pipeline Governance as a Nested System" for the full treatment.
 
@@ -815,7 +815,7 @@ How does this governance model behave as team count grows?
 
 - ~~How many levels of hierarchy?~~ → 4 levels: PO (L0) → Manager agent (L1) → Team lead (L2) → Specialist (L3)
 - ~~Can a manager agent approve PRs or only humans?~~ → Neither. PR merge is team-lead scope (L2). Code review verdict is specialist scope (reviewer agent). Manager agent has no PR authority.
-- ~~What decisions require human approval vs. can be delegated?~~ → See Decision Delegation Matrix (49 decision types mapped, including XP pipeline governance rows 40-45 and Oracle governance rows 46-49 added from T09 v2)
+- ~~What decisions require human approval vs. can be delegated?~~ → See Decision Delegation Matrix (49 decision types mapped, including XP pipeline governance rows 40-45 and Librarian governance rows 46-49 added from T09 v2)
 - ~~Conflict resolution — when two teams disagree, who decides?~~ → See Q5 (escalation ladder: direct → L1 → PO)
 - ~~How do we prevent a manager agent from going rogue?~~ → See Anti-Patterns table + Failure Modes (authority drift, governance bypass)
 

@@ -17,6 +17,20 @@ evr-ai-base:latest = Debian bookworm-slim + Node 22 + Claude Code + gh + gosu + 
 VJS2-AI-teams repo: `C:/Users/mihkel.putrinsh/Documents/github/VJS2-AI-teams/`
 Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 
+## APEX-RESEARCH LIBRARIAN DEPLOYMENT (2026-04-13)
+
+[CHECKPOINT] Brunel side feature-complete. 4 patches + wiki scaffold in `designs/deployed/apex-research/librarian/`. Standing by for Cal/Celes Pass1 ack + team-lead approval + PR.
+[PATTERN] apex-research attribution `(*AR:<Name>*)` differs from our `(*FR:<Name>*)`. Config SOT in `~/workspace/.claude/teams/apex-research/` (repo); runtime `~/.claude/teams/...` ephemeral per startup.md.
+[DECISION] Pass1/Pass2 separation: prose renamed Oracle→Librarian, but machine identifiers (`agentType: "oracle"`, `oracle-state.json`, `filed-by: oracle`) ALL stay as "oracle" until Pass2 atomic flip. Cross-team consistency with Cal's Callimachus state. Reviewers must NOT normalize.
+[DECISION] Wiki subdirs universal set only: patterns/ gotchas/ decisions/ contracts/ archive/. No observations/process/findings — apex-research proposes domain-specific post-first-use.
+[DECISION] Delivery via git PR (repo is SOT). Phase A patches drafted. Phase B: team-lead PR to Eesti-Raudtee/apex-migration-research. Phase C: Schliemann git pull + tmux split + spawn_member.sh in live session.
+[GOTCHA] Inbox files created at agent registration time. If a specialist sends to a not-yet-registered agent, message is LOST — no retry. Verified live in container. Spawn order must put service-role agents (librarian) BEFORE message senders.
+[PATTERN] Dual-sourced docs (same content in common-prompt + role-specific prompt) must be defended with a forward statement in BOTH copies, not a footnote — footnotes get pruned by DRY pressure, forward statements get inherited.
+[LEARNED] [SUBMITTED] Protocol shapes are FIELD-SET CONTRACTS, not prose. When two agents share a protocol, field set must match exactly — Scope/Confidence/Related/Evidence are load-bearing for downstream logic. Drafting from "what I think a submission should look like" produces silent classification breakage. ALWAYS read receiver's full prompt before drafting any protocol the sender uses. Tonal variation OK; field divergence breaks the interface. Filed at `wiki/patterns/protocol-shapes-are-typed-contracts.md` (Cal, 2026-04-13).
+[LEARNED] Cross-read should happen at handoff time, not as final sanity check. When a collaborator pings with v2.5/integration announcement, read their FULL artifact then, not just the section they explicitly asked about.
+[PATTERN] Submission format calibration from Cal: cite related entries by file path (`patterns/foo.md`), not natural-language descriptor — speeds librarian dedup scan. Apply on next Protocol A submission.
+[WIP] Meta-pattern (Cal's observation, worth chewing on): silent failure modes need explicit structural gates because no automated check catches them. The discipline IS the gate. Triplet so far: Pass1/Pass2 separation, within-document grep, consumer-as-source-of-truth cross-read. If I observe a 4th instance (ADR amendments, roster.json migrations, common-prompt rule additions), submit to Cal and propose Protocol C promotion to "Structural Change Discipline" common-prompt section.
+
 ## UIKIT-DEV (2026-04-10)
 
 [CHECKPOINT] 82MB Figma JSON transferred to `uikit-dev` container: scp→host→docker cp→chown.

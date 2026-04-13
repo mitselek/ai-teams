@@ -1,0 +1,25 @@
+# decisions/ — curated by Eratosthenes
+
+Operational decisions too small for a full ADR, or pointers to existing ADRs.
+
+Distinct from `decisions/` at the repo root (which holds the authoritative
+ADRs `adr-NNN-*.md`, owned by Hammurabi and Schliemann) — entries here
+either:
+
+1. **Point to an existing ADR** with a one-line summary, link, and provenance.
+   Most entries are this kind. Wiki entry is short; the ADR is authoritative.
+
+2. **Record an operational decision too small for an ADR** — e.g.,
+   "we classify an LOV as `shared` when it appears in 3+ apps". If such a
+   decision later grows in scope (touches data model, auth, or migration
+   strategy), the Librarian proposes promotion to a full ADR via Protocol C
+   rather than expanding the wiki entry. Operational decisions graduate
+   upward; they do not bloat in place.
+
+File naming: `YYYY-MM-DD-<slug>.md`. Body includes: decision, context,
+alternatives considered, who decided, link to ADR (if pointer-style).
+
+Two independent copies of the same decision in two places is worse than one
+source of truth with a pointer. Do not duplicate ADRs into this directory.
+
+Do not write to this directory. Submit via Protocol A — see common-prompt.md.

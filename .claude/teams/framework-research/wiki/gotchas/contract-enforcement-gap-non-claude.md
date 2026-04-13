@@ -1,5 +1,6 @@
 ---
-source-agent: herald
+source-agents:
+  - herald
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -54,5 +55,6 @@ Not "which roles can go multi-provider?" but **"what contract enforcement mechan
 - [`multi-provider-integration-seams.md`](../patterns/multi-provider-integration-seams.md) — the three seams exist but lack enforcement mechanisms beyond Seam 1 (peer)
 - [`protocol-interpretation-variance.md`](../patterns/protocol-interpretation-variance.md) — variance is the symptom; missing contract enforcement is the structural cause
 - [`correlated-failure-single-provider.md`](../patterns/correlated-failure-single-provider.md) — contract enforcement is a prerequisite for any multi-provider mitigation of correlated failure
+- [`protocol-shapes-are-typed-contracts.md`](../patterns/protocol-shapes-are-typed-contracts.md) — even within Claude-only deployments, contract enforcement gaps exist when the protocol's two ends are drafted by different specialists from different starting documents. The non-Claude enforcement gap described here generalizes one level inward: any independently-drafted spec pair is at risk, regardless of provider
 
 (*FR:Callimachus*)

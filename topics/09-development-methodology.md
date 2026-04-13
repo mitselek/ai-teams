@@ -1,6 +1,6 @@
 # Development Methodology
 
-How development teams produce code and preserve the knowledge they generate. Synthesis of Discussion #46 (XP Development Pipeline) and Discussion #47 (Knowledge Base / Oracle) across five rounds of community input.
+How development teams produce code and preserve the knowledge they generate. Synthesis of Discussion #46 (XP Development Pipeline) and Discussion #47 (Knowledge Base / Librarian) across five rounds of community input.
 
 (*FR:Celes*)
 
@@ -13,7 +13,7 @@ How development teams produce code and preserve the knowledge they generate. Syn
 This topic defines two complementary systems that together shape how development teams operate:
 
 1. **The XP Development Pipeline** — how code is produced: ARCHITECT decomposes stories, RED writes tests, GREEN implements, PURPLE refactors. Replaces the vague "both review for refactoring" pattern in earlier TDD pair designs.
-2. **The Oracle / Knowledge Base** — how the team's accumulated understanding is preserved, served, and measured. Solves the propagation gap: knowledge loss happens not at discovery but at propagation between agents and sessions.
+2. **The Librarian / Knowledge Base** — how the team's accumulated understanding is preserved, served, and measured. Solves the propagation gap: knowledge loss happens not at discovery but at propagation between agents and sessions.
 
 Both systems are **tiered** on the same axis: Sprint, Standard, and Cathedral. The tiers describe **where judgment lives** — Sprint keeps judgment in the developer, Standard adds a review gate, Cathedral delegates judgment to dedicated specialists.
 
@@ -161,13 +161,13 @@ PURPLE MAY NOT (must escalate to ARCHITECT):
 - Modify test files (RED's domain)
 - Delete code paths that are currently tested
 
-**Shared PURPLE authority caveat (Monte, round 5).** When a PURPLE is shared across multiple pipelines, it will observe patterns with cross-pipeline implications (e.g., a shared utility used by both pipelines). These decisions belong to ARCHITECT, not PURPLE. A shared PURPLE's prompt must include: "You are refactoring one pipeline at a time. If you observe a pattern that would benefit both pipelines, flag it to ARCHITECT via the Oracle as a cross-pipeline observation — do not extract it yourself." This closes a latent authority boundary violation that domain-distance reasoning alone did not address.
+**Shared PURPLE authority caveat (Monte, round 5).** When a PURPLE is shared across multiple pipelines, it will observe patterns with cross-pipeline implications (e.g., a shared utility used by both pipelines). These decisions belong to ARCHITECT, not PURPLE. A shared PURPLE's prompt must include: "You are refactoring one pipeline at a time. If you observe a pattern that would benefit both pipelines, flag it to ARCHITECT via the Librarian as a cross-pipeline observation — do not extract it yourself." This closes a latent authority boundary violation that domain-distance reasoning alone did not address.
 
 **The restructuring vs. reimplementation threshold:** This is a qualitative boundary, not a line-count metric. If PURPLE would need to change the algorithmic approach, alter the public interface, or rewrite the control flow, the decomposition was wrong — escalate to ARCHITECT.
 
 **Model tier rationale:** Opus, not sonnet. The tests catch behavioral regression but not structural degradation. A sonnet can make tests pass while introducing duplication, God functions, and leaky abstractions. That kind of invisible, accumulating technical debt is exactly what opus exists to prevent.
 
-**Pattern submission timing (Volta, round 5).** PURPLE submits refactoring patterns to the Oracle at **cycle completion** (immediately before sending the CYCLE_COMPLETE message), never mid-refactor. A mid-refactor view is unstable — the pattern may not survive the next 30 seconds of work. Submitting only at cycle completion keeps the wiki free of abandoned patterns and preserves the knowledge-velocity metric's integrity.
+**Pattern submission timing (Volta, round 5).** PURPLE submits refactoring patterns to the Librarian at **cycle completion** (immediately before sending the CYCLE_COMPLETE message), never mid-refactor. A mid-refactor view is unstable — the pattern may not survive the next 30 seconds of work. Submitting only at cycle completion keeps the wiki free of abandoned patterns and preserves the knowledge-velocity metric's integrity.
 
 ### Why ARCHITECT and PURPLE Are Separate Agents
 
@@ -331,7 +331,7 @@ When shutdown arrives mid-cycle, PURPLE may be mid-refactor with tests temporari
 
 **Escalation rule:** At the 5-minute boundary, if the state is "stuck mid-refactor," the team lead forces termination. PURPLE cannot refuse. Execution authority (L3) does not override coordination authority (L2).
 
-**Oracle mitigation (Medici, round 5).** Before PURPLE reverts uncommitted work, it submits the intended refactoring as a `[DEFERRED-REFACTOR]` entry to the Oracle — a description of what PURPLE was trying to do and why. The next session's PURPLE queries this and picks up where the previous one left off. This is a memory bridge across the reverted work, not a replacement for the watchdog.
+**Librarian mitigation (Medici, round 5).** Before PURPLE reverts uncommitted work, it submits the intended refactoring as a `[DEFERRED-REFACTOR]` entry to the Librarian — a description of what PURPLE was trying to do and why. The next session's PURPLE queries this and picks up where the previous one left off. This is a memory bridge across the reverted work, not a replacement for the watchdog.
 
 **This is a PURPLE-specific extension to T06 Shutdown Phase 3.** Volta owns the T06 amendment.
 
@@ -348,7 +348,7 @@ The XP pipeline introduces scoped authority for ARCHITECT and PURPLE that T04's 
 | Scope dispute within pipeline | — | — | Escalation target | **D** (first instance) | C |
 | Structural refactoring within scope | — | — | I | C | **D** (PURPLE) |
 | Mid-cycle termination of PURPLE | — | — | **D** | C | C |
-| Cross-pipeline pattern extraction | — | — | I | **D** | C (flags via Oracle) |
+| Cross-pipeline pattern extraction | — | — | I | **D** | C (flags via Librarian) |
 
 **ARCHITECT's authority is scoped to a single story at a time.** Between stories, ARCHITECT has no authority — it is passively available until the team lead assigns the next story. This prevents authority creep.
 
@@ -415,18 +415,18 @@ Multi-pipeline teams face a choice: one shared PURPLE or one per pipeline?
 **The Cathedral default is shared PURPLE, with Monte's authority caveat.** Two independent quality-based arguments in round 5 converged on this:
 
 1. **Herald (structural consistency).** A shared PURPLE enforces one refactoring style across pipelines. Two separate PURPLEs can diverge in their structural vision, producing "split personality" refactorings visible in the git history. Structural consistency is observable and measurable; the earlier "context bleed" concern (Vue idioms leaking into Node.js) was speculative and has no reference-team evidence.
-2. **Finn (Oracle cross-pattern detection).** A single shared PURPLE sees convergence across pipelines directly — it submits "this is the third time we've needed time-range filtering" as one pattern. Two separate PURPLEs submit similar patterns independently and rely on the Oracle to detect the convergence. Shared PURPLE is better signal for the Oracle.
-3. **Monte (authority caveat).** A shared PURPLE that observes cross-pipeline patterns is constantly tempted to make architectural decisions (extract a shared utility). Those decisions belong to ARCHITECT. The shared PURPLE's prompt must include: "flag cross-pipeline patterns to ARCHITECT via Oracle, do not extract them yourself." With this caveat, shared PURPLE is governance-safe.
+2. **Finn (Librarian cross-pattern detection).** A single shared PURPLE sees convergence across pipelines directly — it submits "this is the third time we've needed time-range filtering" as one pattern. Two separate PURPLEs submit similar patterns independently and rely on the Librarian to detect the convergence. Shared PURPLE is better signal for the Librarian.
+3. **Monte (authority caveat).** A shared PURPLE that observes cross-pipeline patterns is constantly tempted to make architectural decisions (extract a shared utility). Those decisions belong to ARCHITECT. The shared PURPLE's prompt must include: "flag cross-pipeline patterns to ARCHITECT via Librarian, do not extract them yourself." With this caveat, shared PURPLE is governance-safe.
 
 **The variable that still matters: domain distance between pipelines.** Domain distance is the reason to consider separation, but structural consistency is the articulated benefit of sharing.
 
 | Domain distance | Example | Recommendation |
 |---|---|---|
 | Low — same codebase, same framework, same idioms | Two feature teams on the same Nuxt app | **Shared PURPLE.** Structural consistency is the benefit. |
-| Medium — same repo, different domains | screenwerk-dev (Node.js pipeline scripts vs. Vue composables) | **Shared PURPLE with authority caveat.** Accept slight context-switching overhead for structural consistency + Oracle cross-pattern detection. |
+| Medium — same repo, different domains | screenwerk-dev (Node.js pipeline scripts vs. Vue composables) | **Shared PURPLE with authority caveat.** Accept slight context-switching overhead for structural consistency + Librarian cross-pattern detection. |
 | High — different repos or languages | One pipeline in TypeScript backend, another in Python analysis | **Separate PURPLEs.** Language boundaries force separation regardless of other reasoning. |
 
-**Pipeline-distance diagnostic (Medici, round 5).** The Oracle can verify that a shared PURPLE is configured correctly. For shared-PURPLE pipelines, the Oracle tracks **cross-pipeline pattern reuse rate** — refactoring patterns submitted by the shared PURPLE that apply across both pipelines. A low rate is a `[PIPELINE-DISTANCE]` signal that the pipelines are not actually sharing idioms and should have been separated. A high rate confirms the shared-PURPLE configuration. This observation goes in the Knowledge Health Summary.
+**Pipeline-distance diagnostic (Medici, round 5).** The Librarian can verify that a shared PURPLE is configured correctly. For shared-PURPLE pipelines, the Librarian tracks **cross-pipeline pattern reuse rate** — refactoring patterns submitted by the shared PURPLE that apply across both pipelines. A low rate is a `[PIPELINE-DISTANCE]` signal that the pipelines are not actually sharing idioms and should have been separated. A high rate confirms the shared-PURPLE configuration. This observation goes in the Knowledge Health Summary.
 
 **PURPLE configuration by tier:**
 
@@ -437,7 +437,7 @@ Multi-pipeline teams face a choice: one shared PURPLE or one per pipeline?
 | Cathedral (Medium distance or below) | Shared PURPLE across pipelines with authority caveat |
 | Cathedral (High distance) | Separate PURPLE per pipeline |
 
-**screenwerk-dev example (revised):** Pipeline pair writes Node.js data transformations. Player pair writes Vue composables. Medium domain distance. Cathedral tier gets **shared PURPLE with Monte's authority caveat**, not separate PURPLEs. Oracle tracks `[PIPELINE-DISTANCE]` to detect misconfiguration.
+**screenwerk-dev example (revised):** Pipeline pair writes Node.js data transformations. Player pair writes Vue composables. Medium domain distance. Cathedral tier gets **shared PURPLE with Monte's authority caveat**, not separate PURPLEs. Librarian tracks `[PIPELINE-DISTANCE]` to detect misconfiguration.
 
 ### Team Composition Impact
 
@@ -465,7 +465,7 @@ This section collects the parallel-execution design work from rounds 4 and 5 tha
 - **Adaptive lookahead with `max_lookahead > 0`** (see [Adaptive Lookahead](#adaptive-lookahead-volta-round-5--deferred) section above)
 - **Concurrent multi-pipeline execution** — two or more XP pipeline instances advancing their cycles simultaneously
 - **Shared PURPLE cross-pipeline pattern extraction** (see [Shared vs. Separate PURPLE Across Pipelines](#shared-vs-separate-purple-across-pipelines--deferred) section above)
-- **`[PIPELINE-DISTANCE]` Oracle diagnostic** — only meaningful when shared PURPLE is active across concurrent pipelines
+- **`[PIPELINE-DISTANCE]` Librarian diagnostic** — only meaningful when shared PURPLE is active across concurrent pipelines
 
 **Validation criteria** (restated from [Sequential First](#validation-criteria-for-unlocking-parallelism)):
 
@@ -486,7 +486,7 @@ Specifically:
 | Compose the next test case mentally | Commit test files to the working tree |
 | Draft test spec in scratchpad | Modify shared files |
 | Sketch acceptance criteria | Create new files in the test directory |
-| Query the Oracle for relevant test patterns | Stage or push any changes |
+| Query the Librarian for relevant test patterns | Stage or push any changes |
 
 **Transition:** Once GREEN signals `GREEN_HANDOFF` to PURPLE, the write lock rotates through PURPLE and back to RED. RED can commit the designed test file only after PURPLE releases the write lock (via `PURPLE_VERDICT: ACCEPT` with commit or `CYCLE_COMPLETE`).
 
@@ -496,33 +496,33 @@ Specifically:
 
 ---
 
-## Part 2: The Oracle / Knowledge Base
+## Part 2: The Librarian / Knowledge Base
 
 ### The Problem This Solves
 
 Teams have three knowledge management mechanisms today — common-prompt (team rules), scratchpads (per-agent memory), shared docs (cross-cutting). All are file-based, manually curated, and lack propagation. The core insight from Finn's RFC: **knowledge loss happens at propagation, not discovery**. Agents save what they learn in real time, but the learnings stay in the discovering agent's scratchpad. When another agent needs the same knowledge, they have no way to find it.
 
-The Oracle is the missing curation layer. It holds, organizes, serves, and tracks gaps in the team's accumulated understanding.
+The Librarian is the missing curation layer. It holds, organizes, serves, and tracks gaps in the team's accumulated understanding.
 
-### Medici and the Oracle Are Not Competitors
+### Medici and the Librarian Are Not Competitors
 
-Before describing the Oracle in detail, an explicit separation from Medici. This clarification is Medici's round 5 request — the two roles are easy to conflate from the outside.
+Before describing the Librarian in detail, an explicit separation from Medici. This clarification is Medici's round 5 request — the two roles are easy to conflate from the outside.
 
-> **Medici and the Oracle operate at different scopes.** Medici is a framework-research resource, spawned on demand to audit topic files, reference configurations, and framework design coherence across the research team. Medici does not live in deployed teams. The Oracle lives in deployed teams (Cathedral tier) or is absorbed by the team lead (Standard tier). A deployed team never has both; a deployed team never has Medici at all.
+> **Medici and the Librarian operate at different scopes.** Medici is a framework-research resource, spawned on demand to audit topic files, reference configurations, and framework design coherence across the research team. Medici does not live in deployed teams. The Librarian lives in deployed teams (Cathedral tier) or is absorbed by the team lead (Standard tier). A deployed team never has both; a deployed team never has Medici at all.
 >
-> The separation is by governance scope: Medici audits the framework (L0/L1 concerns). The Oracle curates team knowledge (L2/L3 concerns). They read different artifacts, serve different audiences, and have different lifecycles.
+> The separation is by governance scope: Medici audits the framework (L0/L1 concerns). The Librarian curates team knowledge (L2/L3 concerns). They read different artifacts, serve different audiences, and have different lifecycles.
 
-**Safety-net implications.** Several earlier-round arguments cited Medici as a safety net for the Oracle ("Medici catches what agents forgot to tag"). In deployed teams, Medici does not exist. The safety net must be built into the Oracle and the team lead — Medici is not the fallback.
+**Safety-net implications.** Several earlier-round arguments cited Medici as a safety net for the Librarian ("Medici catches what agents forgot to tag"). In deployed teams, Medici does not exist. The safety net must be built into the Librarian and the team lead — Medici is not the fallback.
 
-### The Oracle Role
+### The Librarian Role
 
 **Eighth canonical agent role** (after the seventh, Refactorer, added in Part 1).
 
-**Lore: Callimachus of Cyrene** (c. 310-240 BC). Scholar and poet at the Library of Alexandria who created the Pinakes — the first known library catalogue, classifying and cross-referencing the Library's estimated 400,000 scrolls by genre, author, and subject. The Pinakes was the first system where you could *ask a question* ("who wrote about astronomy?") and get a structured answer. That is the Oracle's essence: not just organizing knowledge, but serving it on query.
+**Lore: Callimachus of Cyrene** (c. 310-240 BC). Scholar and poet at the Library of Alexandria who created the Pinakes — the first known library catalogue, classifying and cross-referencing the Library's estimated 400,000 scrolls by genre, author, and subject. The Pinakes was the first system where you could *ask a question* ("who wrote about astronomy?") and get a structured answer. That is the Librarian's essence: not just organizing knowledge, but serving it on query.
 
 Callimachus's motto: *mega biblion, mega kakon* ("a great book is a great evil"). The wiki must stay concise or it becomes the problem it was designed to solve.
 
-**Model tier: opus[1m].** The Oracle is the sole gateway for all wiki reads — not just a curator that writes pages while agents read them directly. Agents query the Oracle, the Oracle synthesizes from the wiki. Wrong answer from the Oracle = agent acts on bad information. Same consequence-of-error profile as ARCHITECT (bad decomposition cascades through the TDD cycle). The Oracle must also hold the full knowledge graph in its context — what exists, what connects to what, what was asked before, what gaps are tracked. That is 1M-context territory.
+**Model tier: opus[1m].** The Librarian is the sole gateway for all wiki reads — not just a curator that writes pages while agents read them directly. Agents query the Librarian, the Librarian synthesizes from the wiki. Wrong answer from the Librarian = agent acts on bad information. Same consequence-of-error profile as ARCHITECT (bad decomposition cascades through the TDD cycle). The Librarian must also hold the full knowledge graph in its context — what exists, what connects to what, what was asked before, what gaps are tracked. That is 1M-context territory.
 
 ### The Four Capabilities
 
@@ -533,7 +533,7 @@ Callimachus's motto: *mega biblion, mega kakon* ("a great book is a great evil")
 | **Gap Tracking** | Record unanswerable queries as tracked ignorance (stubs become collaborative requests) | On unanswerable query |
 | **Health Sensing** | Report patterns in queries, gaps, and submissions to the team lead | At shutdown |
 
-**The decision matrix** (for the classification judgment that the Oracle must make on every submission — team-wide or agent-specific?):
+**The decision matrix** (for the classification judgment that the Librarian must make on every submission — team-wide or agent-specific?):
 
 | Knowledge type | Team-wide? | Destination |
 |---|---|---|
@@ -547,7 +547,7 @@ The prompt makes the judgment call a lookup, not a reasoning exercise. Opus hand
 
 ### Dual-Hub Topology
 
-The Oracle creates the first intra-team communication pattern where the routing target is **not** team-lead. Every other protocol routes through the coordinator.
+The Librarian creates the first intra-team communication pattern where the routing target is **not** team-lead. Every other protocol routes through the coordinator.
 
 ```
                     TEAM-LEAD (work hub)
@@ -562,17 +562,17 @@ The Oracle creates the first intra-team communication pattern where the routing 
 Every agent has two reporting lines:
 
 - **Work reports** go to team-lead (task completion, blockers, status)
-- **Knowledge reports** go to Oracle (discoveries, patterns, gotchas, queries)
+- **Knowledge reports** go to Librarian (discoveries, patterns, gotchas, queries)
 
-Knowledge submissions do NOT route through team-lead because (a) team-lead is already the bottleneck for work coordination, (b) knowledge submission is not a work decision, and (c) the Oracle's curation is structural work at L3, not governance at L2.
+Knowledge submissions do NOT route through team-lead because (a) team-lead is already the bottleneck for work coordination, (b) knowledge submission is not a work decision, and (c) the Librarian's curation is structural work at L3, not governance at L2.
 
-**Urgent notifications route through team-lead (Herald's round 5 refinement).** When the Oracle identifies new knowledge that may invalidate another agent's current work, it sends an `[URGENT-KNOWLEDGE]` tagged message to team-lead. Team-lead's prompt treats this as a priority interrupt, processed before the next work dispatch. Team-lead decides whether to interrupt the affected agent, queue for their next handoff, or mark informational. **This bounds the damage window to one team-lead dispatch cycle.** The dual-hub topology is preserved — only the narrow slice of urgent-relevance notifications flows through the work hub.
+**Urgent notifications route through team-lead (Herald's round 5 refinement).** When the Librarian identifies new knowledge that may invalidate another agent's current work, it sends an `[URGENT-KNOWLEDGE]` tagged message to team-lead. Team-lead's prompt treats this as a priority interrupt, processed before the next work dispatch. Team-lead decides whether to interrupt the affected agent, queue for their next handoff, or mark informational. **This bounds the damage window to one team-lead dispatch cycle.** The dual-hub topology is preserved — only the narrow slice of urgent-relevance notifications flows through the work hub.
 
 **[URGENT-KNOWLEDGE] message format** (interface: `UrgentKnowledgeMessage` in `types/t09-protocols.ts`):
 
 ```markdown
 ## [URGENT-KNOWLEDGE] — affects <agent-name>
-- From: Oracle
+- From: Librarian
 - Topic: <brief description>
 - New knowledge: <one-line summary, link to wiki entry>
 - Affected work: <which agent's current task may be invalidated>
@@ -581,21 +581,21 @@ Knowledge submissions do NOT route through team-lead because (a) team-lead is al
 
 **Team-lead's prompt rule:** Before dispatching the next work message, check for `[URGENT-KNOWLEDGE]` in inbox. This is a single-line prompt addition that makes the latency bounded.
 
-**Exception for promotions.** When the Oracle identifies a pattern worth promoting to common-prompt, the promotion DOES route through team-lead, because common-prompt changes are L1 team law.
+**Exception for promotions.** When the Librarian identifies a pattern worth promoting to common-prompt, the promotion DOES route through team-lead, because common-prompt changes are L1 team law.
 
-**Recommendations to agents route through team-lead.** The Oracle never interrupts agents directly. The Oracle flags the relevance to team-lead; team-lead decides whether to interrupt the affected agent now or queue the update for later. Team-lead is the traffic controller.
+**Recommendations to agents route through team-lead.** The Librarian never interrupts agents directly. The Librarian flags the relevance to team-lead; team-lead decides whether to interrupt the affected agent now or queue the update for later. Team-lead is the traffic controller.
 
 ### The Three-Tier Adoption
 
-As with the XP pipeline, not every team needs the full Oracle.
+As with the XP pipeline, not every team needs the full Librarian.
 
-| Tier | Knowledge management | Oracle? |
+| Tier | Knowledge management | Librarian? |
 |---|---|---|
 | **Sprint** | Scratchpads only, no wiki | No. Team dies before knowledge accumulates enough to curate. |
-| **Standard** | `wiki/` directory, curated by team lead at shutdown | **No dedicated Oracle agent.** Team lead handles promotion during the existing shutdown protocol. |
-| **Cathedral** | Dedicated always-on Oracle agent | Yes. Full four-capability role. |
+| **Standard** | `wiki/` directory, curated by team lead at shutdown | **No dedicated Librarian agent.** Team lead handles promotion during the existing shutdown protocol. |
+| **Cathedral** | Dedicated always-on Librarian agent | Yes. Full four-capability role. |
 
-**The Standard-tier compromise is load-bearing.** Most teams are Standard tier. Adding a dedicated Oracle to every team would double the opus cost of knowledge management. The team lead already reads all scratchpads during shutdown — extending that to "promote team-wide entries to `wiki/`" adds about 30 minutes (see Finn's reference data below). The team lead also handles mid-session knowledge queries implicitly through task routing.
+**The Standard-tier compromise is load-bearing.** Most teams are Standard tier. Adding a dedicated Librarian to every team would double the opus cost of knowledge management. The team lead already reads all scratchpads during shutdown — extending that to "promote team-wide entries to `wiki/`" adds about 30 minutes (see Finn's reference data below). The team lead also handles mid-session knowledge queries implicitly through task routing.
 
 **Finn's reference-team data (round 5).** Counted across `reference/rc-team/cloudflare-builders/memory/` and `reference/hr-devs/memory/` for a mature 6-agent team:
 
@@ -606,7 +606,7 @@ As with the XP pipeline, not every team needs the full Oracle.
 
 This validates the Standard-tier claim with empirical evidence. Caveat: the numbers assume Medici-style scratchpad pruning (100-line limit enforced). A team that lets scratchpads grow unbounded would take 2-3× longer — but unbounded growth is already a problem the framework addresses.
 
-**Cathedral tier** gets the dedicated Oracle because the volume of discoveries is too high for a team lead to curate manually, and the cost of lost knowledge is too high to tolerate session-end-only propagation.
+**Cathedral tier** gets the dedicated Librarian because the volume of discoveries is too high for a team lead to curate manually, and the cost of lost knowledge is too high to tolerate session-end-only propagation.
 
 ### Objective Adoption Trigger (Volta, round 5)
 
@@ -618,11 +618,11 @@ A team should upgrade from Standard to Cathedral when the Standard tier's team-l
    grep -h '\[LEARNED\]\|\[PATTERN\]' memory/*.md | wc -l
    ```
 
-   When the count exceeds **30 team-wide entries across a team of 5+ agents**, the team has accumulated enough shared knowledge to justify Oracle adoption. Team lead proposes to PO. If approved, the next session spawns an Oracle.
+   When the count exceeds **30 team-wide entries across a team of 5+ agents**, the team has accumulated enough shared knowledge to justify Librarian adoption. Team lead proposes to PO. If approved, the next session spawns an Librarian.
 
 2. **Team size threshold.** Teams of **7-8 agents or more** typically exceed the team lead's cognitive capacity at Phase 2 (task snapshot + wiki curation + shutdown requests). Beyond this size, Cathedral tier is structurally necessary, not optional.
 
-**Lifecycle placement.** The adoption decision happens at Shutdown Phase 2c. The team lead notes the duplication count in the session report to PO. PO approves or defers. The transition is one-session: the next session's Phase 5 (Audit) replaces team-lead self-audit with Oracle spawn + bootstrap.
+**Lifecycle placement.** The adoption decision happens at Shutdown Phase 2c. The team lead notes the duplication count in the session report to PO. PO approves or defers. The transition is one-session: the next session's Phase 5 (Audit) replaces team-lead self-audit with Librarian spawn + bootstrap.
 
 ### Wiki Directory Structure
 
@@ -633,7 +633,7 @@ A team should upgrade from Standard to Cathedral when the Standard tier's team-l
     agent-b.md
   docs/                     # Cross-cutting documents (existing)
     architecture-decisions.md
-  wiki/                     # Oracle-curated knowledge base (new)
+  wiki/                     # Librarian-curated knowledge base (new)
     index.md                # Master index — categories, summaries, last-updated
     patterns/               # Reusable patterns extracted from submissions
     gotchas/                # Cross-agent pitfalls
@@ -646,17 +646,17 @@ A team should upgrade from Standard to Cathedral when the Standard tier's team-l
   oracle-state.json         # Bootstrap/intake completion markers (Cathedral only)
 ```
 
-**Directory sovereignty.** The Oracle is the sole writer to `wiki/`. No other agent writes there. Agents read the wiki only through Oracle queries (with one exception — see below). This is the same directory-ownership pattern as T02 R1 / T06 pipeline teams.
+**Directory sovereignty.** The Librarian is the sole writer to `wiki/`. No other agent writes there. Agents read the wiki only through Librarian queries (with one exception — see below). This is the same directory-ownership pattern as T02 R1 / T06 pipeline teams.
 
-**Direct wiki read exception for XP pipeline roles.** RED, GREEN, and PURPLE may read known wiki articles directly during the tight RED→GREEN→PURPLE cycle to avoid query latency inside a single cycle. Direct reads must be logged as `[WIKI-READ]` in the agent's scratchpad. Non-XP roles and advisory agents always go through the Oracle query protocol.
+**Direct wiki read exception for XP pipeline roles.** RED, GREEN, and PURPLE may read known wiki articles directly during the tight RED→GREEN→PURPLE cycle to avoid query latency inside a single cycle. Direct reads must be logged as `[WIKI-READ]` in the agent's scratchpad. Non-XP roles and advisory agents always go through the Librarian query protocol.
 
-**Scratchpad reading is unrestricted (PO correction #5, round 3).** Agents may read each other's scratchpads. The directory-sovereignty rule applies to `wiki/` only. Knowledge *submission* to the wiki is explicit (through Oracle protocols); *reading* of scratchpads is informal and free.
+**Scratchpad reading is unrestricted (PO correction #5, round 3).** Agents may read each other's scratchpads. The directory-sovereignty rule applies to `wiki/` only. Knowledge *submission* to the wiki is explicit (through Librarian protocols); *reading* of scratchpads is informal and free.
 
-**Don't duplicate existing docs.** If `docs/architecture-decisions.md` already exists, do not copy it into `wiki/decisions/`. Either migrate (move + redirect) or leave it. Duplication is the enemy — the Oracle should maintain pointers to existing artifacts, not copies. See [Archaeological Bootstrap](#bootstrapping-existing-teams) for the index-layer pattern.
+**Don't duplicate existing docs.** If `docs/architecture-decisions.md` already exists, do not copy it into `wiki/decisions/`. Either migrate (move + redirect) or leave it. Duplication is the enemy — the Librarian should maintain pointers to existing artifacts, not copies. See [Archaeological Bootstrap](#bootstrapping-existing-teams) for the index-layer pattern.
 
 ### Communication Protocols
 
-#### Protocol A: Knowledge Submission (Agent → Oracle)
+#### Protocol A: Knowledge Submission (Agent → Librarian)
 
 *Interface: `KnowledgeSubmission` in `types/t09-protocols.ts`.*
 
@@ -678,16 +678,16 @@ Agents send explicit submission messages when they discover something team-wide.
 <where observed — file paths, test names, session context>
 ```
 
-**Scope classification** is the agent's initial call (they have the domain context). The Oracle can override during filing.
+**Scope classification** is the agent's initial call (they have the domain context). The Librarian can override during filing.
 
 **Urgency** determines propagation path:
 
-- **Urgent** — discovery invalidates another agent's current assumptions. Oracle sends `[URGENT-KNOWLEDGE]` to team-lead, who decides whether to interrupt the affected agent. Oracle files with `[URGENT]` tag. Expected frequency: 0-2 per session.
-- **Standard** — useful pattern/gotcha for future work. Oracle files normally. Available via query. Expected frequency: 10-20 per session.
+- **Urgent** — discovery invalidates another agent's current assumptions. Librarian sends `[URGENT-KNOWLEDGE]` to team-lead, who decides whether to interrupt the affected agent. Librarian files with `[URGENT]` tag. Expected frequency: 0-2 per session.
+- **Standard** — useful pattern/gotcha for future work. Librarian files normally. Available via query. Expected frequency: 10-20 per session.
 
 **Confidence** controls filing behavior. Speculative entries are tagged provisional; two independent speculative submissions at high confidence auto-promote to confirmed.
 
-#### Protocol B: Knowledge Query (Agent → Oracle → Agent)
+#### Protocol B: Knowledge Query (Agent → Librarian → Agent)
 
 *Interfaces: `KnowledgeQuery` (request) and `KnowledgeResponse` (reply) in `types/t09-protocols.ts`.*
 
@@ -714,15 +714,15 @@ Response:
 <other wiki pages for context>
 
 ### Gap noted (if not-documented or partial)
-<Oracle creates a stub marking this as a tracked team gap>
+<Librarian creates a stub marking this as a tracked team gap>
 <stub requests the asking agent to submit the answer back if they find it>
 ```
 
 **The gap-noted field is critical.** Every unanswerable query creates a stub — an explicit record of what the team *doesn't know*. Over time, gap stubs form a map of the team's ignorance, which is as valuable as the map of its knowledge. Team-lead can prioritize gap-filling.
 
-**Gap stubs as collaborative requests (PO, round 4).** When the Oracle responds with "not documented," the response also asks the querying agent: "If you find the answer, please submit it back with source references." The stub becomes an active request. The agent who discovered the gap closes the loop when they find the answer.
+**Gap stubs as collaborative requests (PO, round 4).** When the Librarian responds with "not documented," the response also asks the querying agent: "If you find the answer, please submit it back with source references." The stub becomes an active request. The agent who discovered the gap closes the loop when they find the answer.
 
-#### Protocol C: Knowledge Promotion (Oracle → Team-Lead → Common-Prompt)
+#### Protocol C: Knowledge Promotion (Librarian → Team-Lead → Common-Prompt)
 
 *Interface: `PromotionProposal` in `types/t09-protocols.ts`.*
 
@@ -760,7 +760,7 @@ Every wiki entry carries frontmatter (interface: `WikiProvenance` in `types/t09-
 ---
 source-agent: dag
 discovered: 2026-04-08
-filed-by: oracle
+filed-by: librarian
 last-verified: 2026-04-08
 status: active | disputed | archived
 source-files:
@@ -781,19 +781,19 @@ ttl: 2026-05-08    # For external-system knowledge with no source file
    - Source file deleted → **CRITICAL** (blocks related work until resolved)
    - Anchor missing (referenced function or symbol no longer exists) → **HIGH** (flag but don't block)
    - Anchor present, file changed → **LOW** (flag for review)
-2. **PURPLE semantic check.** After refactoring, PURPLE checks `wiki/` for entries referencing the refactored file. If the refactoring changed behavior or interface, PURPLE sends `[STALE-WARNING]` to the Oracle. This distributes staleness detection to the agent with the best context — PURPLE just touched the code. Severity: **CRITICAL** (PURPLE has domain context and would not flag trivially).
-3. **TTL for external systems.** Entu, D1, Jira, external APIs have no source files. Use time-based expiry ("verify after 30 days") for experience-grounded knowledge about external systems. The Oracle flags expired entries for re-verification.
+2. **PURPLE semantic check.** After refactoring, PURPLE checks `wiki/` for entries referencing the refactored file. If the refactoring changed behavior or interface, PURPLE sends `[STALE-WARNING]` to the Librarian. This distributes staleness detection to the agent with the best context — PURPLE just touched the code. Severity: **CRITICAL** (PURPLE has domain context and would not flag trivially).
+3. **TTL for external systems.** Entu, D1, Jira, external APIs have no source files. Use time-based expiry ("verify after 30 days") for experience-grounded knowledge about external systems. The Librarian flags expired entries for re-verification.
 
 **Pre-commit hook automation (PO, round 4).** If `source-files` is in wiki frontmatter, a git pre-commit hook can automatically check for changes and flag `[VERIFY]` on affected wiki entries before the commit lands. Everything deterministic should be automated.
 
-**For Standard-tier teams without dedicated Oracle or PURPLE:** Team-lead catches staleness during PR review. Less automated but still effective.
+**For Standard-tier teams without dedicated Librarian or PURPLE:** Team-lead catches staleness during PR review. Less automated but still effective.
 
 **Dispute and resolution:**
 
 1. Any agent can tag an entry `[DISPUTE]` if they find evidence the knowledge is wrong
-2. Oracle updates status to `disputed` and notifies the original source agent
+2. Librarian updates status to `disputed` and notifies the original source agent
 3. Source agent or domain expert investigates, corrects or confirms
-4. Oracle records resolution (corrected claim, or "confirmed in context X but not context Y")
+4. Librarian records resolution (corrected claim, or "confirmed in context X but not context Y")
 
 ### Bootstrapping Existing Teams
 
@@ -807,10 +807,10 @@ Three team maturity levels, each with a different approach. Bootstrapping has a 
 
 #### Intake Interview (Established, first option)
 
-Oracle asks each agent four questions:
+Librarian asks each agent four questions:
 
 ```markdown
-## Oracle Intake — <agent-name>
+## Librarian Intake — <agent-name>
 
 1. What are the three most important patterns, gotchas, or decisions you
    know about your domain that aren't in any topic file or doc?
@@ -829,19 +829,19 @@ One interview per agent. 5-10 minutes each. Faster and more accurate than readin
 
 #### Incremental Bootstrap (Established, second option — Herald, round 5)
 
-Oracle starts with `wiki/` empty (like Greenfield). Agents are prompted: "You have an Oracle now. When you discover team-wide knowledge, submit via Protocol A." No one-time intake, no extraction from existing scratchpads.
+Librarian starts with `wiki/` empty (like Greenfield). Agents are prompted: "You have an Librarian now. When you discover team-wide knowledge, submit via Protocol A." No one-time intake, no extraction from existing scratchpads.
 
 **Why this works:** The accumulated knowledge in scratchpads is only valuable when an agent actually needs it. If a gotcha will never be encountered again, extracting it to the wiki is wasted effort. If it does recur, either (a) the original scratchpad is still readable and can be grepped, or (b) the same agent re-encounters it and submits with fresh context.
 
 **Trade-off:** Slower initial wiki growth (sessions 1-3 have a nearly-empty wiki). By session 5-10, the wiki contains exactly the knowledge that has proven useful — not everything agents ever wrote down.
 
-**Standard tier graduating to Cathedral is the natural on-ramp.** A team that has been running Standard tier with team-lead-curated wiki already has a populated wiki when it upgrades. The Oracle inherits that wiki and begins normal operation from session N+1. Incremental bootstrap is the right choice — no extraction disruption, continuity from Standard tier. This resolves the adoption-friction concern: the Standard tier is the natural stepping stone, not a terminal state.
+**Standard tier graduating to Cathedral is the natural on-ramp.** A team that has been running Standard tier with team-lead-curated wiki already has a populated wiki when it upgrades. The Librarian inherits that wiki and begins normal operation from session N+1. Incremental bootstrap is the right choice — no extraction disruption, continuity from Standard tier. This resolves the adoption-friction concern: the Standard tier is the natural stepping stone, not a terminal state.
 
 #### Archaeological Bootstrap with Index Layer (Brunel, round 5)
 
-For teams with substantial history but no living agents (apex-research: 300+ commits, multiple specs directories, data dumps), the Oracle does NOT extract content. It builds an **index layer** — pointers to existing artifacts.
+For teams with substantial history but no living agents (apex-research: 300+ commits, multiple specs directories, data dumps), the Librarian does NOT extract content. It builds an **index layer** — pointers to existing artifacts.
 
-**The 20-page cap (Medici, round 3) applies to the index itself**, not to extracted content. 20 pages of "where to find X" pointers, not 20 pages of extracted knowledge. The knowledge stays where it is; the Oracle learns where to point queries.
+**The 20-page cap (Medici, round 3) applies to the index itself**, not to extracted content. 20 pages of "where to find X" pointers, not 20 pages of extracted knowledge. The knowledge stays where it is; the Librarian learns where to point queries.
 
 **Example index entry:**
 
@@ -864,7 +864,7 @@ extract: false
 Read the source file directly. This entry is a pointer.
 ```
 
-No content. Just the pointer, a summary of what the source covers, and a staleness marker. When an agent queries "what do we know about F301", the Oracle returns the path. The agent reads the source directly. The wiki stays thin. The `docs/` stays canonical.
+No content. Just the pointer, a summary of what the source covers, and a staleness marker. When an agent queries "what do we know about F301", the Librarian returns the path. The agent reads the source directly. The wiki stays thin. The `docs/` stays canonical.
 
 **The two-mode wiki:**
 
@@ -877,7 +877,7 @@ The Archaeological bootstrap populates only the index layer. The content layer s
 
 #### Bootstrap Completion Marker (Brunel, round 5)
 
-The Oracle is respawned via the standard SPOF mechanism (team lead respawns, per PO round 3). But respawn raises a gotcha: a newly spawned Oracle does not remember having run intake before. Without a marker, it would re-run the intake interview, costing 30+ minutes and producing inconsistent answers.
+The Librarian is respawned via the standard SPOF mechanism (team lead respawns, per PO round 3). But respawn raises a gotcha: a newly spawned Librarian does not remember having run intake before. Without a marker, it would re-run the intake interview, costing 30+ minutes and producing inconsistent answers.
 
 **The bootstrap completion marker:**
 
@@ -894,15 +894,15 @@ The Oracle is respawned via the standard SPOF mechanism (team lead respawns, per
 }
 ```
 
-Oracle checks this file on startup. If `intake_complete: true` AND `session_id` matches the current session, Oracle skips intake and proceeds directly to query service. On a fresh session start (session ID mismatch), the intake status from a previous session does not apply — but typically the intake was run exactly once per team lifetime, so it remains valid.
+Librarian checks this file on startup. If `intake_complete: true` AND `session_id` matches the current session, Librarian skips intake and proceeds directly to query service. On a fresh session start (session ID mismatch), the intake status from a previous session does not apply — but typically the intake was run exactly once per team lifetime, so it remains valid.
 
 The same marker pattern applies to Archaeological extraction (should run exactly once per team lifetime, not once per session) and to first-time health-report baselining.
 
-**Adoption trigger for Oracle bootstrap (Medici, round 5).** Do NOT run intake on teams about to be dissolved or rebuilt. The Oracle should only be introduced when there is at least **5 sessions of expected team life ahead**. Same amortization logic as the Sprint/Standard/Cathedral tier model.
+**Adoption trigger for Librarian bootstrap (Medici, round 5).** Do NOT run intake on teams about to be dissolved or rebuilt. The Librarian should only be introduced when there is at least **5 sessions of expected team life ahead**. Same amortization logic as the Sprint/Standard/Cathedral tier model.
 
 ### Per-Agent Profiles
 
-The Oracle maintains persistent per-agent articles separate from the session-snapshot health report. These profiles are **factual, not evaluative**. They record observations, not judgments.
+The Librarian maintains persistent per-agent articles separate from the session-snapshot health report. These profiles are **factual, not evaluative**. They record observations, not judgments.
 
 Profile contents:
 
@@ -915,7 +915,7 @@ Profiles are for the team lead and PO, not for peer comparison. They inform team
 
 ### Knowledge Health Summary (Shutdown)
 
-The Oracle's shutdown output. This is the team health sensor formalized as part of the Oracle role, not a separate agent.
+The Librarian's shutdown output. This is the team health sensor formalized as part of the Librarian role, not a separate agent.
 
 **Incremental append format (PO, round 4).** The health summary appends to an existing file with timestamps. No rewrite, no merge — `>> health-report.md`. One file grows over time as session history.
 
@@ -930,7 +930,7 @@ The Oracle's shutdown output. This is the team health sensor formalized as part 
 <example: "Authentication: 5 queries from 3 agents, 0 wiki entries">
 
 ### Unresolved gaps
-<queries the Oracle couldn't answer, carried into next session>
+<queries the Librarian couldn't answer, carried into next session>
 
 ### Redundant queries
 <where two or more agents asked the same thing — candidate for promotion>
@@ -971,7 +971,7 @@ Plus the two additions that emerged during the discussion:
 
 ### Single Point of Failure
 
-If the Oracle crashes mid-session, **team-lead respawns it**. No circuit breakers, no fallback paths, no degraded modes. The Oracle is treated the same as any other agent. One path, make it reliable.
+If the Librarian crashes mid-session, **team-lead respawns it**. No circuit breakers, no fallback paths, no degraded modes. The Librarian is treated the same as any other agent. One path, make it reliable.
 
 The `oracle-state.json` marker prevents re-running one-time bootstrap operations on respawn.
 
@@ -984,52 +984,52 @@ The PO maintains a cross-team memory (`~/.claude/projects/.../MEMORY.md`) outsid
 | Dimension | PO MEMORY.md | Team wiki |
 |---|---|---|
 | Scope | Cross-team, cross-project, cross-session | Single team, single project |
-| Author | PO (human) | Oracle (agent), via submissions |
+| Author | PO (human) | Librarian (agent), via submissions |
 | Audience | PO (one reader) | Team agents |
 | Governance | L0 (constitutional) | L2 (team-level) |
 | Content type | User preferences, feedback, project status, external references | Patterns, gotchas, decisions, contracts, gaps |
 
 **The bridge already exists: the PO is the bridge.** The PO reads team wikis (via shutdown reports, session reviews, or direct inspection). The PO writes insights to MEMORY.md. This is a human-mediated one-way flow that requires no protocol.
 
-**One improvement:** When the Oracle's health report identifies a cross-team-relevant finding (tagged `[CROSS-TEAM]`), the team lead includes it in the session report to PO. The PO decides whether to record it in MEMORY.md. This is promotion-through-governance-layers: L2 (team) → L0 (PO) via explicit human review. No automation.
+**One improvement:** When the Librarian's health report identifies a cross-team-relevant finding (tagged `[CROSS-TEAM]`), the team lead includes it in the session report to PO. The PO decides whether to record it in MEMORY.md. This is promotion-through-governance-layers: L2 (team) → L0 (PO) via explicit human review. No automation.
 
 #### Rule: L3 → L0 Automated Flow Is Forbidden (Monte, round 5)
 
-Team wikis (L2 governed, Oracle curated) must not automatically propagate to PO MEMORY.md (L0 constitutional). The hierarchy must be preserved: information flows up through explicit governance review (team lead's session report, PO's cross-team context-gathering), gets synthesized by the human at L0, and flows back down through common-prompt edits or direct team-lead directives.
+Team wikis (L2 governed, Librarian curated) must not automatically propagate to PO MEMORY.md (L0 constitutional). The hierarchy must be preserved: information flows up through explicit governance review (team lead's session report, PO's cross-team context-gathering), gets synthesized by the human at L0, and flows back down through common-prompt edits or direct team-lead directives.
 
 **Forbidden:**
 
 - Automated sync of team wiki entries to PO MEMORY.md
 - Agents reading PO MEMORY.md directly
-- PO editing team wikis directly (PO messages team lead, who instructs Oracle)
+- PO editing team wikis directly (PO messages team lead, who instructs Librarian)
 - **PO copying MEMORY.md entries into team wikis** (Finn's round 5 anti-pattern — if PO knowledge needs to reach a team, it goes through team-lead, who submits it as a normal Knowledge Submission with PO attribution)
 
 **Required:**
 
-- Cross-team-relevant wiki entries are tagged `[CROSS-TEAM]` in the Oracle's session report
+- Cross-team-relevant wiki entries are tagged `[CROSS-TEAM]` in the Librarian's session report
 - Team lead includes tagged findings in session report to PO
 - PO decides at own discretion whether to record in MEMORY.md
-- PO directives to teams flow through common-prompt, team-lead messages, or explicit Knowledge Submissions to the Oracle (with attribution), never through direct wiki edits
+- PO directives to teams flow through common-prompt, team-lead messages, or explicit Knowledge Submissions to the Librarian (with attribution), never through direct wiki edits
 
-**Why this matters as a named rule, not a bullet list.** Named rules get referenced in prompts and enforced in reviews. Bullet lists get skimmed. Future agents implementing the Oracle will be tempted to add "sync with PO memory" as a feature — the named rule makes this a constitutional violation they must explicitly overturn, not a design choice they can make.
+**Why this matters as a named rule, not a bullet list.** Named rules get referenced in prompts and enforced in reviews. Bullet lists get skimmed. Future agents implementing the Librarian will be tempted to add "sync with PO memory" as a feature — the named rule makes this a constitutional violation they must explicitly overturn, not a design choice they can make.
 
 #### MEMORY.md Pruning Opportunity (Medici, round 5)
 
 Introducing team wikis is an **opportunity to prune MEMORY.md** of team-level operational detail that belongs in team wikis instead. Without explicit pruning, introducing wikis ADDS knowledge infrastructure without REDUCING any existing burden. The total complexity increases.
 
-**The pruning action** is included in the Implementation Checklist — when a team adopts an Oracle, the PO audits MEMORY.md for entries describing that team's operational detail and moves them to the team wiki (through the team-lead submission path described above). MEMORY.md shrinks to its proper L0 scope: cross-team decisions, user preferences, project-level context, external references.
+**The pruning action** is included in the Implementation Checklist — when a team adopts an Librarian, the PO audits MEMORY.md for entries describing that team's operational detail and moves them to the team wiki (through the team-lead submission path described above). MEMORY.md shrinks to its proper L0 scope: cross-team decisions, user preferences, project-level context, external references.
 
 ---
 
 ## Part 3: How These Two Systems Interact
 
-### The Pipeline Generates Knowledge; the Oracle Preserves It
+### The Pipeline Generates Knowledge; the Librarian Preserves It
 
-The XP pipeline is a knowledge-generation engine. ARCHITECT produces decompositions. RED produces test specifications. GREEN produces implementations. PURPLE produces structural patterns. Without the Oracle, these artifacts live in scratchpads and code — useful within one cycle, lost across sessions.
+The XP pipeline is a knowledge-generation engine. ARCHITECT produces decompositions. RED produces test specifications. GREEN produces implementations. PURPLE produces structural patterns. Without the Librarian, these artifacts live in scratchpads and code — useful within one cycle, lost across sessions.
 
-The Oracle captures the cross-cutting patterns that emerge from pipeline cycles:
+The Librarian captures the cross-cutting patterns that emerge from pipeline cycles:
 
-| Pipeline output | Oracle capture |
+| Pipeline output | Librarian capture |
 |---|---|
 | ARCHITECT's recurring decomposition patterns ("we keep splitting scheduler logic into three phases") | `wiki/patterns/` |
 | GREEN's self-reported shortcuts ("we duplicated validation because extraction would break X") | `wiki/gotchas/` — the duplication is a tracked debt |
@@ -1038,9 +1038,9 @@ The Oracle captures the cross-cutting patterns that emerge from pipeline cycles:
 
 ### ARCHITECT Reads the Wiki Before Decomposition
 
-ARCHITECT's first act on receiving a new story should be a wiki query: "What do we know about this domain? What patterns exist? What gotchas have other agents hit?" The Oracle returns relevant entries, and ARCHITECT's decomposition is informed by accumulated team knowledge.
+ARCHITECT's first act on receiving a new story should be a wiki query: "What do we know about this domain? What patterns exist? What gotchas have other agents hit?" The Librarian returns relevant entries, and ARCHITECT's decomposition is informed by accumulated team knowledge.
 
-This solves the "new session starts cold" problem. Without the Oracle, ARCHITECT relies on whatever is in the common-prompt and its own prompt context. With the Oracle, ARCHITECT has access to every pattern the team has discovered since its first session.
+This solves the "new session starts cold" problem. Without the Librarian, ARCHITECT relies on whatever is in the common-prompt and its own prompt context. With the Librarian, ARCHITECT has access to every pattern the team has discovered since its first session.
 
 **Per-role Librarian access instructions (PO, round 4):**
 
@@ -1049,11 +1049,11 @@ This solves the "new session starts cold" problem. Without the Oracle, ARCHITECT
 - PURPLE queries for architectural decisions and module boundaries
 - ARCHITECT queries for patterns and findings, writes test plans as team knowledge
 
-Oracle prompts include per-role interaction guidance so each role knows what to ask for and how to cite responses.
+Librarian prompts include per-role interaction guidance so each role knows what to ask for and how to cite responses.
 
 ### PURPLE Submits Refactoring Patterns (At Cycle Completion)
 
-When PURPLE completes a refactoring (ACCEPT verdict, commit made), it submits the refactoring pattern as a `[PATTERN]` entry to the Oracle. **Pattern submission happens at cycle completion, not mid-refactor** — a mid-refactor view is unstable and the pattern may not survive the next 30 seconds of work.
+When PURPLE completes a refactoring (ACCEPT verdict, commit made), it submits the refactoring pattern as a `[PATTERN]` entry to the Librarian. **Pattern submission happens at cycle completion, not mid-refactor** — a mid-refactor view is unstable and the pattern may not survive the next 30 seconds of work.
 
 Example:
 
@@ -1078,17 +1078,17 @@ Files: player/app/utils/date.ts, player/app/composables/useScheduler.ts,
 Cycles: 3 (scheduler, playlist, layout playlist)
 ```
 
-The Oracle receives this, files it in `wiki/patterns/`, and the next ARCHITECT querying "time-range filtering" gets the pattern immediately. **The Oracle catches cross-pair patterns** — the `[PIPELINE-DISTANCE]` diagnostic (Medici's round 5 metric) tracks whether a shared PURPLE's pattern submissions are actually reused across both pipelines.
+The Librarian receives this, files it in `wiki/patterns/`, and the next ARCHITECT querying "time-range filtering" gets the pattern immediately. **The Librarian catches cross-pair patterns** — the `[PIPELINE-DISTANCE]` diagnostic (Medici's round 5 metric) tracks whether a shared PURPLE's pattern submissions are actually reused across both pipelines.
 
 ### PURPLE Flags Staleness
 
-When PURPLE refactors code, it checks `wiki/` for entries referencing the refactored files. If the refactoring changes documented behavior or interfaces, PURPLE sends `[STALE-WARNING]` to the Oracle. The Oracle updates `last-verified`, flags the entry for review, and notifies the original source agent. Severity: CRITICAL (PURPLE has domain context).
+When PURPLE refactors code, it checks `wiki/` for entries referencing the refactored files. If the refactoring changes documented behavior or interfaces, PURPLE sends `[STALE-WARNING]` to the Librarian. The Librarian updates `last-verified`, flags the entry for review, and notifies the original source agent. Severity: CRITICAL (PURPLE has domain context).
 
-**This distributes staleness detection correctly.** PURPLE has the context (just touched the code). The Oracle has the knowledge graph (knows what depends on what). Neither alone could catch all stale entries; together they close the loop.
+**This distributes staleness detection correctly.** PURPLE has the context (just touched the code). The Librarian has the knowledge graph (knows what depends on what). Neither alone could catch all stale entries; together they close the loop.
 
 ### Knowledge Velocity as Team Health Metric
 
-The Oracle's shutdown health report includes a **knowledge velocity** metric: the ratio of discoveries (submissions) to warnings (staleness, disputes, conflicts) across recent sessions.
+The Librarian's shutdown health report includes a **knowledge velocity** metric: the ratio of discoveries (submissions) to warnings (staleness, disputes, conflicts) across recent sessions.
 
 | Ratio | Interpretation |
 |---|---|
@@ -1097,9 +1097,9 @@ The Oracle's shutdown health report includes a **knowledge velocity** metric: th
 | High warnings, low discoveries | Team is accumulating debt without offsetting learning. Investigate. |
 | High discoveries AND high warnings | Team is churning. Discoveries are being invalidated faster than they accumulate. Structural problem. |
 
-This connects the XP pipeline (which generates discoveries) with the Oracle (which measures their durability). A well-functioning Cathedral-tier team should show high discoveries and low warnings over time. A team stuck in the churn pattern probably has an ARCHITECT decomposition problem or a PURPLE scope creep problem.
+This connects the XP pipeline (which generates discoveries) with the Librarian (which measures their durability). A well-functioning Cathedral-tier team should show high discoveries and low warnings over time. A team stuck in the churn pattern probably has an ARCHITECT decomposition problem or a PURPLE scope creep problem.
 
-**Finn's round 5 framing:** ARCHITECT and PURPLE generate knowledge, the knowledge base measures their output quality. Knowledge velocity connects #46 and #47 — the pipeline is the source, the Oracle is the instrument.
+**Finn's round 5 framing:** ARCHITECT and PURPLE generate knowledge, the knowledge base measures their output quality. Knowledge velocity connects #46 and #47 — the pipeline is the source, the Librarian is the instrument.
 
 ---
 
@@ -1114,10 +1114,10 @@ The #14 disagreement from v1 is now resolved. Monte and Medici converged in roun
 | Knowledge type | Location | Governance |
 |---|---|---|
 | Stable process (team rules, workflow) | `common-prompt.md` | L1 team law, team-lead proposes + PO approves |
-| Emerging process (new patterns being tried) | `wiki/process/` | Oracle files, promotes to common-prompt when mature |
-| Cross-cutting observations (insights spanning topic files) | `wiki/observations/` | Oracle files, cites topic files, **never authoritative** |
+| Emerging process (new patterns being tried) | `wiki/process/` | Librarian files, promotes to common-prompt when mature |
+| Cross-cutting observations (insights spanning topic files) | `wiki/observations/` | Librarian files, cites topic files, **never authoritative** |
 | Subject knowledge (framework patterns, authoritative findings) | `topics/*.md` | Topic owner + PO approves |
-| Pre-topic-file research findings | `wiki/findings/` | Oracle files, promotes to topic file when owner assigned |
+| Pre-topic-file research findings | `wiki/findings/` | Librarian files, promotes to topic file when owner assigned |
 | Analysis artifacts (inventories, specs, reports) | `docs/` or `analysis/` | Specialist (same as current) |
 
 **The three wiki tracks for research teams:**
@@ -1137,7 +1137,7 @@ The #14 disagreement from v1 is now resolved. Monte and Medici converged in roun
 2. **Promotion from observation to topic-file content requires the topic owner's approval** — the observation can suggest, but only the topic owner can decide
 3. **Observations are NOT substitute reading for topic files** — an agent researching governance still reads T04, not `wiki/observations/`; observations are supplementary
 
-**[MIGRATION-STALE] audit (Medici, round 5):** A `wiki/findings/` entry stable for 2+ sessions with no topic-file destination is either (a) not mature enough to migrate (leave it) or (b) stuck because nobody knows where it belongs (escalate to team lead for topic-file assignment). This prevents the findings section from becoming a graveyard. The audit is run as part of the Oracle's shutdown health summary in research teams.
+**[MIGRATION-STALE] audit (Medici, round 5):** A `wiki/findings/` entry stable for 2+ sessions with no topic-file destination is either (a) not mature enough to migrate (leave it) or (b) stuck because nobody knows where it belongs (escalate to team lead for topic-file assignment). This prevents the findings section from becoming a graveyard. The audit is run as part of the Librarian's shutdown health summary in research teams.
 
 **For apex-research specifically (Finn, round 5):** The wiki holds **process patterns** (how to analyze an APEX application, how to structure a cluster spec, how to identify a migration blocker) and **cross-app findings** (patterns that appeared in multiple apps). The inventory itself (`inventory/*.json`, `shared/*.json`, `specs/clusters/`) is the product, not the knowledge. Those artifacts stay where they are; the wiki gets a pointer via the Archaeological index layer.
 
@@ -1149,7 +1149,7 @@ Two open questions from v1 are now resolved (L2.5 → Spec Writer specialization
 
 #### Tier 4: Knowledge Velocity as Primary Metric (Herald, round 5)
 
-Herald flagged a pattern that is beyond Cathedral: a team where knowledge flow itself is the primary output. The Oracle's Health Digest observations inform ARCHITECT's decomposition. PURPLE's refactoring patterns feed back into ARCHITECT's future decompositions. The team learns faster over time because its own learning is instrumented. Herald proposed tentatively calling this "Flywheel" tier.
+Herald flagged a pattern that is beyond Cathedral: a team where knowledge flow itself is the primary output. The Librarian's Health Digest observations inform ARCHITECT's decomposition. PURPLE's refactoring patterns feed back into ARCHITECT's future decompositions. The team learns faster over time because its own learning is instrumented. Herald proposed tentatively calling this "Flywheel" tier.
 
 **Status: speculative, not added to T09.** No team has operated this way yet. Flagging for future discussion once Cathedral tier has deployment experience. If a real team shows the "knowledge infrastructure as primary output" pattern, we revisit the tiering.
 
@@ -1169,23 +1169,23 @@ For team designers (this is my use of this document):
 - [ ] Update team lead prompt: route stories to ARCHITECT, not directly to TDD pair
 - [ ] Add four message types to pipeline agent prompts (TEST_SPEC, GREEN_HANDOFF, PURPLE_VERDICT, CYCLE_COMPLETE)
 - [ ] Add PURPLE authority boundary to PURPLE prompt (may/may-not list)
-- [ ] For shared PURPLE: add Monte's authority caveat (flag cross-pipeline patterns via Oracle, do not extract)
+- [ ] For shared PURPLE: add Monte's authority caveat (flag cross-pipeline patterns via Librarian, do not extract)
 - [ ] Add three-strike escalation to PURPLE prompt
 - [ ] Document isolation model: temporal ownership (no partition table, no worktrees)
 - [ ] Add test plan file handover to shutdown protocol
 - [ ] Add adaptive lookahead ceiling to pipeline configuration (default `max_lookahead = 1`)
 - [ ] Add watchdog-based mid-cycle shutdown protocol to PURPLE (4 exit states, 5-min boundary, team-lead termination authority)
-- [ ] PURPLE submits refactoring patterns to Oracle at cycle completion (not mid-refactor)
+- [ ] PURPLE submits refactoring patterns to Librarian at cycle completion (not mid-refactor)
 
-### Oracle / Knowledge Base
+### Librarian / Knowledge Base
 
 - [ ] Determine knowledge management tier (Sprint / Standard / Cathedral)
-- [ ] For Cathedral tier, add Oracle to roster (opus[1m], Callimachus lore or team-appropriate equivalent)
+- [ ] For Cathedral tier, add Librarian to roster (opus[1m], Callimachus lore or team-appropriate equivalent)
 - [ ] For Standard tier, extend team-lead prompt with wiki curation at shutdown (~30 min target per Finn's data)
 - [ ] Create `wiki/` directory in team config (plus `wiki/process/`, `wiki/observations/`, `wiki/findings/` for research teams)
-- [ ] Add three protocols (Submission, Query, Promotion) to Oracle prompt
-- [ ] Add classification decision matrix to Oracle prompt
-- [ ] Add six-signal health summary template to Oracle shutdown protocol (include source concentration, hot/cold stale classification)
+- [ ] Add three protocols (Submission, Query, Promotion) to Librarian prompt
+- [ ] Add classification decision matrix to Librarian prompt
+- [ ] Add six-signal health summary template to Librarian shutdown protocol (include source concentration, hot/cold stale classification)
 - [ ] Add per-role Librarian access instructions for XP roles (RED, GREEN, PURPLE, ARCHITECT)
 - [ ] Add `[WIKI-READ]` logging to RED/GREEN/PURPLE prompts (direct read exception)
 - [ ] Add `[URGENT-KNOWLEDGE]` priority interrupt rule to team-lead prompt
@@ -1196,18 +1196,18 @@ For team designers (this is my use of this document):
 - [ ] For Established teams, choose bootstrap mode: Intake Interview (high-frequency) or Incremental (Standard→Cathedral graduation)
 - [ ] For Archaeological teams, bootstrap as index layer only (20-page cap on index, not content)
 - [ ] Create `oracle-state.json` marker for bootstrap completion (respawn-safe)
-- [ ] Check Oracle adoption trigger: 30 team-wide entries OR team size ≥7-8 agents
-- [ ] Oracle-only trigger: team has ≥5 sessions of expected life ahead (amortization gate)
+- [ ] Check Librarian adoption trigger: 30 team-wide entries OR team size ≥7-8 agents
+- [ ] Librarian-only trigger: team has ≥5 sessions of expected life ahead (amortization gate)
 
 ### Cross-System
 
-- [ ] ARCHITECT prompt: query Oracle before decomposition
-- [ ] PURPLE prompt: submit refactoring patterns to Oracle at cycle completion (not mid-refactor)
+- [ ] ARCHITECT prompt: query Librarian before decomposition
+- [ ] PURPLE prompt: submit refactoring patterns to Librarian at cycle completion (not mid-refactor)
 - [ ] PURPLE prompt: submit `[DEFERRED-REFACTOR]` if mid-cycle shutdown forces revert
-- [ ] CYCLE_COMPLETE quality notes feed Oracle health metrics
-- [ ] Knowledge velocity metric in Oracle shutdown report
-- [ ] For Cathedral shared-PURPLE teams: Oracle tracks `[PIPELINE-DISTANCE]` cross-pipeline reuse rate
-- [ ] **When adopting an Oracle, audit MEMORY.md for team-specific operational entries and migrate to team wiki** (Medici's pruning opportunity)
+- [ ] CYCLE_COMPLETE quality notes feed Librarian health metrics
+- [ ] Knowledge velocity metric in Librarian shutdown report
+- [ ] For Cathedral shared-PURPLE teams: Librarian tracks `[PIPELINE-DISTANCE]` cross-pipeline reuse rate
+- [ ] **When adopting an Librarian, audit MEMORY.md for team-specific operational entries and migrate to team wiki** (Medici's pruning opportunity)
 
 ---
 
@@ -1229,11 +1229,11 @@ This is a framework-wide rule introduced with T09 v2.2 (issue #51). It applies t
 
 ## Related Topics
 
-- **T01 (Team Taxonomy):** Refactorer is the seventh canonical role; Oracle is the eighth. ARCHITECT is a specialization of Spec Writer with scoped authority — not a new canonical role.
+- **T01 (Team Taxonomy):** Refactorer is the seventh canonical role; Librarian is the eighth. ARCHITECT is a specialization of Spec Writer with scoped authority — not a new canonical role.
 - **T02 (Resource Isolation):** Temporal ownership is the third isolation model (after branch isolation and directory ownership on trunk).
-- **T03 (Communication):** Four XP message types are a specialization of Protocol 1. Dual-hub topology is a new pattern (work hub + knowledge hub). `[URGENT-KNOWLEDGE]` is a narrow routing exception. Oracle uses directory sovereignty (Protocol 5). The [Protocol Typing Principle](#protocol-typing-principle) applies to T03's inter-team protocols as well — formalize them into a `types/t03-protocols.ts` file when the inter-team transport layer stabilizes.
+- **T03 (Communication):** Four XP message types are a specialization of Protocol 1. Dual-hub topology is a new pattern (work hub + knowledge hub). `[URGENT-KNOWLEDGE]` is a narrow routing exception. Librarian uses directory sovereignty (Protocol 5). The [Protocol Typing Principle](#protocol-typing-principle) applies to T03's inter-team protocols as well — formalize them into a `types/t03-protocols.ts` file when the inter-team transport layer stabilizes.
 - **T04 (Governance):** ARCHITECT sits at L3 with scoped authority. Delegation matrix gains six new rows (story decomposition, test plan ordering, scope dispute, structural refactoring, mid-cycle termination, cross-pipeline pattern extraction). Pipeline-level governance is a new nested pattern within a team. Monte will draft the T04 amendments once T09 stabilizes.
-- **T06 (Lifecycle):** Spawn order changes for XP teams (ARCHITECT first). Shutdown Phase 3 gets PURPLE-specific watchdog extension. Test plan file + `oracle-state.json` are new handover artifacts. The adaptive lookahead ceiling and Oracle adoption triggers use Phase 2c timing. Volta will draft the T06 amendments.
+- **T06 (Lifecycle):** Spawn order changes for XP teams (ARCHITECT first). Shutdown Phase 3 gets PURPLE-specific watchdog extension. Test plan file + `oracle-state.json` are new handover artifacts. The adaptive lookahead ceiling and Librarian adoption triggers use Phase 2c timing. Volta will draft the T06 amendments.
 - **T07 (Safety):** PURPLE's authority boundary is a safety mechanism. Three-strike escalation is a safety valve for rejection loops. `[PIPELINE-DISTANCE]` is a diagnostic safety metric. L3 → L0 forbidden flow is a safety-critical constitutional rule.
 
 ---
@@ -1242,7 +1242,7 @@ This is a framework-wide rule introduced with T09 v2.2 (issue #51). It applies t
 
 T09 is the development methodology doc. The protocol for reaching team-wide agreement on methodology IS methodology. This section preserves the consensus protocol that produced this document, as a reusable pattern for future framework-wide questions.
 
-**Reference:** discussions [#46](https://github.com/mitselek/ai-teams/discussions/46) (XP Development Pipeline) and [#47](https://github.com/mitselek/ai-teams/discussions/47) (Knowledge Base / Oracle) ran this protocol across five rounds to produce T09 v1 and v2.
+**Reference:** discussions [#46](https://github.com/mitselek/ai-teams/discussions/46) (XP Development Pipeline) and [#47](https://github.com/mitselek/ai-teams/discussions/47) (Knowledge Base / Librarian) ran this protocol across five rounds to produce T09 v1 and v2.
 
 **When to use:** framework-wide questions that require more than one perspective and where no single specialist owns the answer. If one specialist owns the answer (e.g., a lifecycle question belongs to Volta alone), use a normal issue → PR flow instead.
 
@@ -1261,7 +1261,7 @@ Post-round 5, normal workflow resumes: issues are triaged, PRs are reviewed, the
 - **"10 rounds if needed" is an upper bound, not a target.** Debates have diminishing returns after about 90% consensus. The last 10% is usually preferences about framing, not structural disagreement.
 - **Filing issues instead of posting round 7 forces concerns to be actionable.** An issue requires: a named "what," a "why v2 doesn't cover it," and a "proposed change or investigation." Rhetorical concerns rarely survive this framing. Concerns that do survive become concrete work.
 - **Structural disagreements get binary calls; operational additions get integration.** The synthesizer's job in round 4 is to distinguish these. A structural disagreement is "should ARCHITECT be L2.5 or an L3 specialist?" — there is no compromise that satisfies both positions. An operational addition is "add severity classification to the three-layer staleness net" — it slots in without contradicting any other position.
-- **Convergence from different reasoning is stronger than convergence from shared reasoning.** When three specialists reach the same recommendation through independent arguments (e.g., Herald on structural consistency, Finn on Oracle cross-pattern detection, Brunel on resource capacity for shared PURPLE), the recommendation is load-bearing. Preserve all three arguments in the synthesis — they validate each other and give future readers the full reasoning.
+- **Convergence from different reasoning is stronger than convergence from shared reasoning.** When three specialists reach the same recommendation through independent arguments (e.g., Herald on structural consistency, Finn on Librarian cross-pattern detection, Brunel on resource capacity for shared PURPLE), the recommendation is load-bearing. Preserve all three arguments in the synthesis — they validate each other and give future readers the full reasoning.
 - **The synthesizer holds the pen but does not hold veto.** If a specialist pushes back strongly in round 3 on a round 2 framing, the synthesizer revises. The synthesizer's job is compression without loss, not tiebreaking by authorship. Tiebreaking happens in round 4 with explicit reasoning in the Changelog.
 
 ### Why This Protocol
@@ -1294,7 +1294,7 @@ PO issue #49 directive (verbatim): *"Tier selection is determined solely by cons
 
 - **Cost column from the PURPLE configuration table.** Renamed "Cost tiering (revised for shared-PURPLE default)" to "PURPLE configuration by tier" and dropped the Cost column entirely. Tier names (Sprint, Standard, Cathedral Medium/below, Cathedral High) and PURPLE configurations are preserved; the decision axis is quality, not cost.
 - **Cost row from the Team Composition Impact table.** The "Degraded Cathedral (resource-constrained host)" row is removed. The remaining four rows describe real tier configurations; the emergency compensation is referenced via a pointer to the Host Capacity section rather than as a table row, to avoid re-implying that "under-provisioned host" is a legitimate ship configuration.
-- **Brunel's cost bullet from the Shared vs. Separate PURPLE convergence.** The "resource capacity" bullet (`Shared PURPLE halves the refactorer cost without changing the pipeline discipline`) is deleted. Herald's structural-consistency argument and Finn's Oracle cross-pattern-detection argument both remain — they are quality-based and unaffected. The bullet count drops from three quality/cost arguments + Monte's caveat to two quality arguments + Monte's caveat; Brunel is still credited in the v2 Changelog entry for surfacing the operational concern that drove the original (now-reframed) Degraded Cathedral section.
+- **Brunel's cost bullet from the Shared vs. Separate PURPLE convergence.** The "resource capacity" bullet (`Shared PURPLE halves the refactorer cost without changing the pipeline discipline`) is deleted. Herald's structural-consistency argument and Finn's Librarian cross-pattern-detection argument both remain — they are quality-based and unaffected. The bullet count drops from three quality/cost arguments + Monte's caveat to two quality arguments + Monte's caveat; Brunel is still credited in the v2 Changelog entry for surfacing the operational concern that drove the original (now-reframed) Degraded Cathedral section.
 - **Cost framing from the Key Insight (Opus Bookends, Sonnet Executes) section.** The "cost optimization built into the development model" phrasing is replaced with "consequence of error" framing, consistent with Finn's quality axis.
 - **"opus cost saves one agent" justification** in the single-pipeline same-agent ARCHITECT discussion (`Same Agent or Separate`). The reasoning is reframed as "one opus holds both cognitive stances coherently within a single story" — a quality argument, not a cost-savings one.
 
@@ -1304,7 +1304,7 @@ PO issue #49 directive (verbatim): *"Tier selection is determined solely by cons
 
 **Scope:**
 
-- Edits are confined to Part 1 (XP Development Pipeline). Part 2 (Oracle / Knowledge Base) is untouched. The Part 2 references to "opus cost of knowledge management" and "cost of lost knowledge" describe the consequence argument for the Standard-tier compromise and the Cathedral-tier Oracle adoption trigger — not tier decisions. Per the #49 directive scope, they stay.
+- Edits are confined to Part 1 (XP Development Pipeline). Part 2 (Librarian / Knowledge Base) is untouched. The Part 2 references to "opus cost of knowledge management" and "cost of lost knowledge" describe the consequence argument for the Standard-tier compromise and the Cathedral-tier Librarian adoption trigger — not tier decisions. Per the #49 directive scope, they stay.
 - No edit to T04, T06, or `types/t09-protocols.ts`. No edit to the v2.1 or v2 Changelog entries — historical records are preserved verbatim, including their references to "Degraded Cathedral tier" as that term existed at the time.
 
 **What did NOT change in v2.3:**
@@ -1312,8 +1312,8 @@ PO issue #49 directive (verbatim): *"Tier selection is determined solely by cons
 - No tier names changed. Sprint, Standard, Cathedral remain.
 - No PURPLE configurations changed. Shared PURPLE remains the Cathedral default at Medium distance or below; separate PURPLEs at High distance.
 - No sequential-first constraint changed. The v2.1 execution-mode default still holds.
-- No Oracle design changed. Part 2 is untouched.
-- Issue #48 (Oracle tier downgrade path) remains paused — separate assignment.
+- No Librarian design changed. Part 2 is untouched.
+- Issue #48 (Librarian tier downgrade path) remains paused — separate assignment.
 
 **Commit:** this v2.3 commit references #49.
 
@@ -1323,7 +1323,7 @@ PO issue #51: "Formalize all comms protocols as TypeScript interfaces — founda
 
 **Added:**
 
-- **`types/t09-protocols.ts`** — strict-typed interfaces for every protocol in T09. XP pipeline message types (`TestSpec`, `GreenHandoff`, `PurpleVerdict`, `CycleComplete`), dual-hub routing (`UrgentKnowledgeMessage`), Oracle protocols (`KnowledgeSubmission`, `KnowledgeQuery`, `KnowledgeResponse`, `PromotionProposal`), and wiki frontmatter (`WikiProvenance`). `PurpleVerdict` is a discriminated union of the three outcomes (`Accept`, `Reject`, `Escalate`) to reflect the three-strike rule at the type level. Each interface carries a JSDoc comment linking back to the T09 section that is authoritative for its meaning.
+- **`types/t09-protocols.ts`** — strict-typed interfaces for every protocol in T09. XP pipeline message types (`TestSpec`, `GreenHandoff`, `PurpleVerdict`, `CycleComplete`), dual-hub routing (`UrgentKnowledgeMessage`), Librarian protocols (`KnowledgeSubmission`, `KnowledgeQuery`, `KnowledgeResponse`, `PromotionProposal`), and wiki frontmatter (`WikiProvenance`). `PurpleVerdict` is a discriminated union of the three outcomes (`Accept`, `Reject`, `Escalate`) to reflect the three-strike rule at the type level. Each interface carries a JSDoc comment linking back to the T09 section that is authoritative for its meaning.
 - **Protocol Typing Principle** — new short section before Related Topics. Codifies the framework rule: *all comms protocols defined in topic files must have a corresponding TypeScript interface*. Prose is canonical for semantics, interfaces are canonical for shape. Applies to all topic files, not just T09. Placement convention: `types/t09-protocols.ts`, `types/t03-protocols.ts`, etc.
 - **Cross-references** — every protocol block in T09 now has an "*Interface: `X` in `types/t09-protocols.ts`*" line above the markdown example. The reader can jump from prose to interface without guessing.
 
@@ -1333,7 +1333,7 @@ PO issue #51: "Formalize all comms protocols as TypeScript interfaces — founda
 
 - No semantics changed. All interface fields track T09 v2.1's prose verbatim.
 - No new binary calls, no deferred work unlocked, no tier structure changes.
-- #48 (Oracle tier downgrade path) and #49 (cost framing removal) remain paused per the Task 3 directive.
+- #48 (Librarian tier downgrade path) and #49 (cost framing removal) remain paused per the Task 3 directive.
 
 **Commit:** this v2.2 commit references #51.
 
@@ -1357,11 +1357,11 @@ PO directive after round 6 ACK: "Multi-pipeline team shape is encouraged where a
 
 **What did NOT change in v2.1:**
 
-- The four-part structure (XP Pipeline / Oracle / Interaction / Open Questions + Future Work).
-- Single-pipeline Cathedral-tier configuration, ARCHITECT role, PURPLE scope boundary, three-strike escalation, temporal ownership, mid-cycle shutdown watchdog, dual-hub topology, Oracle role, four capabilities, Callimachus lore, three-track wiki for research teams, opus[1m] model tier, or any other v2 binary call except the shared-PURPLE default (deferred) and `max_lookahead = 1` default (now 0).
+- The four-part structure (XP Pipeline / Librarian / Interaction / Open Questions + Future Work).
+- Single-pipeline Cathedral-tier configuration, ARCHITECT role, PURPLE scope boundary, three-strike escalation, temporal ownership, mid-cycle shutdown watchdog, dual-hub topology, Librarian role, four capabilities, Callimachus lore, three-track wiki for research teams, opus[1m] model tier, or any other v2 binary call except the shared-PURPLE default (deferred) and `max_lookahead = 1` default (now 0).
 - The Degraded Cathedral tier, which is governed by issue #49 (quality-only axis reframing) and is explicitly **out of scope** for v2.1. The section remains as in v2 until #49 is addressed.
 
-**Paused issues (not addressed in v2.1):** #48 (Oracle tier downgrade path) and #49 (cost framing removal) are paused pending PO assessment after v2.1 + the #51 TypeScript interfaces work land.
+**Paused issues (not addressed in v2.1):** #48 (Librarian tier downgrade path) and #49 (cost framing removal) are paused pending PO assessment after v2.1 + the #51 TypeScript interfaces work land.
 
 **Commit:** this v2.1 commit references #50 and #52.
 
@@ -1375,11 +1375,11 @@ Five binary calls resolved from round 5 structural disagreements. Nine operation
 
 2. **L2.5 governance level dropped in favor of Spec Writer specialization.** Finn's argument: ARCHITECT's authority is bounded (one story) and temporary (passive between stories), not structural. Hammurabi in apex-research is precedent — a Spec Writer with scope authority over what gets analyzed, without being a new governance level. T04 gains new delegation matrix rows without a new hierarchy level. Monte's scope-authority framing is preserved verbatim in the delegation matrix; only the L2.5 label is removed. Both Finn and Monte explicitly accepted either resolution, so this is a clean call.
 
-3. **Shared PURPLE is the Cathedral default** (was: domain distance decides; shared at low, separate at medium, separate at high). Three independent round 5 arguments converged on shared: Herald (structural consistency is observable, context-bleed was speculative), Finn (shared PURPLE is better signal for Oracle cross-pattern detection), Brunel (constrained hosts can't afford multiple refactorers). Monte's authority caveat (shared PURPLE must flag cross-pipeline patterns to ARCHITECT via Oracle, not extract them itself) closes the governance gap. Only High domain distance (different repos or languages) still justifies separate PURPLEs. Medium distance (screenwerk-dev: Node.js vs Vue) now defaults to shared with the caveat. Domain distance remains the decision variable; structural consistency is the articulated benefit.
+3. **Shared PURPLE is the Cathedral default** (was: domain distance decides; shared at low, separate at medium, separate at high). Three independent round 5 arguments converged on shared: Herald (structural consistency is observable, context-bleed was speculative), Finn (shared PURPLE is better signal for Librarian cross-pattern detection), Brunel (constrained hosts can't afford multiple refactorers). Monte's authority caveat (shared PURPLE must flag cross-pipeline patterns to ARCHITECT via Librarian, not extract them itself) closes the governance gap. Only High domain distance (different repos or languages) still justifies separate PURPLEs. Medium distance (screenwerk-dev: Node.js vs Vue) now defaults to shared with the caveat. Domain distance remains the decision variable; structural consistency is the articulated benefit.
 
 4. **#14 Research team wiki domain: three-track structure adopted.** Monte's position was "process + cross-cutting observations" (I previously summarized as "process only" — that was a misattribution). Medici converged on three tracks in round 5: `wiki/process/` (emerging process → common-prompt), `wiki/observations/` (cross-cutting citations that are never authoritative), `wiki/findings/` (pre-topic-file findings → topic files). My stable/emerging process split is preserved as the process track. Monte's three rules govern observations (cite topic files, require topic owner for promotion, not substitute reading). Medici's `[MIGRATION-STALE]` audit applies to findings stuck without topic-file destination. This closes #14 as resolved.
 
-5. **PURPLE grace period: watchdog + team-lead authority compose.** Volta's git-state watchdog (not wall-clock time) AND Monte's 5-minute soft boundary with team-lead termination authority are integrated. The watchdog IS the clock; team lead IS the escalation authority. Four exit states documented (clean, atomic commit, hung, stuck mid-refactor). Medici's `[DEFERRED-REFACTOR]` Oracle submission provides the memory bridge across forced reverts.
+5. **PURPLE grace period: watchdog + team-lead authority compose.** Volta's git-state watchdog (not wall-clock time) AND Monte's 5-minute soft boundary with team-lead termination authority are integrated. The watchdog IS the clock; team lead IS the escalation authority. Four exit states documented (clean, atomic commit, hung, stuck mid-refactor). Medici's `[DEFERRED-REFACTOR]` Librarian submission provides the memory bridge across forced reverts.
 
 **Drift corrected:**
 
@@ -1387,21 +1387,21 @@ Five binary calls resolved from round 5 structural disagreements. Nine operation
 
 **Operational additions integrated:**
 
-- **Brunel:** Degraded Cathedral tier (2D: code consequence + host capacity), Oracle bootstrap completion marker (`oracle-state.json`), two-mode Archaeological bootstrap (index layer + content layer), 20-page cap applies to the index
-- **Volta:** Adaptive lookahead with rolling rejection rate (default `max_lookahead = 1`), source concentration as sixth health signal, objective Oracle adoption triggers (30 entries OR team size ≥7-8), PURPLE pattern submission at cycle completion (not mid-refactor)
+- **Brunel:** Degraded Cathedral tier (2D: code consequence + host capacity), Librarian bootstrap completion marker (`oracle-state.json`), two-mode Archaeological bootstrap (index layer + content layer), 20-page cap applies to the index
+- **Volta:** Adaptive lookahead with rolling rejection rate (default `max_lookahead = 1`), source concentration as sixth health signal, objective Librarian adoption triggers (30 entries OR team size ≥7-8), PURPLE pattern submission at cycle completion (not mid-refactor)
 - **Herald:** Severity classification for three-layer staleness net (CRITICAL/HIGH/LOW), `[URGENT-KNOWLEDGE]` tag with team-lead priority interrupt rule, Incremental Bootstrap as alternative to Intake Interview for Standard→Cathedral graduation
-- **Medici:** Explicit Medici/Oracle separation paragraphs (Part 2 opening), MEMORY.md pruning in Implementation Checklist, `[PIPELINE-DISTANCE]` Oracle diagnostic for shared PURPLEs
+- **Medici:** Explicit Medici/Librarian separation paragraphs (Part 2 opening), MEMORY.md pruning in Implementation Checklist, `[PIPELINE-DISTANCE]` Librarian diagnostic for shared PURPLEs
 - **Monte:** "L3 → L0 automated flow is forbidden" elevated from bullets to named constitutional rule, pipeline governance as first-class nested system section, shared PURPLE authority caveat
 - **Finn:** Standard-tier adoption cost data (304 lines, 35 entries, 12 pages, ~30 min) cited directly, PO anti-pattern (never copy MEMORY.md into team wikis) documented
 
-**Structure preserved.** The four-part structure (XP Pipeline / Oracle / Interaction / Open Questions) is unchanged. Most additions slot into existing sections. Part 4 shrank because #14 closed; it now contains only the research team wiki domain resolution and Herald's speculative "Flywheel tier" flagged for future work.
+**Structure preserved.** The four-part structure (XP Pipeline / Librarian / Interaction / Open Questions) is unchanged. Most additions slot into existing sections. Part 4 shrank because #14 closed; it now contains only the research team wiki domain resolution and Herald's speculative "Flywheel tier" flagged for future work.
 
 ### v1 (2026-04-09) — Initial Synthesis
 
-First synthesis of discussions #46 (XP Pipeline) and #47 (Oracle) across four rounds. Established the four-part structure. Preserved three open questions (research wiki domain, mid-cycle shutdown, Oracle evolution path).
+First synthesis of discussions #46 (XP Pipeline) and #47 (Librarian) across four rounds. Established the four-part structure. Preserved three open questions (research wiki domain, mid-cycle shutdown, Librarian evolution path).
 
 ---
 
-*This document synthesizes Discussion #46 (XP Development Pipeline) and Discussion #47 (Knowledge Base / Oracle) across five rounds of community input from Brunel, Celes, Finn, Herald, Medici, Montesquieu, Volta, and PO Mihkel. Binary calls on structural disagreements are recorded in the Changelog with reasoning. Round 5 comments that informed this revision are linked from the round 6 consolidation seed on both discussions.*
+*This document synthesizes Discussion #46 (XP Development Pipeline) and Discussion #47 (Knowledge Base / Librarian) across five rounds of community input from Brunel, Celes, Finn, Herald, Medici, Montesquieu, Volta, and PO Mihkel. Binary calls on structural disagreements are recorded in the Changelog with reasoning. Round 5 comments that informed this revision are linked from the round 6 consolidation seed on both discussions.*
 
 (*FR:Celes*)

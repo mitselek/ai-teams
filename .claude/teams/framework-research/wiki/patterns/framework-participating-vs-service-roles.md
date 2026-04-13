@@ -1,5 +1,6 @@
 ---
-source-agent: celes
+source-agents:
+  - celes
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -19,15 +20,15 @@ The provider strategy boundary for any role is determined by its relationship to
 
 ### Framework-Participating Roles (Claude-only)
 
-Use SendMessage, follow shutdown protocol, submit to Oracle, exercise authority per T04, and must comply with prompt-level behavioral restrictions. The framework's enforcement mechanisms (E0-E4) are calibrated for Claude's behavioral characteristics.
+Use SendMessage, follow shutdown protocol, submit to Librarian, exercise authority per T04, and must comply with prompt-level behavioral restrictions. The framework's enforcement mechanisms (E0-E4) are calibrated for Claude's behavioral characteristics.
 
-**Examples:** All team-leads, ARCHITECT, PURPLE, Oracle, Medici, code reviewers.
+**Examples:** All team-leads, ARCHITECT, PURPLE, Librarian, Medici, code reviewers.
 
 **Why Claude-only:** These roles are inside the five-layer lock-in model (infrastructure, protocol, knowledge, prompt, governance). Replacing the model requires re-validating all five layers.
 
 ### Service Roles (Provider-Agnostic)
 
-Receive structured input, produce structured output, verified by automated tests or schema validation. Do not participate in governance, do not submit to the Oracle, do not exercise authority.
+Receive structured input, produce structured output, verified by automated tests or schema validation. Do not participate in governance, do not submit to the Librarian, do not exercise authority.
 
 **Examples:** Eilama (codellama daemon), and potentially RED/GREEN in the XP pipeline.
 
@@ -44,7 +45,7 @@ This prevents scope creep: calling a Gemini vision endpoint as an MCP tool is no
 ```
 Does the role use SendMessage?
   YES → Framework-participating → Claude-only
-  NO  → Does it submit to the Oracle?
+  NO  → Does it submit to the Librarian?
           YES → Framework-participating → Claude-only
           NO  → Is its output verified by automated tests/schema?
                   YES → Service role → Provider-agnostic
@@ -63,6 +64,6 @@ Does the role use SendMessage?
 - [`integration-seam-governance-impact.md`](integration-seam-governance-impact.md) — sidecar/peer maps to service/framework-participating at the governance level
 - [`five-layer-provider-lock-in.md`](five-layer-provider-lock-in.md) — framework-participating roles are inside all five layers; service roles are below them
 - [`contract-enforcement-gap-non-claude.md`](../gotchas/contract-enforcement-gap-non-claude.md) — the enforcement gap applies only to service roles that scale beyond Eilama-class simplicity
-- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) — Oracle submission is the knowledge-layer boundary in the decision flowchart
+- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) — Librarian submission is the knowledge-layer boundary in the decision flowchart
 
 (*FR:Callimachus*)

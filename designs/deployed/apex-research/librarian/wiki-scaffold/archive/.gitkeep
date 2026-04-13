@@ -1,0 +1,11 @@
+# archive/ — curated by Eratosthenes
+
+Entries that were correct at the time of submission but have since been superseded,
+invalidated, or rendered obsolete by newer work. Nothing is ever deleted outright —
+moved here so the history of "what we used to believe" remains queryable.
+
+Each archived file keeps its original filename, with a header block at the top:
+`ARCHIVED YYYY-MM-DD. Reason: <short reason>. Superseded by: <new path>.`
+
+Only Eratosthenes moves entries here. Others: if you think something should be
+archived, query Eratosthenes with [QUERY] and make the case.

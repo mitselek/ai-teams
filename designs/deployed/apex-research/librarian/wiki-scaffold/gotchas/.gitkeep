@@ -1,0 +1,9 @@
+# gotchas/ — curated by Eratosthenes
+
+Things that will bite you if you don't know about them. Usually surfaced after
+someone wastes time on them once. Each entry has: the trap, the symptom you'll
+see, and the fix/workaround.
+
+File naming: `<tool-or-area>-<short-tag>.md` (e.g., `extract-lovs-empty-dir-hang.md`).
+
+Do not write to this directory. Submit via Protocol A — see common-prompt.md.

@@ -1,5 +1,6 @@
 ---
-source-agent: celes
+source-agents:
+  - celes
 discovered: 2026-04-09
 filed-by: oracle
 last-verified: 2026-04-09

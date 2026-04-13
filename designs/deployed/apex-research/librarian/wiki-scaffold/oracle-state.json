@@ -1,0 +1,19 @@
+{
+  "_comment": "Bootstrap state file for the apex-research knowledge hub (Librarian role, agent Eratosthenes). Filename kept as 'oracle-state.json' in Pass 1 — machine identifier will be renamed in Pass 2 alongside other machine identifiers (filed-by: oracle, agentType: 'oracle'). Do not hand-edit — maintained by Eratosthenes.",
+  "version": 1,
+  "role": "librarian",
+  "curator": "eratosthenes",
+  "intake_complete": false,
+  "intake_date": null,
+  "initialized": null,
+  "entry_count": {
+    "patterns": 0,
+    "gotchas": 0,
+    "decisions": 0,
+    "contracts": 0,
+    "archive": 0
+  },
+  "last_submission": null,
+  "last_query": null,
+  "index": []
+}

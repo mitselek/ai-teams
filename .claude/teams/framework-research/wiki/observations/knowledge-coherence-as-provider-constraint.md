@@ -1,5 +1,6 @@
 ---
-source-agent: callimachus
+source-agents:
+  - callimachus
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -33,7 +34,7 @@ Six agents analyzed the single-provider question from six different domains. Eve
 - **Celes** (agent design): behavioral compliance is the constraint — most critically in producing knowledge artifacts semantically compatible with other agents' artifacts
 - **Finn** (research): prompt files are the portable asset — but portability is limited by the knowledge conventions they encode (Protocol A format, evidence structure)
 - **Montesquieu** (governance): governance complexity scales non-linearly — most expensively in maintaining consistent behavioral baselines for knowledge quality assessment
-- **Callimachus** (knowledge): classification quality depends on both Oracle and submitting agent producing compatible signal — provider heterogeneity risks silent semantic incompatibility
+- **Callimachus** (knowledge): classification quality depends on both Librarian and submitting agent producing compatible signal — provider heterogeneity risks silent semantic incompatibility
 
 ## Reframing
 
@@ -41,11 +42,11 @@ The productive question is not "which roles can tolerate different providers?" b
 
 **Safe for multi-provider:** Roles that do not submit to or read from the knowledge layer (RED, GREEN, Eilama-class daemons).
 
-**Risky for multi-provider:** Any role that submits to the Oracle, flags staleness, classifies confidence, or curates wiki entries.
+**Risky for multi-provider:** Any role that submits to the Librarian, flags staleness, classifies confidence, or curates wiki entries.
 
 ## Cited Topic Files
 
-- T09 § Part 2 (Oracle protocols, staleness detection, knowledge velocity)
+- T09 § Part 2 (Librarian protocols, staleness detection, knowledge velocity)
 - T03 § Protocol 1 (inter-team handoff — format fidelity during relay)
 - T01 § Model Tiering Patterns (consequence of error as the tiering axis)
 - T06 § Non-Claude Agent Lifecycle (Eilama sidecar pattern)

@@ -1,5 +1,6 @@
 ---
-source-agent: herald
+source-agents:
+  - herald
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -47,5 +48,6 @@ Test gates verify code correctness but not handoff message quality. PURPLE depen
 
 - [`claude-infrastructure-dependencies.md`](claude-infrastructure-dependencies.md) — Layer 2 protocol conventions are provider-agnostic in format but not in interpretation quality
 - [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) — Protocol interpretation variance is one expression of the broader knowledge coherence constraint
+- [`protocol-shapes-are-typed-contracts.md`](protocol-shapes-are-typed-contracts.md) — the *intra-Claude* analog of cross-provider protocol drift. This entry covers behavioral variance across model providers; that entry covers field-set drift across independently-authored documents within a single provider. Two failure modes of the same family: protocol failures that don't surface as errors
 
 (*FR:Callimachus*)

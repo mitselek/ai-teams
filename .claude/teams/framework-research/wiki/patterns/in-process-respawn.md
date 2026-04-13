@@ -1,5 +1,6 @@
 ---
-source-agent: team-lead
+source-agents:
+  - team-lead
 discovered: 2026-04-09
 filed-by: oracle
 last-verified: 2026-04-09

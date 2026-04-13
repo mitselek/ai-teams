@@ -1,5 +1,6 @@
 ---
-source-agent: brunel
+source-agents:
+  - brunel
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10

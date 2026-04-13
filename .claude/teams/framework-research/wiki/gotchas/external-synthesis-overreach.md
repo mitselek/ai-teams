@@ -1,5 +1,6 @@
 ---
-source-agent: finn
+source-agents:
+  - finn
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -31,7 +32,7 @@ Speculative future scenarios are treated as confirmed capability gaps with speci
 
 Distinct concerns from different specialists are merged into a single category, losing the distinction between problems with different solutions.
 
-**Instance:** Callimachus's concern (semantic classification quality in the Oracle pipeline) and Celes's concern (behavioral compliance in prompt engineering) were merged into one "Knowledge Compatibility Barrier" — losing the distinction between a knowledge-layer problem and a prompt-engineering problem.
+**Instance:** Callimachus's concern (semantic classification quality in the Librarian pipeline) and Celes's concern (behavioral compliance in prompt engineering) were merged into one "Knowledge Compatibility Barrier" — losing the distinction between a knowledge-layer problem and a prompt-engineering problem.
 
 ## Verification Checklist for External Reviews
 

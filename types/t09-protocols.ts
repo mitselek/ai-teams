@@ -36,7 +36,7 @@ export interface TestCasePosition {
 }
 
 /**
- * Git commit SHA. Used by GREEN, PURPLE, and Oracle provenance.
+ * Git commit SHA. Used by GREEN, PURPLE, and Librarian provenance.
  */
 export type CommitSha = string;
 
@@ -225,15 +225,15 @@ export interface CycleComplete {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Part 2 — Oracle Dual-Hub Routing
+// Part 2 — Librarian Dual-Hub Routing
 // See topics/09-development-methodology.md § "Dual-Hub Topology" and
 // "[URGENT-KNOWLEDGE] message format".
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * [URGENT-KNOWLEDGE] (Oracle → Team-Lead → affected agent).
+ * [URGENT-KNOWLEDGE] (Librarian → Team-Lead → affected agent).
  *
- * The narrow routing exception to the dual-hub topology. The Oracle uses
+ * The narrow routing exception to the dual-hub topology. The Librarian uses
  * this when new knowledge may invalidate another agent's in-flight work.
  * Team-lead's prompt treats the message as a priority interrupt, processed
  * before the next work dispatch — this bounds the damage window to one
@@ -242,7 +242,7 @@ export interface CycleComplete {
  * Source: T09 § "Dual-Hub Topology" → "[URGENT-KNOWLEDGE] message format".
  */
 export interface UrgentKnowledgeMessage {
-  /** Always "Oracle" — the Oracle is the only sender of this message type. */
+  /** Always "Oracle" — the Librarian is the only sender of this message type. Machine identifier pending Pass 2 rename. */
   from: "Oracle";
   /** The agent whose current work may be invalidated. */
   affectsAgent: string;
@@ -256,7 +256,7 @@ export interface UrgentKnowledgeMessage {
   /** Which of the affected agent's current tasks may be invalidated. */
   affectedWork: string;
   /**
-   * Oracle's recommendation. Team-lead makes the final call — "interrupt",
+   * Librarian's recommendation. Team-lead makes the final call — "interrupt",
    * "queue for next handoff", or "informational only" are the three levers
    * team-lead can pull.
    */
@@ -267,18 +267,18 @@ export interface UrgentKnowledgeMessage {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Part 2 — Oracle Communication Protocols
+// Part 2 — Librarian Communication Protocols
 // See topics/09-development-methodology.md § "Communication Protocols"
 // (Protocol A: Knowledge Submission, Protocol B: Knowledge Query,
 // Protocol C: Knowledge Promotion).
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Protocol A — Knowledge Submission (Agent → Oracle).
+ * Protocol A — Knowledge Submission (Agent → Librarian).
  *
- * An agent explicitly submits a discovery to the Oracle. The agent makes
+ * An agent explicitly submits a discovery to the Librarian. The agent makes
  * the initial scope classification (they have the domain context); the
- * Oracle may override during filing. Urgent submissions trigger
+ * Librarian may override during filing. Urgent submissions trigger
  * `UrgentKnowledgeMessage` routing through team-lead.
  *
  * Source: T09 § "Communication Protocols" → "Protocol A: Knowledge Submission".
@@ -303,10 +303,10 @@ export interface KnowledgeSubmission {
 }
 
 /**
- * Protocol B (request) — Knowledge Query (Agent → Oracle).
+ * Protocol B (request) — Knowledge Query (Agent → Librarian).
  *
- * An agent asks the Oracle a question. `urgency` controls whether the
- * Oracle responds ahead of other work ("blocking") or folds the query
+ * An agent asks the Librarian a question. `urgency` controls whether the
+ * Librarian responds ahead of other work ("blocking") or folds the query
  * into normal curation flow ("background").
  *
  * Source: T09 § "Communication Protocols" → "Protocol B: Knowledge Query".
@@ -315,16 +315,16 @@ export interface KnowledgeQuery {
   from: string;
   /** Natural-language question. */
   question: string;
-  /** What the agent is trying to do. Gives the Oracle context to synthesize. */
+  /** What the agent is trying to do. Gives the Librarian context to synthesize. */
   context: string;
   urgency: "blocking" | "background";
 }
 
 /**
- * Protocol B (response) — Knowledge Response (Oracle → Agent).
+ * Protocol B (response) — Knowledge Response (Librarian → Agent).
  *
- * The Oracle's reply to a `KnowledgeQuery`. On `not-documented` or `partial`,
- * the Oracle also creates a gap stub — an explicit record of what the team
+ * The Librarian's reply to a `KnowledgeQuery`. On `not-documented` or `partial`,
+ * the Librarian also creates a gap stub — an explicit record of what the team
  * doesn't know. Over time, gap stubs form a map of the team's ignorance.
  *
  * Gap stubs are collaborative requests: the response asks the querying
@@ -336,14 +336,14 @@ export interface KnowledgeQuery {
 export interface KnowledgeResponse {
   to: string;
   status: "found" | "partial" | "not-documented";
-  /** Wiki pages the Oracle consulted to synthesize the answer. */
+  /** Wiki pages the Librarian consulted to synthesize the answer. */
   sources: string[];
   /** Direct answer synthesized from wiki entries. */
   answer: string;
   /** Other wiki pages for additional context. */
   relatedEntries: string[];
   /**
-   * Populated when `status` is "not-documented" or "partial". The Oracle
+   * Populated when `status` is "not-documented" or "partial". The Librarian
    * creates a stub marking this as a tracked team gap, and the stub
    * includes a request asking the querying agent to close the loop.
    */
@@ -354,9 +354,9 @@ export interface KnowledgeResponse {
 }
 
 /**
- * Protocol C — Knowledge Promotion (Oracle → Team-Lead → Common-Prompt).
+ * Protocol C — Knowledge Promotion (Librarian → Team-Lead → Common-Prompt).
  *
- * When a wiki entry matures enough to become a team rule, the Oracle
+ * When a wiki entry matures enough to become a team rule, the Librarian
  * proposes promotion to common-prompt. Team-lead reviews: approved
  * promotions are written by team-lead (common-prompt is L1 team law).
  * Rejected promotions stay in the wiki as documented knowledge.
@@ -370,7 +370,7 @@ export interface PromotionProposal {
   proposedSection: string;
   /** Why this should be a team rule, not just documented knowledge. */
   justification: string;
-  /** Exact text to add to common-prompt (Oracle drafts, team-lead edits). */
+  /** Exact text to add to common-prompt (Librarian drafts, team-lead edits). */
   proposedText: string;
   /** Incidents, submissions, and queries supporting the promotion. */
   evidence: {
@@ -401,7 +401,7 @@ export interface WikiProvenance {
   sourceAgent: string;
   /** ISO date when the knowledge was discovered. */
   discovered: string;
-  /** Always "oracle" — the Oracle is the sole writer to the wiki. */
+  /** Always "oracle" — the Librarian is the sole writer to the wiki. */
   filedBy: "oracle";
   /** ISO date when the entry was last verified as current. */
   lastVerified: string;
@@ -414,7 +414,7 @@ export interface WikiProvenance {
   sourceIssues?: string[];
   /**
    * Time-based expiry for external-system knowledge (Entu, D1, Jira, APIs)
-   * that has no source file to track. ISO date; the Oracle flags expired
+   * that has no source file to track. ISO date; the Librarian flags expired
    * entries for re-verification.
    */
   ttl?: string;

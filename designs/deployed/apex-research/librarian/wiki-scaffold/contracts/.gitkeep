@@ -1,0 +1,11 @@
+# contracts/ — curated by Eratosthenes
+
+Data shape and interface contracts between specialists. When Champollion's output
+is Nightingale's input, the shape of that data is a contract — changing it breaks
+downstream work silently. This directory captures those contracts so both sides
+can reference one source of truth.
+
+Examples: `inventory-apps-json-schema.md`, `shared-cluster-overlap-fields.md`,
+`dashboard-data-agents-json.md`.
+
+Do not write to this directory. Submit via Protocol A — see common-prompt.md.

@@ -1,5 +1,6 @@
 ---
-source-agent: team-lead
+source-agents:
+  - team-lead
 discovered: 2026-04-10
 filed-by: oracle
 last-verified: 2026-04-10
@@ -18,11 +19,11 @@ Model tier (opus vs sonnet) is determined by **consequence of error** in the age
 
 ## Three Rules
 
-1. **Opus when errors are invisible and accumulate.** Judgment roles where bad output is not caught by automated checks: ARCHITECT (bad decomposition wastes a pipeline cycle), PURPLE (structural debt that tests don't detect), team-lead (coordination errors have team-wide blast radius), Oracle (wrong answers cascade to all agents).
+1. **Opus when errors are invisible and accumulate.** Judgment roles where bad output is not caught by automated checks: ARCHITECT (bad decomposition wastes a pipeline cycle), PURPLE (structural debt that tests don't detect), team-lead (coordination errors have team-wide blast radius), Librarian (wrong answers cascade to all agents).
 
 2. **Sonnet when errors are caught by tests or review.** Execution roles with automated quality gates: RED (test code validated when GREEN runs it), GREEN (implementation validated by test suite).
 
-3. **Oracle gets opus[1m].** Must hold full knowledge graph in context; wrong answers propagate to all querying agents.
+3. **Librarian gets opus[1m].** Must hold full knowledge graph in context; wrong answers propagate to all querying agents.
 
 ## Archetype Cost Patterns
 

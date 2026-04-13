@@ -372,7 +372,7 @@ Three round-5 contributions compose into one mechanism:
 
 1. **Git-state watchdog (Volta).** The watchdog monitors the git working tree, not wall-clock time. Polling every 10 seconds. A PURPLE that has not changed any files in 60 seconds is either done or stuck — both warrant action. A PURPLE that is actively modifying files is doing work, regardless of how long it takes.
 2. **5-minute soft boundary (Monte).** Inside 5 minutes from the shutdown request, PURPLE holds sovereignty over its atomic commit. At the 5-minute mark, team-lead termination authority activates and decides based on watchdog state.
-3. **`[DEFERRED-REFACTOR]` Oracle handoff (Medici).** Before PURPLE reverts uncommitted work, it submits the intended refactoring to the Oracle as a `[DEFERRED-REFACTOR]` entry — a description of what PURPLE was trying to do and why. The next session's PURPLE queries this entry and resumes from the reverted state. Memory bridge across the revert, not a replacement for the watchdog.
+3. **`[DEFERRED-REFACTOR]` Librarian handoff (Medici).** Before PURPLE reverts uncommitted work, it submits the intended refactoring to the Librarian as a `[DEFERRED-REFACTOR]` entry — a description of what PURPLE was trying to do and why. The next session's PURPLE queries this entry and resumes from the reverted state. Memory bridge across the revert, not a replacement for the watchdog.
 
 ##### Watchdog trigger
 
@@ -424,9 +424,9 @@ t=300s    5-minute soft boundary — team lead termination authority activates
 
 **Escalation rule:** At the 5-minute boundary, if the state is "stuck mid-refactor," the team lead forces termination. **PURPLE cannot refuse.** Execution authority (L3) does not override coordination authority (L2). This is the standard L3→L2 relationship from T04, made explicit for PURPLE because the refactoring context creates a temptation to claim "I'm about to finish — just a bit more."
 
-##### Oracle handoff before revert
+##### Librarian handoff before revert
 
-Before the team lead issues `git reset --hard HEAD` (in either the Hung state or the team-lead-forced revert from Stuck mid-refactor), PURPLE must submit a `[DEFERRED-REFACTOR]` entry to the Oracle. This is a brief description of what PURPLE was attempting and why:
+Before the team lead issues `git reset --hard HEAD` (in either the Hung state or the team-lead-forced revert from Stuck mid-refactor), PURPLE must submit a `[DEFERRED-REFACTOR]` entry to the Librarian. This is a brief description of what PURPLE was attempting and why:
 
 ```markdown
 ## Knowledge Submission
@@ -446,15 +446,15 @@ State at revert: <files touched, call sites migrated, remaining work>
 <files involved, CYCLE_COMPLETE of most recent successful cycle>
 ```
 
-The next session's PURPLE queries the Oracle for `[DEFERRED-REFACTOR]` entries on first activation. If it finds one relevant to the current story, it resumes from the reverted state. The reverted work is not lost — only the in-progress code is gone, and the intent is preserved in the wiki. This is a **memory bridge**, not a replacement for the revert. The git state is clean; the knowledge of what to do next session is preserved.
+The next session's PURPLE queries the Librarian for `[DEFERRED-REFACTOR]` entries on first activation. If it finds one relevant to the current story, it resumes from the reverted state. The reverted work is not lost — only the in-progress code is gone, and the intent is preserved in the wiki. This is a **memory bridge**, not a replacement for the revert. The git state is clean; the knowledge of what to do next session is preserved.
 
-**If the team has no Oracle (Standard tier or below),** the `[DEFERRED-REFACTOR]` entry goes into the team-lead's scratchpad with a `[WIP]` tag. Less durable but still functional: the next session's team lead reads it during Phase 0 Orient and can brief PURPLE manually.
+**If the team has no Librarian (Standard tier or below),** the `[DEFERRED-REFACTOR]` entry goes into the team-lead's scratchpad with a `[WIP]` tag. Less durable but still functional: the next session's team lead reads it during Phase 0 Orient and can brief PURPLE manually.
 
 ##### Expected outcome
 
 - All agents (including PURPLE) terminated. Team lead is the only active process.
 - Working tree is clean: either PURPLE committed atomically, or the watchdog/team-lead reverted uncommitted changes.
-- If revert happened, an `[DEFERRED-REFACTOR]` entry exists in the Oracle (or team-lead scratchpad) describing the interrupted work.
+- If revert happened, an `[DEFERRED-REFACTOR]` entry exists in the Librarian (or team-lead scratchpad) describing the interrupted work.
 
 ##### Failure modes
 
@@ -462,8 +462,8 @@ The next session's PURPLE queries the Oracle for `[DEFERRED-REFACTOR]` entries o
 |---|---|---|
 | Watchdog terminates a legitimate long-running refactor | Refactor genuinely needs >60s of continuous file edits but took a brief pause | Tune the unchanged-files window per deployment (60s is a default, not a law). Document the tuning in team's `startup.md`. |
 | Team lead forgets to run the watchdog and standard Phase 3 wait hangs indefinitely | Human/protocol error — team lead treated PURPLE like any other agent | `startup.md` and team-lead prompt must explicitly list PURPLE in the watchdog path. Duplicate check at spawn: if roster contains PURPLE, the shutdown protocol must include Phase 3a. |
-| `[DEFERRED-REFACTOR]` entry is lost because Oracle crashed during submission | Oracle SPOF (see T09) | Team lead respawns Oracle (per T09's standard SPOF handling). PURPLE retries the submission. If that fails, the entry falls back to team-lead scratchpad. |
-| Next session's PURPLE does not check for `[DEFERRED-REFACTOR]` entries | PURPLE prompt gap | PURPLE prompt template must include "On activation, query Oracle for `[DEFERRED-REFACTOR]` entries matching current story." This is a T09 Cathedral-tier deployment checklist item. |
+| `[DEFERRED-REFACTOR]` entry is lost because Librarian crashed during submission | Librarian SPOF (see T09) | Team lead respawns Librarian (per T09's standard SPOF handling). PURPLE retries the submission. If that fails, the entry falls back to team-lead scratchpad. |
+| Next session's PURPLE does not check for `[DEFERRED-REFACTOR]` entries | PURPLE prompt gap | PURPLE prompt template must include "On activation, query Librarian for `[DEFERRED-REFACTOR]` entries matching current story." This is a T09 Cathedral-tier deployment checklist item. |
 
 ##### Non-scope for this amendment
 

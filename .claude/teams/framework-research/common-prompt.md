@@ -3,7 +3,7 @@
 ## Team
 
 - **Team name:** `framework-research`
-- **Members:** team-lead/Aen (team coordinator), finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer), brunel (containerization engineer), callimachus (oracle / knowledge curator)
+- **Members:** team-lead/Aen (team coordinator), finn (research coordinator), medici (knowledge health), celes (agent resources manager), volta (lifecycle engineer), herald (protocol designer), brunel (containerization engineer), callimachus (librarian / knowledge curator)
 - **Mission:** Design a multi-team AI agent framework that scales to tens of teams
 
 ## Workspace
@@ -67,7 +67,7 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 
 - **`docs/health-report.md`** — Medici's output
 - **`docs/findings.md`** — cross-cutting research findings
-- **`wiki/`** — Oracle-curated knowledge base (Callimachus is the sole writer)
+- **`wiki/`** — Librarian-curated knowledge base (Callimachus is the sole writer)
 
 ### Dual-Hub Routing (Knowledge + Work)
 
