@@ -19,7 +19,8 @@ Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 
 ## APEX-RESEARCH LIBRARIAN DEPLOYMENT (2026-04-13)
 
-[CHECKPOINT] Brunel side feature-complete. 4 patches + wiki scaffold in `designs/deployed/apex-research/librarian/`. Standing by for Cal/Celes Pass1 ack + team-lead approval + PR.
+[CHECKPOINT] SHIPPED. PR #57 merged to `Eesti-Raudtee/apex-migration-research` (`feat/librarian-eratosthenes`, 12 files, 752 insertions). Schliemann spawns Eratosthenes into pre-created pane %5. Three-way cross-read caught Protocol A/B field-set bug + wiki/index.md + intake_complete dangling refs before merge.
+[DEFERRED] Awaiting Cal's eval of candidate 4th structural-discipline instance I flagged on Celes's behalf (13:25 msg): "prompt-to-artifact cross-verification". Either distinct entry (cluster → 4) or dedup of #3 protocol-shapes-are-typed-contracts. Both outcomes fine.
 [PATTERN] apex-research attribution `(*AR:<Name>*)` differs from our `(*FR:<Name>*)`. Config SOT in `~/workspace/.claude/teams/apex-research/` (repo); runtime `~/.claude/teams/...` ephemeral per startup.md.
 [DECISION] Pass1/Pass2 separation: prose renamed Oracle→Librarian, but machine identifiers (`agentType: "oracle"`, `oracle-state.json`, `filed-by: oracle`) ALL stay as "oracle" until Pass2 atomic flip. Cross-team consistency with Cal's Callimachus state. Reviewers must NOT normalize.
 [DECISION] Wiki subdirs universal set only: patterns/ gotchas/ decisions/ contracts/ archive/. No observations/process/findings — apex-research proposes domain-specific post-first-use.

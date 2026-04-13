@@ -343,11 +343,5 @@
     "summary": "Shutdown: save state and close",
     "timestamp": "2026-04-10T13:12:03.481Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1775840611312@finn\",\"from\":\"team-lead\",\"reason\":\"Bioforge-dev roster design complete and deployed. Thank you for the research — it shaped the final design.\",\"timestamp\":\"2026-04-10T17:03:31.312Z\"}",
-    "timestamp": "2026-04-10T17:03:31.312Z",
-    "read": true
   }
 ]
