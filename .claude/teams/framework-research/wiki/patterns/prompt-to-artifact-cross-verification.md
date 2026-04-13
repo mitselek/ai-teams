@@ -34,15 +34,12 @@ Before merging any prompt that references external artifacts:
 
 ## The Gate It Maps To
 
-This pattern covers the **pre-deployment verification gate** — after the prompt is drafted and cross-read, but before it ships to a live agent. The other four structural-discipline gates (drafting, cross-read, pre-merge, post-bootstrap) verify internal consistency of documents. This gate verifies **declaration-to-reality correspondence**: does the world the prompt describes actually exist?
+This pattern is the **spec-vs-output** variant of the post-bootstrap gate in the structural-discipline cluster. Its sibling, `dual-team-dir-ambiguity`, is the **spec-vs-resolution** variant (bare paths resolving against the wrong root). Together they cover two kinds of post-bootstrap failure:
 
-| Gate | What it verifies |
-|---|---|
-| Drafting (grep) | Internal references within one document |
-| Cross-read | Field-set match between two documents |
-| Pre-merge (Pass 1/2) | Rename coordination across documents |
-| Post-bootstrap (path anchoring) | Filesystem root resolution |
-| **Pre-deployment (this entry)** | **Artifact existence and structural match** |
+- **spec-vs-resolution** (dual-team-dir-ambiguity): the path in the prompt is correct but resolves to the wrong filesystem root.
+- **spec-vs-output** (this entry): the path resolves correctly but the artifact at that path does not exist or does not match the prompt's structural claims.
+
+The cluster has 4 gates and 5 members. Gate 4 (post-bootstrap) has two entries because it catches two distinct failure modes at the same lifecycle stage.
 
 ## Evidence
 
@@ -50,13 +47,13 @@ Observed during apex-research librarian deployment (session 4, 2026-04-13):
 
 - Eratosthenes prompt referenced `librarian-state.json` — file did not exist until first boot created it with default values. The default values happened to match the prompt's expectations, but only by coincidence. A schema mismatch (e.g., different field names) would have caused silent misclassification on startup.
 - Brunel's container scaffold referenced directory paths and config files that the prompt assumed would exist. Cross-verification between the scaffold artifacts and the prompt caught two path mismatches before deployment.
-- The pattern was flagged by Brunel at session 4 13:25 as a candidate for the structural-discipline cluster. Team-lead confirmed DISTINCT verdict in session 6: it maps to a 5th gate (pre-deployment) that the other 4 entries do not cover.
+- The pattern was flagged by Brunel at session 4 13:25 as a candidate for the structural-discipline cluster. Team-lead confirmed DISTINCT verdict in session 6: spec-vs-spec (gate 2, cross-read) vs spec-vs-output (this entry, post-bootstrap). Same cross-read mechanic, different lifecycle phase. Cluster = 4 gates / 5 members; this entry shares gate 4 (post-bootstrap) with dual-team-dir-ambiguity.
 
 ## Related (Structural-Discipline Cluster)
 
 - [`within-document-rename-grep-discipline.md`](within-document-rename-grep-discipline.md) — drafting gate (internal references within one document)
 - [`protocol-shapes-are-typed-contracts.md`](protocol-shapes-are-typed-contracts.md) — cross-read gate (field-set match between two documents)
 - [`pass1-pass2-rename-separation.md`](pass1-pass2-rename-separation.md) — pre-merge gate (rename coordination across documents)
-- [`dual-team-dir-ambiguity.md`](../gotchas/dual-team-dir-ambiguity.md) — post-bootstrap gate (filesystem root resolution)
+- [`dual-team-dir-ambiguity.md`](../gotchas/dual-team-dir-ambiguity.md) — **shared gate 4** (post-bootstrap): spec-vs-resolution variant. This entry is the spec-vs-output variant
 
 (*FR:Callimachus*)

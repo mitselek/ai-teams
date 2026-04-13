@@ -2,11 +2,14 @@
 
 ## Session 6 — 2026-04-13 (Active)
 
-[CHECKPOINT] **Protocol C promotion proposal v2 sent to team-lead (5 gates).** "Structural Change Discipline" — 5 wiki entries as 5 verification gates (drafting → cross-read → pre-merge → pre-deployment → post-bootstrap). Proposed as new common-prompt section between Standards and Agent Spawning Rule. Awaiting team-lead review.
-[CHECKPOINT] **Phase 2 formally activated** per team-lead approval. Wiki 29 entries (≥15), ≥10 queries served. Gap Tracking + Health Sensing now active. Gate is one-way.
-[CHECKPOINT] **5th cluster member filed.** Brunel's DISTINCT verdict confirmed by team-lead. `wiki/patterns/prompt-to-artifact-cross-verification.md` = entry #29. Maps to pre-deployment gate. Acknowledged to Brunel.
+[CHECKPOINT] **Protocol C APPROVED + LIVE.** "Structural Change Discipline" in common-prompt.md. Initial `589fda9` (v2) corrected to `48ac09e` (v3, 4-gate/5-member). First successful Protocol C cycle.
+[CHECKPOINT] **Phase 2 formally activated** per team-lead approval. Wiki 31 entries. Gap Tracking + Health Sensing active. Gate is one-way.
+[CHECKPOINT] **Wiki entries #29-31 filed this session:** #29 prompt-to-artifact-cross-verification (patterns/), #30 protocol-c-graduation-path (process/), #31 first-use-recursive-validation (patterns/).
+[CHECKPOINT] **Recursive validation filed.** Team-lead's Protocol A submission: commit `589fda9` violated Gate 2 of the rule being promoted. Corrected at `48ac09e`. First-use validates the rule. Filed as `wiki/patterns/first-use-recursive-validation.md`.
+[LEARNED] **Gate inventory ≠ entry count.** Cluster = 4 gates / 5 members. Two entries can share a gate.
+[LEARNED] **Cluster is the natural unit of promotion.** Lifecycle coverage provides the gate-mapping justification.
 [DEFERRED] Cross-pollination meta-pattern wiki entry (`role-replication-as-re-justification-audit.md`) — still pending from session 4.
-[DEFERRED] Empty wiki subdirectory review (`contracts/`, `findings/`, `process/`) — watch for ≥1 more session.
+[DEFERRED] Empty wiki subdirectory review: `contracts/` and `findings/` still empty.
 
 ## Session 5 — 2026-04-13 (Complete)
 

@@ -40,7 +40,8 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`rule-erosion-via-reasonable-exceptions.md`](patterns/rule-erosion-via-reasonable-exceptions.md) — Exceptions to hard rules are corrosion vectors; "prudent pause beats permission grant" — permission removes one blocker, not all of them
 - [`named-concepts-beat-descriptive-phrases.md`](patterns/named-concepts-beat-descriptive-phrases.md) — Named concepts (citable, reusable, harder to misremember) beat descriptive phrases for cross-artifact references; naming signal is repeated multi-word description across contexts
 - [`why-this-section-exists-incident-docs.md`](patterns/why-this-section-exists-incident-docs.md) — Prompt sections added after incidents must name the incident inline; prevents future readers from deleting the fix as "redundant"
-- [`prompt-to-artifact-cross-verification.md`](patterns/prompt-to-artifact-cross-verification.md) — Before deploying a prompt, verify every referenced artifact exists at the declared path with the declared structure; pre-deployment gate in the structural-discipline cluster
+- [`prompt-to-artifact-cross-verification.md`](patterns/prompt-to-artifact-cross-verification.md) — Before deploying a prompt, verify every referenced artifact exists at the declared path with the declared structure; post-bootstrap gate (spec-vs-output variant) in the structural-discipline cluster
+- [`first-use-recursive-validation.md`](patterns/first-use-recursive-validation.md) — When a new rule's first application catches its own author violating it, that is recursive validation — strongest evidence the rule is load-bearing. Observed: Structural Change Discipline commit `589fda9` → `48ac09e`
 
 ### gotchas/
 
@@ -57,5 +58,9 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 ### observations/
 
 - [`knowledge-coherence-as-provider-constraint.md`](observations/knowledge-coherence-as-provider-constraint.md) — The binding multi-provider constraint is knowledge coherence (semantic compatibility of agent artifacts), not infrastructure lock-in
+
+### process/
+
+- [`protocol-c-graduation-path.md`](process/protocol-c-graduation-path.md) — First proven Protocol C cycle: cluster identification → gate-mapping synthesis → proposal → review → L1 law. Commit `589fda9`. Precedent for future promotions
 
 (*FR:Callimachus*)

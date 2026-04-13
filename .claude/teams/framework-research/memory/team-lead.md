@@ -17,6 +17,7 @@
 [WIP] Cross-pollination meta-pattern wiki entry (Cal background housekeeping).
 
 [DEFERRED] **Discussion #56 actionable items** (carried from prior session, still unassigned):
+
 - Provider outage emergency protocol (Monte, T04)
 - Sidecar/peer framework in T06 (Brunel+Monte)
 - Contract enforcement mechanism (Herald)
@@ -37,6 +38,7 @@
 **Team:** Callimachus + Celes + Herald. Brunel/Monte/Finn/Volta/Medici not spawned (not needed for this scope).
 
 **Rhythm:**
+
 - Cal prepared 377-line steal-back inventory (12 patterns, 10 patches after consolidation)
 - Celes drafted coordinated patch for Cal's prompt
 - Cross-read gate with Cal caught 2 bugs (Protocol A step ordering + Batch Intake heading depth)

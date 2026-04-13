@@ -20,7 +20,7 @@ Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 ## APEX-RESEARCH LIBRARIAN DEPLOYMENT (2026-04-13)
 
 [CHECKPOINT] SHIPPED. PR #57 merged to `Eesti-Raudtee/apex-migration-research` (`feat/librarian-eratosthenes`, 12 files, 752 insertions). Schliemann spawns Eratosthenes into pre-created pane %5. Three-way cross-read caught Protocol A/B field-set bug + wiki/index.md + intake_complete dangling refs before merge.
-[DECISION] Structural-discipline cluster: 5 members across 4 gates. "Prompt-to-artifact cross-verification" is DISTINCT from protocol-shapes-are-typed-contracts (spec-vs-spec at drafting time vs. spec-vs-output post-production). Protocol A submitted to Cal (2026-04-13 17:08). Team-lead accepted verdict. Cal filing + drafting Protocol C proposal.
+[DECISION] Structural-discipline cluster SHIPPED as L1 team law (commit 589fda9). 5 members across 5 gates: drafting → cross-read → pre-merge → pre-deployment → post-bootstrap. My gate-inventory framing was the load-bearing argument. "Prompt-to-artifact cross-verification" filed at `wiki/patterns/prompt-to-artifact-cross-verification.md`.
 [PATTERN] apex-research attribution `(*AR:<Name>*)` differs from our `(*FR:<Name>*)`. Config SOT in `~/workspace/.claude/teams/apex-research/` (repo); runtime `~/.claude/teams/...` ephemeral per startup.md.
 [DECISION] Pass1/Pass2 separation: prose renamed Oracle→Librarian, but machine identifiers (`agentType: "oracle"`, `oracle-state.json`, `filed-by: oracle`) ALL stay as "oracle" until Pass2 atomic flip. Cross-team consistency with Cal's Callimachus state. Reviewers must NOT normalize.
 [DECISION] Wiki subdirs universal set only: patterns/ gotchas/ decisions/ contracts/ archive/. No observations/process/findings — apex-research proposes domain-specific post-first-use.
@@ -30,7 +30,7 @@ Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 [LEARNED] [SUBMITTED] Protocol shapes are FIELD-SET CONTRACTS, not prose. When two agents share a protocol, field set must match exactly — Scope/Confidence/Related/Evidence are load-bearing for downstream logic. Drafting from "what I think a submission should look like" produces silent classification breakage. ALWAYS read receiver's full prompt before drafting any protocol the sender uses. Tonal variation OK; field divergence breaks the interface. Filed at `wiki/patterns/protocol-shapes-are-typed-contracts.md` (Cal, 2026-04-13).
 [LEARNED] Cross-read should happen at handoff time, not as final sanity check. When a collaborator pings with v2.5/integration announcement, read their FULL artifact then, not just the section they explicitly asked about.
 [PATTERN] Submission format calibration from Cal: cite related entries by file path (`patterns/foo.md`), not natural-language descriptor — speeds librarian dedup scan. Apply on next Protocol A submission.
-[CHECKPOINT] Meta-pattern RESOLVED: 5 instances confirmed across 4 verification gates (drafting, cross-read, pre-merge, post-bootstrap). Protocol A submitted for 5th member. Cal drafting Protocol C promotion to "Structural Change Discipline" common-prompt section. Gate-mapping table delivered as load-bearing argument.
+[CHECKPOINT] Meta-pattern SHIPPED: "Structural Change Discipline" promoted to common-prompt L1 team law via Protocol C (commit 589fda9, 2026-04-13). 5 verification gates, 5 cluster members, 29 wiki entries total.
 
 ## UIKIT-DEV (2026-04-10)
 
