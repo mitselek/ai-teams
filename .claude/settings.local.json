@@ -1,14 +1,14 @@
 {
   "attribution": {
-    "commit": "Team: comms-dev",
-    "pr": "Team: comms-dev"
+    "commit": "",
+    "pr": ""
   },
   "permissions": {
     "allow": [
-      "Bash(cd:*)",
-      "Bash(TEAM_DIR=\"$HOME/.claude/teams/framework-research\")",
-      "Bash(rm -rf \"$TEAM_DIR\")",
-      "Read(//home/ai-teams/workspace/**)"
+      "Bash",
+      "Read",
+      "Edit",
+      "Write"
     ]
   }
 }
