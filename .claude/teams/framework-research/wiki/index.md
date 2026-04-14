@@ -43,6 +43,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`prompt-to-artifact-cross-verification.md`](patterns/prompt-to-artifact-cross-verification.md) — Before deploying a prompt, verify every referenced artifact exists at the declared path with the declared structure; post-bootstrap gate (spec-vs-output variant) in the structural-discipline cluster
 - [`first-use-recursive-validation.md`](patterns/first-use-recursive-validation.md) — When a new rule's first application catches its own author violating it, that is recursive validation — strongest evidence the rule is load-bearing. Observed: Structural Change Discipline commit `589fda9` → `48ac09e`
 - [`world-state-on-wake.md`](patterns/world-state-on-wake.md) — On compaction/rebuild/respawn recovery, agents read a world-state snapshot before acting on stale memory. Seed material for Volta's persist/restore extension. Source: Aalto (uikit-dev) — first externally-sourced pattern
+- [`tmux-pane-border-format-for-teams.md`](patterns/tmux-pane-border-format-for-teams.md) — Three labeling styles for tmux `pane-border-format` (role ID, persona, combined), syntax for the conditional chain, runtime persistence caveat. Sibling pattern to the pane-labels gotcha. Source: Aalto + team-lead
 
 ### gotchas/
 
@@ -51,6 +52,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`cloudflare-d1-migration-query.md`](gotchas/cloudflare-d1-migration-query.md) — 10 D1 gotchas from hr-devs: CASCADE ignores PRAGMA, safe `_new` rename pattern, BLOB traps, silent row drops, MCP write access ($5K incident)
 - [`dual-team-dir-ambiguity.md`](gotchas/dual-team-dir-ambiguity.md) — Bare `.claude/teams/<team>/` resolves to two distinct dirs (Repo team config dir at `$REPO`, durable; Runtime team dir at `$HOME`, ephemeral). Wrong-root writes vanish silently on container rebuild. Fix: leading Path Convention section anchors all bare paths to `$REPO`. Production: Eratosthenes first boot, 2026-04-13
 - [`embedded-github-token-in-git-config.md`](gotchas/embedded-github-token-in-git-config.md) — Fleet-standard `clone_or_pull()` persists GITHUB_TOKEN to `.git/config` via `sed`-injected auth URL. Fix: transient `http.extraheader` via `-c`, never persisted. Affects all teams descending from `evr-ai-base`
+- [`tmux-pane-labels-decoupled-from-personas.md`](gotchas/tmux-pane-labels-decoupled-from-personas.md) — uikit-dev tmux pane titles show role IDs (`@component-dev-1`) not persona names (Eames). Presentation layer reads layout config, not roster. Cognitive cost, functionally correct routing. Source: Aalto. Scope pending Brunel investigation
 
 ### decisions/
 
@@ -61,6 +63,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 
 - [`knowledge-coherence-as-provider-constraint.md`](observations/knowledge-coherence-as-provider-constraint.md) — The binding multi-provider constraint is knowledge coherence (semantic compatibility of agent artifacts), not infrastructure lock-in
 - [`compaction-stale-state-deployed-teams.md`](observations/compaction-stale-state-deployed-teams.md) — Aalto (uikit-dev) reports 5 compaction incidents + ranked wishlist; 5-10% of teammate messages were stale re-announcements. First externally-sourced Protocol A submission
+- [`librarian-growth-curves-by-team-type.md`](observations/librarian-growth-curves-by-team-type.md) — Cross-Librarian comparison: framework-research 34 entries / apex-research 0 entries. Three non-exclusive hypotheses (team-type ceiling, Phase 2 accelerator, submitter floor). Speculative, revisit 2026-04-28
 
 ### process/
 
