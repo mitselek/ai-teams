@@ -50,11 +50,5 @@
     "timestamp": "2026-04-13T13:38:33.817Z",
     "color": "blue",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776088262081@celes\",\"from\":\"team-lead\",\"reason\":\"Session close — Phase 1+2 committed/pushed, Schliemann briefed. Next session pivots to evr-ui-ki team, framework-research goes idle.\",\"timestamp\":\"2026-04-13T13:51:02.081Z\"}",
-    "timestamp": "2026-04-13T13:51:02.081Z",
-    "read": true
   }
 ]

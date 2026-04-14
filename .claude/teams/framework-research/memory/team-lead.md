@@ -2,9 +2,11 @@
 
 ## NEXT SESSION
 
-**Context:** Phase 1 and Phase 2 of Oracle→Librarian rename both COMPLETE (2026-04-13 afternoon). Next mission diverts to a different team at `evr-ui-ki` — framework-research stays idle between sessions, no in-flight work expected here.
+**Context:** 2026-04-14 midday session closed in pivot/on-demand mode. Framework-research stayed in background/on-demand posture. Three agents spawned (Cal, Volta, Finn), three durable doc artifacts landed, five commits pushed. Primary focus team remains uikit-dev (Aalto's container). Next framework-research trigger is either the **Fix session** (F1+F2 from persist-coverage split — latent jq bug + nomenclature rename, surgical) or the **Design session** (D1-D7 full persist-coverage ship) — whichever PO directs first.
 
-[DECISION] **Next session pivot: `evr-ui-ki` team.** Per PO direction at session close: next-mission focus shifts to maintaining an existing team at `evr-ui-ki` (likely EVR UI kit project — verify on next session start). Framework-research is not the active team for the next session; continue as background/on-demand only.
+[DECISION] **Pivot to uikit-dev continues.** Framework-research stays on-demand. Harvest docs from this session are `docs/persist-coverage-audit-2026-04-14.md` (Volta) and `docs/uikit-dev-harvest-2026-04-14.md` (Finn) — both are required reading for whoever opens the next FR session. The persist-coverage ship-session split (Fix vs Design) is captured in the WIP block below.
+
+[DECISION] **6 Aalto open questions DEFERRED from routing.** Finn's Section D has 6 questions priority-ranked P1-P3. PO + team-lead agreed to defer all 6 — no tmux-direct this session. Re-evaluate at next natural uikit-dev contact point (e.g., when Aalto surfaces a new compaction incident, or when a Fix/Design session needs the answers to proceed).
 
 [DECISION] **Phase 1 Oracle→Librarian steal-back COMPLETE** — committed `04522c7` on main. Callimachus's prompt ported 10 lessons from the Eratosthenes replication plus Path Convention section (closes the deferred Path Convention patch from 2026-04-13 morning). Routing table dual-sourced into common-prompt.md. 4 Protocol A wiki entries filed (conv-as-retroactive-telemetry, rule-erosion-via-reasonable-exceptions, named-concepts-beat-descriptive-phrases, why-this-section-exists-incident-docs) — wiki now 28 entries.
 
@@ -70,6 +72,32 @@ Priority-ranked by Finn: Q1 + Q4 highest (scaling evidence), Q6 + Q3 medium (des
 [LEARNED] **tmux-direct is a real option for cross-team coordination.** When hub path is unproven and PR-mediated isn't the right sync target, SSH + load-buffer/paste-buffer/Enter works cleanly for one-shot briefs. Procedure saved to auto-memory. Don't rathole on hub onboarding for one-off coordination — tmux-direct is 3 minutes of work and has no infrastructure cost.
 
 [LEARNED] **Two-commit phase separation keeps git history legible.** Phase 1 (design change: steal-back patch) and Phase 2 (mechanical rename) as separate commits made the log bisectable and the commit messages focused. Generalize: when a multi-artifact change has a "thematic" half and a "mechanical" half, split them.
+
+---
+
+## Session: 2026-04-14 (midday) — Cleanup + Volta audit + Finn uikit-dev harvest
+
+**Team:** Callimachus + Volta + Finn. Brunel/Monte/Celes/Herald/Medici not spawned (not needed for this scope). Aalto contacted once via tmux-direct (login code paste, pre-harvest).
+
+**Rhythm:**
+
+- Startup Steps 1-5 executed cleanly (git pull, TeamCreate, 23 inboxes restored).
+- Janitorial discovery: `project-memory/` (36 files, ~175KB of per-user auto-memory) + `.project-dir-name` marker found untracked in repo — output of a prior Volta `persist-project-state.sh` dry-run against workstation substrate. Team-lead deleted both before commit.
+- Wiki batch committed (`441be40`) — 3 pending Cal entries (tmux pane labels/format + librarian growth curves) plus index and scratchpad updates.
+- Cal spawned → filed `wiki/gotchas/persist-project-state-leaks-per-user-memory.md` (#38), committed `f8cb4e8`.
+- Volta spawned → delivered `docs/persist-coverage-audit-2026-04-14.md`, committed `37a0833`. Mitigation chosen: Option (c) target-dir refusal with `git check-ignore` opt-in, shared helper. Four structural-discipline flags surfaced, two ship-session blockers (Flag 1, Flag 3).
+- PO pivot mid-session: pull from `Eesti-Raudtee/evr-ui-kit`. Main updated (4 commits, 72 files, +207K lines Figma pipeline). Develop branch checked out locally, 15 commits touching `.claude/teams/uikit-dev/` since last cross-read.
+- Finn spawned → harvested uikit-dev develop, delivered `docs/uikit-dev-harvest-2026-04-14.md`, committed `d805b5c`. Key finds: A7 latent bug in FR's own `restore-inboxes.sh` (inline jq), A10 ephemeral-snapshot MANIFEST as empirical reference for Volta's ship session, B3 wiki governance divergence framing, B7 pane-labels gotcha is root-cause confirmation not n=2.
+- Ship-session split applied: Fix session (F1 jq extraction + F2 nomenclature rename, surgical, near-term) vs Design session (D1-D7 full persist-coverage ship, focused framework-research session). Committed `76c7820`.
+- QoL fix: `core.safecrlf = false` set globally to silence LF/CRLF chatter.
+- Side task: cloned `mitselek/bigbook` into `~/Documents/github/.mmp/bigbook` (unrelated to FR, delegated housekeeping).
+- 5 commits pushed to origin/main: `441be40`, `f8cb4e8`, `37a0833`, `d805b5c`, `76c7820`.
+
+[CHECKPOINT] Wiki 37 → 38 entries. Two new doc artifacts in `docs/`. Ship-session backlog split and indexed. Six Aalto questions queued and deferred. Scratchpad updated with F/D session split, two new [LEARNED] entries, 6-question Aalto deferral.
+
+[LEARNED 2026-04-14] **Restraint compounds: when safety submissions produce pattern-candidate byproducts, flag them and move on — don't draft them same-session.** Cal's filing pattern this session (gotcha #38 + 3 Cal candidates queued for post-freeze) is the second time restraint during freeze yielded a cleaner pattern surface than an impatient draft would have. Generalizable: the discipline of "I see the pattern, I will not draft it now" is itself information-preserving.
+
+[WARNING] **Team-lead coordinator-only discipline slipped early in the session.** Before Cal/Volta/Finn were spawned, team-lead did execution work (tmux-direct paste to Aalto, bigbook clone, initial clutter deletion, wiki batch commit, reading persist script headers). The scripts-reading specifically was Volta's territory; the user correctly flagged the slippage. Post-slippage the discipline held. Going forward: prefer spawn-before-act even for cheap one-offs during warmup.
 
 ---
 

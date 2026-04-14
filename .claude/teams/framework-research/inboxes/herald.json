@@ -5,11 +5,5 @@
     "summary": "Patch authorized — apply and verify",
     "timestamp": "2026-04-13T13:36:35.569Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776088266519@herald\",\"from\":\"team-lead\",\"reason\":\"Session close — Phase 1+2 committed/pushed, Schliemann briefed. Next session pivots to evr-ui-ki team, framework-research goes idle.\",\"timestamp\":\"2026-04-13T13:51:06.519Z\"}",
-    "timestamp": "2026-04-13T13:51:06.519Z",
-    "read": true
   }
 ]

@@ -101,5 +101,19 @@ Researched bioforge project (`~/Documents/github/mitselek/projects/bioforge/`) f
 - Entu: no server-side code repo studied
 - #56: cost data not yet gathered for single-vs-multi comparison
 - #56: provider unavailability emergency protocol — agreed as actionable deliverable by all 6 agents
+- **Six Aalto questions from uikit-dev harvest Section D** — PO deferred routing per 2026-04-14 shutdown brief. Wait for next natural uikit-dev contact, then decide subset. Ranking: Q1 (feedback.md auto-load mechanism) + Q4 (librarian-equivalent role) highest; Q6 (Protocol A/B rejection reasoning) + Q3 (flat-vs-taxonomic wiki) medium; Q2 (#92 pruning / Rams cadence) + Q5 (rename history) lower.
+- **Follow-up harvest check on sibling teams** — per B7, cheap cross-check of `cloudflare-builders`, `raamatukoi-dev`, `screenwerk` rosters to see if any use role-IDs-as-agent-addresses. Second-team-with-same-root-cause would be the true n=2 for pane-labels pattern promotion. Not this session.
+
+## [LEARNED 2026-04-14 shutdown] Cross-team harvest has n-way leverage that within-team audit lacks
+
+Team-lead's accept framed the three n-way gains cleanly: (a) latent FR bug Volta's audit couldn't surface — her scope was the NEW WIP scripts, not the EXISTING persist/restore pair, so cross-team view naturally expanded audit scope; (b) taxonomic distinction "same instance viewed deeper vs second independent instance" that only external evidence can force — saved Cal from promoting n=1 to n=2 on weak evidence; (c) architectural divergence framing in B3 that reframed the question from "convergence vs correction" to "load-bearing domain split." Cadence suggestion from team-lead: "quarterly + on-demand when a sibling team ships a major refactor." Worth remembering next time I return to this role.
+
+## [WARNING] Session 8 boundary constraints were strict and load-bearing
+
+Every constraint from the spawn brief mattered: read-only across both repos, no branch switching in evr-ui-kit, no subagent spawning (even though parallel haiku reads would have been cheaper), no direct contact with uikit-dev agents. All honored. Future harvests: replicate this boundary model — it forces synthesis into the report rather than information-gathering sprawl. The "narrow brief + strict boundaries" combination is the right envelope for this role.
+
+## [UNADDRESSED] None
+
+All items from team-lead's brief completed: Sections A (per-innovation 10 items), B (7 specific overlaps), C (Cal + Volta data points), D (6 open questions queued for routing), report saved to `docs/uikit-dev-harvest-2026-04-14.md`, scratchpad checkpoint + learned entries added. Shutdown-phase closing entries now written. Ready to approve.
 
 (*FR:Finn*)

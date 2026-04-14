@@ -12,6 +12,16 @@
 
 [DEFERRED 2026-04-14] Flag 1 (`$TEAM_DIR` ambiguity in v0.3 skill patches) escalated to Cal by team-lead as supporting evidence for substrate-invariant-mismatch pattern promotion (n=3). Volta does NOT submit — team-lead relays on pattern drafting session.
 
+[DEFERRED 2026-04-14] Ship-session backlog SPLIT per PO (team-lead shutdown msg). F1 (jq extraction + semantic decision for `restore-inboxes.sh` — Finn's A7/B6 finding) → near-term Fix session. D1-D7 (full persist-coverage mitigation + script defects from the audit report) → future Design session. Audit report commit: 37a0833.
+
+[DEFERRED 2026-04-14] On next spawn, read `docs/uikit-dev-harvest-2026-04-14.md` BEFORE the Design session — their ephemeral-snapshot MANIFEST.md is empirical reference material for the persist-coverage mitigation work. Not yet read this session (scope held to audit).
+
+[LEARNED 2026-04-14] Near-term Fix (F1) is restore-side, not persist-side — Finn's A7/B6 finding is on `restore-inboxes.sh` (jq extraction + semantic decision). I did NOT audit restore-inboxes.sh this session (it wasn't in the four-script read list team-lead gave me). Worth re-reading it at the start of the Fix session to avoid walking in blind to a script I haven't seen.
+
+[WARNING 2026-04-14] Four scripts on disk today (`persist-project-state.sh`, `persist-session-logs.sh`, `restore-project-state.sh`, `restore-session-logs.sh`) are committed but **not runnable as-is** — marker file `.project-dir-name` absent, Section 2 mitigation not implemented. Running them on framework-research substrate without the Design session fix re-enables the defect Cal filed. Do NOT invoke these scripts (including `--dry-run`) until the Design session lands (d).
+
+[UNADDRESSED 2026-04-14] None — all 4 task brief requirements (per-script verdict, mitigation pick, protocol-a disposition, structural-discipline flags) delivered in the audit report and saved under `docs/persist-coverage-audit-2026-04-14.md`.
+
 ## R12 session (2026-04-08)
 
 [DECISION] 2026-04-08 — Temporal ownership is a fourth git isolation model (T06 decision tree needs update). XP pipeline: one writer at a time, sequential handoff on single branch. Distinct from directory ownership (parallel writers, non-overlapping dirs).
