@@ -32,11 +32,14 @@ Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 [PATTERN] Submission format calibration from Cal: cite related entries by file path (`patterns/foo.md`), not natural-language descriptor — speeds librarian dedup scan. Apply on next Protocol A submission.
 [CHECKPOINT] Meta-pattern SHIPPED: "Structural Change Discipline" promoted to common-prompt L1 team law via Protocol C (commit 589fda9, 2026-04-13). 5 verification gates, 5 cluster members, 29 wiki entries total.
 
-## UIKIT-DEV (2026-04-10)
+## UIKIT-DEV (2026-04-13 migration sealed)
 
-[CHECKPOINT] 82MB Figma JSON transferred to `uikit-dev` container: scp→host→docker cp→chown.
-[CHECKPOINT] Container: `uikit-dev` on `dev@100.96.54.170`, image `uikit-dev-claude:latest`, repo `Eesti-Raudtee/evr-ui-kit`.
-[LEARNED] No deployed teams register exists. Proposed README.md table — outside write scope, awaiting team-lead.
+[CHECKPOINT] Full A+B+C migration SHIPPED. First non-framework-research team using Structural Change Discipline as active guardrail. SSH key `id_ed25519_uikit` → port 2228, team config durable in `Eesti-Raudtee/evr-ui-kit:develop` at `.claude/teams/uikit-dev/`, rc-connect key `8` via `Eesti-Raudtee/dev-toolkit:master f278a93`.
+[CHECKPOINT] Lifecycle scripts match framework-research/Volta pattern: persist prunes to 100, restore strips shutdown/idle via external `restore-filter.jq`. Do NOT mark-read — Volta doesn't, and neither should we.
+[LEARNED] Dry-run is the cheapest bug-catching gate. Reading the script passed; running it found a mangled jq regex (`""type""` vs `\"type\"`) that would have shipped broken. Commit `1deb90e` fixed via external filter file.
+[LEARNED] Base64-encode-via-SSH strips shell-escape backslashes. For scripts with `\"` or `\s`, write via heredoc with single-quote delimiter or `cat > file << 'EOF'` — never via echo/base64 pipelines.
+[LEARNED] Task assignments ≠ checkpoint approvals. When PO says "report after each phase", wait for the approval reply before moving on — even if a queued task for the next phase is already visible. Checkpoint violation noted but outcomes accepted this time.
+[GOTCHA] evr-ui-kit `.git/config` has `GITHUB_TOKEN` embedded in push URL — stored in the container. Survives rebuilds. Flagged for separate rotation task.
 
 ## RAAMATUKOI-DEV (2026-04-09)
 
