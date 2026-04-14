@@ -2,11 +2,16 @@
 
 ## NEXT SESSION
 
-**Context:** 2026-04-14 midday session closed in pivot/on-demand mode. Framework-research stayed in background/on-demand posture. Three agents spawned (Cal, Volta, Finn), three durable doc artifacts landed, five commits pushed. Primary focus team remains uikit-dev (Aalto's container). Next framework-research trigger is either the **Fix session** (F1+F2 from persist-coverage split — latent jq bug + nomenclature rename, surgical) or the **Design session** (D1-D7 full persist-coverage ship) — whichever PO directs first.
+**Context:** 2026-04-14 midday session closed in pivot/on-demand mode. Three agents spawned (Cal, Volta, Finn), three durable doc artifacts landed, six commits pushed. **Next session's directive pivots to a NEW research branch: Jira pipeline assessment** — unrelated to the persist-coverage ship backlog (which stays queued).
 
-[DECISION] **Pivot to uikit-dev continues.** Framework-research stays on-demand. Harvest docs from this session are `docs/persist-coverage-audit-2026-04-14.md` (Volta) and `docs/uikit-dev-harvest-2026-04-14.md` (Finn) — both are required reading for whoever opens the next FR session. The persist-coverage ship-session split (Fix vs Design) is captured in the WIP block below.
+[DECISION 2026-04-14 close] **Next session topic: assess Eesti Raudtee's Jira + GitFlow development pipeline.** PO-directed reading material before session work begins:
+- **Page 1:** `https://eestiraudtee.atlassian.net/wiki/spaces/VJS2/pages/1163755527/Arendusprotsessi+Workflow+JIRA` — "Arendusprotsessi Workflow JIRA" (Development process workflow in Jira). Space: VJS2. Page ID: 1163755527.
+- **Page 2:** `https://eestiraudtee.atlassian.net/wiki/spaces/VJS2/pages/1660518403/V+ljalaskeprotsess+GitFlow` — "Väljalaskeprotsess GitFlow" (Release process / GitFlow). Space: VJS2. Page ID: 1660518403.
+Both are in Estonian. Expect `atlassian:search-company-knowledge` skill or Confluence API access via existing `~/.claude/.env` credentials (`ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN`). Recommended opening team: Finn (read the pages, produce structured digest) + possibly Cal (classify findings into patterns vs gotchas vs observations). Framework-research's persist-coverage ship backlog (Fix + Design sessions) and post-freeze Cal candidates stay QUEUED — do not start them unless PO redirects.
 
-[DECISION] **6 Aalto open questions DEFERRED from routing.** Finn's Section D has 6 questions priority-ranked P1-P3. PO + team-lead agreed to defer all 6 — no tmux-direct this session. Re-evaluate at next natural uikit-dev contact point (e.g., when Aalto surfaces a new compaction incident, or when a Fix/Design session needs the answers to proceed).
+[DECISION 2026-04-14] **Pivot to uikit-dev continues in the background.** Harvest docs from today's session are `docs/persist-coverage-audit-2026-04-14.md` (Volta) and `docs/uikit-dev-harvest-2026-04-14.md` (Finn) — required reading IF Fix/Design session is triggered. Not required for the Jira pipeline assessment session.
+
+[DECISION 2026-04-14] **6 Aalto open questions DEFERRED from routing.** Finn's Section D has 6 questions priority-ranked P1-P3. PO + team-lead agreed to defer all 6 — no tmux-direct this session. Re-evaluate at next natural uikit-dev contact point.
 
 [DECISION] **Phase 1 Oracle→Librarian steal-back COMPLETE** — committed `04522c7` on main. Callimachus's prompt ported 10 lessons from the Eratosthenes replication plus Path Convention section (closes the deferred Path Convention patch from 2026-04-13 morning). Routing table dual-sourced into common-prompt.md. 4 Protocol A wiki entries filed (conv-as-retroactive-telemetry, rule-erosion-via-reasonable-exceptions, named-concepts-beat-descriptive-phrases, why-this-section-exists-incident-docs) — wiki now 28 entries.
 
