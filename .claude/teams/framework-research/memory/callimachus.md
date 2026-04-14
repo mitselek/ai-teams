@@ -1,6 +1,14 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 6 — 2026-04-13 (Active)
+## Session 7 — 2026-04-14 (Active)
+
+[CHECKPOINT] **First externally-sourced Protocol A intake** (task #13). Aalto (uikit-dev team-lead) reported 5 compaction incidents + ranked wishlist via tmux-direct relay. Filed as `wiki/observations/compaction-stale-state-deployed-teams.md` (#32) + derived pattern `wiki/patterns/world-state-on-wake.md` (#33). Seed material for Volta's persist/restore extension.
+[CHECKPOINT] **Brunel's embedded-token gotcha filed.** `wiki/gotchas/embedded-github-token-in-git-config.md` (#34). Fleet-wide defect: `clone_or_pull()` persists GITHUB_TOKEN to `.git/config` via sed-injected auth URL. Fix: transient `http.extraheader`. Runtime-confirmed on uikit-dev, static-confirmed on 4 entrypoints, inheritance-suspected on 3 more teams. `evr-ai-base` image clean.
+[LEARNED] **External intake requires explicit provenance frontmatter.** Added `source-team`, `intake-method`, `wiki-entry-type: external` fields to distinguish from internal submissions. First use: Aalto entries (#32, #33).
+[WIP] **Phase 2 metric proposal:** external-vs-internal source ratio = 2/34 (~5.9%) for session 7. Target 10-20% for mature team. Include in Knowledge Health Summary at shutdown.
+[DEFERRED] **Meta-pattern:** silent state drift between producer and consumers after producer changes. Three independent observations in 2 days (Gate 2 violation at 589fda9, restore-inboxes.sh shell-escape bug, Aalto compaction stale state). Name and file when Volta's available.
+
+## Session 6 — 2026-04-13 (Complete)
 
 [CHECKPOINT] **Protocol C APPROVED + LIVE.** "Structural Change Discipline" in common-prompt.md. Initial `589fda9` (v2) corrected to `48ac09e` (v3, 4-gate/5-member). First successful Protocol C cycle.
 [CHECKPOINT] **Phase 2 formally activated** per team-lead approval. Wiki 31 entries. Gap Tracking + Health Sensing active. Gate is one-way.
