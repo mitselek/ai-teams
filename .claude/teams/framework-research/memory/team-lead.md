@@ -16,6 +16,21 @@
 
 [WIP] Cross-pollination meta-pattern wiki entry (Cal background housekeeping).
 
+[WIP] **Substrate-invariant-mismatch pattern candidate (n=2, supporting n=3)** — flagged by Cal 2026-04-14 after filing `persist-project-state-leaks-per-user-memory.md` (#38). Shape: "syntactically correct code, invariants don't hold on this substrate." Two primary instances now cross-referenced bidirectionally:
+- `dual-team-dir-ambiguity.md` (path-ambiguity variant, Eratosthenes first boot)
+- `persist-project-state-leaks-per-user-memory.md` (wrong-substrate variant, script mirror semantics this session)
+Third supporting data point from Volta's 12:54 audit (Flag 1): v0.3 skill-integration patches reference `$TEAM_DIR` ambiguously — same root cause as dual-team-dir-ambiguity applied to a NEW consumer (skill files). Evidence the original gotcha has broad-consumer scope. n=2 qualifies for pattern promotion; Cal held back per delivery-window freeze. Candidate names: `substrate-invariant-mismatch` or `right-code-wrong-substrate`. Queue for next non-freeze framework-research session — Cal drafts, team-lead reviews.
+
+[WIP] **Persist-coverage ship session blockers (from Volta audit 2026-04-14 12:54)** — see `docs/persist-coverage-audit-2026-04-14.md` (Volta to save). Ship session must land these in order:
+1. **Mitigation FIRST** — Option (c) target-dir refusal with `git check-ignore` opt-in, shared helper `_substrate-check.sh` sourced by both persist scripts. Not (a), not (b), not layered. Rationale: (c) detects the ground-truth invariant at the write site; opt-in inverts (b)'s fail-open into fail-closed with explicit team assertion.
+2. **THEN** marker file `.project-dir-name` re-creation (Flag 3: order matters — re-creating marker without mitigation re-enables the exact defect Cal filed).
+3. **Flag 1 fix:** v0.3 skill patches must declare Path Convention or anchor `$TEAM_DIR` to `$REPO`. Sibling fix to `dual-team-dir-ambiguity.md`.
+4. **Script-level defects:** `persist-project-state.sh` atomic wipe-then-copy via trap; `persist-session-logs.sh` cross-operator tarball collision guard.
+5. **`protocol-a-submission-draft.md` disposition:** HOLD (not stale, don't delete). Pre-ship: add STATUS UPDATE annotation noting mitigation must be integrated into submission body. Post-ship: revision pass to incorporate substrate-hazard sibling. Route direct to Cal via dual-hub rule (no team-lead intermediate).
+6. **Softer flags (non-blocking):** Flag 2 — strip absolute byte counts from protocol-a draft (replace with structural claims). Flag 4 — fix `<agent-name>` literal placeholder in v0.3 skill patch prose.
+
+[LEARNED 2026-04-14] **(c) over (a) over (b) for substrate-mismatch defect class** — Volta's reasoning: (a) container-only guard requires unenforceable cross-team invariant (every container entrypoint must plant sentinel, every workstation must not); (b) .gitignore entry suppresses at git layer not write site, fails-open; (c) detects the actual invariant via `git check-ignore` with opt-in escape hatch. The `check-ignore` opt-in is the key innovation — it inverts (b)'s fail-open into fail-closed with explicit team assertion, letting container teams opt in via team-local `.gitignore` while workstation operators get hard refusal. Generalizable to any "correct code, wrong substrate" defect class where the write site can detect the invariant directly.
+
 [DEFERRED] **Discussion #56 actionable items** (carried from prior session, still unassigned):
 
 - Provider outage emergency protocol (Monte, T04)
