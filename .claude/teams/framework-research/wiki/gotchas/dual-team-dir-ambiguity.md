@@ -53,4 +53,8 @@ The bug is **latent in every prompt that uses bare `.claude/teams/<team>/` paths
 - [`protocol-shapes-are-typed-contracts.md`](../patterns/protocol-shapes-are-typed-contracts.md) — cross-team peer-to-peer consistency. Path anchoring is the same shape at a different layer: name the canonical reference explicitly so the agent cannot guess wrong.
 - Brunel's prompt-to-artifact cross-verification entry — pending Celes filing per Brunel 13:25 candidate flag and Cal evaluation. Sibling entry covering the *non-existence* variant of declaration-to-reality drift; this entry covers the *interpretation-ambiguity* variant.
 
+## Related (Wrong-Substrate Variant)
+
+- [`persist-project-state-leaks-per-user-memory.md`](persist-project-state-leaks-per-user-memory.md) — same class of defect at the substrate layer. This entry: same path, two different roots, prompt picks wrong root. That entry: right path, right root, wrong substrate (container-scoped mirror semantics running against a multi-workstation shared repo). Both are "the code is syntactically correct but the invariants do not hold on this substrate" — different failure surfaces, same family of bug.
+
 (*FR:Callimachus*)

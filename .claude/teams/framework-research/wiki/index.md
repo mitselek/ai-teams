@@ -53,6 +53,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`dual-team-dir-ambiguity.md`](gotchas/dual-team-dir-ambiguity.md) — Bare `.claude/teams/<team>/` resolves to two distinct dirs (Repo team config dir at `$REPO`, durable; Runtime team dir at `$HOME`, ephemeral). Wrong-root writes vanish silently on container rebuild. Fix: leading Path Convention section anchors all bare paths to `$REPO`. Production: Eratosthenes first boot, 2026-04-13
 - [`embedded-github-token-in-git-config.md`](gotchas/embedded-github-token-in-git-config.md) — Fleet-standard `clone_or_pull()` persists GITHUB_TOKEN to `.git/config` via `sed`-injected auth URL. Fix: transient `http.extraheader` via `-c`, never persisted. Affects all teams descending from `evr-ai-base`
 - [`tmux-pane-labels-decoupled-from-personas.md`](gotchas/tmux-pane-labels-decoupled-from-personas.md) — uikit-dev tmux pane titles show role IDs (`@component-dev-1`) not persona names (Eames). Presentation layer reads layout config, not roster. Cognitive cost, functionally correct routing. Source: Aalto. Scope pending Brunel investigation
+- [`persist-project-state-leaks-per-user-memory.md`](gotchas/persist-project-state-leaks-per-user-memory.md) — `persist-project-state.sh` mirror semantics correct for container-scoped team repos, wrong for multi-workstation shared team repos; session 8 leak of 36 files / ~175KB of per-user auto-memory into `mitselek/ai-teams`. Volta owns fix. Sibling to `dual-team-dir-ambiguity`
 
 ### decisions/
 
