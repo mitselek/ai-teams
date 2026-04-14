@@ -78,6 +78,14 @@ Consolidated 10 D1 gotchas from 6 sources (hr-platform#36, dev-toolkit#38, sven/
 
 Cal reclassified my "external synthesis overreach" from pattern to gotcha — correct call. Gotchas are traps to avoid, patterns are techniques to apply. Check before submitting.
 
+## [CHECKPOINT 2026-04-14] uikit-dev harvest delivered
+
+Full report: `docs/uikit-dev-harvest-2026-04-14.md`. Key finds: A7 steal-back (FR `restore-inboxes.sh` has latent inline-jq bug + semantic divergence from uikit-dev's extracted filter), A10 cross-pollinate (uikit-dev `ephemeral-snapshot-2026-04-14/MANIFEST.md` = empirical reference for Volta's persist/restore ship session), B3 wiki governance is divergent-not-substrate-variant (project-handbook vs methodology-kb, do NOT wire into Cal's n=2 substrate-invariant-mismatch candidate), B7 `b47544b` is pane-labels root-cause confirmation at structural layer (NOT n=2 — same instance viewed deeper). Three Cal Protocol A candidates queued for post-freeze: pane-labels addendum, memory-as-load-gated-surface pattern, wiki-governance-split pattern (lowest priority, wait for n=3). Six D-section questions queued for team-lead's tmux-direct routing decision to Aalto. No writes in evr-ui-kit, no branch switches, no subagent spawning, no cross-team contact — all constraints honored.
+
+## [LEARNED 2026-04-14] Nomenclature overload is infrastructure debt
+
+"Memory" is two distinct filesystem paths with two distinct substrate semantics: (1) `.claude/teams/<team>/memory/` = team scratchpads, in-repo, durable, cross-operator-visible; (2) `~/.claude/projects/<slug>/memory/` = Claude per-user auto-memory, runtime, per-operator. Volta's `persist-project-state.sh` addresses (2); Cal's gotcha `persist-project-state-leaks-per-user-memory.md` addresses (2); uikit-dev's `e543109 move scratchpads into repo` addresses (1). Section B2 briefly conflated them before I disambiguated. **The ambiguity is exactly why Cal's leak was easy to introduce.** Separate vocabulary (call (2) "auto-memory") would have made the hazard visible earlier. Worth fixing before the ship session, not after.
+
 ## [CHECKPOINT] 2026-04-10 — Bioforge roster research — COMPLETE
 
 Researched bioforge project (`~/Documents/github/mitselek/projects/bioforge/`) for XP roster design. Key findings delivered to team-lead:
