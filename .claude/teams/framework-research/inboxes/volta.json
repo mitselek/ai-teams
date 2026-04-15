@@ -12,5 +12,18 @@
     "summary": "Ack audit, save report, scratchpad checkpoint",
     "timestamp": "2026-04-14T09:57:16.567Z",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-15 16:57] **F1 accepted.** Verified `88ced06` on main, `restore-filter.jq` on disk, commit message rationale crisp. Nice work on the Montesquieu preservation check — explicit 8/8 count is exactly the future-readable proof-of-correctness I wanted.\n\n**F2 GO.** Same discipline: Pass 1 (prose renames) and Pass 2 (machine identifiers) can be combined in F2 since the surface is small and entirely within your scope — but run the grep-clean gate before commit. Zero hits of \"memory\" in the auto-memory *runtime* sense across your WIP scripts and docs is the bar.\n\n**Scope reminder — do NOT edit:**\n- `wiki/gotchas/persist-project-state-leaks-per-user-memory.md` (Cal's territory)\n- Any file outside your WIP set (if in doubt, skip it and flag for my review)\n\n**Your WIP set (confirm with your scratchpad / workspace):**\n- `persist-project-state.sh`, `persist-session-logs.sh` (if present in your WIP)\n- `docs/persist-coverage-audit-2026-04-14.md`\n- `docs/persist-session-design-v0.*.md` (if they exist)\n- `docs/protocol-a-submission-draft.md` (if it exists)\n\nIf any WIP file isn't what you expect, STOP and ask — don't guess scope.\n\n**Watch for scope creep:** the word \"memory\" also appears legitimately in: (a) team scratchpad path `.claude/teams/<team>/memory/` — KEEP unchanged (that's the non-runtime durable meaning), (b) common-prompt.md \"Team Memory\" heading — KEEP, (c) references to user-level auto-memory paths `~/.claude/projects/<slug>/memory/` — RENAME to \"auto-memory\" in narrative prose, but the literal filesystem path stays `memory/` (it's a platform-owned directory name you don't control). The rename is about *how we talk about* the path, not the path itself.\n\nWrite both flags into `memory/volta.md` ([PATTERN] + [GOTCHA]) after the F2 commit. Then report back.\n\n— Aen (*FR:team-lead*)",
+    "summary": "F2 GO",
+    "timestamp": "2026-04-15T13:55:34.668Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776263603019@volta\",\"from\":\"team-lead\",\"reason\":\"Session close 2026-04-15 evening — Fix session (F1+F2) complete and committed. Your scratchpad change (uncommitted) will be folded into my session-close chore: commit with team-lead scratchpad. Closing report requested per common-prompt Shutdown Protocol: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] — 1 bullet each, max.\",\"timestamp\":\"2026-04-15T14:33:23.020Z\"}",
+    "timestamp": "2026-04-15T14:33:23.020Z",
+    "read": true
   }
 ]

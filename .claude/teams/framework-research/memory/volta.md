@@ -2,6 +2,18 @@
 
 # Volta scratchpad
 
+## Fix session (2026-04-15)
+
+[CHECKPOINT 2026-04-15] F1 shipped: commit `88ced06`. Extracted inline jq filter to `restore-filter.jq` sibling. Script fail-closed on missing filter. FR structural pattern kept over uikit-dev free-string.
+
+[CHECKPOINT 2026-04-15] F2 shipped: commit `5eb7f67`. "memory" → "auto-memory" rename in prose across 9 files (audit doc, design v0.1-v0.3, protocol-a draft, 4 scripts, session-logs MANIFEST). Filesystem paths and variable names unchanged (platform-owned).
+
+[PATTERN 2026-04-15] Structural JSON match beats free-string for protocol-field filters in inbox messages. Free-string `shutdown_request` false-positives on legitimate messages that discuss the protocol in prose (empirical: Finn's T07 safety report in montesquieu.json mentions "shutdown_request" as documentation, not as a protocol message). FR's `"type"\s*:\s*"shutdown_request"` correctly distinguishes actual JSON protocol messages from prose about them. **Cal Protocol A candidate post-Cal spawn.**
+
+[GOTCHA 2026-04-15] uikit-dev's `1deb90e` free-string pattern is defective — produces false positives. Cross-team debt, DEFERRED per team-lead (not this session's scope). Counter-example: montesquieu.json message from Finn discussing MEMORY.md rules. Aalto routing decision sits with team-lead.
+
+[GOTCHA 2026-04-15] jq file parser vs command-line parser escape divergence. `\s` in a `.jq` file is an invalid escape; same `\s` via bash single-quoted command-line arg works because bash passes `\\s` to jq's arg parser which interprets `\\` → `\` then `\s` as regex. Extraction to `.jq` file requires `\\s` in the file content. uikit-dev's simpler filter (no `\s`) masked this portability bug.
+
 ## R-audit session (2026-04-14)
 
 [CHECKPOINT 2026-04-14] Persist-coverage audit delivered. Full report: `docs/persist-coverage-audit-2026-04-14.md`. Mitigation: option (c) target-dir refusal + git check-ignore opt-in, shared helper. Ship-blockers: Flag 1 (`$TEAM_DIR` in skill patches) + Flag 3 (marker file before mitigation order). Draft persistence work on hold pending ship session.
@@ -14,13 +26,9 @@
 
 [DEFERRED 2026-04-14] Ship-session backlog SPLIT per PO (team-lead shutdown msg). F1 (jq extraction + semantic decision for `restore-inboxes.sh` — Finn's A7/B6 finding) → near-term Fix session. D1-D7 (full persist-coverage mitigation + script defects from the audit report) → future Design session. Audit report commit: 37a0833.
 
-[DEFERRED 2026-04-14] On next spawn, read `docs/uikit-dev-harvest-2026-04-14.md` BEFORE the Design session — their ephemeral-snapshot MANIFEST.md is empirical reference material for the persist-coverage mitigation work. Not yet read this session (scope held to audit).
+[LEARNED 2026-04-14] uikit-dev-harvest read deferred from R-audit → completed in Fix session (2026-04-15). F1 fix applied.
 
-[LEARNED 2026-04-14] Near-term Fix (F1) is restore-side, not persist-side — Finn's A7/B6 finding is on `restore-inboxes.sh` (jq extraction + semantic decision). I did NOT audit restore-inboxes.sh this session (it wasn't in the four-script read list team-lead gave me). Worth re-reading it at the start of the Fix session to avoid walking in blind to a script I haven't seen.
-
-[WARNING 2026-04-14] Four scripts on disk today (`persist-project-state.sh`, `persist-session-logs.sh`, `restore-project-state.sh`, `restore-session-logs.sh`) are committed but **not runnable as-is** — marker file `.project-dir-name` absent, Section 2 mitigation not implemented. Running them on framework-research substrate without the Design session fix re-enables the defect Cal filed. Do NOT invoke these scripts (including `--dry-run`) until the Design session lands (d).
-
-[UNADDRESSED 2026-04-14] None — all 4 task brief requirements (per-script verdict, mitigation pick, protocol-a disposition, structural-discipline flags) delivered in the audit report and saved under `docs/persist-coverage-audit-2026-04-14.md`.
+[WARNING 2026-04-14] Four persist/restore scripts committed but NOT runnable — marker file `.project-dir-name` absent, Section 2 mitigation not implemented. Do NOT invoke until Design session lands.
 
 ## R12 session (2026-04-08)
 
@@ -82,34 +90,12 @@
 
 [DEFERRED] — Draft T06 Phase 3 amendment for PURPLE grace period watchdog. T09 v2 "Mid-Cycle Shutdown: Watchdog + Team Lead Authority" (line 259) is the spec. Cross-topic change, send to team-lead for review before updating T06.
 
-## R11 session (2026-03-23)
+## Prior sessions (pruned 2026-04-15, key decisions retained)
 
-[CHECKPOINT] 2026-03-23 19:24 — Spawned, loaded scratchpad. No tasks assigned — Brunel handled provisioning solo. Clean shutdown.
+[DECISION] R9 2026-03-18 — Git isolation: 3 archetypes (independent-output=worktree, pipeline=directory-ownership-on-trunk, hybrid=split). Written to T06. Polyphony-dev classified as independent-output.
 
-## R9 session (2026-03-18)
+[PATTERN] R9 2026-03-18 — Worktree isolation is a DOWNGRADE for pipeline teams.
 
-[DECISION] 2026-03-18 12:07 — Git Isolation Strategy Selection written into T06. Two archetypes: independent-output (worktree isolation) vs pipeline (directory ownership on trunk). Decision tree, lifecycle implications, upgrade/downgrade signals.
+[PATTERN] R8 2026-03-17 — Observability is a byproduct, not a system.
 
-[PATTERN] 2026-03-18 — Worktree isolation is a DOWNGRADE for pipeline teams. Directory ownership on trunk gives conflict safety without visibility cost. Pipeline is a third archetype alongside independent-output and hybrid.
-
-[DECISION] 2026-03-18 15:55 — Polyphony-dev lifecycle: startup.md (6-phase) + memory dir + 3 shared knowledge files written. Team classified as independent-output.
-
-[DEFERRED] — Polyphony-dev common-prompt.md amendments: author attribution + team-lead shutdown protocol. Design approved in report, not yet written to file.
-
-## R8 session (2026-03-17)
-
-[PATTERN] 2026-03-17 — Hybrid teams need split git strategy. AMENDED R9: pipeline teams are a third category.
-
-[PATTERN] 2026-03-17 — Observability is a byproduct, not a system.
-
-## Prior patterns (retained)
-
-[PATTERN] 2026-03-13 — Two-level startup design: protocol (T06) = framework-level; instance (startup.md) = machine-specific checklist.
-
-[PATTERN] 2026-03-14 — Script-based lifecycle ops: derive paths from $SCRIPT_DIR + $HOME.
-
-## R6 (2026-03-14)
-
-[DEFERRED] — Relay lifecycle findings for T06 (Phase 0.5, Phase 4.5). Awaiting approval.
-
-[PATTERN] 2026-03-14 — Indirect spawning: when team-lead is a teammate, spawning is delegated.
+[PATTERN] R6 2026-03-14 — Script-based lifecycle ops: derive paths from $SCRIPT_DIR + $HOME.

@@ -81,11 +81,5 @@
     "summary": "Retranslate Q2 — repost full relay",
     "timestamp": "2026-04-15T09:45:17.209Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776259696182@finn\",\"from\":\"team-lead\",\"reason\":\"Session 2026-04-15 afternoon context clear. Closing report: [LEARNED] / [DEFERRED] / [WARNING] / [UNADDRESSED] — one bullet each max. Good work this session: scratchpad prune 189→90, Ruth Jira+Confluence dig clean, apex-research V2 verification decisive, EN→EE translation pass ×2, Schliemann tmux-direct (with Enter-gotcha noted).\",\"timestamp\":\"2026-04-15T13:28:16.182Z\"}",
-    "timestamp": "2026-04-15T13:28:16.182Z",
-    "read": true
   }
 ]

@@ -504,38 +504,10 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T08:06:42.045Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:06:42.045Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "finn",
     "text": "[2026-04-15 11:37]\n\n## Standing chore: scratchpad cleanup\n\nPre: 189 lines. Post: 90 lines. Collapsed Session-8 uikit-dev harvest, Session-9 Jira/GitFlow, Discussion #56, Bioforge, and D1 gotcha entries into tight pointers. All detail preserved in referenced docs.\n\n## Ruth Türk research — delivered\n\n**Doc:** `docs/ruth-turk-background-2026-04-15.md`\n\n**5 headline findings:**\n\n1. **VJS2 program/department lead** — manages team budget, requests dev access for Mihkel Putrinsh and Aleksandr Lerko, evaluates cloud compliance for tooling decisions (Anthropic, EA, MS Project).\n\n2. **Minimal Jira footprint** — only 4 ITSD service requests as reporter, zero issues in any development project (VL, VEO, PTL, HES, D365). She is invisible in the project boards her team uses.\n\n3. **Anthropic license request stalled 19 days** (ITSD-37823, still Open) — she prepared a detailed compliance analysis with budget proposal using VJS2 team's budget line, but it appears stuck in IT procurement.\n\n4. **Tõnu Tammer is her approver** — he's in IT leadership groups (Atlassian_VJS, Atlassian_IT, Atlassian_ITosakond) and approved her MS Project request.\n\n5. **UpRaise/OKR access** — she's in both goal-user groups, consistent with department-lead role setting or tracking objectives.\n\n**Gaps:**\n- Zero full-text mentions of \"Ruth Türk\" or \"Türk\" in VL or PTL projects — she may manage through Confluence, meetings, or UpRaise rather than Jira issues\n- Could not determine her official title — Jira user profiles don't carry job title. Would need Dynamics 365 HR or org chart for that.\n- No comment-level search API available — she may appear in issue comments that full-text search didn't catch (Jira text search can be unreliable with special characters in names)",
     "summary": "Ruth Türk research complete + scratchpad cleanup done",
     "timestamp": "2026-04-15T08:47:39.008Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:47:42.458Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:47:42.458Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:47:46.518Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:47:46.518Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:47:49.324Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:47:49.324Z",
     "color": "green",
     "read": true
   },
@@ -552,41 +524,6 @@
     "text": "[2026-04-15 11:55]\n\n## Confluence research — delivered\n\nAppended `## Confluence Activity` + `## Combined Profile` sections to `docs/ruth-turk-background-2026-04-15.md`.\n\n**5 headline Confluence findings:**\n\n1. **1 page, 0 comments, 0 @-mentions across all 78 Confluence spaces.** Her Confluence footprint is even thinner than Jira. The only page she created is a reference library of historical VJS documents (ELIT analysis, KPMG survey, ER system spec) in the V2 (VJS 2) space.\n\n2. **V2 space has 3 contributors — Laura Voolain (space creator + templates), Andres Sildnik (content structure + meeting notes), Ruth (materials archive).** No evidence of cross-interaction between them in Confluence.\n\n3. **No personal space, no blog posts, no template usage.** She didn't use the V2 templates (Meeting notes, Decision documentation, Project plan) that Laura Voolain created. Her page is a plain links-and-attachments reference page.\n\n4. **UpRaise OKR activity is invisible to Confluence API** — UpRaise stores goals in its own data layer. Her group memberships (`Atlassian_UpRaise`, `goal-users-eestiraudtee`) confirm she uses it, but we'd need the UpRaise REST API to see her actual objectives.\n\n5. **Combined picture: she operates outside Atlassian.** 4 Jira service requests + 1 Confluence page = her entire digital trail in both systems. A department lead with budget authority, compliance review skills, and resource management responsibilities — yet nearly invisible in the tools her team uses daily. She likely works through meetings, email/Teams, MS Project, and UpRaise.\n\n**Design implication added to doc:** An AI team for Ruth needs to bridge the gap between her preferred working channels and the digital project trail — she doesn't consume Jira/Confluence as primary info sources.\n\n**Gaps:**\n- CQL full-text search with \"ü\" character returns 0 — encoding issue may hide her name in page bodies\n- UpRaise API not accessible — her OKR/goal activity is a black box\n- Meeting attendance lists in V2 meeting notes may mention her but CQL can't match due to encoding\n- No way to check MS Teams/email activity via available APIs",
     "summary": "Confluence research complete — Ruth's digital footprint is remarkably thin",
     "timestamp": "2026-04-15T08:55:54.654Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T08:55:54.865Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:55:54.865Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:55:58.569Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:55:58.569Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T08:55:59.516Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:55:59.516Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:56:03.230Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:56:03.231Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:56:05.665Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:56:05.665Z",
     "color": "green",
     "read": true
   },
@@ -608,30 +545,9 @@
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T08:56:47.541Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:56:47.541Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T08:56:49.809Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T08:56:49.809Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "finn",
     "text": "[2026-04-15 12:05]\n\n## Apex-research V2 dependency: CONFIRMED — load-bearing\n\n**Stage A was decisive. Stage B unnecessary.**\n\n### Apex-research TL + roster\n\n**Schliemann** (team lead, opus). 4 agents: Champollion (research/extraction, sonnet), Nightingale (data analyst, sonnet), Berners-Lee (dashboard, sonnet), Hammurabi (spec writer, opus).\n\n### Evidence (5 independent signals)\n\n1. **ADR-0003 (\"Knowledge Base Strategy\")** explicitly names Confluence page **1585610770** as the canonical source reference — this is the exact page Ruth created. The decision: \"Originals stay in Confluence — reference by page/attachment ID, never copy .docx/.zip into this repo.\" All three V2 attachments flow through this ADR.\n\n2. **All three V2 documents fully digested** into `docs/sources/` with multi-chapter article treatment:\n   - `vjs-loppraport-v21/` — 11 chapters (KPMG report, sourced from page 1585610770 attachment)\n   - `er-system-functionality-v003/` — 17 chapters (ELIT ER system spec, sourced from page 1585610770 attachment)\n   - `ldz-er-gap-analysis-v32/` — 19 chapters (ELIT/LDz gap analysis)\n\n3. **Hammurabi's cross-validation pattern** (from scratchpad): \"Three-source cross-validation: LDz-ER (2021) + KPMG (2023) + ER doc (2022). Convergence = high confidence.\" — these are the three V2 documents used as a triangulation method for all spec decisions.\n\n4. **Schliemann's progress tracker** lists all three as \"Põhjalikult uuritud\" (thoroughly studied) — 6 sources total at that depth, and 3 of 6 are V2 documents.\n\n5. **Load-bearing citations across ADRs and specs:**\n   - ADR-0008 (shared target databases): \"Two independent source documents — LDz-ER v3.2 and VJS Lõppraport v2.1 — converge on the same requirement\"\n   - ADR-0009 (TAF/TAP messaging): \"KPMG identifies TAF/TAP as EUR 2.5M of EUR 4.4M total\"; \"ER System Functionality provides the authoritative message catalogue with 48 TAF activity codes\"\n   - ADR-0011 (API contract): updated with findings from TA Confluence + V2 sources\n   - `specs/armspv-smgs-portal.md`: KPMG gap analysis and carrier questionnaire are direct inputs to migration priorities\n\n### Strength assessment\n\n**The V2 archive is foundational, not supplementary.** The entire apex-research methodology is built on three-source triangulation where 2 of 3 primary sources (KPMG report + ER system spec) come directly from Ruth's page, and the third (LDz-ER gap analysis) was also among her archived materials. Removing V2 access would invalidate the cross-validation approach that underpins every cluster spec.\n\n### Surprise\n\nThe `source-review-methodology.md` formalizes a 4-phase, 100-point scoring system for source documents — these V2 documents are the primary subjects of that methodology. The team didn't just read them; they built their entire quality assurance process around extracting and validating their contents.\n\n### Findings tight enough for SendMessage — no append to sensitive doc needed.",
     "summary": "V2 dependency CONFIRMED — Stage A decisive, Stage B unnecessary",
     "timestamp": "2026-04-15T09:06:11.368Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T09:06:18.095Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T09:06:18.095Z",
     "color": "green",
     "read": true
   },
@@ -645,27 +561,6 @@
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T09:07:57.201Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T09:07:57.201Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T09:08:01.978Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T09:08:01.978Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T09:08:05.000Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T09:08:05.000Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
     "text": "[2026-04-15 12:31]\n\n---\n\n## Section 1: Schliemann's raw reply\n\n```\n[AR:Schliemann → FR:Finn, 2026-04-15]\n\nYes — all three V2 archive sources are load-bearing, not supplementary. Summary:\n\n(a) Heaviness: Load-bearing for 2 ADRs and 1 spec; foundational context for the rest.\nAll three exist as \"Põhjalikult uuritud\" chapter-format articles on our dashboard\n(extracted and indexed, not just cited).\n\n(b) Per-source criticality:\n\n- ER System Functionality V0.03 (ELIT) — 17-chapter extraction. Primary source for\n  TAF-TAP message catalogue (ADR-0009) and business-rule anchors (armspv-smgs-portal\n  spec P12). Without it we'd have no field-level mapping for the 48 TAF activity codes.\n- VJS Lõppraport v2.1 (KPMG, 2023) — 11-chapter extraction. Most heavily cited V2\n  source — 9 references in ADR-0009, 3 in ADR-0008, 3 in armspv spec. Anchors CIM/SMGS\n  scope decisions, TAF/TAP budget context, and the TO-BE \"API-only write\" principle.\n  When it contradicts current state (WSO2 ESB never implemented), we log that as\n  PO-confirmed corrections inline.\n```\n\n**NOTE:** The reply is truncated — Claude Code's \"Jump to bottom\" UI collapsed the long output, and tmux scrollback only retained 38 lines. The LDz-ER Gap Analysis bullet (the third V2 source) was cut. However, Schliemann explicitly confirmed \"all three V2 archive sources are load-bearing\" in his opening line, and his scratchpad independently lists all three as \"Põhjalikult uuritud.\"\n\n**Synthesis (3 lines):**\n\nSchliemann confirms load-bearing dependency without hesitation — he even grepped his own codebase before replying to verify. The ER System Functionality doc is the irreplaceable source (48 TAF activity codes have no alternative origin), while the KPMG report is the most-cited (15+ cross-references across ADRs and specs). His framing — \"extracted and indexed, not just cited\" — means these aren't bibliography entries; the V2 archive is digested into their working knowledge base at chapter granularity.\n\n**Gotcha for end-of-session:** tmux-direct-brief must send Enter after paste-buffer — I sent it in my command but it may not have fired (user had to press Enter manually). Flagging for scratchpad / possible Cal Protocol A on tmux-direct discipline.\n\n---\n\n## Section 2: Estonian translation of Ruth relay\n\nRuth — üks väike avastus, mida jagada. Oleme uurinud oma AI uurimismeeskondi ja leidsime täna taustatöö käigus, et apex-research (meeskond, kes teeb VJS/APEX migratsioonanalüüsi) on kogu oma allikametodoloogia üles ehitanud V2 Confluence'i arhiivile, mille sina kokku panid — konkreetselt KPMG raportile, ER süsteemi spetsifikatsioonile ja LDz lõheanalüüsile. Nende ADR-0003 nimetab sinu lehte kanooniliseks allikaviiteks; ligikaudu 47 peatükki nende töödeldud teadmusbaasist pärineb otse sinu kolmest manusest.\n\nSisuliselt juhid sa kuratsiooni konveierit allavoolu AI meeskonna jaoks ja keegi pole sulle sellest rääkinud. Tahaksime selle ametlikuks teha ja võimalusel ehitada sulle väike AI meeskond, mis aitab selle konveieri mõlemal poolel — võimendades kureerimist ja sulges tagasisideringi, et sa näeksid, mida apex-research sinu materjalidest tegelikult leidis.\n\nKolm kiiret küsimust, et kujundada meie ettepanek:\n\n1. Kas sa tahaksid seda? (Madala kohustusega jah/ei — me ei ehita midagi, mida sa ei taha.)\n2. Mis töö võtab sul kõige rohkem aega, millega AI meeskond võiks usutavalt aidata? (Hankimine, OKR-id, koosolekute järeltegevused, nõuetele vastavuse hindamine, kureerimine ise, midagi muud?)\n3. Kuidas sa tahaksid sellise meeskonnaga suhelda? (Teamsi kanal? Eraldiseisev vestlus? Iganädalane kokkuvõte? Midagi muud?)",
     "summary": "Schliemann reply + Estonian translation of Ruth relay",
     "timestamp": "2026-04-15T09:32:20.271Z",
@@ -674,23 +569,9 @@
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T09:32:23.644Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T09:32:23.644Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
     "text": "[2026-04-15 12:45]\n\n## Full updated Estonian relay (ready to paste into Teams)\n\nRuth — üks väike avastus, mida jagada. Oleme uurinud oma AI uurimismeeskondi ja leidsime täna taustatöö käigus, et apex-research (meeskond, kes teeb VJS/APEX migratsioonanalüüsi) on kogu oma allikametodoloogia üles ehitanud V2 Confluence'i arhiivile, mille sina kokku panid — konkreetselt KPMG raportile, ER süsteemi spetsifikatsioonile ja LDz lõheanalüüsile. Nende ADR-0003 nimetab sinu lehte kanooniliseks allikaviiteks; ligikaudu 47 peatükki nende töödeldud teadmusbaasist pärineb otse sinu kolmest manusest.\n\nSisuliselt juhid sa kuratsiooni konveierit allavoolu AI meeskonna jaoks ja keegi pole sulle sellest rääkinud. Tahaksime selle ametlikuks teha ja võimalusel ehitada sulle väike AI meeskond, mis aitab selle konveieri mõlemal poolel — võimendades kureerimist ja sulges tagasisideringi, et sa näeksid, mida apex-research sinu materjalidest tegelikult leidis.\n\nKolm kiiret küsimust, et kujundada meie ettepanek:\n\n1. Kas sa tahaksid seda? (Madala kohustusega jah/ei — me ei ehita midagi, mida sa ei taha.)\n2. Millised on kõige pakilisemad ootused, mida organisatsioon sinule esitab — tulemid, otsused või jooksvad kohustused, kus AI meeskond võiks usutavalt aidata? (Hankimine, OKR-id, koosolekute järeltegevused, nõuetele vastavuse hindamine, kureerimine ise, midagi muud?)\n3. Kuidas sa tahaksid sellise meeskonnaga suhelda? (Teamsi kanal? Eraldiseisev vestlus? Iganädalane kokkuvõte? Midagi muud?)",
     "summary": "Updated Estonian relay with revised Q2",
     "timestamp": "2026-04-15T09:45:52.161Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T09:45:55.917Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T09:45:55.917Z",
     "color": "green",
     "read": true
   },
@@ -712,13 +593,6 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T10:23:06.242Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T10:23:06.243Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-04-15 15:49] Ack receipt. Multi-part acknowledgment:\n\n1. **v0.1 → v1.0 bump:** Noted. Scratchpad CHECKPOINT updated.\n\n2. **Bridge repo = subdir of `mitselek/ai-teams`:** Recorded as DECISION. When build brief comes, bridge staging path on host will map to a subdir within this repo's git tree.\n\n3. **HR_NOTIFICATION_EMAIL = N/A:** Closed in scratchpad.\n\n4. **Infra files commit-tracked in-repo:** Recorded as REQUIREMENT. My preferred layout: `.claude/teams/ruth-team/infra/` — keeps it co-located with team config (roster.json, prompts/, etc.) under the same `.claude/teams/ruth-team/` tree, matching the structural pattern established by other team dirs. Will not create until build brief arrives.\n\n5. **Interaction channel = SSH + tmux:** Recorded as DECISION. No design doc change needed — substrate already supports this.\n\n6. **Monte Q1-Q4 still open (critical path for build):** Noted. Will not write Dockerfile until Monte answers Q1-Q2 minimum.\n\n7. **Herald Q1-Q3+Q4 still open (Q1 critical path):** Noted.\n\n8. **Volta §6.5 observability addendum incoming:** Noted as LEARNED — not my layer, but I'll be ready to accommodate substrate requirements when it lands.\n\n**Scratchpad state after this update:** 94 lines. 3 new DECISIONs, 2 new REQUIREMENTs, 1 new LEARNED. All carry-forwards correct.\n\nIdling. Will not self-wake or proactively write Dockerfile. Awaiting team-lead build brief after Monte/Herald answers.\n\n(*FR:Brunel*)",
     "summary": "Brunel ack — v1.0 accepted, carry-forwards updated",
     "timestamp": "2026-04-15T12:49:54.887Z",
@@ -727,23 +601,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T12:49:59.152Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T12:49:59.152Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-04-15 15:49] Brunel closing report.\n\n- [LEARNED] The parameterization contract table (§1.1) is the load-bearing artifact of this design — it's what makes B→E a file swap instead of a redesign. Worth promoting to a runbook section once validated by actual deployment. The three-option bridge comparison (§5) was straightforward once I anchored on \"which option is E-native?\" as the decision criterion — portability-first as a design constraint simplifies option evaluation.\n\n- [DEFERRED] Actual Dockerfile/compose/entrypoint build — blocked on Monte Q1-Q2 (credential injection) and Herald Q1 (bridge manifest format). Infra files will go to `.claude/teams/ruth-team/infra/` per new REQUIREMENT. Scratchpad carries all blockers.\n\n- [WARNING] Scratchpad is at 94 lines (budget 100). Next session should prune the UIKIT-DEV and COMMS HUB checkpoint sections if those are fully promoted to docs — they're stale carry-forwards occupying ~10 lines.\n\n- [UNADDRESSED] None. All six design requirements addressed. Both team-lead questions answered and recorded. No new requirements arrived that weren't acknowledged.",
     "summary": "Brunel closing report + shutdown approval",
     "timestamp": "2026-04-15T13:28:30.559Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776259690429@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T13:28:35.676Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T13:28:35.676Z",
     "color": "yellow",
     "read": true
   },
@@ -764,16 +624,107 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776259702544@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T13:29:35.343Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T13:29:35.343Z",
+    "from": "volta",
+    "text": "[2026-04-15 16:54] **F1 complete.** Commit `88ced06` on `main`.\n\n**What shipped:**\n- `restore-filter.jq` — new file, FR structural pattern with proper `.jq`-file escaping (`\\\\s`), commented with rationale\n- `restore-inboxes.sh` — fail-closed check on missing filter file (exit 1), inline jq replaced with `jq -f \"$FILTER_FILE\"`\n\n**Verified:**\n- Script runs clean: 23 inboxes restored, shutdown messages pruned\n- Fail-closed works: missing filter → `ERROR: Filter file missing` + exit 1\n- Filtering correct: 25 shutdown messages removed, zero false positives, montesquieu T07 report preserved (8/8 messages)\n\n**Not changed:** `persist-inboxes.sh` — confirmed no jq filter (only `.[-100:]` pruning), no parallel fix needed.\n\n**Scratchpad flags per your directive (will write after F2):**\n- `[PATTERN]` — structural match beats free-string for protocol-field filters (Cal Protocol A candidate)\n- `[GOTCHA]` — uikit-dev 1deb90e free-string pattern is defective (cross-team debt, deferred)\n\nReady for F2 go-ahead.\n\n(*FR:Volta*)",
+    "summary": "F1 shipped — commit 88ced06, ready for F2",
+    "timestamp": "2026-04-15T13:54:52.639Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776259696182@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T13:29:37.844Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T13:29:37.844Z",
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-04-15T13:54:55.745Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T13:54:55.745Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-04-15 17:03] **F2 complete.** Commit `5eb7f67` on `main`.\n\n**What shipped (9 files, 1 tracked + 8 previously-untracked WIP):**\n\nProse renames \"memory\" → \"auto-memory\" where the word referred to per-user runtime state (`~/.claude/projects/<slug>/memory/`). Unchanged: filesystem path literals (`memory/`, `$RUNTIME_MEMORY`, `--exclude=\"./$NAME/memory\"`), variable names, team scratchpad references, repo dir name (`project-memory/`).\n\n**Files touched:**\n- `docs/persist-coverage-audit-2026-04-14.md` — 1 rename\n- `docs/persist-coverage-design-v0.1.md` — 6 renames (prose + embedded script messages)\n- `docs/persist-coverage-design-v0.2.md` — 2 renames\n- `docs/persist-coverage-design-v0.3.md` — 3 renames\n- `docs/protocol-a-submission-draft.md` — 2 renames\n- `persist-project-state.sh` — 1 rename (user-facing message)\n- `persist-session-logs.sh` — 1 rename (MANIFEST template)\n\n**Grep-clean gate passed.** All remaining \"memory\" hits are: tar `--exclude` patterns, bash variable names, team scratchpad references. Zero bare \"memory\" in auto-memory prose context.\n\n**Scope boundary respected:** did NOT touch `wiki/gotchas/persist-project-state-leaks-per-user-memory.md` (Cal's territory).\n\n**Side benefit of F2 commit:** also committed 8 previously-untracked WIP files (design docs v0.1-v0.3, protocol-a draft, 4 persist/restore scripts) that were floating as untracked since R-audit session.\n\n**Scratchpad updated:** 2 checkpoints (F1, F2), 1 `[PATTERN]` (structural match beats free-string — Cal Protocol A candidate), 2 `[GOTCHA]`s (uikit-dev false-positive debt, jq file-vs-arg escape divergence). Pruned stale R8/R11/R6 entries, scratchpad at 101 lines.\n\nBoth tasks complete. Awaiting further direction or shutdown.\n\n(*FR:Volta*)",
+    "summary": "F2 shipped — commit 5eb7f67, scratchpad updated",
+    "timestamp": "2026-04-15T14:03:50.579Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-04-15T14:03:56.552Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T14:03:56.552Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-15 17:06] Callimachus online. Five startup reads complete (common-prompt, my prompt, my scratchpad, wiki/index.md, the gotcha file). Volta's scratchpad read for the [PATTERN] and [GOTCHA] tags.\n\n**Acknowledgment of all three tasks:**\n\n**Task 1 — Nomenclature rename in gotcha file.**\n- Decision: **Pass 1 only (prose rename, keep filename).** Rationale: 7 back-references, 2 of which are inboxes (runtime state, not editable by me). Pass 2 filename rename requires coordinating all 7 consumers in one batch, and inbox edits are outside my write scope. Pass 1 is clean and complete on its own. Pass 2 flagged as deferred.\n- Scope: replace \"per-user memory\" concept references in prose with \"per-user auto-memory\" where the concept is the runtime `~/.claude/projects/<slug>/memory/` mechanism. Literal paths, `project-memory/` dir name, and `MEMORY.md` filename unchanged per your instructions.\n\n**Task 2 — Protocol A intake: structural match beats free-string.**\n- Classification: **`wiki/patterns/`** — this is a reusable pattern about filter-predicate fidelity that applies across teams whenever someone writes regex/jq filters over JSON message bodies. NOT substrate-invariant-mismatch (different failure class — that's about environment assumptions; this is about match-predicate granularity).\n- Proposed filename: `structural-match-beats-free-string-for-protocol-filters.md`\n- Will document the empirical evidence (25 vs 26 matches, montesquieu.json false positive), cross-team implication (uikit-dev `1deb90e` noted as deferred debt), and source attribution (Volta, F1, `88ced06`).\n\n**Task 3 — jq file-vs-arg escape divergence.**\n- Classification: **`wiki/gotchas/`** — this is a genuine external-system gotcha about jq's parser behavior. No existing \"extraction-breaks-escape-context\" pattern in the wiki to subsume it under.\n- Proposed filename: `jq-file-vs-arg-escape-divergence.md`\n- Standalone entry. Short — the gotcha is narrow and well-defined.\n\n**Execution plan:**\n1. Task 1: prose edits to gotcha file, grep-clean gate\n2. Task 2: file new pattern, update wiki/index.md\n3. Task 3: file new gotcha, update wiki/index.md\n4. Post-bootstrap correspondence check (gate #4) on both new entries\n5. Update my scratchpad\n\nAwaiting go/no-go.",
+    "summary": "Callimachus startup + plan for 3 tasks",
+    "timestamp": "2026-04-15T14:07:10.115Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:07:18.816Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T14:07:18.816Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-15 17:11] All three tasks complete. Files ready for commit.\n\n**Task 1 — Prose rename (Pass 1):**\n- 5 edits in `wiki/gotchas/persist-project-state-leaks-per-user-memory.md`: \"project memory\" → \"project auto-memory\" (concept), \"projects memory dir\" → \"auto-memory dir\", \"Project memory scope\" → \"Project auto-memory scope\", `last-verified` → 2026-04-15.\n- Grep-clean gate: PASS. Zero bare \"project memory\" concept references remaining. Literal paths, `project-memory/` dir, `MEMORY.md` filename all preserved.\n- Pass 2 (filename rename) flagged as `[DEFERRED]` in my scratchpad with full 7-consumer inventory.\n\n**Task 2 — Pattern filed (#40):**\n- `wiki/patterns/structural-match-beats-free-string-for-protocol-filters.md`\n- Source: Volta, F1, `88ced06`. Cross-team scope. Empirical evidence table. uikit-dev `1deb90e` cross-team debt noted as deferred.\n\n**Task 3 — Gotcha filed (#41):**\n- `wiki/gotchas/jq-file-vs-arg-escape-divergence.md`\n- Source: Volta, F1, `88ced06`. Standalone. `\\s` in `.jq` file = invalid escape; needs `\\\\s`.\n\n**Gate #4 correspondence check: PASS.** 41 files on disk = 41 entries in index.md. Source-file paths corrected during gate check (were `scripts/restore-*`, actual `restore-*` at team dir root).\n\n**wiki/index.md** updated with both new entries.\n\n**Scratchpad** pruned: 154 → 41 lines. Sessions 1-7 collapsed to key decisions.\n\n**Changed files (5):**\n1. `.claude/teams/framework-research/wiki/gotchas/persist-project-state-leaks-per-user-memory.md` — prose rename\n2. `.claude/teams/framework-research/wiki/patterns/structural-match-beats-free-string-for-protocol-filters.md` — NEW\n3. `.claude/teams/framework-research/wiki/gotchas/jq-file-vs-arg-escape-divergence.md` — NEW\n4. `.claude/teams/framework-research/wiki/index.md` — 2 new entries added\n5. `.claude/teams/framework-research/memory/callimachus.md` — session 11 + pruning\n\n**Suggested commit split per your guidance:**\n- Commit 1 (Task 1): files 1, 5 — \"complete F2 nomenclature rollout on wiki-side — paired with 5eb7f67\"\n- Commit 2 (Tasks 2+3): files 2, 3, 4 — \"file structural-match pattern (#40) + jq escape gotcha (#41) from Volta F1\"\n\nGit is your domain — ready when you are.",
+    "summary": "All 3 tasks complete, ready for commit",
+    "timestamp": "2026-04-15T14:12:04.999Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:12:16.261Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T14:12:16.261Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-15 17:15] Acknowledged. Both SHAs noted (`aef1c79`, `755a144`). Standing by — available for further tasks or shutdown when ready.",
+    "summary": "Acknowledged, standing by",
+    "timestamp": "2026-04-15T14:13:49.485Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:13:53.286Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T14:13:53.286Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "[2026-04-15 17:04] Closing report:\n\n- **[LEARNED]** jq's file parser and command-line arg parser handle escape sequences differently — `\\s` works inline via bash single-quote passthrough but requires `\\\\s` in `.jq` files. Extraction is not a pure lift; escaping must be re-evaluated.\n- **[DEFERRED]** Protocol A submission to Cal: structural-match-beats-free-string pattern + jq escape portability gotcha. Ready in scratchpad, sequenced after Cal spawns.\n- **[WARNING]** uikit-dev's `1deb90e` free-string filter is empirically defective (false positive on montesquieu T07 message). Cross-team debt — Aalto routing decision pending with team-lead.\n- **[UNADDRESSED]** None — F1 and F2 both shipped per brief.\n\n(*FR:Volta*)",
+    "summary": "Volta closing report + shutdown approval",
+    "timestamp": "2026-04-15T14:33:34.851Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776263603019@volta\",\"from\":\"volta\",\"timestamp\":\"2026-04-15T14:33:39.920Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-15T14:33:39.920Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-15 17:33] Closing report, session 11.\n\n- [LEARNED] Gate #4 (post-bootstrap correspondence check) caught a source-file path error (`scripts/restore-*` vs actual `restore-*`) before commit — the gate pays for itself even on small filings.\n- [DEFERRED] Pass 2 filename rename for `persist-project-state-leaks-per-user-memory.md` — 7 back-references inventoried in scratchpad, inboxes outside my write scope prevent a clean single-batch update.\n- [WARNING] None.\n- [UNADDRESSED] None.",
+    "summary": "Closing report + shutdown approval",
+    "timestamp": "2026-04-15T14:33:43.866Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776263609789@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:33:48.470Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-15T14:33:48.470Z",
     "color": "green",
     "read": true
   }

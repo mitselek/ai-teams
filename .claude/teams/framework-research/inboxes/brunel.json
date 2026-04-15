@@ -5,11 +5,5 @@
     "summary": "v1.0 accepted + team-lead answers + new constraint",
     "timestamp": "2026-04-15T12:48:58.545Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776259690429@brunel\",\"from\":\"team-lead\",\"reason\":\"Session 2026-04-15 afternoon context clear. Closing report requested: [LEARNED] / [DEFERRED] / [WARNING] / [UNADDRESSED] — one bullet each max. Your v1.0 is accepted, infra path agreed, you're off critical path until Monte/Herald answers land next session.\",\"timestamp\":\"2026-04-15T13:28:10.430Z\"}",
-    "timestamp": "2026-04-15T13:28:10.430Z",
-    "read": true
   }
 ]
