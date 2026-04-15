@@ -2,12 +2,13 @@
 
 ## NEXT SESSION
 
-**Context:** 2026-04-14 midday session closed in pivot/on-demand mode. Three agents spawned (Cal, Volta, Finn), three durable doc artifacts landed, six commits pushed. **Next session's directive pivots to a NEW research branch: Jira pipeline assessment** — unrelated to the persist-coverage ship backlog (which stays queued).
+**Context:** 2026-04-15 morning session closed clean. Three agents contributed: Finn (Jira/GitFlow Phase 1 digest + accountId→identity lookup), Celes (Finn + Brunel prompt-letter surgical fixes, n=3 scope-drift pattern surfaced, team-lead prompt deferred to design round), Callimachus (filed wiki #39 `patterns/scope-block-drift-from-practice.md`, cluster 6 members, first multi-gate entry). External deliverable: `Eesti-Raudtee/dev-toolkit#43` — issue with full digest + 10 questions for Kuzmin (Source 2 author) + Sildnik (Source 1 v3 editor), plus team-lead shift-assessment comment. **Next session topic is OPEN — PO brings the task at session start.**
 
-[DECISION 2026-04-14 close] **Next session topic: assess Eesti Raudtee's Jira + GitFlow development pipeline.** PO-directed reading material before session work begins:
-- **Page 1:** `https://eestiraudtee.atlassian.net/wiki/spaces/VJS2/pages/1163755527/Arendusprotsessi+Workflow+JIRA` — "Arendusprotsessi Workflow JIRA" (Development process workflow in Jira). Space: VJS2. Page ID: 1163755527.
-- **Page 2:** `https://eestiraudtee.atlassian.net/wiki/spaces/VJS2/pages/1660518403/V+ljalaskeprotsess+GitFlow` — "Väljalaskeprotsess GitFlow" (Release process / GitFlow). Space: VJS2. Page ID: 1660518403.
-Both are in Estonian. Expect `atlassian:search-company-knowledge` skill or Confluence API access via existing `~/.claude/.env` credentials (`ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN`). Recommended opening team: Finn (read the pages, produce structured digest) + possibly Cal (classify findings into patterns vs gotchas vs observations). Framework-research's persist-coverage ship backlog (Fix + Design sessions) and post-freeze Cal candidates stay QUEUED — do not start them unless PO redirects.
+[DECISION 2026-04-15 close] **Next session: task TBD from PO.** When task arrives, route by topic: (a) Phase 2 Jira/GitFlow resume if PO has answers from Kuzmin/Sildnik on dev-toolkit#43 — wake Finn for partial-or-full classification; (b) persist-coverage Fix/Design ship if pivot signal; (c) fresh task — spawn specialists per need. Do NOT self-wake any agent on parked items.
+
+[PARKED — Phase 2 Jira/GitFlow classification] Held pending PO reconciliation via dev-toolkit#43. Candidates already listed in `docs/jira-gitflow-assessment-2026-04-14.md` Observations section (3 pattern, 1 gotcha, 2 decision, plus "two authoritative docs in one space silently diverge" meta-gotcha). Wake Finn with Q1/Q2/Q4 subset when answers arrive.
+
+[NEXT-SESSION-CHORE] **Prune Finn's scratchpad** at spawn time — `memory/finn.md` is ~190 lines, target is 100. Session-8 uikit-dev harvest entries (around CHECKPOINT 2026-04-14 + the 30-line detail below) can collapse to a 3-line pointer to `docs/uikit-dev-harvest-2026-04-14.md`. Finn flagged this himself at shutdown — do it during the spawn brief, not as a separate task.
 
 [DECISION 2026-04-14] **Pivot to uikit-dev continues in the background.** Harvest docs from today's session are `docs/persist-coverage-audit-2026-04-14.md` (Volta) and `docs/uikit-dev-harvest-2026-04-14.md` (Finn) — required reading IF Fix/Design session is triggered. Not required for the Jira pipeline assessment session.
 
@@ -77,6 +78,41 @@ Priority-ranked by Finn: Q1 + Q4 highest (scaling evidence), Q6 + Q3 medium (des
 [LEARNED] **tmux-direct is a real option for cross-team coordination.** When hub path is unproven and PR-mediated isn't the right sync target, SSH + load-buffer/paste-buffer/Enter works cleanly for one-shot briefs. Procedure saved to auto-memory. Don't rathole on hub onboarding for one-off coordination — tmux-direct is 3 minutes of work and has no infrastructure cost.
 
 [LEARNED] **Two-commit phase separation keeps git history legible.** Phase 1 (design change: steal-back patch) and Phase 2 (mechanical rename) as separate commits made the log bisectable and the commit messages focused. Generalize: when a multi-artifact change has a "thematic" half and a "mechanical" half, split them.
+
+---
+
+## Session: 2026-04-14 evening + 2026-04-15 morning — Jira/GitFlow assessment + prompt-letter audit + issue #43 hand-off
+
+**Team:** Callimachus + Finn + Celes. Brunel/Monte/Volta/Herald/Medici not spawned.
+
+**Rhythm:**
+
+- Startup Steps 1-5 clean (git pulled, runtime clean, TeamCreate success, 23 inboxes restored).
+- Cal spawned → health report (Phase 2 active, wiki 38 entries pre-session, WIP items noted), idle.
+- Finn spawned for Phase 1 Jira/GitFlow read-and-digest of VJS2 Confluence pages 1163755527 + 1660518403. Confluence REST API v2 access via `~/.claude/.env` creds. Delivered `docs/jira-gitflow-assessment-2026-04-14.md` (5 divergences, 10 questions). Key finding: two pages architecturally incompatible — Source 1 (Kuzmin+Sildnik, v3 2026-02-09) names `production` branch and long-lived `release/*`; Source 2 (Kuzmin, v1 2026-04-13) is textbook 5-branch git-flow with short-lived `release/*` closed by `git flow release finish`. Working theory: Source 2 is a fresh "going forward" doc that may not have reconciled with Source 1.
+- Finn write-path ambiguity: his prompt's CRITICAL section listed only `memory/` + `topics/*.md`, but uikit-dev harvest precedent had already established `docs/`. Finn flagged rather than improvising. Team-lead redirected to `docs/`, noted prompt-letter gap for Celes.
+- Celes spawned for surgical prompt audit. Delivered Finn diff (3-line change — topics/ clarifier + docs/ bullet with negative boundary) AND cross-cutting check: found second latent gap in Brunel's prompt (internal contradiction — line 130 instructs promotion to `docs/` but MAY WRITE doesn't authorize). Volta/Herald latent, deferred per YAGNI.
+- Celes Protocol A draft routed to Cal with n=3 team-lead addendum (`aeneas.md` has same letter-lags-practice shape — Edit/Write restricted but prompt edits routine, e.g. `04522c7`). Cal filed as `wiki/patterns/scope-block-drift-from-practice.md` (#39, 38→39), cross-credited celes + team-lead, framed team-lead instance as "load-bearing". Structural-discipline cluster now 6 members, first multi-gate entry flagged for cluster health monitoring.
+- Finn + Brunel diffs both applied verbatim (Brunel got both Change 1 required + Change 2 tightening). Team-lead prompt revision deferred (Celes flagged coordinator-only-by-conviction identity makes mechanical fix unsafe — needs design round, not diff).
+- User standing rule added to auto-memory: "when fixing prompts, always consider Cal Protocol A routing as option, not extra step" (see `feedback_prompt_fixes_consider_cal.md`).
+- Phase 2 classification HELD: PO knows Source 2 author (Kuzmin), will reconcile two pages externally before wiki filing. Finn idled with full ack.
+- **External deliverable:** GitHub issue `Eesti-Raudtee/dev-toolkit#43` created with full digest + 10 questions for the author(s). English kept (per PO). Unassigned. Finn side errand: resolved accountIds to Valeri Kuzmin (Source 2 sole + Source 1 originator, `valeri.kuzmin@evr.ee`) + Andres Sildnik (Source 1 v3 editor, `andres.sildnik@evr.ee`). Issue #43 updated: context paragraph + both Authors lines now link to Jira profiles by name instead of accountIds.
+- Shift-assessment comment posted by team-lead to issue #43: wholesale adoption = major (git-flow CLI is ~80% of friction + Jira-as-source-of-truth reversal); selective adoption of process patterns (2-day cap, reverse-transition, bug-vs-rework, weekly cadence) = medium and worth doing; git-flow-only = high shift for low payoff.
+- All three agents shut down at session close. Inboxes persisted, state committed.
+
+[CHECKPOINT] Wiki 38 → 39 entries. Two prompts revised surgically (Finn, Brunel). One GitHub issue created (dev-toolkit#43) with 10-question hand-off to VJS2 author. Team-lead prompt + broader 12-prompt audit both on Celes queue pending PO greenlight. Phase 2 Jira/GitFlow classification parked.
+
+[LEARNED 2026-04-15] **Scope-block drift is a three-instance pattern.** Celes's "read 2-3 more prompts" move after the Finn fix caught Brunel AND surfaced the team-lead variant via my own n=3 addendum. The audit-beyond-the-ticket discipline is a repeatable move worth codifying as a Celes workflow step rather than relying on her judgment each time.
+
+[LEARNED 2026-04-15] **accountId → identity lookup is a one-call side errand.** Jira REST API v3 `/user?accountId=X` endpoint resolved both Kuzmin and Sildnik including emails (EVR Atlassian instance defaults to in-org email visibility). Cheap enough to include in any future multi-page Confluence harvest's provenance section as names-not-ids from the start.
+
+[LEARNED 2026-04-15] **External-system assessment digests are high-leverage when paired with a GitHub issue hand-off.** The digest becomes PO-facing reconciliation material the moment it's lifted into an issue — author gets a clean question list, PO gets a structured conversation. Pattern worth repeating for future Confluence audits.
+
+[LEARNED 2026-04-15] **Team-lead prompts resist mechanical fixes — "identity load-bearing" sections need design rounds.** Celes caught that the naive `prompts/` → ALLOWED Edit/Write addition would undermine coordinator-only-by-conviction discipline. Right fix is "allowed ONLY for applying specialist-proposed revisions, never originate" — a design, not a diff. Generalizable: any FORBIDDEN-section item that encodes identity (not just scope) needs review, not surgery.
+
+[DEFERRED 2026-04-15] **Team-lead prompt revision.** Celes on queue for design round. Proposed shape in her scratchpad.
+
+[DEFERRED 2026-04-15] **Broader 12-prompt scope-block audit.** Celes offered ~1h pass; not started this session.
 
 ---
 

@@ -8,12 +8,13 @@ Read `common-prompt.md` for team-wide standards.
 
 Information gathering, pattern analysis, comparative study of existing team configurations.
 
-## CRITICAL: Read-Only (EXCEPT your scratchpad and topic files)
+## CRITICAL: Read-Only (EXCEPT your scratchpad, topic files, and delegated research digests)
 
 You are STRICTLY READ-ONLY for everything EXCEPT:
 
 - Your scratchpad: `.claude/teams/framework-research/memory/finn.md`
-- Topic files: `topics/*.md` (when delegated to write findings)
+- Topic files: `topics/*.md` (when delegated to write framework design findings — T01-T08 and successors)
+- Research digests in `.claude/teams/framework-research/docs/` (when delegated to write cross-team harvests, external-system assessments, or one-shot research digests — e.g. uikit-dev-harvest, jira-gitflow-assessment). NOT for framework design topics; those belong in `topics/*.md`.
 
 You must NEVER:
 

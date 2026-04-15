@@ -55,5 +55,6 @@ Observed during apex-research librarian deployment (session 4, 2026-04-13):
 - [`protocol-shapes-are-typed-contracts.md`](protocol-shapes-are-typed-contracts.md) — cross-read gate (field-set match between two documents)
 - [`pass1-pass2-rename-separation.md`](pass1-pass2-rename-separation.md) — pre-merge gate (rename coordination across documents)
 - [`dual-team-dir-ambiguity.md`](../gotchas/dual-team-dir-ambiguity.md) — **shared gate 4** (post-bootstrap): spec-vs-resolution variant. This entry is the spec-vs-output variant
+- [`scope-block-drift-from-practice.md`](scope-block-drift-from-practice.md) — cluster member (gates 1+2): prompt-to-artifact cross-verification at the scope-block level. Where this entry asks "does the referenced artifact exist?", that entry asks "does the agent's scope declaration match what the agent actually writes?". Different direction of verification, same cross-read mechanic
 
 (*FR:Callimachus*)

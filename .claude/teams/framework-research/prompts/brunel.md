@@ -47,6 +47,7 @@ Specifically you work on:
 
 - `.claude/teams/framework-research/memory/brunel.md` — your own scratchpad
 - `topics/06-lifecycle.md` — **your sections only** (see Section Ownership below)
+- `.claude/teams/framework-research/docs/` — container design artifacts (e.g., `hr-devs-container-spec.md`, `container-deployment-runbook.md`) and promoted scratchpad entries per the Scratchpad Discipline rule below. NOT for container sections of `06-lifecycle.md`; those belong in the topic file.
 - Docker config files at repo root: `Dockerfile`, `docker-compose.yml`, `.dockerignore`
 - Shell scripts for container management (e.g., `start-container.sh`)
 
@@ -127,6 +128,6 @@ Tags to use: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `
 
 Use `[REQUIREMENT]` to track items received from team-lead that have not yet been addressed. Remove the tag only when the requirement is confirmed delivered and acknowledged by team-lead.
 
-**Scratchpad discipline:** Your scratchpad must stay under 100 lines. Promote completed checkpoint entries and gotchas to docs/ or topics/ — do not accumulate history in the scratchpad. Your scratchpad is your working memory, not your journal.
+**Scratchpad discipline:** Your scratchpad must stay under 100 lines. Promote completed checkpoint entries and gotchas to `.claude/teams/framework-research/docs/` (per MAY WRITE above) or `topics/06-lifecycle.md` (container sections only) — do not accumulate history in the scratchpad. Your scratchpad is your working memory, not your journal.
 
 (*FR:Celes*)

@@ -44,6 +44,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`first-use-recursive-validation.md`](patterns/first-use-recursive-validation.md) — When a new rule's first application catches its own author violating it, that is recursive validation — strongest evidence the rule is load-bearing. Observed: Structural Change Discipline commit `589fda9` → `48ac09e`
 - [`world-state-on-wake.md`](patterns/world-state-on-wake.md) — On compaction/rebuild/respawn recovery, agents read a world-state snapshot before acting on stale memory. Seed material for Volta's persist/restore extension. Source: Aalto (uikit-dev) — first externally-sourced pattern
 - [`tmux-pane-border-format-for-teams.md`](patterns/tmux-pane-border-format-for-teams.md) — Three labeling styles for tmux `pane-border-format` (role ID, persona, combined), syntax for the conditional chain, runtime persistence caveat. Sibling pattern to the pane-labels gotcha. Source: Aalto + team-lead
+- [`scope-block-drift-from-practice.md`](patterns/scope-block-drift-from-practice.md) — Agent prompt `MAY WRITE` blocks drift from practice in two variants: letter lags practice (Finn, Aeneas) or internal contradiction (Brunel). Prevention: draft scope block last, after workflow. Structural-discipline cluster member (gates 1+2). n=3. Source: Celes, team-lead
 
 ### gotchas/
 

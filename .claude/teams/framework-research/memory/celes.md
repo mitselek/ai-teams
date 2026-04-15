@@ -272,6 +272,18 @@ Detailed session logs for Mar 23, Mar 24, Apr 6, and the Apr 8/9 T09 discussion 
 [PATTERN] When project has single repo + single language: collapse ARCHITECT into team-lead, drop Oracle. 4 characters not 9. Cathedral-lite.
 [PATTERN] WORKFLOW.md already specifies the full pipeline protocol — common-prompt can reference it rather than duplicating. Keep common-prompt as operational config, WORKFLOW.md as the process contract.
 
+## Finn + Brunel scope-block audit (2026-04-14)
+
+[CHECKPOINT] Finn prompt scope block revised — `docs/` added to MAY WRITE with T01-T08 clarifier on `topics/`. Brunel same-shape fix (lines 46-51 + line 130 cross-reference). Both applied by team-lead.
+[PATTERN] Scope-block drift from practice — letter-lags-practice (Finn variant) vs internal-contradiction (Brunel variant). Detection: cross-read MAY WRITE against (a) prompt's own body instructions and (b) accepted artifacts by that agent. Wiki #39 `patterns/scope-block-drift-from-practice.md` (Cal, n=3 including Aen's team-lead prompt addendum).
+[LEARNED] Cross-cutting audit pays. "I'll just read 2-3 more prompts" caught the Brunel latent contradiction. Single-target prompt fixes should always include a 2-3 file sweep of structurally similar prompts. Codify as Celes discipline step when revising any scope block.
+[LEARNED] (from Cal) Pattern vs decision classification: variants-as-symptom-location = pattern; variants-as-rejected-alternatives = decision. Absence of "alternatives considered and rejected" section is the tell.
+[LEARNED] (from Cal) n≥3 evidence sections should identify the **load-bearing instance** — the one whose presence carries the generality argument — not present symmetric bullets. For #39, Aen's team-lead prompt was load-bearing because the gatekeeper's own gatekeeping drifting proves the pattern is not role-local.
+[PATTERN] Prevention rule adopted into Onboarding Brief self-check: scope block is written LAST in any new prompt, after workflow/output-format/scratchpad-discipline are final. Every path referenced in those sections must appear in MAY READ or MAY WRITE. Same principle generalizes — summarizing/constraining/indexing sections must follow their source.
+[DEFERRED] Team-lead (Aen) prompt has same latent gap: `prompts/aeneas.md:43` restricts `Edit/Write` to `memory/` + roster, but team-lead routinely edits prompts (Finn + Brunel this session, commit 04522c7 prior). Non-urgent per Aen's own message — queue for post-session prompt-revision pass. Not a simple MAY WRITE addition; Aen's prompt has a distinctive FORBIDDEN/ALLOWED structure and the fix needs to preserve the coordinator-only identity. Draft-revision approach needs its own design round, not same-shape mechanical fix.
+[DEFERRED] Volta + Herald latent `docs/` gaps — YAGNI, fix only if/when they actually need to write digests. Per "design from observation" feedback rule.
+[CLUSTER-OBSERVATION] Wiki #39 is the first Structural Change Discipline cluster member to span two gates (drafting + cross-read). Cal flagged this as cluster-health signal — if more multi-gate members emerge, the cluster may need re-tiering. Watch when drafting future prompts.
+
 ## Deferred (carried forward)
 
 [DEFERRED] #48 (Oracle tier downgrade path) — paused per Task 3 directive, awaiting PO assessment. Now the last issue in the #48/#49 pair — #49 landed in v2.3.

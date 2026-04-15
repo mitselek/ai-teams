@@ -12,11 +12,5 @@
     "summary": "Ack audit, save report, scratchpad checkpoint",
     "timestamp": "2026-04-14T09:57:16.567Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776166279557@volta\",\"from\":\"team-lead\",\"reason\":\"Session wrap-up. Your audit (37a0833) is committed. Ship-session backlog has been SPLIT per PO: F1 (your jq extraction + semantic decision for restore-inboxes.sh — Finn's A7/B6 finding) lands in a near-term Fix session; D1-D7 (full persist-coverage mitigation + script defects) lands in a future Design session. Read docs/uikit-dev-harvest-2026-04-14.md before the Design session — their ephemeral-snapshot MANIFEST.md is empirical reference material. Follow your shutdown protocol: write any final [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] to memory/volta.md, then approve shutdown.\",\"timestamp\":\"2026-04-14T11:31:19.557Z\"}",
-    "timestamp": "2026-04-14T11:31:19.557Z",
-    "read": true
   }
 ]
