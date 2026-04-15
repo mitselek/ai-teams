@@ -6,6 +6,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEAM_NAME="$(basename "$SCRIPT_DIR")"
 REPO_INBOXES="$SCRIPT_DIR/inboxes"
 RUNTIME_INBOXES="$HOME/.claude/teams/$TEAM_NAME/inboxes"
+FILTER_FILE="$SCRIPT_DIR/restore-filter.jq"
+
+# Precondition: sibling filter file must exist (fail-closed, not fail-open)
+if [ ! -f "$FILTER_FILE" ]; then
+  echo "ERROR: Filter file missing: $FILTER_FILE" >&2
+  echo "Cannot restore inboxes without shutdown-message filter. Refusing to proceed." >&2
+  exit 1
+fi
 
 # Precondition: runtime team dir must exist (TeamCreate should have run)
 RUNTIME_TEAM_DIR="$HOME/.claude/teams/$TEAM_NAME"
@@ -36,13 +44,8 @@ for inbox_file in "$REPO_INBOXES"/*.json; do
   [ -f "$inbox_file" ] || continue
   filename=$(basename "$inbox_file")
 
-  # Filter out messages where the text field contains shutdown or idle notification types
-  jq '[.[] | select(
-    (.text | test("\"type\"\\s*:\\s*\"shutdown_request\"") | not) and
-    (.text | test("\"type\"\\s*:\\s*\"shutdown_approved\"") | not) and
-    (.text | test("\"type\"\\s*:\\s*\"shutdown_response\"") | not) and
-    (.text | test("\"type\"\\s*:\\s*\"idle_notification\"") | not)
-  )]' "$inbox_file" > "$RUNTIME_INBOXES/$filename"
+  # Filter out shutdown/idle protocol messages (structural JSON match, not free-string)
+  jq -f "$FILTER_FILE" "$inbox_file" > "$RUNTIME_INBOXES/$filename"
 
   RESTORED=$((RESTORED + 1))
 done
