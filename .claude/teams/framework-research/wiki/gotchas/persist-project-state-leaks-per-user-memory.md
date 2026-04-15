@@ -3,7 +3,7 @@ source-agents:
   - team-lead
 discovered: 2026-04-14
 filed-by: librarian
-last-verified: 2026-04-14
+last-verified: 2026-04-15
 status: active
 scope: team-wide
 source-files:
@@ -14,9 +14,9 @@ source-issues: []
 
 # persist-project-state.sh leaks per-user auto-memory into shared team repos
 
-`persist-project-state.sh` (WIP, Volta, v0.3 design) mirrors each agent's local `~/.claude/projects/<slug>/memory/*.md` into a repo-relative `project-memory/` directory on agent shutdown. The mirror semantics are correct for **container-scoped team repos** (where the "project" is the team container and every operator writes the same project memory) and wrong for **multi-workstation shared team repos** (where each operator has distinct personal auto-memory and the repo is shared).
+`persist-project-state.sh` (WIP, Volta, v0.3 design) mirrors each agent's local `~/.claude/projects/<slug>/memory/*.md` into a repo-relative `project-memory/` directory on agent shutdown. The mirror semantics are correct for **container-scoped team repos** (where the "project" is the team container and every operator writes the same project auto-memory) and wrong for **multi-workstation shared team repos** (where each operator has distinct personal auto-memory and the repo is shared).
 
-When the script runs on a workstation against a shared team repo, every shutdown cycle commits the operator's personal `MEMORY.md`, `feedback_*`, `project_*`, `reference_*` files (plus any other `*.md` in the local projects memory dir) into `.claude/teams/<team>/project-memory/`. Next operator pulls and sees another operator's state.
+When the script runs on a workstation against a shared team repo, every shutdown cycle commits the operator's personal `MEMORY.md`, `feedback_*`, `project_*`, `reference_*` files (plus any other `*.md` in the local auto-memory dir) into `.claude/teams/<team>/project-memory/`. Next operator pulls and sees another operator's state.
 
 ## Observed incident — 2026-04-14
 
@@ -26,12 +26,12 @@ The script itself had not been run this session — the files were staged by a p
 
 ## Root cause
 
-`persist-project-state.sh` assumes its substrate is a single-operator container where the team repo and the project memory are **co-scoped**. On that substrate, the mirror is invariant: every agent in the container is operating on the same team, and the project memory dir holds state that genuinely belongs to the team.
+`persist-project-state.sh` assumes its substrate is a single-operator container where the team repo and the project auto-memory are **co-scoped**. On that substrate, the mirror is invariant: every agent in the container is operating on the same team, and the auto-memory dir holds state that genuinely belongs to the team.
 
 On a multi-workstation shared team repo substrate, the assumption breaks in two directions at once:
 
 1. **Repo scope is team-wide, not operator-wide.** Writing per-operator state into the repo crosses a blast-radius boundary.
-2. **Project memory scope is operator-wide, not team-wide.** The local `~/.claude/projects/<slug>/memory/` dir holds the operator's personal auto-memory index and topic files, not team-owned artifacts.
+2. **Project auto-memory scope is operator-wide, not team-wide.** The local `~/.claude/projects/<slug>/memory/` dir holds the operator's personal auto-memory index and topic files, not team-owned artifacts.
 
 Same code, two substrates, opposite invariants.
 
