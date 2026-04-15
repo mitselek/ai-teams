@@ -45,6 +45,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`world-state-on-wake.md`](patterns/world-state-on-wake.md) — On compaction/rebuild/respawn recovery, agents read a world-state snapshot before acting on stale memory. Seed material for Volta's persist/restore extension. Source: Aalto (uikit-dev) — first externally-sourced pattern
 - [`tmux-pane-border-format-for-teams.md`](patterns/tmux-pane-border-format-for-teams.md) — Three labeling styles for tmux `pane-border-format` (role ID, persona, combined), syntax for the conditional chain, runtime persistence caveat. Sibling pattern to the pane-labels gotcha. Source: Aalto + team-lead
 - [`scope-block-drift-from-practice.md`](patterns/scope-block-drift-from-practice.md) — Agent prompt `MAY WRITE` blocks drift from practice in two variants: letter lags practice (Finn, Aeneas) or internal contradiction (Brunel). Prevention: draft scope block last, after workflow. Structural-discipline cluster member (gates 1+2). n=3. Source: Celes, team-lead
+- [`structural-match-beats-free-string-for-protocol-filters.md`](patterns/structural-match-beats-free-string-for-protocol-filters.md) — Structural JSON field match beats free-string substring for protocol-field filters; free-string false-positives on prose that discusses the protocol. Empirical: 25 vs 26 matches, 1 false positive (montesquieu.json). Cross-team scope. Source: Volta, F1
 
 ### gotchas/
 
@@ -55,6 +56,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`embedded-github-token-in-git-config.md`](gotchas/embedded-github-token-in-git-config.md) — Fleet-standard `clone_or_pull()` persists GITHUB_TOKEN to `.git/config` via `sed`-injected auth URL. Fix: transient `http.extraheader` via `-c`, never persisted. Affects all teams descending from `evr-ai-base`
 - [`tmux-pane-labels-decoupled-from-personas.md`](gotchas/tmux-pane-labels-decoupled-from-personas.md) — uikit-dev tmux pane titles show role IDs (`@component-dev-1`) not persona names (Eames). Presentation layer reads layout config, not roster. Cognitive cost, functionally correct routing. Source: Aalto. Scope pending Brunel investigation
 - [`persist-project-state-leaks-per-user-memory.md`](gotchas/persist-project-state-leaks-per-user-memory.md) — `persist-project-state.sh` mirror semantics correct for container-scoped team repos, wrong for multi-workstation shared team repos; session 8 leak of 36 files / ~175KB of per-user auto-memory into `mitselek/ai-teams`. Volta owns fix. Sibling to `dual-team-dir-ambiguity`
+- [`jq-file-vs-arg-escape-divergence.md`](gotchas/jq-file-vs-arg-escape-divergence.md) — `\s` in bash single-quoted jq arg works; same `\s` in a `.jq` file is invalid escape. Extraction to `.jq` requires `\\s`. jq file parser vs command-line arg parser use different string-parsing paths. Source: Volta, F1
 
 ### decisions/
 
