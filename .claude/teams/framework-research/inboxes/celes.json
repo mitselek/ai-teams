@@ -20,11 +20,5 @@
     "summary": "Brunel diff applied — both changes",
     "timestamp": "2026-04-14T14:11:09.601Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776239756956@celes\",\"from\":\"team-lead\",\"reason\":\"Session close 2026-04-15 morning. Finn + Brunel diffs applied, wiki #39 filed (you are cross-credited), team-lead prompt revision + broader 12-prompt audit both preserved on your queue as [DEFERRED] in my scratchpad. PO picking up a new task next. Please (1) write in-progress state to your scratchpad (memory/celes.md) including the two queue items + the [PATTERN] on scope-block drift + the [LEARNED] on load-bearing-instance framing from Cal's filing, (2) send closing message to team-lead with [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] (1 bullet each max), (3) approve shutdown via shutdown_response. The cross-cutting audit caught the Brunel latent defect that would have hit us next session — strong work.\",\"timestamp\":\"2026-04-15T07:55:56.956Z\"}",
-    "timestamp": "2026-04-15T07:55:56.956Z",
-    "read": true
   }
 ]

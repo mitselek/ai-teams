@@ -1,5 +1,22 @@
 # Brunel scratchpad
 
+## RUTH-TEAM DESIGN (2026-04-15)
+
+[CHECKPOINT] Design v1.0 ACCEPTED — `docs/ruth-team-container-design-2026-04-15.md`, 384 lines. Bumped v0.1→v1.0 by team-lead. All six design requirements accepted.
+[DECISION] Recommended bridge = option C (git-mediated) with B-only write-through cache at `/home/dev/ruth-apex-bridge/`. Only option that's E-native (Swarm volumes aren't cross-service). Staging cache gives A-speed on B without portability debt.
+[DECISION] Ruth-team SSH user = `ai-teams` (same as apex-research, not a new per-team user). Container isolation already provides the boundary; user variation adds no gain and forks the tooling.
+[DECISION] Port 2224 proposed for ruth-team sshd (skipping 2223 to avoid runbook §4 debug-port collision).
+[PATTERN] Parameterization contract table (TEAM_NAME, HOST_WORKSPACE_DIR, DEPLOYMENT_MODE etc.) — reusable skeleton for future teams. Brunel recommendation: promote to runbook as §24 after Ruth-team actually deploys and validates the contract.
+[GOTCHA] `network_mode: host` + Swarm incompatibility — B uses host mode (WARP forced), E cannot. Compose file must have two profiles (`b-host` vs `e-swarm`) from day one. Don't ship a single-profile compose and then scramble at migration.
+[DECISION] Bridge repo = subdir of `mitselek/ai-teams` (not separate repo). Team-lead answer.
+[DECISION] HR_NOTIFICATION_EMAIL carryover = N/A, closed. Team-lead answer.
+[DECISION] Interaction channel = SSH + tmux pane (same as operator→apex-research). Zero new infra. Teams integration deferred → `mitselek/ai-teams#57` research backlog.
+[REQUIREMENT] Infra files (Dockerfile, compose, entrypoint, helper scripts) must be commit-tracked in-repo under a designated path. NOT on operator workstation. Suggested: `.claude/teams/ruth-team/infra/` or `containers/ruth-team/` at repo root — my call on layout. Applies to next build step.
+[REQUIREMENT] Do NOT proactively write Dockerfile yet. Wait for Monte/Herald answers + team-lead build brief.
+[WIP] Monte governance answers (§4.3 — Q1-Q4) still open. Q1-Q2 on critical path for build (credential injection).
+[WIP] Herald bridge protocol shape (§5.3 — Q1-Q3+Q4) still open. Q1 on critical path for build.
+[LEARNED] Volta will likely add a §6.5 observability/instrumentation addendum atop my substrate after Ruth responds. Not my layer — but expect it and don't be blindsided.
+
 ## KEY GOTCHAS (carry forward — all containers)
 
 [GOTCHA] WARP TLS interception: network_mode:host + NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem + system CA.
