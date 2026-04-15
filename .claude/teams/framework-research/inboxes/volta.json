@@ -19,11 +19,5 @@
     "summary": "F2 GO",
     "timestamp": "2026-04-15T13:55:34.668Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776263603019@volta\",\"from\":\"team-lead\",\"reason\":\"Session close 2026-04-15 evening — Fix session (F1+F2) complete and committed. Your scratchpad change (uncommitted) will be folded into my session-close chore: commit with team-lead scratchpad. Closing report requested per common-prompt Shutdown Protocol: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] — 1 bullet each, max.\",\"timestamp\":\"2026-04-15T14:33:23.020Z\"}",
-    "timestamp": "2026-04-15T14:33:23.020Z",
-    "read": true
   }
 ]

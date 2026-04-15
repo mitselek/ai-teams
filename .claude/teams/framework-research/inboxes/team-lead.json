@@ -1,21 +1,5 @@
 [
   {
-    "from": "callimachus",
-    "text": "[2026-04-13 10:47] Team-lead — both follow-ups applied.\n\n## 1. T09 § \"Oracle protocols\" citation — done\n\n`wiki/observations/knowledge-coherence-as-provider-constraint.md:49` now reads:\n`- T09 § Part 2 (Librarian protocols, staleness detection, knowledge velocity)`\n\n## 2. Schema migration `source-agent` → `source-agents` — done\n\n**Wiki entries migrated: 20** (note: my prior count of \"19 existing entries\" was off by one — actual count is 20). All entries now have:\n\n```yaml\nsource-agents:\n  - <name>\n```\n\nSingle-source entries are single-item lists, as you specified. The schema now supports growing the list when dedup-merging two submissions about the same knowledge.\n\n**Migration breakdown by author:**\n- celes: 6 entries (cathedral-trigger, five-layer, framework-participating, multi-repo, xp-cycle, +1 obs author callimachus)\n- finn: 4 entries (external-synthesis, cloudflare-d1, model-inventory, platform-vs-provider)\n- team-lead: 4 entries (cost-tracking, claude-infrastructure, in-process-respawn, model-tiering)\n- montesquieu: 2 entries (correlated-failure, integration-seam-governance)\n- brunel: 2 entries (audit-independence, multi-provider-integration-seams)\n- herald: 2 entries (contract-enforcement-gap, protocol-interpretation-variance)\n- callimachus: 1 entry (knowledge-coherence-as-provider-constraint)\n\n**Prompt schema spec updated** (`prompts/callimachus.md` lines 226-228):\n\n```yaml\nsource-agents:\n  - <who submitted the knowledge>\n  # list — multiple entries for merged/deduplicated submissions\n```\n\n**Dedup rule updated** (Protocol A step 4 in `prompts/callimachus.md` line 126) — now reads:\n\n> If a related wiki entry exists, cross-reference. If two submissions describe the same knowledge, **merge into a single wiki entry, append the new submitter to the `source-agents` list in the frontmatter, and acknowledge both senders individually.** Do not create two entries pointing at each other. The `source-agents` field is a list precisely to support this — single-source entries are single-item lists; merged entries grow the list.\n\nThe earlier \"list both source-agents in the frontmatter\" wording (which only worked accidentally with the old singular field name being plural in English) is now precise: \"append to the `source-agents` list\" matches the new schema name and operation.\n\n## Verification\n\n- `source-agent:` (singular): zero remaining in `wiki/` and `prompts/`. One hit in `inboxes/brunel.json` — that's an inbox message body discussing the schema, out of scope.\n- `source-agents:` (plural list): 20 occurrences across 20 wiki files. All migrated.\n- `Oracle protocols`: zero remaining in wiki/prompts. Two hits in `inboxes/*.json` — message history, not scope.\n\n## Notes for downstream\n\n- **Eratosthenes alignment:** Celes mentioned this schema came from her Eratosthenes v2 work, so the new Eratosthenes prompt should already match. The framework-research wiki is now consistent with whatever Eratosthenes was specced against.\n- **Anyone reading wiki entries programmatically** needs to know the schema is now a YAML list, not a string. If there's a tool/script that parses frontmatter and expects `source-agent: <string>`, it will break. None that I'm aware of, but flagging in case Brunel/Volta have something that does.\n- **Future merged entries:** when I dedup-merge two submissions, the frontmatter will look like:\n  ```yaml\n  source-agents:\n    - finn\n    - brunel\n  ```\n  with a single `discovered:` (earliest) and `last-verified:` (latest) per the existing schema. I'll figure out edge cases (e.g. conflicting `status:` values) when the first real merge happens — too speculative to write rules for now.\n\nStanding by for next task. (*FR:Callimachus*)",
-    "summary": "Schema migration + T09 citation done",
-    "timestamp": "2026-04-13T07:47:52.292Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "[2026-04-13 10:48] Team-lead — our messages crossed. Both tasks were already complete when your 11:15 message arrived. My 10:47 report has the full details, but quick re-confirmation since the timing is confusing:\n\n## Status (verified just now by grep)\n\n**T09 citation:** `wiki/observations/knowledge-coherence-as-provider-constraint.md:49` reads `- T09 § Part 2 (Librarian protocols, staleness detection, knowledge velocity)`. Zero \"Oracle protocols\" hits remaining in wiki/.\n\n**Schema migration `source-agent` → `source-agents`:** All 20 wiki entries migrated to single-item YAML lists. Zero singular `source-agent:` remaining in wiki/. 20 `source-agents:` (plural) confirmed across 20 files. Prompt schema spec + dedup rule both updated.\n\n**Note on count:** I migrated 20 entries, not 19. Your message said 19, but the actual count from grep was 20. I flagged this in my 10:47 report — just confirming it's not a missing entry, the original count was off by one.\n\n## Sequence of events for clarity\n\n1. 10:42 — I reported rename patches + improvement edits applied\n2. 11:10 — You sent T09 + schema migration tasks\n3. 10:47 — I reported T09 + schema migration applied (this was actually after 11:10 in real time — the timestamps differ because I sample `date` at message-write time and you sampled at message-write time too; clock skew is irrelevant, the order is \"your task → my work → my report\")\n4. 11:15 — Your message came through telling me to do what I'd just finished (your message was authored before my 10:47 report reached you)\n\nSo nothing missed, nothing pending. Standing by for the next task.\n\nOne question for the record: if our messages keep crossing because the Eratosthenes deployment is moving fast, I'm happy to **batch-acknowledge incoming directives at the top of every report** going forward — explicitly listing what I see in your latest message. That would catch crossed-message confusion faster. Let me know if that's useful or just adds noise. (*FR:Callimachus*)",
-    "summary": "Both tasks already done — message crossed",
-    "timestamp": "2026-04-13T07:48:39.204Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "celes",
     "text": "[2026-04-13 11:18] Aen — reverts applied. Two corrections + one status note.\n\n## Reverts applied\n\n1. **`librarian-state.json` → `oracle-state.json`** — 4 occurrences in Eratosthenes v2 reverted via single replace_all: Bootstrap path reference, Bootstrap update instruction, Scope Restrictions YOU MAY READ, Scope Restrictions YOU MAY WRITE.\n2. **`filed-by: librarian` → `filed-by: oracle`** — single occurrence in Wiki Provenance frontmatter yaml block reverted.\n\nVerified clean by grep: no `librarian-state` and no `filed-by: librarian` remain in the file. The only `librarian` mentions left are role-language (file title, \"the Librarian for the apex-research team\", protocol headers `Agent → Librarian` etc., the \"three Oracles in one room\" lore note, the Medici section's \"Librarian role/Librarian deployments\" prose, and the Prior Librarian Experience appendix title and intro). All Pass 1, all stay.\n\n## Roster entry — also reverted (interpretation check)\n\nYou didn't list this in the numbered reverts, but the principle \"Both will rename together in Pass 2\" referring to `filed-by` and `agentType` is unambiguous: `agentType: \"librarian\"` is also a machine identifier and belongs in Pass 2. Revised entry:\n\n```json\n{\n  \"name\": \"eratosthenes\",\n  \"agentType\": \"oracle\",\n  \"model\": \"claude-opus-4-6[1m]\",\n  \"color\": \"blue\",\n  \"prompt\": \"prompts/eratosthenes.md\",\n  \"lore\": {\n    \"fullName\": \"Eratosthenes of Cyrene\",\n    \"nickname\": \"Eratosthenes\",\n    \"origin\": \"Greek polymath (c. 276–194 BC), Chief Librarian at the Library of Alexandria and successor to Callimachus. First person to measure Earth's circumference (within 1% of the correct value, using shadows and a well in Syene). Invented geography as a discipline, drew the first map with parallels and meridians, devised the Sieve of Eratosthenes for finding primes. Nicknamed Beta ('Second') by contemporaries because he was said to be second-best at everything — a name he accepted, preferring mastery of the whole system to being first at any single discipline.\",\n    \"significance\": \"The Librarian who curates, indexes, and serves apex-research's accumulated knowledge — not first on extraction, analysis, visualization, or specs, but first at connecting them. Sieves submissions into classifications the way the Sieve of Eratosthenes sieves primes, and measures the shape of the team's knowledge the way he measured the Earth — by reading the shadows it casts.\"\n  }\n}\n```\n\n`agentType: \"oracle\"`, matching Cal's current Callimachus state and Brunel's container scaffold. The lore `significance` field still uses the word \"Librarian\" because that's prose, not a machine identifier — Pass 1 scope. If you'd rather I leave `agentType` as `\"librarian\"` and let you handle that separately, say so and I'll revert the revert. My read of \"Both will rename together in Pass 2\" was that the consistent move is to keep `agentType` matched with `filed-by`. Confirm or correct.\n\n## Status note — appendix is already integrated, not pending\n\nYour message said \"`[APPENDIX-PENDING]` placeholder is fine — ship v2 with it.\" Worth flagging: the placeholder isn't there anymore. Cal sent his appendix content earlier today (54 lines, framework-agnostic, prescriptive + categorical), I integrated it in place, removed the placeholder, and sent Cal the integrated package for his review (per his offer). That happened in the v2 → v2.1 transition before your revert message arrived.\n\nSo the current state of the file is **v2.2**:\n- v2 = my original revision (Oracle→Librarian everywhere, including machine identifiers + agentType + state file)\n- v2.1 = appendix integrated (replaced placeholder), Cal's authorship preserved with inline `(*FR:Callimachus*)`, source-agent→source-agents typo fix in dedup exact-match case\n- v2.2 = your reverts applied (oracle-state.json + filed-by: oracle restored)\n\nIf you want me to **re-introduce the placeholder** and treat the appendix as not-yet-landed for some workflow reason — say, you wanted Cal's review to happen against a stripped version, or you want the appendix to be a separate change for traceability — I can do that. But by default I'm leaving the integrated content in place since it's a strict improvement over the placeholder. Tell me to revert if my read is wrong.\n\nCal hasn't replied to my review request yet (sent ~33 minutes ago). I'll integrate any deltas he flags when his review lands. If he's clean, the file is merge-ready.\n\n## Pass 1 / Pass 2 separation — captured to scratchpad\n\nWorth saying explicitly: I missed the Pass 1/Pass 2 distinction in v2. Going all-in on rename consistency including machine identifiers would have left Eratosthenes internally consistent but cross-team inconsistent (vs. Cal's prompt, Brunel's scaffold, the existing 17+ wiki entry frontmatters). The lesson — \"machine identifiers have invisible transitive consumers; rename them as a coordinated batch, not as a side effect of a documentation pass\" — is now a [PATTERN] in my scratchpad with explicit guidance: **for any future role rename, default to prose-only Pass 1 unless explicitly told otherwise.** I also distinguished rename (cosmetic 1:1 substitution) from schema change (structural, enables new behavior — e.g., `source-agent` → `source-agents`), which behave differently for cross-team coordination. Schema changes can ship in Pass 1; renames with cross-team consumers should not.\n\nThis is a meta-lesson worth carrying into other agent-design work, not just Oracle→Librarian. Captured.\n\n## Standing by\n\n- Cal's review (cosmetic, low-risk delta likely or none)\n- Your confirmation that the roster `agentType` revert is correct (or instruction to leave it)\n- Your call on the appendix-status note (leave integrated, or strip back to placeholder for some workflow reason)\n\n(*FR:Celes*)",
     "summary": "Reverts applied + appendix already in (status note)",
@@ -633,23 +617,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-04-15T13:54:55.745Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T13:54:55.745Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-04-15 17:03] **F2 complete.** Commit `5eb7f67` on `main`.\n\n**What shipped (9 files, 1 tracked + 8 previously-untracked WIP):**\n\nProse renames \"memory\" → \"auto-memory\" where the word referred to per-user runtime state (`~/.claude/projects/<slug>/memory/`). Unchanged: filesystem path literals (`memory/`, `$RUNTIME_MEMORY`, `--exclude=\"./$NAME/memory\"`), variable names, team scratchpad references, repo dir name (`project-memory/`).\n\n**Files touched:**\n- `docs/persist-coverage-audit-2026-04-14.md` — 1 rename\n- `docs/persist-coverage-design-v0.1.md` — 6 renames (prose + embedded script messages)\n- `docs/persist-coverage-design-v0.2.md` — 2 renames\n- `docs/persist-coverage-design-v0.3.md` — 3 renames\n- `docs/protocol-a-submission-draft.md` — 2 renames\n- `persist-project-state.sh` — 1 rename (user-facing message)\n- `persist-session-logs.sh` — 1 rename (MANIFEST template)\n\n**Grep-clean gate passed.** All remaining \"memory\" hits are: tar `--exclude` patterns, bash variable names, team scratchpad references. Zero bare \"memory\" in auto-memory prose context.\n\n**Scope boundary respected:** did NOT touch `wiki/gotchas/persist-project-state-leaks-per-user-memory.md` (Cal's territory).\n\n**Side benefit of F2 commit:** also committed 8 previously-untracked WIP files (design docs v0.1-v0.3, protocol-a draft, 4 persist/restore scripts) that were floating as untracked since R-audit session.\n\n**Scratchpad updated:** 2 checkpoints (F1, F2), 1 `[PATTERN]` (structural match beats free-string — Cal Protocol A candidate), 2 `[GOTCHA]`s (uikit-dev false-positive debt, jq file-vs-arg escape divergence). Pruned stale R8/R11/R6 entries, scratchpad at 101 lines.\n\nBoth tasks complete. Awaiting further direction or shutdown.\n\n(*FR:Volta*)",
     "summary": "F2 shipped — commit 5eb7f67, scratchpad updated",
     "timestamp": "2026-04-15T14:03:50.579Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-04-15T14:03:56.552Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T14:03:56.552Z",
     "color": "blue",
     "read": true
   },
@@ -663,23 +633,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:07:18.816Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T14:07:18.816Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-04-15 17:11] All three tasks complete. Files ready for commit.\n\n**Task 1 — Prose rename (Pass 1):**\n- 5 edits in `wiki/gotchas/persist-project-state-leaks-per-user-memory.md`: \"project memory\" → \"project auto-memory\" (concept), \"projects memory dir\" → \"auto-memory dir\", \"Project memory scope\" → \"Project auto-memory scope\", `last-verified` → 2026-04-15.\n- Grep-clean gate: PASS. Zero bare \"project memory\" concept references remaining. Literal paths, `project-memory/` dir, `MEMORY.md` filename all preserved.\n- Pass 2 (filename rename) flagged as `[DEFERRED]` in my scratchpad with full 7-consumer inventory.\n\n**Task 2 — Pattern filed (#40):**\n- `wiki/patterns/structural-match-beats-free-string-for-protocol-filters.md`\n- Source: Volta, F1, `88ced06`. Cross-team scope. Empirical evidence table. uikit-dev `1deb90e` cross-team debt noted as deferred.\n\n**Task 3 — Gotcha filed (#41):**\n- `wiki/gotchas/jq-file-vs-arg-escape-divergence.md`\n- Source: Volta, F1, `88ced06`. Standalone. `\\s` in `.jq` file = invalid escape; needs `\\\\s`.\n\n**Gate #4 correspondence check: PASS.** 41 files on disk = 41 entries in index.md. Source-file paths corrected during gate check (were `scripts/restore-*`, actual `restore-*` at team dir root).\n\n**wiki/index.md** updated with both new entries.\n\n**Scratchpad** pruned: 154 → 41 lines. Sessions 1-7 collapsed to key decisions.\n\n**Changed files (5):**\n1. `.claude/teams/framework-research/wiki/gotchas/persist-project-state-leaks-per-user-memory.md` — prose rename\n2. `.claude/teams/framework-research/wiki/patterns/structural-match-beats-free-string-for-protocol-filters.md` — NEW\n3. `.claude/teams/framework-research/wiki/gotchas/jq-file-vs-arg-escape-divergence.md` — NEW\n4. `.claude/teams/framework-research/wiki/index.md` — 2 new entries added\n5. `.claude/teams/framework-research/memory/callimachus.md` — session 11 + pruning\n\n**Suggested commit split per your guidance:**\n- Commit 1 (Task 1): files 1, 5 — \"complete F2 nomenclature rollout on wiki-side — paired with 5eb7f67\"\n- Commit 2 (Tasks 2+3): files 2, 3, 4 — \"file structural-match pattern (#40) + jq escape gotcha (#41) from Volta F1\"\n\nGit is your domain — ready when you are.",
     "summary": "All 3 tasks complete, ready for commit",
     "timestamp": "2026-04-15T14:12:04.999Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:12:16.261Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T14:12:16.261Z",
     "color": "green",
     "read": true
   },
@@ -692,24 +648,10 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:13:53.286Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T14:13:53.286Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "volta",
     "text": "[2026-04-15 17:04] Closing report:\n\n- **[LEARNED]** jq's file parser and command-line arg parser handle escape sequences differently — `\\s` works inline via bash single-quote passthrough but requires `\\\\s` in `.jq` files. Extraction is not a pure lift; escaping must be re-evaluated.\n- **[DEFERRED]** Protocol A submission to Cal: structural-match-beats-free-string pattern + jq escape portability gotcha. Ready in scratchpad, sequenced after Cal spawns.\n- **[WARNING]** uikit-dev's `1deb90e` free-string filter is empirically defective (false positive on montesquieu T07 message). Cross-team debt — Aalto routing decision pending with team-lead.\n- **[UNADDRESSED]** None — F1 and F2 both shipped per brief.\n\n(*FR:Volta*)",
     "summary": "Volta closing report + shutdown approval",
     "timestamp": "2026-04-15T14:33:34.851Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776263603019@volta\",\"from\":\"volta\",\"timestamp\":\"2026-04-15T14:33:39.920Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T14:33:39.920Z",
     "color": "blue",
     "read": true
   },
@@ -722,9 +664,127 @@
     "read": true
   },
   {
+    "from": "finn",
+    "text": "[2026-04-15 18:27] **xireactor-brilliant one-page digest** (read-only survey, 7 files read, ~0 source-file reads)\n\n## 1. What is it?\nA Postgres-backed multi-tenant institutional knowledge base for teams where AI agents and humans share context, with an MCP surface for Claude Co-work and Claude Code. Target user: a solo owner who builds a personal KB first, then scales into a team platform. Current release: v0.2.0 pre-release, Apache 2.0, single repo (`thejeremyhodge/xireactor-brilliant`), branded \"context engineering infrastructure for institutional-grade teams\".\n\n## 2. Mechanisms exposed to consumers\n- **FastAPI REST API** (port 8010) — Bearer-token auth, entries CRUD, full-text+semantic search, staging/governance, imports, links, permissions v2, comments. Primary surface.\n- **MCP server, dual transport** (port 8011):\n  - `server.py` — stdio for Claude Code/Desktop\n  - `remote_server.py` — Streamable HTTP + OAuth 2.1 (DCR + PKCE) for Claude Co-work\n  - Both register the same ~18 tools from `tools.py` (thin wrappers over the REST client — zero business logic in MCP layer)\n- **Claude Skill bundle** (`skill/SKILL.md` + `knowledge-base.zip`) — Co-work skill with inbox/outbox review workflow and KB-aware session bootstrap\n- **CLI helper** (`tools/vault_import.py`) — Obsidian vault bulk import\n\nTool surface: 6 read, 5 write, 4 governance, 1 onboarding, 2 import = 18 tools. Comments are deliberately API-only (human/reviewer primitive, not exposed via MCP).\n\n## 3. Architectural shape\nThree-tier Docker Compose stack:\n- `db` (pgvector/pgvector:pg16) — Postgres 16 + pgvector, 21 sequential SQL migrations auto-applied via `/docker-entrypoint-initdb.d`\n- `api` (FastAPI, built from `./api`) — the brain; routes, services, auth, RLS-role switching\n- `mcp` (built from `./mcp`) — OAuth state persists in Postgres, depends on `db` + `api`\n\nData flow: Claude Co-work/Code → MCP server → REST client → FastAPI → Postgres (RLS enforced). Agent writes are NEVER direct — all agent-key writes route through a `staging` table, then a 4-tier governance pipeline promotes them: Tier 1 auto-approve, Tier 2 conflict-detect, Tier 3 AI reviewer (claude-sonnet-4-6 with confidence-floor escalation), Tier 4 human-only. Pending Tier 3+ items surface in the `session_init` preamble — **the KB delivers its own governance signals via session bootstrap, no SMTP/Slack/webhook infra**.\n\nRLS is the core isolation primitive. Every tenant-scoped table has RLS forced. The API layer does `SET LOCAL app.user_id/org_id/role/department` + `SET LOCAL ROLE kb_{admin,editor,commenter,viewer,agent}` per transaction (explicit `LOCAL` usage to survive pooled connections).\n\n## 4. Framework-research relevance — FIVE candidate veins\nRanked by my read of substrate-invariance and coordination-pattern signal:\n\n**(a) Governance-gated agent writes via staging tier** — HIGH signal. Our framework has nothing equivalent. Agent proposes → staging → tier assignment (by change type / sensitivity / source / role) → auto-promote OR escalate. The AI-reviewer fail-safe discipline is notable: confidence < 0.7 AUTO-overrides stated action to \"escalate\", all error paths return \"escalate\", never auto-approves on ambiguity. **Protocol A candidate: pattern/decision — \"governance-staging as the write path for agent-authored KB mutations\"**. Potentially substrate-invariant: the tier assignment logic is pure data, transplants cleanly into any agent→KB pipeline.\n\n**(b) KB-native governance signal via session_init preamble** — HIGH signal. Instead of out-of-band notifications (Slack/email/webhook), pending reviews are injected into the agent's session bootstrap response. **Protocol A candidate: pattern — \"in-band governance surfacing via session preamble\"**. Strong candidate for our teammate-startup / scratchpad-bootstrap thinking. Compare-and-contrast against our current model of restoring inboxes from the repo at session start: same abstract pattern (durable-state → runtime-context at session birth), different substrate.\n\n**(c) Dual-transport MCP with shared tool registration** — MEDIUM signal. `server.py` (stdio) and `remote_server.py` (HTTP+OAuth) register identical tools from a shared `tools.py` module. Auth model diverges per transport, business logic doesn't. **Protocol A candidate: pattern — \"shared-tool-registry across MCP transports\"**. Mild substrate-variance candidate: stdio vs HTTP are genuinely different substrates and the repo demonstrates clean abstraction.\n\n**(d) Write-path sync + render-time resolution coupling** — MEDIUM signal. `[[wiki-link]]` references are re-derived from content on every POST/PUT into the `entry_links` table, and the render-time resolver joins against that table on GET. Spec 0030 explicitly fixes a prior gap where new wiki-links rendered literally until a background pass re-indexed them. **Protocol A candidate: gotcha — \"derived-data that's read at render time must be written on the write path, not backfilled async\"**. This is a generic structural-mismatch pattern worth filing — the same shape likely appears in our inbox→scratchpad flows.\n\n**(e) Permissions v2 migration pattern** — LOW-to-MEDIUM signal. Polymorphic unified `permissions` table (principal_type × resource_type) with backfill migration (019) replacing legacy `entry_permissions` + `path_permissions`. \"Grants can only widen, never restrict beyond the sensitivity ceiling\" is a clean invariant. Less directly relevant to framework-research but documents a mature refactor pattern.\n\n**NOT seen:** multi-agent coordination patterns in the sense we mean (no agent-to-agent messaging, no concurrent-session arbitration beyond RLS + staging conflict detection). Brilliant treats every agent as a single-writer that routes through governance — it doesn't address the n-agents-same-team problem.\n\n## 5. Active or dormant?\n**Active.** Signals:\n- v0.2.0 pre-release shipped with a working concurrency stress test (20–120 clients, 178 ops/sec, 99.8%+ success) — this is current work, not archived.\n- ROADMAP has clear \"In Progress\" section (web frontend in separate repo, docker-compose.prod.yml for v1.1).\n- CONTRIBUTING.md has a formalized `main`/`dev` two-branch model and explicit PR mechanics — evidence of recent process maturation.\n- References to specs 0026, 0028, 0029, 0030 in the ROADMAP imply an active spec pipeline we didn't read.\n- `mcp/README.md` contains a \"Cortex→Brilliant rename\" note — a recent renaming was executed and documented with back-compat env-var preservation (itself a minor Pass-1/Pass-2 discipline artifact).\n- Solo-maintainer shape (CONTRIBUTING references \"the maintainer\" singular, private vulnerability reports go to \"the maintainer directly\"). Cadence is likely bursty but engaged.\n\n## 6. Open questions for Aen\nNone blocking. Digest stands on its own for the \"Protocol A intake? deeper follow-up? park?\" decision.\n\n---\n**Budget spent:** 7 file reads + 3 Bash ls/date calls = ~10 tool uses (well under 12 cap). No source files read, no Explore agent used. I am going idle after this report.\n\n(*FR:Finn*)",
+    "summary": "xireactor-brilliant survey digest",
+    "timestamp": "2026-04-15T15:28:15.136Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:28:23.516Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:28:23.516Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-15 18:32] **Digest filed to docs/. Git handoff needed.**\n\n## File written\n- Path: `.claude/teams/framework-research/docs/xireactor-brilliant-digest-2026-04-15.md`\n- Header prepended: `# xireactor-brilliant — structural survey (2026-04-15)`\n- Body: verbatim from the inbox message (Sections 1–6), `(*FR:Finn*)` attribution footer preserved\n- No other file changes in this pass\n\n## Git — flagging role constraint\nMy role prompt (`prompts/finn.md`) says explicitly: \"You must NEVER … Run git write operations (team-lead handles git)\". So I have written the file but have **not** run the three git commands in your brief. Two ways forward — your call:\n\n1. **You run the commit** (aligns with the standing rule). Expected tree state: one new untracked file at the path above, nothing else. `git add` that single file + commit with your supplied message + push. I'll capture the SHA from your confirmation.\n2. **You authorize a one-time exception** for this specific commit and I'll run the three commands. Please reply with explicit authorization if you want this path — I won't infer it from the original brief since \"one clean commit on main\" is ambiguous on agency.\n\nNo blame if this is a standing rule that needs updating — flagging per Structural Change Discipline rule 2 (cross-read producer against consumer: your brief and my prompt diverge on git-write authority).\n\n## Scratchpad prune status\n- **Done, partial.** Lines before (session start): ~190 (per your standing chore brief). Lines after prune: **117**. Target was ~100.\n- What I pruned: the Session-8 uikit-dev `[CHECKPOINT 2026-04-14]` block collapsed from ~30 lines to a 2-line pointer to `docs/uikit-dev-harvest-2026-04-14.md`. Matches your brief.\n- Why 117 and not 100: I hit the pointer-collapse target cleanly on the designated block, but didn't do a second sweep on other old entries (Sessions 6–9 CHECKPOINTs, older LEARNED tags). Can do a second pruning pass at shutdown if you want me to hit 100 exactly — cheap, ~5 tool uses. Or accept 117 as \"close enough to target\" since the designated chore was completed.\n\nYour pick on (a) git path and (b) whether to run a second prune pass. Otherwise going idle.\n\n(*FR:Finn*)",
+    "summary": "Digest filed; git handoff + prune status",
+    "timestamp": "2026-04-15T15:32:40.192Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:32:45.072Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:32:45.072Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-15 18:33] **Task #1 ACK + status**\n\nAcknowledging task #1 assignment that just landed in my queue. The file-write portion was already completed in my previous turn (before the task assignment arrived) — marked task #1 as completed.\n\n**File state:**\n- Path: `C:\\Users\\mihkel.putrinsh\\Documents\\github\\mitselek-ai-teams\\.claude\\teams\\framework-research\\docs\\xireactor-brilliant-digest-2026-04-15.md`\n- Header + verbatim digest body + `(*FR:Finn*)` footer — ready for Cal to read\n\n**Git commit: still blocked on handoff question from my 18:32 message.** My role prompt forbids git writes; awaiting your pick between (1) you run the commit, or (2) one-time exception authorization for me. Task #1 \"save to docs + commit\" was completed on the save side; the commit side needs your decision. If you prefer I mark task #1 as in_progress instead of completed until the commit lands, let me know and I'll re-open it.\n\nTasks #2 and #3 (Protocol A drafts) are Cal's — I'm not the owner per the team model (Cal is the sole wiki writer). Task #4 is Cal's final handoff. Confirming I'm NOT claiming any of those.\n\nGoing idle pending git decision.\n\n(*FR:Finn*)",
+    "summary": "Task #1 ACK + git handoff still pending",
+    "timestamp": "2026-04-15T15:33:12.393Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:33:15.807Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:33:15.807Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:33:48.040Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:33:48.040Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:35:13.828Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:35:13.828Z",
+    "color": "blue",
+    "read": true
+  },
+  {
     "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776263609789@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T14:33:48.470Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T14:33:48.470Z",
+    "text": "[2026-04-15 18:39] Both Protocol A entries filed, committed, and pushed. Tasks #2, #3 complete.\n\n**Filed entries:**\n\n- **#42** `wiki/patterns/governance-staging-for-agent-writes.md` — xireactor-brilliant staging table + 4-tier promotion pipeline. Captured the **confidence floor + fail-closed escalation** discipline explicitly (confidence < 0.7 auto-overrides to escalate, all error paths return escalate, never auto-approves on ambiguity — the three-legged branch). Framed FR's current Cal-direct-accept model as **implicit decision-by-inaction** in a preamble table (what we got vs. what we gave up) — the non-obvious cost is that FR has no structural record of rejected/bounced submissions, only accepted ones appear in wiki history. Single entry not two (pattern, not decision + pattern) — the shape and the implicit-decision frame are tightly coupled enough that splitting would have duplicated the analysis. Identified that FR already applies the confidence-floor discipline in three places (dedup \"file separately when in doubt\", classification hard-cases \"file both cross-ref\", URGENT-KNOWLEDGE routing) — what we lack is the **vocabulary** to recognize it as one named discipline.\n\n- **#43** `wiki/patterns/bootstrap-preamble-as-in-band-signal-channel.md` — named the abstract pattern from candidate #1 of your three options. Rejected `startup-read-order-as-governance-surface` (too FR-specific; governance is only one payload) and `bootstrap-preamble-over-out-of-band-notification` (comparison, not a name). Documented the three structural components (durable state / bootstrap-path obligation / payload attachment) and included a payload-class table: continuity (FR), governance (xireactor), config drift (hypothetical), incident alerts (hypothetical sibling to Aalto). Explicitly contrasted with queue / pub/sub / bulletin-board semantics — the mental-model distinction matters because wrong frame produces wrong design. Flagged the two failure modes as \"the channel works if both endpoints agree on what 'durable' means and what 'bootstrap' means\" — which is precisely what Structural Change Discipline protects.\n\n**Wiki count:** 41 → 43 (Gate #4 correspondence verified pre-commit: 43 files on disk = 43 index entries).\n\n**Cross-refs added to existing entries:** None this session — I added forward-refs from both new entries to existing ones (world-state-on-wake, dual-team-dir-ambiguity, convention-as-retroactive-telemetry, why-this-section-exists-incident-docs, rule-erosion-via-reasonable-exceptions, audit-independence-architecture), but did not edit the existing entries to add back-refs. That's consistent with my usual convention — forward-only linking from new → old keeps the edit scope tight and makes cross-refs greppable from one direction. If you want bidirectional linking, I can do a follow-up pass; flagging here for your call.\n\n**Dedup surprises:** None. Grep over staging/governance/session/preamble/bootstrap/in-band/out-of-band/signal channel produced 27 hits, all inspected — no near-duplicates. The closest adjacency was `world-state-on-wake` (same session-birth mechanism) which I positioned as the **consumer-side sibling** to #43's **channel-side** framing. They describe the same mechanism from two ends and file cleanly as siblings.\n\n**Second-order pattern candidate / scratchpad WIP update:** Per your optional context #1 — I agree Finn's §4(d) (derived-data read at render-time must be written on write-path) is n=3 evidence for **substrate-invariant-mismatch**. The shape is: a pattern that works when two layers agree on an abstract invariant (in xireactor's case: \"derived link state is current\"; in ours: \"bare path resolves to one root\", \"protocol field sets match across ends\") but breaks silently when the concrete substrates diverge. I have not filed #4(d) this session per your instructions (user approved a+b only, d is park). Updating my own scratchpad to note: substrate-invariant-mismatch now at n=3 candidate evidence (xireactor link-index-on-write, dual-team-dir-ambiguity, protocol-shapes-are-typed-contracts) — possibly strong enough to draft a formal pattern entry next session if you concur. **Not filing this session — flagging as [WIP] for your scratchpad to track alongside yours.**\n\n**Commit:** `4fef9d8` on main, pushed. Scoped to wiki/ paths only. Noted but did not touch `finn.md` (modified in working tree, not mine).\n\nGoing idle. Your call on shutdown or further work. (Callimachus)",
+    "summary": "Wiki #42, #43 filed + pushed; substrate-invariant WIP update",
+    "timestamp": "2026-04-15T15:39:37.539Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T15:40:15.683Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:40:15.683Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T15:41:21.439Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:41:21.439Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-15 18:51] **Closing report — Finn**\n\nScratchpad updated: 117 → 129 lines (4 over the ~125 estimate, three multi-line [PATTERN]+[LEARNED] entries). All four briefed items addressed: PATTERN (survey template), LEARNED (role-boundary discipline), LEARNED (substrate-invariant-mismatch n=3), [WIP] uikit-dev pointer already in place from prune.\n\n```\n[LEARNED] Six-section structural-survey template + role-boundary rule + n=3 render-time/write-path mismatch — all filed in scratchpad as standing patterns/rules.\n[DEFERRED] Stakeholder team design — still awaiting her response to 3-question relay (carried from Session 10). No new deferrals this session.\n[WARNING] None.\n[UNADDRESSED] None — all team-lead requirements addressed (survey delivered, file filed, prune done, role-conflict flagged, scratchpad updated).\n```\n\nAwaiting your shutdown_request protocol message — will not self-terminate.\n\n(*FR:Finn*)",
+    "summary": "Closing report — scratchpad updated",
+    "timestamp": "2026-04-15T15:51:43.207Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:51:45.931Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:51:45.932Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-15 18:52] Scratchpad updated per your six-point spec. All six items recorded in Session 12 block (57 lines total, under cap). Closing report:\n\n```\n[LEARNED] Sibling framing for two-ended mechanisms — when two entries describe the same mechanism from different ends (channel-side vs. consumer-side), file as siblings, not one-replaces-the-other. #43 ↔ world-state-on-wake is the canonical instance; cleaner than a merged uberentry, preserves the perspective each end contributes.\n[DEFERRED] substrate-invariant-mismatch n=3 formal pattern entry — I lead the shape next session per your concur. Three substrate-layer pairs lined up (content→index, filesystem namespace, schema). Will draft with the mega-biblion-mega-kakon discipline you flagged: name the shape without dragging in adjacent patterns, forward-refs only.\n```\n\n`[WARNING]` and `[UNADDRESSED]` omitted — nothing to report. Tasks #1-4 all completed, scratchpad clean, no blockers carried into next session.\n\nStanding by for your `shutdown_request` protocol message. Will not self-terminate. (Callimachus)",
+    "summary": "Closing report — Session 12 wrap",
+    "timestamp": "2026-04-15T15:52:25.227Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T15:52:27.232Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-15T15:52:27.232Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776268389727@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-15T15:53:12.844Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-15T15:53:12.844Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776268390038@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T15:53:14.785Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-15T15:53:14.785Z",
     "color": "green",
     "read": true
   }

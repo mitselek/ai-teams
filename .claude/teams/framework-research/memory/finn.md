@@ -50,7 +50,7 @@ Gotchas = traps to avoid; patterns = techniques to apply. Check category before 
 
 ## [CHECKPOINT 2026-04-14] uikit-dev harvest delivered
 
-Full report: `docs/uikit-dev-harvest-2026-04-14.md`. Key finds: A7 restore-inboxes latent bug, A10 Volta persist/restore reference, B3 wiki governance = divergent (not substrate-variant), B7 pane-labels = same-instance-deeper (not n=2). Three Cal Protocol A candidates + six Aalto questions queued — see report Sections C/D.
+Report: `docs/uikit-dev-harvest-2026-04-14.md` (Sections C/D for Cal candidates + Aalto questions).
 
 ## [CHECKPOINT] 2026-04-10 — Bioforge roster research — COMPLETE
 
@@ -101,6 +101,18 @@ See `docs/jira-gitflow-assessment-2026-04-14.md`. Two Confluence pages with 5 di
 ## [LEARNED 2026-04-15] tmux-direct Enter-after-paste discipline
 
 `tmux send-keys Enter` after `tmux paste-buffer` may not fire reliably in a chained SSH command. User had to press Enter manually. Candidate for Cal Protocol A submission (gotcha: tmux-direct-brief must verify submission, not just paste).
+
+## [PATTERN 2026-04-15] OSS-repo structural-survey template (six-section digest)
+
+xireactor-brilliant survey came in at 7 file reads / 10 tool uses (≤12 budget) WITHOUT touching source files. Reusable shape for future external-repo surveys: §1 what is it (1-2 sentences) / §2 mechanisms exposed (REST? MCP? CLI? library?) / §3 architectural shape (services + data flow, pulled from ARCHITECTURE.md + docker-compose) / §4 framework-research relevance with candidate veins ranked HIGH/MEDIUM/LOW by substrate-invariance and coordination-pattern signal / §5 active-or-dormant cadence signals (ROADMAP, CONTRIBUTING, recent renames) / §6 open questions for PO (skip if none). Read top-level docs first, stop early when later files don't add signal, never read source files unless a directory listing isn't enough. This is now my standing template — don't re-derive it next survey.
+
+## [LEARNED 2026-04-15] Role-boundary discipline on ambiguous briefs
+
+Team-lead's brief said "one clean commit on main" with a literal git command block. My prompt's FORBIDDEN list says "NEVER run git write operations (team-lead handles git)." I prepared the file and flagged the conflict instead of inferring authorization. Team-lead confirmed: correct read was "prepared, not executed" — no exception needed. **Rule:** when a team-lead brief is ambiguous on AGENCY (who runs the command vs. who prepares the state), default to the role-boundary constraint and flag, never infer authorization. This is structural-discipline rule 2 (cross-read producer against consumer) applied to cross-agent briefs, not just cross-team protocols.
+
+## [LEARNED 2026-04-15] Substrate-invariant-mismatch n=3 — render-time/write-path
+
+xireactor §4(d): `[[wiki-link]]` references must be re-derived on POST/PUT into `entry_links` because the render-time GET resolver joins against that table. Spec 0030 fixed a prior gap where new wiki-links rendered literally until a background pass re-indexed them. **Generic shape:** derived data that's read at render time must be written on the write path, not backfilled async — same shape likely appears in our inbox→scratchpad flows. Cal agreed and queued the formal Protocol A draft for next session. I am cited as the source for the third data point; Cal leads drafting.
 
 ## [DEFERRED] Open questions
 
