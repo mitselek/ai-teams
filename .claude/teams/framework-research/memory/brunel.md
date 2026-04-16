@@ -1,24 +1,31 @@
 # Brunel scratchpad
 
-## XIREACTOR PILOT HOST ARCHITECTURE (2026-04-15 late-eve session)
+## XIREACTOR PILOT DESIGN (2026-04-15 — superseded by deploy section below)
 
-[CHECKPOINT] v0.6.3 session-final at `docs/xireactor-pilot-host-architecture-2026-04-15.md`, 785 lines. 3-service stack (db + api + audit_sidecar), ~500 MB RAM baseline on RC `100.96.54.170`. Row-level RLS topology converged with Monte v4 §3.2.1 three-state `owned_by` column. Stdio-only transport (upstream `mcp` container not deployed). `audit_role BYPASSRLS` sidecar closes Monte v4 §7.1.2. `9000_schema_ext.sql` bootstrap file enforces Monte v4 §3.6.3 `owned_by NOT NULL` invariant with `current_setting('app.org_id')` session-context default (never defaults to `co-owned`). Pilot thesis: cross-tenant-writes-only slice on top of existing wikis per Cal's migration assessment (NOT a wiki migration). §10 asymmetric-Tier-3 second-thesis is PROPOSED (not adopted), gated on PO + apex consent.
-[DECISION] Row-level-only topology (not schema-per-tenant). Brunel infrastructure reasoning + Monte v4 §3.2.1 governance reasoning converge independently. Evidence: upstream's 21 migrations assume single-schema; forking upstream to test upstream is category-invalid per §1.2 named principle. Monte v4 §7.1.1 records his own withdrawal with self-aware lesson. Brunel §3.2 is the concrete evidence layer under Monte's principled self-correction.
-[DECISION] Upstream discipline: DO NOT fork xireactor source. Pinned-tag consumption only. Customization via compose override + bootstrap SQL + audit sidecar. Named principle: "piloting a different artifact than the one under evaluation is category-invalid." Wiki candidate at n=1 (routed to Cal).
-[DECISION] Two-layer regression defense: Layer 1 = upstream pinning (protects from drift); Layer 2 = CI lint `9999_rls_lint.sql` (protects from silent upstream regression at tag-bump time). Layer 2 is what makes Layer 1 cheap.
-[DECISION] Stdio-only MCP transport. Upstream `mcp` HTTP+OAuth container not deployed. Consumers launch upstream `server.py` as stdio subprocess. API host-bound to Tailscale interface only (`100.96.54.170:8010`, NEVER `0.0.0.0`). Path back to HTTP+OAuth documented at §3.4 (~1-2 hours operator work to re-enable).
-[DECISION] File placement: `containers/xireactor-pilot/` at repo root (not under `.claude/teams/framework-research/`). Signals shared cross-team substrate. Ruth-team reconciliation is team-lead's [NEXT-SESSION-CHORE].
-[DECISION] Audit container: `BYPASSRLS` read-only role on primary (not pg_dump pipeline, not read replica). One-line SQL + read-only session default. Closes Monte v4 §7.1.2 Brunel-side flag.
-[FINDING] xireactor-pilot is the SIMPLER B→E migration case than ruth-team along 3 independent axes: no WARP/corporate-TLS, no team-config-repo surface, no sshd/tmux substrate. If xireactor-pilot can't B→E cleanly, no other team will. Cheapest falsifier of E-pattern portability claims. Promoted to PO brief as "unexpected win."
-[WARNING] §10 oscillation (7 revisions: phantom → self-rejection → novel → overbroad-withdrawal → PROPOSED → over-withdrawal → re-restored) was substrate-speculation dressed as reasoning. Neither Brunel nor team-lead read xireactor's actual source code. §10's "option (c) is §1.2-compliant" is best-current-guess, not authoritative. Resolves only via §8.1 source-code walkthrough at stand-up — same class as Herald's Q1/Q2 (c)/(c) digest-silent preconditions. Do NOT treat v0.6.3 §10 as settled fact.
-[LEARNED] Team-lead guidance is input to my integration check, not a substitute for it. Folds derived from integrated reasoning (v0.3 upstream-discipline, v0.5 pilot-thesis reshape) survived multi-round iteration. Single-source folds (v0.4 §10 revival on team-lead 19:19, v0.5 SOFT/MEDIUM labels on Monte v3 §7.2) both needed reversal. Pre-fold consistency check: before folding an endorsement or classification I didn't originate, re-check whether it's consistent with the latest integrated doc state, not just whether the endorsement makes sense on its own.
-[LEARNED] Retraction-scope cross-wires: a narrow retraction ("I'm wrong about v0.1's phantom flag-flip") can be misread as broad guidance ("asymmetric experiments are wrong in general") if the scope isn't named explicitly. Sender discipline: name the scope of every retraction. Receiver discipline: state the scope assumption before folding, flag if ambiguous. Co-developed pattern with team-lead — both sides of the relay need the same discipline.
-[WIP] §8.1 combined Q1+Q2 source-code walkthrough at infrastructure stand-up. One reading-the-source pass, two questions: (Q1) does tier-assignment route on `owned_by` or equivalent, (Q2) does session_init respect RLS via `SET LOCAL`. 3x3 outcome matrix (PASS/PARTIAL/FAIL per question). Also resolves §10 §1.2-compliance question (does option (c) actually work without touching upstream). HIGHEST-consequence item per team-lead (wiki #43 names the invisible-cross-tenant-leak failure mode).
+[CHECKPOINT] v0.6.3 design-phase shipped at `docs/xireactor-pilot-host-architecture-2026-04-15.md` (785 lines). All design decisions preserved there; scratchpad entries pruned on 2026-04-16 deploy pass.
+[WARNING] §10 asymmetric-Tier-3 thesis is PROPOSED (not adopted), gated on PO + apex consent. §10's "option (c) is §1.2-compliant" is best-current-guess. §8.1 Q1/Q2 walkthrough deferred per 2026-04-16 deploy-first posture; smoke test is the empirical substitute.
+
+## META-LESSONS — carry forward
+
+[LEARNED] Team-lead guidance is input to my integration check, not a substitute for it. Folds from integrated reasoning survive iteration; single-source folds (endorsement I didn't originate) both needed reversal. Pre-fold consistency check: re-check whether an endorsement is consistent with latest doc state, not just whether it makes sense on its own.
+[LEARNED] Retraction-scope cross-wires: a narrow retraction can be misread as broad guidance if scope isn't named. Sender discipline: name scope of every retraction. Receiver discipline: state scope assumption before folding.
+
+## XIREACTOR-PILOT VJS2KB DEPLOY — Phase 1 (2026-04-16)
+
+[CHECKPOINT] Phase 1 artifacts written to `containers/xireactor-pilot/` (15 files). PO "deploy first, design later" override accepted — 4 design docs become post-deploy evaluation frameworks, not preconditions. v0.6.3 §Status gate explicitly overridden.
+[DECISION] Smoke test = §8.1 walkthrough substitute. Three checks: A (FR writes, FR reads), B (FR invisible to apex — Q2 invariance), C (apex invisible to FR — Q1 RLS). On FAIL: teardown (§1.2), NOT patch.
+[DECISION] Ruth-team port 2224 → **2228** (NOT 2226 — BT-TRIAGE collision per deployments.md:21). Updated ruth-team-container-design + deployments.md coherently. xireactor-pilot claims no SSH; uses TCP 8010 (Tailscale). New "Backend services (non-SSH)" section added to deployments.md.
+[DECISION] Path (a) confirmed — artifact generation on workstation, operator executes DEPLOY.md on RC. Team-lead tool restrictions don't authorize SSH/docker; Agent-tool Bash runs on Windows, not RC.
+[LEARNED] "Port 2225+" brief was imprecise — mixed SSH port pool (2222-2227) with backend port space (8010+). xireactor-pilot is backend. Pattern: when port numbers appear in a brief, name the space explicitly.
+[LEARNED] Global port collision bites across hosts. hr-devs=2225, BT-TRIAGE=2226, comms-dev=2227 are PROD-LLM-resident but anchor the sequence ruth-team must respect. Registry is cross-host, not per-host.
+[WIP] Phase 2 (deploy log KB entry + token wiring) blocked on Phase 1 commit + operator DEPLOY.md execution. Template in README.md §Bootstrap KB entry; consumer MCP snippets ready in `mcp-client-snippets/`.
+[GOTCHA] Bootstrap SQL 9001/9002 use placeholder user columns — real upstream auth table shape NOT verified (needs §8.1 walkthrough, deferred). DEPLOY.md step 5 flags this; operator may need to adapt.
+[GOTCHA] `docker-compose.override.yml` `mcp` service uses `deploy.replicas:0 + profiles:[disabled]` to null out upstream's mcp. Fallback if upstream v0.2.0 doesn't respect these fields is forking their compose — violates §1.2. Escalate if hit at deploy time.
 
 ## NEXT-SESSION-CHORE
 
-[CHORE] Stale port 2224 in ruth-team doc `docs/ruth-team-container-design-2026-04-15.md` — entu-research now occupies 2224 per `deployments.md`. Trivial edit, won't get lost.
-[CHORE] §8 header labels (SOFT/MEDIUM) may still carry stale Monte v3 §7.2 classifications — verify they align with Herald v1.2 (c)/(c) landing and §8.1 content. If stale, update to honest "digest-silent, resolves via walkthrough" framing.
+[CHORE] §8 header labels (SOFT/MEDIUM) in v0.6.3 may still carry stale Monte v3 §7.2 classifications — verify they align with Herald v1.2 (c)/(c) and §8.1 framing. Deferred per deploy-first posture.
+[CHORE] `containers/xireactor-pilot/` vs `.claude/teams/ruth-team/infra/` layout reconciliation still open per team-lead. Not my chore this session.
 
 ## RUTH-TEAM DESIGN (2026-04-15)
 

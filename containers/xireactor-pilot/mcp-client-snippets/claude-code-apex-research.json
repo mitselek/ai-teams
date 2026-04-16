@@ -1,16 +1,15 @@
 {
-  "_comment": "apex-research tenant — MCP stdio config snippet. For apex-research agents running INSIDE the apex-research container on RC, XIREACTOR_API_URL can use docker DNS (http://xireactor-api:8010) if the apex-research container joins the xireactor-pilot_default network. Otherwise use the Tailscale host loopback URL below.",
+  "_comment": "apex-research — MCP stdio config for xireactor-brilliant on RC (100.96.54.170). Merge into Claude Code MCP config. Requires Python venv with xireactor-brilliant/mcp/requirements.txt installed. Replace <API_KEY> with a real key from /home/dev/.xireactor-admin-key or a demo key (bkai_adm1_testkey_admin).",
   "mcpServers": {
-    "xireactor-apex": {
+    "brilliant-apex": {
       "command": "python",
       "args": [
-        "-m",
-        "xireactor_mcp.server"
+        "/home/dev/xireactor-brilliant/mcp/server.py"
       ],
       "env": {
-        "XIREACTOR_API_URL": "http://100.96.54.170:8010",
-        "XIREACTOR_BEARER_TOKEN": "<APEX_BEARER_TOKEN>",
-        "XIREACTOR_ORG_ID": "apex-research"
+        "PYTHONUNBUFFERED": "1",
+        "CORTEX_BASE_URL": "http://100.96.54.170:8000",
+        "CORTEX_API_KEY": "<API_KEY>"
       }
     }
   }
