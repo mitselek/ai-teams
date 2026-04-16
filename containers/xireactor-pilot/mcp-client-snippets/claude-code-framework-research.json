@@ -1,0 +1,17 @@
+{
+  "_comment": "framework-research tenant — MCP stdio config snippet. Merge into ~/.claude/mcp.json or equivalent on the consumer workstation. Replace <FR_BEARER_TOKEN> with the token issued to fr-team-lead (or fr-agent). Token lives in secrets/tenant-tokens.env on the operator workstation.",
+  "mcpServers": {
+    "xireactor-fr": {
+      "command": "python",
+      "args": [
+        "-m",
+        "xireactor_mcp.server"
+      ],
+      "env": {
+        "XIREACTOR_API_URL": "http://100.96.54.170:8010",
+        "XIREACTOR_BEARER_TOKEN": "<FR_BEARER_TOKEN>",
+        "XIREACTOR_ORG_ID": "fr"
+      }
+    }
+  }
+}

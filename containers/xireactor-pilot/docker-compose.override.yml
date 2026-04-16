@@ -1,0 +1,75 @@
+# xireactor-pilot — docker-compose.override.yml
+#
+# This file overrides upstream's docker-compose.yml. The operator runs:
+#
+#   docker compose \
+#     -f /path/to/xireactor-brilliant/docker-compose.yml \
+#     -f docker-compose.override.yml \
+#     up -d
+#
+# See DEPLOY.md for the full chain and §1.2 for why we do not fork upstream.
+#
+# v0.6.3 §3.1 service graph: 3 services total (db + api + audit_sidecar).
+# Upstream's `mcp` service is explicitly NOT included — stdio-only per §3.4.
+
+name: xireactor-pilot
+
+services:
+  # --- db: pgvector/pg16 from upstream; override volumes + bootstrap SQL -----
+  db:
+    # Pinned via upstream's image directive; we only override volumes.
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      AUDIT_ROLE_PASSWORD: ${AUDIT_ROLE_PASSWORD}
+    volumes:
+      # pgdata — named volume, survives restarts, NOT survives `compose down -v`
+      - ${POSTGRES_DATA_VOLUME}:/var/lib/postgresql/data
+      # Pilot bootstrap SQL — runs AFTER upstream's 21 migrations (9000+ prefix
+      # ensures lexicographic sort order in /docker-entrypoint-initdb.d).
+      - ./bootstrap:/docker-entrypoint-initdb.d/pilot:ro
+    # No host port exposure — db is strictly internal.
+    ports: !reset []
+
+  # --- api: FastAPI; override host port binding to Tailscale interface only --
+  api:
+    environment:
+      ANTHROPIC_API_KEY_PATH: ${ANTHROPIC_API_KEY_PATH}
+    ports:
+      # CRITICAL (§2.3): bind to Tailscale interface, NEVER 0.0.0.0.
+      # Operator verifies with `ss -lntp | grep ${API_PORT}` in DEPLOY.md step 9.
+      - "${API_HOST_BIND}:${API_PORT}:${API_PORT}"
+    secrets:
+      - anthropic-api-key
+    depends_on:
+      - db
+
+  # --- Upstream's mcp service: NOT deployed (§3.4 stdio-only collapse) -------
+  # Deliberately empty override: upstream ships `mcp`; we null it out by
+  # scaling to 0. Consumers launch server.py as a stdio subprocess instead.
+  mcp:
+    deploy:
+      replicas: 0
+    profiles: [disabled]
+
+  # --- audit_sidecar: BYPASSRLS read-only auditor (§3.5) --------------------
+  audit_sidecar:
+    build:
+      context: ./audit_sidecar
+    environment:
+      PGHOST: db
+      PGUSER: audit_role
+      PGPASSWORD: ${AUDIT_ROLE_PASSWORD}
+      PGDATABASE: xireactor
+    volumes:
+      - audit_reports:/reports
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  xireactor-pilot_pgdata:
+  audit_reports:
+
+secrets:
+  anthropic-api-key:
+    file: ./secrets/anthropic-api-key

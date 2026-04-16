@@ -30,7 +30,7 @@ The container reads the following from a `.env` file at compose-up time. Default
 | `TEAM_REPO_URL` | Git URL for team config repo | — (required) | `git@github.com:mitselek/ai-teams.git` | same |
 | `TEAM_REPO_BRANCH` | Branch to check out for team config | `main` | `main` | same |
 | `TEAM_CONFIG_PATH` | Path within repo to team config dir | `.claude/teams/${TEAM_NAME}` | same | same |
-| `SSH_PORT` | Container sshd port | — (required) | `2224` | N/A (SSH via Cloudflare Access) |
+| `SSH_PORT` | Container sshd port | — (required) | `2228` | N/A (SSH via Cloudflare Access) |
 | `CLAUDE_ENV_ID` | Statusline badge identifier | `${TEAM_NAME^^}` | `RUTH` | same |
 | `HOST_WORKSPACE_DIR` | Host path bind-mounted into container workspace | — (required on B) | `/home/dev/ruth-team-workspace` | N/A (Docker Swarm volume) |
 | `CLAUDE_NAMED_VOLUME` | Docker named volume for `~/.claude/` | `${TEAM_NAME}_claude` | `ruth-team_claude` | Swarm volume |
@@ -45,7 +45,7 @@ The container reads the following from a `.env` file at compose-up time. Default
 |---|---|---|
 | `network_mode: host` | Required for WARP + host DNS on dev host (§1 of runbook). Swarm does not allow it on routing-mesh services. | DEPLOYMENT_MODE gate: compose file has two service definitions guarded by profile (`b-host` vs `e-swarm`). Both share the same image and entrypoint. |
 | WARP CA bind-mount | Host-specific (corporate-only) | Absent on E (host is a generic cloud node). Compose uses a Docker secret OR empty string; entrypoint is a no-op when `WARP_CA_PATH=""`. |
-| Host port 2224 for SSH | Conflicts if two teams choose same port on the same host | Port is a per-team parameter; see §2 for co-location port table. Not relevant on E (Cloudflare Access terminates auth). |
+| Host port 2228 for SSH | Conflicts if two teams choose same port on the same host | Port is a per-team parameter; see §2 for co-location port table. Not relevant on E (Cloudflare Access terminates auth). |
 | SSH user name `ai-teams` | Historical — all teams use the same user | Keep it. Cross-team isolation is via separate containers, not separate host users. Documented as a convention, not an invariant. |
 | Docker named volume for `~/.claude/` | Not usable on Swarm without a volume driver | Swarm uses a named volume too, but with an explicit driver (`local` or cloud-backed). Compose file parameterizes the volume driver. |
 
@@ -99,10 +99,10 @@ Host port table for the dev server:
 | Team | SSH port | Dashboard (optional) | Source of truth |
 |---|---|---|---|
 | apex-research | 2222 | 5173 | existing deployment |
-| ruth-team | 2224 (proposed) | N/A (no dashboard on B) | this doc |
-| *reserved for next team* | 2225 | — | — |
+| ruth-team | 2228 (proposed) | N/A (no dashboard on B) | this doc |
+| *reserved for next team* | 2229+ | — | — |
 
-Skipping 2223: avoids collision with historical `sshd -p 2223` debug usage from runbook §4.
+**Port history:** original v0.1 proposed 2224; `entu-research` subsequently claimed 2224 per `deployments.md`, and 2225–2227 are held by PROD-LLM containers (`hr-devs`, `BT-TRIAGE`, `comms-dev`) in the cross-host registry. Moved to **2228** (next free) at 2026-04-16 per team-lead directive. Skipping 2223 also avoided historical `sshd -p 2223` debug usage from runbook §4 (now permanently held by `polyphony-dev`).
 
 **[E-migrate:** SSH ports become irrelevant on E. Cloudflare Access fronts each service via hostname (`ruth.dev.evr.ee`, `apex.dev.evr.ee`) and the containers expose their management interface on an internal-only port unreachable from the public internet. Port pool collapses to the per-container internal port (e.g., 22 for all teams — no collision because each has a distinct swarm service name).**]**
 
@@ -114,7 +114,7 @@ Skipping 2223: avoids collision with historical `sshd -p 2223` debug usage from 
 
 - The in-container user name is not a security boundary — container isolation is. Two `ai-teams` users in two separate containers have no shared filesystem, no shared process tree, no shared network namespace (on E) or shared PID namespace (on B).
 - All existing scripts (`start-team.sh`, `spawn_member.sh`, `apply-layout.sh`) assume `/home/ai-teams/...` — changing the user name would fork the tooling for no isolation gain.
-- Host user on B is `dev` (apex-research convention). The PO SSH's in as `ai-teams@100.96.54.170:2224` which is routed to the ruth-team container's sshd.
+- Host user on B is `dev` (apex-research convention). The PO SSH's in as `ai-teams@100.96.54.170:2228` which is routed to the ruth-team container's sshd.
 
 **Non-goal:** Containerization does not protect against a malicious operator; it protects against accidental state bleed. Both goals are satisfied by container separation without user-name variation.
 
@@ -288,7 +288,7 @@ Each design choice in §1-§5 carries a `[E-migrate: ...]` note. Summary table:
 | §1.1 Parameterization | .env file with B values | .env file with E values | Trivial — file swap |
 | §1.1 `network_mode: host` | Required on B (WARP + DNS) | Disallowed on E — use bridge network | Compose profile switch (already sketched) |
 | §1.1 `WARP_CA_PATH` | `/usr/local/share/ca-certificates/managed-warp.pem` | `""` (no WARP on E) | Entrypoint no-op branch |
-| §1.1 SSH port | Host port 2224 | Cloudflare Access hostname | Drop SSH from compose; add tunnel config |
+| §1.1 SSH port | Host port 2228 | Cloudflare Access hostname | Drop SSH from compose; add tunnel config |
 | §1.1 Named volume for `~/.claude/` | Local driver | Local or cloud-backed driver | Compose driver field |
 | §2 Co-location | Same host as apex | Separate swarm services, possibly separate nodes | Swarm service declaration |
 | §2.3 Port allocation | Per-team pool (2222-2299) | Per-team hostname (`ruth.dev.evr.ee`) | Cloudflare config, not compose |

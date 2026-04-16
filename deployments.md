@@ -20,8 +20,17 @@ Canonical reference for all live AI team deployments. Source of truth: `~/bin/rc
 | 5 | hr-devs | PROD-LLM | 2225 | ai-teams | id_ed25519_apex | live |
 | 6 | BT-TRIAGE | PROD-LLM | 2226 | ai-teams | id_ed25519_apex | live |
 | 7 | comms-dev | PROD-LLM | 2227 | ai-teams | id_ed25519_apex | live |
+| 8 | ruth-team | RC | 2228 | ai-teams | id_ed25519_ruth (TBD) | planned |
 | 0 | hr-devs (bare metal) | RC | 22 | dev | (default) | live |
 | 9 | PROD-LLM (host) | PROD-LLM | 22 | michelek | id_ed25519_apex | live |
+
+### Backend services (non-SSH)
+
+| # | Name | Host | Port | Binding | Status |
+|---|---|---|---|---|---|
+| B1 | xireactor-pilot API | RC | 8010 | 100.96.54.170 (Tailscale only) | planned |
+
+Backend services do not expose SSH. `xireactor-pilot` is a stdio-MCP-only KB substrate — MCP consumers launch `server.py` as a subprocess from their own Claude Code sessions; the HTTP surface is reachable only from Tailscale peers. See `.claude/teams/framework-research/docs/xireactor-pilot-host-architecture-2026-04-15.md` §2.3.
 
 ## Connection Commands
 
