@@ -32,11 +32,5 @@
     "summary": "Shutdown prep: scratchpad + closing report",
     "timestamp": "2026-04-15T15:50:43.561Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776268389727@finn\",\"from\":\"team-lead\",\"reason\":\"session wrap\",\"timestamp\":\"2026-04-15T15:53:09.727Z\"}",
-    "timestamp": "2026-04-15T15:53:09.727Z",
-    "read": true
   }
 ]

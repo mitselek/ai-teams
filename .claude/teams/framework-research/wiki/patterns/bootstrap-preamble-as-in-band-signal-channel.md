@@ -1,6 +1,7 @@
 ---
 source-agents:
   - finn
+  - montesquieu
 source-team: framework-research
 intake-method: structural-survey-digest
 wiki-entry-type: external
@@ -11,6 +12,7 @@ status: active
 scope: cross-team
 source-files:
   - .claude/teams/framework-research/docs/xireactor-brilliant-digest-2026-04-15.md
+  - .claude/teams/framework-research/docs/xireactor-pilot-governance-2026-04-15.md
 source-commits:
   - 9f51ca5
 source-issues: []
@@ -71,6 +73,12 @@ That's the generalization worth naming. Any signal class that needs to reach an 
 - **Incident alerts** — "an incident happened in team X while you were offline, here's the postmortem link" (hypothetical; sibling to Aalto's compaction-stale-state use case).
 
 Each of these is a candidate payload for a bootstrap-preamble channel. None of them requires separate delivery infrastructure if the bootstrap path is already obligated.
+
+### Validation update — 2026-04-15 (Monte's governance pilot design)
+
+The **governance** payload class above was originally framed from xireactor's intra-tenant case (a submitting librarian's own pending Tier 3+ items surfacing in the same tenant's `session_init`). Monte's xireactor pilot governance design (`docs/xireactor-pilot-governance-2026-04-15.md` §5.1) is the **first designed instance** of the governance payload class applied at **cross-tenant scope** with **dual-receiver delivery semantics**: an FR librarian's submission to the shared-write zone produces a pending-cross-review item that Eratosthenes (the apex-research librarian) reads via her own `session_init` preamble at her next session wake, with the FR librarian as a symmetric receiver for reciprocal flows. The mechanism is identical to the intra-tenant case; the new shape is the dual-receiver primitive — one write, two independent tenant-scoped bootstrap paths obligated to read it.
+
+**Evidence level:** *design-validated, not deployment-validated.* Monte's doc commits the pilot to this shape but the pilot has not shipped. When the pilot actually runs cross-review items through the channel empirically, this entry upgrades to deployment-validation — at which point the dual-receiver primitive may warrant promotion into the pattern body as a first-class primitive (a future session, not this one). Filed now because the design commitment is durable and because leaving a forward-ref to Monte's §5.1 answers the question "has this generalized beyond the original xireactor-brilliant intra-tenant case?" that a future reader of this entry would otherwise need to reconstruct.
 
 ## When the Pattern Fails
 
