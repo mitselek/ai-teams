@@ -55,12 +55,6 @@
 [GOTCHA] Root-owned /tmp files block ai-teams writes — create tmux sessions as target user.
 [GOTCHA] Consecutive `**Bold:**` lines collapse on GitHub. Use `- **Bold:**` bullet lists.
 
-## DEPLOYMENT
-
-evr-ai-base:latest = Debian bookworm-slim + Node 22 + Claude Code + gh + gosu + tmux + SSH.
-VJS2-AI-teams repo: `C:/Users/mihkel.putrinsh/Documents/github/VJS2-AI-teams/`
-Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
-
 ## SHIPPED DEPLOYMENTS (compressed — details in commits + design docs)
 
 [CHECKPOINT] **apex-research Eratosthenes** (2026-04-13): PR #57 merged. Structural-discipline cluster shipped as L1 team law (commit `589fda9`). Wiki `prompt-to-artifact-cross-verification` filed. Oracle→Librarian Pass1/Pass2 complete (commits `04522c7`+`ca0e56f`).
