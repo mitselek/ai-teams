@@ -282,6 +282,13 @@ TMUX_EOF
     chown "$(basename "${user_home}"):$(basename "${user_home}")" "${user_home}/.tmux.conf"
 done
 
+# ── Step 9a3: tmux-apex launcher ─────────────────────────────────────────────
+cat > /usr/local/bin/tmux-apex << 'TMUX_APEX_EOF'
+#!/usr/bin/env bash
+tmux -u attach -t 'apex-research' 2>/dev/null || tmux -u new -s 'apex-research'
+TMUX_APEX_EOF
+chmod +x /usr/local/bin/tmux-apex
+
 # ── Step 9b: Git attribution ──────────────────────────────────────────────────
 # Base image sets git user to mitselek (personal). Override for apex-research team.
 gosu "${CONTAINER_USER}" git config --global user.name "apex-research"
