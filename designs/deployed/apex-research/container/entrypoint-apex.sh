@@ -305,7 +305,16 @@ if [ ! -f "$SETTINGS_FILE" ]; then
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
-    "defaultMode": "bypassPermissions",
+    "defaultMode": "auto",
+    "allow": [
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Skill(update-config)",
+      "Read",
+      "Edit",
+      "Write"
+    ],
     "deny": [
       "mcp__jira__jira_create_issue",
       "mcp__jira__jira_delete_issue",
@@ -314,6 +323,10 @@ if [ ! -f "$SETTINGS_FILE" ]; then
     ]
   },
   "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "statusLine": {
     "type": "command",
     "command": "bash /opt/statusline-command.sh"
