@@ -1,33 +1,45 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## NEXT SESSION
+## SESSION 19 WRAP — 2026-04-24 (issues #60 + #61 closed, xireactor dropped)
 
-**VJS2KB is deployed on RC.** KB works. Deploy-first posture (PO directive 2026-04-16). Remaining tasks:
+**Closed this session:**
 
-1. **Re-apply xireactor host-networking override** — for Windows-operator reachability from Tailscale. Pattern: `network_mode: host` in compose override (documented in `docs/container-deployment-runbook.md` §1/§5/§10, tested on apex/hr-devs/polyphony/entu).
-2. **MCP stdio for consumer teams** — bind-mount `xireactor-brilliant/` into consumer containers, install `mcp/requirements.txt` in container venv, merge snippet from `containers/xireactor-pilot/mcp-client-snippets/` into Claude Code MCP config. Snippets already rewritten to real deployment values (`brilliant-*` prefix, port 8000, `CORTEX_*` env, script at `/home/dev/xireactor-brilliant/mcp/server.py`).
-3. **Smoke test A/B/C** per Brunel [DECISION]: A (FR writes, FR reads), B (FR invisible to apex — Q2 invariance), C (apex invisible to FR — Q1 RLS). On FAIL: teardown (§1.2), NOT patch.
+- **#60 — Retire tmux-pane spawn.** Shipped framework-level `docs/agent-spawn-protocol.md` v2.0.0 (Herald, renamed from `subagent-fallback-protocol.md`; commit `8397ee9` → `4a63b90`). Brunel Task A: 5× `spawn_member.sh` copies gated with hard `exit 1` + deprecation header; `tmux-spawn-guide.md` banner; container Dockerfiles/entrypoints annotate tmux as human-SSH scaffolding only (commit `49bdedc`). `startup.md`/`SKILL.md` audited — no edits needed. Cross-repo `aliases.sh` rewrite handed to Schliemann via issue-comment (apex-research winding down).
+- **#61 — Move `.claude/teams/` → `teams/` at repo root.** Single commit `7e72771`: 258 files changed (168 content rewrites + 90 pure moves). Runtime paths (`$HOME/.claude/teams/`, `~/.claude/teams/`, `/home/*/.claude/teams/`) preserved intact; only repo-relative refs rewritten. Same move applied to `designs/deployed/apex-research/teams/` and `designs/new/hr-devs/teams/` (scaffold consistency). Cross-repo handoff for apex via issue-comment with the exact Python contextual-replace script. Auto-memory + external skills updated: `framework-research-startup/SKILL.md` Step 1 pointer, `shutdown-agent-tool-team/SKILL.md` template (no fallback — single source of truth), `MEMORY.md`, `project_ai_teams_framework.md`, `project_celes_agent_hr.md`, `project_prod_llm_server.md`.
 
-**Spawn plan:** Brunel (tasks 1+2 infra work) + Cal (wiki queue + KB quality monitoring once teams start writing).
+**Root-cause update on #60.** Post-ship we identified the session-17 crash class as a **Claude Code + tmux interaction bug**, not a general tmux problem. Agent-tool spawn still preferable for lifecycle reasons but crash-prevention urgency is gone. Note retained on #60 close comment.
 
-## NEXT-SESSION-CHOREs
+**xireactor direction DROPPED entirely by PO (2026-04-24).** Orphaned infra removed in commit `6923a12` (`containers/xireactor-pilot/` — 15 files). Preserved as institutional record: 5 specialist design docs in `docs/xireactor-*-2026-04-15.md` + 1 memory state file + 4 wiki patterns that generalized beyond xireactor (`substrate-invariant-mismatch`, `integration-not-relay`, `bootstrap-preamble-as-in-band-signal-channel`, `governance-staging-for-agent-writes`). All prior NEXT-SESSION items tied to xireactor (pilot thesis reshape, PO-BRIEF 6 items, Cal §11.5 edits, Finn source walkthrough, §10 natural-experiment) are WITHDRAWN.
 
-- [ ] **Eratosthenes symmetric prompt edits — tmux-direct to Schliemann.** NOT YET FIRED. Monte called for 2 FR-side edits (pre-classification zone check + bootstrap-path xireactor session_init read). Eratosthenes needs mirrored edits. Include 2 Monte wiki candidates (multi-mode-defenses + bootstrap-preamble-as-cross-tenant-channel) as contextual routing.
+**Wiki adds this session:**
+- `wiki/gotchas/warp-dns-vs-routing-asymmetry-rc-host.md` (#46, Cal)
+- `wiki/references/rc-host-db-tunnel-architecture.md` (#47, first `references/` entry, TTL 2026-10-24)
+
+**Cross-team unblock:** apex-research DB access via reverse SSH from Windows operator → RC host loopback → apex container. Script at `apex-migration-research/.claude/bin/open-db-tunnels.sh` (commit `c79b838` in that repo). Operator-run, session-bounded. `entrypoint-apex.sh` WARN on tunnel down (commit `24cca0d`).
+
+## NEXT SESSION — validation priority
+
+**FIRST ACTION on restart: validate the #61 refactoring.** The skill → startup → team spawn chain must work end-to-end with all paths pointing to `teams/framework-research/`. If anything references `.claude/teams/framework-research/` and fails, it's a miss from this session's rewrite sweep and needs to be caught immediately.
+
+Validation checklist:
+
+1. `framework-research-startup` skill triggers and reads `~/Documents/github/mitselek-ai-teams/teams/framework-research/startup.md` cleanly.
+2. `startup.md` Steps 1–5 execute without path errors — especially `restore-inboxes.sh` / `persist-inboxes.sh` (repo-side, moved) and `TeamCreate` (runtime-side, unchanged).
+3. Spawn at least one agent (Cal recommended — smallest surface, no xireactor tail). Verify:
+   - Prompt reads from `teams/framework-research/prompts/callimachus.md` ✓
+   - Scratchpad read from `teams/framework-research/memory/callimachus.md` ✓
+   - Inbox restore from `teams/framework-research/inboxes/callimachus.json` → `$HOME/.claude/teams/framework-research/inboxes/` ✓
+4. Confirm Cal can write to `teams/framework-research/wiki/**` with **no permission prompt** — this is the empirical verification that #61 solved the root problem.
+
+If any step fails: grep `.claude/teams/` in the affected surface, patch, recommit.
+
+## NEXT-SESSION-CHOREs (non-xireactor, still active)
+
+- [ ] **T06 Path-tree rewrite (Volta).** `topics/06-lifecycle.md` Path 1/2/2.5/3 decision tree needs rewrite for Agent-tool spawn (post-#60). Herald's `agent-spawn-protocol.md` defines the shapes each path uses; Volta's rewrite references them. T03/T06 boundary named clearly (Herald session-19 [LEARNED]): "protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when."
 - [ ] **Finn scratchpad prune** at spawn (~190 lines → target 100). Session-8 uikit-dev harvest entries collapse to pointer to `docs/uikit-dev-harvest-2026-04-14.md`.
 - [ ] **Brunel: fix stale port 2224 in ruth-team container doc.** `docs/ruth-team-container-design-2026-04-15.md` has port 2224 but `deployments.md` already allocates entu-research:2224. 1-line fix, assign to Brunel on next ruth-team task.
-- [ ] **Cal §11.5 prompt edits** — apply after PO confirms asymmetric-slice pilot shape. Drafts in Cal's session 13 scratchpad: §11.5.1 pre-classification zone check, §11.5.2 bootstrap-path read, §11.5.3 startup.md Step 5.5.
-- [ ] **Finn source-code walkthrough** — FIRST next-session action gated on PO ACK of asymmetric-slice pilot. Herald §6.5.3 scope: xireactor v0.2.0 target files `api/services/staging.py` + `api/routers/session_init.py`. Resolves Q1 (per-zone staging) + Q2 (tenant-scoped session_init) + §10 §1.2-compliance. ~20-30 tool uses. Prerequisite: Finn scratchpad prune. Three outcomes: (a) proceed, (b) PILOT HALTS pending PO cost decision, (c) recurse.
-
-## PO-BRIEF — for post-pilot evaluation session (all 6 items open, none reviewed yet)
-
-1. **Pilot thesis reshape confirmation** — "adopt xireactor cross-tenant slice ONLY" (Cal v2 verdict). Cal §6.4 pass/fail criteria as runtime gate. PO committed to full-adoption evaluation originally; asymmetric shape is a different deal.
-2. **4-signature ownership-transfer ritual appropriateness** — heavy-ritual vs "librarian decides, audit catches." Monte recommends heavy ritual.
-3. **Post-pilot efficacy review session trigger** — when does pilot evaluation happen? Different specialist mix needed.
-4. **Ecosystem-integration bundle disposition** — team-lead rec: keep #59 standalone, do NOT merge into #57+#58+#59 bundle (different problem space). PO final call.
-5. **Ruth-team bandwidth sequencing** — ruth-team priority on Brunel; xireactor pilot parks behind ruth-team completion. PO-directive with sunk-cost v1.0 doc + external principal.
-6. **§10 natural-experiment proposal** — NOT a clean adopt/reject decision. Resolves only via source-code walkthrough (outcome (c)). If walkthrough reveals per-tenant policy state already expressible → becomes real PROPOSED option; if not → stays withdrawn. PO doesn't choose now.
-
-**Unexpected wins to surface:** xireactor-pilot is simpler B→E migration case than ruth-team (no WARP/host-networking/corporate-TLS constraint) — cheapest E-pattern portability falsifier. Two specialist gate-2-on-self instances (Brunel v0.1→v0.2, Herald v1.1→v1.2). `audit_role BYPASSRLS` one-line-SQL primitive.
+- [ ] **Brunel: `tmux-spawn-guide.md` retirement decision** — currently banner-gated; Brunel's call on whether to delete outright. Parked DEFERRED per session 19.
+- [ ] **Eratosthenes symmetric prompt edits — tmux-direct to Schliemann.** WITHDRAWN if Schliemann's apex shutdown persists. Preserved here only because the pattern (multi-mode-defenses + bootstrap-preamble-as-cross-tenant-channel wiki candidates) is substrate-independent — if revived under a new pilot, the structure carries forward.
 
 ## META-LEARNINGS — carry forward
 
