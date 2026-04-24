@@ -270,6 +270,13 @@ done
 
 # ── Step 9a2: tmux config ────────────────────────────────────────────────────
 # .tmux.conf is on container filesystem — recreate on every start.
+#
+# NOTE (2026-04-24, #60): tmux is no longer required for agent SPAWNING —
+# agents are spawned via the Agent tool (team_name + name) from the team-lead
+# Claude Code session. The .tmux.conf + tmux-apex launcher below are kept
+# purely for HUMAN terminal use: PO SSH-in attaches a persistent multi-pane
+# shell session. If PO access goes away (or switches to a plain shell), these
+# two blocks can be removed without affecting agent lifecycle.
 for user_home in "${HOME_DIR}" /home/michelek; do
     cat > "${user_home}/.tmux.conf" << 'TMUX_EOF'
 set -g default-terminal "tmux-256color"
@@ -282,7 +289,9 @@ TMUX_EOF
     chown "$(basename "${user_home}"):$(basename "${user_home}")" "${user_home}/.tmux.conf"
 done
 
-# ── Step 9a3: tmux-apex launcher ─────────────────────────────────────────────
+# ── Step 9a3: tmux-apex launcher (human-terminal only, post-#60) ─────────────
+# Human-use: PO runs `tmux-apex` from SSH to attach/create a named session.
+# NOT used by agent spawn path — that now routes through the Agent tool.
 cat > /usr/local/bin/tmux-apex << 'TMUX_APEX_EOF'
 #!/usr/bin/env bash
 tmux -u attach -t 'apex-research' 2>/dev/null || tmux -u new -s 'apex-research'

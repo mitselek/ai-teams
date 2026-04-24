@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# ──────────────────────────────────────────────────────────────────────────────
+# This is a reference copy of hr-devs's original tmux-pane spawn script.
+# tmux-pane spawning is retired as the framework default. New teams use the
+# Agent tool with team_name + name from a Claude Code team-lead session.
+# See spawn_member.sh (repo root `.claude/teams/`) header and issue #60
+# for the new spawn/respawn pattern.
+#
+# Kept as a reference artifact; do NOT invoke.
+# (*FR:Brunel*)
+# ──────────────────────────────────────────────────────────────────────────────
+
+echo "ERROR: reference/hr-devs/spawn_member.sh is deprecated reference material (#60). Do not execute." >&2
+exit 1
+
 # Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
 # Reads roster, registers in config.json, spawns in tmux pane.
 #

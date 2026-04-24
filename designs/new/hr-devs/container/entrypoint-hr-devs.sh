@@ -257,6 +257,13 @@ echo "# To start Vite on the correct port: npm run dev -- --port \$VITE_PORT" >>
 echo "# Or: npm run local:start  (uses wrangler dev, check wrangler.jsonc for port)" >> "$BASHRC"
 
 # ── Step 7b: tmux config + auto-tmux on SSH login ────────────────────────────
+# NOTE (2026-04-24, #60): tmux here is HUMAN-TERMINAL scaffolding only.
+# Agent spawning no longer uses tmux panes — agents spawn via the Agent tool
+# (team_name + name) from the team-lead Claude Code session, not via
+# `tmux send-keys`. The auto-tmux block below + apply-layout.sh remain useful
+# for PO SSH-in (persistent shell, pre-arranged panes). If the team drops
+# human SSH access, this entire step can be removed along with the tmux
+# install in the Dockerfile. See issue #60.
 cat > "${HOME_DIR}/.tmux.conf" << 'TMUX_EOF'
 set -g default-terminal "tmux-256color"
 set -gq utf8 on

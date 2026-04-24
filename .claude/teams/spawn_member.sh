@@ -1,6 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# ──────────────────────────────────────────────────────────────────────────────
+# tmux-pane spawning is no longer the framework default. Use the Agent tool
+# with team_name + name parameters from a Claude Code team-lead session.
+#
+# New respawn pattern:
+#   1. ar-remove-member <agent>     # jq del from config.json
+#   2. Re-call Agent(team_name=..., name=..., subagent_type="general-purpose",
+#                    prompt=..., run_in_background=True)  # from team-lead session
+#
+# This script is preserved as reference for the legacy tmux-pane lifecycle.
+# Do NOT invoke for new spawns. See container-deployment-runbook.md for the
+# Agent-tool spawn procedure and issue #60 for migration rationale.
+# (*FR:Brunel*)
+# ──────────────────────────────────────────────────────────────────────────────
+
+echo "ERROR: spawn_member.sh is deprecated. See header for the Agent-tool spawn pattern (#60)." >&2
+exit 1
+
 # Usage: spawn_member.sh [--target-pane %XX] <team-name> <agent-name> [tmux-session]
 # Reads roster from the team directory, registers in config.json, spawns in tmux pane.
 

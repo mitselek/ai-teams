@@ -35,7 +35,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 # ── Python 3 + SSH server + sudo + tmux ──────────────────────────────────────
 # Single apt layer: Python (extraction scripts), SSH (PO access), sudo (PO perms),
-# tmux (session management for Claude Code).
+# tmux (HUMAN SSH session scaffolding only — post-#60, agent spawning is
+# Agent-tool-based, not tmux-based; tmux can be removed if PO SSH drops).
 # Venv and pip install happen at entrypoint (depends on workspace volume).
 RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 \

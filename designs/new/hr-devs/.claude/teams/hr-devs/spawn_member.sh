@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# ──────────────────────────────────────────────────────────────────────────────
+# tmux-pane spawning retired as the framework default. This design artifact
+# remains in designs/new/ as historical reference; do NOT invoke.
+#
+# New spawn path (issue #60): Agent tool with team_name + name parameters,
+# called from the team-lead Claude Code session. No tmux, no subprocess.
+# Respawn: ar-remove-member <agent> + re-Agent() call.
+# (*FR:Brunel*)
+# ──────────────────────────────────────────────────────────────────────────────
+
+echo "ERROR: designs/new/hr-devs spawn_member.sh is deprecated (#60). Do not execute." >&2
+exit 1
+
 # spawn_member.sh (*FR:Brunel*)
 #
 # Container variant of hr-devs spawn_member.sh.

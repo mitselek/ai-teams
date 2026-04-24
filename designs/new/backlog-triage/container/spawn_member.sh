@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# ──────────────────────────────────────────────────────────────────────────────
+# tmux-pane spawning retired as the framework default. Do NOT invoke.
+# New spawn path: Agent tool (team_name + name) from team-lead Claude session.
+# Respawn: ar-remove-member <agent> + re-Agent(). See issue #60.
+# (*FR:Brunel*)
+# ──────────────────────────────────────────────────────────────────────────────
+
+echo "ERROR: designs/new/backlog-triage spawn_member.sh is deprecated (#60). Do not execute." >&2
+exit 1
+
 # spawn_member.sh — Spawn a backlog-triage agent into a tmux pane
 #
 # Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]

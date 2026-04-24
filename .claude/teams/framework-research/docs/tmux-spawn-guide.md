@@ -1,5 +1,37 @@
 # Spawning Agents into tmux Panes (*FR:Brunel*)
 
+> **⚠ DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)**
+>
+> tmux-pane spawning has been retired as the framework default. Session-17
+> evidence (apex-research) showed a repeatable crash class on permission-dialog
+> rendering under tmux-pane-launched `claude` CLI. Session-19 confirmed that
+> the Agent tool (`team_name` + `name` parameters) spawns persistent teammates
+> cleanly with no tmux subprocess. See issue #60 for full evidence and scope.
+>
+> **New spawn procedure (post-#60):**
+>
+> ```
+> 1. TeamCreate(team_name="<team>")
+> 2. Restore inboxes (if applicable)
+> 3. Per teammate, in data-dependency order:
+>      Agent(team_name="<team>",
+>            name="<agent>",
+>            subagent_type="general-purpose",
+>            prompt="You are <persona>. Read .claude/teams/<team>/prompts/<name>.md,
+>                    common-prompt.md, your scratchpad. Send team-lead an intro.",
+>            run_in_background=True)
+> 4. Wait for intro, proceed.
+> ```
+>
+> **New respawn procedure:** `ar-remove-member <agent>` (jq del from
+> `config.json`) + re-`Agent()` call. No `/exit` dance, no pane survival
+> concern.
+>
+> This guide is archived for historical reference only. Do NOT use it to
+> bootstrap new teams or respawn agents. The legacy `spawn_member.sh`
+> copies in this repo are guarded with a deprecation exit; invoking them
+> will error out.
+
 Reusable guide for spawning Claude Code agents into pre-existing tmux panes.
 Applies to any container team using the `spawn_member.sh` + tmux pattern.
 

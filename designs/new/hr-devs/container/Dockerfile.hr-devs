@@ -52,6 +52,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Timezone + SSH server + tmux + locales ────────────────────────────────────
+# NOTE (#60): tmux is retained for HUMAN SSH session scaffolding only.
+# Agent spawning is Agent-tool-based post-#60 — no tmux panes required.
+# If the container drops PO SSH access, tmux can be removed from the apt line.
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tzdata \

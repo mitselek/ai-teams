@@ -49,7 +49,9 @@ ENV LC_ALL=en_US.UTF-8
 # - jq:             used by entrypoint to manipulate JSON (settings.json, mcp.json)
 # - git:            clone repos, run git log / pickaxe searches
 # - openssh-server: SSH access on port 2226
-# - tmux:           terminal multiplexer for agent sessions
+# - tmux:           terminal multiplexer for HUMAN SSH sessions
+#                   (post-#60: agent spawning is Agent-tool-based, not tmux-based;
+#                    tmux remains only as scaffolding for PO SSH attach)
 # - locales:        en_US.UTF-8 locale (Claude Code requires UTF-8)
 # - gosu:           privilege drop without tty requirement (su/sudo need one)
 # - tzdata:         timezone data for Europe/Tallinn

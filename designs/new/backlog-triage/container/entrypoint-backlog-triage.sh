@@ -260,6 +260,12 @@ for var in "${!SHELL_VARS[@]}"; do
 done
 
 # ── Step 7: tmux config + auto-tmux on SSH login ──────────────────────────────
+# NOTE (2026-04-24, #60): tmux here is HUMAN-TERMINAL scaffolding only.
+# Agent spawning no longer uses tmux panes — agents spawn via the Agent tool
+# (team_name + name) from the team-lead Claude Code session. The auto-tmux
+# block below supports PO SSH-in with persistent pre-arranged panes. If PO
+# SSH access goes away, this step + the tmux install in the Dockerfile can
+# both be removed. See issue #60.
 cat > "${HOME_DIR}/.tmux.conf" << 'TMUX_EOF'
 set -g default-terminal "tmux-256color"
 set -gq utf8 on
