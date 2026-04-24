@@ -10,6 +10,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 | `gotchas/` | Cross-agent pitfalls |
 | `decisions/` | Architecture decisions with rationale |
 | `contracts/` | API shapes, type definitions |
+| `references/` | Pointers to external artifacts/configs with TTL (operational, not generalizable) |
 | `process/` | Emerging process patterns (research team) |
 | `observations/` | Cross-cutting insights citing topic files (research team, never authoritative) |
 | `findings/` | Pre-topic-file findings (research team) |
@@ -61,6 +62,7 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`tmux-pane-labels-decoupled-from-personas.md`](gotchas/tmux-pane-labels-decoupled-from-personas.md) — uikit-dev tmux pane titles show role IDs (`@component-dev-1`) not persona names (Eames). Presentation layer reads layout config, not roster. Cognitive cost, functionally correct routing. Source: Aalto. Scope pending Brunel investigation
 - [`persist-project-state-leaks-per-user-memory.md`](gotchas/persist-project-state-leaks-per-user-memory.md) — `persist-project-state.sh` mirror semantics correct for container-scoped team repos, wrong for multi-workstation shared team repos; session 8 leak of 36 files / ~175KB of per-user auto-memory into `mitselek/ai-teams`. Volta owns fix. Sibling to `dual-team-dir-ambiguity`
 - [`jq-file-vs-arg-escape-divergence.md`](gotchas/jq-file-vs-arg-escape-divergence.md) — `\s` in bash single-quoted jq arg works; same `\s` in a `.jq` file is invalid escape. Extraction to `.jq` requires `\\s`. jq file parser vs command-line arg parser use different string-parsing paths. Source: Volta, F1
+- [`warp-dns-vs-routing-asymmetry-rc-host.md`](gotchas/warp-dns-vs-routing-asymmetry-rc-host.md) — RC-host WARP resolvers silently fail on `*.evr.ee` hostnames while IP routing works fine; use IPs directly in RC-origin configs. Cross-team. TTL: 2026-10-24. Source: Brunel
 
 ### decisions/
 
@@ -72,6 +74,10 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 - [`knowledge-coherence-as-provider-constraint.md`](observations/knowledge-coherence-as-provider-constraint.md) — The binding multi-provider constraint is knowledge coherence (semantic compatibility of agent artifacts), not infrastructure lock-in
 - [`compaction-stale-state-deployed-teams.md`](observations/compaction-stale-state-deployed-teams.md) — Aalto (uikit-dev) reports 5 compaction incidents + ranked wishlist; 5-10% of teammate messages were stale re-announcements. First externally-sourced Protocol A submission
 - [`librarian-growth-curves-by-team-type.md`](observations/librarian-growth-curves-by-team-type.md) — Cross-Librarian comparison: framework-research 34 entries / apex-research 0 entries. Three non-exclusive hypotheses (team-type ceiling, Phase 2 accelerator, submitter floor). Speculative, revisit 2026-04-28
+
+### references/
+
+- [`rc-host-db-tunnel-architecture.md`](references/rc-host-db-tunnel-architecture.md) — RC-host SSH keys (dev@:22 with `id_ed25519`, ai-teams@:2222 with `id_ed25519_apex`) + operator-triggered reverse SSH tunnel giving apex-research container `localhost:11521/11522` → VJSDBTEST/VJSDBTEST2. Script at `apex-migration-research/.claude/bin/open-db-tunnels.sh` (commit `c79b838`). TTL: 2026-10-24. Source: team-lead
 
 ### process/
 
