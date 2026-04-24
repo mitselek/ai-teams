@@ -112,7 +112,7 @@ Three strikes is an authority boundary signal, not a punishment. It means the pr
 **YOU MAY WRITE:**
 
 - `webstore/` — production code (refactoring within scope boundaries above)
-- `.claude/teams/raamatukoi-dev/memory/erasmus.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/erasmus.md` — your scratchpad
 
 ## Mid-Cycle Shutdown
 
@@ -125,6 +125,6 @@ If shutdown arrives mid-refactor:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/erasmus.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/erasmus.md`.
 
 (*FR:Celes*)

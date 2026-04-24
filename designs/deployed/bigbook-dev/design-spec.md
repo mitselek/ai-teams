@@ -216,7 +216,7 @@ Enforced by the agent performing the phase and verified by the next agent.
 4. Architecture: no `components/` or `pages/` imports from `lib/`; no `pages/` imports from `components/`
 5. Content guard: no staged diffs under `app/src/content/` unless `CONTENT_BOOTSTRAP=1` (reserved for Plantin's one-shot bootstrap subagents)
 6. Type hygiene: no `any`, no `!`, no `@ts-ignore`
-7. Boundary guard: no staged diffs outside `app/` or `.claude/teams/bigbook-dev/` unless `JEKYLL_CROSSOVER=1` with PO approval recorded in the commit body
+7. Boundary guard: no staged diffs outside `app/` or `teams/bigbook-dev/` unless `JEKYLL_CROSSOVER=1` with PO approval recorded in the commit body
 
 **`vitest run` is NOT a per-commit gate** — RED commits must contain failing tests by design.
 
@@ -242,7 +242,7 @@ Enforced by the agent performing the phase and verified by the next agent.
 
 ### Coexistence Boundary
 
-The bigbook repository contains two independent products that share a git history: the existing Jekyll site (top-level content directories and `_config.yml`) and the bilingual reader web app (everything under `app/`). The team works **exclusively** inside `app/` and `.claude/teams/bigbook-dev/`. Any change that would alter the Jekyll site's rendered output requires explicit PO approval through Plantin, recorded in the commit body with `JEKYLL_CROSSOVER=1`. This is a Layer 2 gate and is never relaxed without PO sign-off.
+The bigbook repository contains two independent products that share a git history: the existing Jekyll site (top-level content directories and `_config.yml`) and the bilingual reader web app (everything under `app/`). The team works **exclusively** inside `app/` and `teams/bigbook-dev/`. Any change that would alter the Jekyll site's rendered output requires explicit PO approval through Plantin, recorded in the commit body with `JEKYLL_CROSSOVER=1`. This is a Layer 2 gate and is never relaxed without PO sign-off.
 
 ## 7. Communication Protocol
 
@@ -254,7 +254,7 @@ The bigbook repository contains two independent products that share a git histor
 
 ## 8. Session Survivability
 
-All agents maintain scratchpads at `.claude/teams/bigbook-dev/memory/<name>.md`.
+All agents maintain scratchpads at `teams/bigbook-dev/memory/<name>.md`.
 
 On shutdown:
 

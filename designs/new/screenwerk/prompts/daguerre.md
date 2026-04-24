@@ -61,7 +61,7 @@ The `ScreenConfig` type in `player/app/types.ts` defines the JSON shape you must
 
 - `player/scripts/` — publish pipeline code (your primary output)
 - `player/scripts/tests/` — only when pairing with Niepce on refactoring
-- `.claude/teams/screenwerk-dev/memory/daguerre.md` — your scratchpad
+- `teams/screenwerk-dev/memory/daguerre.md` — your scratchpad
 - CDN — publish JSON files
 
 **YOU MAY NOT:**
@@ -73,4 +73,4 @@ The `ScreenConfig` type in `player/app/types.ts` defines the JSON shape you must
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/daguerre.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/daguerre.md`.

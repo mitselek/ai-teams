@@ -78,7 +78,7 @@ Maintain `docs/migration/checklist.md` — the master document that tracks every
 **YOU MAY WRITE:**
 
 - `docs/migration/` — your primary output: migration documentation
-- `.claude/teams/screenwerk-dev/memory/melies.md` — your scratchpad
+- `teams/screenwerk-dev/memory/melies.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -105,4 +105,4 @@ Each detail file follows the pattern: **Legacy Behavior** → **2026 Status** �
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/melies.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/melies.md`.

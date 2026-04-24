@@ -361,13 +361,13 @@ Beyond git, agents can read/write arbitrary files. The framework should define a
 {
   "writablePaths": [
     "{worktree}/",
-    ".claude/teams/{team-name}/memory/",
-    ".claude/teams/{team-name}/docs/",
+    "teams/{team-name}/memory/",
+    "teams/{team-name}/docs/",
     "/tmp/{team-name}/"
   ],
   "readOnlyPaths": [
-    ".claude/teams/{team-name}/common-prompt.md",
-    ".claude/teams/{team-name}/roster.json"
+    "teams/{team-name}/common-prompt.md",
+    "teams/{team-name}/roster.json"
   ]
 }
 ```

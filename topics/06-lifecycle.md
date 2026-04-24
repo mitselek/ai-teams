@@ -100,7 +100,7 @@ cd <team-config-repo> && git pull
 
 #### Phase 2.0a: Validate `$HOME` (_FR:Volta_ — amendment from restart 4, 2026-03-13)
 
-**Problem this solves:** Restart 4 field test revealed that `$HOME` resolves to an EMPTY STRING in some bash invocations on Windows/Git Bash. The diagnose script then checks `/.claude/teams/framework-research` (root path) instead of the correct user path. Other bash calls in the same session resolved `$HOME` correctly. Shell initialization is inconsistent across bash invocations on this platform.
+**Problem this solves:** Restart 4 field test revealed that `$HOME` resolves to an EMPTY STRING in some bash invocations on Windows/Git Bash. The diagnose script then checks `/teams/framework-research` (root path) instead of the correct user path. Other bash calls in the same session resolved `$HOME` correctly. Shell initialization is inconsistent across bash invocations on this platform.
 
 **Rule: Never use `$HOME` directly in path construction. Always resolve it first and validate.**
 
@@ -119,7 +119,7 @@ if [ ! -d "$RESOLVED_HOME" ]; then
   exit 1
 fi
 
-TEAM_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
+TEAM_DIR="$RESOLVED_HOME/teams/<team-name>"
 echo "Using TEAM_DIR=$TEAM_DIR"
 ```
 
@@ -218,7 +218,7 @@ rm -rf "$TEAM_DIR"
 **Action:** Restore inboxes from repo (durable copy persisted during prior session's Shutdown Phase 4a).
 
 ```bash
-TEAM_CONFIG_DIR="<team-config-repo>/.claude/teams/<team-name>"
+TEAM_CONFIG_DIR="<team-config-repo>/teams/<team-name>"
 # TEAM_DIR is the runtime dir, set in Phase 2.0a
 
 if [ -d "$TEAM_CONFIG_DIR/inboxes" ]; then
@@ -480,12 +480,12 @@ The next session's PURPLE queries the Librarian for `[DEFERRED-REFACTOR]` entrie
 
 **Problem this solves:** The previous protocol relied on the runtime dir (`$HOME/.claude/teams/...`) surviving between sessions. Phase 5 (Preserve) said "do NOT call TeamDelete" to keep inboxes alive. But the runtime dir is ephemeral — reboots, manual cleanup, or OS temp cleanup can destroy it. Field observation (2026-03-13): COLD START despite 5 prior commits in memory/. All closing reports from the previous session were lost because they existed only in the runtime dir's inboxes.
 
-**Key insight: there are TWO `.claude/teams/<team-name>/` directories:**
+**Key insight: there are TWO `teams/<team-name>/` directories:**
 
 | Directory   | Location                                        | Owner                 | Durability                                         |
 | ----------- | ----------------------------------------------- | --------------------- | -------------------------------------------------- |
 | Runtime dir | `$HOME/.claude/teams/<team-name>/`              | Platform (TeamCreate) | Ephemeral — survives only until dir is removed     |
-| Repo dir    | `<team-config-repo>/.claude/teams/<team-name>/` | Team (git-tracked)    | Durable — survives reboots, available on any clone |
+| Repo dir    | `<team-config-repo>/teams/<team-name>/` | Team (git-tracked)    | Durable — survives reboots, available on any clone |
 
 Scratchpads live in the repo dir and are already committed. Inboxes live in the runtime dir and were NOT committed — this was the gap. The fix: copy inboxes from runtime to repo during shutdown, making them durable.
 
@@ -493,8 +493,8 @@ Scratchpads live in the repo dir and are already committed. Inboxes live in the 
 
 ```bash
 # Phase 4a: Persist inboxes
-TEAM_CONFIG_DIR="<team-config-repo>/.claude/teams/<team-name>"
-RUNTIME_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
+TEAM_CONFIG_DIR="<team-config-repo>/teams/<team-name>"
+RUNTIME_DIR="$RESOLVED_HOME/teams/<team-name>"
 
 if [ -d "$RUNTIME_DIR/inboxes" ]; then
   mkdir -p "$TEAM_CONFIG_DIR/inboxes"
@@ -516,8 +516,8 @@ fi
 
 ```bash
 # Commit scratchpads + task snapshot + inboxes in one atomic commit
-git add .claude/teams/<team-name>/memory/
-git add .claude/teams/<team-name>/inboxes/
+git add teams/<team-name>/memory/
+git add teams/<team-name>/inboxes/
 git commit -m "chore: save team state (scratchpads, tasks, inboxes)"
 git push
 ```
@@ -1021,7 +1021,7 @@ Shutdown sequence (both teams):
 2. Send shutdown to all agents (broadcast or one-by-one)
 3. Wait for confirmation from each
 4. Save task list snapshot to memory/
-5. `git add .claude/teams/.../memory/ && git commit -m "chore: save team scratchpads" && git push`
+5. `git add teams/.../memory/ && git commit -m "chore: save team scratchpads" && git push`
 6. **DO NOT TeamDelete** — directory stays so next session can restore inboxes
 
 Each agent on shutdown: write WIP to scratchpad → send closing message (LEARNED / DEFERRED / WARNING, 1 bullet max each) → approve.
@@ -1158,7 +1158,7 @@ The container is transparent to Volta's protocol. From the lifecycle protocol's 
 - **Phase 1 (Sync):** `git pull` inside container. GITHUB_TOKEN is available as env var for HTTPS auth.
 - **Phase 2.0a ($HOME validation):** `$HOME` is always `/home/ai-teams` — validation passes immediately. The Windows/Git Bash fallback path is never triggered.
 - **Phase 3 (Create):** `TeamCreate` writes to `/home/ai-teams/.claude/teams/<team-name>/` — on the team's named volume. Survives container restarts.
-- **Phase 4 (Restore inboxes):** reads from repo dir (`/home/ai-teams/workspace/.claude/teams/<team-name>/inboxes/`). Same path resolution as non-container.
+- **Phase 4 (Restore inboxes):** reads from repo dir (`/home/ai-teams/workspace/teams/<team-name>/inboxes/`). Same path resolution as non-container.
 - **Shutdown Phase 4a (Persist inboxes):** writes to repo dir, then `git push`. GITHUB_TOKEN covers auth.
 
 No protocol changes required. The container is a deployment detail, not a protocol change.

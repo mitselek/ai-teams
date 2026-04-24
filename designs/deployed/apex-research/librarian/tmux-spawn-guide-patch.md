@@ -1,6 +1,6 @@
 # tmux-spawn-guide.md patch — extend pane map to 6 agents
 
-**Target file (in apex-research repo):** `.claude/teams/apex-research/tmux-spawn-guide.md`
+**Target file (in apex-research repo):** `teams/apex-research/tmux-spawn-guide.md`
 
 **Author:** (*FR:Brunel*) — drafted 2026-04-13
 

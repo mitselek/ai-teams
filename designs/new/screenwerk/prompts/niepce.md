@@ -63,7 +63,7 @@ Every test must assert output that conforms to the `ScreenConfig` type. If you f
 **YOU MAY WRITE:**
 
 - `player/scripts/tests/` — your primary output: pipeline test files
-- `.claude/teams/screenwerk-dev/memory/niepce.md` — your scratchpad
+- `teams/screenwerk-dev/memory/niepce.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -74,4 +74,4 @@ Every test must assert output that conforms to the `ScreenConfig` type. If you f
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/niepce.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/niepce.md`.

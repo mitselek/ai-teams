@@ -20,7 +20,7 @@
 
 **Project:** `~/Documents/github/bigbook/`
 
-The web app lives as a subdirectory of the existing Jekyll repository. The team writes only inside `app/` and `.claude/teams/bigbook-dev/`. The existing Jekyll site (`_config.yml`, `peatykid/`, `kogemuslood/`, `lisad/`, `front_matter/`, `index.md`, `TOC.md`, `_layouts/`, `_includes/`, `_sass/`, `_source/`) is **off-limits** to the team. See "Coexistence Boundary" below.
+The web app lives as a subdirectory of the existing Jekyll repository. The team writes only inside `app/` and `teams/bigbook-dev/`. The existing Jekyll site (`_config.yml`, `peatykid/`, `kogemuslood/`, `lisad/`, `front_matter/`, `index.md`, `TOC.md`, `_layouts/`, `_includes/`, `_sass/`, `_source/`) is **off-limits** to the team. See "Coexistence Boundary" below.
 
 ```
 bigbook/
@@ -53,7 +53,7 @@ bigbook/
 │   ├── eslint.config.js
 │   ├── lefthook.yml
 │   └── README.md
-└── .claude/teams/bigbook-dev/      # roster, prompts, common-prompt
+└── teams/bigbook-dev/      # roster, prompts, common-prompt
     └── memory/                     # agent scratchpads
 ```
 
@@ -64,7 +64,7 @@ The bigbook repository contains **two independent products** that share a git hi
 1. **The existing Jekyll site** (all top-level content directories, `_config.yml`, `_layouts/`, `_includes/`, `_sass/`, `_source/`, `assets/css/`). Serves the Estonian edition as static HTML at GitHub Pages under `/bigbook/`.
 2. **The bilingual reader web app** (everything inside `app/`). Serves the bilingual side-by-side experience from a separate deployment.
 
-**The team works exclusively inside `app/` and `.claude/teams/bigbook-dev/`.** The Jekyll site is not ours to edit, reformat, lint, or "improve while we're here." Any change that would alter the Jekyll site's rendered output — including touching `_config.yml`, moving files out of `peatykid/`, or modifying `assets/css/` — **requires explicit PO approval through Plantin**.
+**The team works exclusively inside `app/` and `teams/bigbook-dev/`.** The Jekyll site is not ours to edit, reformat, lint, or "improve while we're here." Any change that would alter the Jekyll site's rendered output — including touching `_config.yml`, moving files out of `peatykid/`, or modifying `assets/css/` — **requires explicit PO approval through Plantin**.
 
 The two authoritative PDFs in `assets/` (`AA-BigBook-4th-Edition.pdf` and `BIGBOOK EST PRINT + crop marks.pdf`) are the source of truth for the book's text. They are **read-only** for the team. Content extraction and initial bilingual alignment are performed by one-shot anonymous subagents spawned by Plantin as needed — they are not the dev team's responsibility, and ongoing alignment maintenance after user edits is the end user's responsibility, not the team's.
 
@@ -256,7 +256,7 @@ Per `app/docs/WORKFLOW.md`. Enforced by the performing agent, verified by the ne
 4. Architecture: no `components/` or `pages/` imports from `lib/`; no `pages/` imports from `components/`
 5. Content guard: no commit under `app/src/content/en/` or `app/src/content/et/` from the dev team (enforced by a lefthook script that blocks staged diffs in those paths unless an explicit `CONTENT_BOOTSTRAP=1` env flag is set; the flag is only used by Plantin's one-shot bootstrap subagents)
 6. Type hygiene: no `any`, no `!`, no `@ts-ignore`
-7. Boundary guard: no staged diffs outside `app/` or `.claude/teams/bigbook-dev/` unless `JEKYLL_CROSSOVER=1` is set with PO approval recorded in the commit body
+7. Boundary guard: no staged diffs outside `app/` or `teams/bigbook-dev/` unless `JEKYLL_CROSSOVER=1` is set with PO approval recorded in the commit body
 
 **`vitest run` is NOT a per-commit gate** — RED commits must contain failing tests by design.
 
@@ -279,7 +279,7 @@ Before Plantin hands a story to PO:
 **This team builds what the spec defines and nothing more.** If a task looks like a scope expansion beyond the spec, agents escalate to Plantin. Plantin escalates to PO.
 
 "Scope expansion" explicitly includes:
-- Touching any file outside `app/` or `.claude/teams/bigbook-dev/`
+- Touching any file outside `app/` or `teams/bigbook-dev/`
 - Adding dependencies not in the stack contract
 - Introducing a second UI framework
 - Producing a dedicated backend when the PKCE client-side flow is still viable
@@ -291,7 +291,7 @@ Before Plantin hands a story to PO:
 
 ## Shutdown Protocol
 
-1. Write in-progress state to your scratchpad at `.claude/teams/bigbook-dev/memory/<your-name>.md`
+1. Write in-progress state to your scratchpad at `teams/bigbook-dev/memory/<your-name>.md`
 2. If you are PURPLE and mid-refactor: revert uncommitted changes and note what you were doing in scratchpad
 3. Send closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max)
 4. Approve shutdown
@@ -300,7 +300,7 @@ Team-lead shuts down last, commits memory files, pushes.
 
 ## On Startup
 
-1. Read your personal scratchpad at `.claude/teams/bigbook-dev/memory/<your-name>.md` if it exists
+1. Read your personal scratchpad at `teams/bigbook-dev/memory/<your-name>.md` if it exists
 2. Read `app/docs/WORKFLOW.md` — the XP cycle protocol
 3. Read the spec at `app/docs/spec.md` (at least the sections relevant to current work)
 4. Send a brief intro message to `team-lead`

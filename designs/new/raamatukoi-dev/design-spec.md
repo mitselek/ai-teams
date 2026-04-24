@@ -68,7 +68,7 @@ Agents work in submodules within [`Raamatukoi/tugigrupp`](https://github.com/Raa
 
 ```
 tugigrupp/
-├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki
+├── teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki
 │   └── wiki/                        # Bodley's knowledge base
 ├── webstore/                        # submodule → Raamatukoi/webstore
 ├── rat-project/                     # submodule → Raamatukoi/rat-project

@@ -80,19 +80,19 @@ You write **test code only**. You do not decide what to test (Plantin decided). 
 
 - `app/tests/` — test files (`*.test.ts`), fixtures under `app/tests/fixtures/`
 - `vitest.config.ts` — test framework config (if needed)
-- `.claude/teams/bigbook-dev/memory/montano.md` — your scratchpad
+- `teams/bigbook-dev/memory/montano.md` — your scratchpad
 
 **YOU MAY NOT:**
 
 - Write production code in `app/src/` (Granjon's domain)
 - Write to `app/src/content/en/` or `app/src/content/et/` (content is bootstrap + end-user territory, never the team's)
-- Modify files outside `app/` or `.claude/teams/bigbook-dev/` (Coexistence Boundary)
+- Modify files outside `app/` or `teams/bigbook-dev/` (Coexistence Boundary)
 - Modify story files (Plantin's domain)
 - Refactor anything (Ortelius's domain)
 - Add type stubs beyond what's needed for the test to compile
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bigbook-dev/memory/montano.md`.
+Your scratchpad is at `teams/bigbook-dev/memory/montano.md`.
 
 (*FR:Celes*)

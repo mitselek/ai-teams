@@ -627,7 +627,7 @@ A team should upgrade from Standard to Cathedral when the Standard tier's team-l
 ### Wiki Directory Structure
 
 ```
-.claude/teams/<team>/
+teams/<team>/
   memory/                   # Per-agent scratchpads (existing)
     agent-a.md
     agent-b.md
@@ -882,7 +882,7 @@ The Librarian is respawned via the standard SPOF mechanism (team lead respawns, 
 **The bootstrap completion marker:**
 
 ```
-.claude/teams/<team>/oracle-state.json
+teams/<team>/oracle-state.json
 ```
 
 ```json
@@ -1123,7 +1123,7 @@ The #14 disagreement from v1 is now resolved. Monte and Medici converged in roun
 **The three wiki tracks for research teams:**
 
 ```
-.claude/teams/framework-research/
+teams/framework-research/
   wiki/
     process/          # Emerging process patterns (Celes's resolution)
     observations/     # Cross-cutting insights across topic files (Monte)

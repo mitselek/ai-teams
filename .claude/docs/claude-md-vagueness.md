@@ -6,9 +6,9 @@ Review notes on `~/.claude/CLAUDE.md` after the 2026-04-14 translate + trim pass
 
 Three sections reference artifacts without naming their location:
 
-- **Roster JSON** — "Read the agent's `prompt` field from the roster JSON" never says where the JSON lives. Candidate: `.claude/teams/<team>/roster.json` (workdir-relative).
-- **Scratchpads** — the memory-tags section assumes scratchpads exist but never names the path. Candidate: `.claude/teams/<team>/memory/<agent>.md`.
-- **Inboxes** — "back up inboxes" mentions no path. Candidate: `.claude/teams/<team>/inboxes/<agent>.json`.
+- **Roster JSON** — "Read the agent's `prompt` field from the roster JSON" never says where the JSON lives. Candidate: `teams/<team>/roster.json` (workdir-relative).
+- **Scratchpads** — the memory-tags section assumes scratchpads exist but never names the path. Candidate: `teams/<team>/memory/<agent>.md`.
+- **Inboxes** — "back up inboxes" mentions no path. Candidate: `teams/<team>/inboxes/<agent>.json`.
 
 One line per section would fix all three.
 
@@ -28,11 +28,11 @@ After step 2 runs, the old team is gone — "agent already exists" can't apply f
 > If the project has a team (roster), ALWAYS delegate to team members.
 
 The detection rule is implicit. Is the check:
-- `.claude/teams/` directory exists?
+- `teams/` directory exists?
 - `roster.json` present anywhere?
 - User explicitly mentioned a team?
 
-A concrete rule would make this mechanical. Suggested: "A project has a team if `.claude/teams/<name>/roster.json` exists for any `<name>`."
+A concrete rule would make this mechanical. Suggested: "A project has a team if `teams/<name>/roster.json` exists for any `<name>`."
 
 ## 4. Shutdown mechanics are hand-wavy
 

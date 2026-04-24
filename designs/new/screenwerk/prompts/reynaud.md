@@ -72,7 +72,7 @@ When Melies identifies legacy behaviors that the player doesn't replicate, work 
 - `player/app/components/` — Vue components
 - `player/app/pages/` — routes and pages
 - `player/app/utils/` — utility functions
-- `.claude/teams/screenwerk-dev/memory/reynaud.md` — your scratchpad
+- `teams/screenwerk-dev/memory/reynaud.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -83,4 +83,4 @@ When Melies identifies legacy behaviors that the player doesn't replicate, work 
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/reynaud.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/reynaud.md`.

@@ -1,6 +1,6 @@
 # common-prompt.md patch — add Librarian role and Dual-Hub Routing
 
-**Target file (in apex-research repo):** `.claude/teams/apex-research/common-prompt.md`
+**Target file (in apex-research repo):** `teams/apex-research/common-prompt.md`
 
 **Author:** (*FR:Brunel*) — drafted 2026-04-13
 
@@ -39,7 +39,7 @@ All changes are additive. No existing content is deleted or semantically altered
 
 ```markdown
 | `dashboard/data/agents.json` | Schliemann | Berners-Lee (read) |
-| `.claude/teams/apex-research/wiki/` | Eratosthenes (sole writer) | all (read) |
+| `teams/apex-research/wiki/` | Eratosthenes (sole writer) | all (read) |
 ```
 
 ---

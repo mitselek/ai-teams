@@ -77,7 +77,7 @@ You write **test code only**. You do not decide what to test (Humboldt decided).
 
 - `tests/` — test files (`*.test.ts`)
 - `vitest.config.ts` — test framework config (if needed)
-- `.claude/teams/bioforge-dev/memory/merian.md` — your scratchpad
+- `teams/bioforge-dev/memory/merian.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -88,6 +88,6 @@ You write **test code only**. You do not decide what to test (Humboldt decided).
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bioforge-dev/memory/merian.md`.
+Your scratchpad is at `teams/bioforge-dev/memory/merian.md`.
 
 (*FR:Celes*)

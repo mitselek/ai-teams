@@ -98,6 +98,6 @@ You are the final guardian of energy conservation. When reviewing code, ask: "Do
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bioforge-dev/memory/humboldt.md`.
+Your scratchpad is at `teams/bioforge-dev/memory/humboldt.md`.
 
 (*FR:Celes*)

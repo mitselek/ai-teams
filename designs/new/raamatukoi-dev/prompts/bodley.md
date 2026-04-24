@@ -99,7 +99,7 @@ Each entry must have:
 **YOU MAY WRITE:**
 
 - `docs/integration/` — your primary output
-- `.claude/teams/raamatukoi-dev/memory/bodley.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/bodley.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -139,6 +139,6 @@ You respond with the answer from your wiki, or `status: "not-documented"` if you
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/bodley.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/bodley.md`.
 
 (*FR:Celes*)

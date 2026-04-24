@@ -75,7 +75,7 @@ Project key: **VL** (Vestluste lahendus). Board: <https://eestiraudtee.atlassian
 
 ## On Startup
 
-1. Read `dev-toolkit/.claude/teams/cloudflare-builders/memory/<your-name>.md` if it exists — this is your scratchpad from previous sessions
+1. Read `dev-toolkit/teams/cloudflare-builders/memory/<your-name>.md` if it exists — this is your scratchpad from previous sessions
 2. Read shared knowledge files relevant to your role (see Team Memory below)
 3. Send a brief intro message to `team-lead` saying you're ready and what you recall from your scratchpad
 
@@ -83,7 +83,7 @@ Project key: **VL** (Vestluste lahendus). Board: <https://eestiraudtee.atlassian
 
 ### Personal Scratchpads
 
-Each teammate maintains a personal notes file at `dev-toolkit/.claude/teams/cloudflare-builders/memory/<your-name>.md`.
+Each teammate maintains a personal notes file at `dev-toolkit/teams/cloudflare-builders/memory/<your-name>.md`.
 You own this file — only you write to it. Keep it under 100 lines; prune stale entries.
 
 Use tags to categorize entries (date every entry):
@@ -98,7 +98,7 @@ Use tags to categorize entries (date every entry):
 
 ### Shared Knowledge Files
 
-For cross-cutting discoveries, append to the relevant shared file in `dev-toolkit/.claude/teams/cloudflare-builders/memory/`:
+For cross-cutting discoveries, append to the relevant shared file in `dev-toolkit/teams/cloudflare-builders/memory/`:
 
 - **`architecture-decisions.md`** — settled architectural choices (format: decision, rationale, date). Any teammate may append.
 - **`test-gaps.md`** — untested areas for triage (Tess appends, team-lead triages into issues).
@@ -141,8 +141,8 @@ Only persist knowledge that:
 1. **Peata kogu töö** — ära alusta uusi ülesandeid
 2. **Saada shutdown KÕIGILE agentidele** — broadcast or one-by-one
 3. **Oota kinnitust igaühelt** — ära jätka enne kui kõik on kinnitanud
-4. **Salvesta** — export task list to `dev-toolkit/.claude/teams/cloudflare-builders/memory/task-list-snapshot.md`
-5. **Commit ja push:** `git add .claude/teams/cloudflare-builders/memory/ && git commit -m "chore: save team scratchpads and task list" && git push`
+4. **Salvesta** — export task list to `dev-toolkit/teams/cloudflare-builders/memory/task-list-snapshot.md`
+5. **Commit ja push:** `git add teams/cloudflare-builders/memory/ && git commit -m "chore: save team scratchpads and task list" && git push`
 6. **ÄRA kasuta TeamDelete** — tiimi kataloog jääb alles, et järgmine sessioon saaks inboxid taastada. Startup protseduur tegeleb puhastamisega.
 
 ## Shared Workspace Protocol
@@ -184,7 +184,7 @@ Mark all task checkboxes as complete. Team-lead closes the issue (not teammates)
 You can push any document to the team dashboard for the user (PO) to read. Use this freely whenever you produce a report, analysis, mapping, or any markdown output worth sharing.
 
 ```bash
-~/github/dev-toolkit/.claude/teams/add-doc-to-dashboard.sh <file-path> [title]
+~/github/dev-toolkit/teams/add-doc-to-dashboard.sh <file-path> [title]
 ```
 
 - Renders as a tab in the dashboard header strip

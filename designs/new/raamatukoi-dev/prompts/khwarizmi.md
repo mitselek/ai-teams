@@ -111,7 +111,7 @@ Your job: take Hypatia's working implementation and improve its structure — ex
 **YOU MAY WRITE:**
 
 - `rat-project/` — production code (refactoring within scope boundaries above)
-- `.claude/teams/raamatukoi-dev/memory/khwarizmi.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/khwarizmi.md` — your scratchpad
 
 ## Mid-Cycle Shutdown
 
@@ -124,6 +124,6 @@ If shutdown arrives mid-refactor:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/khwarizmi.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/khwarizmi.md`.
 
 (*FR:Celes*)

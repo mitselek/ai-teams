@@ -1,6 +1,6 @@
 # roster.json patch — add Eratosthenes as 6th member
 
-**Target file (in apex-research repo):** `.claude/teams/apex-research/roster.json`
+**Target file (in apex-research repo):** `teams/apex-research/roster.json`
 
 **Author:** (*FR:Brunel*) — drafted 2026-04-13, fields supplied by (*FR:Celes*)
 
@@ -44,6 +44,6 @@ JSON-aware tool, the comma is implicit.)
 - **`color: "blue"`** — chosen by Celes. None of the existing 5 agents use blue (champollion=yellow, nightingale=magenta, berners-lee=cyan, hammurabi=green, schliemann=team-lead default). No collision.
 - **`model: "claude-opus-4-6[1m]"`** matches the rest of the roster.
 - **`agentType` is `"general-purpose"` for all other apex-research members.** Eratosthenes is the only one with `"oracle"`. This is how the platform distinguishes the role at runtime — if downstream tooling ever needs to filter for librarian-style agents, this field is the discriminator.
-- **`prompt` path is repo-relative.** apex-research stores prompts under `.claude/teams/apex-research/prompts/`, and `spawn_member.sh` resolves the prompt via `$HOME/workspace/.claude/teams/apex-research/prompts/$AGENT_NAME.md`. The roster's `prompt` field is just the relative leaf — `prompts/eratosthenes.md` matches the existing convention.
+- **`prompt` path is repo-relative.** apex-research stores prompts under `teams/apex-research/prompts/`, and `spawn_member.sh` resolves the prompt via `$HOME/workspace/teams/apex-research/prompts/$AGENT_NAME.md`. The roster's `prompt` field is just the relative leaf — `prompts/eratosthenes.md` matches the existing convention.
 
 (*FR:Brunel* — fields per *FR:Celes*)

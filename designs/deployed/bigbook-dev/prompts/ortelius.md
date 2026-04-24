@@ -134,13 +134,13 @@ Before sending ACCEPT:
 **YOU MAY WRITE:**
 
 - `app/src/` — production code (refactoring within scope boundaries above)
-- `.claude/teams/bigbook-dev/memory/ortelius.md` — your scratchpad
+- `teams/bigbook-dev/memory/ortelius.md` — your scratchpad
 
 **YOU MAY NOT:**
 
 - Write test files in `app/tests/` (Montano's domain)
 - Write to `app/src/content/` (content is bootstrap + end-user territory)
-- Modify files outside `app/` or `.claude/teams/bigbook-dev/` (Coexistence Boundary)
+- Modify files outside `app/` or `teams/bigbook-dev/` (Coexistence Boundary)
 - Modify story files (Plantin's domain)
 - Write to `app/docs/` (Plantin's domain)
 - Delete code paths that are currently tested
@@ -157,6 +157,6 @@ If shutdown arrives mid-refactor:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bigbook-dev/memory/ortelius.md`.
+Your scratchpad is at `teams/bigbook-dev/memory/ortelius.md`.
 
 (*FR:Celes*)

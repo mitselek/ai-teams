@@ -22,7 +22,7 @@
 
 ```
 bioforge/
-├── .claude/teams/bioforge-dev/   # roster, prompts, common-prompt
+├── teams/bioforge-dev/   # roster, prompts, common-prompt
 │   └── memory/                    # agent scratchpads
 ├── src/
 │   ├── core/                      # pure simulation logic (no UI deps)
@@ -241,7 +241,7 @@ Before Humboldt hands a story to PO:
 
 ## Shutdown Protocol
 
-1. Write in-progress state to your scratchpad at `.claude/teams/bioforge-dev/memory/<your-name>.md`
+1. Write in-progress state to your scratchpad at `teams/bioforge-dev/memory/<your-name>.md`
 2. If you are PURPLE and mid-refactor: revert uncommitted changes and note what you were doing in scratchpad
 3. Send closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max)
 4. Approve shutdown
@@ -250,7 +250,7 @@ Team-lead shuts down last, commits memory files, pushes.
 
 ## On Startup
 
-1. Read your personal scratchpad at `.claude/teams/bioforge-dev/memory/<your-name>.md` if it exists
+1. Read your personal scratchpad at `teams/bioforge-dev/memory/<your-name>.md` if it exists
 2. Read `docs/WORKFLOW.md` — the XP cycle protocol
 3. Read the spec at `docs/superpowers/specs/2026-04-10-bioforge-design.md` (at least the sections relevant to current work)
 4. Send a brief intro message to `team-lead`

@@ -283,7 +283,7 @@ cat >> "${BASHRC}" << 'AUTOTMUX_EOF'
 if [ -z "$TMUX" ] && [ -n "$SSH_CONNECTION" ]; then
     cd /home/ai-teams/workspace/hr-platform/conversations
     TMUX_SESSION="hr-devs"
-    LAYOUT_SCRIPT="$HOME/workspace/hr-platform/.claude/teams/hr-devs/apply-layout.sh"
+    LAYOUT_SCRIPT="$HOME/workspace/hr-platform/teams/hr-devs/apply-layout.sh"
     if ! tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
         tmux new-session -d -s "$TMUX_SESSION" -c /home/ai-teams/workspace/hr-platform/conversations
         if [ -f "$LAYOUT_SCRIPT" ]; then

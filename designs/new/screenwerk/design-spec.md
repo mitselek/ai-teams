@@ -193,7 +193,7 @@ The digital signage domain — projecting scheduled content to screens in public
 
 ```
 ScreenWerk/ai-team/
-├── .claude/teams/screenwerk-dev/   # team config (roster, prompts, common-prompt, startup.md)
+├── teams/screenwerk-dev/   # team config (roster, prompts, common-prompt, startup.md)
 ├── legacy/                          # submodule → ScreenWerk/Screenwerk-2018 (read-only)
 ├── player/                          # submodule → ScreenWerk/2026 (primary dev target)
 └── docs/                            # team output (entu/, migration/)
@@ -258,7 +258,7 @@ ScreenWerk/ai-team/
 - `ScreenWerk/ai-team` cloned with submodules: `git clone --recurse-submodules`
   - `player/` → `ScreenWerk/2026` (read + write)
   - `legacy/` → `ScreenWerk/Screenwerk-2018` (read only)
-- Team config at `.claude/teams/screenwerk-dev/`
+- Team config at `teams/screenwerk-dev/`
 - `gh` CLI authenticated for GitHub API access (ScreenWerk org)
 - Node.js 22.x (as specified in `player/package.json` engines)
 - Entu auth token configured for API access

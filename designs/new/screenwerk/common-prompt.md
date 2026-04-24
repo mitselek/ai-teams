@@ -14,7 +14,7 @@
 
 ```
 ~/workspace/ai-team/
-├── .claude/teams/screenwerk-dev/   # roster, prompts, common-prompt, startup.md
+├── teams/screenwerk-dev/   # roster, prompts, common-prompt, startup.md
 ├── legacy/                          # submodule → ScreenWerk/Screenwerk-2018 (READ ONLY)
 ├── player/                          # submodule → ScreenWerk/2026 (primary dev target)
 └── docs/                            # team output (entu/, migration/)
@@ -155,7 +155,7 @@ Melies does not write production code. He:
 
 ## Shutdown Protocol
 
-1. Write in-progress state to your scratchpad at `.claude/teams/screenwerk-dev/memory/<your-name>.md`
+1. Write in-progress state to your scratchpad at `teams/screenwerk-dev/memory/<your-name>.md`
 2. Send closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max)
    - `[UNADDRESSED]`: any requirements from team-lead that were not completed or explicitly deferred
 3. Approve shutdown
@@ -164,7 +164,7 @@ Team-lead shuts down last, commits memory files, pushes.
 
 ## On Startup
 
-1. Read your personal scratchpad at `.claude/teams/screenwerk-dev/memory/<your-name>.md` if it exists
+1. Read your personal scratchpad at `teams/screenwerk-dev/memory/<your-name>.md` if it exists
 2. Read `player/README.md`
 3. Send a brief intro message to `team-lead`
 

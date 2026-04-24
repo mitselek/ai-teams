@@ -56,6 +56,6 @@ Your job:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/manutius.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/manutius.md`.
 
 (*FR:Celes*)

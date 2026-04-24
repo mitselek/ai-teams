@@ -27,7 +27,7 @@ if [ -n "$PANES" ]; then
 fi
 
 # Queue the startup prompt — will be waiting in the input buffer when Claude loads
-STARTUP_MSG='Sa oled cloudflare-builders tiimi team-lead. Tee startup sammud: 1) cd ~/github/dev-toolkit && git pull 2) TeamCreate(team_name="cloudflare-builders") 3) Loe roster dev-toolkit/.claude/teams/cloudflare-builders.json ja common-prompt.md 4) Spawni Finn tiimiliikmena (run_in_background: true). Seejärel raporteeri et oled valmis ja oota ülesannet.'
+STARTUP_MSG='Sa oled cloudflare-builders tiimi team-lead. Tee startup sammud: 1) cd ~/github/dev-toolkit && git pull 2) TeamCreate(team_name="cloudflare-builders") 3) Loe roster dev-toolkit/teams/cloudflare-builders.json ja common-prompt.md 4) Spawni Finn tiimiliikmena (run_in_background: true). Seejärel raporteeri et oled valmis ja oota ülesannet.'
 
 echo "[rc-start] Starting Claude Code with auto-prompt..."
 cd ~/github/hr-platform/conversations

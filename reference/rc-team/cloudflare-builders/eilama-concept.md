@@ -105,14 +105,14 @@ eilama-daemon.py
 ### Daemon sketch (Python, ~80 lines)
 
 ```python
-# dev-toolkit/.claude/teams/eilama-daemon.py
+# dev-toolkit/teams/eilama-daemon.py
 import json, time, requests, pathlib, datetime
 
 INBOX = pathlib.Path("~/.claude/teams/cloudflare-builders/inboxes/eilama.json").expanduser()
 INBOXES = pathlib.Path("~/.claude/teams/cloudflare-builders/inboxes").expanduser()
 OLLAMA = "http://localhost:11434/api/generate"
 MODEL = "codellama:13b-instruct"
-SYSTEM_PROMPT = open("dev-toolkit/.claude/teams/cloudflare-builders/prompts/eilama-system.txt").read()
+SYSTEM_PROMPT = open("dev-toolkit/teams/cloudflare-builders/prompts/eilama-system.txt").read()
 
 seen_ids = set()
 
@@ -241,6 +241,6 @@ as `prompts/eilama-system.txt` (created at implementation time).
 | Integration | Inbox-polling Python daemon |
 | Languages (input) | English only |
 | Code output | TypeScript, SQL, Python |
-| Startup | `python3 dev-toolkit/.claude/teams/eilama-daemon.py &` |
+| Startup | `python3 dev-toolkit/teams/eilama-daemon.py &` |
 | VRAM | ~8GB (always-on), no conflict with Claude API agents |
 | Team role | Code Scaffold Specialist (boilerplate, stubs, SQL drafts) |

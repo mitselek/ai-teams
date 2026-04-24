@@ -232,7 +232,7 @@ main() {
     if send_message comms-dev framework-research team-lead query "$tc03_body"; then
       sleep 2
 
-      local fr_inbox="/root/.claude/teams/framework-research/inboxes/team-lead"
+      local fr_inbox="/root/teams/framework-research/inboxes/team-lead"
       if inbox_has_message framework-research "$fr_inbox" 1 "$tc03_body"; then
         if validate_inbox_message framework-research "$fr_inbox" "$tc03_body" \
             comms-dev framework-research team-lead; then
@@ -262,7 +262,7 @@ main() {
     if send_message framework-research comms-dev babbage query "$tc04_body"; then
       sleep 2
 
-      local cd_inbox="/root/.claude/teams/comms-dev/inboxes/babbage"
+      local cd_inbox="/root/teams/comms-dev/inboxes/babbage"
       if inbox_has_message comms-dev "$cd_inbox" 1 "$tc04_body"; then
         if validate_inbox_message comms-dev "$cd_inbox" "$tc04_body" \
             framework-research comms-dev babbage; then
@@ -350,7 +350,7 @@ s.close()
 
     sleep 1
 
-    local fr_inbox="/root/.claude/teams/framework-research/inboxes/team-lead"
+    local fr_inbox="/root/teams/framework-research/inboxes/team-lead"
     if ! inbox_has_message framework-research "$fr_inbox" 1 "${tc06_id}"; then
       pass "TC-06" "Tampered message (bad checksum) — not delivered to inbox"
     else

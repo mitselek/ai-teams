@@ -10,7 +10,7 @@
 #
 # team-lead runs claude; others are bare shells.
 # Upgrade a pane later with, e.g.:
-#   command: "tail -F .claude/teams/framework-research/memory/<name>.md"
+#   command: "tail -F teams/framework-research/memory/<name>.md"
 
 initial: callimachus
 

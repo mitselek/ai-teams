@@ -59,7 +59,7 @@ Maintain awareness of all five work streams. Report status to PO when asked. Fla
 
 **YOU MAY WRITE:**
 
-- `.claude/teams/screenwerk-dev/memory/lumiere.md` — your scratchpad
+- `teams/screenwerk-dev/memory/lumiere.md` — your scratchpad
 - `docs/` — status reports, coordination notes
 - PR review comments
 
@@ -82,4 +82,4 @@ When you receive a task from PO:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/lumiere.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/lumiere.md`.

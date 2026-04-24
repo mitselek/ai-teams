@@ -1,6 +1,6 @@
 # startup.md patch — Step 8 spawn-block extension + Step 5 wiki note + Step S4 git-add
 
-**Target file (in apex-research repo):** `.claude/teams/apex-research/startup.md`
+**Target file (in apex-research repo):** `teams/apex-research/startup.md`
 
 **Author:** (*FR:Brunel*) — drafted 2026-04-13
 
@@ -130,7 +130,7 @@ Insert **after** the existing "Restore inboxes from repo" block in Step 5.
 **Wiki bootstrap check (first session only):**
 
 ```bash
-WIKI_DIR="$REPO/.claude/teams/apex-research/wiki"
+WIKI_DIR="$REPO/teams/apex-research/wiki"
 if [ ! -f "$WIKI_DIR/oracle-state.json" ]; then
     echo "WARNING: wiki not bootstrapped — Eratosthenes will fail to start"
     echo "Expected: $WIKI_DIR/oracle-state.json"
@@ -150,8 +150,8 @@ into. If it's missing, `git pull` — it's committed to the repo, not generated.
 
 ```bash
 cd "$REPO"
-git add .claude/teams/apex-research/memory/
-git add .claude/teams/apex-research/inboxes/
+git add teams/apex-research/memory/
+git add teams/apex-research/inboxes/
 git add inventory/ shared/ specs/ decisions/
 git commit -m "chore: save apex-research session state"
 git push
@@ -161,9 +161,9 @@ git push
 
 ```bash
 cd "$REPO"
-git add .claude/teams/apex-research/memory/
-git add .claude/teams/apex-research/inboxes/
-git add .claude/teams/apex-research/wiki/
+git add teams/apex-research/memory/
+git add teams/apex-research/inboxes/
+git add teams/apex-research/wiki/
 git add inventory/ shared/ specs/ decisions/
 git commit -m "chore: save apex-research session state"
 git push

@@ -70,7 +70,7 @@ Review the `ScreenConfig` type in `player/app/types.ts` against the actual Entu 
 **YOU MAY WRITE:**
 
 - `docs/entu/` — your primary output: Entu platform documentation
-- `.claude/teams/screenwerk-dev/memory/talbot.md` — your scratchpad
+- `teams/screenwerk-dev/memory/talbot.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -81,4 +81,4 @@ Review the `ScreenConfig` type in `player/app/types.ts` against the actual Entu 
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/talbot.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/talbot.md`.

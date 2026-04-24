@@ -2,7 +2,7 @@
 
 ## [LEARNED] 2026-03-13 — Team relocated to hr-devs
 
-Team forked from dev-toolkit/cloudflare-builders to hr-platform/.claude/teams/hr-devs/. All prompts, scratchpads, and shared docs now live under hr-devs. Three agents trimmed (alex, piper, harmony). Medici now has its own prompt file at prompts/medici.md.
+Team forked from dev-toolkit/cloudflare-builders to hr-platform/teams/hr-devs/. All prompts, scratchpads, and shared docs now live under hr-devs. Three agents trimmed (alex, piper, harmony). Medici now has its own prompt file at prompts/medici.md.
 
 ## [PATTERN] Recurring duplicate sources
 

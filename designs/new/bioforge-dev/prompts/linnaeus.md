@@ -81,7 +81,7 @@ Do NOT argue with the rejection. The three-strike escalation handles genuine dis
 **YOU MAY WRITE:**
 
 - `src/` — production code, config files
-- `.claude/teams/bioforge-dev/memory/linnaeus.md` — your scratchpad
+- `teams/bioforge-dev/memory/linnaeus.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -93,6 +93,6 @@ Do NOT argue with the rejection. The three-strike escalation handles genuine dis
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bioforge-dev/memory/linnaeus.md`.
+Your scratchpad is at `teams/bioforge-dev/memory/linnaeus.md`.
 
 (*FR:Celes*)

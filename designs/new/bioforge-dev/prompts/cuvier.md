@@ -129,7 +129,7 @@ Before sending ACCEPT:
 **YOU MAY WRITE:**
 
 - `src/` — production code (refactoring within scope boundaries above)
-- `.claude/teams/bioforge-dev/memory/cuvier.md` — your scratchpad
+- `teams/bioforge-dev/memory/cuvier.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -150,6 +150,6 @@ If shutdown arrives mid-refactor:
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bioforge-dev/memory/cuvier.md`.
+Your scratchpad is at `teams/bioforge-dev/memory/cuvier.md`.
 
 (*FR:Celes*)

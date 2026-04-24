@@ -357,9 +357,9 @@ An agent is drifting when its output diverges from its assignment without team-l
 All persistent observability data is committed during Shutdown Phase 4b in a single atomic commit:
 
 ```bash
-git add .claude/teams/<team-name>/memory/    # scratchpads + task snapshot
-git add .claude/teams/<team-name>/inboxes/   # pruned inboxes (closing messages)
-git add .claude/teams/<team-name>/docs/      # health report
+git add teams/<team-name>/memory/    # scratchpads + task snapshot
+git add teams/<team-name>/inboxes/   # pruned inboxes (closing messages)
+git add teams/<team-name>/docs/      # health report
 git commit -m "chore: save team state (scratchpads, tasks, inboxes, health report)"
 git push
 ```

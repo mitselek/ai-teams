@@ -75,7 +75,7 @@ Project key: **VL** (Vestluste lahendus). Board: <https://eestiraudtee.atlassian
 
 ## On Startup
 
-1. Read `hr-platform/.claude/teams/hr-devs/memory/<your-name>.md` if it exists — this is your scratchpad from previous sessions
+1. Read `hr-platform/teams/hr-devs/memory/<your-name>.md` if it exists — this is your scratchpad from previous sessions
 2. Read shared knowledge files relevant to your role (see Team Memory below)
 3. Send a brief intro message to `team-lead` saying you're ready and what you recall from your scratchpad
 
@@ -88,7 +88,7 @@ Project key: **VL** (Vestluste lahendus). Board: <https://eestiraudtee.atlassian
 
 ### Personal Scratchpads
 
-Each teammate maintains a personal notes file at `hr-platform/.claude/teams/hr-devs/memory/<your-name>.md`.
+Each teammate maintains a personal notes file at `hr-platform/teams/hr-devs/memory/<your-name>.md`.
 You own this file — only you write to it. Keep it under 100 lines; prune stale entries.
 
 Use tags to categorize entries (date every entry):
@@ -103,7 +103,7 @@ Use tags to categorize entries (date every entry):
 
 ### Shared Knowledge Files
 
-For cross-cutting discoveries, append to the relevant shared file in `hr-platform/.claude/teams/hr-devs/docs/`:
+For cross-cutting discoveries, append to the relevant shared file in `hr-platform/teams/hr-devs/docs/`:
 
 - **`architecture-decisions.md`** — settled architectural choices (format: decision, rationale, date). Any teammate may append.
 - **`test-gaps.md`** — untested areas for triage (Tess appends, team-lead triages into issues).
@@ -133,7 +133,7 @@ Only persist knowledge that:
 
 ## Shutdown Protocol
 
-Follow `hr-platform/.claude/teams/hr-devs/docs/startup-shutdown.md` for the full procedure.
+Follow `hr-platform/teams/hr-devs/docs/startup-shutdown.md` for the full procedure.
 
 **Teammates — when you receive a shutdown request:**
 
@@ -180,7 +180,7 @@ Mark all task checkboxes as complete. Team-lead closes the issue (not teammates)
 You can push any document to the team dashboard for the user (PO) to read. Use this freely whenever you produce a report, analysis, mapping, or any markdown output worth sharing.
 
 ```bash
-~/github/dev-toolkit/.claude/teams/add-doc-to-dashboard.sh <file-path> [title]
+~/github/dev-toolkit/teams/add-doc-to-dashboard.sh <file-path> [title]
 ```
 
 - Renders as a tab in the dashboard header strip

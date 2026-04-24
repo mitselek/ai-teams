@@ -63,7 +63,7 @@ Do NOT argue with the rejection. The three-strike escalation handles genuine dis
 **YOU MAY WRITE:**
 
 - `webstore/` — production code, CI config, package.json, tsconfig
-- `.claude/teams/raamatukoi-dev/memory/aldus.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/aldus.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -78,6 +78,6 @@ When you encounter an integration point and need to understand the contract, que
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/aldus.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/aldus.md`.
 
 (*FR:Celes*)

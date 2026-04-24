@@ -8,7 +8,7 @@ Key fix: finn prompt used `$FIGMA_PAT` without braces — corrected to `${FIGMA_
 
 ## [LEARNED] 2026-03-10 — Audit v3 findings (previous session)
 
-PATH VEAD PARANDATUD — eelmise auditi (2026-03-09) põhileid lahendatud. Kõik 9 agendi prompti viitavad nüüd korrektsele `dev-toolkit/.claude/teams/cloudflare-builders/memory/<name>.md` rajale.
+PATH VEAD PARANDATUD — eelmise auditi (2026-03-09) põhileid lahendatud. Kõik 9 agendi prompti viitavad nüüd korrektsele `dev-toolkit/teams/cloudflare-builders/memory/<name>.md` rajale.
 
 ## [PATTERN] Recurring duplicate sources
 

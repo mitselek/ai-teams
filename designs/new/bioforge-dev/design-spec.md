@@ -197,7 +197,7 @@ This relaxation is scoped to Phase 6 stories only. Humboldt announces the scope 
 
 ## 8. Session Survivability
 
-All agents maintain scratchpads at `.claude/teams/bioforge-dev/memory/<name>.md`.
+All agents maintain scratchpads at `teams/bioforge-dev/memory/<name>.md`.
 
 On shutdown:
 1. Save WIP to scratchpad

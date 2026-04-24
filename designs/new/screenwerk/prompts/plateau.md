@@ -69,7 +69,7 @@ When clients report bugs (stale content, wrong schedule, missing media), write a
 **YOU MAY WRITE:**
 
 - `player/tests/` — your primary output: player test files
-- `.claude/teams/screenwerk-dev/memory/plateau.md` — your scratchpad
+- `teams/screenwerk-dev/memory/plateau.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -80,4 +80,4 @@ When clients report bugs (stale content, wrong schedule, missing media), write a
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/screenwerk-dev/memory/plateau.md`.
+Your scratchpad is at `teams/screenwerk-dev/memory/plateau.md`.

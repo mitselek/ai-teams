@@ -24,7 +24,7 @@
 
 ```
 ~/workspace/tugigrupp/
-├── .claude/teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki
+├── teams/raamatukoi-dev/   # roster, prompts, common-prompt, wiki
 │   └── wiki/                        # Bodley's knowledge base
 ├── webstore/                        # submodule → Raamatukoi/webstore
 ├── rat-project/                     # submodule → Raamatukoi/rat-project
@@ -185,7 +185,7 @@ If a task looks like new feature work, RED/GREEN/PURPLE escalate to ARCHITECT. A
 
 ## Shutdown Protocol
 
-1. Write in-progress state to your scratchpad at `.claude/teams/raamatukoi-dev/memory/<your-name>.md`
+1. Write in-progress state to your scratchpad at `teams/raamatukoi-dev/memory/<your-name>.md`
 2. If you are PURPLE and mid-refactor: submit a `[DEFERRED-REFACTOR]` entry to Bodley describing what you were trying to do and why, before reverting uncommitted work
 3. Send closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max)
    - `[UNADDRESSED]`: any requirements from team-lead that were not completed or explicitly deferred
@@ -195,7 +195,7 @@ Team-lead shuts down last, commits memory files, pushes.
 
 ## On Startup
 
-1. Read your personal scratchpad at `.claude/teams/raamatukoi-dev/memory/<your-name>.md` if it exists
+1. Read your personal scratchpad at `teams/raamatukoi-dev/memory/<your-name>.md` if it exists
 2. Read the CLAUDE.md of your assigned repo (`webstore/CLAUDE.md` or `rat-project/CLAUDE.md`)
 3. Read `docs/tdd-pipeline.md` — the XP cycle protocol
 4. Send a brief intro message to `team-lead`

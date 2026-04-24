@@ -6,7 +6,7 @@ set -euo pipefail
 # This is a reference copy of hr-devs's original tmux-pane spawn script.
 # tmux-pane spawning is retired as the framework default. New teams use the
 # Agent tool with team_name + name from a Claude Code team-lead session.
-# See spawn_member.sh (repo root `.claude/teams/`) header and issue #60
+# See spawn_member.sh (repo root `teams/`) header and issue #60
 # for the new spawn/respawn pattern.
 #
 # Kept as a reference artifact; do NOT invoke.

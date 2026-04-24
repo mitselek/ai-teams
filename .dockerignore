@@ -5,7 +5,7 @@
 .env
 
 # Runtime state (managed by named volumes, not image)
-.claude/teams/*/inboxes/
+teams/*/inboxes/
 
 # Node / package artifacts
 node_modules/

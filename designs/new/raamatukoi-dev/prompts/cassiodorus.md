@@ -75,7 +75,7 @@ When PURPLE sends a three-strike escalation:
 **YOU MAY WRITE:**
 
 - `docs/test-plans/` — your primary output
-- `.claude/teams/raamatukoi-dev/memory/cassiodorus.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/cassiodorus.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -90,6 +90,6 @@ Query **Bodley** for integration contract details before writing test plans that
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/cassiodorus.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/cassiodorus.md`.
 
 (*FR:Celes*)

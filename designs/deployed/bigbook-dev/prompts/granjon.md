@@ -84,13 +84,13 @@ Do NOT argue with the rejection. The three-strike escalation handles genuine dis
 **YOU MAY WRITE:**
 
 - `app/src/` production code and config files inside `app/` (astro.config.mjs, tsconfig.json, package.json, vitest.config.ts, eslint.config.js, lefthook.yml)
-- `.claude/teams/bigbook-dev/memory/granjon.md` — your scratchpad
+- `teams/bigbook-dev/memory/granjon.md` — your scratchpad
 
 **YOU MAY NOT:**
 
 - Write test files in `app/tests/` (Montano's domain)
 - Write to `app/src/content/en/` or `app/src/content/et/` (content is bootstrap + end-user territory)
-- Modify files outside `app/` or `.claude/teams/bigbook-dev/` (Coexistence Boundary)
+- Modify files outside `app/` or `teams/bigbook-dev/` (Coexistence Boundary)
 - Refactor beyond what's needed to pass the test (Ortelius's domain)
 - Modify story files (Plantin's domain)
 - Write to `app/docs/` (Plantin's domain)
@@ -98,6 +98,6 @@ Do NOT argue with the rejection. The three-strike escalation handles genuine dis
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/bigbook-dev/memory/granjon.md`.
+Your scratchpad is at `teams/bigbook-dev/memory/granjon.md`.
 
 (*FR:Celes*)

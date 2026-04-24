@@ -59,7 +59,7 @@ Query **Bodley** for integration contract details before writing integration tes
 
 - `webstore/__tests__/`, `webstore/**/*.test.*`, `webstore/**/*.spec.*` — test files
 - `webstore/vitest.config.*` or `webstore/jest.config.*` — test framework config
-- `.claude/teams/raamatukoi-dev/memory/jikji.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/jikji.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -74,6 +74,6 @@ When you need to understand an integration contract to write accurate test asser
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/jikji.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/jikji.md`.
 
 (*FR:Celes*)

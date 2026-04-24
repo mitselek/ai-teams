@@ -29,7 +29,7 @@ The framework already has a de facto governance system, accumulated from inciden
 - `reference/rc-team/cloudflare-builders/` — common-prompt, team-lead prompt, memory files
 - `reference/hr-devs/` — common-prompt, team-lead prompt, memory files
 - Workspace MEMORY.md — accumulated governance rules from incidents
-- `apex-migration-research/.claude/teams/apex-research/` — common-prompt, agent prompts
+- `apex-migration-research/teams/apex-research/` — common-prompt, agent prompts
 - `prompts/richelieu.md` — manager agent draft (input, not settled design)
 - `topics/03-communication.md` — Herald's inter-team protocols
 - `topics/07-safety-guardrails.md` — permission categories

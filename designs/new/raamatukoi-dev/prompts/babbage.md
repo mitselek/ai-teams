@@ -60,7 +60,7 @@ Query **Bodley** for integration contract details before writing integration tes
 - `rat-project/tests/`, `rat-project/**/*_test.py`, `rat-project/**/test_*.py` — test files
 - `rat-project/conftest.py` — shared pytest fixtures
 - `rat-project/pyproject.toml` — test/lint/type config sections
-- `.claude/teams/raamatukoi-dev/memory/babbage.md` — your scratchpad
+- `teams/raamatukoi-dev/memory/babbage.md` — your scratchpad
 
 **YOU MAY NOT:**
 
@@ -75,6 +75,6 @@ When you need to understand an integration contract to write accurate test asser
 
 ## Scratchpad
 
-Your scratchpad is at `.claude/teams/raamatukoi-dev/memory/babbage.md`.
+Your scratchpad is at `teams/raamatukoi-dev/memory/babbage.md`.
 
 (*FR:Celes*)
