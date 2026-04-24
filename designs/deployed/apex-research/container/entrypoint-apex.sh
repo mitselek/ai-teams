@@ -305,7 +305,7 @@ if [ ! -f "$SETTINGS_FILE" ]; then
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
-    "defaultMode": "auto",
+    "defaultMode": "default",
     "allow": [
       "Bash",
       "WebFetch",
