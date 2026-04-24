@@ -2,7 +2,7 @@
 
 ## 2026-04-24 (session #60 — issue #60 protocol doc updates)
 
-[WIP] Issue #60 — retire tmux-pane spawn as default, standardize on Agent-tool persistent spawn. Two deliverables: (a) framework-level `subagent-fallback-protocol.md` rewrite (no framework version exists yet; only apex-research has one at `apex-migration-research/.claude/teams/apex-research/subagent-fallback-protocol.md` v1.0.0 by Schliemann), (b) startup.md flagged-line audit with proposed replacement text.
+[WIP] Issue #60 — retire tmux-pane spawn as default, standardize on Agent-tool persistent spawn. Two deliverables: (a) framework-level `agent-spawn-protocol.md` rewrite (no framework version exists yet; only apex-research has one at `apex-migration-research/.claude/teams/apex-research/subagent-fallback-protocol.md` v1.0.0 by Schliemann), (b) startup.md flagged-line audit with proposed replacement text.
 
 [DECISION] Reframed the "fallback" axis. The old framing was "persistent-tmux-pane teammate (default) vs one-shot-Agent-tool subagent (fallback)." The new framing is "persistent Agent-tool teammate (default) vs one-shot Agent-tool subagent (fallback)." Both modes share the Agent tool — the discriminator is the `team_name` + `name` parameters (persistent) vs no `team_name` (one-shot). This collapses the two-tool distinction into a one-tool, one-parameter distinction, which is structurally cleaner.
 
@@ -12,9 +12,9 @@
 
 [DECISION] Scope discipline. I'm NOT editing `spawn_member.sh`, container entrypoints, or `topics/06-lifecycle.md` Path 1/2/2.5/3 decision tree. Brunel owns container entrypoints (per issue #60 scope), and topic-file edits are out of my write-scope (proposed to team-lead, not authored by me). My scope is the protocol doc + the startup.md flagged-line audit.
 
-[CHECKPOINT] Deliverable shipped to team-lead at 14:48: full rewrite of `subagent-fallback-protocol.md` v2.0.0 + startup.md/SKILL.md audit findings (no edits needed for either) + open question on T06 Path-tree ownership.
+[CHECKPOINT] Deliverable shipped to team-lead at 14:48: full rewrite of `agent-spawn-protocol.md` v2.0.0 + startup.md/SKILL.md audit findings (no edits needed for either) + open question on T06 Path-tree ownership.
 
-[DECISION] Aen resolved scope boundaries (2026-04-24 14:50): Volta owns the T06 Path 1/2/2.5/3 decision-tree rewrite — filed as NEXT-SESSION-CHORE for her. My protocol doc defines the shapes each lifecycle path uses; her rewrite references my shapes, not the other way around. Clean separation: Herald = protocol shapes (T03), Volta = lifecycle state machine (T06). Aen landing the protocol doc at `docs/subagent-fallback-protocol.md` himself per my recommended path. `tmux-spawn-guide.md` retirement is Brunel's timing call — parked as DEFERRED.
+[DECISION] Aen resolved scope boundaries (2026-04-24 14:50): Volta owns the T06 Path 1/2/2.5/3 decision-tree rewrite — filed as NEXT-SESSION-CHORE for her. My protocol doc defines the shapes each lifecycle path uses; her rewrite references my shapes, not the other way around. Clean separation: Herald = protocol shapes (T03), Volta = lifecycle state machine (T06). Aen landing the protocol doc at `docs/agent-spawn-protocol.md` himself per my recommended path. `tmux-spawn-guide.md` retirement is Brunel's timing call — parked as DEFERRED.
 
 [LEARNED] **T03/T06 boundary, named clearly.** "Protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when." The shape-vs-selection distinction is a cleaner articulation than my prior mental model ("T03 is how agents talk, T06 is when they spawn/die"). Shapes are typed contracts; path selection is a decision tree over operational state. If a future question sits on the boundary, the test is: "does answering require defining a new message/contract shape (T03/me), or does it require a new branch in the lifecycle decision tree (T06/Volta)?" Save for next-session scope disambiguation.
 
