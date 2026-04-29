@@ -126,11 +126,5 @@
     "summary": "Session-close: write scratchpad + closing report",
     "timestamp": "2026-04-15T17:29:40.180Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1776274403276@monte\",\"from\":\"team-lead\",\"reason\":\"session wrap 2026-04-15\",\"timestamp\":\"2026-04-15T17:33:23.276Z\"}",
-    "timestamp": "2026-04-15T17:33:23.276Z",
-    "read": true
   }
 ]

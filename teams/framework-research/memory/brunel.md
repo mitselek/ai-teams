@@ -1,5 +1,13 @@
 # Brunel scratchpad
 
+## APEX CONTAINER — CHROMIUM/PLAYWRIGHT DEPS (2026-04-29) — CLOSED
+
+[CHECKPOINT] Dual-track shipped end-to-end. Live-inject + Dockerfile-bake. Source-commit on origin/main: `9ddfb10`. Cal entries filed (wiki at 49, provenance-closed). RC-clone divergence cleanup also complete: stale clone moved aside to `apex-migration-research.pre-fresh-clone-2026-04-29`, fresh clone in place at `/home/dev/github/apex-migration-research`. PR #115 (`TERM` + `CLAUDE_CODE_NO_FLICKER` in entrypoint SHELL_VARS) merged squash on origin/main as `049f766e`. Two infra gotchas (gh-not-on-RC, CRLF/LF) HELD for n=2 confirmation before Cal submission per team-lead guidance.
+[GOTCHA] When investigating "X commits ahead, Y commits behind" divergence, message-match search on origin is the cheap way to detect rebased history. `git branch -r --contains <sha>` returning empty for ahead-commits + matching messages on origin under different SHAs = rebase signature, not local-only commits. Avoid recommending pull/rebase from this state — fresh-clone.
+[GOTCHA] `gh` is NOT on the RC host (only inside the apex container). For PR-open from RC-side work, push branch via SSH-remote (`git@github.com:`) then open PR from a host that has `gh` authed (Windows side here). RC's HTTPS git creds were read-only; SSH had write access.
+[PATTERN] CRLF/LF line-ending divergence inflates raw diff line counts. Always run `git diff -w --stat` alongside `git diff --stat` when evaluating "is this 700-line diff substantive?" — the gap is the noise floor. apex-migration-research entries committed from Windows have CR endings; LF re-saves on RC = git sees whole file changed.
+[LEARNED] My initial "RC clone needs git pull" recommendation was based on the wrong assumption that the RC clone was a vanilla mirror. Pre-fold consistency check should have asked "is the deploy clone in sync with origin" before stating "needs pull". This is the same shape as my 2026-04-24 "tunnel client" failure — both were single-source folds I hadn't validated against the deployment topology.
+
 ## ISSUE #60 TMUX-SPAWN RETIREMENT — INFRA SIDE (2026-04-24)
 
 [CHECKPOINT] Task A delivered. 5 spawn_member.sh copies gated with early-exit deprecation header. tmux-spawn-guide.md archived with top banner pointing to Agent-tool spawn. Container entrypoint tmux setups annotated: tmux now serves human-SSH scaffolding only, no longer required for agent spawning. aliases.sh rewrite drafted in `docs/aliases-sh-rewrite-draft-2026-04-24.md` — canonical file in apex-migration-research repo (Schliemann owns), NOT applied from my side.

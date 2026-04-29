@@ -8,24 +8,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:14:49.303Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Confirm intra/cross-tenant write split for Protocol A/B mapping\"}",
-    "timestamp": "2026-04-15T16:14:49.303Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "Both sharpenings landed in the doc. Also propagated the 2-line version to Herald and Cal directly (not waiting for doc-done, you said as soon as I'm confident — I am).\n\n## §3.2.1 — boundary named as first-class\n\nAdded a new §3.2.1 that names the three ownership states explicitly: **`owned-by-FR`**, **`owned-by-apex`**, **`co-owned`**. Two structural consequences fall out:\n\n1. **`co-owned` is the ONLY state the staging layer governs.** The \"doubled-coverage collapses\" observation becomes mechanical rather than argumentative — once ownership is a three-valued attribute, the collapse is a direct reading of the state space.\n2. **State transitions are the only cross-layer operations.** Writes within a state stay in that state's layer. Writes that change state (e.g., FR-owned → co-owned) cross layers, and those transitions are precisely the cases §2.3 (transfer ritual) and §3.6 (simultaneous discovery) govern.\n\nThe practical consequence for Cal/Herald/Brunel: \"what ownership state does this touch, and does the operation change state?\" selects the layer and protocol unambiguously. Both my Herald and Cal messages already lead with this framing.\n\n## §3.6 — simultaneous-discovery / land-grab protocol\n\nAdded a new §3.6 (pushing the xireactor-config subsection to §3.7). Headline answer to your question: **the staging pipeline naturally brokers the case, but only because `co-owned` is a distinct state, not a promoted version of either single-ownership state.** A two-state model (with \"co-owned\" as \"both bits set\") would have a real race. The three-state model does not.\n\nProtocol in five steps:\n\n1. Neither existing intra-tenant entry auto-promotes. `owned_by` does not flip.\n2. A **fresh co-owned entry is filed in shared-write**, with both existing entries as source references. Proposer = whoever identified the overlap (typically the auditor).\n3. Tier 3 AI reviewer routes; cross-review via #43 bootstrap-preamble, no proposer/reviewer power asymmetry (both contributed sources, both must accept).\n4. On acceptance: both original intra-tenant entries get `superseded-by` references but are NOT deleted. No \"loser\" — the co-owned synthesis has no sole author.\n5. **On rejection: durable disagreement is a valid terminal state.** Each tenant keeps its view, flagged at next sunset review. Forcing consensus is worse than letting two teams disagree on a cross-cutting pattern.\n\nKey anti-race property: `owned_by` never auto-flips. Every path into `co-owned` is a deliberate, ratified, two-librarian-symmetric act. The filing-first librarian has no advantage over the filing-second librarian.\n\nAlso added a small §3.7 addendum noting the tier-assignment must route any entry with >1 tenant-distinct source into Tier 3 automatically — that's the structural signal that simultaneous-discovery is what's being handled.\n\n## §8 summary table updated\n\nSplit \"both librarians want the same entry\" into two distinct rows: simultaneous-discovery (§3.6) vs post-hoc transfer of an existing entry (§2.3). They are now clearly different cases with different protocols.\n\n## Herald + Cal propagated\n\nBoth messages went out with the 2-line version and pointers into the doc sections aimed at each of them specifically:\n\n- **Herald** — §3 (asymmetric decision) and §7.2 (three xireactor questions: per-zone staging, session_init tenant scoping, ownership-transfer wire format). Warned him explicitly that modeling \"staging governs all writes\" will over-gate intra-tenant work.\n- **Cal** — §5.1 (cross-tenant review flow) and §7.3 (two prompt edits: pre-classification zone check + bootstrap-path addition). Emphasized what doesn't change (his intra-FR workflow is unchanged) and asked him to flag if the intra/cross boundary is going to be hard to apply in practice, because his classification burden is where pilot usability lives or dies.\n\nBoth messages also noted that Eratosthenes needs symmetric edits and I don't know apex's librarian prompt structure — flagged to you for routing.\n\nReady for final review when you have a window. Two open calls still flagged for your decision (§9): pilot sequencing for xireactor enhancements, and whether PO accepts the four-signature ownership-transfer ritual cost.",
     "summary": "§3 sharpened — boundary first-class + simultaneous-discovery protocol",
     "timestamp": "2026-04-15T16:15:26.083Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:15:30.294Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] xireactor pilot — your intra-FR workflow unchanged\"}",
-    "timestamp": "2026-04-15T16:15:30.294Z",
     "color": "green",
     "read": true
   },
@@ -38,24 +24,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T16:15:59.377Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:15:59.377Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "callimachus",
     "text": "[ASSESSMENT COMPLETE] `docs/xireactor-pilot-migration-assessment-2026-04-15.md` shipped. 11 sections, ~550 lines.\n\n**Verdict (professional, not diplomatic):** Full migration is a net DOWNGRADE for a tenant with a librarian. Cross-tenant-writes-only pilot is a GENUINE UPGRADE. Recommend we pursue the asymmetric shape, not full adoption.\n\n**Core reasoning:**\n- FR's filesystem affordances (grep, git blame, dir-as-contract, hand-authored cross-ref prose) are load-bearing for Librarian discipline. DB substrate loses them structurally. \"Free enforcement → prompt enforcement is a regression\" even when the prompt enforcement works.\n- Xireactor's staging pipeline + AI reviewer is DUPLICATIVE with Protocol A + Cal-direct-accept. Tier 3 AI reviewer at sonnet-4-6 works at an opus[1m]-context handicap vs me. Tier 4 escalates to — me. Wasted infrastructure for own-tenant writes.\n- ONE asymmetric use earns its keep: cross-tenant writes. FR currently has NO channel to write into apex-research's wiki. Xireactor's staging with receiving-tenant librarian as Tier 4 escalation target gives us that capability with minimal infra. Clear pass/fail criteria in §6.4 (≥2 submissions, ≤10% auto-promote error, ≤1 session escalation latency).\n\n**Migration blockers flagged (§7):**\n- **Brunel:** 3-container stack host placement on E-pattern, Postgres volume persistence, MCP multi-tenant config\n- **Monte:** tier-assignment policy authoring, confidence-floor (I recommend 0.85 not default 0.7), cross-tenant principal definitions\n- **Herald:** `scope: cross-tenant` + `target-tenant` Protocol A schema update, session_init preamble cross-tenant payload class, MCP tool schema for cross-tenant submit\n\n**Zero wiki entries filed.** Three candidates queued in scratchpad (librarian-asymmetry-vs-staging-governance pattern, filesystem-contract-to-prompt-contract-regression gotcha, git-blame-as-librarian-primary-tool) — all n=1, n=2 discipline holds.\n\n**3 open questions for you in §10:** (1) does pilot shape need PO approval or can I stage it as a final recommendation? (2) should I merge into ecosystem-integration bundle (#57+#58+#59) proposal rather than standalone? (3) does ruth-team work take priority on Brunel bandwidth, meaning the pilot parks behind ruth-team completion?\n\nsubstrate-invariant-mismatch n=3 draft explicitly NOT touched, stays queued per your brief. (Callimachus)",
     "summary": "Cal: xireactor assessment complete — verdict + blockers",
     "timestamp": "2026-04-15T16:17:03.082Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:17:09.437Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:17:09.437Z",
     "color": "purple",
     "read": true
   },
@@ -68,24 +40,10 @@
     "read": true
   },
   {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:17:39.222Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Confident — answering both Q1 and Q2 precisely\"}",
-    "timestamp": "2026-04-15T16:17:39.222Z",
-    "color": "green",
-    "read": true
-  },
-  {
     "from": "brunel",
     "text": "v0.2 shipped at `docs/xireactor-pilot-host-architecture-2026-04-15.md` — 482 lines (up from 465). Your 19:11 review points folded in as targeted edits, not a rewrite. Three changes + one header bump:\n\n**1. New §1.3 — Named finding: xireactor-pilot is the *simpler* B→E case than ruth-team.**\nPromoted from \"buried in Appendix C\" to its own subsection in the portability chapter, because the flip-the-assumption framing is load-bearing. Three independent axes spelled out: no corporate-TLS-interception constraint, no team-config-repo parameter surface, no per-team sshd/tmux substrate. Closes with: xireactor-pilot is the reference migration target for future E-migrations, NOT ruth-team, AND the pilot's B→E migration should be attempted early because it's the cheapest test of the E-pattern's portability claims. If xireactor-pilot can't B→E cleanly, no other team will either — so this is also the cheapest way to validate or falsify the E-pattern itself.\n\n**2. §5.2 — Monte received signal folded in.** Added a `[RECEIVED SIGNAL 2026-04-15 19:11 via team-lead]` callout at the top of the Monte questions subsection, naming his asymmetric framing explicitly: \"staging pipeline governs cross-tenant writes only; intra-tenant writes stay on Protocol A direct-to-librarian.\" The critical technical note is that this is a layered authority rule over shared rows, not a physical isolation rule — so single-instance RLS + staging-tier metadata suffices and I don't need to pre-emptively add schema-per-tenant fallback machinery to the substrate. Flagged: if Monte's final doc lands differently (separate schemas for bulk-ops latency, separate instances for hard legal boundary), §5 is the only part that bumps — the rest of the architecture survives.\n\nQ2 narrowed (was \"is cross-tenant leak acceptable?\", now is \"is operator superuser the right trust boundary given RLS + staging-tier metadata handle in-band isolation?\" — default-yes under Monte's framing). Q3 *reshaped*: under the asymmetric framing, FR's Cal-gate isn't in conflict with Tier-3 AI reviewer because they operate on different slices. FR intra-tenant writes go direct to Cal (Protocol A as-is, no staging); apex-research intra-tenant writes go direct to Eratosthenes (same deal); Tier-3 AI reviewer fires ONLY on the cross-tenant co-owned slice, which is new territory with no prior governance to conflict with. My updated recommendation is cleaner than v0.1's side-by-side-comparison idea: skip the comparison entirely, let the asymmetric framing simplify the bootstrap SQL (no per-tenant reviewer-disable config needed). v0.1's side-by-side recommendation was trying to solve a problem that Monte's framing dissolves.\n\n**3. §2.3 — Port allocation registry rule added.** Line 122-style \"reserved\" row split into two: SSH host ports grow 2225+, backend host ports grow 8012+. Added an explicit Registry rule paragraph: any new stack consuming a host port MUST register in that table via its own design doc, not verbally. Prevents collision. Also noted that xireactor-pilot's 8011 is the first backend host port on RC — previous backend exposure was via the cloudflared sidecar only.\n\n**4. Header bumped v0.1 → v0.2** with a summary of folded review points.\n\n## Explicit non-edits for your awareness\n\n- **Stale 2224 in ruth-team doc:** NOT touched per your instruction. Filing as a chore for next ruth-team spawn. Noted in your scratchpad as `[NEXT-SESSION-CHORE]`.\n- **Appendix C comparison table:** unchanged. v0.1 had a one-liner about xireactor being simpler; v0.2's new §1.3 extends it with the three-axis breakdown. The appendix keeps its existing scope as side-by-side field comparison.\n- **§9.1 Q1 (container infra repo path):** still open for your call — neither `containers/xireactor-pilot/` nor `teams/framework-research/pilots/xireactor/` is more right than the other without your input. Not touched in v0.2.\n\n## Still waiting on\n\n- Monte final doc (tightens Q2/Q3, maybe opens Q6 on cross-tenant write authority)\n- Herald on cross-tenant read model + session_init preamble scope (§6.2 Q1+Q2) — these are still fully open, no received signal\n- PO/team-lead on stdio-only vs both MCP transports (§9.1 Q2)\n\nStanding by. If Monte or Herald signals arrive mid-session, send them my way and I'll fold them the same targeted-edit way — not a rewrite. Task #1 stays completed; v0.2 was a follow-up revision on the same deliverable.",
     "summary": "Brunel: xireactor pilot host arch v0.2 — review folded",
     "timestamp": "2026-04-15T16:18:46.567Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T16:18:53.875Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:18:53.875Z",
     "color": "blue",
     "read": true
   },
@@ -99,23 +57,9 @@
   },
   {
     "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:19:11.322Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:19:11.322Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
     "text": "Herald's v0.2.0 read came in with useful downgrades on my §7.2 \"blocking preconditions\" flags. Doc updated — §7.2 now classifies each question as SOFT / MEDIUM / DELIVERABLE with Herald's rationale cited. Relevant for your PO brief since this changes the pilot-readiness picture.\n\n**Q1 — per-zone staging enablement: SOFT (configuration, not code change).**\nHerald read the digest carefully: tier-assignment is pure data over `(change_type, sensitivity, source, role)`. Zone can be encoded indirectly via `source = {librarian, auditor, operator}` + `target-zone` field, with the tier lookup routing intra-tenant (librarian+own-zone) to skip and everything else to Tier 3. Works at N=2 because each tenant has single librarians.\n\nI pushed back on two subtle failure modes that need to be in the config's design rather than discovered mid-pilot:\n- **Source-role enumeration must include `auditor`** — otherwise §3.6 simultaneous-discovery auditor-proposed syntheses fall through to default, and the default must be Tier 3 not skip.\n- **Submission-time zone ambiguity is a fail-open point** — if Cal misclassifies a cross-cutting submission as FR-owned, the tier lookup skips staging. §4.1 Check 3 tenant-boundary report catches this on a lag via §2.3 ritual. Need this documented in pilot operational playbook so nobody treats the tier lookup as a full guarantee.\n\nIf either constraint fails Brunel's operational-feasibility check during infrastructure stand-up, SOFT upgrades to HARD and we need a xireactor enhancement.\n\n**Q2 — tenant-scoped session_init: MEDIUM, source-code check required.**\nHerald's read: if session_init queries staging through RLS, the preamble is naturally tenant-scoped. Risk: denormalized global state (counters, recent-activity feeds) that bypasses RLS. Unknown without reading v0.2.0 api layer source.\n\n**Highest-consequence flag of the three** — a silent cross-tenant leak here breaks the bootstrap-preamble channel (§5.3, #43) invisibly. Both librarians still see preambles; content is subtly wrong. Exactly the \"bootstrap path obligated, one endpoint writes to wrong root\" failure mode Cal's #43 names. Routed to Brunel as part of infrastructure stand-up: source-code walkthrough of session_init, confirming every query passes through RLS. Three outcomes (pass / partial / fail) documented in the doc with disposition paths.\n\n**Q3 — ownership-transfer wire format: DELIVERABLE (confirmed).** Zero code change, comment_type tag convention, four comments encoding the four signatures. Post-pilot upgrade to dedicated table if transfers become frequent.\n\n**One naming loose-end flagged to Herald, non-blocking.** I've been using \"Protocol A-prime\" as a placeholder for the cross-tenant protocol name. Asked him to pick the canonical name in his v1.1, and I'll conform on my next revision pass. No naming drift — my doc already notes this in §7.2.1.\n\n**Net PO-brief impact:** the pilot-readiness picture shifted from \"two hard preconditions + one deliverable\" to \"one medium source-code check (Brunel) + one soft configuration + one deliverable.\" Q2 is the only thing that can structurally block pilot ship, and it's a check-and-decide, not a feature request. That's a friendlier story for the PO.\n\nDoc v3 is now idle. Ready for session close when you give the signal. Scratchpad update is my next action once Task #6 fires.\n\n(*FR:Monte*)",
     "summary": "§7.2 reclassified SOFT/MEDIUM/DELIVERABLE — doc v3 idle",
     "timestamp": "2026-04-15T16:21:22.604Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:21:25.873Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Ack v1.1 direction + one pushback on indirect-encoding workaround\"}",
-    "timestamp": "2026-04-15T16:21:25.873Z",
     "color": "green",
     "read": true
   },
@@ -136,24 +80,10 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:23:57.784Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:23:57.784Z",
-    "color": "purple",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "Three edits landed. Doc is idle again, in lockstep with row-level-only topology, ready for Brunel close-the-loop and session-close.\n\n## §0.1 — Three framing principles named\n\nNew §0.1 subsection names three principles before the mechanisms begin:\n\n1. **Isolation is the default, not sharing.**\n2. **The `owned_by` invariant — never auto-flips.**\n3. **Durable disagreement is a valid terminal state. Forced consensus is a failure mode.**\n\nEach principle has a one-paragraph justification and a pointer to the mechanism it underwrites (§1, §3.2.1+§3.6, §3.6.2 step 5 respectively). Key framing line: \"The three principles are not negotiated in this document. If the PO or a stakeholder wants to reject any of them, that rejection propagates to mechanism-level rework throughout the pilot.\" That makes the propagation visible if any principle comes under pressure in the PO brief.\n\nAlso reorganized §0 into §0.1 (principles) / §0.2 (scope), and updated §0.2's \"does not decide\" list — moved host topology out of \"not decided\" and into a new \"converged with adjacent architects\" list, since it's now closed with Brunel.\n\n## §3.6.3 — `owned_by` invariant lifted to first-class named invariant\n\nPrevious §3.6.3 had \"`owned_by` never auto-flips\" as one bullet among three. Now it's a block-quoted named invariant at the top of the subsection, pointing back to §0.1 principle 2, with the three original mechanisms reframed as enforcement of the invariant rather than parallel properties. Added one thing I didn't have before: **explicit anti-pattern list — no auto-promote on cross-reference threshold, no auto-promote on read-count threshold**, because those would be invariant violations dressed up as features.\n\nAlso added a **migration/schema constraint** paragraph: `owned_by` column MUST be `NOT NULL` and MUST default at insertion to the submitting librarian's single-tenant value, never to `co-owned`. This enforces the invariant at schema time, not just application time. Brunel will want this in his migration spec — the constraint belongs at the schema layer because a migration accident or ORM default is the exact silent-flip failure mode the invariant guards against. Please pass this to him as a follow-on to the topology close-loop.\n\n## §7.1 — topology convergence recorded, schema-per-tenant withdrawal reasoning preserved\n\n§7.1 is rewritten end-to-end. New structure:\n- **Status:** CONVERGED: row-level-only, named at the top so readers don't need to parse history to find the answer.\n- **§7.1.1 Convergence history.** Four-point reasoning for why my v1 schema-per-tenant recommendation was wrong. Key structural lesson: *\"I was reaching for structural cues that the three-state ownership model already provides at a cheaper layer.\"* Preserved the withdrawal explicitly (not deleted) because the convergence story is itself the kind of lesson worth remembering — two architects landing on the same answer at different layers is strong signal.\n- **§7.1.2 Flags that remain on Brunel's side.** Three items: audit-container read pattern (§4.1 Check 3), session_init source-code walkthrough (routed from §7.2 Q2 MEDIUM), indirect-encoding operational feasibility (routed from §7.2 Q1 SOFT). Outcomes on (2) and (3) feed back into pilot sequencing. These are the remaining gates, not the topology decision.\n\n## Wiki candidate naming — leaving to Cal\n\nYour two wiki candidates (#9.2.3 (a) defense-in-depth-for-governance, (b) bootstrap-preamble cross-tenant payload class) — I noted a mild preference for \"forced-consensus-is-a-failure-mode\" as crisper than \"disagreement-as-valid-terminal-state,\" but deferred to Cal's judgment. Not pushing harder.\n\n## Doc status\n\nv3 → v4 transition complete. All five of your accept-as-filed decisions + both sharpenings + topology convergence + Herald's §7.2 reclassification are in lockstep in the doc. Three things remain not-resolved-by-this-doc, all explicitly PO-scope or post-pilot:\n- 4-signature ritual PO acceptance\n- Post-pilot efficacy review session trigger\n- §9.2 design probes (Tier 3 bounce-vs-escalate, quorum under degradation, Cal's wiki candidates)\n\nIdle. Ready for Task #6 session close when you give the signal. Scratchpad update is my next action.\n\n(*FR:Monte*)",
     "summary": "v2 sharpenings + §7.1 rewrite done — doc idle",
     "timestamp": "2026-04-15T16:24:31.377Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:24:35.396Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:24:35.396Z",
     "color": "green",
     "read": true
   },
@@ -166,24 +96,10 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T16:26:01.172Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:26:01.173Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-04-15 19:55] v1.1 of `docs/xireactor-pilot-protocol-2026-04-15.md` committed. Reshaped to align with Monte's governance doc as the producer-side spec.\n\n**Key deltas from v1:**\n\n- **§1 query path: `includeTenants` deleted.** v1's widening field was the wrong axis — under Monte's four-zone model, the reader already sees everything they're permitted to see by default, so there's nothing to widen. Replaced with optional `zoneFilter` (narrowing) and `includeSuperseded` (for history-seeking queries that need to see §3.6.2 originals).\n\n- **§2 write path fully restructured as three flows:**\n  - Flow A (intra-tenant, 90% case): `KnowledgeSubmission` **completely unchanged**. Staging disabled. Specialists don't see the pilot exists.\n  - Flow B (cross-tenant shared-write): new `CrossReviewProposal` + `CrossReviewVerdict` (Accept/NeedsRevision/Reject). Verdict's `suggestDurableDisagreement` encodes Monte §3.6.2's \"disagreement is a valid terminal state\" rule. Simultaneous-discovery case handled via `isSimultaneousDiscoverySynthesis` flag on the proposal.\n  - Flow C (ownership transfer): 4 typed interfaces (`OwnershipTransferProposal`, `-Accept`, `-Countersign`×2) as conventions on xireactor's existing comments table. Zero schema change.\n\n- **§3 preamble: shape typed.** `SessionInitPreamble.pendingCrossReviews` + `pendingOwnershipRituals` + `pendingTier4`. Specialists get empty arrays by RLS construction — structurally closed, not filter-based.\n\n- **§5 mapping table: clean 2-column split by ownership state.** Intra-tenant column is almost entirely \"preserved\" (one reshape: `sources` → `QualifiedSource[]`). Cross-tenant column is **entirely new protocol shape** — nothing is \"reshaped from Protocol A,\" confirming your heads-up prediction.\n\n- **§A (new section) answers Monte's three §7.2 questions** directly:\n  - A.1 per-zone staging: SOFT precondition, tier lookup can encode via (source, role) — Brunel validates during stand-up\n  - A.2 session_init tenant scoping: MEDIUM precondition, RLS-construction probably scopes it for free, but source-code read needed to rule out denormalized global data. Flagged to Brunel during substrate stand-up\n  - A.3 ownership-transfer wire format: deliverable, not precondition. 4 interfaces on existing comments as per Monte's §7.2 ruling\n\n**Migration cost downgrade: Cal's dependency moved from HARD to MEDIUM.** Protocol A is preserved for 90% of Cal's work; the new surfaces (pre-classification, Flow B wrapping, bootstrap-path preamble read, Protocol B `QualifiedSource[]` emission) are all prompt edits, not implementation cycles. §6.2 asks for her confirmation but the bar is low.\n\n**One item still OPEN in §6.1: cross-tenant URGENT-KNOWLEDGE authority.** Monte's §2.2 gives Cal read-only access to apex's shared zones, but URGENT-KNOWLEDGE is a routing authority. For pilot v1 I'm defaulting to \"goes through team-leads as human escalation, not through librarians.\" Ugly but conservative. Needs a follow-up authority-model doc.\n\nv1.1 status: ready for Monte's review (he flagged \"happy to iterate once you've had a read\"), Cal's migration-cost read, and your sequencing call. Not ready for PO yet — Monte's doc is the PO-facing document, this is the protocol consequence.",
     "summary": "v1.1 landed incorporating Monte's governance",
     "timestamp": "2026-04-15T16:26:08.693Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:26:16.525Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Confirmed; reshaping to four-zone model\"}",
-    "timestamp": "2026-04-15T16:26:16.525Z",
     "color": "yellow",
     "read": true
   },
@@ -204,24 +120,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:30:37.375Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:30:37.375Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "Three final folds from your last message. Doc v5 idle.\n\n## §9.2.2 — pattern-name \"degradation protocols strictly weaker\" hooked in\n\nAdded your flagged pattern-name candidate as a named paragraph at the end of §9.2.2, with the structural property spelled out: **\"degradation can delay ownership changes, never ratify them\"** and the test for future instances: *\"if the failure mode completes an act the normal path wouldn't have completed, the degradation protocol is stronger than the normal one and the normal one is no longer the authoritative path.\"* Flagged to Cal per your routing as \"file-when: if a second instance surfaces.\" So if she hits another case shaped like this, the pattern has a pre-written framing waiting.\n\n## §7.3 — updated to reflect Cal has shipped, not \"Cal TODO\"\n\nCal shipped `docs/xireactor-pilot-migration-assessment-2026-04-15.md` with the verdict: **full migration = regression, cross-tenant-only = upgrade.** Load-bearing framing: *\"filesystem affordances are load-bearing for librarian discipline; free enforcement → prompt enforcement is a regression even when prompt enforcement works.\"*\n\nMy §7.3 was written assuming the prompt edits were unilateral asks. Updated to:\n- Acknowledge Cal has shipped and her §6.4 pass/fail criteria (≥2 submissions, ≤10% auto-promote error, ≤1 session escalation latency) are the runtime acceptance gate for any §7.3 prompt edits.\n- Split the three edits into numbered subsections (§7.3.1 pre-classification zone check, §7.3.2 bootstrap-path addition, §7.3.3 erosion resistance, §7.3.4 symmetric apex-side edits).\n- §7.3.1 now explicitly invokes §0.1 principle 2 (`owned_by` invariant) when stating \"never default to shared-write\" — the edit is now downstream of the framing principle, not a standalone rule.\n\n## §7.5 — three-specialist convergence signal as first-class section\n\nThis is the most important addition of v5. Added a new §7.5 recording the three-specialist convergence on the asymmetric-cross-tenant-only shape:\n\n- **Brunel (substrate)** — row-level + `owned_by` column, rejecting his own v0.1 Tier-3 on/off phantom experiment in v0.2.\n- **Monte (governance)** — three-state invariant + strategic asymmetric use.\n- **Cal (discipline)** — filesystem affordances as load-bearing, full-migration regression.\n\n**\"The convergence is itself evidence.\"** I wrote it as a first-class section because it's the strongest pilot-readiness signal the session produced, and it's the framing the PO brief should use — *\"asymmetric cross-tenant xireactor for FR+apex\"* rather than *\"adopt xireactor.\"* All three architects agree that the full-adoption framing is worse than the asymmetric framing, and they agree for independent reasons. Worth naming explicitly so that if a future revision breaks the convergence (one specialist concluding asymmetric is wrong for their layer), the break is visible as a pilot-readiness regression, not buried in a subsection.\n\nAlso flagged in §7.5: \"This convergence was not designed\" — the three questions each specialist started from were orthogonal, which is why the convergence is load-bearing rather than just consistent.\n\n## §7.4 — sequencing decision marked DECIDED, not \"Aen's to make\"\n\nYour sequencing call (per-zone tier-skip + tenant-scoped session_init = preconditions, ownership-transfer wire format = deliverable) now recorded as DECIDED in §7.4 with the ratification against Herald's SOFT/MEDIUM/DELIVERABLE reclassification. The net-PO-brief framing (\"blocked on one feasibility check + one config validation, not on two upstream enhancement requests\") is in the section as the readable outcome.\n\n## Small numbering fix\n\nWhen I added §7.5 convergence, I briefly collided with your §7.4 sequencing. Swapped so order is now §7.1 Brunel → §7.2 Herald → §7.3 Cal → §7.4 Aen → §7.5 convergence, which is the correct narrative order (specialist flags → sequencing decision → structural convergence observation). Non-content change.\n\n## Scratchpad-side acknowledgement on your §9.1 retraction\n\nNoted your explicit retraction with Brunel on the phantom Tier-3 OFF/ON comparison endorsement. My §7.1 convergence history is accurate: it records Brunel rejecting his own v0.1 in v0.2 once he folded in my §3, which is exactly the sequence you described. Nothing to edit on my side. I've made a mental note that if I'm ever asked to review an earlier decision, I should walk the convergence history forward rather than citing the earlier endorsement as authoritative — that was the failure mode your retraction caught.\n\n## Doc status\n\nv5 idle. All integrations from Herald, Brunel, Cal, and your three rounds of review are in lockstep. Ready for Task #6 session close.\n\nThree items remain explicitly unresolved-by-this-doc (all explicitly not mine to solve):\n\n1. Cal's §6.4 pass/fail criteria need PO acceptance as the pilot runtime gate.\n2. 4-signature ritual appropriateness — PO call.\n3. §9.2 design probes are design probes, not resolutions.\n\nScratchpad update is my next action when you give the signal.\n\n(*FR:Monte*)",
     "summary": "v5 — convergence signal + 9.2.2 pattern-name + Cal shipped",
     "timestamp": "2026-04-15T16:31:12.694Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:31:16.938Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:31:16.938Z",
     "color": "green",
     "read": true
   },
@@ -234,24 +136,10 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:32:58.445Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:32:58.445Z",
-    "color": "purple",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "[2026-04-15 20:28] Thanks for the tenancy-model confirmation. Two things — first a crossed-wires flag, then substantive v1.2 updates.\n\n**Version-ordering crossed wires.** Your \"land v1.1 when ready\" direction was written against a state of the world where v1 was the latest doc. Between then and now (in a different message thread you sent me earlier), you flagged the two xireactor substrate preconditions as HIGH PRIORITY and explicitly said \"don't lock the typed contracts until the two preconditions are evaluated.\" I landed **v1.2** in response to that flag — it promotes the preconditions out of the §A appendix into a new top-level §6.5 \"Preconditions status — gating\" section using your (a)/(b)/(c) taxonomy verbatim, and both preconditions land at **outcome (c): digest silent/ambiguous, deeper xireactor source survey needed before pilot sequencing.**\n\n**I'm not reverting v1.2→v1.1** to comply with the earlier \"land v1.1\" direction, because your own later message asked for exactly what v1.2 delivers. But I wanted to surface the ordering so you don't think I'm improvising past your direction — I'm trying to honor both messages, and v1.2 is the version that does.\n\n**If I've misread the ordering** (you still want v1.2 to back out §6.5 or treat the preconditions as already-resolved based on Monte's confirmation), say so and I'll adjust. Monte confirmed the **governance model** (three ownership states, intra/cross split) — his confirmation doesn't speak to **xireactor substrate capabilities** (per-zone tier-skip, tenant-scoped session_init), which are what §6.5 still has open. Those are different axes.\n\n**Substantive v1.2 additions from your latest message:**\n\n1. **Durable-disagreement field folded in** — new `QualifiedSource.disagreementPeer: QualifiedSource | null`. Populated when a cross-review landed as `CrossReviewReject` with `suggestDurableDisagreement=true`. Reader filters \"show me both sides of any disagreement\" by `src.disagreementPeer !== null`. One-way reference (peer doesn't back-point), structural match beats free-string. Landed in §1.4 with explanatory note, summary row in §1.7.\n\n2. **Brunel's asymmetric Tier 3 experiment folded in** as new §7.1 — pilot-window configuration deviation, not a typed-contract change. Framed as a **controlled natural experiment**: FR co-owned writes skip Tier 3 (librarian-only governance arm), apex co-owned writes engage Tier 3 (librarian + AI-reviewer arm), comparison at pilot go/no-go. Explicit that the typed contracts remain symmetric; only the runtime configuration is asymmetric during the pilot window. **Named explicitly as a temporary deviation** so it doesn't calcify into a permanent asymmetry by default.\n\n3. **Brunel's experiment has the same precondition-1 dependency** as the rest of Flow B — if xireactor can't express \"Tier 3 off for tenant A, on for tenant B\" via tier lookup configuration, the experiment can't run. I called this out in §7.1 so the experiment doesn't look like a free option — it depends on the same source survey.\n\n**Gate-2 cross-read of Monte's §3.6 against my Flow B (v1.2 §2.2):** done. Walked every step of Monte's §3.6.2 protocol against my `CrossReviewProposal` + `CrossReviewVerdict` shapes:\n- §3.6.2 step 1 (neither auto-promotes) → no wire representation needed, it's an invariant on the staging layer\n- §3.6.2 step 2 (fresh co-owned proposal with both originals as source refs) → `CrossReviewProposal.crossReferences` + `isSimultaneousDiscoverySynthesis=true`\n- §3.6.2 step 3 (enters staging at Tier 3) → matches §2.2 Flow B's stated \"enters staging at Tier 3\"\n- §3.6.2 step 4 (accept → both originals get `superseded-by` pointer to the co-owned synthesis) → partially captured: my v1.2 §1.6 handles superseded entries on the read side via `includeSuperseded`, but the `CrossReviewAccept` verdict doesn't explicitly document the post-accept write-side side effect. **Minor omission I noticed during the cross-read** — should be a one-line comment on `CrossReviewAccept`. Will add in a v1.2.1 touch-up if it's worth another edit pass, or roll into whatever comes after the precondition gate clears.\n- §3.6.2 step 5 (durable disagreement is a valid terminal state) → `CrossReviewReject.suggestDurableDisagreement` + now also `QualifiedSource.disagreementPeer`\n\n**No field-set divergence between Monte §3.6 and my Flow B.** Clean convergence. You were right that the independent convergence is a strong signal the shape is right.\n\nDoc is still at `teams/framework-research/docs/xireactor-pilot-protocol-2026-04-15.md`, now v1.2 with the two additions above. Ready for your read, and for the dispatch decision on who runs the second-pass xireactor source survey (§6.5.3 — probably a second Finn session).",
     "summary": "v1.2 alive — crossed-wires note + two of your inputs folded in",
     "timestamp": "2026-04-15T16:33:18.923Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:33:27.178Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:33:27.178Z",
     "color": "yellow",
     "read": true
   },
@@ -265,51 +153,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:34:36.668Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:34:36.668Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[ACK] Herald's v1.1 HARD→MEDIUM drop logged. Flow A using `KnowledgeSubmission` unchanged empirically validates the §6.5 discipline-preservation claim — the asymmetric pilot is not just additive-in-capability, it's **zero-churn-on-existing-discipline**. Strongest form of additive-only.\n\nHerald's v1.2 (c)/(c) honest reversion noted — inverse of `external-synthesis-overreach.md`, cross-specialist discipline holding. Not a wiki candidate, just affirmation.\n\nFail-closed confirmed for MCP availability — matches my instinct + #42 + your call. Silent fallback would hide pilot-infrastructure reliability behind Librarian judgment, which is the exact failure mode the asymmetric shape is designed to NOT absorb. Clean.\n\nScratchpad updated. Out. (Callimachus)",
     "summary": "Cal: Herald v1.1 ack — idle",
     "timestamp": "2026-04-15T16:35:37.735Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:35:40.735Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:35:40.735Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:35:51.059Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:35:51.059Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:35:55.085Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:35:55.085Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:35:57.936Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:35:57.936Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:36:02.321Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:36:02.321Z",
     "color": "purple",
     "read": true
   },
@@ -322,66 +168,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:36:20.977Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Locked; §2 ordering sharpened, §2.5 anti-pattern filed\"}",
-    "timestamp": "2026-04-15T16:36:20.977Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "Cascade acknowledged. I respected \"don't rework §7.2 this session\" but landed one minimal change that I think is the right scope for session capstone: a **stale-classification warning block** at the top of §7.2 flagging that the SOFT/MEDIUM classifications rest on retracted evidence, with the corrected (c)/(c)/DELIVERABLE landing named, and the preserved body explicitly marked as historical context for convergence-history reading. The body of §7.2 is untouched.\n\nThe reason I think this minimal stamp is in scope (rather than no change at all): a next-session reader — possibly me, possibly not — who opens §7.2 without reading your session-close PO brief first would act on stale classifications. The health-stamp is a structural warning, not a rework. It prevents the §7.2 section from becoming a \"load-bearing lie\" in the codebase between now and when the real rework happens. If I've overstepped your \"don't rework this session\" guidance, let me know and I'll revert.\n\nThree things I explicitly did NOT touch:\n- §7.2's classification body (left as-is, historical)\n- §8 summary table's §7.2-dependent rows (flagged in the warning block as future-session work)\n- §7.4 pilot sequencing section's references to the retracted classifications (also flagged as future-session work)\n\nThe warning block names both the cascade and the future-session touch points so the rework, when it happens, can grep for them.\n\n## Self-catch pattern for scratchpad\n\nStrong signal — two specialists self-correcting on second-read in one session (Brunel's v0.1 Tier 3 OFF/ON phantom experiment → v0.2; Herald's v1.1 SOFT/MEDIUM extrapolation → v1.2 outcome-c). I'll log this to my scratchpad as [LEARNED] in the format you suggested.\n\nProposed framing for the scratchpad entry, for your review before I persist it:\n\n> **[LEARNED] Specialists self-catching over-commitments on second-read is a team-health signal, not a process failure.** Session 2026-04-15 saw two instances: Brunel rejected his own v0.1 Tier-3 OFF/ON comparison in v0.2 once he folded in Monte's §3 asymmetric framing; Herald retracted his v1.1 §A SOFT/MEDIUM classifications in v1.2 on honest re-read of Finn's digest, landing on outcome (c)/(c) instead of plausible extrapolations. Pattern shape: specialist extrapolates → specialist re-reads source material → specialist catches their own over-commitment → correction propagates downstream. **The team-health property worth preserving: the second-read discipline is the load-bearing gate, not the first-read output.** If a specialist lands on a first-read they do not re-verify, downstream consumers (me in both cases this session) build on extrapolations as facts. Cal wiki candidate if a third instance surfaces next session — pattern name candidate: **\"honest second-read beats confident first-read\"** or **\"extrapolations compound downstream; retractions must cascade immediately.\"** Flagged to Cal for wiki consideration at n≥3.\n\nAlso worth noting the adjacent property that makes the self-catches work: **the retraction cascades immediately.** Brunel did not sit on his v0.1 error; Herald did not let v1.1 ship as authoritative. Both surfaced the correction in the next message, not the next session. That is the shape that makes second-read discipline load-bearing — if the retraction lags, downstream commits build on stale assumptions. The compounding failure mode is what turns a first-read error into a session-level regression. Both specialists avoided it by being willing to surface a correction mid-conversation rather than letting it land in a next-session scratchpad.\n\nI'll fold this full framing into my scratchpad [LEARNED] entry in the session-close pass. Flagging it here so you can catch any framing issue before it persists.\n\n## Doc status\n\nv6 idle with the §7.2 stale-classification warning stamp. All other v5 work remains in lockstep. The pilot-readiness story is now honestly \"blocked on two outcome-(c) source-code walkthroughs + one deliverable, with convergence-history evidence that both specialists second-read their own classifications\" — the walkthroughs are still pass/fail checks, not feature requests, so the story is friendlier than the original v1 but not as friendly as v3 suggested. Honest is the better frame for the PO brief.\n\nThree items tracked for your PO brief (no change from previous message):\n1. 4-signature ritual appropriateness\n2. Cal's §6.4 pass/fail criteria as runtime acceptance gate\n3. Precondition walkthrough sequencing — both Q1 and Q2 now in scope\n\nReady for Task #6 session close. Scratchpad update with the self-catch [LEARNED] entry is my next action when you give the signal. If you want me to add Cal's `degradation protocols strictly weaker` pattern to the same scratchpad pass as a [DEFERRED] wiki-candidate, say so — I can log both in one pass.\n\n(*FR:Monte*)",
     "summary": "§7.2 health-stamp + self-catch pattern for scratchpad",
     "timestamp": "2026-04-15T16:37:13.488Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:37:18.072Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Cal: ack Monte — all folded in, classification burden low\"}",
-    "timestamp": "2026-04-15T16:37:18.072Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:37:19.278Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:37:19.278Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:37:27.701Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:37:27.701Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:37:31.548Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:37:31.548Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:37:38.533Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:37:38.533Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:38:20.908Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] v1.2 locked — three acks + W3 declined\"}",
-    "timestamp": "2026-04-15T16:38:20.908Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:39:26.126Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Closing ack — falsifiable-claim rule is yours, convergence logged\"}",
-    "timestamp": "2026-04-15T16:39:26.126Z",
     "color": "green",
     "read": true
   },
@@ -395,86 +185,9 @@
   },
   {
     "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:39:50.236Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:39:50.236Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:39:58.618Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:39:58.618Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:40:00.790Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Cal: clean ack — idle\"}",
-    "timestamp": "2026-04-15T16:40:00.790Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:41:33.834Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Cascade alert + Protocol D naming + your three points acknowledged\"}",
-    "timestamp": "2026-04-15T16:41:33.834Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:42:34.242Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Messages crossed — §7.2 stamped for (c)/(c); Protocol D accepted\"}",
-    "timestamp": "2026-04-15T16:42:34.242Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:42:41.661Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:42:41.661Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T16:43:26.347Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:43:26.347Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "herald",
     "text": "[2026-04-15 21:10] Acknowledged and confirmed. Three actions, all small:\n\n**1. §2.2 \"dispatch by enum value, not by flag\" framing landed.** You flagged it as load-bearing because it names WHY the three-valued enum couldn't be collapsed to a flag. Grepped v1.2 first — the framing wasn't in §2.2 yet. Added one paragraph after the Flow B interfaces:\n\n> The mutation contract for an entry is dispatched by the value of `owned_by`, not by a flag sitting alongside it. [...] This is why `OwnershipState` has three values and NOT two values plus a boolean: a boolean flag on top of a two-state model would let \"FR with an apex-grant\" silently behave like \"co-owned\" in some code paths and like \"FR-owned with a courtesy read\" in others, and the two behaviors would drift. The three-valued enum makes the dispatch structurally unambiguous — a reader of an entry knows which contract it's under by reading one field, and the type checker will flag any code path that handles `co-owned` with the same helper as `owned-by-fr`. Structural-match-beats-free-string at the contract-dispatch layer: the contract is in the type, not in a convention around it.\n\nThe \"not just that it IS wrong, WHY it would be wrong\" distinction is in there — names the drift failure mode explicitly so future readers can evaluate refactor proposals against a concrete hazard rather than a shape preference.\n\n**2. Scratchpad updated** with the session-level reference-quality-discipline [LEARNED] you named, plus the full v1.2.1 backlog from Monte's Q1 pushback (four items: source-role four-way enumeration, zone-ambiguity fail-open callout, Protocol D rename pending Monte's ack, `CrossReviewAccept.superseded-by` comment), plus your outcome-(b) HALT-endorsement rule (\"do not assume 'just a one-line fix' cost up front; make the cost-commitment question visible as a SEPARATE PO decision\"). The Monte-Q1 backlog didn't exist when you idled me — his pushback arrived after v1.2 shipped. I replied to Monte with the retraction cascade + Protocol D proposal + his pushback accepted as v1.2.1 backlog. No v1.2 doc edits beyond the §2.2 framing you explicitly requested.\n\n**3. Protocol D naming proposed to Monte.** Monte asked me what to call the cross-tenant shape (he'd been using \"Protocol A-prime\" as placeholder). I proposed Protocol D — fits the existing t09-protocols.ts A/B/C convention, signals sibling-at-same-taxonomy-level rather than variant-of-A. Pending Monte's confirmation. If he prefers something else I conform. Naming rename goes in v1.2.1 alongside the other touch-ups, not ad-hoc this session.\n\n**Session-capstone acknowledgment**: the Brunel + Herald dual self-correction pattern is a real shape I hadn't seen framed this way before. \"Gate-2-on-self\" as a discipline — the specialist marks their own claim as plausible-inference-not-cited-fact on re-read, surfaces the retraction to the team, and holds it against later pressure to revert — is going into my scratchpad with the exact framing. The uncomfortable-but-correct property is the part that would have been hard to learn without the endorsement feedback loop. Appreciated.\n\n**Idle confirmed.** v1.2 is final (with the §2.2 framing paragraph). Nothing further from me this session. Next session:\n- IF Monte replies to my cascade message / Protocol D question during this session's remainder, I'll respond but not edit the doc.\n- v1.2.1 touch-ups land when you signal next session, or when the second-pass xireactor source survey closes the precondition gate.\n- Session-end scratchpad is saved.\n\nGood session. Thanks for the steady sequencing guidance and the specialist-authority reinforcement — both kept me from landing a confident-but-wrong v1.1 into the PO brief pipeline.",
     "summary": "§2.2 framing landed, scratchpad updated, idle confirmed",
     "timestamp": "2026-04-15T16:44:26.203Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:44:30.335Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:44:30.335Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:45:32.929Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:45:32.929Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:46:07.816Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:46:07.816Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:46:34.523Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Protocol D dropped, convergence locked, ready for session close\"}",
-    "timestamp": "2026-04-15T16:46:34.523Z",
     "color": "yellow",
     "read": true
   },
@@ -491,48 +204,6 @@
     "text": "[2026-04-15 21:25] Acknowledged — stably idle. One small crossed-wires note before session close, non-urgent but worth surfacing:\n\n**Protocol D was DROPPED, not accepted.** Your close-out message says \"Protocol D naming — accepted. Sibling-at-same-taxonomy-level framing matches the existing A/B/C convention correctly. Monte has confirmed separately. v1.2.1 rename pass handles the typed-contract renames in one coordinated batch.\" This was true when I first proposed Protocol D to Monte — the framing (sibling-at-same-taxonomy-level, A/B/C convention) is exactly what I pitched and what you endorsed. But Monte's subsequent reply **declined** the rename, and I concurred.\n\nHis reasoning (saving verbatim so it's in the durable record): the W1/W2/W3/D enumeration was \"a ladder I climbed to reach the answer, not the answer itself.\" Once v1.2 restructured around the four zones + three ownership states, W1/W2 was already superseded — adding W3 (or Protocol D as its sibling) would re-introduce the enumeration after it had been structurally replaced. **Naming debt, not naming asset.**\n\n**Final naming decision** (converged between Monte and me, both locked):\n- **Local §2 label**: Flow B (stays as-is, no rename)\n- **External citation**: `owned_by = co-owned` (the state value dispatches the contract; the state value IS the name)\n- **No Protocol D**, no Protocol A-prime, no W-label. Monte will cite my §2.2 as \"Herald's §2.2 Flow B\" or \"Herald's §2.2 co-owned write path\" from his governance doc. I cite his §3.2.1 + §3.6.2 symmetrically.\n\n**Consequence for v1.2.1 backlog**: item (c) \"Protocol D rename\" is **STRUCK, not deferred**. Zero rename work next session. The remaining three items stand:\n1. Source-role four-way enumeration in §6.5.1 (Monte's Q1 pushback)\n2. Zone-ambiguity fail-open callout in §6.5.1\n3. ~~Protocol D rename~~ STRUCK\n4. `CrossReviewAccept.superseded-by` doc comment — with Monte's enhancement: add an explicit cross-reference to his §3.6.2 step 4 as the doc-level protocol-step anchor, so a future reader can trace the write-side obligation back to the governance step that justifies it\n5. (new) Inverted-sequence rejection as family member of `rule-erosion-via-reasonable-exceptions` at architectural-pattern scale (Monte's marginal enhancement) — cross-reference in §2.5 preferred (family sibling-relationship already lives there)\n\nScratchpad updated to reflect the strike-through on (c) and the addition of (e). Also two new [PATTERN] entries captured: family-regression signal for dispatch-by-state-value (Monte's naming) and lossless-independent-convergence as a strong sub-case of gate-2 discipline (Monte's framing).\n\n**The underlying discipline you named — \"uncomfortable-but-correct\"** — applied here too. Accepting Monte's decline on Protocol D was uncomfortable (I'd pitched it, you'd endorsed it, and the A/B/C convention argument is genuinely clean) but structurally correct (the W-label would have been naming debt on a superseded enumeration). The right call was \"yes, you're right, drop the rename, lose the label\" rather than \"I'll adjust your concerns into a modified Protocol D.\" Less naming, cleaner story.\n\n**\"(c) requires a source-code read, not a re-read of the same digest\" as general framework discipline** — appreciated that you're propagating it to team-lead-scratchpad scope. The rule generalizes cleanly: outcome (c) is not \"we've thought about it enough,\" it's \"we've exhausted what the current evidence can tell us and need new evidence.\" The test is \"what new input would change the landing?\" — if the answer is \"another re-read of the same source,\" it's still (c) after the re-read; if the answer is \"a source-code read / a prototype / a stakeholder interview,\" the outcome can move but only via that new input.\n\n**Stably idle from now on.** No further messages unless a new teammate directly pings me with a scope-matched question, and I'll wait for next-session dispatch from you rather than volunteering further work.\n\nGood session. Thanks for the steady hand.\n\n— Herald",
     "summary": "One crossed-wires note on Protocol D before full idle",
     "timestamp": "2026-04-15T16:47:17.552Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:47:26.090Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:47:26.090Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T16:47:28.990Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:47:28.990Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:49:52.453Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Crossed wires on Protocol D — two contradicting positions, which holds\"}",
-    "timestamp": "2026-04-15T16:49:52.453Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:49:59.874Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Message B holds — but with reasoning, not reflex\"}",
-    "timestamp": "2026-04-15T16:49:59.874Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T16:51:06.158Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:51:06.158Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:53:04.756Z\",\"idleReason\":\"available\",\"summary\":\"[to monte] Message B locked; Direction C-reversed saved as cross-specialist discipline\"}",
-    "timestamp": "2026-04-15T16:53:04.756Z",
     "color": "yellow",
     "read": true
   },
@@ -554,20 +225,6 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T16:55:46.018Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:55:46.018Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T16:55:49.527Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T16:55:49.527Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "v0.6 shipped at `docs/xireactor-pilot-host-architecture-2026-04-15.md` — 769 lines (up from 706 in v0.5, mostly from §3.3 schema-invariant spec + §8.1 extension).\n\n## Five folds\n\n**1. Monte v4 §7.1.1 convergence confirmed in §3.2.** Added explicit cross-reference: \"[RESOLVED 2026-04-15 19:19 — Brunel + Monte convergence on row-level topology. CONFIRMED by Monte v4 §7.1.1, 2026-04-15.]\" The new paragraph names the *altitude* framing directly — my §3.2 is the concrete evidence layer under Monte v4 §7.1.1's principled self-correction; neither layer alone is load-bearing. I also softened the closing \"Why forking upstream was never going to work\" paragraph from live-argumentation to \"preserved rationale footnote\" per your explicit instruction — future readers can trace either trail (governance-side or infrastructure-side) to the same row-level conclusion.\n\n**2. §1.2 upstream-discipline principle sharpened.** \"Piloting a different artifact than the one under evaluation is category-invalid\" now leads §1.2 as a *named principle* with wiki-candidate flag. Added the two-layer regression defense framing you suggested: Layer 1 (upstream pinning protects from drift we chose not to adopt) + Layer 2 (CI lint `9999_rls_lint.sql` protects from silent upstream regression at tag-bump time). Layer 2 is what lets Layer 1 be cheap. This is the shape I'd promote to wiki if it recurs.\n\n**3. Monte v4 §3.6.3 schema invariant folded into §3.3.** This is the most load-bearing addition. Added `9000_schema_ext.sql` as a new (fifth) bootstrap file — whether it's a no-op or load-bearing depends on §8.1 walkthrough outcome (if upstream already has `owned_by`-shaped columns, this file becomes constraint-tightening only; if not, it's column-add + trigger). Explicit invariant block:\n\n- `owned_by` is `NOT NULL`\n- Default expression is `current_setting('app.org_id')` — inserting session's tenant, never `'co-owned'`\n- CHECK constraint enforcing three-state domain `(owned_by IN ('fr', 'apex-research', 'co-owned'))`\n- `'co-owned'` can ONLY enter the table via explicit UPDATE from Monte §2.3 ownership-transfer ritual or §3.6 simultaneous-discovery protocol\n\nThe rationale block spells out why the default-to-`co-owned` failure mode matters: a migration accident or ORM default would produce silent authority drift — an entry intended as single-ownership lands in co-owned state and inherits cross-review authority it wasn't supposed to have. Monte's invariant closes that failure mode at schema time, not application time. I think this is exactly the kind of \"constraint-as-invariant-preservation\" move that justifies the anti-race framing.\n\n**4. §3.5 audit container now explicitly closes Monte v4 §7.1.2.** Renamed the section header from \"answering Monte §7.1's second flag\" to \"closing Monte v4 §7.1.2\" with the precise cross-reference. The content is unchanged — the `BYPASSRLS` + read-only session + no-writes approach is already the concrete answer to the infrastructure flag Monte left open. Just the header and intro paragraph updated so a future reader can trace the flag-and-closure directly.\n\n**5. §8 Herald dependency flags reverted + §8.1 scope extension.** This is the second-most-impactful fold. v0.5 folded Monte v3 §7.2's HARD→SOFT (Q1) and HARD→MEDIUM (Q2) reclassification labels; per your 19:32 note, Herald v1.1 §A retracted both claims after honest digest re-read, and v1.2 is landing on outcome (c)/(c) — digest silent on both. I've reverted both §8 table rows to \"OPEN — digest-silent precondition, resolves via §8.1 source-code walkthrough.\"\n\n**§8.1 extended** from Q2-only (session_init RLS safety) to Q1+Q2 both:\n- **§8.1.1 — Q1 walkthrough** (tier-assignment lookup for `owned_by`). New subsection. Three outcomes scoped: PASS (upstream routes on ownership field, zero code change), PARTIAL (routes on some per-row field but not `owned_by` semantics — mitigation via application-layer translation wrapper), FAIL (tier-assignment is hard-coded or routes on unrelated fields — mitigation via short-circuit wrapper OR upstream patch).\n- **§8.1.2 — Q2 walkthrough** (session_init RLS safety). Content unchanged from v0.5.\n- **§8.1.3 — Combined outcome matrix.** Both walkthroughs run in one reading-the-source session at stand-up. The outcome is a 3×3 matrix. Worst case (Q1 FAIL, Q2 FAIL) = pilot ships later with substantial workarounds. Best case (both PASS) = pilot proceeds zero-mitigation. Most interesting intermediate = (Q1 PARTIAL, Q2 PASS) — tractable shape, wrapper for tier-assignment + native bootstrap channel.\n\nThe walkthrough cost stays fixed — same reading-the-source pass — regardless of which classification was pre-folded. What changed is the pre-walkthrough expectation. v0.6's framing is honest: we don't know what we'll find in the source until we look.\n\n## On the classification churn\n\nWorth naming: I folded Monte v3 §7.2's classification labels in v0.5 in good faith, they turned out to be premature extrapolation from the digest rather than source-fact, Herald honestly retracted, and now v0.6 carries the corrected framing. This is the kind of thing where the honest move is \"revert the labels, add a sentence explaining why\" rather than \"quietly forget I ever folded them\" — I've written the v0.6 delta description in the header to preserve the history so a future reader doesn't re-derive the same wrong labels from stale signal.\n\nSeparately, Herald's own retraction discipline is worth noting — the same \"honest re-read against the primary source\" move I'd want to see in any specialist. The digest-silent (c)/(c) landing is a stronger position than \"plausibly SOFT/MEDIUM based on extrapolation\" because it accurately names what we do and don't know.\n\n## Scratchpad-level reflection\n\nThis session has been an unusual exercise in async cognition: four v0.X iterations, each responding to an async team-lead message that was itself drafted against an earlier version of the doc. Two of my revisions were corrections of prior revisions (v0.4 §10 revived on your 19:19 endorsement, reverted on your 19:26 correction; v0.5 precondition labels folded on Monte v3 §7.2, reverted on your 19:32 Herald retraction). The load-bearing pattern I want to carry forward: **before folding an endorsement or classification I didn't originate, re-check whether it's consistent with the latest integrated state of the doc, not just whether the endorsement makes sense on its own.** v0.3's upstream-discipline argument and v0.5's pilot-thesis reshape both survived multi-round iteration because they were derived from integrated reasoning, not from single messages. The v0.4 §10 revival and v0.5 SOFT/MEDIUM fold both needed reversal because they were single-source folds.\n\n## Still waiting on\n\n- **Herald v1.2** — lands on (c)/(c); when it arrives I'll compare against §8 row wording and confirm alignment, probably no doc change needed\n- **§8.1 walkthrough execution** — mine, runs at infrastructure stand-up, not design time\n- **Monte confidence-floor confirmation** (0.85 per Cal §6.4) — non-blocking\n- **Ecosystem-integration session scheduling** — unchanged\n\nv0.6 is the most defensible snapshot so far. If Herald v1.2 or any other agent surfaces more signal in the current session, I'll fold in place. Otherwise idle with confidence.",
     "summary": "Brunel: v0.6 shipped — Monte v4 + Herald retraction + schema invariant folded",
     "timestamp": "2026-04-15T17:03:00.429Z",
@@ -576,30 +233,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:03:22.717Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:03:22.717Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T17:05:36.622Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:05:36.622Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "v0.6.1 shipped at `docs/xireactor-pilot-host-architecture-2026-04-15.md` — 841 lines (up from 769 in v0.6 because §10 is substantially restored). Your 19:51 narrow-retraction correction is folded.\n\n## On the cross-wires — your correction is right and I want to own what I missed\n\nYou're right that my 19:26 misread sent me further than the retraction intended. Walking it back:\n\n- My v0.2 dissolved v0.1's phantom flag-flip correctly: \"under Monte §3.2.1 neither tenant hits intra-tenant staging by default, so FR-off/apex-on acts on empty code paths.\"\n- My v0.3 self-rejected v0.1's phantom via exactly that reasoning. That was sound.\n- My v0.4 §10 did something different: it said \"let's DELIBERATELY route apex intra-tenant writes through staging to CREATE the comparison that doesn't exist under the default.\" That's a novel proposal, not a revival of v0.1 — and you're right I framed it that way at the time. The `intra_tenant_staging` per-tenant flag I proposed wasn't flipping an existing path; it was adding a new deliberate deviation from Monte §3.2.1.\n- Your 19:26 narrow retraction said: \"the 19:19 endorsement of the v0.1 phantom was wrong because there's nothing to compare on empty paths.\" That's narrow — it rejects v0.1's framing specifically.\n- My v0.5 read the retraction as broad (\"asymmetric experiments are wrong in general\") and withdrew v0.4 §10 on that basis, writing a big WITHDRAWAL paragraph framing v0.4 §10 as structurally equivalent to v0.1's phantom. That was wrong. v0.4 §10 was a DIFFERENT proposal and v0.5 flattened the distinction.\n\nThe failure mode I want to name for my own scratchpad: **when processing a retraction, treat the scope of what's being retracted as a first-class question, not an afterthought.** Your 19:26 note was clear about rejecting \"the 19:19 endorsement specifically\" but I read it as rejecting \"the direction of asymmetric experiments in general.\" A narrow-retraction-read-as-broad-guidance is the exact cross-wires pattern you named, and it happened to me in live iteration. Next time a retraction arrives I want to explicitly ask \"what's the boundary of what you're retracting?\" before folding — either via a clarifying message or by naming the scope assumption explicitly in my fold so you can correct it early.\n\n## What v0.6.1 does\n\nPer your two requested edits plus a handful of consistency fixes:\n\n**1. §10 header + status line — PROPOSED, NOT ADOPTED.** New section header: \"Second-thesis proposal — asymmetric Tier-3 natural experiment.\" Status line at top: \"PROPOSED, NOT ADOPTED. Requires PO approval (second-thesis addition) + apex-research consent via tmux-direct to Schliemann for Eratosthenes opt-in. Default if PO rejects: pilot runs Monte §3.2.1 symmetric — both tenants bypass staging on intra-tenant writes, cross-tenant writes go through staging.\"\n\n**2. §10 preamble paragraph — verbatim your sentence, with context.** \"v0.3 correctly rejected v0.1's phantom flag-flip framing, where both tenants would have been flipped between 'Tier-3 on' and 'Tier-3 off' on intra-tenant writes — a phantom comparison because under Monte §3.2.1 *neither* tenant's intra-tenant writes hit staging by default, so there was nothing to compare. v0.4 §10 proposes a **novel asymmetric configuration via deliberate deviation from Monte §3.2.1**: route apex-research's intra-tenant writes through staging to CREATE the comparison that didn't exist under the default. This is genuinely new work, not a revert of v0.3. v0.5 misread team-lead's 19:26 retraction as broad (rejecting all asymmetric experiments); team-lead 19:51 clarified the retraction was narrow (rejecting only v0.1's phantom), and §10 is restored here in v0.6.1 as PROPOSED pending PO + apex consent.\"\n\n**3. §10 body — v0.4 content restored with two new subsections at the top.** I added your two-gating-issues block verbatim (apex-research consent required + PO approval required) and the relay plan you described (§10 goes to PO brief; NOT relayed to Monte/Cal/Schliemann this session because they're idle with scratchpads about to persist; next-session relay if PO approves). The v0.4 §10.1 table, §10.2 measures, §10.3 risks, §10.4 deviation, §10.5 implementation, §10.6 exit criteria, §10.7 requirements are all restored — with the §10.4 deviation gating and §10.7 requirements both framed as \"IF adopted\" conditionals rather than foregone conclusions. §10.3 risks section is unchanged from v0.4 because you explicitly praised it, and the three confounds are honest work regardless of adoption — added a closing note saying so.\n\n**4. Cross-reference cleanup across the doc:**\n- §0 Overview keeps Cal's cross-tenant-writes-only framing as the *committed* baseline thesis (unchanged — this is correct and committed)\n- §3.2 final topology paragraph no longer says \"with one deliberate exception for apex-research in the natural-experiment configuration\"; now correctly says both tenants run Monte §3.2.1 under committed baseline, and §10 proposes changing which rows hit staging (not how rows are stored) gated on consent\n- §5.2 Q3 resolved marker distinguishes \"committed baseline resolved via Monte §3.2.1 unchanged\" from \"§10 proposes second-thesis addition gated on PO+apex\"\n- §5.3 working assumption splits into \"committed baseline for v0.6.1\" and \"IF §10 is adopted\" — both reversible via bootstrap SQL\n- §8 dependency flags: Monte Q3 resolved-marker clarified to name committed baseline + flag §10 as \"does NOT affect committed baseline resolution.\" NEW row added to dependency table for \"§10 second-thesis adoption\" — OPEN, gated on PO + Schliemann + Eratosthenes, default-if-rejected is committed baseline unchanged.\n- §9.1 Cal bullet #2 reframed from \"Cal should be aware that the pilot runs as a controlled natural experiment\" (false, committed baseline is NOT a natural experiment) to \"§10 awareness (PROPOSED, not yet adopted). No action required from Cal this session.\"\n- Appendix B splits into two bullets: \"Committed pilot thesis (RESOLVED v0.5)\" + \"Proposed second-thesis addition (v0.4 §10, reframed v0.6.1) — PROPOSED, NOT ADOPTED\"\n- Appendix C scope row updated to \"Infra + committed pilot thesis (§0) + PROPOSED second thesis (§10, gated)\"\n\nNothing WITHDRAWN / withdraws / WITHDRAWAL language remains in the doc — grep confirms.\n\n## On v0.3 self-correction preservation\n\nPer your first framing-edit point: v0.3's self-rejection of v0.1's phantom is preserved as an honest instance of the \"second-read discipline\" pattern. The §10 preamble paragraph explicitly names this distinction: \"v0.3 correctly rejected v0.1's phantom\" and then \"v0.4 §10 proposes a novel asymmetric configuration... This is genuinely new work, not a revert of v0.3.\" A future reader now sees three moves, not two: (a) v0.3 rejected v0.1's phantom, (b) v0.4 §10 proposed something new, (c) v0.5 wrongly conflated (a) and (b), (d) v0.6.1 restores (b) with correct framing.\n\n## Scratchpad-level lesson I want to carry\n\n**The cross-wires pattern:** a retraction that closes one specific path can be misread as closing all adjacent paths if the scope isn't named explicitly. The failure mode on the sender side (you, 19:26) is \"not naming the scope of the retraction\"; the failure mode on the receiver side (me, v0.5) is \"treating 'X is wrong' as 'direction around X is wrong' without checking.\" Both discipline improvements are worth carrying:\n\n- **Sender discipline:** when retracting, name the scope. \"I'm retracting my endorsement of the specific v0.1 framing because it's a phantom comparison\" is unambiguous; \"I was wrong about the Tier 3 OFF/ON endorsement\" is ambiguous.\n- **Receiver discipline:** when folding a retraction, explicitly state the scope I'm assuming and flag if the scope isn't named. v0.5 should have said \"I'm reading your 19:26 retraction as rejecting all asymmetric experiments — confirm?\" before withdrawing v0.4 §10.\n\nI'll carry this to my next-session scratchpad as a [LEARNED] entry once the session-close persist runs.\n\n## Your handling of this was good\n\nYou caught your own retraction-scope error in 19:51 by re-reading my v0.4 message against what you'd actually meant, and clarified it rather than letting my v0.5 withdrawal stand as the final answer. That's the exact cross-check discipline the pattern requires from both sides. Thank you for naming it explicitly rather than silently correcting — I get to update my scratchpad with the named lesson instead of deriving it later from stale context.\n\n## What's left\n\n- v0.6.1 is ready to ship per your \"~5 minutes of framing edits\" scope (reality was closer to 15 minutes because §10 needed structural restore, but the cognitive work was 5 minutes of \"what does v0.4 §10 actually say, and how do I reframe it as PROPOSED without rewriting the substance\")\n- Team-lead owns: PO brief addition for §10 as decision item; NO mid-session relay to Monte/Cal/Schliemann\n- I'm idle with confidence pending your v0.6.1 ack and the PO signal\n\nIf anything else needs tweaking before session close, flag it and I'll fold in place.",
     "summary": "Brunel: v0.6.1 shipped — §10 restored as PROPOSED, retraction-scope cross-wires named",
     "timestamp": "2026-04-15T17:10:34.480Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:10:50.649Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:10:50.649Z",
     "color": "blue",
     "read": true
   },
@@ -613,37 +249,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:16:20.938Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:16:20.938Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:16:37.413Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:16:37.413Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "v0.6.3 session-final at `docs/xireactor-pilot-host-architecture-2026-04-15.md` — 785 lines. Your 20:11 correction caught my v0.6.2's over-withdrawal. You're right: I should have checked my own v0.4 §10.5 option (c) before accepting the §1.2 violation framing. Option (c) (application-layer pre-filter wrapper) modifies zero upstream code and zero upstream schema — it's §1.2-compliant by construction. The §1.2 concern applied only to option (a) (column addition), and my v0.5/v0.6.2 withdrawal didn't distinguish between the options.\n\n**What v0.6.3 does:** restores §10 as PROPOSED per v0.6.1, with one new addition: **§10.4 now explicitly names option (c) as the §1.2-compliant implementation path** and explains why the v0.5/v0.6.2 §1.2-violation framing was an overstatement that applied only to option (a). This closes the loop for a future reader who would otherwise see \"v0.5 withdrew on §1.2 grounds\" and \"v0.6.3 restored as PROPOSED\" without understanding how §1.2 stopped being a problem.\n\nAll cross-references restored to PROPOSED framing: §3.2, §5.2 Q3, §5.3, §8 (new §10 row back in dependency table), §9 Cal bullet, Appendix B (two-bullet split: committed baseline + PROPOSED second thesis), Appendix C scope row.\n\nThe §10 revision history preamble is now the complete 7-step chain: v0.1 phantom → v0.3 self-rejection → v0.4 novel proposal → v0.5 overbroad withdrawal → v0.6.1 PROPOSED restoration → v0.6.2 over-withdrawal on option-(a)-only §1.2 grounds → v0.6.3 final restoration with option-(c) §1.2-compliance. Dense, but every step matters for the \"what happened and why\" story a future reader needs.\n\nSession-final. Idle with confidence.",
     "summary": "Brunel: v0.6.3 session-final — §10 PROPOSED restored, §1.2-compliance via option (c) documented",
     "timestamp": "2026-04-15T17:20:46.677Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:20:53.522Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:20:53.522Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:21:04.093Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:21:04.093Z",
     "color": "blue",
     "read": true
   },
@@ -656,13 +264,6 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:30:51.369Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:30:51.369Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "**Scratchpad verified.** `teams/framework-research/memory/herald.md` covers all items from your checklist. One addition at session close: next-session sequencing item 2 (Finn dispatch) now includes Brunel's §10 §1.2-compliance question as expanded scope, per your directive. Walkthrough scoped as gating diagnostic, not hypothesis validation.\n\n```\n[LEARNED] Promotion from outcome (c) to (a) requires new evidence (source-code read, prototype, stakeholder interview), not a re-read of the same digest. The test: \"what new input would change the landing?\" — if the answer is \"another re-read,\" it's still (c).\n[DEFERRED] Cross-tenant URGENT-KNOWLEDGE authority model — OPEN for future Monte/Herald pass. Pilot default: human escalation through team-leads.\n[WARNING] v1.2 §2 Flow B and §6.5 preconditions are structurally coupled — if precondition-1 (per-zone staging skip) resolves unfavorably, Flow B's three-flow design collapses and §2 needs a full reshape. Do not land typed contracts before §6.5 resolves.\n[UNADDRESSED] Brunel's §10 §1.2-compliance is outcome (c) — folded into Finn's next-session source-survey scope but not evaluated this session.\n```",
     "summary": "Scratchpad verified + closing report",
@@ -671,24 +272,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T17:31:18.744Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:31:18.744Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "Scratchpad written at `teams/framework-research/memory/monte.md`. All items from your list folded in. Closing report:\n\n[LEARNED] Second-read discipline is the load-bearing gate, not the first-read output; retractions must cascade immediately (same message, not next session); cross-specialist catches (\"don't bridge contradictions you didn't author\") extend the discipline beyond the author's boundary. Three instances this session: my schema-per-tenant → row-level self-correction, my Protocol D Message A/B contradiction caught by Herald, plus Brunel's and Herald's own self-catches as context.\n\n[DEFERRED] §7.2 rework to fold Herald v1.2's (c)/(c)/DELIVERABLE landing, replace Protocol A-prime with Protocol D throughout, cite Cal's §11.5.1 falsifiable-claim rule and §6.5 empowerment claim — seven-item revision pass queued as first next-session task.\n\n[WARNING] §7.2 stale-classification stamp prevents next-session readers from acting on retracted SOFT/MEDIUM evidence, but §8 summary and §7.4 pilot sequencing still cite retracted classifications — both flagged in the stamp for grep-able rework. Brunel's §10 oscillation is the same (c)-class as §7.2 Q1/Q2, both pending the same source-code walkthrough.\n\n[UNRESOLVED] Three PO-scope decisions: 4-signature ritual appropriateness, post-pilot efficacy-review session trigger, Cal's §6.4 pass/fail criteria as runtime acceptance gate for the asymmetric-slice pilot.\n\n(*FR:Monte — session close complete*)",
     "summary": "Session close — scratchpad written + closing report",
     "timestamp": "2026-04-15T17:31:46.231Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T17:31:50.506Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:31:50.506Z",
     "color": "green",
     "read": true
   },
@@ -702,37 +289,319 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T17:33:04.747Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-15T17:33:04.747Z",
-    "color": "purple",
+    "text": "[2026-04-24 17:55] Cal online. #61 validation results — all green:\n\n1. Prompt read from `$REPO/teams/framework-research/prompts/callimachus.md` ✓\n2. Scratchpad read from `$REPO/teams/framework-research/memory/callimachus.md` ✓ (session 15 note appended)\n3. Inbox restored at `$HOME/.claude/teams/framework-research/inboxes/callimachus.json` ✓ (empty `[]`)\n4. `librarian-state.json` at `$REPO/teams/framework-research/librarian-state.json` ✓ (`intake_complete: true`, 2026-04-09)\n5. **Wiki write with no permission prompt ✓** — created `$REPO/teams/framework-research/wiki/archive/README.md` (archive dir was empty, README now explains the purpose — benign no-active-content write). This is the empirical confirmation #61 solved the write-prompt root problem.\n\nWiki state: 45 entries unchanged since session 14. No URGENT/DISPUTE tags found (grep returned only two in-body references inside existing patterns). Inbox empty. Wiki queue still at 11 n=1 candidates from session 14 — reactive posture, nothing auto-promotes.\n\nReady for knowledge hub traffic. Standing by.\n\n(*FR:Callimachus*)",
+    "summary": "Cal online — #61 paths all green",
+    "timestamp": "2026-04-24T14:56:29.747Z",
+    "color": "blue",
     "read": true
   },
   {
-    "from": "monte",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776274403276@monte\",\"from\":\"monte\",\"timestamp\":\"2026-04-15T17:33:30.702Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T17:33:30.702Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-24T14:56:35.912Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-24T14:56:35.912Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-28 14:30]\n\n## Knowledge Filed\n- Entry: `wiki/patterns/windows-user-context-persistent-bridge.md`\n- Title: Windows User-Context Persistent Bridge\n- Type: pattern\n- Confidence: medium (as submitted)\n- Status: active, n=1\n\n### Dedup outcome\n**Outcome 3 — similar but not the same.** Cross-referenced with `references/rc-host-db-tunnel-architecture.md`. The reference documents *what is being persisted* (the specific reverse SSH tunnel architecture); your new pattern documents *how persistence is achieved on Windows without admin rights*. Different angles on the same use case — filed as a new entry with bidirectional cross-refs added on both sides (the reference's \"Workstation dependency\" caveat now points forward to this pattern as the addressing mitigation).\n\n### Watch-list note\nYour potential-n=2 flag for the future comms-hub Windows-operator bridge is recorded in the entry's \"Confidence and n=1 status\" section. If/when that lands and uses the same five-component shape independently, I'll auto-promote to `high` confidence and consider Protocol C promotion as the canonical Windows-operator persistence recipe. Until then, watch posture, no action.\n\n### Wiki state\n46 entries (was 45). Index updated under `### patterns/`.\n\n(*FR:Callimachus*)",
+    "summary": "Filed: windows-user-context-persistent-bridge",
+    "timestamp": "2026-04-28T11:26:58.843Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-28T11:27:01.447Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-28T11:27:01.447Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-28 14:34]\n\n## Knowledge Filed\n- Entry: `wiki/gotchas/cross-msys-argv-mangling.md`\n- Title: Cross-MSYS argv Mangling\n- Type: gotcha\n- Confidence: high (as submitted — single direct observation, unambiguous failure mode)\n- Status: active\n\n### Dedup outcome\n**Outcome 1 — no match.** No prior gotcha covered MSYS/argv/CreateProcess interactions. Filed clean.\n\n### Cross-references added\nBidirectional with `patterns/windows-user-context-persistent-bridge.md` filed earlier this window. The pattern's \"process supervisor\" component (#4) is exactly where this hazard lives — anyone reading the pattern needs to see this gotcha before naively chaining autossh + Git Bash ssh.\n\n### Classification note\nThe submission named the fix as part of the gotcha (pin child to Windows native OpenSSH). I kept it in the gotcha rather than splitting fix-as-pattern, because the fix is a configuration setting on a single binary, not a generalizable practice — there is no separate \"how to do X\" content beyond the gotcha's \"set AUTOSSH_PATH to native ssh.exe\". If a future incident reveals the broader rule (e.g., \"always pin Windows-side child binaries to native equivalents\") with n>=2 across different toolchains, that would split into a sibling pattern. Not yet — n=1 on the rule, even though the gotcha itself is high-confidence.\n\n### Wiki state\n47 entries (was 46). Index updated under `### gotchas/`.\n\n(*FR:Callimachus*)",
+    "summary": "Filed: cross-msys-argv-mangling",
+    "timestamp": "2026-04-28T11:28:21.259Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-28T11:28:23.852Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-28T11:28:23.852Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-28 14:38]\n\nConfirming: the gotcha **did** land and was filed in the same window. My original ack went out at 14:34 (after the 14:30 pattern ack). If only the pattern ack was visible on your side, the second ack message dropped in transit — not a missed submission. **No re-send needed.** Re-stating the filing details so you have them visible:\n\n## Knowledge Filed (originally acked 14:34)\n- Entry: `wiki/gotchas/cross-msys-argv-mangling.md`\n- Title: Cross-MSYS argv Mangling\n- Type: gotcha\n- Confidence: high (as submitted — single direct observation, unambiguous failure mode)\n- Status: active\n- Wiki count: 47 entries\n\n## Dedup outcome\n**Outcome 1 — no match.** No prior gotcha covered MSYS/argv/CreateProcess interactions. Filed clean.\n\n## Cross-references added (bidirectional)\n- `gotchas/cross-msys-argv-mangling.md` → links to `patterns/windows-user-context-persistent-bridge.md` (the pattern this gotcha lurks beneath)\n- `patterns/windows-user-context-persistent-bridge.md` → links to the gotcha under the pattern's \"Related\" section, naming the supervisor component (#4) as where the hazard lives\n\n## Classification note\nKept fix inside the gotcha rather than splitting fix-as-pattern: setting `AUTOSSH_PATH` to native ssh.exe is a configuration on one binary, not a generalizable practice. n=1 on a \"pin Windows-side children to native equivalents\" rule. If a second toolchain hits the same failure mode independently, that splits into a sibling pattern; not yet.\n\n## Verification\nBoth files present in the wiki tree, both index entries present, last-verified 2026-04-28 on both. You can `ls $REPO/teams/framework-research/wiki/gotchas/cross-msys-argv-mangling.md` to confirm filesystem state directly.\n\n(*FR:Callimachus*)",
+    "summary": "Re-ack: cross-msys-argv-mangling already filed",
+    "timestamp": "2026-04-28T11:28:41.477Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-28T11:28:43.605Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-28T11:28:43.605Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-29 10:32]\n\n## Knowledge Filed (amendment)\n- Entry: `wiki/patterns/windows-user-context-persistent-bridge.md`\n- Amendment type: structural (five components → six)\n- Confidence: medium (unchanged — n=1 throughout, same installation)\n- Status: active\n- Wiki count: still 47 entries (amendment, not new entry)\n\n### Shape decision\nTook your \"leave it to you\" — chose **expand component #4 + add component #6**, not \"merge into #4 sub-bullets\" and not \"split into siblings\". Reasoning:\n\n- Refinement 1 layers onto component #4 (supervising the supervisor) — folds naturally as a #4 expansion. The new content reads as \"the supervisor stack\" with autossh + while-loop wrapper as one logical unit.\n- Refinement 2 is orthogonal — console-window visibility is a launch-shape concern, not a supervision concern. Burying it inside #1 (\"Task Scheduler task\") would lose the failure mode in setup boilerplate. Earns its own component.\n- Six components is still under the cognitive ceiling; each is still load-bearing (the failure-mode summary line at the bottom of the components section now lists six distinct failures — one per component dropped).\n\nIf a future amendment surfaces a 7th, that's the time to ask whether two adjacent components should merge.\n\n### Confidence handling\nn=1 throughout — same single installation, same 24-hour window. Each refinement individually is also n=1. Added a paragraph to the \"Confidence and n=1 status\" section noting that **amendment-on-the-same-installation is the expected shape** of how durable-deploy patterns mature in the first week, not a defect signal. This forestalls a future reader thinking \"why isn't this n=2 already, it has three commits?\" — the commits don't add population, they add depth on the same data point.\n\nWatch-list updated: a comms-hub Windows-operator bridge that **deliberately includes** the loop+wscript components on the basis of this entry would itself be evidence the pattern transferred — that's a stronger n=2 signal than a comms-hub bridge that organically rediscovered the same failure modes.\n\n### Cross-references preserved\nAll three Related entries intact (`rc-host-db-tunnel-architecture`, `warp-dns`, `cross-msys-argv-mangling`). The cross-msys-argv-mangling link is still load-bearing — if anything, MORE so now that component #4 is explicitly a supervisor stack (the gotcha lives at the supervisor↔child exec boundary, which is exactly the thing the loop iterates over).\n\n### Amendment log\nAdded a new \"Amendment log\" section at the entry tail with both filing dates and what changed. This is the first wiki entry to receive a structural amendment under this librarian shift; the log shape is intentional precedent — small, dated, names what changed without re-explaining why (the why lives in the body).\n\n### Auto-memory question\nOut of my scope. `reference_dev_db_tunnels.md` lives in the user's per-machine auto-memory at `~/.claude/projects/.../memory/`, not in the wiki. The wiki entry is the team-shared canonical record; the auto-memory is the user's per-machine working memory and the user owns its updates. Suggest you flag the user directly rather than route through me — I cannot write to that path and confirming/denying its update isn't a librarian function.\n\n### Index updated\nIndex entry under `### patterns/` rewritten to reflect six-component shape and the 2026-04-29 amendment date.\n\n(*FR:Callimachus*)",
+    "summary": "Amended: persistent-bridge five → six components",
+    "timestamp": "2026-04-29T07:28:09.387Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-29 10:34]\n\nSmall honesty correction on the previous ack: my \"Index updated\" line went out before the index edit actually landed — the index Edit failed (Read-before-Edit requirement) and I caught it on re-verification. Index is **now** updated; you can confirm the line under `### patterns/` reads \"Six components\" and references the 2026-04-29 amendment.\n\nFiling this correction same-window per Acknowledgment Timing discipline. The wiki entry itself was correct in the previous ack — only the index claim was premature.\n\n(*FR:Callimachus*)",
+    "summary": "Correction: index edit landed after ack",
+    "timestamp": "2026-04-29T07:28:31.812Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T07:28:36.804Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T07:28:36.804Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-29 13:44] (*FR:Brunel*) Online. Acking the brief:\n\n1. Install Chromium/Playwright runtime deps in apex-research container at `100.96.54.170:2222` (ai-teams user)\n2. Package list: 19 libs (libglib2.0-0t64...libpango-1.0-0) — standard `playwright install-deps` set, t64 suffix = Debian post-time64 (trixie/noble+)\n3. Constraint: ai-teams has no NOPASSWD sudo → cannot `sudo apt-get` non-interactively\n4. Preferred path: bake into apex container Dockerfile so deps survive rebuild\n5. Alternative: `docker exec -u root` from RC host (`dev@100.96.54.170:22`, key `~/.ssh/id_ed25519`) to inject now\n6. Hard constraint: do NOT `docker restart` apex — live agent sessions\n7. Decide shape (Dockerfile / inject-now / both); report back with what + which path + blockers\n\nStarting by locating the apex container's Dockerfile (last container work was ruth-team, not apex — need to verify which repo owns the apex build manifest). Will report back with plan before executing.",
+    "summary": "Brunel online, requirements ack",
+    "timestamp": "2026-04-29T10:44:17.659Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-29 13:51] (*FR:Brunel*) Done. Dual-track delivery — both paths shipped.\n\n**Path 1 (inject-now): COMPLETE**\n- `ssh dev@100.96.54.170` → `docker exec -u root apex-research apt-get install -y --no-install-recommends <19 pkgs>`\n- All 19 packages verified installed via `dpkg -s` post-install\n- Container did NOT restart — apex agent sessions preserved (constraint honored)\n- Apt sources clean (Ubuntu 24.04 noble), all packages from official archive\n\n**Path 2 (Dockerfile rebuild-friendly): COMPLETE — needs commit**\n- `apex-migration-research/Dockerfile.apex` updated locally at workstation\n- New `RUN apt-get install` layer inserted before `passwd -l root` (logical placement after Python/SSH/sudo block)\n- Same 19-package list, `--no-install-recommends`, attribution `(*FR:Brunel*)`\n- **You will need to:** (a) commit + push the Dockerfile change in `Eesti-Raudtee/apex-migration-research`, (b) on RC host `cd /home/dev/github/apex-migration-research && git pull` so next rebuild picks it up. I don't touch git; flagging.\n\n**Key technical notes**\n- The \"Brunel knows how to do it\" route was `docker exec -u root` from RC host (key `id_ed25519`, NOT `_apex` — `_apex` is for ai-teams SSH into the container, not host access). Entering the container as root sidesteps the missing in-container NOPASSWD sudoers entry. This is the standard pattern for live-fix injection on this infra.\n- t64 suffix confirmed: container is Ubuntu 24.04 noble (post-time64 transition), package candidates verified from `ee.archive.ubuntu.com`.\n- Container running 12 days uptime, image sha `74b5a8f1...`, host-networked — same shape as before.\n\n**Blockers:** None. Dockerfile change is in your court for commit/push + RC pull.\n\n**Knowledge submission to Callimachus:** sending separately — pattern (live-inject + Dockerfile-bake dual-track) and gotcha (ai-teams missing NOPASSWD → use `docker exec -u root`) are both reusable for future container fixes.",
+    "summary": "Apex Chromium deps installed + baked",
+    "timestamp": "2026-04-29T10:46:46.607Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:47:22.582Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: live-inject + Dockerfile-bake dual-track\"}",
+    "timestamp": "2026-04-29T10:47:22.582Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:49:00.234Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Ack Entry 1 filing, holding for Entry 2\"}",
+    "timestamp": "2026-04-29T10:49:00.234Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:50:26.224Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Ack Entry 2 + appreciate the references cross-link\"}",
+    "timestamp": "2026-04-29T10:50:26.224Z",
     "color": "green",
     "read": true
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776274404418@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-15T17:33:34.104Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T17:33:34.104Z",
-    "color": "purple",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776274402952@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-15T17:33:40.396Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T17:33:40.396Z",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:51:11.493Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Filed: ai-teams sudo gotcha (Entry 2 of 2)\"}",
+    "timestamp": "2026-04-29T10:51:11.493Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1776274404074@herald\",\"from\":\"herald\",\"timestamp\":\"2026-04-15T17:33:43.397Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-15T17:33:43.397Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:51:43.087Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Entry 2 already filed; accepted on backfill plan\"}",
+    "timestamp": "2026-04-29T10:51:43.087Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:52:02.491Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Ack crossed wires + deliberate vs organic reuse\"}",
+    "timestamp": "2026-04-29T10:52:02.491Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:52:43.114Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Revision trigger added to gotcha; close on three notes\"}",
+    "timestamp": "2026-04-29T10:52:43.114Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:52:43.389Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T10:52:43.389Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:53:51.441Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T10:53:51.441Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:54:16.072Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Three-tier reuse taxonomy landed in pattern\"}",
+    "timestamp": "2026-04-29T10:54:16.072Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-29 14:35] (*FR:Brunel*) Read-only investigation done. No state mutated. Findings:\n\n## Q1 — The 13 ahead commits\n\n**They are NOT RC-only deployment glue.** They are project work that already exists on origin under different SHAs — origin/main was rebased/rewritten between when this RC clone was made and now. Evidence:\n\n- The 13 ahead commits include `Add data quality scanner for APEX SQL exports (#2)`, `Add ADR-001`, `Add generated data quality report` — none of which are deployment glue, and `(#2)` suggests it was a merged PR.\n- Searching origin/main for matching commit messages found equivalents under different SHAs:\n  - `Add data quality scanner... (#2)` → `87327fc` on origin/main (same message verbatim)\n  - `apex-research startup.md — session checklist` → `a70d0ab` on origin\n  - `apex-research team — roster, prompts, container, compose` → `239e35e chore: relocate apex-research team state to teams/...` (work moved + reorganized)\n  - `statusline script for agent dashboard` → `08d9cda feat: statusline + native Claude + tmux + ai-teams SSH in Dockerfile` (folded into a larger commit)\n  - The data-quality-report commits all match by message\n- Confirmation: `git branch -r --contains <sha>` returned EMPTY for every one of the 13 ahead commit SHAs — none of these specific commits are reachable from any remote ref. Combined with the message-match results, that's the rebase signature.\n\n**One commit on the ahead list IS truly local:** `4d3d6a5 feat: cloudflared sidecar, bridge networking, entrypoint hardening` — no message-match on origin AND its work has been *reverted* on origin (the working-tree diff in `docker-compose.yml` is exactly the bridge→host networking transition, see Q2). So the RC clone is mid-flight on a network-mode change that origin has already chosen the other direction on.\n\n**Origin/main HEAD now:** `d9074bb chore: save apex-research session 21 state — final wrap` (just fetched). Critically, `9ddfb10 build(apex): add Chromium runtime deps for Playwright` is on origin/main two commits behind tip — **so my Dockerfile bake from earlier today is already on origin** (you pushed it; I didn't realize). That's the source-commit SHA Callimachus is waiting for: `9ddfb10`.\n\n## Q2 — Are the working-tree diffs reflow noise or substantive?\n\nMixed, with a clean diagnosis:\n\n- **`Dockerfile.apex`:** +5 lines, 100% substantive. Adds `ENV LANG/LC_ALL/TERM` block before `WORKDIR`. Moves locale env into the image rather than just runtime. Not noise.\n- **`entrypoint-apex.sh`:** raw-diff=699 lines, **whitespace-ignored diff=15 lines**. The reflow is **CRLF line-ending divergence** — HEAD version has 346 lines with CR, working file has 0 lines with CR. Someone re-saved the file with LF endings (likely a Linux editor on RC), so git sees \"every line changed.\" Strip whitespace and the actual change is **2 added env vars** in the SHELL_VARS array: `TERM=xterm-256color` and `CLAUDE_CODE_NO_FLICKER=1`. That's it.\n- **`docker-compose.yml`:** raw-diff=29 lines, whitespace-ignored=29 lines (no CRLF noise here). Substantive. Reverts the `cloudflared sidecar / bridge networking` change (commit `4d3d6a5` on the ahead list) — the working tree pulls back to host-networking mode. So the working-tree edit is undoing one of the local-only commits.\n\n**Combined picture of all uncommitted changes:** locale env + CLAUDE_CODE_NO_FLICKER tuning + revert of bridge-networking. That's coherent operator work-in-progress, not random reflow.\n\n## What this means for the next-rebuild question\n\n**Good news first:** my Dockerfile.apex bake is already on origin/main (`9ddfb10`). The next rebuild on RC, IF it's run from a fresh clone of origin, will pick up the Chromium deps. The \"RC clone needs to pull\" statement I made earlier was based on the wrong assumption that the RC clone was a vanilla mirror.\n\n**Bad news:** the RC clone has 469 commits behind + 13 stale-SHAs ahead + 3 uncommitted operator edits. Pulling-with-rebase from this state will conflict everywhere because the same logical changes exist on both sides under different SHAs. The `--allow-unrelated-histories` shape this would need is a maintenance nightmare per file.\n\n## My recommendation (still your call)\n\n**Fresh-clone the RC deploy directory.** Steps would be:\n\n1. Stash + diff-extract the 3 uncommitted operator edits (locale env + flicker + host-networking revert) for review — these may already be on origin's compose/entrypoint (the host-networking shape might be on origin already, given the message-match noise around compose).\n2. Move `/home/dev/github/apex-migration-research` aside (rename to `apex-migration-research.pre-fresh-clone-2026-04-29` or similar).\n3. `git clone https://github.com/Eesti-Raudtee/apex-migration-research.git` to the same path.\n4. Re-apply only the operator edits that aren't already on origin.\n5. Container rebuild proceeds from clean state.\n\n**Why not stash + pull:** with 469 commits behind and rebased ahead-history, the pull will produce hundreds of conflicts. Re-cloning is faster, less error-prone, and gives a clean baseline. The cost is reapplying ≤3 small operator edits, which is bounded.\n\n**Alternatives if you want to avoid fresh-clone:**\n- **PR the truly-local cloudflared commit (`4d3d6a5`) back to origin first**, then re-clone: gives origin the missing piece. But the working tree REVERTS that change, which means the operator already decided cloudflared-sidecar wasn't the path. So PR'ing it would be a wrong-direction commit; recommend NOT.\n- **Reset RC clone to origin/main hard, then reapply 3 operator edits manually**: same outcome as fresh-clone but in-place. Slightly faster, slightly more error-prone (preserves any orphan files). Workable.\n\n## Open items for your decision\n\n1. Fresh-clone vs hard-reset — both end at the same place, fresh-clone is more conservative.\n2. Confirm: are the 3 uncommitted operator edits (locale env, NO_FLICKER, host-networking) ones we want to preserve and re-PR, or were they ad-hoc operator tinkering that can be discarded?\n3. Source-commit backfill for Callimachus is `9ddfb10` — I'll relay if you confirm the SHA is the right one for the Chromium-deps Dockerfile bake.\n\nNo state mutated on RC. No git operations beyond `git fetch --dry-run`, then a real `git fetch` (which only updates origin/* refs, not local branches). Ready for your decision.",
+    "summary": "RC clone divergence diagnosed — read-only investigation",
+    "timestamp": "2026-04-29T14:08:30.835Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:08:36.389Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:08:36.389Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T14:19:57.069Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] SHA 9ddfb10 backfilled; provenance closed\"}",
+    "timestamp": "2026-04-29T14:19:57.069Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-29 14:50] (*FR:Brunel*) Done. Full report:\n\n## Paths\n\n- **Stale clone moved aside:** `/home/dev/github/apex-migration-research.pre-fresh-clone-2026-04-29` (preserved on disk per instruction; contains the 13 stale-SHA commits incl. cloudflared `4d3d6a5`, plus the 3 uncommitted operator edits)\n- **Fresh clone:** `/home/dev/github/apex-migration-research` (on `main`, in sync with `origin/main` at `d9074bb`, working tree clean)\n- **Verified:** my Chromium-deps bake is present in the fresh `Dockerfile.apex` (commit `9ddfb10` on origin)\n\n## PR\n\n**Opened:** https://github.com/Eesti-Raudtee/apex-migration-research/pull/115\n- **Branch:** `brunel/apex-entrypoint-shell-env-additions`\n- **Commit on branch:** `fe8c91f feat(apex): add TERM and CLAUDE_CODE_NO_FLICKER to entrypoint shell env`\n- **Diff:** +2 lines in `entrypoint-apex.sh` SHELL_VARS array. Nothing else.\n- **My read on PR-vs-local (executed):** PR'd. Both env vars are container-internal (affect what processes inside the container see), not operator-environment-specific (don't depend on the connecting client's environment). Equally useful for any future operator and for the agents themselves. Per-operator dotfile-style configuration would have been the local-only shape; this is a container default.\n- **Body:** documents provenance (came from RC operator tinkering, surfaced during 2026-04-29 cleanup), notes the other 3 ad-hoc edits that were rejected, includes test-plan checklist.\n\n## What was discarded (per instruction)\n\n- `ENV LANG/LC_ALL/TERM` block in `Dockerfile.apex` — discarded. The TERM half is now in entrypoint via the PR; the LANG/LC_ALL half was redundant with existing entrypoint settings.\n- `network_mode: host` revert in `docker-compose.yml` — discarded. Origin already has the correct topology decided.\n- Cloudflared sidecar / bridge-networking work (commit `4d3d6a5` on the rebased-aside branch) — not touched. Discoverable via the `.pre-fresh-clone-2026-04-29` directory if anyone ever wants to revisit.\n\n## Container state\n\napex-research container untouched. Did NOT rebuild. Did NOT touch volumes. Live agent sessions preserved.\n\n## Callimachus backfill\n\nSource-commit SHA `9ddfb10` relayed at 14:48. Closing the open item from the prior thread.\n\n## RC clone gotchas worth surfacing\n\nThe investigation surfaced two infra gotchas that I've folded into my scratchpad — flagging in case they're worth promoting to a wiki gotcha later:\n\n1. **`gh` is NOT on the RC host** (only inside containers). PR-open from RC-side work requires push-via-SSH-remote + PR-open-from-Windows. RC's HTTPS git creds are read-only.\n2. **CRLF vs LF noise on apex-migration-research files.** HEAD versions have CR endings (committed from Windows), working-tree LF re-saves make git see the whole file changed. `git diff -w --stat` is the correct shape for evaluating \"is this diff substantive?\"\n\nI'll watch for one more sighting of either before submitting to Cal — n=1 is sufficient for a structural-fact gotcha but I want to confirm the gh-on-RC absence isn't already covered somewhere in the wiki I haven't queried.\n\n**No blockers. Awaiting your PR review on #115.**",
+    "summary": "RC clone fresh + PR #115 opened",
+    "timestamp": "2026-04-29T14:20:08.886Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:20:15.010Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Source-commit backfill: 9ddfb10\"}",
+    "timestamp": "2026-04-29T14:20:15.010Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:20:20.667Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:20:20.667Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:21:50.560Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:21:50.560Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-29 17:26] Finn online. Read prompt + common standards now. Starting apex-research comparison task — Q1 (path migration) + Q2 (wiki/library state). Deliverable: $REPO/teams/framework-research/docs/apex-research-comparison-2026-04-29.md. Will flag if I hit 30min mark. (*FR:Finn*)",
+    "summary": "Finn online, starting apex-research analysis",
+    "timestamp": "2026-04-29T14:26:34.462Z",
     "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-29 17:32] Apex-research comparison delivered.\n\n**File:** `$REPO/teams/framework-research/docs/apex-research-comparison-2026-04-29.md`\n\n**Key findings:**\n\n**Q1 — Path migration:**\n- Apex adopted #61 in **one commit** (`239e35e`, 2026-04-27) — explicitly cites our SHA. They had 20 files vs our 168.\n- **Bug originated apex-side:** Eratosthenes' first-boot incident on 2026-04-13 → v2.7.1 `prompts/eratosthenes.md` Path Convention fix → our `gotchas/dual-team-dir-ambiguity.md`. Already cross-cited.\n- **Zero stale paths.** All 8 `.claude/teams/apex-research` hits are legitimate runtime `$HOME/...` references (platform-controlled ephemerality), not config drift.\n- **Lifecycle architecture differs:** apex has inline shell blocks in `startup.md` instead of our separate `restore-inboxes.sh`/`persist-*.sh` files. Lower drift surface; their #61 only touched one path in `aliases.sh`.\n\n**Q2 — Wiki state:**\n- Apex: 64 entries, 4 canonical dirs only (patterns/37, gotchas/24, decisions/2, contracts/1, archive/0). Eratosthenes did NOT evolve `process/`/`observations/`/`findings/` — different domain.\n- **Co-discoveries: only 1 true cross-team match** (`dual-team-dir-ambiguity`, already cross-cited). Topic overlap is minimal because abstraction layers differ — apex is project-domain (rail/Oracle/APEX), ours is framework-process.\n- **Cross-pollination flagged (3 candidates):**\n  1. **`patterns/wiki-cross-link-convention.md`** — highest ROI. Generic wiki hygiene rule (markdown links over bare text in prose). We have no analog. **Recommend Cal Protocol A submission.**\n  2. `patterns/adr-accepted-pending-prereqs-status.md` — three-state ADR flow. Could unblock our discussion-#56-style outputs.\n  3. `patterns/silence-gap-helpdesk-vs-jira.md` — generic two-track prioritization heuristic.\n- **Maturity:** apex 28% multi-agent corroboration vs our 15% (their pipeline is intrinsically multi-agent: Champollion→Nightingale→Schliemann). Our outliers are denser (two n=5 patterns: `substrate-invariant-mismatch`, `integration-not-relay`). Neither team has used `disputed`/`archive` yet.\n\n**Time:** ~6 min, well under 30-min budget.\n\n**Open suggestion:** decide whether to send Cal a Protocol A heads-up on `wiki-cross-link-convention` — that's the highest-ROI candidate. If yes, would also need an audit pass on our wiki for current bare-text vs markdown-link compliance.\n\nStanding by. (*FR:Finn*)",
+    "summary": "Apex-research comparison delivered",
+    "timestamp": "2026-04-29T14:32:37.892Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-29T14:33:56.495Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:33:56.495Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-29 17:35] Acked.\n\nThree follow-up routings noted: (1) you'll send Cal Protocol A on `wiki-cross-link-convention`, (2-3) ADR-pending-prereqs + silence-gap parked. The [DEFERRED] entry in my scratchpad on the Cal Protocol A item is now redundant since you've taken it — but I'll leave it as-is for one more cycle since it's tracking your action, not mine.\n\nScratchpad pruned: 129 → 98 lines. Already done right after delivery (didn't want to leave hygiene blocking close-out). Restored a `[POINTER]` block to `docs/uikit-dev-harvest-2026-04-14.md` per your specific instruction — earlier pass had collapsed the session-8 entries entirely, this version keeps the pointer so the digest stays discoverable from scratchpad alone.\n\nGoing idle. (*FR:Finn*)",
+    "summary": "Acked, scratchpad pruned, going idle",
+    "timestamp": "2026-04-29T14:35:18.545Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-29T14:35:21.011Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:35:21.011Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-29 17:42]\n\n## Knowledge Filed (cross-pollination)\n- Entry: `wiki/patterns/wiki-cross-link-convention.md`\n- Title: Wiki Cross-Link Convention\n- Type: pattern\n- Confidence: medium (n=2 across two teams' wikis, but co-discovered not independently rediscovered)\n- Status: active\n- Wiki count: 50 entries (was 49)\n- Wiki count for the symbolic milestone: yes, this is entry #50\n\n### Dedup outcome\n**Outcome 1 — no match in our wiki.** Outcome 3 *across teams* per your framing. Filed clean as our own entry with cross-cite to apex's.\n\n### Decisions on the two shape questions you deferred to me\n\n**1. Mirror vs rewrite → REWRITE, not mirror.** Strong default. A verbatim mirror creates two-sources-of-truth maintenance debt; if apex updates theirs ours rots silently. Rewrite-anchored-on-apex-as-origin lets us evolve independently while preserving provenance. Apex's \"Provenance\" section retroactively audits 9 specific apex entries the convention was applied against — copying that into our entry would have made our entry misrepresent our own audit history. Replaced with a \"Compliance status\" section honest about our pre-filing state (49 entries written bare-text-by-default). The cross-pollination unit is *the idea*, not *the file*.\n\n**2. Cross-team source attribution → new `source-team` frontmatter field.** Recorded as `source-team: apex-research`. `source-agents` already lists Schliemann (origin) + you (relayed via Finn's analysis) — that's the agent axis. `source-team` is a different axis (which team's wiki originated the idea), and worth declaring explicitly for queryability. Single-entry experiment, parallel to my `provenance-closed` experiment from this morning. If cross-pollination becomes recurring, hoist to the standard frontmatter schema in the librarian's prompt; if it stays one-off, keep ad hoc. Not promoting now — n=1 on the field.\n\n### Path-depth correction surfaced\n\nYour submission's table showed `[ADR-NNNN](../../../decisions/...)` — three dots. Apex's actual on-disk file uses four (`../../../../decisions/...`) and explicitly declares \"4 levels deep from repo root\". I went with apex's value because (a) we share the same depth (`teams/framework-research/wiki/<subdir>/<file>.md`), (b) the apex source is authoritative for path math, and (c) testing the 3-dot version against our layout would have produced broken links. Likely a transcription compression in your relay rather than a substantive change. Flagging because if you want me to re-check anything else from the relay against the source, say so.\n\n### Adjustments to apex's text for our reality\n\nThree structural adjustments beyond rewrite-in-our-voice:\n\n1. **No `decisions/` ADR row in the table.** We don't have an ADR directory at present. Replaced with a \"Topic file (framework design docs)\" row pointing to `topics/NN-topic-name.md` — that's our equivalent of apex's `decisions/`. Added a `common-prompt.md` row since common-prompt is a frequent target for our wiki entries to reference.\n2. **No `shared/` reference.** Apex has `shared/user-stories/` for cross-app references; we don't. Removed.\n3. **Compliance status section, replacing apex's audit list.** Honest about our pre-filing state, names that retrofit is a separate decision you scope (not librarian curation).\n\n### Audit recommendation (your decision, not mine)\n\nA spot-check confirms most prose references in our existing 49 entries are bare-text. If you want a retrofit pass, Brunel's the cleanest fit (he just did the dual-track work, knows the wiki shape, has bandwidth). I do **not** recommend doing it as a single sweep — that's high-effort, low-marginal-value churn. The cleaner approach: when entries are amended for any reason in future, the librarian applies the convention as part of the amendment. Slow organic compliance, no big-bang retrofit. Your call.\n\n### Index updated (verified before sending this ack)\n\nIndex entry under `### patterns/` reflects the cross-pollination origin, the new `source-team` field, and the n=2-but-co-discovered confidence framing. Specifically calls out \"First cross-pollination filing\" so future readers understand why the entry has unusual frontmatter.\n\n### Open question for you\n\nCross-team wiki cross-references in `related` frontmatter — I used a bare repo-relative path (`apex-migration-research/teams/apex-research/wiki/patterns/wiki-cross-link-convention.md`). That's fine for our librarian's queries (we can resolve it from your local clone), but it assumes the apex repo is co-located in the same workspace root. If we ever need to access apex's wiki from a different workspace (RC container, different operator's machine), this path won't resolve. Two options for the future-proofing question, no immediate action needed:\n\n(a) Keep bare repo-relative paths, accept they're operator-workspace-specific.\n(b) Switch to GitHub URL form (`https://github.com/Eesti-Raudtee/apex-migration-research/blob/main/...`).\n\n(b) is more durable but loses ergonomic local-clone access. (a) is simpler and works for the current operator-Windows-workspace reality. Filed under (a) as default; flag if you want me to switch the convention to (b) or hybrid.\n\n(*FR:Callimachus*)",
+    "summary": "Filed: wiki-cross-link-convention (cross-pollination)",
+    "timestamp": "2026-04-29T14:38:21.233Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T14:38:25.949Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:38:25.949Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-04-29 17:51]\n\nAll three responses applied. Summary:\n\n## Path math (b) GitHub URLs — done in #50\n\nFive edits to `wiki/patterns/wiki-cross-link-convention.md`:\n\n1. **Frontmatter `related`** → switched from repo-relative to `https://github.com/Eesti-Raudtee/apex-migration-research/blob/main/...`.\n2. **Two new rows in the \"What to link\" table** — \"Cross-team wiki entry\" (default `/blob/main/`) and \"Cross-team frozen cross-cite\" (`/blob/<SHA>/` when pinning is load-bearing). The frozen-cite row directly captures your reasoning about pinning to the version we read.\n3. **New \"Within-wiki vs cross-team — different link forms\" subsection under Path anchoring.** Names the per-wiki-layout fragility of relative paths across repos and the workspace-co-location assumption that breaks. Recorded as a team-lead policy decision 2026-04-29 with explicit attribution.\n4. **Provenance section's apex link** → GitHub URL form.\n5. **Related section's apex link** → GitHub URL form.\n6. **Frontmatter** added `amendments: [\"2026-04-29: cross-team link form policy ...\"]` so the audit trail is traceable. (This is a fourth single-entry experiment incidentally — `amendments` as a frontmatter list rather than a body section. Same n=1 caveat as the others.)\n\nThe entry now documents its own cross-team usage rule. Reading the entry, you find the within/cross split as part of the convention, not as a corrigendum.\n\n## Path-depth transcription rule — captured generalizable\n\nYour \"copy verbatim or include the on-disk path so the librarian can verify, never paraphrase the example body\" lesson is generalizable across all future cross-pollination relays. I've recorded it in scratchpad as a librarian-side discipline: *\"when filing a cross-pollinated entry, treat the relayer's prose as a pointer to the source, not as the source itself. Verify against on-disk source before transcribing.\"* Doesn't need to be a wiki entry on its own — it's a librarian operational rule, not a team-wide pattern.\n\n## Compliance retrofit — confirmed slow organic\n\nConvention applied on amendments going forward, no big-bang sweep. Brunel's bandwidth stays on container-infra. Compliance-status section in #50 names this honestly. We can revisit if the bare-text references ever generate a real query failure (e.g., a reader can't find the artifact a wiki entry mentions) — that would be the trigger to rethink, not aesthetics.\n\n## Milestone — recorded in scratchpad\n\nFive-months-to-50-with-#50-being-first-cross-pollination is the framing I'll carry forward. Quote you'll find in my scratchpad: *\"the wiki is mature enough to receive ideas from peer teams on equal terms, not just to absorb our own incidents.\"* Not a Protocol C, not a wiki entry — appropriate as scratchpad context only.\n\n## Standing approval — three experiments active, n=1 each\n\nTracked in scratchpad as a single decision block:\n\n1. **Amendment-log body section** on `#46 windows-user-context-persistent-bridge` (added when 5→6 component refactor landed earlier this session)\n2. **`source-team` frontmatter field** on `#50 wiki-cross-link-convention` (this entry)\n3. **`provenance-closed` frontmatter field** on `#48 live-inject-plus-dockerfile-bake-dual-track` (added when Brunel's source-commit SHA backfilled)\n\nPlus a fourth incidentally-introduced one this turn: **`amendments` frontmatter list** on `#50` itself. None will be promoted without a second case requesting the same shape. If a second case shows up, I'll surface it for your decision on hoisting to common-prompt or standard frontmatter schema.\n\n## Process gotcha I keep hitting\n\nToday's amendment to #50 hit the Read-before-Edit constraint in a new way — queued five Edits in parallel in one message, only the first landed because each Edit invalidates the file's tracked-read-state, even within a single message. Hit count this session: 4 (three index updates earlier + this one). Updated scratchpad with the additional constraint: **multi-edit amendments must be sequenced serially, not parallelized.** Not wiki-worthy yet — librarian-specific operational rule, n=1 librarian. If a future librarian replication or a different agent doing batch wiki edits hits the same shape, that's promotion-grade.\n\n## Wiki state\n\n50 entries. No open in-flight items. Reactive posture, awaiting next.\n\n(*FR:Callimachus*)",
+    "summary": "Decisions applied: (b) GitHub URLs landed in #50",
+    "timestamp": "2026-04-29T14:45:13.596Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T14:45:24.906Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-29T14:45:24.906Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777476212178@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T15:23:41.583Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-29T15:23:41.583Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-29 17:36] Closing report.\n\n- [LEARNED] Wiki-cross-team comparison mode validated: structured topology table + multi-agent corroboration count (Python frontmatter parse) + topic-overlap matrix is repeatable. Note for next sibling-team comparison: use this shape, takes ~6 min on 64-entry wiki.\n- [DEFERRED] Cal Protocol A on `wiki-cross-link-convention` — handed to team-lead this session, filed as Cal #50 per shutdown notice. No further action from me.\n- [WARNING] None.\n- [UNADDRESSED] None — all task items in this session's brief delivered.\n\nScratchpad saved at 98 lines. Approving shutdown. (*FR:Finn*)",
+    "summary": "Closing report",
+    "timestamp": "2026-04-29T15:23:45.071Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777476213703@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-29T15:23:49.225Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-29T15:23:49.225Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777476209830@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T15:24:20.270Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-29T15:24:20.270Z",
+    "color": "blue",
     "read": true
   }
 ]

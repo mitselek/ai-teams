@@ -1,128 +1,97 @@
 # Finn's Scratchpad — framework-research
 
-## [INDEX] 2026-03-13 — Reference material
+## [INDEX] Reference material
 
-- `reference/rc-team/cloudflare-builders/` — original RC team (11 agents, rc-oriented, tmux/SSH based)
-- `reference/hr-devs/` — evolved project team (9 agents, local + RC hybrid)
+- `reference/rc-team/cloudflare-builders/` — original RC team (11 agents)
+- `reference/hr-devs/` — evolved project team (9 agents)
 - `topics/` — 8 design topic files + T09 development methodology
 - `designs/` — deployed: apex-research; new: penrose-dev, screenwerk, raamatukoi-dev, backlog-triage
 
-## [PATTERN] Key differences between rc-team and hr-devs
+## [PATTERN] rc-team vs hr-devs deltas (older harvest)
 
-1. **Spawning:** rc-team uses Agent tool; hr-devs uses `spawn_member.sh`
-2. **Memory layout:** rc-team: flat `memory/`; hr-devs: `memory/` + `docs/`
-3. **Startup:** hr-devs has canonical `docs/startup-shutdown.md`
-4. **Medici:** hr-devs has more detailed audit checklist (6 categories vs implied)
+1. Spawning: rc-team Agent tool; hr-devs `spawn_member.sh`
+2. Memory layout: rc-team flat `memory/`; hr-devs `memory/` + `docs/`
+3. Startup: hr-devs canonical `docs/startup-shutdown.md`
+4. Medici: hr-devs more detailed audit checklist
 
 ## [LEARNED] Team-lead self-check pattern
 
-penrose-dev team-lead.md: "SELF-CHECK: Am I Doing The Work Myself?" with FORBIDDEN/ALLOWED tool lists. Worth adopting in future team designs.
+penrose-dev `team-lead.md`: "SELF-CHECK: Am I Doing The Work Myself?" with FORBIDDEN/ALLOWED tool lists.
 
 ## [PATTERN] Team sizing heuristic
 
-team size = number of distinct abstraction boundaries, not number of deliverables
+team size = number of distinct abstraction boundaries, not deliverables.
 
-## [LEARNED] 2026-04-09 — Round 1 tone-setting for multi-round RFCs
+## [PATTERN] Multi-Round Consensus Protocol
 
-Sharp round 1 with binary claims → agents push back → genuine convergence in rounds 3-4. Cautious round 1 → weak synthesis.
+Seed → R1 binary claims → R2-3 refinement → R4 PO → R5 synthesis → R6 ACK. Documented in T09 (c59bc76).
 
-## [PATTERN] 2026-04-09 — Multi-Round Consensus Protocol
+## [CHECKPOINT] T09 cluster — closed (6 of 6 ACKs, c59bc76, L2.5 dropped)
 
-Seed → round 1 binary claims → round 2-3 refinement → round 4 PO → round 5 synthesis → round 6 ACK. Documented in T09 (c59bc76).
+## [CHECKPOINT] Discussion #56 — single-provider strategy — PAUSED at R2
 
-## [CHECKPOINT] 2026-04-09 — T09 cluster closed (6 of 6 ACKs)
+R1: 9 teams, 68 slots (43 opus, 24 sonnet, 1 local). Unanimous: single-provider optimal now. R2: zero divergence; key finding: lock-in is to Claude Code *platform*, not Anthropic *models*. 3 Protocol A submissions filed by Cal. Three open items: unavailability protocol, platform-vs-provider, cost data.
 
-Zero position divergences. T09 v2 committed at c59bc76. L2.5 dropped per my resolution request.
-
-## [CHECKPOINT] 2026-04-10 — Discussion #56: Single-provider model strategy — PAUSED at R2
-
-Discussion: <https://github.com/mitselek/ai-teams/discussions/56>
-R1: 9 teams, 68 slots (43 opus, 24 sonnet, 1 local). Unanimous: single-provider optimal now.
-R2: Zero divergence. Key finding: lock-in is to Claude Code *platform*, not Anthropic *models*. Gemini overreached on recommendations. Three open items: (1) unavailability protocol, (2) platform-vs-provider, (3) cost data. 3 Protocol A submissions filed by Cal. Paused before authority assignment.
-
-## [CHECKPOINT] 2026-04-10 — D1 gotcha research — COMPLETE
-
-10 gotchas from 6 sources → `wiki/gotchas/cloudflare-d1-migration-query.md` (6-month TTL).
-
-## [LEARNED] 2026-04-10 — Cal reclassifies submissions
+## [LEARNED] Cal reclassifies submissions
 
 Gotchas = traps to avoid; patterns = techniques to apply. Check category before submitting to Cal.
 
-## [CHECKPOINT 2026-04-14] uikit-dev harvest delivered
-
-Report: `docs/uikit-dev-harvest-2026-04-14.md` (Sections C/D for Cal candidates + Aalto questions).
-
-## [CHECKPOINT] 2026-04-10 — Bioforge roster research — COMPLETE
-
-Cathedral tier, single pipeline, 5 agents. Used raamatukoi-dev as reference. Team-lead confirmed findings shaped final design.
-
-## [DEFERRED] Open questions
-
-- Polyphony roster redesign — awaiting PO approval
-- Entu: no server-side code repo studied
-- #56: cost data + unavailability protocol (paused at R2)
-- Six Aalto questions from uikit-dev harvest Section D — wait for next natural contact. Priority: Q1+Q4 > Q6+Q3 > Q2+Q5
-- Sibling roster cross-check (pane-labels n=2 candidate) — deferred
-
-## [LEARNED 2026-04-14] Cross-team harvest envelope
+## [LEARNED] Cross-team harvest envelope
 
 Narrow brief + strict read-only boundaries forces synthesis over sprawl. Cadence: quarterly + on-demand when sibling ships major refactor. n-way leverage: cross-team view surfaces bugs invisible to within-team audit scope.
 
-## [CHECKPOINT 2026-04-14] Jira + GitFlow digest — Phase 2 HELD
+## [PATTERN] docs/ vs topics/ write-path rule
 
-See `docs/jira-gitflow-assessment-2026-04-14.md`. Two Confluence pages with 5 divergences, 10 open questions. Phase 2 classification HELD — PO reaching out to page authors (Kuzmin, Sildnik) for reconciliation. Wake: team-lead SendMessage after PO returns.
+`topics/*.md` = framework design only (T01-T09). `docs/*.md` = external assessments, harvests, one-shot research. Default to `docs/` for non-framework output.
 
-## [PATTERN 2026-04-14] docs/ vs topics/ write-path rule
+## [POINTER] uikit-dev harvest (session 8, 2026-04-14)
 
-`topics/*.md` = framework design only (T01–T09). `docs/*.md` = external assessments, harvests, one-shot research. Default to `docs/` for non-framework output. Prompt gap logged for Celes.
+Full digest: `docs/uikit-dev-harvest-2026-04-14.md`. Sections C/D = Cal candidates + 6 Aalto questions (priority Q1+Q4 > Q6+Q3 > Q2+Q5). Cadence rule + harvest envelope learnings retained above.
 
-## [DEFERRED 2026-04-14] Phase 2 — classification pass
+## [DEFERRED] Phase 2 Jira/GitFlow classification
 
-6 candidates in digest Observations section (3 patterns, 1 gotcha, 2 decisions). Not submitted to Cal — HELD pending PO reconciliation with page authors.
+6 candidates in digest Observations section (3 patterns, 1 gotcha, 2 decisions). HELD pending PO reconciliation with Kuzmin/Sildnik. See `docs/jira-gitflow-assessment-2026-04-14.md`.
 
-## [LEARNED 2026-04-15] Jira/Confluence API tips
+## [LEARNED] Jira/Confluence API tips
 
-- User lookup: `GET /rest/api/3/user?accountId=<id>` → displayName + emailAddress in one call. EVR instance exposes emails to org users.
-- Confluence text extraction: HTMLParser strips `ac:structured-macro` silently — intercept macro name + extract CDATA from `ac:plain-text-body`. Always check macro count before trusting text dump.
-- CQL `text ~` with special chars (ü, ö) returns 0 — encoding issue. Use `contributor`/`creator` CQL operators (accountId-based) instead of name-string searches.
+- User lookup: `GET /rest/api/3/user?accountId=<id>` returns displayName + emailAddress.
+- Confluence text extraction: HTMLParser strips `ac:structured-macro` silently — intercept macro name + extract CDATA from `ac:plain-text-body`.
+- CQL `text ~` with special chars (ü, ö) returns 0 — encoding issue. Use `contributor`/`creator` (accountId-based) instead.
 
-## [CHECKPOINT 2026-04-15] Session 10 — stakeholder profiling + cross-team verification
+## [CHECKPOINT] Stakeholder profiling + apex-research V2 dependency verification
 
-**Delivered:**
-1. Stakeholder background digest (Jira + Confluence) → `sensitive/ruth-turk-background-2026-04-15.md`. Sensitive path, not committed to git.
-2. Apex-research V2 dependency verified — 5 independent evidence signals from local reads (ADR-0003 names the exact page, 47 chapters digested, three-source cross-validation pattern).
-3. tmux-direct brief to Schliemann (`apex-research:0.0`). Reply confirmed load-bearing dependency: "extracted and indexed, not just cited."
-4. EN→EE translation of stakeholder relay (2 passes — Q2 revised for organizational accountability framing).
+Delivered (1) sensitive stakeholder digest (path: `sensitive/ruth-turk-background-2026-04-15.md`, not committed), (2) apex-research V2 dependency verified — 5 independent evidence signals, (3) tmux-direct brief to Schliemann at apex-research:0.0, (4) EN→EE relay translation. Awaiting stakeholder's response to 3-question relay.
 
-**State on shutdown:**
-- Schliemann's reply partially truncated by tmux scrollback (LDz-ER bullet cut). Core finding captured.
-- Awaiting stakeholder's response to the 3-question relay (sent via Teams by PO).
+## [LEARNED] tmux-direct Enter-after-paste discipline
 
-## [LEARNED 2026-04-15] tmux-direct Enter-after-paste discipline
+`tmux send-keys Enter` after `tmux paste-buffer` may not fire reliably in chained SSH command. Candidate Cal Protocol A gotcha: tmux-direct-brief must verify submission, not just paste.
 
-`tmux send-keys Enter` after `tmux paste-buffer` may not fire reliably in a chained SSH command. User had to press Enter manually. Candidate for Cal Protocol A submission (gotcha: tmux-direct-brief must verify submission, not just paste).
+## [PATTERN] OSS-repo structural-survey template (six-section digest)
 
-## [PATTERN 2026-04-15] OSS-repo structural-survey template (six-section digest)
+Reusable shape for external-repo surveys: §1 what is it / §2 mechanisms exposed / §3 architectural shape / §4 framework-research relevance with HIGH/MEDIUM/LOW veins / §5 cadence signals / §6 open questions. Read top-level docs first, stop early when later files don't add signal, never read source files unless dir listing isn't enough. xireactor-brilliant survey: 7 file reads / 10 tool uses (≤12 budget).
 
-xireactor-brilliant survey came in at 7 file reads / 10 tool uses (≤12 budget) WITHOUT touching source files. Reusable shape for future external-repo surveys: §1 what is it (1-2 sentences) / §2 mechanisms exposed (REST? MCP? CLI? library?) / §3 architectural shape (services + data flow, pulled from ARCHITECTURE.md + docker-compose) / §4 framework-research relevance with candidate veins ranked HIGH/MEDIUM/LOW by substrate-invariance and coordination-pattern signal / §5 active-or-dormant cadence signals (ROADMAP, CONTRIBUTING, recent renames) / §6 open questions for PO (skip if none). Read top-level docs first, stop early when later files don't add signal, never read source files unless a directory listing isn't enough. This is now my standing template — don't re-derive it next survey.
+## [LEARNED] Role-boundary discipline on ambiguous briefs
 
-## [LEARNED 2026-04-15] Role-boundary discipline on ambiguous briefs
+When a team-lead brief is ambiguous on AGENCY (who runs vs prepares), default to role-boundary constraint and flag — never infer authorization. Structural-discipline rule 2 applied to cross-agent briefs.
 
-Team-lead's brief said "one clean commit on main" with a literal git command block. My prompt's FORBIDDEN list says "NEVER run git write operations (team-lead handles git)." I prepared the file and flagged the conflict instead of inferring authorization. Team-lead confirmed: correct read was "prepared, not executed" — no exception needed. **Rule:** when a team-lead brief is ambiguous on AGENCY (who runs the command vs. who prepares the state), default to the role-boundary constraint and flag, never infer authorization. This is structural-discipline rule 2 (cross-read producer against consumer) applied to cross-agent briefs, not just cross-team protocols.
+## [LEARNED] Substrate-invariant-mismatch n=3 — render-time/write-path
 
-## [LEARNED 2026-04-15] Substrate-invariant-mismatch n=3 — render-time/write-path
+Derived data read at render time must be written on the write path, not backfilled async. xireactor §4(d): `[[wiki-link]]` references re-derived on POST/PUT into `entry_links`. Same shape likely in our inbox→scratchpad flows. Cal queued formal Protocol A draft.
 
-xireactor §4(d): `[[wiki-link]]` references must be re-derived on POST/PUT into `entry_links` because the render-time GET resolver joins against that table. Spec 0030 fixed a prior gap where new wiki-links rendered literally until a background pass re-indexed them. **Generic shape:** derived data that's read at render time must be written on the write path, not backfilled async — same shape likely appears in our inbox→scratchpad flows. Cal agreed and queued the formal Protocol A draft for next session. I am cited as the source for the third data point; Cal leads drafting.
+## [CHECKPOINT 2026-04-29] Apex-research comparison delivered
 
-## [DEFERRED] Open questions
+`docs/apex-research-comparison-2026-04-29.md`. Q1: apex adopted #61 in 1 commit (239e35e), zero stale paths, lifecycle in inline `startup.md` blocks not separate scripts. Q2: apex 64 entries / 4 canonical dirs only / 28% multi-agent corroboration / wiki-cross-link-convention is highest-ROI cross-pollination candidate (no analog ours). Only 1 true co-discovery: `dual-team-dir-ambiguity` (already cross-cited).
+
+## [DEFERRED] Open questions (consolidated)
 
 - Polyphony roster redesign — awaiting PO approval
 - Entu: no server-side code repo studied
 - #56: cost data + unavailability protocol (paused at R2)
-- Six Aalto questions from uikit-dev harvest Section D — wait for next natural contact. Priority: Q1+Q4 > Q6+Q3 > Q2+Q5
-- Sibling roster cross-check (pane-labels n=2 candidate) — deferred
-- Jira/GitFlow Phase 2 classification — HELD pending PO reconciliation with page authors
+- 6 Aalto questions from uikit-dev harvest §D — wait for next natural contact. Priority: Q1+Q4 > Q6+Q3 > Q2+Q5
+- Sibling roster cross-check (pane-labels n=2 candidate)
+- Jira/GitFlow Phase 2 classification — HELD pending PO reconciliation
 - Stakeholder team design — awaiting her response to 3-question relay
+- Cal Protocol A on `wiki-cross-link-convention` from apex — flagged in 2026-04-29 deliverable; team-lead's call
 
 ## [UNADDRESSED] None
 

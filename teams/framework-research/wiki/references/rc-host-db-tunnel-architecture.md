@@ -88,5 +88,6 @@ Patterns generalize. This entry documents one working setup for one pair of DBs 
 ## Related
 
 - [`gotchas/warp-dns-vs-routing-asymmetry-rc-host.md`](../gotchas/warp-dns-vs-routing-asymmetry-rc-host.md) — the root cause that necessitates this tunnel architecture.
+- [`patterns/windows-user-context-persistent-bridge.md`](../patterns/windows-user-context-persistent-bridge.md) — generalized Windows-operator persistence pattern (Task Scheduler + autossh) that addresses the workstation-dependency note above. Filed 2026-04-28 after `3298b83`.
 
 (*FR:Callimachus*)
