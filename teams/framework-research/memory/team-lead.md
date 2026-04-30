@@ -1,5 +1,45 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 22 WRAP — 2026-04-30 (EVR konteinerite standard shipped: Stage-0 + Stage-1)
+
+**Goal (PO-set):** Push hello-world-container PoC through corporate pipeline; end with adopted "EVR sisene konteinerite standard" + Jira intake protocol for ad-hoc dockerised installations at EVR.
+
+**Shipped:**
+
+- **Stage 0:** Standard published as Confluence page id `1713864752` ("EVR sisene konteinerite standard") in **D365 space** (temporary — V2 has restrictive create-perm; only Ruth as space owner can move/create). Banner-marked "Ettepanek — ootab ITOps poolt vastu võtmist". URL: `https://eestiraudtee.atlassian.net/wiki/spaces/D365/pages/1713864752/EVR+sisene+konteinerite+standard`
+- **Stage 1:** Tracking issue [TPS-583](https://eestiraudtee.atlassian.net/browse/TPS-583) posted, assigned **Ruth Türk**. 4-step Stage-1 ask: move D365→V2 → review → escalate → identify subteam. RFC #2 close-bridge embedded in acceptance criteria.
+- **Drafts in `docs/`:** `evr-sisene-konteinerite-standard-v0.1.md`, `evr-konteinerite-intake-template-v0.1.md`, `evr-konteinerite-tracking-issue.md`, plus harvest doc (Finn pruned 240→92 lines), audit reports (Medici pass 1+2), proposed-diff doc (Brunel pass 2 review surface).
+
+**Workflow shape (reusable for future ad-hoc standards):** Finn harvest (RFC ref + repo state + Confluence space landscape + mirror target) → PO 4 confirms (home / Jira project / title / placement) → Brunel drafts (3 artifacts mirroring chosen reference) → Medici audit → revisions → Medici re-audit → propose-diff review → apply → Stage-0 publish → Stage-1 post.
+
+**`[speculative]` markers convention introduced** — flag Brunel inferences, container-adaptations of Linux-standard patterns, RFC #2-derived RACI as draft-state. 16 surviving markers in standard, 2 in intake, 2 in tracking. Stage-1 reviewers scan as confirm/adjust points.
+
+[LEARNED — substrate-level findings, multiple promotion-grade]
+
+- **V2 Confluence space create-permission restricted to space owner (Ruth)** — affects ALL future publish flows from non-owner team members. Workaround: publish in PO's permitted space (D365 here), Ruth moves to V2 as Stage-1 step. Wiki candidate.
+- **TPS Jira project rejects Task issue type, accepts Story** — workflow quirk; Story has same hierarchy level (0) and works. Worth noting for future TPS posts.
+- **EVR's actual SSO is EntraID (Microsoft Azure AD), NOT WSO2.** WSO2 is the integration platform (Micro Integrator for TAF/TAP message routing). Cited via FSM page `536248326` (UAM SSO) + INFOSEC page `851607559` (Delinea SSO). Brunel verified — corrected my hedge during the IAM/PAM ripple. Wiki candidate (substrate-fact for EVR docs).
+- **`createConfluencePage` MCP returns 404 on V2** (likely permission-as-404 disguise; Atlassian obscures permission denial behind 404 for security best-practice). Wiki candidate (gotcha-shape).
+- **Mirror target: Roland Kilusk's "EVR sisene Linux standard"** (page `1335984130`, ITOps space `I`). Title format `EVR sisene <X> standard`, ~700-1000w single-ET prose, EN product nouns inline, no parallel EN, Tier 0/1/2 classification, no frontmatter, exception-doc in preamble. Peer: BYOD standard. **Tier-numeral inversion vs intuitive (Brunel's call):** Tier 0 = highest sensitivity (production-adjacent), Tier 2 = lowest (≤4-week PoC). Matches Linux standard convention.
+
+**Wiki candidates (Cal Protocol A on next spawn) — 4 from session 22 + 1 carried from 21:**
+
+1. **Two-stage adoption pattern** (proposal in own/permitted space → escalation → canonical org space) — substrate-relevant for future standards.
+2. **`[speculative]` marker convention for cross-team handoff** — defines "this is inference, please confirm" without breaking flow.
+3. **Confluence space create-perm-as-404 disguise** — gotcha-shaped, useful pattern.
+4. **EntraID-not-WSO2** — substrate-fact for EVR docs going forward.
+5. **(Carried from session 21):** "In-memory team-leadership state survives `/clear` independently of disk" — n=2 cross-team apex+FR.
+
+[DEFERRED — Stage 2 ahead] Pending Ruth's escalation outcome via TPS-583:
+
+- Move D365 page to V2 (Ruth's Stage-1 step 1; she has space-owner perms)
+- Standard v0.1 → v1.0: banner removed, receiving role baked in
+- Page moves V2 → ITOps space `I` (peer to Linux + BYOD)
+- Close TPS-583
+- Close RFC #2 (`Eesti-Raudtee/hello-world-container` PR #2) review status (PR stays open with `do not merge` flag, just review-status closed)
+
+**Auth note:** Atlassian plugin OAuth (claude.ai/Atlassian) authenticated this session — read+write scopes for Confluence + Jira at cloudId `2309a7c9-1d93-47a4-80ef-ab7f528cbb77`. Token persists session-level; re-auth needed at next session start.
+
 ## SESSION 21 WRAP — 2026-04-30 (#62 patch shipped, new shutdown S5 dogfooded)
 
 **#62 from apex-research/Schliemann** filed AS REFERENCE for FR — proposed startup/shutdown collapse based on apex session 23 in-memory-survives-`/clear` failure. Volta assessed; adopted with one modification (kept R4-3 operational gate as Step 2b — verify-on-disk is independently load-bearing, not just retry-loop scaffolding).
@@ -23,21 +63,20 @@
 
 **This shutdown is first to use new S5** — dogfooding the patch. Next session's startup runs 5 logical steps not 8, with no in-memory recovery branch.
 
-## NEXT SESSION — clean slate
+## NEXT SESSION — TPS-583 watch primary
 
-No urgent first-action. New startup procedure should be cleaner — TeamDelete from this S5 means no in-memory recovery needed at next start.
-
-Possible directions, rough priority:
-
-1. **Cal spawn (when next needed for wiki work)** — route the in-memory-survives-`/clear` candidate via Protocol A.
-2. **T06 path-tree rewrite (Volta)** — now ALSO scoped to fix DO-NOT-TeamDelete contradictions (T06 lines 528 + 1025) that contradict new S5.
-3. **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event.
-4. **Ruth-team observability gap** — only on Ruth Q2/Q3 response.
+1. **TPS-583 watch** — when user signals Ruth has progressed (subteam identified, page moved to V2, or both), action Stage-2: page moves V2→ITOps `I`, banner removed, v1.0, intake-template assignee filled, close TPS-583, close RFC #2 review-status.
+2. **Cal spawn (when next needed for wiki work)** — route 5 wiki candidates: 4 from session 22 (two-stage adoption, `[speculative]` marker convention, create-perm-404 disguise, EntraID-not-WSO2) + carried session-21 in-memory-survives-`/clear`. All via Protocol A.
+3. **T06 path-tree rewrite (Volta)** — also scoped to fix DO-NOT-TeamDelete contradictions on T06 lines 528 + 1025 that contradict new S5 (#62 patch).
+4. **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event.
+5. **Ruth-team observability gap** — only on Ruth Q2/Q3 response.
 
 If PO arrives with direction, that takes priority.
 
 ## NEXT-SESSION-CHOREs (still active)
 
+- [ ] **TPS-583 status check + Stage 2 actioning.** When Ruth has identified ITOps receiving subteam (or moved page), action: page V2→`I` move, banner removal, v1.0 promotion, intake assignee bake-in, close TPS-583 + RFC #2 review-status.
+- [ ] **Cal session-22 wiki candidates (4) + session-21 carry (1).** 5 promotion-grade candidates: two-stage adoption pattern, `[speculative]` marker convention, Confluence create-perm-404 disguise, EntraID-not-WSO2 substrate-fact, in-memory-survives-`/clear`.
 - [ ] **T06 Path-tree rewrite (Volta).** `topics/06-lifecycle.md` Path 1/2/2.5/3 decision tree needs rewrite for Agent-tool spawn (post-#60). Herald's `agent-spawn-protocol.md` defines the shapes each path uses; Volta's rewrite references them. T03/T06 boundary named clearly (Herald session-19 [LEARNED]): "protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when." **Session 21 addition:** also audit T06 lines 528 + 1025 for "DO NOT TeamDelete" assertions that contradict new shutdown S5 (#62 patch).
 - [ ] **Cal: route in-memory-survives-`/clear` wiki candidate** (#62-derived, n=2 apex+FR) on next Cal spawn via Protocol A. Volta's session-21 [LEARNED] is the source — promotion-grade.
 - [x] ~~Finn scratchpad prune (~190 lines → target 100)~~ — DONE this session, 129→98 lines, pointer block preserved.
