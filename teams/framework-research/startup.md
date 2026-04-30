@@ -31,7 +31,9 @@ All paths are derived from two anchors:
 
 **Known gotcha #2 (from Restart 4, 2026-03-13):** `$HOME` can be UNRELIABLE on some platforms (e.g., Windows/Git Bash resolves it to empty string). The lifecycle scripts use `$SCRIPT_DIR` to derive repo paths and `$HOME` only for the runtime dir. If `$HOME` is empty, set it explicitly before running scripts.
 
-**Known gotcha #3 (from Restart 4, 2026-03-13):** `TeamCreate` returns success and reports a `team_file_path`, but `config.json` may NOT exist on disk immediately. Other teams (e.g., cloudflare-builders) do have config.json on disk. Hypothesis: config.json may be written lazily (e.g., on first agent message). The Step 4 verification has been updated to account for this.
+**Known gotcha #3 (from Restart 4, 2026-03-13):** `TeamCreate` returns success and reports a `team_file_path`, but `config.json` may NOT exist on disk immediately. Other teams (e.g., cloudflare-builders) do have config.json on disk. Hypothesis: config.json may be written lazily (e.g., on first agent message). Step 2's verify-on-disk check (and Step 2b operational gate) defends against this.
+
+**Known gotcha #4 (from session-startup 2026-04-30):** In-memory team-leadership state survives `/clear`. A bare `rm -rf $TEAM_DIR` cleans disk but does NOT release leadership; the next `TeamCreate` then fails with "Already leading team. Use TeamDelete to end the current team before creating a new one." Mitigation is structural — Step 2 always calls `TeamDelete` before `TeamCreate`. Shutdown Step S5 calls `TeamDelete` on graceful exit so next session's `/clear` start needs no cleanup at all.
 
 ## Read Order
 
@@ -62,68 +64,36 @@ cd "$REPO" && git pull
 
 **Verify:** Output says "Already up to date" or shows pulled changes.
 
-### Step 2: Diagnose
-
-```bash
-TEAM_DIR="$HOME/.claude/teams/framework-research"
-if [ -d "$TEAM_DIR" ]; then echo "STALE DIR — will clean"; else echo "CLEAN — normal state"; fi
-```
-
-| Result | Meaning | Next action |
-|---|---|---|
-| STALE DIR | Runtime dir left over from interrupted or same-invocation session | Go to Step 3 |
-| CLEAN | Normal state — platform cleaned up after last session | Go to Step 3 |
-
-The runtime dir is **ephemeral by platform design** — the platform does not preserve it between CLI sessions. A missing dir is the normal state, not an anomaly. All durable state lives in the repo (scratchpads, inboxes). No investigation needed.
-
-### Step 3: Clean
-
-```bash
-TEAM_DIR="$HOME/.claude/teams/framework-research"
-
-# No /tmp backup needed — inboxes are persisted to the repo during shutdown.
-# Runtime dir inboxes are stale copies, safe to discard.
-
-# Remove stale dir (safe even if it doesn't exist)
-rm -rf "$TEAM_DIR"
-```
-
-**Verify:** `ls "$TEAM_DIR"` returns "No such file or directory".
-
-### Step 4: Create
+### Step 2: Reset team state
 
 ```
+TeamDelete(team_name="framework-research")   # best-effort; ignore failure if no team to clean
 TeamCreate(team_name="framework-research")
 ```
 
-**Verify (two checks):**
+```bash
+ls "$HOME/.claude/teams/framework-research/config.json"
+```
+
+**Verify (all three):**
 
 1. TeamCreate returned success with a `team_file_path` and `lead_agent_id`
-2. Check disk: `ls "$HOME/.claude/teams/framework-research/config.json"`
+2. config.json exists on disk (the `ls` above)
+3. Roster matches `teams/framework-research/roster.json`
 
-**If check 1 succeeds but check 2 fails (config.json not on disk):**
+**Why this collapses Steps 2–4 from R7-and-earlier:** The old Step 2 (diagnose) gated nothing — both branches went to Step 3. The old Step 3 (`rm -rf`) is strictly weaker than `TeamDelete`: it cleans disk but misses in-memory team-leadership state. The 2026-04-30 session-startup confirmed the failure mode empirically — `rm -rf` ran clean, then `TeamCreate` returned "Already leading team" because in-memory state survived `/clear`. Recovery required `TeamDelete()` anyway. `TeamDelete()` at the top is the single primitive that handles both fresh-start and stale-state paths.
 
-This happened in Restart 4 (2026-03-13). TeamCreate reported success but config.json did not exist. Agents spawned into this state are wasted — team is non-functional.
+**If `TeamDelete` errors with "no team to delete":** ignore. Best-effort by design.
 
-**Recovery (max 2 attempts):**
+**If verify check 2 fails (config.json absent after TeamCreate):** rare — observed once (Restart 4, 2026-03-13). The recovery is the same primitive: re-run `TeamDelete + TeamCreate` once. If it still fails → STOP. Ask the user. Do NOT proceed to spawn.
 
-1. `TeamDelete(team_name="framework-research")`
-2. `TeamCreate(team_name="framework-research")`
-3. Re-check disk for config.json
-4. If still fails after 2 attempts → STOP. Ask the user. Do NOT proceed to spawn.
-
-#### Step 4b: Operational gate (*FR:Volta* — from R4-3)
+#### Step 2b: Operational gate (*FR:Volta* — from R4-3)
 
 **Do NOT spawn any agent until the team is verified operational.** In Restart 4, an agent was spawned into a broken team state (TeamCreate returned "success" but team was non-functional). The agent was wasted.
 
-**Gate check:** After Step 4, before ANY spawn (Step 6):
+The verify-on-disk check above IS this gate. One `ls` separates a working team from a broken one. Do not proceed to Step 4 (Spawn) until config.json is confirmed.
 
-- config.json exists on disk: `ls "$HOME/.claude/teams/framework-research/config.json"`
-- If config.json is absent → do NOT proceed. Run Step 4 recovery.
-
-This gate is cheap (one `ls`) and prevents the expensive failure of spawning agents into a broken team.
-
-### Step 5: Restore inboxes from repo
+### Step 3: Restore inboxes from repo
 
 ```bash
 REPO="$(git rev-parse --show-toplevel)"
@@ -140,7 +110,7 @@ The script handles:
 
 **Verify:** Script outputs "Restored N inbox(es)..." or "No repo inboxes found..." (cold start). Non-zero exit = error, investigate before proceeding.
 
-### Step 6: Spawn agents
+### Step 4: Spawn agents
 
 Ask the user which agents to spawn. Do NOT auto-spawn any agent (including Medici). Spawn per task requirements. Before each spawn, check `config.json` — if agent name already exists, use SendMessage instead of spawning.
 **Verify:** No `name-2` entries in `config.json`.
@@ -193,7 +163,17 @@ The persist script handles:
 
 **Verify:** `git log --oneline -1` shows the commit. Inboxes are in the repo.
 
-**Note:** Previous versions had a Step S5 (Preserve) that said "do NOT call TeamDelete." Removed in R7 — the runtime dir is ephemeral by platform design. Step S4 (Persist to repo) is the final shutdown step. The repo is the sole durable store.
+### Step S5: Release team leadership
+
+```
+TeamDelete(team_name="framework-research")
+```
+
+**Why:** The in-memory team-leadership state (held by the parent CLI process) is independent of disk state. On graceful exit, `TeamDelete` nulls it cleanly so the next session's `/clear` startup has nothing to recover from — Step 2's `TeamDelete` becomes a no-op rather than a recovery. On crash exit (no S5), Step 2 still cleans up at next start; S5 is the happy-path optimization.
+
+**Verify:** `TeamDelete` returns success or "no team to delete" (idempotent).
+
+**Note:** R7 had no S5 — the conclusion that "TeamDelete is unnecessary because the runtime dir is ephemeral" was wrong. The runtime *dir* is ephemeral; the parent CLI's in-memory leadership state is NOT. The 2026-04-30 session-startup made this distinction empirically obvious. See gotcha #4.
 
 ## Environment Notes
 
