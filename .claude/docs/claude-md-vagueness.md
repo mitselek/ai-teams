@@ -16,8 +16,8 @@ One line per section would fix all three.
 
 Numbered as a sequential recipe, but step 3 is actually a separate rule:
 
-> 2. If yes: back up inboxes → delete the old team → TeamCreate(...) → restore inboxes
-> 3. If an agent already exists in the team, send SendMessage — don't spawn a duplicate
+> 1. If yes: back up inboxes → delete the old team → TeamCreate(...) → restore inboxes
+> 2. If an agent already exists in the team, send SendMessage — don't spawn a duplicate
 
 After step 2 runs, the old team is gone — "agent already exists" can't apply from the same flow. Step 3 is really a general "don't spawn duplicates during an active session" rule, not step 3 of reuse.
 
@@ -28,6 +28,7 @@ After step 2 runs, the old team is gone — "agent already exists" can't apply f
 > If the project has a team (roster), ALWAYS delegate to team members.
 
 The detection rule is implicit. Is the check:
+
 - `teams/` directory exists?
 - `roster.json` present anywhere?
 - User explicitly mentioned a team?
@@ -48,6 +49,7 @@ Two under-specified steps:
 > Date every entry
 
 Multiple plausible formats:
+
 - `2026-04-14`
 - `2026-04-14 18:30`
 - ISO 8601 `2026-04-14T18:30:00Z`
@@ -60,6 +62,7 @@ Pick one and name it.
 > `[LEARNED]`, `[DEFERRED]`, `[WARNING]` (max 1 of each)
 
 Could mean:
+
 - (a) At most one tag *of each type* in the closing message (one `[LEARNED]`, one `[DEFERRED]`, one `[WARNING]`)
 - (b) At most one *item under each tag* (not a laundry list of learnings)
 

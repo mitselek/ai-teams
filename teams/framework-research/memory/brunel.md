@@ -1,5 +1,14 @@
 # Brunel scratchpad
 
+## EVR KONTEINERITE STANDARD v0.1 (2026-04-30)
+
+[CHECKPOINT] 3 mustandid tarnitud `teams/framework-research/docs/`: standard v0.1, intake-vorm v0.1, tracking-issue body. Mirror = "EVR sisene Linux standard" (page 1335984130). 4-role RACI võetud üle hello-world-container PR #2 DEPLOYMENT-ROLES.md-st (main HEAD). Vastuvõttev tiim = TBD (Stage 1 käigus identifitseeritav). Stage-0 koht = V2 ruum (id 1115095052), top-level sibling. Stage-2 sihtruum = ITOps `I` ruum, peer Linux + BYOD standarditele. Tracking-issue → TPS projekt, assignee Ruth Türk.
+[DECISION] Tier-süsteemi adapteerin Linuxi 0/1/2 mudelist konteineri-konteksti: Tier 0 = tootmislähedane, Tier 1 = sisetiimi/staging, Tier 2 = lühi-eluealine PoC ≤4 nädalat. Linuxi standardis 3 tier-i sisu erines (KRIITILINE/KESKMINE/MADAL labels-id säilitan, sisu adapteerin).
+[DECISION] Sektsiooni-adaptatsioon: säilitan Linuxi spine (Baasturvalisus, IAM/PAM, Monitooring, Logimine, Automatiseerimine), aga Baasturvalisus → "Baasturvalisus ja konteineri kuvand" (image-supply-chain ja root-rules tõstetud sinna), Automatiseerimine → "Tarne- ja juurutusprotsessi automatiseerimine" (CI/CD-spetsiifiline). H4 "Uute masinate juurutus" → "Uute konteinerite juurutus" — kuhu on intake-vorm sõlmitud.
+[DECISION] Kogemata erandit ei lisanud — ITOps-i alamtiimi nimetus jäeti TBD-ks, aga "Sysops / Infra" rolli täpsus ITOps-il, mitte muu üksuse külge — see on Stage 1 ainus avatud küsimus, mille vastuvõttev tiim ise sõlmib.
+[LEARNED] Linuxi standard on ~700w / 30 lauset, väga compact. Püüdsin sama tihedusega — v0.1 vahemikus 700-1000w. EN tooted nähtavad inline (Docker, Cloudflare Tunnel, GitHub Actions, Cloudflare Access, Docker Swarm, Cloudflare Tunnel, Delinea Secret Server jt) — paralleel-EN-i ei ole.
+[LEARNED] Kogu material PoC-st (README + WALKTHROUGH ~80% sisust) lift-itud kontseptuaalselt, mitte verbatim — Linux standard on policy-tasand, mitte protseduur. Sama eristust hoidsin: standard ütleb "mis peab olema", mitte "kuidas seda teha" (kuidas-vastus on PoC repos endas).
+
 ## APEX CONTAINER — CHROMIUM/PLAYWRIGHT DEPS (2026-04-29) — CLOSED
 
 [CHECKPOINT] Dual-track shipped end-to-end. Live-inject + Dockerfile-bake. Source-commit on origin/main: `9ddfb10`. Cal entries filed (wiki at 49, provenance-closed). RC-clone divergence cleanup also complete: stale clone moved aside to `apex-migration-research.pre-fresh-clone-2026-04-29`, fresh clone in place at `/home/dev/github/apex-migration-research`. PR #115 (`TERM` + `CLAUDE_CODE_NO_FLICKER` in entrypoint SHELL_VARS) merged squash on origin/main as `049f766e`. Two infra gotchas (gh-not-on-RC, CRLF/LF) HELD for n=2 confirmation before Cal submission per team-lead guidance.
