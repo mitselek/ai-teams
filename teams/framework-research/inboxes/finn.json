@@ -5,11 +5,5 @@
     "summary": "Comparison accepted, stand down",
     "timestamp": "2026-04-29T14:34:32.149Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777476213703@finn\",\"from\":\"team-lead\",\"reason\":\"Session 20 wrap. Apex-research comparative analysis delivered, scratchpad pruned 129→98. No in-flight items. Three cross-pollination candidates routed (1 filed by Cal as #50, 2 parked). Session-end shutdown per startup.md S2c.\",\"timestamp\":\"2026-04-29T15:23:33.703Z\"}",
-    "timestamp": "2026-04-29T15:23:33.703Z",
-    "read": true
   }
 ]

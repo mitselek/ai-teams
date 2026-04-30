@@ -1,53 +1,45 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-## SESSION 20 WRAP — 2026-04-29 (#61 validated, tunnel persistence shipped, apex-research comparison)
+## SESSION 21 WRAP — 2026-04-30 (#62 patch shipped, new shutdown S5 dogfooded)
 
-**#61 validation passed empirically.** Cal spawned cleanly, all four path checks green, wiki write with no permission prompt confirmed end-to-end. Validation block from session 19 fully discharged. The `.claude/teams/` → `teams/` refactor is verified as operationally portable.
+**#62 from apex-research/Schliemann** filed AS REFERENCE for FR — proposed startup/shutdown collapse based on apex session 23 in-memory-survives-`/clear` failure. Volta assessed; adopted with one modification (kept R4-3 operational gate as Step 2b — verify-on-disk is independently load-bearing, not just retry-loop scaffolding).
 
-**Tunnel persistence work (apex-migration-research repo, not this one):**
+**Empirical confirmation (n=2 cross-team):** This session's startup hit the exact failure mode. `rm -rf "$TEAM_DIR"` ran clean, then `TeamCreate` returned "Already leading team. Use TeamDelete to end..." Recovery required `TeamDelete + TeamCreate` anyway. Same pathology Schliemann reported.
 
-Three commits hardened the operator-side reverse SSH tunnel from Windows machine → RC host loopback → apex container (Oracle DEV/TEST DB access on `127.0.0.1:11521/11522`):
-- `183de33` — wrapper now loops autossh (`while true; ... sleep 10`); autossh's special-case fatal-exit-on-127 took the bridge silently down at 02:04 with no scheduler trigger to revive it. Supervisor-of-supervisor pattern.
-- `8edc230` — wscript+VBS hidden launcher replaces direct bash invocation in the Task Scheduler action; the supervisor loop kept a Windows Terminal window alive forever.
-- `9ddfb10` — Chromium runtime deps baked into `Dockerfile.apex` (live-injected via `docker exec -u root` first, no container restart, agent sessions preserved).
-- `049f766e` — PR #115 merged: 2 container-internal env vars (`TERM=xterm-256color`, `CLAUDE_CODE_NO_FLICKER=1`) preserved from RC operator tinkering.
+**Patch committed (`426194d`):** `teams/framework-research/startup.md`
+- Steps 2 (Diagnose) + 3 (rm -rf Clean) + 4 (Create + retry block) → single Step 2 (Reset team state): `TeamDelete + TeamCreate + verify`. Recovery primitive hoisted to top of every startup instead of branched into on failure.
+- Step 4b (operational gate) → Step 2b. The verify-on-disk check IS the gate.
+- Steps 5/6 → 3/4.
+- New Step S5 (Release team leadership): `TeamDelete()` after final `git push`. Nulls in-memory state on graceful exit; next session's `/clear` startup needs no recovery.
+- Gotcha #3 updated (now references Step 2 verify, was Step 4).
+- New gotcha #4 documents "in-memory team-leadership state survives `/clear`".
+- Old R7 Note "S5 removed because runtime is ephemeral" replaced with corrected explanation: runtime *dir* IS ephemeral; parent CLI's in-memory leadership state is NOT.
 
-**RC clone of apex-migration-research was diverged 13 ahead / 469 behind with three uncommitted operator edits.** Brunel triaged read-only: 12 of 13 ahead were stale-SHA versions of work already on origin (rebased upstream); 1 was truly local (cloudflared sidecar — operator already reverting it). Fresh-clone executed; stale clone preserved at `/home/dev/github/apex-migration-research.pre-fresh-clone-2026-04-29`. Two operator env vars promoted via PR; three other ad-hoc edits discarded.
+**Cross-team:** Comment posted on mitselek/ai-teams#62 (`issuecomment-4350394024`) with FR-side confirmation, commit link, evidence correction (FR retry block was n=1, not n=0 — Restart 4 hit it).
 
-**Apex-research comparative analysis delivered** (Finn): `docs/apex-research-comparison-2026-04-29.md`. Two findings:
-- Path migration adoption: apex did #61 in one commit (`239e35e`, 2026-04-27) explicitly citing our SHA `7e72771`. 20 files vs our 168. Zero stale paths. Bidirectional flow confirmed: their 2026-04-13 dual-team-dir incident produced our `gotchas/dual-team-dir-ambiguity.md`; our #61 produced their later relocation commit.
-- Wiki state: apex 64 entries vs our 47. Eratosthenes did NOT evolve `process/`/`observations/`/`findings/` subdirs (different domain). Only 1 true cross-team co-discovery (already cross-cited). Apex pipeline intrinsically multi-agent → 28% multi-agent corroboration vs our 15%; our outliers are denser (two n=5 patterns).
+**Volta's [LEARNED] — wiki promotion criterion:** "Cross-team gotcha promotion: when one team observes a failure mode and fixes it, second-team confirmation (n=2) is the trigger to elevate from team-local doc to wiki-level pattern. Schliemann's #62 + this session's startup is the canonical pair."
 
-**Wiki: 45 → 50 entries this session (+5, plus 1 amendment).**
+**Wiki candidate held (Cal Protocol A on next spawn):** "In-memory team-leadership state survives `/clear` independently of disk" — substrate-relevant, gotcha-shaped, n=2 cross-team. Cal not spawned this session.
 
-| # | Title | Type | Filer | Notes |
-|---|---|---|---|---|
-| #46 | windows-user-context-persistent-bridge | pattern | Cal | filed 5-component, **amended same-day to 6-component** when supervisor-loop + hidden-launcher refinements landed; first wiki entry to receive a structural amendment under Cal's shift |
-| #47 | cross-msys-argv-mangling | gotcha | Cal | high confidence on failure mode, n=1 on broader "pin Windows-side children to native equivalents" rule |
-| #48 | live-inject-plus-dockerfile-bake-dual-track | pattern | Cal (Brunel-source) | dual-track delivery for live-container fixes |
-| #49 | ai-teams-user-no-sudo-use-docker-exec-root | gotcha | Cal (Brunel-source) | container-side missing NOPASSWD sudoers → use `docker exec -u root` from RC host |
-| #50 | wiki-cross-link-convention | pattern | Cal (apex-source via Finn) | **first cross-pollination filing**, mature-wiki milestone |
+**This shutdown is first to use new S5** — dogfooding the patch. Next session's startup runs 5 logical steps not 8, with no in-memory recovery branch.
 
-**Cross-team link form policy adopted (this session):** within our wiki → relative paths (existing); cross-team to apex/comms-dev/etc → GitHub URL form (`/blob/main/...` default, `/blob/<sha>/...` for frozen cross-cite). Path-depth assumptions don't hold across teams' layouts. See [DECISION] block below.
+## NEXT SESSION — clean slate
 
-**Auto-memory updated:** `reference_dev_db_tunnels.md` carries the full persistence stack (autossh + Task Scheduler + wscript hidden + supervisor loop + AUTOSSH_PATH=Windows-native).
+No urgent first-action. New startup procedure should be cleaner — TeamDelete from this S5 means no in-memory recovery needed at next start.
 
-## NEXT SESSION — open carryovers, no validation priority this time
+Possible directions, rough priority:
 
-Session 19's validation priority is fully discharged. No urgent first-action on restart.
+1. **Cal spawn (when next needed for wiki work)** — route the in-memory-survives-`/clear` candidate via Protocol A.
+2. **T06 path-tree rewrite (Volta)** — now ALSO scoped to fix DO-NOT-TeamDelete contradictions (T06 lines 528 + 1025) that contradict new S5.
+3. **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event.
+4. **Ruth-team observability gap** — only on Ruth Q2/Q3 response.
 
-Possible directions, in rough priority order:
-
-1. **Aalto/uikit-dev cross-team debt** — 6 deferred Q's from Finn's Section D harvest, plus uikit-dev `1deb90e` defective free-string jq pattern. Tmux-direct relay to Aalto bundled with the Q's. Only triggered by a uikit-dev contact event.
-2. **Ruth-team observability gap** — Brunel's v1.0 + Volta §6.5 addendum still gated on Ruth's Q2/Q3. Do NOT wake Volta/Celes speculatively — only on Ruth response.
-3. **T06 path-tree rewrite** (Volta) — `topics/06-lifecycle.md` Path 1/2/2.5/3 decision tree needs Agent-tool-spawn rewrite. Herald `agent-spawn-protocol.md` defines path shapes. Carryover from session 19 chore list.
-4. **Finn scratchpad** — already pruned this session 129→98 lines (Finn's own initiative + my carry-forward direction). No further pruning needed.
-
-If PO arrives with direction, that takes priority over the above.
+If PO arrives with direction, that takes priority.
 
 ## NEXT-SESSION-CHOREs (still active)
 
-- [ ] **T06 Path-tree rewrite (Volta).** `topics/06-lifecycle.md` Path 1/2/2.5/3 decision tree needs rewrite for Agent-tool spawn (post-#60). Herald's `agent-spawn-protocol.md` defines the shapes each path uses; Volta's rewrite references them. T03/T06 boundary named clearly (Herald session-19 [LEARNED]): "protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when."
+- [ ] **T06 Path-tree rewrite (Volta).** `topics/06-lifecycle.md` Path 1/2/2.5/3 decision tree needs rewrite for Agent-tool spawn (post-#60). Herald's `agent-spawn-protocol.md` defines the shapes each path uses; Volta's rewrite references them. T03/T06 boundary named clearly (Herald session-19 [LEARNED]): "protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when." **Session 21 addition:** also audit T06 lines 528 + 1025 for "DO NOT TeamDelete" assertions that contradict new shutdown S5 (#62 patch).
+- [ ] **Cal: route in-memory-survives-`/clear` wiki candidate** (#62-derived, n=2 apex+FR) on next Cal spawn via Protocol A. Volta's session-21 [LEARNED] is the source — promotion-grade.
 - [x] ~~Finn scratchpad prune (~190 lines → target 100)~~ — DONE this session, 129→98 lines, pointer block preserved.
 - [ ] **Brunel: fix stale port 2224 in ruth-team container doc.** `docs/ruth-team-container-design-2026-04-15.md` has port 2224 but `deployments.md` already allocates entu-research:2224. 1-line fix, assign to Brunel on next ruth-team task.
 - [ ] **Brunel: `tmux-spawn-guide.md` retirement decision** — currently banner-gated; Brunel's call on whether to delete outright. Parked DEFERRED per session 19.
@@ -71,6 +63,8 @@ If PO arrives with direction, that takes priority over the above.
 [LEARNED] **Outcome (c) generalized definition** (Herald's sharpening): *"Outcome (c) is not 'we've thought about it enough,' it's 'we've exhausted what the current evidence can tell us and need new evidence.' The test is 'what new input would change the landing?'"* — applies across evidence types.
 
 ## STANDING DECISIONS
+
+[DECISION — session 21] **#62 startup/shutdown patches adopted.** Steps 2/3/4 collapse to single `TeamDelete + TeamCreate + verify`; new Step S5 `TeamDelete()` after `git push`. Gotcha #3 updated, #4 added. Source: apex-research/Schliemann's #62, FR session-21 startup empirical confirmation (n=2 cross-team). T06 amendment (lines 528 + 1025 contradict new S5) batched with path-tree-rewrite chore, not new task.
 
 [DECISION — session 20] **Cross-team wiki cross-references use GitHub URL form**, not repo-relative paths. Within our wiki, relative paths preserved (existing). For cross-team `related` frontmatter and prose links to apex/comms-dev/etc: default `https://github.com/<org>/<repo>/blob/main/<path>`; switch to `/blob/<sha>/<path>` when freezing a cross-cite is load-bearing (e.g., apex amends their entry and we want our cross-cite to remain literal to what we read). Path-depth assumptions (4-levels-deep math) hold within a team's wiki layout but break across teams' layouts. First applied on entry #50.
 
@@ -101,6 +95,8 @@ If PO arrives with direction, that takes priority over the above.
 - §9.2 design probes: Tier 3 bounce-vs-escalate rejection format, structured-vs-free-text
 
 ## ACTIVE WIP
+
+[WIP — session 21] **Cal wiki candidate held:** "in-memory team-leadership state survives `/clear` independently of disk" — n=2 cross-team (apex session 23 + FR session 21). Promotion-grade per Volta's n=2 criterion. Route on Cal's next spawn via Protocol A.
 
 [WIP — session 20] **Three apex-research cross-pollination candidates from Finn's 2026-04-29 comparative analysis.** Status:
 - ✅ `wiki-cross-link-convention` → filed as #50 with cross-team link form policy decision baked in.
@@ -142,6 +138,8 @@ If PO arrives with direction, that takes priority over the above.
 [DECISION] **"Cathedral-lite"** = Cathedral tier with ARCHITECT merged into team-lead. Valid for single-repo, single-language, single-pipeline projects.
 
 ## SESSION HISTORY (compressed)
+
+**2026-04-30 (session 21):** #62 from apex-research/Schliemann assessed by Volta, patched, committed (`426194d`). startup.md Steps 2-4 collapse to single `TeamDelete + TeamCreate + verify`; new shutdown S5 `TeamDelete()` after `git push`. Gotcha #4 added (in-memory state survives `/clear`). Cross-team comment on #62 (`issuecomment-4350394024`) with FR-side n=2 confirmation. Wiki candidate held for Cal: "in-memory state survives `/clear`" (n=2 apex+FR). T06 amendment (lines 528 + 1025) batched with existing path-tree-rewrite chore. This shutdown is first to use new S5 — dogfooding the patch.
 
 **2026-04-29 (session 20):** #61 validation passed empirically (Cal). Tunnel persistence work in apex-migration-research repo (3 commits + 1 PR-merge): supervisor-of-supervisor loop (`183de33`), wscript hidden launcher (`8edc230`), Chromium runtime deps Dockerfile bake (`9ddfb10`), operator env-var PR #115 merged (`049f766e`). RC clone fresh-cloned (Brunel triage). Apex-research comparative analysis (Finn) → `docs/apex-research-comparison-2026-04-29.md`. Wiki 45→50: #46 windows-bridge (5→6 amend), #47 cross-msys-argv, #48 dual-track, #49 ai-teams-sudo, #50 wiki-cross-link-convention (first cross-pollination filing). Cross-team link form policy adopted. 4 single-entry frontmatter experiments active under Cal.
 

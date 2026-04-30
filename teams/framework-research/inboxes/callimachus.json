@@ -80,11 +80,5 @@
     "summary": "Decisions: GitHub URLs cross-team, organic compliance, milestone",
     "timestamp": "2026-04-29T14:41:46.767Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777476209830@callimachus\",\"from\":\"team-lead\",\"reason\":\"Session 20 wrap. All threads closed: tunnel persistence shipped, apex container deps installed, RC clone fresh-cloned, apex-research comparative analysis delivered, wiki 45→50 with first cross-pollination filing on entry #50. No in-flight items. Session-end shutdown per startup.md S2c.\",\"timestamp\":\"2026-04-29T15:23:29.830Z\"}",
-    "timestamp": "2026-04-29T15:23:29.830Z",
-    "read": true
   }
 ]

@@ -67,11 +67,5 @@
     "summary": "PR #115 merged 049f766e",
     "timestamp": "2026-04-29T14:21:19.653Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777476212178@brunel\",\"from\":\"team-lead\",\"reason\":\"Session 20 wrap. All container-infra work closed: tunnel hardening (3 commits), apex Chromium deps dual-track, RC clone fresh-cloned + PR #115 merged. Two RC-infra gotchas at n=1 watch posture carried forward in my scratchpad. Session-end shutdown per startup.md S2c.\",\"timestamp\":\"2026-04-29T15:23:32.178Z\"}",
-    "timestamp": "2026-04-29T15:23:32.178Z",
-    "read": true
   }
 ]

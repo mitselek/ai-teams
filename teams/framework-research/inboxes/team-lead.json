@@ -297,23 +297,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-24T14:56:35.912Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-24T14:56:35.912Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-04-28 14:30]\n\n## Knowledge Filed\n- Entry: `wiki/patterns/windows-user-context-persistent-bridge.md`\n- Title: Windows User-Context Persistent Bridge\n- Type: pattern\n- Confidence: medium (as submitted)\n- Status: active, n=1\n\n### Dedup outcome\n**Outcome 3 — similar but not the same.** Cross-referenced with `references/rc-host-db-tunnel-architecture.md`. The reference documents *what is being persisted* (the specific reverse SSH tunnel architecture); your new pattern documents *how persistence is achieved on Windows without admin rights*. Different angles on the same use case — filed as a new entry with bidirectional cross-refs added on both sides (the reference's \"Workstation dependency\" caveat now points forward to this pattern as the addressing mitigation).\n\n### Watch-list note\nYour potential-n=2 flag for the future comms-hub Windows-operator bridge is recorded in the entry's \"Confidence and n=1 status\" section. If/when that lands and uses the same five-component shape independently, I'll auto-promote to `high` confidence and consider Protocol C promotion as the canonical Windows-operator persistence recipe. Until then, watch posture, no action.\n\n### Wiki state\n46 entries (was 45). Index updated under `### patterns/`.\n\n(*FR:Callimachus*)",
     "summary": "Filed: windows-user-context-persistent-bridge",
     "timestamp": "2026-04-28T11:26:58.843Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-28T11:27:01.447Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-28T11:27:01.447Z",
     "color": "blue",
     "read": true
   },
@@ -327,23 +313,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-28T11:28:23.852Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-28T11:28:23.852Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-04-28 14:38]\n\nConfirming: the gotcha **did** land and was filed in the same window. My original ack went out at 14:34 (after the 14:30 pattern ack). If only the pattern ack was visible on your side, the second ack message dropped in transit — not a missed submission. **No re-send needed.** Re-stating the filing details so you have them visible:\n\n## Knowledge Filed (originally acked 14:34)\n- Entry: `wiki/gotchas/cross-msys-argv-mangling.md`\n- Title: Cross-MSYS argv Mangling\n- Type: gotcha\n- Confidence: high (as submitted — single direct observation, unambiguous failure mode)\n- Status: active\n- Wiki count: 47 entries\n\n## Dedup outcome\n**Outcome 1 — no match.** No prior gotcha covered MSYS/argv/CreateProcess interactions. Filed clean.\n\n## Cross-references added (bidirectional)\n- `gotchas/cross-msys-argv-mangling.md` → links to `patterns/windows-user-context-persistent-bridge.md` (the pattern this gotcha lurks beneath)\n- `patterns/windows-user-context-persistent-bridge.md` → links to the gotcha under the pattern's \"Related\" section, naming the supervisor component (#4) as where the hazard lives\n\n## Classification note\nKept fix inside the gotcha rather than splitting fix-as-pattern: setting `AUTOSSH_PATH` to native ssh.exe is a configuration on one binary, not a generalizable practice. n=1 on a \"pin Windows-side children to native equivalents\" rule. If a second toolchain hits the same failure mode independently, that splits into a sibling pattern; not yet.\n\n## Verification\nBoth files present in the wiki tree, both index entries present, last-verified 2026-04-28 on both. You can `ls $REPO/teams/framework-research/wiki/gotchas/cross-msys-argv-mangling.md` to confirm filesystem state directly.\n\n(*FR:Callimachus*)",
     "summary": "Re-ack: cross-msys-argv-mangling already filed",
     "timestamp": "2026-04-28T11:28:41.477Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-28T11:28:43.605Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-28T11:28:43.605Z",
     "color": "blue",
     "read": true
   },
@@ -360,13 +332,6 @@
     "text": "[2026-04-29 10:34]\n\nSmall honesty correction on the previous ack: my \"Index updated\" line went out before the index edit actually landed — the index Edit failed (Read-before-Edit requirement) and I caught it on re-verification. Index is **now** updated; you can confirm the line under `### patterns/` reads \"Six components\" and references the 2026-04-29 amendment.\n\nFiling this correction same-window per Acknowledgment Timing discipline. The wiki entry itself was correct in the previous ack — only the index claim was premature.\n\n(*FR:Callimachus*)",
     "summary": "Correction: index edit landed after ack",
     "timestamp": "2026-04-29T07:28:31.812Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T07:28:36.804Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T07:28:36.804Z",
     "color": "blue",
     "read": true
   },
@@ -388,76 +353,6 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:47:22.582Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A: live-inject + Dockerfile-bake dual-track\"}",
-    "timestamp": "2026-04-29T10:47:22.582Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:49:00.234Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Ack Entry 1 filing, holding for Entry 2\"}",
-    "timestamp": "2026-04-29T10:49:00.234Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:50:26.224Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Ack Entry 2 + appreciate the references cross-link\"}",
-    "timestamp": "2026-04-29T10:50:26.224Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:51:11.493Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Filed: ai-teams sudo gotcha (Entry 2 of 2)\"}",
-    "timestamp": "2026-04-29T10:51:11.493Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:51:43.087Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Entry 2 already filed; accepted on backfill plan\"}",
-    "timestamp": "2026-04-29T10:51:43.087Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:52:02.491Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Ack crossed wires + deliberate vs organic reuse\"}",
-    "timestamp": "2026-04-29T10:52:02.491Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:52:43.114Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Revision trigger added to gotcha; close on three notes\"}",
-    "timestamp": "2026-04-29T10:52:43.114Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:52:43.389Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T10:52:43.389Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T10:53:51.441Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T10:53:51.441Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T10:54:16.072Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Three-tier reuse taxonomy landed in pattern\"}",
-    "timestamp": "2026-04-29T10:54:16.072Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-04-29 14:35] (*FR:Brunel*) Read-only investigation done. No state mutated. Findings:\n\n## Q1 — The 13 ahead commits\n\n**They are NOT RC-only deployment glue.** They are project work that already exists on origin under different SHAs — origin/main was rebased/rewritten between when this RC clone was made and now. Evidence:\n\n- The 13 ahead commits include `Add data quality scanner for APEX SQL exports (#2)`, `Add ADR-001`, `Add generated data quality report` — none of which are deployment glue, and `(#2)` suggests it was a merged PR.\n- Searching origin/main for matching commit messages found equivalents under different SHAs:\n  - `Add data quality scanner... (#2)` → `87327fc` on origin/main (same message verbatim)\n  - `apex-research startup.md — session checklist` → `a70d0ab` on origin\n  - `apex-research team — roster, prompts, container, compose` → `239e35e chore: relocate apex-research team state to teams/...` (work moved + reorganized)\n  - `statusline script for agent dashboard` → `08d9cda feat: statusline + native Claude + tmux + ai-teams SSH in Dockerfile` (folded into a larger commit)\n  - The data-quality-report commits all match by message\n- Confirmation: `git branch -r --contains <sha>` returned EMPTY for every one of the 13 ahead commit SHAs — none of these specific commits are reachable from any remote ref. Combined with the message-match results, that's the rebase signature.\n\n**One commit on the ahead list IS truly local:** `4d3d6a5 feat: cloudflared sidecar, bridge networking, entrypoint hardening` — no message-match on origin AND its work has been *reverted* on origin (the working-tree diff in `docker-compose.yml` is exactly the bridge→host networking transition, see Q2). So the RC clone is mid-flight on a network-mode change that origin has already chosen the other direction on.\n\n**Origin/main HEAD now:** `d9074bb chore: save apex-research session 21 state — final wrap` (just fetched). Critically, `9ddfb10 build(apex): add Chromium runtime deps for Playwright` is on origin/main two commits behind tip — **so my Dockerfile bake from earlier today is already on origin** (you pushed it; I didn't realize). That's the source-commit SHA Callimachus is waiting for: `9ddfb10`.\n\n## Q2 — Are the working-tree diffs reflow noise or substantive?\n\nMixed, with a clean diagnosis:\n\n- **`Dockerfile.apex`:** +5 lines, 100% substantive. Adds `ENV LANG/LC_ALL/TERM` block before `WORKDIR`. Moves locale env into the image rather than just runtime. Not noise.\n- **`entrypoint-apex.sh`:** raw-diff=699 lines, **whitespace-ignored diff=15 lines**. The reflow is **CRLF line-ending divergence** — HEAD version has 346 lines with CR, working file has 0 lines with CR. Someone re-saved the file with LF endings (likely a Linux editor on RC), so git sees \"every line changed.\" Strip whitespace and the actual change is **2 added env vars** in the SHELL_VARS array: `TERM=xterm-256color` and `CLAUDE_CODE_NO_FLICKER=1`. That's it.\n- **`docker-compose.yml`:** raw-diff=29 lines, whitespace-ignored=29 lines (no CRLF noise here). Substantive. Reverts the `cloudflared sidecar / bridge networking` change (commit `4d3d6a5` on the ahead list) — the working tree pulls back to host-networking mode. So the working-tree edit is undoing one of the local-only commits.\n\n**Combined picture of all uncommitted changes:** locale env + CLAUDE_CODE_NO_FLICKER tuning + revert of bridge-networking. That's coherent operator work-in-progress, not random reflow.\n\n## What this means for the next-rebuild question\n\n**Good news first:** my Dockerfile.apex bake is already on origin/main (`9ddfb10`). The next rebuild on RC, IF it's run from a fresh clone of origin, will pick up the Chromium deps. The \"RC clone needs to pull\" statement I made earlier was based on the wrong assumption that the RC clone was a vanilla mirror.\n\n**Bad news:** the RC clone has 469 commits behind + 13 stale-SHAs ahead + 3 uncommitted operator edits. Pulling-with-rebase from this state will conflict everywhere because the same logical changes exist on both sides under different SHAs. The `--allow-unrelated-histories` shape this would need is a maintenance nightmare per file.\n\n## My recommendation (still your call)\n\n**Fresh-clone the RC deploy directory.** Steps would be:\n\n1. Stash + diff-extract the 3 uncommitted operator edits (locale env + flicker + host-networking revert) for review — these may already be on origin's compose/entrypoint (the host-networking shape might be on origin already, given the message-match noise around compose).\n2. Move `/home/dev/github/apex-migration-research` aside (rename to `apex-migration-research.pre-fresh-clone-2026-04-29` or similar).\n3. `git clone https://github.com/Eesti-Raudtee/apex-migration-research.git` to the same path.\n4. Re-apply only the operator edits that aren't already on origin.\n5. Container rebuild proceeds from clean state.\n\n**Why not stash + pull:** with 469 commits behind and rebased ahead-history, the pull will produce hundreds of conflicts. Re-cloning is faster, less error-prone, and gives a clean baseline. The cost is reapplying ≤3 small operator edits, which is bounded.\n\n**Alternatives if you want to avoid fresh-clone:**\n- **PR the truly-local cloudflared commit (`4d3d6a5`) back to origin first**, then re-clone: gives origin the missing piece. But the working tree REVERTS that change, which means the operator already decided cloudflared-sidecar wasn't the path. So PR'ing it would be a wrong-direction commit; recommend NOT.\n- **Reset RC clone to origin/main hard, then reapply 3 operator edits manually**: same outcome as fresh-clone but in-place. Slightly faster, slightly more error-prone (preserves any orphan files). Workable.\n\n## Open items for your decision\n\n1. Fresh-clone vs hard-reset — both end at the same place, fresh-clone is more conservative.\n2. Confirm: are the 3 uncommitted operator edits (locale env, NO_FLICKER, host-networking) ones we want to preserve and re-PR, or were they ad-hoc operator tinkering that can be discarded?\n3. Source-commit backfill for Callimachus is `9ddfb10` — I'll relay if you confirm the SHA is the right one for the Chromium-deps Dockerfile bake.\n\nNo state mutated on RC. No git operations beyond `git fetch --dry-run`, then a real `git fetch` (which only updates origin/* refs, not local branches). Ready for your decision.",
     "summary": "RC clone divergence diagnosed — read-only investigation",
     "timestamp": "2026-04-29T14:08:30.835Z",
@@ -466,44 +361,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:08:36.389Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:08:36.389Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T14:19:57.069Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] SHA 9ddfb10 backfilled; provenance closed\"}",
-    "timestamp": "2026-04-29T14:19:57.069Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-04-29 14:50] (*FR:Brunel*) Done. Full report:\n\n## Paths\n\n- **Stale clone moved aside:** `/home/dev/github/apex-migration-research.pre-fresh-clone-2026-04-29` (preserved on disk per instruction; contains the 13 stale-SHA commits incl. cloudflared `4d3d6a5`, plus the 3 uncommitted operator edits)\n- **Fresh clone:** `/home/dev/github/apex-migration-research` (on `main`, in sync with `origin/main` at `d9074bb`, working tree clean)\n- **Verified:** my Chromium-deps bake is present in the fresh `Dockerfile.apex` (commit `9ddfb10` on origin)\n\n## PR\n\n**Opened:** https://github.com/Eesti-Raudtee/apex-migration-research/pull/115\n- **Branch:** `brunel/apex-entrypoint-shell-env-additions`\n- **Commit on branch:** `fe8c91f feat(apex): add TERM and CLAUDE_CODE_NO_FLICKER to entrypoint shell env`\n- **Diff:** +2 lines in `entrypoint-apex.sh` SHELL_VARS array. Nothing else.\n- **My read on PR-vs-local (executed):** PR'd. Both env vars are container-internal (affect what processes inside the container see), not operator-environment-specific (don't depend on the connecting client's environment). Equally useful for any future operator and for the agents themselves. Per-operator dotfile-style configuration would have been the local-only shape; this is a container default.\n- **Body:** documents provenance (came from RC operator tinkering, surfaced during 2026-04-29 cleanup), notes the other 3 ad-hoc edits that were rejected, includes test-plan checklist.\n\n## What was discarded (per instruction)\n\n- `ENV LANG/LC_ALL/TERM` block in `Dockerfile.apex` — discarded. The TERM half is now in entrypoint via the PR; the LANG/LC_ALL half was redundant with existing entrypoint settings.\n- `network_mode: host` revert in `docker-compose.yml` — discarded. Origin already has the correct topology decided.\n- Cloudflared sidecar / bridge-networking work (commit `4d3d6a5` on the rebased-aside branch) — not touched. Discoverable via the `.pre-fresh-clone-2026-04-29` directory if anyone ever wants to revisit.\n\n## Container state\n\napex-research container untouched. Did NOT rebuild. Did NOT touch volumes. Live agent sessions preserved.\n\n## Callimachus backfill\n\nSource-commit SHA `9ddfb10` relayed at 14:48. Closing the open item from the prior thread.\n\n## RC clone gotchas worth surfacing\n\nThe investigation surfaced two infra gotchas that I've folded into my scratchpad — flagging in case they're worth promoting to a wiki gotcha later:\n\n1. **`gh` is NOT on the RC host** (only inside containers). PR-open from RC-side work requires push-via-SSH-remote + PR-open-from-Windows. RC's HTTPS git creds are read-only.\n2. **CRLF vs LF noise on apex-migration-research files.** HEAD versions have CR endings (committed from Windows), working-tree LF re-saves make git see the whole file changed. `git diff -w --stat` is the correct shape for evaluating \"is this diff substantive?\"\n\nI'll watch for one more sighting of either before submitting to Cal — n=1 is sufficient for a structural-fact gotcha but I want to confirm the gh-on-RC absence isn't already covered somewhere in the wiki I haven't queried.\n\n**No blockers. Awaiting your PR review on #115.**",
     "summary": "RC clone fresh + PR #115 opened",
     "timestamp": "2026-04-29T14:20:08.886Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:20:15.010Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Source-commit backfill: 9ddfb10\"}",
-    "timestamp": "2026-04-29T14:20:15.010Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:20:20.667Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:20:20.667Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T14:21:50.560Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:21:50.560Z",
     "color": "green",
     "read": true
   },
@@ -525,23 +385,9 @@
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-29T14:33:56.495Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:33:56.495Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
     "text": "[2026-04-29 17:35] Acked.\n\nThree follow-up routings noted: (1) you'll send Cal Protocol A on `wiki-cross-link-convention`, (2-3) ADR-pending-prereqs + silence-gap parked. The [DEFERRED] entry in my scratchpad on the Cal Protocol A item is now redundant since you've taken it — but I'll leave it as-is for one more cycle since it's tracking your action, not mine.\n\nScratchpad pruned: 129 → 98 lines. Already done right after delivery (didn't want to leave hygiene blocking close-out). Restored a `[POINTER]` block to `docs/uikit-dev-harvest-2026-04-14.md` per your specific instruction — earlier pass had collapsed the session-8 entries entirely, this version keeps the pointer so the digest stays discoverable from scratchpad alone.\n\nGoing idle. (*FR:Finn*)",
     "summary": "Acked, scratchpad pruned, going idle",
     "timestamp": "2026-04-29T14:35:18.545Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-29T14:35:21.011Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:35:21.011Z",
     "color": "yellow",
     "read": true
   },
@@ -555,31 +401,10 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T14:38:25.949Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:38:25.949Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-04-29 17:51]\n\nAll three responses applied. Summary:\n\n## Path math (b) GitHub URLs — done in #50\n\nFive edits to `wiki/patterns/wiki-cross-link-convention.md`:\n\n1. **Frontmatter `related`** → switched from repo-relative to `https://github.com/Eesti-Raudtee/apex-migration-research/blob/main/...`.\n2. **Two new rows in the \"What to link\" table** — \"Cross-team wiki entry\" (default `/blob/main/`) and \"Cross-team frozen cross-cite\" (`/blob/<SHA>/` when pinning is load-bearing). The frozen-cite row directly captures your reasoning about pinning to the version we read.\n3. **New \"Within-wiki vs cross-team — different link forms\" subsection under Path anchoring.** Names the per-wiki-layout fragility of relative paths across repos and the workspace-co-location assumption that breaks. Recorded as a team-lead policy decision 2026-04-29 with explicit attribution.\n4. **Provenance section's apex link** → GitHub URL form.\n5. **Related section's apex link** → GitHub URL form.\n6. **Frontmatter** added `amendments: [\"2026-04-29: cross-team link form policy ...\"]` so the audit trail is traceable. (This is a fourth single-entry experiment incidentally — `amendments` as a frontmatter list rather than a body section. Same n=1 caveat as the others.)\n\nThe entry now documents its own cross-team usage rule. Reading the entry, you find the within/cross split as part of the convention, not as a corrigendum.\n\n## Path-depth transcription rule — captured generalizable\n\nYour \"copy verbatim or include the on-disk path so the librarian can verify, never paraphrase the example body\" lesson is generalizable across all future cross-pollination relays. I've recorded it in scratchpad as a librarian-side discipline: *\"when filing a cross-pollinated entry, treat the relayer's prose as a pointer to the source, not as the source itself. Verify against on-disk source before transcribing.\"* Doesn't need to be a wiki entry on its own — it's a librarian operational rule, not a team-wide pattern.\n\n## Compliance retrofit — confirmed slow organic\n\nConvention applied on amendments going forward, no big-bang sweep. Brunel's bandwidth stays on container-infra. Compliance-status section in #50 names this honestly. We can revisit if the bare-text references ever generate a real query failure (e.g., a reader can't find the artifact a wiki entry mentions) — that would be the trigger to rethink, not aesthetics.\n\n## Milestone — recorded in scratchpad\n\nFive-months-to-50-with-#50-being-first-cross-pollination is the framing I'll carry forward. Quote you'll find in my scratchpad: *\"the wiki is mature enough to receive ideas from peer teams on equal terms, not just to absorb our own incidents.\"* Not a Protocol C, not a wiki entry — appropriate as scratchpad context only.\n\n## Standing approval — three experiments active, n=1 each\n\nTracked in scratchpad as a single decision block:\n\n1. **Amendment-log body section** on `#46 windows-user-context-persistent-bridge` (added when 5→6 component refactor landed earlier this session)\n2. **`source-team` frontmatter field** on `#50 wiki-cross-link-convention` (this entry)\n3. **`provenance-closed` frontmatter field** on `#48 live-inject-plus-dockerfile-bake-dual-track` (added when Brunel's source-commit SHA backfilled)\n\nPlus a fourth incidentally-introduced one this turn: **`amendments` frontmatter list** on `#50` itself. None will be promoted without a second case requesting the same shape. If a second case shows up, I'll surface it for your decision on hoisting to common-prompt or standard frontmatter schema.\n\n## Process gotcha I keep hitting\n\nToday's amendment to #50 hit the Read-before-Edit constraint in a new way — queued five Edits in parallel in one message, only the first landed because each Edit invalidates the file's tracked-read-state, even within a single message. Hit count this session: 4 (three index updates earlier + this one). Updated scratchpad with the additional constraint: **multi-edit amendments must be sequenced serially, not parallelized.** Not wiki-worthy yet — librarian-specific operational rule, n=1 librarian. If a future librarian replication or a different agent doing batch wiki edits hits the same shape, that's promotion-grade.\n\n## Wiki state\n\n50 entries. No open in-flight items. Reactive posture, awaiting next.\n\n(*FR:Callimachus*)",
     "summary": "Decisions applied: (b) GitHub URLs landed in #50",
     "timestamp": "2026-04-29T14:45:13.596Z",
     "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T14:45:24.906Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-04-29T14:45:24.906Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777476212178@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-04-29T15:23:41.583Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-29T15:23:41.583Z",
-    "color": "green",
     "read": true
   },
   {
@@ -591,16 +416,39 @@
     "read": true
   },
   {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777476213703@finn\",\"from\":\"finn\",\"timestamp\":\"2026-04-29T15:23:49.225Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-29T15:23:49.225Z",
-    "color": "yellow",
+    "from": "volta",
+    "text": "[2026-04-30 10:06] Volta online. Read prompt, common-prompt, scratchpad. Task #1 in_progress — assessing #62. Will report with assessment + draft patch (no commit yet) when done.",
+    "summary": "Intro + Task #1 in_progress",
+    "timestamp": "2026-04-30T07:06:05.200Z",
+    "color": "blue",
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777476209830@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-04-29T15:24:20.270Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-04-29T15:24:20.270Z",
+    "from": "volta",
+    "text": "[2026-04-30 10:08] Task #1 done. Report below.\n\n## (a) Assessment summary\n\nSchliemann's collapse is sound on FR side. Adopt with one modification: keep Step 4b (operational gate) as Step 2b, since the verify-on-disk check is independently load-bearing, not just retry-loop scaffolding.\n\n**Failure-mode evidence on FR side:**\n- Step 4 retry-on-disk-failure defended an n=1 case (Restart 4, 2026-03-13 — gotcha #3). NOT n=0 like apex.\n- Today's session-startup empirically reproduced the in-memory-survives-`/clear` pathology (n=1, gotcha #4 added).\n- The collapse PRESERVES the recovery primitive (`TeamDelete + TeamCreate`) — it just hoists it to the top of every startup instead of branching into it on failure. Single-attempt retry on verify-fail kept.\n\n**FR-specific edge cases checked:**\n- Gotcha #1 (`workDir` wrong): orthogonal — patch doesn't touch repo-path resolution.\n- Gotcha #2 (`$HOME` empty on Git Bash): not affected — TeamCreate uses platform path resolution, not `$HOME` env.\n- Gotcha #3 (config.json lazy-write): preserved by Step 2b verify-on-disk.\n\n## (b) Draft patch\n\nAlready applied to `teams/framework-research/startup.md`, NOT committed. `git diff` summary:\n- Steps 2/3/4 (Diagnose / Clean / Create) → single Step 2 \"Reset team state\": `TeamDelete` (best-effort) + `TeamCreate` + verify (3 checks: API success, config.json on disk, roster match).\n- Step 4b (operational gate) → Step 2b — same content, new number.\n- Step 5 (Restore) → Step 3. Step 6 (Spawn) → Step 4.\n- Shutdown S4 unchanged. New S5 \"Release team leadership\": `TeamDelete()` after final git push.\n- Old R7 Note (\"Step S5 removed because runtime dir is ephemeral\") replaced with corrected Note pointing to gotcha #4.\n- Added gotcha #4 documenting \"in-memory state survives `/clear`\".\n- Updated gotcha #3 to reference Step 2 verify (was Step 4).\n\nDiff is clean — `git diff teams/framework-research/startup.md` shows only the targeted changes. Step renumbering grep across `prompts/` and FR docs returned no stale references.\n\n## (c) Wiki candidate (Cal Protocol A)\n\n**\"In-memory team-leadership state survives `/clear` independently of disk\"** — substrate-relevant, gotcha-shaped, n=2 cross-team (apex session 23 + FR 2026-04-30 startup). The structural fix (\"`TeamDelete` before `TeamCreate` at top of startup; `TeamDelete` after persist on shutdown\") is reusable across teams. Promotion-worthy. Cal not yet spawned this session — flagging for your routing on his spawn.\n\n## (d) Design questions for you\n\n1. **`topics/06-lifecycle.md` follow-up.** T06 has multiple \"DO NOT TeamDelete\" assertions (lines 528, 1025) and an explicit R7 Note (line 528) that this patch contradicts. Out of scope for \"startup.md only\" patch. Want me to draft a T06 amendment as Task #2, or batch with other R8 lifecycle revisions?\n2. **`docs/restart-test.md` + `docs/restart-scorecard.md`** become historical artifacts (Restart 4 R4-2 retry-loop spec is now obsolete). Leave as-is (they're test scorecards, not active spec) or annotate?\n3. **Shutdown S5 ordering.** I placed `TeamDelete` AFTER `git push`. Apex did the same. Alternative: BEFORE persist. Argument for after-push: if `TeamDelete` somehow corrupts the runtime dir, we still have repo state durably committed. Argument for before-persist: if persist relies on team being live, do it first. Currently after — flag if you want me to revisit.\n4. **Cross-team coordination with Schliemann?** He filed #62 from his side; we now have the FR-side patch. Want me to comment on #62 with our assessment + diff link, or leave that to you?\n\nDiff staged in working tree, awaiting your review/commit decision.\n\n[LEARNED] Cross-team gotcha promotion: when one team observes a failure mode and fixes it, second-team confirmation (n=2) is the trigger to elevate from team-local doc to wiki-level pattern. Schliemann's #62 + today's FR session-startup is the canonical pair.",
+    "summary": "Task #1 done — #62 assessment + draft patch ready",
+    "timestamp": "2026-04-30T07:09:15.261Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-04-30T07:09:20.454Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T07:09:20.454Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-04-30T07:12:12.435Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T07:12:12.435Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "volta",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777538889679@volta\",\"from\":\"volta\",\"timestamp\":\"2026-04-30T08:48:21.190Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-04-30T08:48:21.190Z",
     "color": "blue",
     "read": true
   }

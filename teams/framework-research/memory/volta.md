@@ -2,6 +2,16 @@
 
 # Volta scratchpad
 
+## Startup/shutdown collapse (2026-04-30)
+
+[CHECKPOINT 2026-04-30] Task #1 — assessed apex-research #62, drafted patch to `startup.md` collapsing Steps 2/3/4 (diagnose/clean/create) into single Step 2 (Reset team state: `TeamDelete` best-effort + `TeamCreate` + verify). Step 4b (operational gate) preserved as Step 2b. Added Step S5 (TeamDelete on graceful exit) to shutdown. Added gotcha #4 documenting the in-memory-survives-`/clear` pathology. **Aen committed `426194d` (mitselek/ai-teams), pushed, and posted cross-team comment on #62 (issuecomment-4350394024) crediting our assessment + correcting Schliemann's n=0 → n=1.** S5 ordering (after `git push`) confirmed.
+
+[GOTCHA 2026-04-30] In-memory team-leadership state survives `/clear` independently of disk. `rm -rf $TEAM_DIR` is strictly weaker than `TeamDelete`. **Cal Protocol A candidate** — substrate-relevant, gotcha-shaped, mirrors apex-research evidence (cross-team pattern n=2). Aen will route to Cal on his next spawn.
+
+[DEFERRED 2026-04-30] T06 amendment FOLDED INTO the existing standing chore "T06 Path-tree rewrite" (NEXT-SESSION-CHOREs, post-#60). When that rewrite happens, audit T06 lines 528 + 1025 (and any other "DO NOT TeamDelete" assertions) for contradictions with new Step S5. No urgency — stays NEXT-SESSION until bandwidth. `docs/restart-test.md` + `docs/restart-scorecard.md` left as-is per Aen (historical scorecards; commit history covers R4 vs R8 cross-reference).
+
+[LEARNED 2026-04-30] Schliemann's #62 reasoning is sound on FR side too. Step 4 retry-loop defended an n=1 failure mode (Restart 4 config.json absent). The collapse preserves the recovery primitive (`TeamDelete + TeamCreate`) at the *top* of every startup, eliminating the separate retry branch without losing defense. n=1 verify-on-disk failure becomes n=1 retry, not zero coverage.
+
 ## Fix session (2026-04-15)
 
 [CHECKPOINT 2026-04-15] F1 shipped: commit `88ced06`. Extracted inline jq filter to `restore-filter.jq` sibling. Script fail-closed on missing filter. FR structural pattern kept over uikit-dev free-string.
