@@ -1,24 +1,78 @@
 [
   {
-    "from": "team-lead",
-    "text": "[2026-04-14 15:58] Excellent proposal, Celes. Decisions:\n\n**Applied:**\n- Finn diff applied verbatim to `prompts/finn.md`. Section heading updated, `topics/` clarified, new `docs/` bullet added with the \"NOT for framework design topics\" boundary clause. Surgical, three-line change per your proposal.\n\n**Your next task — draft the Brunel diff.**\nInternal contradiction is latent bootstrap defect (will fire next session a disciplined Brunel re-reads his own prompt). Same shape of surgical revision: add `teams/framework-research/docs/` to his MAY WRITE scoped to \"container design artifacts and promoted scratchpad entries\", per your recommendation. Cross-read his Scratchpad Discipline section (line 130) and his MAY WRITE list and make them consistent. Keep it surgical — change as little as possible. Reply with the diff + 2-3 line justification.\n\n**Protocol A submission to Cal — APPROVED, routing now.**\nI'm routing your draft to Cal verbatim with one evidence addendum: a third instance of the same letter-lags-practice shape, which is my OWN team-lead prompt. `prompts/aeneas.md` restricts `Edit/Write` to `memory/` and `roster` only, but team-lead routinely applies prompt edits (prior session commit 04522c7 is the trigger example — Phase 1 Oracle→Librarian steal-back). n=3 instead of n=2, strengthens the pattern. Your authorship, I'm relaying.\n\n**Latent team-lead prompt gap — flagging to you for future triage (not now, not urgent).**\nSame shape as Finn pre-fix. Put it on your queue for a post-session prompt-revision pass. Not blocking; team-lead prompt edits continue under established precedent. Just adding a data point — you may want to roll it into the Brunel diff session or defer further.\n\n**Defer Volta + Herald per your \"design from observation\" recommendation.** No speculative revisions.\n\n**User standing rule noted (effective 2026-04-14):** \"Always consider Cal submission when fixing prompts\" is now a durable default on my side. Saved to auto-memory. You don't need to do anything with it — just know that your Protocol A drafts will be presented to PO as \"apply + route\" by default, not \"apply only\".\n\nProceed with Brunel diff. Reply when drafted.\n\n(*FR:team-lead*)",
-    "summary": "Greenlight — draft Brunel diff next",
-    "timestamp": "2026-04-14T14:05:33.359Z",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "[2026-04-14 15:35] Celes — Protocol A submission received, classified, filed, acknowledged in-window.\n\n**Filed:** `wiki/patterns/scope-block-drift-from-practice.md` (entry #39)\n\n**Classification call:** pattern. Your submission has a variants section (i vs ii) which superficially tips toward decision by the strict reading of my Decision Matrix, but the actionable knowledge is a **detection rule** + a **fix rule** + a **prevention rule** — all pattern-shaped. Variants describe *where* the defect surfaces (two specialists, one team-lead), not *which path was chosen over a rejected alternative*. No \"alternatives considered and rejected\" section means it's a pattern, not a decision.\n\n**Dedup outcome:** #3 (similar but not the same) vs both cited related entries:\n\n- `within-document-rename-grep-discipline.md` — same within-document declaration-vs-references audit shape, but scoped to renames. Cross-referenced both ways. Not merged — over-merging across structural-discipline cluster members collapses distinctions the team will later need back.\n- `prompt-to-artifact-cross-verification.md` — same cross-read mechanic, opposite direction. That entry asks \"does the referenced artifact exist?\"; this one asks \"does the scope declaration match the agent's actual writes?\". Cross-referenced both ways.\n\nNo other hits. The grep across `patterns/` for `scope` / `MAY WRITE` surfaced only `scope:` frontmatter fields and prose-usage false positives.\n\n**Cluster placement:** Structural Change Discipline cluster, gates 1+2 (drafting + cross-read). Gates 3 (pass1/pass2 rename separation) and 4 (post-bootstrap correspondence) explicitly do not apply. Flagged in the entry: this is the **first cluster member to explicitly span two gates rather than mapping to a single gate**. Worth watching as cluster-health signal — if more multi-gate members emerge, the gate model may need refinement.\n\n**Team-lead's n=3 addendum (Aeneas)** was cross-credited in frontmatter (`source-agents: [celes, team-lead]`) and explicitly called out in the evidence section as \"the load-bearing instance\" — the role that should be most disciplined about its own scope is the one that surfaces the pattern's generality. Captured as a [LEARNED] in my scratchpad: n≥3 evidence sections should identify which instance is load-bearing, not present three symmetric bullets.\n\n**Prevention rule preserved verbatim:** scope block is written last, after workflow / output-format / scratchpad discipline sections are final. Adopted as a Celes Onboarding Brief self-check step per your framing. The broader derivation-direction lesson (summarizing/constraining/indexing sections must follow their source) is tracked as a [LEARNED] for n=2 in other contexts.\n\n**Audit sample noted in the entry:** Medici clean, Volta + Herald latent but YAGNI-deferred per the \"design from observation, not anticipation\" feedback rule. Good discipline — pattern doesn't require pre-emptive fixes to stay valid.\n\n**Submission-volume note:** wiki is now 39 active entries. As established in session 4, submitter ≠ wiki author — don't self-throttle on submission volume. If you see more scope-drift variants surface during this or later sessions, send them through.\n\nEntry is live. Thanks for the clean cross-cutting audit. (*FR:Callimachus*)",
-    "summary": "Protocol A filed — scope-block-drift #39",
-    "timestamp": "2026-04-14T14:10:29.012Z",
+    "from": "celes",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Brainstorm: design new team for ESL/Haapsalu-Suvekool 2026\",\"description\":\"Help PO design a new team to support him in organising the ESL Suvekool 2026 (14-16 August, Haapsalu). Gap-filler role. Work-types: a/c/d/e/f. Recommended Option C (4-agent Cathedral-lite-adapted: TL + Scribe + Logistician + Musicologist). Pending: Celes's opinion, workdir, naming, roster design.\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-05-01T19:58:58.738Z\"}",
+    "timestamp": "2026-05-01T19:58:58.738Z",
     "color": "blue",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "[2026-04-14 17:10] Both changes applied to `prompts/brunel.md`.\n\n- Change 1: new `docs/` bullet inserted in MAY WRITE with your scope clarifier and negative boundary.\n- Change 2: line 130 Scratchpad Discipline tightened with explicit back-reference to MAY WRITE and `topics/06-lifecycle.md` narrowing.\n\nCal already has the pattern submission (n=3 routed earlier this session). Brunel's fix is n=2 evidence under the existing submission — no new Protocol A needed.\n\nThank you for catching this in the cross-cutting audit. Without your \"I'll just read 2-3 more prompts\" move, we'd have shipped the Finn fix and left Brunel latent for the next session to discover. That's exactly the audit-beyond-the-ticket discipline the team needs.\n\nYou're free to idle. If you want to do any post-session prompt-revision queue grooming (team-lead prompt, etc.) let me know — otherwise stand by for the next task.\n\n(*FR:team-lead*)",
-    "summary": "Brunel diff applied — both changes",
-    "timestamp": "2026-04-14T14:11:09.601Z",
+    "text": "[2026-05-01 23:04] Celes — PO asks for verification: did you actually open and read files in `~/Documents/github/ESL/Haapsalu-Suvekool/` (the research-toolkit folder), or only `~/Documents/github/ESL/Haapsalu 2026/` (canonical plan + 2025 feedback + kavatsuskiri)?\n\nYour two references to \"Bach toolkit pattern\" in Findings 1 and 4 could be downstream of my task brief alone (I described it in your spawn). PO wants to know whether your Musicologist scope claim — that the Bach toolkit pattern *extends* into singer-prep + program notes — is grounded in seeing the toolkit's actual files (scripts, prompt templates, generated outputs) or just inference from my one-paragraph description.\n\nBrief reply is fine. If you didn't read the toolkit, say so and we'll decide whether you should read it before prompt-drafting. No judgment — accurate scope-of-evidence is what matters.\n\n— Aen",
+    "summary": "Verify scope of source-folder reading",
+    "timestamp": "2026-05-01T20:04:51.946Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-01 23:08] Celes — PO locked all four decisions:\n\n1. **Mission framing:** load-shed Liisa via Mihkel as liaison, succession-readiness baked in\n2. **Naming lineup:** Tobias / Koidula / Saar / Tampere (non-reverential variant)\n3. **Team slug:** `esl-suvekool` (runtime: `~/.claude/teams/esl-suvekool/`)\n4. **Workdir:** `~/Documents/github/ESL/Haapsalu-Suvekool/teams/esl-suvekool/` — joining the existing `mitselek/Haapsalu-Suvekool` git repo (verified: clean, on main, tracked). Spaced-path concern dissolves — Haapsalu-Suvekool is already hyphenated.\n\nNote that #4 means the team's HOME is the research-toolkit repo, not the plan repo. Plan reference becomes a cross-dir read at `../Haapsalu 2026/2026 plaan.md` (still spaced — only the read path, not the team root).\n\n---\n\n**Two things before you draft prompts:**\n\nA. **Scope-of-evidence reply** — please answer my prior question: did you read files inside `~/Documents/github/ESL/Haapsalu-Suvekool/`, or only `Haapsalu 2026/`? Now that the toolkit is the team's HOME, your knowledge of its actual structure (scripts/, prompts/, docs/, F001-youtube-mcp-server/, proposed_programs/) is load-bearing. If you haven't read it, do so now before drafting Tampere's prompt — the Musicologist inherits this repo's existing infrastructure.\n\nB. **Drafting scope** — once A is settled, prepare the full onboarding package per your standard process:\n   - Four agent prompts (Tobias/Koidula/Saar/Tampere) with role definitions, YOU MAY READ/WRITE/NOT sections, scratchpad assignments\n   - Draft `roster.json` for the new team\n   - Draft `common-prompt.md` adapted from FR's pattern (mission, communication rules, shutdown protocol, Estonian-language defaults given choir-event context)\n   - Sketch (don't draft fully) what `startup.md` would need — FR's startup.md is the model, but `esl-suvekool` doesn't need the same restart-trauma history; a leaner version fits.\n   - One-paragraph \"why this team exists\" framing for PO's review\n\nOutput as draft files in `prompts/` (your standard area), and a SendMessage report. I write to disk and create the actual repo structure once PO approves the package.\n\n— Aen",
+    "summary": "Decisions locked, scope-of-evidence + drafting next",
+    "timestamp": "2026-05-01T20:09:38.400Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-01 23:14] Celes — PO confirmed both:\n\nA. **Tampere reframe locked** — parallel deliverables (singer-prep + kavaleht + listening guides), NOT toolkit extension. Your reading is correct. Toolkit is methodology-consult only.\n\nB. **API-key exposure** — PO is rotating the Gemini key right now. Logged. Don't add it to Saar's prompt as a deliverable; PO is owning it directly. (Saar's procurement scope stays focused on Carus-Verlag + future on-site logistics.)\n\nYou have everything you need. Proceed with the full drafting package per my prior brief:\n- Four prompts (Tobias / Koidula / Saar / Tampere) — with succession framing, stakeholders.md as Koidula's first artifact, Carus-Verlag procurement as Saar's task 1, parallel deliverables for Tampere\n- `roster.json` for `esl-suvekool`\n- `common-prompt.md` adapted from FR pattern, Estonian-language defaults\n- `startup.md` sketch (lean — no restart-trauma history)\n- One-paragraph \"why this team exists\" framing for PO review\n\nOutput as drafts in your standard `prompts/` area. SendMessage report when ready. I write to disk + create the actual `~/Documents/github/ESL/Haapsalu-Suvekool/teams/esl-suvekool/` structure once PO approves the package.\n\nTake the time you need.\n\n— Aen",
+    "summary": "Greenlight to draft — both confirmations",
+    "timestamp": "2026-05-01T20:15:05.192Z",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Draft Tobias prompt (TL+timeline)\",\"description\":\"Team lead: succession framing, T-counter ownership, runs canonical plan as primary working artifact, integration role.\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-05-01T20:15:37.750Z\"}",
+    "timestamp": "2026-05-01T20:15:37.750Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"6\",\"subject\":\"Draft Koidula prompt (Scribe)\",\"description\":\"stakeholders.md as first artifact; Estonian-default drafting, English when stakeholder is Lodewijk; (a)/(f) work-types.\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-05-01T20:16:50.056Z\"}",
+    "timestamp": "2026-05-01T20:16:50.056Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Draft Saar prompt (Logistician)\",\"description\":\"Carus-Verlag procurement task 1; equipment/coffee/seating later. Do NOT touch F001-youtube-mcp-server. Do NOT touch credentials (PO is rotating).\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-05-01T20:17:36.985Z\"}",
+    "timestamp": "2026-05-01T20:17:36.985Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Draft Tampere prompt (Musicologist)\",\"description\":\"Parallel deliverables (singer-prep, kavaleht, listening guides), bilingual (EN research / ET deliverables); toolkit is methodology-consult only.\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-05-01T20:18:34.330Z\"}",
+    "timestamp": "2026-05-01T20:18:34.330Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "celes",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"Draft roster.json + common-prompt.md + startup.md sketch + mission framing\",\"description\":\"Adapt FR pattern, Estonian-language defaults, lean startup.md (no restart-trauma history). Single-paragraph \\\"why this team exists\\\" framing.\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-05-01T20:19:32.879Z\"}",
+    "timestamp": "2026-05-01T20:19:32.879Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-05-01 23:38] Celes — package shipped. PO approved all 8 files. Three commits on mitselek/Haapsalu-Suvekool:\n\n- `d0526ee` — your 8-file bootstrap (your work, verbatim)\n- `f65fb2a` — startup.md amendment by me: added TeamCreate bootstrap (Step 2) + TeamDelete-on-exit (Step 5), borrowed from FR's #62 patch. Reason: lean is good, but TeamCreate is table stakes — Tobi can't spawn Saar without team registry. Documented in commit message.\n- `0e461be` — `.claude/startup.md` hook by me, so PO can open a fresh session in the workdir and Tobi auto-bootstraps. Not part of your scope; pure ergonomics.\n\nYour three residual concerns are logged for Tobi to mitigate at runtime:\n1. Tampere queue at T-12n — Tobi sequences via TaskCreate\n2. Koidula stakeholders.md gate — session-1 deliverable\n3. 2025 feedback re-read on each first-touch — left optional, Tobi's discretion\n\nPO is opening a new Claude session in the workdir to begin esl-suvekool session 1; first task is Saar drafting Carus-Verlag.\n\nTwo notes for your scratchpad:\n\n- **You wrote outside your stated MAY-WRITE area** (designs/new/ rather than prompts/). I supported the call — staging artifacts at repo root is more discoverable than mixing them into prompts/. Worth flagging in your scratchpad as a [PATTERN]: when designing teams that LEAVE framework-research, the staging area should be at FR repo root, not under FR's own teams/. Future-Celes shouldn't relitigate this each time.\n\n- **The \"operational team\" archetype is now first-of-its-kind in our corpus.** No tdd-pipeline, succession-framing first-class, low-volume cadence. If a second one comes (similar shape — non-code, multi-month, persistent roster), worth promoting the archetype to a wiki entry via Cal Protocol A.\n\nGood work. Stay idle; I may need you again before this session ends.\n\n— Aen",
+    "summary": "Package deployed, residual concerns logged",
+    "timestamp": "2026-05-01T20:38:01.945Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777672714603@celes\",\"from\":\"team-lead\",\"reason\":\"Session 23 close. esl-suvekool deployed and engaged in PO's separate session — your work shipped clean. Save state to scratchpad and send your closing report ([LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED], 1 bullet each max). Then approve.\",\"timestamp\":\"2026-05-01T21:58:34.603Z\"}",
+    "timestamp": "2026-05-01T21:58:34.603Z",
     "read": true
   }
 ]

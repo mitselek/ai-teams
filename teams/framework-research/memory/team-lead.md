@@ -1,5 +1,58 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 23 WRAP — 2026-05-01/02 (esl-suvekool team designed + deployed)
+
+**Goal (PO-set):** Design a new team to support PO in organising ESL Haapsalu Suvekool 2026 (concert 2026-08-16, Haapsalu Toomkirik). PO's role is gap-filler supporting Liisa Rahusoo (board lead).
+
+**Shipped:**
+
+- **8-file onboarding package** designed by Celes, deployed to `mitselek/Haapsalu-Suvekool` repo at `teams/esl-suvekool/`. Three commits: `d0526ee` (bootstrap), `f65fb2a` (startup amendment — TeamCreate + S5 added), `0e461be` (`.claude/startup.md` repo-root hook for fresh-session ergonomics).
+- **Team architecture (Option C, Cathedral-lite-adapted, all opus-4-7):** Tobi (Rudolf Tobias, TL+timeline owner), Lyyd (Lydia Koidula, Estonian scribe + stakeholders.md gate), Saar (Mart Saar, logistician — Carus-Verlag tellimus is task-1 day-1), Tamp (Herbert Tampere, musicologist — singer-prep + kavaleht + listening guides for Zelenka/Hasse/Vivaldi).
+- **Mission framing locked (PO confirmed):** "load-shed Liisa via Mihkel as liaison, succession-readiness baked in" — NOT "help Mihkel organise." Liisa announced board departure for Jan 2027 (or Apr 2027). Every artifact designed for the next Suvekool lead (not Liisa, not Mihkel).
+- **First session of esl-suvekool started by PO same evening** (in separate Claude session, Haapsalu-Suvekool/ workdir; .claude/startup.md hook auto-bootstrapped Tobi). Confirmed engaged 2026-05-02.
+
+**Workflow shape (reusable for future team designs):** PO intent → Aen brainstorming (work-types, architecture options) → spawn Celes for opinion → Celes Brilliant query for substrate → architecture + naming + workdir options → PO 4 decisions → Celes drafts package → Aen TL review → PO approval → Aen deploys (commit + push to target repo) → bootstrap hook → PO opens fresh session.
+
+[LEARNED — substrate, promotion-grade]
+
+- **Operational team archetype introduced** — first-of-its-kind in our corpus. Differentiators: no tdd-pipeline, succession-framing first-class, low-volume cadence (1-3x/week), persistent-roster-episodic-sessions. Wiki candidate (n=1, watch). Promotion trigger: a second similar team (non-code, multi-month, persistent roster) requesting same shape.
+- **`.claude/startup.md` at repo root as fresh-session bootstrap hook** — novel pattern. Lets PO open Claude in a workdir and the assistant auto-identifies as the team-lead persona, reads team config, runs startup. Cleaner than expecting PO to type bootstrap incantations every session. Wiki candidate (n=1, watch).
+- **Mutual exclusivity of team-leadership prevents in-session cross-team spawning** — confirmed empirically. Designing-team-Y from session-leading-team-X works; spawning agents into team-Y from team-X session does NOT (Agent tool with team_name=Y requires team-Y already TeamCreate'd, which conflicts). Solution: deploy team-Y artifacts + .claude/startup.md hook, hand to PO for fresh-session start.
+- **API key in cleartext caught by Celes during toolkit read** — surfaced 5-file exposure (README + BACH-TOOLS-GUIDE) + `client_secret.json` filename in `mitselek/Haapsalu-Suvekool`. PO rotated same session: new key 35178654-…, old key e8cc9b68-… soft-deleted (30-day undelete window until 2026-05-31), 4 docs cleaned to `YOUR_API_KEY_HERE`, .env gitignored, .env.example added, history rewritten (HEAD c082fd9 → 0e461be), 67 files redacted (47 VSCode + 2 gcloud + 18 misc), local git GC pruned. Substrate finding: when reading any external repo as part of team design, do a credentials sweep early.
+
+[LEARNED — process]
+
+- **Celes wrote outside stated MAY-WRITE area** (designs/new/ at FR repo root, vs prompts/ in her permission block). Aen supported the call — staging at repo root is more discoverable than mixing into prompts/. Flagged in her scratchpad as [PATTERN]: when designing teams that LEAVE framework-research, staging area = FR repo root, not under FR's own teams/. Future-Celes shouldn't relitigate.
+- **Celes's "lean startup" omitted TeamCreate bootstrap** — caught at deployment review. Lean is right principle, but TeamCreate is table stakes (not trauma history). Aen amended startup.md with FR's #62 patch pattern: `TeamDelete + TeamCreate + verify` at start, `TeamDelete()` at end. Lesson: when collapsing a checklist, distinguish "always-needed primitives" from "scar-tissue defensive steps." FR's S5 (#62 patch) is the right model — concise but complete.
+
+**Wiki candidates held (Cal Protocol A on next Cal spawn) — 2 from session 23 + 5 carried from sessions 21/22:**
+
+Session 23 new:
+1. **Operational team archetype** (no tdd-pipeline, succession-first, low-volume cadence) — n=1, watch.
+2. **`.claude/startup.md` repo-root bootstrap hook** for cross-team handoff — n=1, watch.
+
+Carried from session 22 (4) + session 21 (1):
+3. Two-stage adoption pattern (proposal-space → escalation → canonical-org-space) — substrate-relevant for future standards.
+4. `[speculative]` marker convention for cross-team handoff — defines "this is inference, please confirm."
+5. Confluence space create-perm-as-404 disguise — gotcha-shape.
+6. EntraID-not-WSO2 — substrate-fact for EVR docs.
+7. (Carried from session 21): "In-memory team-leadership state survives `/clear` independently of disk" — n=2 cross-team apex+FR. **Empirically reinforced this session** by esl-suvekool's session-1 not needing recovery (S5 worked here at end of session 22, then again at start of session 23).
+
+[DEFERRED — pending Tobi's first-week activity]
+
+- **Watch esl-suvekool session 1 outcomes** — did Saar produce Carus-Verlag draft? Did the bootstrap hook surface any issues? Did Tobi register session-1 [LEARNED] worth bringing up. PO will tell us; do not poll.
+
+## NEXT SESSION — TPS-583 watch primary (no change from session 22)
+
+1. **TPS-583 watch** — when user signals Ruth has progressed (subteam identified, page moved to V2, or both), action Stage-2: page moves V2→ITOps `I`, banner removed, v1.0, intake-template assignee filled, close TPS-583, close RFC #2 review-status.
+2. **Cal spawn (when next needed for wiki work)** — route 7 wiki candidates: 2 from session 23 (operational-team-archetype, .claude-startup-hook) + 4 from session 22 (two-stage adoption, `[speculative]` marker convention, create-perm-404 disguise, EntraID-not-WSO2) + 1 carried from session 21 (in-memory-survives-`/clear`, now n=2-empirically-reinforced).
+3. **T06 path-tree rewrite (Volta)** — also scoped to fix DO-NOT-TeamDelete contradictions on T06 lines 528 + 1025 that contradict S5 (#62 patch).
+4. **esl-suvekool feedback loop** — when PO returns from Tobi's session(s), absorb any [LEARNED] worth promoting upstream.
+5. **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event.
+6. **Ruth-team observability gap** — only on Ruth Q2/Q3 response.
+
+If PO arrives with direction, that takes priority.
+
 ## SESSION 22 WRAP — 2026-04-30 (EVR konteinerite standard shipped: Stage-0 + Stage-1)
 
 **Goal (PO-set):** Push hello-world-container PoC through corporate pipeline; end with adopted "EVR sisene konteinerite standard" + Jira intake protocol for ad-hoc dockerised installations at EVR.

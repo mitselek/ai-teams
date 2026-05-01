@@ -8,7 +8,10 @@
       "Bash",
       "Read",
       "Edit",
-      "Write"
+      "Write",
+      "mcp__brilliant__session_init",
+      "mcp__brilliant__search_entries",
+      "mcp__brilliant__get_entry"
     ]
   }
 }

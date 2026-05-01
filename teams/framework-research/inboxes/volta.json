@@ -5,11 +5,5 @@
     "summary": "#62 patch committed; design Q answers",
     "timestamp": "2026-04-30T07:11:36.788Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777538889679@volta\",\"from\":\"team-lead\",\"reason\":\"session 21 close — task complete, dogfooding new shutdown S5 procedure\",\"timestamp\":\"2026-04-30T08:48:09.679Z\"}",
-    "timestamp": "2026-04-30T08:48:09.679Z",
-    "read": true
   }
 ]
