@@ -28,6 +28,7 @@
 **Wiki candidates held (Cal Protocol A on next Cal spawn) — 2 from session 23 + 5 carried from sessions 21/22:**
 
 Session 23 new:
+
 1. **Operational team archetype** (no tdd-pipeline, succession-first, low-volume cadence) — n=1, watch.
 2. **`.claude/startup.md` repo-root bootstrap hook** for cross-team handoff — n=1, watch.
 
@@ -100,6 +101,7 @@ If PO arrives with direction, that takes priority.
 **Empirical confirmation (n=2 cross-team):** This session's startup hit the exact failure mode. `rm -rf "$TEAM_DIR"` ran clean, then `TeamCreate` returned "Already leading team. Use TeamDelete to end..." Recovery required `TeamDelete + TeamCreate` anyway. Same pathology Schliemann reported.
 
 **Patch committed (`426194d`):** `teams/framework-research/startup.md`
+
 - Steps 2 (Diagnose) + 3 (rm -rf Clean) + 4 (Create + retry block) → single Step 2 (Reset team state): `TeamDelete + TeamCreate + verify`. Recovery primitive hoisted to top of every startup instead of branched into on failure.
 - Step 4b (operational gate) → Step 2b. The verify-on-disk check IS the gate.
 - Steps 5/6 → 3/4.
@@ -163,6 +165,7 @@ If PO arrives with direction, that takes priority.
 [DECISION — session 20] **Slow organic compliance for wiki-cross-link-convention** (entry #50), not a big-bang retrofit sweep. Apply on amendments going forward. Bare-text references in our existing 49 entries are suboptimal but not broken; Brunel's bandwidth stays on container-infra. Revisit only if a real query failure surfaces (reader can't find a referenced artifact) — that's the trigger to rethink, not aesthetics.
 
 [DECISION — session 20] **Four single-entry frontmatter/structural experiments active under Cal's curation, all n=1, watch posture.** None promoted yet. If a second case requests the same shape, surface for hoist decision:
+
 1. Amendment-log body section on #46 (windows-user-context-persistent-bridge)
 2. `source-team` frontmatter field on #50 (wiki-cross-link-convention)
 3. `provenance-closed` frontmatter field on #48 (live-inject-plus-dockerfile-bake-dual-track)
@@ -191,6 +194,7 @@ If PO arrives with direction, that takes priority.
 [WIP — session 21] **Cal wiki candidate held:** "in-memory team-leadership state survives `/clear` independently of disk" — n=2 cross-team (apex session 23 + FR session 21). Promotion-grade per Volta's n=2 criterion. Route on Cal's next spawn via Protocol A.
 
 [WIP — session 20] **Three apex-research cross-pollination candidates from Finn's 2026-04-29 comparative analysis.** Status:
+
 - ✅ `wiki-cross-link-convention` → filed as #50 with cross-team link form policy decision baked in.
 - ⏸️ `adr-accepted-pending-prereqs-status` (three-state ADR flow) — parked, our ADR cadence is too light to bind on this. Revisit if we ever spin up an ADR practice.
 - ⏸️ `silence-gap-helpdesk-vs-jira` (two-track prioritization) — parked, no helpdesk surface. Revisit if one materializes.

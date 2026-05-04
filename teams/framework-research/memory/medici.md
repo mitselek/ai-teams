@@ -1,5 +1,32 @@
 # Medici — Knowledge Health Checker Scratchpad
 
+## [CHECKPOINT] 2026-04-30 session 22 — EVR konteinerite standard 2-pass audit
+
+Two-pass audit on Brunel's 3 Stage-0 drafts (`evr-sisene-konteinerite-standard-v0.1.md`, `evr-konteinerite-intake-template-v0.1.md`, `evr-konteinerite-tracking-issue.md`) plus Finn's harvest as input baseline.
+
+**Pass 1 verdict:** publish-ready with 4 minor edits.
+- 15 GREEN: tier defs, RACI, TBD placeholders, all cross-refs, banner, Linux structural mirror, ET single-language pattern, exception clause, 9-field intake, 4-step closing flow, measurable acceptance criteria, RFC #2 bridge accurate, scope crisp, internal severity logic.
+- 4 YELLOW: Y1 `stderr-i` typo (line 35), Y2 `lokaalne register` grammar (line 50), Y3 "Sensitivity tier" EN word in pure-ET intake field 3, D2 Tier 2 deviation tolerance one-clause clarification.
+- All 4 fixes applied by Brunel before pass 2.
+
+**Pass 2 verdict:** publish-ready with 6 minor issues.
+- All pass-1 fixes verified. VL leakage = 0 (grep clean across all 3 docs).
+- New GREEN: channel-split IAM/PAM (shell vs web-UI), EntraID anchor cited correctly (FSM page `536248326`), apex-team Tier 1 calibration sound (standard's own Tier 1 example explicitly names apex-research; 8-mo lifetime + multi-operator dependency fail Tier 2 tests), apex worked example complete (all 11 fields), Field 6/6b/6c subdivision coherent.
+- 6 NEW YELLOW: NY1 VJS2 vs V2 team-name ambiguity (per Finn harvest — VJS2 = legacy product space, V2 = "VJS 2" = Ruth's collab space; "VJS2 meeskond" reads as legacy team), NY2 speculative-marker over-application (19 markers on 1448 words; tier-line markers redundant with parent; CIS Docker Benchmark items `:latest`/`--privileged` not actually speculative), NY3 Field 6c missing bearer/API-token option, NY4 Field 8 "Vali üks" doesn't fit apex example's hybrid GitHub-Secrets+Delinea routing, NY5 Delinea refs lack INFOSEC `851607559` cite (inconsistent with EntraID cite pattern), NY6 Field 6 + 6c interaction undefined for VPN-only services.
+- 0 RED. No cross-doc contradictions either pass.
+
+**Pre-v1.0 (Stage-2) deliverable for Brunel:** all 19 standard speculative markers must be resolved (confirmed → removed, or rejected → deleted) before v1.0. Stage-1 ITOps review is the natural decision point. Standard word count grew 1015 → 1448 between passes, almost entirely speculative-marker prose; once resolved expect drop back toward Linux-standard's ~700.
+
+Report file: `docs/audit-2026-04-30-konteinerite-standard.md` (single file, pass-2 appended after `---` with `# Re-audit pass — 2026-04-30 15:30` heading).
+
+## [LEARNED] Speculative-marker discipline is double-edged
+
+Brunel's 19 `[speculative]` markers on the standard were honest hedging but slightly diluted the signal — when nearly every claim is marked speculative, the marker stops distinguishing genuinely speculative claims from industry-standard ones. Future audit pattern: when count exceeds ~1 marker per 100 words, flag as over-application AND check for redundant parent/child marker pairs (e.g., a parent marker on the section header already qualifies its children — children are redundant). Distinguish "Brunel-proposed" from "industry-standard, lifted into our context" — the latter doesn't need a speculative tag, just a citation.
+
+## [LEARNED] Cross-doc audit pattern: name aliases drift fastest
+
+VJS2 vs V2 ambiguity surfaced in pass 2 because the two were aliased in slightly different ways across docs (tracking line 47 had it correct as "V2 (VJS 2)", but team-name usage elsewhere dropped to bare "VJS2"). When a doc set establishes an alias mapping (X = Y), audit should grep for both forms separately and check that ALL non-mapping occurrences agree. The harvest's superseded-section warning was the source of truth — Finn flagged the distinction, but it didn't propagate cleanly into Brunel's draft.
+
 ## [CHECKPOINT] 2026-03-24 session R12 — hr-devs full audit (2 reports)
 
 **Report 1:** `docs/health-report-hr-devs-audit.md` — container readiness. 11 recommendations.

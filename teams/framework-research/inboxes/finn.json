@@ -1,9 +1,36 @@
 [
   {
+    "from": "finn",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Finn: harvest inputs for hello-world corp pipeline standard\",\"description\":\"Read-only harvest: (1) RFC #2 contents + status, (2) hello-world-container repo state at v1.2.0, (3) Confluence DevOps space publishing patterns, (4) candidate Jira project for tracking issue (not VL), (5) one existing EVR standard's structural shape. Output to docs/hello-world-corp-pipeline-harvest-2026-04-30.md + summary to team-lead.\",\"assignedBy\":\"finn\",\"timestamp\":\"2026-04-30T09:27:28.500Z\"}",
+    "timestamp": "2026-04-30T09:27:28.500Z",
+    "color": "blue",
+    "read": true
+  },
+  {
     "from": "team-lead",
-    "text": "[2026-04-29 14:35]\n\nRead it. Solid work — structured, citation-rich, conclusions backed by spot-checkable evidence. The single-commit downstream adoption finding (with their commit message explicitly naming our SHA) is the cleanest possible answer to \"did our migration design transfer.\" It did.\n\nThe bidirectional flow narrative on dual-team-dir-ambiguity (their 2026-04-13 incident → our framework-level gotcha → their later #61 adoption) is the kind of cross-team observation that's hard to surface without doing exactly this comparison. Worth carrying forward in our institutional memory.\n\nThree follow-up actions, all in my court not yours:\n\n1. **Cal Protocol A on `wiki-cross-link-convention`** — I'll send. Highest-ROI of your three candidates; we have no analog and the rule is genuinely team-agnostic.\n2. **adr-accepted-pending-prereqs-status** — parking. Our ADR cadence is light right now (most decisions go through topic files, not ADRs) so the three-state flow is a solution looking for our problem. Revisit if we ever spin up an ADR practice.\n3. **silence-gap-helpdesk-vs-jira** — parking. We don't have a helpdesk surface, so the heuristic doesn't bind on us yet.\n\nYou can stand down. Take care of the scratchpad prune (190 → 100 lines, collapse session-8 uikit-dev harvest entries to a pointer to `docs/uikit-dev-harvest-2026-04-14.md`) before going idle, then idle is fine.\n\n(*FR:team-lead*)",
-    "summary": "Comparison accepted, stand down",
-    "timestamp": "2026-04-29T14:34:32.149Z",
+    "text": "[2026-04-30 12:29] Context update — situational awareness, NOT a scope change to your harvest.\n\nPO has refined the publish strategy: instead of going directly into DevOps space, we'll **publish v0.1 as a Proposal in VJS2 (our team's space)**, then escalate through Ruth → DevOps for org adoption. Lifecycle:\n- Stage 0: Proposal in VJS2 (banner-marked \"Proposal — pending org adoption\")\n- Stage 1: Tracking issue → Ruth → escalation\n- Stage 2: DevOps accepts → page moves/cross-links to DevOps space, v1.0\n\nThis doesn't change your 5 deliverables. DevOps space (#3) is still the right place to study the EVENTUAL canonical home's publishing pattern. The \"existing standard shape to mirror\" (#5) can come from any space.\n\n**One small addition if cheap (~5 min):** while you're in Confluence, glance at VJS2 space's top-level page tree so we know what neighbourhood our Proposal will land in. Just structure, no deep reads. If it adds material time, skip it and we'll do it later.\n\nKeep going. Report when ready.\n\n— team-lead",
+    "summary": "Context update: VJS2 as Stage-0 home",
+    "timestamp": "2026-04-30T09:29:24.506Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-30 12:42] Correction from PO: our team's space is **V2** (\"VJS 2\" — collaboration, key=V2, id=1115095052), NOT VJS2. VJS2 is the legacy product space owned by the original VJS team. Naming is confusingly close due to historical reasons.\n\nQuick re-check needed for the Stage-0 placement tradeoff:\n\n1. Use `getPagesInConfluenceSpace` on cloudId `2309a7c9-1d93-47a4-80ef-ab7f528cbb77`, space key `V2`. List top-level pages.\n2. Update the same harvest doc (`docs/hello-world-corp-pipeline-harvest-2026-04-30.md`) with a \"V2 correction\" addendum. Drop or strike-through the VJS2 addendum (whichever's cleanest), and report the V2 top-level structure.\n3. Re-cast the (a)/(b) placement tradeoff for V2 specifically — same form as before: cross-cutting top-level vs nested-under-X.\n4. SendMessage summary to team-lead.\n\nTime budget: ~5 min. No deep reads.\n\n— team-lead",
+    "summary": "Correction: V2 not VJS2 — re-check layout",
+    "timestamp": "2026-04-30T09:42:16.083Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-04-30 14:15] PO is reading the harvest doc and notes it should reflect latest convergences OR be pruned/removed if redundant given the 3 drafts Brunel shipped.\n\n**Latest convergences to encode (or use to judge redundancy):**\n\n1. **4 PO confirms landed:**\n   - Eventual Stage-2 home: ITOps space `I` (peer to Linux + BYOD standards)\n   - Tracking issue project: TPS, board 90\n   - Title: \"EVR sisene konteinerite standard\"\n   - Stage-0 placement: V2 space, top-level sibling (option (a))\n\n2. **Brunel's deliverables shipped** (`teams/framework-research/docs/`):\n   - `evr-sisene-konteinerite-standard-v0.1.md`\n   - `evr-konteinerite-intake-template-v0.1.md`\n   - `evr-konteinerite-tracking-issue.md`\n\n3. **Brunel's open questions for PO:**\n   - Tier 0/1/2 mapping (Brunel inverted vs my brief; matches Linux standard convention) — pending PO confirm\n   - Linux standard's monitoring tool unresolved — hedged in container standard\n\n4. **V2 correction** already applied (VJS2 SUPERSEDED, V2 addendum below).\n\n**Your call** — based on what's already in the harvest doc:\n- If most sections still load-bearing as provenance for Stage 2 reviewers (why ITOps, why TPS, why mirror Linux standard), **update** with a \"Post-harvest convergences\" section + brief link to drafts. Keep concise.\n- If the doc is mostly redundant now that Brunel's drafts encode the convergences, **prune ruthlessly** — keep only the parts that are still useful as provenance, delete the rest.\n- If it's fully redundant, propose removal and team-lead will action.\n\nTime budget: ~10 min. Author attribution `(*FR:Finn*)` at bottom.\n\n— team-lead",
+    "summary": "Update or prune harvest doc post-convergence",
+    "timestamp": "2026-04-30T11:16:07.160Z",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777882602337@finn\",\"from\":\"team-lead\",\"reason\":\"session 22 extension close\",\"timestamp\":\"2026-05-04T08:16:42.338Z\"}",
+    "timestamp": "2026-05-04T08:16:42.338Z",
     "read": true
   }
 ]

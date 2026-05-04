@@ -82,6 +82,22 @@ Derived data read at render time must be written on the write path, not backfill
 
 `docs/apex-research-comparison-2026-04-29.md`. Q1: apex adopted #61 in 1 commit (239e35e), zero stale paths, lifecycle in inline `startup.md` blocks not separate scripts. Q2: apex 64 entries / 4 canonical dirs only / 28% multi-agent corroboration / wiki-cross-link-convention is highest-ROI cross-pollination candidate (no analog ours). Only 1 true co-discovery: `dual-team-dir-ambiguity` (already cross-cited).
 
+## [CHECKPOINT 2026-04-30] Hello-world corp pipeline harvest
+
+`docs/hello-world-corp-pipeline-harvest-2026-04-30.md` (92 lines, pruned from 240). Provenance for EVR konteinerite standard. RFC #2 = `Eesti-Raudtee/hello-world-container` PR #2 (NOT mitselek/ai-teams#2 — name collision trap). PO confirmed: ITOps space `I` Stage-2 home, TPS Jira, "EVR sisene konteinerite standard" title, V2 top-level Stage-0, mirror = Linux standard (page 1335984130). Brunel shipped 3 drafts: standard v0.1, intake template, tracking issue.
+
+## [LEARNED] Provenance-doc lifecycle (harvest → drafts → prune)
+
+When a harvest doc seeds downstream drafts, it doesn't become redundant — it becomes provenance for "why these decisions" questions Stage-2 reviewers will ask. Drafts encode output, harvest encodes justification. Prune ruthlessly to provenance-only when convergences land: drop tradeoffs (PO chose), drop "recommendations" (now confirmed), drop superseded addenda entirely (one-line disambig note suffices). Outcomes table at top mapping each PO confirm → its source section is the highest-ROI structure.
+
+## [GOTCHA] V2 ≠ VJS2 (Confluence space disambiguation)
+
+VJS2 (`84180996`, global, legacy product space, 3 product-card top level) is NOT V2 (`1115095052`, collaboration, project space owned by Ruth Türk, 8 top level). Names confusingly close. Stage-0 publish home is V2. Always verify by space `key` (V2 vs VJS2), not by name "VJS 2" / "VJS (Vedude Jälgimise Süsteem)".
+
+## [LEARNED] CQL gotcha: `parent is empty` rejected
+
+`space = X AND parent is empty` returns 400 Bad Request from Confluence CQL parser. Use `getConfluencePageDescendants` against homepage with `depth=1` (numbers must be JSON numbers not strings) OR `parent = "<homepage_id>"`. The descendants tool with numeric params is the cleanest path to top-level-of-space.
+
 ## [DEFERRED] Open questions (consolidated)
 
 - Polyphony roster redesign — awaiting PO approval

@@ -1,13 +1,5 @@
 [
   {
-    "from": "herald",
-    "text": "[2026-04-15 19:22] Pinged Monte with two gate-2 questions: (1) is intra/cross split confirmed? (2) is co-ownership a first-class third state, or a \"shared grant\" flag?\n\nNon-blocking while I wait — reviewed my v1 under Monte's likely framing. Findings:\n\n- **§3 preamble and §4 MCP rollout both hold as-is.** They're substrate-level, not write-path-dependent. Preamble surfaces only grants-awaiting-my-consent; MCP discovery is config-level D1 regardless.\n- **§1 query path holds.** `includeTenants` field and `QualifiedSource[]` reshape both work across all ownership models, because a query result under any model can return own-tenant + not-own-tenant and the reader needs to know which.\n- **§2 and §5 reshape incoming**, pending Monte:\n  - §2 splits into \"intra-tenant (Protocol A preserved, no staging)\" + \"cross-tenant (new protocol)\"\n  - §5 mapping table becomes a 2-column split — intra-tenant column is all-preserved, cross-tenant column is all-new (not-a-reshape)\n  - **New candidate: W3 — co-ownership via staging arbitration.** If Monte confirms co-ownership as first-class, W3 is the right choice: tier rules redefined for co-owned entries (Tier 1 vanishes, Tier 2 conflict-detect is default, Tier 3 AI-reviewer arbitrates between librarians, Tier 4 for structural changes). Staging becomes the arbitration mechanism between Cal and Eratosthenes on co-owned content, not a gate between agent and librarian. This uses the xireactor staging pipeline for its designed purpose (governance of contested writes) — W1/W2 don't.\n\nNet effect of Monte's framing: the doc gets *cleaner*, not more complicated. Intra-tenant stays simple (Protocol A unchanged), cross-tenant gets its own dedicated shape. The only genuine migration cost is the cross-tenant protocol, which is net-new anyway.\n\nWill hold the edit until Monte replies. If Monte confirms, v1.1 lands cleanly; if Monte says \"not sure yet\", v1 ships with an explicit \"pending tenancy model — §2/§5 reshape deferred\" banner.",
-    "summary": "Pinged Monte, prepared v1.1 reshape plan",
-    "timestamp": "2026-04-15T16:14:45.428Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
     "from": "monte",
     "text": "Both sharpenings landed in the doc. Also propagated the 2-line version to Herald and Cal directly (not waiting for doc-done, you said as soon as I'm confident — I am).\n\n## §3.2.1 — boundary named as first-class\n\nAdded a new §3.2.1 that names the three ownership states explicitly: **`owned-by-FR`**, **`owned-by-apex`**, **`co-owned`**. Two structural consequences fall out:\n\n1. **`co-owned` is the ONLY state the staging layer governs.** The \"doubled-coverage collapses\" observation becomes mechanical rather than argumentative — once ownership is a three-valued attribute, the collapse is a direct reading of the state space.\n2. **State transitions are the only cross-layer operations.** Writes within a state stay in that state's layer. Writes that change state (e.g., FR-owned → co-owned) cross layers, and those transitions are precisely the cases §2.3 (transfer ritual) and §3.6 (simultaneous discovery) govern.\n\nThe practical consequence for Cal/Herald/Brunel: \"what ownership state does this touch, and does the operation change state?\" selects the layer and protocol unambiguously. Both my Herald and Cal messages already lead with this framing.\n\n## §3.6 — simultaneous-discovery / land-grab protocol\n\nAdded a new §3.6 (pushing the xireactor-config subsection to §3.7). Headline answer to your question: **the staging pipeline naturally brokers the case, but only because `co-owned` is a distinct state, not a promoted version of either single-ownership state.** A two-state model (with \"co-owned\" as \"both bits set\") would have a real race. The three-state model does not.\n\nProtocol in five steps:\n\n1. Neither existing intra-tenant entry auto-promotes. `owned_by` does not flip.\n2. A **fresh co-owned entry is filed in shared-write**, with both existing entries as source references. Proposer = whoever identified the overlap (typically the auditor).\n3. Tier 3 AI reviewer routes; cross-review via #43 bootstrap-preamble, no proposer/reviewer power asymmetry (both contributed sources, both must accept).\n4. On acceptance: both original intra-tenant entries get `superseded-by` references but are NOT deleted. No \"loser\" — the co-owned synthesis has no sole author.\n5. **On rejection: durable disagreement is a valid terminal state.** Each tenant keeps its view, flagged at next sunset review. Forcing consensus is worse than letting two teams disagree on a cross-cutting pattern.\n\nKey anti-race property: `owned_by` never auto-flips. Every path into `co-owned` is a deliberate, ratified, two-librarian-symmetric act. The filing-first librarian has no advantage over the filing-second librarian.\n\nAlso added a small §3.7 addendum noting the tier-assignment must route any entry with >1 tenant-distinct source into Tier 3 automatically — that's the structural signal that simultaneous-discovery is what's being handled.\n\n## §8 summary table updated\n\nSplit \"both librarians want the same entry\" into two distinct rows: simultaneous-discovery (§3.6) vs post-hoc transfer of an existing entry (§2.3). They are now clearly different cases with different protocols.\n\n## Herald + Cal propagated\n\nBoth messages went out with the 2-line version and pointers into the doc sections aimed at each of them specifically:\n\n- **Herald** — §3 (asymmetric decision) and §7.2 (three xireactor questions: per-zone staging, session_init tenant scoping, ownership-transfer wire format). Warned him explicitly that modeling \"staging governs all writes\" will over-gate intra-tenant work.\n- **Cal** — §5.1 (cross-tenant review flow) and §7.3 (two prompt edits: pre-classification zone check + bootstrap-path addition). Emphasized what doesn't change (his intra-FR workflow is unchanged) and asked him to flag if the intra/cross boundary is going to be hard to apply in practice, because his classification burden is where pilot usability lives or dies.\n\nBoth messages also noted that Eratosthenes needs symmetric edits and I don't know apex's librarian prompt structure — flagged to you for routing.\n\nReady for final review when you have a window. Two open calls still flagged for your decision (§9): pilot sequencing for xireactor enhancements, and whether PO accepts the four-signature ownership-transfer ritual cost.",
     "summary": "§3 sharpened — boundary first-class + simultaneous-discovery protocol",
@@ -432,141 +424,355 @@
     "read": true
   },
   {
-    "from": "celes",
-    "text": "Aen — read the canonical plan, the 2025 feedback, and your three-option sketch. Here are my four answers, in order. Brief.\n\n## 1. Architecture: Option C, with one structural correction\n\n**I agree with C over A and B**, but I want to sharpen *why* — your \"TL absorbs integration load\" argument is correct, and the 2025 feedback validates it specifically. The 2025 pain points cluster overwhelmingly on **timing and synchronization** (registration late, materials late, info trickled in late, schedule discipline broken on-site). Those are integration failures, not specialist failures. A team without an integrator just relocates the integration burden onto the PO, who is already gap-filling — net zero.\n\nA is rejected on first principles (single point of dilution = single point of role-bleed; the agent will optimize for whichever work-type is loudest each day).\n\nB is rejected because the **(c) timeline-tracking work-type is itself the integration function**. If you split (c) off as the Logistician's side-job or scatter it across all three, you've recreated the gap-filler problem at the agent layer. (c) only makes sense as a TL responsibility.\n\n**My structural correction to C:** the four characters should not be \"TL + 3 specialists where TL is purely coordinator.\" The TL should *own* work-type (c) — timeline tracking and nudging — as their primary deliverable, with coordination as the wrapper around it. Otherwise you get a TL with thin substantive work, which I have seen go wrong (the Cathedral-lite anti-pattern where TL-as-pure-router becomes a bottleneck reading every message). Concretely: the TL is the \"Projektijuht\" analogue and runs the T-counter; Scribe/Logistician/Musicologist are the substantive specialists. That keeps four characters genuinely loaded.\n\n**Half-baked role check:** the role I came closest to flagging was the Musicologist. Repertoire research (e) is bounded and seasonal — Bach toolkit pattern is already substantial, but does it sustain four months of activity? My answer: yes, *if* scoped to extend into program notes, kavaleht musicological text, audience-facing context, and pre-laager listening guides for participants. That is real (a)/(e) overlap territory and gives the Musicologist a steady cadence. If we scoped Musicologist purely as \"extend the toolkit,\" I would push back. With the wider scope (research feeds drafting), the role holds. **Note for prompt-drafting later:** the Musicologist/Scribe handoff for kavaleht text is the riskiest seam in this team; will need an explicit coordination boundary (the table pattern from FR).\n\nSo: Option C, four characters, TL owns (c), Musicologist scoped as research-AND-program-notes, not toolkit-only.\n\n## 2. Naming convention: I recommend **Estonian musical figures**, with one specific lineup\n\nI considered all four candidates you raised. Verdict:\n\n- **Late-Baroque contemporaries (Zelenka-era):** Tempting because the repertoire is the repertoire. Rejected — names like Telemann, Heinichen, Pisendel feel imported into an Estonian-language working context. Choir's chat will be in Estonian. Foreign Baroque names will read as cosplay.\n- **Hellenistic muses:** Beautiful for an art-school team in the abstract. Rejected here — wrong register. This is logistical/operational work for a real concert with real coffee thermoses. Muses make the team sound precious about timeline-nudging.\n- **Mixed pantheon:** This is the FR pattern and it works *for FR* because FR's domain is itself meta and varied. For a focused choir-event team, mixed pantheon dilutes identity. Rejected.\n- **Estonian musical figures:** Strongest fit. Estonian-language chat, choir-music domain, names the participants might actually recognize as cultural anchors. Lands.\n\n**Proposed lineup (4 names):**\n\n- **TL → Tobias** (Rudolf Tobias, 1873–1918, composer of *Des Jona Sendung* — Estonia's first oratorio, conducted in Leipzig 1909). Lore hook: oratorio composer who orchestrated complex multi-voice large-form works under tight constraints. Nickname: **Tobi**. Fits the \"carries integration burden, runs the T-counter\" identity.\n- **Scribe → Koidula** (Lydia Koidula, 1843–1886, poet who wrote the lyrics for *Mu isamaa on minu arm* and a foundational figure of Estonian-language public writing). Lore hook: Estonian-language writing for public reach is *literally* her contribution to history. Nickname: **Lyyd** or **Koid**. The (a)/(f) work-type owner.\n- **Logistician → Saar** (Mart Saar, 1882–1963, composer-organist who navigated practical realities of provincial concert life and church-music logistics). Lore hook: organist-composer rooted in venue practicalities. Nickname: **Saar**. The (d) owner — coffee, vendors, equipment, seating.\n- **Musicologist → Tampere** (Herbert Tampere, 1909–1975, ethnomusicologist and folk-song archivist; deep musicological scholarship). Lore hook: research-discipline figure rather than performer. Nickname: **Tamp**. The (e) + program-notes owner.\n\nI avoided Tormis and Kreek deliberately — both are too iconic and the \"Tormis is on my team\" energy will overpromise. Saar and Tampere are recognizable but not reverential, which is the right calibration for working-team naming.\n\nIf PO prefers reverential icons, swap Saar→Kreek and Tampere→Tormis; the role-fit is roughly the same.\n\n## 3. Workdir placement: option (ii), with a caveat\n\n**`~/Documents/github/ESL/Haapsalu 2026/teams/<name>/`** — alongside the canonical plan.\n\nReasoning:\n- The canonical plan (`2026 plaan.md`) is the team's **primary working artifact**. Co-locating the team config with the artifact it serves is the cleanest mental model. Every session, the TL re-reads the plan; placing it one directory away beats placing it across a sibling repo.\n- Option (i) `Haapsalu-Suvekool/` ties the team to the *toolkit* rather than the *event*. The toolkit is one input the Musicologist consumes; it is not the team's home. Ties team identity to the wrong thing.\n- Option (iii) ESL-org level reads as overreach — this team is for one event, not for ESL writ large. If a future event spawns a sibling team, *then* hoist to (iii). Don't pre-architect.\n- Option (iv) new repo: rejected. New repo = git overhead for what is fundamentally a four-month operational team. The plan already lives in a git-tracked dir; piggyback.\n\n**Caveat:** the directory `Haapsalu 2026` has a space in the name. Several scripts in `ai-teams/` (persist scripts, restore scripts) make assumptions about path-quoting that I have not audited for space-handling. Volta or Brunel should sanity-check the persistence/restore tooling against a spaced path before commitment, OR we rename to `Haapsalu-2026` (hyphen) when creating the `teams/` subdir. This is a 5-minute check, not a blocker — but flagging it because spaced paths are a known shell-quoting gotcha class.\n\n## 4. Persistent vs one-off: persistent, confirmed\n\nFour-month runway with regular T-counter milestones is exactly the persistent-team profile. One-off teams are for \"design this thing, ship the design, terminate\" — single-session or single-week scope. ESL Suvekool has roughly 16 weekly check-in touchpoints between now (T-15n, ~2026-05-01) and the concert (T0, 2026-08-16), plus T+1n debrief.\n\n**One operational rider on persistence:** I recommend the team operate in a *low-volume cadence* — agents are spawned for active work-bursts (drafting a registration mail, planning a coffee order, researching a program note), not kept running idly. Persistent **roster**, episodic **sessions**. This matches how PO will actually use them — 1–3x/week, not daily. The roster.json + scratchpads + memory pattern from FR scales to this without modification.\n\n---\n\nHolding at proposal mode as instructed. Ready to draft prompts when PO signs off on (architecture C with TL owning timeline) + (Estonian musical figures lineup, or a substitution if PO prefers different names) + (workdir placement with spaced-path resolution) + (persistent, low-volume cadence).\n\nOne question back to you for PO: **does PO prefer Tobias/Koidula/Saar/Tampere, or the more reverential Tobias/Koidula/Kreek/Tormis variant?** Naming is the only place I'd want a yes/no before I draft prompts — everything else I can proceed on.\n\n— Celes",
-    "summary": "Celes opinion on ESL Suvekool team design",
-    "timestamp": "2026-05-01T20:00:14.647Z",
+    "from": "finn",
+    "text": "[2026-04-30 12:25] Finn online, harvest task acknowledged.\n\nTask: 5-deliverable harvest for EVR ad-hoc dockerised installations standard. Time budget ~30 min. Read-only.\n\nAcknowledging each deliverable:\n1. RFC #2 contents (mitselek/ai-teams) — gh CLI\n2. hello-world-container repo state @ v1.2.0 — search Eesti-Raudtee + mitselek\n3. Confluence DevOps space contents (cloudId 2309a7c9..., space key DevOps) — Atlassian MCP tools confirmed available\n4. Candidate Jira project recommendation (NOT VL) — getVisibleJiraProjects\n5. Existing EVR standard shape to mirror — Confluence search\n\nOutput: docs/hello-world-corp-pipeline-harvest-2026-04-30.md + summary message.\n\nProceeding now.",
+    "summary": "Finn online, harvest task acknowledged",
+    "timestamp": "2026-04-30T09:25:58.714Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:00:50.430Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:00:50.430Z",
+    "from": "finn",
+    "text": "[2026-04-30 12:30] Harvest complete. Doc: `teams/framework-research/docs/hello-world-corp-pipeline-harvest-2026-04-30.md`.\n\n**1. RFC #2** — NOT mitselek/ai-teams#2 (that's a Kerckhoffs comms-dev sec finding). It's `Eesti-Raudtee/hello-world-container` PR #2 \"RFC: Full PoC review — container + tunnel + SSH + CI/CD\". OPEN, do-not-merge label by design (review-base is empty branch for full-diff review). 1/2 reviewers approved (valerikevr); deniss-labunets pending. Holds 4-role RACI checklist: IT/CF admin, Sysops/Infra, Tech lead, Developer.\n\n**2. hello-world-container @ v1.2.0** (commit 14be25d) — 8 files. README.md (8.8KB) + docs/WALKTHROUGH.md (15.7KB) together cover ~80% of standard content (architecture, secrets flow, deploy flow, adapt-template steps). DEPLOYMENT-ROLES.md referenced by PR but NOT in v1.2.0 tag — Brunel must pull from main HEAD. Gap for org standard: governance + intake workflow + ET narrative + tier classification.\n\n**3. Confluence DevOps space** (id 1024622599, knowledge_base) — essentially empty. 4 pages: GitLab tootekataloog (homepage + child) + 2 untouched Atlassian templates. Shape = product-catalog (one-page-per-service, ET, emoji-prefixed H1s, table-heavy). NOT the right shape for our procedural standard — look elsewhere for mirror.\n\n**4. Jira project** — Primary: **TPS (ITOps)** software. Backup: **IT (IT osakond)** software. Alternative: IB (Infra Beacon). Excluded: ITSD (service desk), AD (data ops), VL. Rationale: ITOps owns the peer standards in Confluence; topic alignment.\n\n**5. Mirror target** — **\"EVR sisene Linux standard\"** (page 1335984130, ITOps space `I`, Roland Kilusk, modified 2025-12-15). Title shape `EVR sisene <X> standard`. Structure: scope paragraph + Tier 0/1/2 classification + sections (Baasturvalisus, IAM/PAM, Monitooring, Logimine, Automatiseerimine). Compact ~700 words single-ET prose with EN product nouns inline, no parallel EN, no frontmatter. Mandates exception-documentation in preamble. Secondary: BYOD standard (199557132), same space + author pattern.\n\nSuggested home for published standard: ITOps space `I`, peer to Linux + BYOD. PO confirm.\n\nBoundaries respected: no posts to Jira/Confluence, no content proposals (Brunel's job).",
+    "summary": "Harvest complete — 5 deliverables",
+    "timestamp": "2026-04-30T09:30:48.701Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:00:55.927Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:00:55.927Z",
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-30T09:31:02.241Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T09:31:02.241Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:01:17.223Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:01:17.223Z",
+    "from": "finn",
+    "text": "[2026-04-30 12:32] VJS2 addendum done — appended to harvest doc.\n\n**VJS2 top level:** strictly 3 Tootekaart (product-card) pages under homepage `84181190`:\n- VJS tootekaart (1419509801)\n- VJS-TTCMS Tootekaart (1619918849)\n- HES Tootekaart (1619951617)\n\nAll ~1000+ space pages nest under one of these three. Top level = uniform product-card shelf, same shape as DevOps space's homepage child.\n\n**Tradeoff for PO (flagged, no recommendation):**\n- (a) Proposal at top level = a 4th sibling next to the 3 product cards. Reads as cross-cutting standard but breaks the uniform shelf. Needs banner.\n- (b) Proposal nested under a product card (e.g., VJS tootekaart) = clean tree, but reads as VJS-specific not cross-cutting.\n\nBrunel will need to know which placement before drafting.\n\nStage 0/1/2 lifecycle understood (proposal → escalation via Ruth → DevOps). Acknowledged that DevOps space study (#3) and mirror target (#5) remain valid as-is — only #3's \"DevOps space is essentially empty\" finding becomes more useful (it tells us the eventual canonical home is also a greenfield, so v1.0 won't have to fit a heavy existing taxonomy).\n\nIdle, ready for next task.",
+    "summary": "VJS2 neighbourhood addendum",
+    "timestamp": "2026-04-30T09:33:09.145Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "Aen — queried Brilliant. PO was right to push. Six material findings, four of which change my recommendation. Delta only, original proposal as baseline.\n\n## Finding 1 — Mihkel is registered as a SINGER, not just an organiser ⭐\nSource: `Meetings/esl/2026-08-14-suvekool-haapsalu`. Mihkel registered 2026-04-22 as Bar (Kammerkoor Crede), sheet position 7. He's a participant first, gap-filler second.\n\n**Impact on proposal:** The team is not just a \"help organise\" team — it's helping a board member who is *also a singer in the choir performing the work*. The Musicologist's program-notes output and pre-laager listening guides have a singer-PO as their first reader, not just an audience-facing artifact. This sharpens the (e) scope: musicological depth that helps Mihkel sing better should be on the deliverable list, not just kavaleht text. The Bach toolkit pattern should explicitly extend to **singer-prep materials for Mihkel himself** (translation, IPA pronunciation, cadence/structural maps for his own bass line in the three works).\n\n## Finding 2 — Liisa is leaving the ESL board in Jan 2027, possibly Apr 2027 ⭐⭐\nSource: `Context/esl/liisa-rahusoo-lahkumine-2027`. Liisa announced her resignation before 2026-04-18 due to overload. Eve proposed extension to Apr 2027 volikogu; Liisa is undecided. **Mihkel privately offered Liisa on 2026-04-23: \"spetsialiseerume kasvõi suvekoolile, aga see on vähemalt teiste laualt maas.\"**\n\n**Impact on proposal:** This recontextualises the entire team mission. PO is not a generic gap-filler — he has explicitly proposed to Liisa to *concentrate ESL board capacity on Suvekool 2026* so the rest stays manageable for her. The team is the operational arm of that offer. The TL must understand:\n- Liisa is **load-shedding by intent**, not just stretched.\n- Anything the team can take off Liisa's desk (drafting, logistics planning, research) is the *core mission*, not a side benefit.\n- Suvekool 2027 has no confirmed lead. The team's persistent roster should be designed with **handoff documentation** as a first-class deliverable, not a nice-to-have. T+1n debrief becomes \"succession brief,\" not just retrospective.\n\nThis is the single biggest update. I want to add an explicit clause to the TL's prompt: *\"Every deliverable must be designed so a future Suvekool lead (not Liisa, not Mihkel) can pick it up. Write artifacts for the next person, not just for the current event.\"*\n\n## Finding 3 — The team has more named stakeholders than PO mentioned\nConfirmed contacts beyond Liisa and Ingrit Malleus: **Lodewijk van der Ree** (programme planner / dirigent, the live decision-maker on orchestra/scores), **Kaia Urb** (hääleseadja, confirmed), **Kristiina Kermes** (kontsertmeister), **Ene Salumäe** (organist, TBC), **Yena Choi / Tuuri Dede / Mikk Dede / Karel Tohv / Andreas Väljamäe** (solists), **ENSO orchestra** (20 musicians), **Kaire Siiner** (ESL tegevjuht, runs `eestisegakoorideliit@gmail.com`), **Tanel Aavistu** (peripheral). Plus the choirmaster/dirigent split — Lodewijk is dirigent, Ingrit is koormeister this year (different from the canonical plan's wording).\n\n**Impact on proposal:** The (f) stakeholder-correspondence work-type is heavier than I budgeted. Scribe's drafting load isn't 4-5 stakeholder threads; it's 10+, and many threads have crossed wires (Lodewijk-via-Liisa, board-via-Kaire-shared-inbox, choirmaster-via-Liisa). The Scribe needs an explicit **stakeholder map** as a starting artifact, not just a writing skill. I'd add: *\"First deliverable: build and maintain a stakeholders.md map — name, role, current status, last-contact, who-talks-to-them. Update before every drafting session.\"* This was implicit in my proposal; making it explicit prevents the Scribe from drafting in a vacuum.\n\n## Finding 4 — Carus-Verlag procurement is a live, urgent task PO owns\nLiisa assigned 2026-04-24: order all sheet music (60-84 chorale copies × 3 works + 2 orchestra packages + Hasse rental form + extra bassoon parts). Estimated €1k-1.5k spend. **The ball is on Mihkel's desk right now.**\n\n**Impact on proposal:** This is operational work-type (d) (procurement/logistics) that is **already in flight**, not future. The Logistician must be ready to pick this up *as the first task, this week*. I had Logistician scoped for August on-site logistics (coffee, equipment, seating). Real scope is broader: **procurement project management** for May-July, then on-site logistics in August. Saar's prompt should reflect: \"(d) covers the full logistical lifecycle: procurement (sheet music, equipment rental), vendor coordination (Carus-Verlag, local catering, organ source TBC by Lodewijk), and on-site execution (coffee, seating, equipment setup).\"\n\n## Finding 5 — Naming sensitivity check\n**Lodewijk van der Ree is the dirigent.** Dutch name. Working language is Estonian, but stakeholders include Dutch + multiple solists. My \"Estonian-musical-figures-as-cosplay-rejection\" reasoning for Baroque names was correct *for the team identity*, but I want to flag: when the Scribe drafts to Lodewijk in English, the team-name \"Tobias\" sending mail signed by \"Lyyd\" (Koidula) is fine; this won't break in cross-language correspondence. Validates my naming proposal — no change needed. Just confirming I checked.\n\n## Finding 6 — Workdir spaced-path concern revalidated\nThe canonical `Haapsalu 2026/` directory has a space; I flagged this earlier. Brilliant confirms there's no convention forcing me to keep the space. **Adjusted recommendation: rename to `Haapsalu-2026/` or place the team subdirectory at `~/Documents/github/ESL/suvekool-2026/teams/<name>/`** with a symlink or pointer back to the canonical plan. PO's call. Don't fight ai-teams shell-quoting.\n\n---\n\n## Revised proposal summary\n\nArchitecture (Option C, 4 chars, TL owns timeline) — **unchanged**.\nNaming (Tobias / Koidula / Saar / Tampere or reverential variant) — **unchanged**.\nPersistence (persistent roster, episodic sessions) — **unchanged**.\n\n**New explicit clauses for prompts (when PO greenlights):**\n\n1. TL prompt — **succession framing**: every deliverable designed for handoff to a future (post-Liisa) Suvekool lead. T+1n debrief = succession brief.\n2. Scribe prompt — **stakeholders.md as first artifact**, not implicit. Maintain proactively.\n3. Logistician prompt — **procurement scope explicit**: Carus-Verlag tellimus is the first live task, not on-site coffee.\n4. Musicologist prompt — **dual-audience deliverables**: Mihkel-as-singer (technique/IPA/structural maps) AND audience (kavaleht text, program notes).\n\n**One question I want to surface to PO:** is the team's mission framed as *\"help Mihkel organise\"* or *\"help ESL run Suvekool 2026 well, channeled through Mihkel as the operational liaison while Liisa loads-sheds\"*? These produce subtly different prompts. The second framing is what Brilliant's evidence supports; I want PO to confirm before I draft.\n\n— Celes",
-    "summary": "Celes — Brilliant query, material updates to proposal",
-    "timestamp": "2026-05-01T20:03:00.363Z",
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-30T09:33:14.782Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T09:33:14.782Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:04:09.549Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:04:09.549Z",
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-30T09:33:19.290Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T09:33:19.290Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:05:06.690Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:05:06.690Z",
+    "from": "finn",
+    "text": "[2026-04-30 12:43] V2 correction applied. Doc updated — VJS2 addendum struck through with SUPERSEDED banner; new V2 addendum added below it.\n\n**V2 space:** id `1115095052`, key `V2`, name \"VJS 2\", type `collaboration` (created 2025-10-02 by Laura Voolain, owned by Ruth Türk). Homepage `1115095364`.\n\n**V2 top-level children — 8 total, exhaustive:**\n\nSubstantive (5):\n- `Project Overview` (1263665166, Sildnik)\n- `Project Documents` (1261469697, Sildnik)\n- `Project Requirements` (1263632385, Sildnik)\n- `Meeting notes in space` (1265565699, Sildnik)\n- `Materjalid varasemastest kaardistustest ja analüüsidest` (1585610770, Ruth Türk, ET)\n\nUntouched Atlassian defaults (3): Template-Project plan / Template-Decision documentation / Template-Meeting notes (all 2025-10-02, Laura Voolain).\n\n**Key change vs VJS2:** V2 is a project-collaboration space, not a product-catalog space. Top level is already MIXED (working pages + templates), so no uniform shelf to break. No existing \"standards\" or \"proposals\" section — greenfield for this type of artifact. Much friendlier landing zone for a Proposal.\n\n**Re-cast Stage-0 placement tradeoff (V2):**\n- **(a) Top-level sibling** — 9th page next to working sections. Cross-cutting framing. Banner still recommended (\"Proposal — pending org adoption\") but breaks no pattern.\n- **(b) Nested under `Project Documents` → Technical** — fits the doc-tree convention, surfaces to project doc reviewers, reads project-scoped.\n- (c) Under `Project Requirements` — a stretch, only if PO explicitly wants requirements-framing.\n\n**Soft suggestion to PO** (still PO's call): (a) or (b). (a) for visibility / cross-cutting feel; (b) for organisational tidiness. (c) is a stretch.\n\nIdle, ready for next task.",
+    "summary": "V2 correction — re-cast tradeoff",
+    "timestamp": "2026-04-30T09:43:35.054Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "Aen — read the toolkit. Six findings, one of which is a hard blocker before drafting Tampere's prompt, plus a security gotcha unrelated to roles.\n\n## Toolkit reality vs. my inference\n\nThe toolkit is **not what I assumed.** It's a research-programming toolkit, *not* a singer-prep toolkit:\n\n- **Actual purpose:** \"Help select suitable musical works for a 70-person amateur choir, accompanied by professional baroque orchestra and soloists, performing in a church with significant reverb.\" (`GEMINI.md:9`)\n- **Mechanism:** Two shell scripts (`bach-research.sh`, `bach-session.sh`) call Gemini 2.0 Flash Lite with a fixed system prompt embodying a Baroque musicologist persona. Output: 5-7 ranked work recommendations with duration/forces/difficulty/acoustic-notes per work.\n- **Existing artifacts:** `proposed_programs/wachet-auf-celebration.md` — a fully-fleshed concert program proposal. `docs/bach-recommendations-table.md` (160 lines), `docs/baroque-repertoire-companion.md` (216 lines) — pre-compiled research outputs.\n- **One active prompt** (`prompts/baroque-choral-research.prompt.md`, 251 lines) — well-engineered, with mandatory clarification phase, 1-5 difficulty scale, acoustic adaptation guidance, hallucination mitigation rules, [VERIFY] tag protocol.\n\n## ⚠️ HARD BLOCKER 1: The toolkit was scoped for a DIFFERENT problem than 2026 needs\n\nThe toolkit's job was **\"help us pick what to perform.\"** That decision is **already made for 2026** — Lodewijk picked Zelenka/Hasse/Vivaldi, Liisa confirmed, Carus-Verlag editions mandated, registration opened, music ordered. The toolkit's primary task — repertoire *selection* research — has zero remaining application to Suvekool 2026.\n\n**This invalidates my Brilliant-delta-finding-1 framing entirely.** I claimed Tampere \"extends the Bach toolkit pattern into singer-prep + program notes.\" That's wrong. The toolkit pattern is *repertoire-selection research for an undecided program*. Singer-prep and program-notes are **adjacent but distinct activities** — they would use a different system prompt, different output structure, different validation rules. Tampere wouldn't be \"extending\" the toolkit, she'd be building parallel tooling.\n\n**Implication for Tampere's role design (genuine half-baked-role check, NOT inferred):**\nThe Musicologist's substantive deliverables for 2026 are:\n- (a) **Singer-prep packets** for the three confirmed works: Zelenka *Magnificat in C* ZWV 107, Hasse *Miserere in c-moll*, Vivaldi *Gloria in D* RV 589 — German + Latin pronunciation/IPA, structural maps, voice-line analysis (with PO's bass line as priority audience).\n- (b) **Kavaleht text** + audience-facing program notes for the three works.\n- (c) **Listening-guide material** for participants pre-laager (the 2025 feedback explicitly requested this — \"Suureks abiks oleks see, kui saadetakse enne laagrit teose õppimiseks hea video\").\n- (d) Optional-and-only-if-asked: extend the toolkit for *future* programming (2027+ Suvekool, advendikontserdid). This is the only path on which the toolkit's existing infrastructure stays useful, and even then it's owned by next-year's coordinator, not Tampere.\n\nThe toolkit isn't dead weight — it's existing infrastructure she may *consult for methodology* (how to write acoustic notes, how to flag [VERIFY], how to structure recommendations) but it is **not** her primary platform. Her primary platform is plain markdown writing in `docs/` or `program/` directories within the team workdir, not the Gemini scripts. **I want to flag this clearly to PO before drafting.**\n\n## ⚠️ HARD BLOCKER 2 (security): API key in cleartext in 5 files\n\n**`README.md:25`, `README.md:31`, `README.md:103`, `docs/BACH-TOOLS-GUIDE.md:97`, `docs/BACH-TOOLS-GUIDE.md:103`** all contain `GEMINI_API_KEY=\"AIzaSy...\"` as a literal string. The key is in a tracked git repo. There's also `F001-youtube-mcp-server/client_secret.json` — unread by me but the filename screams \"do not commit.\"\n\n**This is independent of team design** but is *load-bearing on Saar's prompt* — the Logistician will be doing procurement/credentials work, and \"audit and rotate exposed credentials\" is a real first task that should be on her plate alongside Carus-Verlag. Adding it to the deliverable list.\n\nI will NOT touch these files. Recommendation to PO: rotate the Gemini key immediately, scrub from history, replace with `${GEMINI_API_KEY}` references only. This is PO's call, but it's PO-only work — not safe for any agent to attempt without explicit instruction.\n\n## Other findings (lower stakes)\n\n3. **Toolkit's \"70 amateur singers\" context is OUT OF DATE for 2026.** Sheet says 70 unique registrants 2026-04-22 with sopranos full at 84 max. Toolkit's pre-loaded ensemble context bakes in old assumptions. If Tampere consults the toolkit prompt as a methodology reference, she needs to update the ensemble specs in any new prompts she writes. Not a blocker — just a \"don't blindly copy the embedded context\" note.\n\n4. **Toolkit was Bach-primary; 2026 is Bach-absent.** The active prompt opens with \"Research and recommend J.S. Bach vocal/choral repertoire\" and treats Zelenka as a non-default expansion requiring user confirmation. Zero of the three 2026 works are Bach. Reusing the prompt verbatim would be wrong; reusing the *structural rigor* (clarification phase, [VERIFY] tags, validation rules) is correct.\n\n5. **Toolkit has no Estonian-language output capability.** All examples and outputs are English. The 2025 feedback in Estonian; PO drafts to choir in Estonian; kavaleht is in Estonian. Tampere will need bilingual output — research can be English internally, deliverables to PO must be Estonian unless Mihkel says otherwise.\n\n6. **`F001-youtube-mcp-server/` is a separate side-project** (YouTube MCP server, has its own `package.json`, tests, `client_secret.json`). Out of scope for the team. Saar should NOT touch it; it's adjacent infrastructure that PO maintains separately.\n\n## Revised drafting plan\n\nI'm ready to draft, with these scope updates baked in:\n\n- **Tampere prompt**: deliverables (a)-(c) above. Toolkit is \"consult-for-methodology, not extend.\" Bilingual: English research, Estonian deliverables.\n- **Saar prompt**: Carus-Verlag procurement is task 1; equipment/coffee/seating is later. Add credentials-audit as a flagged-to-PO concern, not auto-action. Saar coordinates with toolkit for IF the team uses any external API in future, but does NOT modify F001-youtube-mcp-server.\n- **Koidula prompt**: stakeholders.md as first artifact (per Brilliant delta). Estonian-default drafting; English when stakeholder is Lodewijk (Dutch).\n- **Tobias prompt**: succession framing baked in (load-shed-Liisa, hand-off-ready artifacts), T-counter ownership, integration role, runs the canonical plan as primary working artifact.\n\n**Two questions before I write to disk:**\n\nA. **Does PO confirm the toolkit-is-not-Tampere's-primary-platform reframe?** I want PO to explicitly say \"yes, Tampere builds parallel deliverables, doesn't extend the toolkit\" before I draft her prompt — because if PO's mental model still has Tampere extending the Gemini scripts, my prompt will mismatch the expectation.\n\nB. **Permission to flag the API-key exposure to PO directly via you?** I think this needs PO's eyes today, separate from the team-design thread. It's not the team's problem to fix, but it's adjacent to where the team will live, and ignoring it would be wrong.\n\nHolding off on writing prompt files until A is confirmed.\n\n— Celes",
-    "summary": "Toolkit read — surprising findings before drafting",
-    "timestamp": "2026-05-01T20:11:04.079Z",
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-30T09:43:41.885Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T09:43:41.885Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:12:00.021Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:12:00.021Z",
+    "from": "brunel",
+    "text": "[2026-04-30 12:47] Brunel here. Read order complete: startup, common-prompt, brunel.md prompt, my scratchpad, Finn's harvest.\n\nAcknowledging the brief, by deliverable:\n\n1. **Standard v0.1** → `docs/evr-sisene-konteinerite-standard-v0.1.md`. Single-ET, ~700-1000w, mirror Roland Kilusk's Linux standard structure (page 1335984130 — fetching now). EN product nouns inline, no parallel EN. Tier 0/1/2 adapted for containers (my judgment). Sections to mirror: Baasturvalisus, IAM/PAM, Monitooring, Logimine, Automatiseerimine — adapt names if container context demands. Exception clause in preamble. Banner \"Ettepanek — ootab ITOps poolt vastu võtmist\". 4-role RACI from RFC #2 embedded. Receiving role = TBD placeholder.\n\n2. **Jira intake template** → `docs/evr-konteinerite-intake-template-v0.1.md`. ET field labels + brief descriptions. 9 required fields per brief. Receiving role assignee = TBD placeholder.\n\n3. **Tracking issue body** → `docs/evr-konteinerite-tracking-issue.md`. Markdown for paste-into-Jira (TPS project, assignee Ruth Türk). Suggested title, scope in/out, Stage-0 V2 link placeholder, Stage-1 ask of Ruth, RFC #2 bridge text, acceptance criteria.\n\nBoundaries acknowledged: no Confluence write, no Jira write, drafts to `docs/` only, attribution `(*FR:Brunel*)` at bottom of each, structural mirror only (no prose lift), no subagents.\n\nSource ingestion plan: Linux standard via Confluence MCP (page 1335984130). hello-world-container README + WALKTHROUGH at v1.2.0 + DEPLOYMENT-ROLES.md from main HEAD via `gh`. RFC #2 already in Finn's harvest.\n\nTime budget noted (45-60 min). Reporting back when all 3 drafts complete with structured summary.",
+    "summary": "Brunel intro + ack of 3 deliverables",
+    "timestamp": "2026-04-30T09:48:17.715Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 13:05] All 3 drafts shipped to `teams/framework-research/docs/`.\n\n**1. Standard v0.1** — `evr-sisene-konteinerite-standard-v0.1.md`\n- Single-ET, ~900w, structural mirror of Roland Kilusk's \"EVR sisene Linux standard\" (page 1335984130). EN product nouns inline, no parallel EN.\n- Banner at top (\"Ettepanek — ootab ITOps poolt vastu võtmist\"). Exception clause in preamble (verbatim-pattern from Linux standard, container-adapted prose).\n- Tier 0/1/2 adapted: Tier 0 = production-adjacent, Tier 1 = inner-team/staging, Tier 2 = ≤4-week PoC.\n- Sections (Linux spine preserved, container-adapted): Baasturvalisus ja konteineri kuvand / IAM-PAM / Monitooring / Logimine / Tarne- ja juurutusprotsessi automatiseerimine. H4 \"Uute konteinerite juurutus\" anchors the intake form.\n- 4-role RACI table embedded (IT/CF admin, Sysops/Infra TBD, Tech lead, Developer) — taken from `Eesti-Raudtee/hello-world-container` PR #2 `DEPLOYMENT-ROLES.md` (main HEAD).\n- Receiving role left explicitly TBD (\"vastuvõttev tiim ITOps-i sees selgub Stage-1 tracking-issue käigus\").\n\n**2. Intake template** — `evr-konteinerite-intake-template-v0.1.md`\n- 9 required ET fields with descriptions + examples, anchored to apex-research as the example tenant.\n- Routes to TPS project, assignee = TBD receiving team. Closing flow at the end (4-step: file → review → provision → close-with-RACI).\n\n**3. Tracking issue body** — `evr-konteinerite-tracking-issue.md`\n- Suggested title: \"EVR sisene konteinerite standard — organisatsiooniülene vastuvõtt\"\n- Scope in/out blocks, Stage-0 link placeholder for V2 publish, 3-step Stage-1 ask of Ruth (review → escalate → identify subteam), RFC #2 bridge text (closing this = natural close for `Eesti-Raudtee/hello-world-container` PR #2 with `deniss-labunets` review pending), 4-checkbox acceptance criteria.\n\n**Open questions / nothing blocking, but PO call:**\n- Stage-0 placement in V2 — I wrote \"top-level sibling\" per your brief (option (a) from Finn's V2 addendum). If PO prefers (b) under Project Documents, only the publish step changes — drafts unaffected.\n- Linux standard's monitoring section is unresolved (Prometheus vs Zabbix vs PRTG) — I noted \"sõltuvalt EVR Linux standardi lõplikust valikust\" in the container standard so we don't pre-commit.\n\nBoundaries respected: zero Confluence/Jira writes, drafts in `docs/` only, `(*FR:Brunel*)` at bottom of each, no subagents, no prose lift from Linux standard. Scratchpad updated. Task #3 marked completed.",
+    "summary": "3 deliverables shipped — final report",
+    "timestamp": "2026-04-30T09:52:45.880Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T09:52:50.522Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T09:52:50.522Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-04-30 14:17] Aen — Medici reporting. Read order complete (startup, common-prompt, my prompt, my scratchpad). Have all 4 docs loaded: Finn's harvest + Brunel's standard/intake/tracking. Starting independent knowledge-health audit now per ~20-min budget. Will write report to `docs/audit-2026-04-30-konteinerite-standard.md` and SendMessage verdict + ≤250-word summary when done. (*FR:Medici*)",
+    "summary": "Medici intro: starting audit of 3 drafts",
+    "timestamp": "2026-04-30T11:17:35.094Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-04-30 14:17] Harvest doc pruned to provenance-only.\n\n**Decision:** Update + prune (mid-option). Doc went from 240 lines / 17.6KB → 92 lines / 6.6KB. Kept the parts that justify Stage-2 reviewers' \"why\" questions, dropped everything redundant with Brunel's drafts.\n\n**Top of doc rewritten as:**\n1. Status block stating doc is now provenance for Stage-2.\n2. **Outcomes table** mapping each PO confirm (ITOps space `I`, TPS board 90, \"EVR sisene konteinerite standard\", V2 top-level, mirror=Linux standard) to the harvest section that justifies it.\n3. Pointer to Brunel's 3 drafts.\n4. **Open questions still pending** — Tier 0/1/2 numeral inversion (Brunel matched Linux convention vs original brief), monitoring tool hedge inherited from Linux standard.\n\n**Trimmed/removed:**\n- Old \"5-bullet substance\" expansions per deliverable — collapsed to dense paragraphs.\n- Struck-through VJS2 addendum — deleted entirely; replaced with one-line disambiguation note inside the V2 section.\n- (a)/(b)/(c) V2 placement tradeoff — collapsed to fact (\"PO confirmed (a)\").\n- \"Recommendation\" framings throughout — converted to \"Confirmed\" or factual rationale.\n- Decoration/repetition removed.\n\n**Retained as load-bearing provenance:**\n- §1 RFC #2 — RACI 4-role contract (justifies Brunel's RACI section).\n- §2 v1.2.0 repo state — DEPLOYMENT-ROLES.md caveat (explains why Brunel pulled RACI from PR body, not tag).\n- §3 DevOps space — justifies \"Stage-2 home is `I`, NOT DevOps space\" decision.\n- §4 Jira project — TPS rationale for ITOps reviewers.\n- §5 Linux standard structural fingerprint — every detail Brunel mirrored (title pattern, tier model, ET+EN-noun language, length, audience). Including Tier inversion rationale.\n- §V2 — Stage-0 location with disambiguation note (V2 ≠ VJS2).\n\nDoc is now genuinely useful as the \"audit trail\" if anyone in ITOps asks \"where did this come from?\" — concise enough to read in 2 minutes.\n\nIdle.",
+    "summary": "Harvest doc pruned — provenance only",
+    "timestamp": "2026-04-30T11:18:01.873Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "[2026-05-01 23:24]\n\nAen — full drafting package ready at `designs/new/esl-suvekool/`. 8 files. Below: the one-paragraph framing for PO, the file inventory, three small things I want PO eyes on before you write to disk, and one thing I deliberately did NOT include.\n\n## One-paragraph \"why this team exists\" (for PO review)\n\n> ESL Suvekool 2026 is the year's signal event for Estonian mixed choirs — Mihkel's \"summer top event\" — and the ESL board's lead for it, Liisa Rahusoo, has announced she's leaving the board in January 2027 (or April 2027 if she accepts Eve's extension). On 23 April Mihkel privately offered her: *\"spetsialiseerume kasvõi suvekoolile, aga see on vähemalt teiste laualt maas.\"* The `esl-suvekool` team is the operational arm of that offer. Four agents — a coordinator who owns the T-counter timeline, a scribe for Estonian-language drafting, a logistician for procurement and on-site work, and a musicologist for singer-prep and program notes — channel Mihkel's gap-filler capacity through specialist roles, so Liisa load-sheds without the event suffering, and so the next Suvekool lead inherits readable artifacts rather than tribal knowledge. Concert is locked: Zelenka/Hasse/Vivaldi at Haapsalu Toomkirik on 16 August 2026; the team handles everything around it, and only that.\n\n## File inventory (all under `designs/new/esl-suvekool/`)\n\n| File | Purpose | Key features |\n|---|---|---|\n| `prompts/tobias.md` | Team lead | T-counter ownership, succession clause, FORBIDDEN/ALLOWED tools, no-touch-toolkit/credentials lines |\n| `prompts/koidula.md` | Scribe | stakeholders.md as first artifact; Estonian default; English-for-Lodewijk; PO-sends-always; frontmatter draft format |\n| `prompts/saar.md` | Logistician | Carus-Verlag tellimus as first task with full order package; on-site logistics calibrated against 2025 feedback; do-NOT-auto-fix-credentials (flag to Tobi only) |\n| `prompts/tampere.md` | Musicologist | 3 deliverable streams (singer-prep / kavaleht / listening guides); toolkit-methodology-consult-only; validation discipline ([VERIFY] tags); Bar-line specifics for PO |\n| `roster.json` | Roster | 4 characters, all `claude-opus-4-7[1m]`, lore entries |\n| `common-prompt.md` | Team standards | T-counter awareness section, Brilliant routing, language defaults, no-TDD-pipeline (intentional omission) |\n| `startup.md` | Lean startup | Date check + plan re-read + Brilliant pulse + inbox + greet — no restart-trauma history |\n| `design-spec.md` | PO review artifact | Why this team / architecture rationale / scope / out-of-scope |\n\n## Three things I want PO to see before you write to disk\n\n1. **The \"operational team\" archetype is new.** This team's `common-prompt.md` has no `tdd-pipeline.md` reference — distinct from FR (research) and screenwerk-dev/raamatukoi (dev) shapes. PO has not seen this shape before; recommend explicit nod in PO's review that this is the right call for a text+coordination team. (Spec-doc design-spec.md flags this in \"Architecture rationale.\")\n\n2. **Tobi can write timeline + succession; he cannot write stakeholders.md or procurement.** Per his FORBIDDEN/ALLOWED block, Tobi's writeable area is `memory/`, `docs/timeline.md`, `docs/succession/`. Updates to `docs/stakeholders.md` route through Koidula. Updates to `docs/procurement/` route through Saar. This is intentional — keeps Tobi as coordinator-with-substantive-deliverable, not as everyone-else's-editor — but it's the kind of boundary that's worth PO confirming explicitly.\n\n3. **Saar's first task is genuinely live, not aspirational.** Carus-Verlag tellimus has been on Mihkel's desk since 2026-04-24. Saar's prompt is written so that the very first session can produce a draft order. PO should know: this team can produce useful output day 1 if spawned; it doesn't need a warm-up cycle.\n\n## What I did NOT include (and why)\n\n- **A `tdd-pipeline.md`** — wrong shape for this team. Documented as intentional in design-spec.md.\n- **Cross-team coordination prompts (Callimachus/Oracle equivalent)** — this team is small enough (4 chars) and short-lived enough (4 months + debrief) that a knowledge-curator role doesn't earn its keep. Brilliant is the cross-session knowledge layer; team scratchpads are session-local. Documented in common-prompt.md \"Brilliant Routing.\"\n- **A Carus-Verlag-credentials section in Saar's prompt** — per your B-confirmation, PO is rotating directly. Saar's prompt instructs flag-as-GOTCHA, never auto-fix.\n- **Restart-trauma history in startup.md** — per your \"lean\" instruction. The `framework-research/startup.md` carries 185 lines of restart history; this one is 50.\n\n## My honest residual concerns\n\n- **Tampere's three streams are ambitious for one agent in low-volume cadence.** If the kavaleht-cycle hits at the same week as the listening-guides deadline (T-12n through T-10n), there will be queueing pressure. Mitigation is in the prompt (Tobi sequences via TaskCreate) but PO should know this is the bottleneck most likely to surface.\n- **Koidula's stakeholder-map first-artifact gate is non-trivial.** Building it from Brilliant + the canonical plan + the email threads is ~30-60 minutes of focused work before any drafting can happen. If PO wants drafts within hour 1 of session 1, the gate gets in the way. Recommendation: treat it as session 1's primary deliverable, not a blocker on draft work.\n- **No agent currently knows the 2025 feedback verbatim.** Common-prompt points at it; individual prompts reference key items (Saar on logistics, Tampere on listening-guide demand, Koidula on Liisa's voice). The first time each agent touches their deliverable, they should re-read the relevant 2025-feedback section. Consider adding a session-1 read-the-feedback step to startup.md if PO thinks this should be enforced.\n\nTake it from here when you're ready. I'll claim and consolidate the package into a single transplantable artifact bundle if you want — just say the word.\n\n— Celes\n\n(*FR:Celes*)",
-    "summary": "esl-suvekool drafting package ready for PO review",
-    "timestamp": "2026-05-01T20:23:42.084Z",
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-04-30T11:18:10.185Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T11:18:10.185Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:23:50.179Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:23:50.179Z",
+    "from": "medici",
+    "text": "[2026-04-30 14:32] Aen — audit complete.\n\n**Verdict: publish-ready with 4 minor edits.**\n\nFull report: `teams/framework-research/docs/audit-2026-04-30-konteinerite-standard.md` (15 GREEN, 4 YELLOW, 4 framing/drift, 0 RED).\n\n**Coherence (all GREEN):** tier defs, 4-role RACI, TBD placeholders, all cross-refs (V2 `1115095052`, ITOps `I`, Linux page `1335984130`, TPS board 90, Roland Kilusk, Ruth Türk, RFC #2), banner text — all consistent across the 4 docs.\n\n**Quality (mostly GREEN):** standard mirrors Linux structural fingerprint faithfully (title pattern, no frontmatter, exception clause in preamble, H2 sections with H4 sub for \"Uute konteinerite juurutus\"). Single-ET prose with EN product nouns inline. 9-field intake complete. 4-step closing flow accurate. Acceptance criteria all measurable. RFC #2 bridge text accurate.\n\n**4 YELLOW edits to fix before publish:**\n\n- **Y1.** Standard line 35: ET typo `stdere-i` → `stderr-i`\n- **Y2.** Standard line 50: ET grammar `lokaalne registr` → `lokaalne register`\n- **Y3.** Intake field 3 label: `Sensitivity tier` → ET equivalent (e.g., `Kriitilisuse tase`) — only EN word in otherwise pure-ET field labels; also re-aligns with standard's \"kriitilisus\" framing.\n- **D2 (one-clause clarification):** Standard line 15 Tier 2 deviation tolerance reads as \"opt out of standard\" — add \"(intake-vorm on siiski kohustuslik)\" to close ambiguity.\n\nOptional polish (Y4 word count ~1015 vs target 700, D1 citation softening, D3 step-3 framing, D4 logging governance) — defer to Stage-1 or PO call.\n\n~5 min of edits for Brunel, then ready for V2 publish. Drafts otherwise solid.\n\n(*FR:Medici*)",
+    "summary": "Audit verdict: publish-ready with 4 minor edits",
+    "timestamp": "2026-04-30T11:20:58.446Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-04-30T11:21:03.409Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T11:21:03.409Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-04-30T11:21:08.430Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T11:21:08.430Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 14:26] All 4 mechanical fixes applied. Both files publish-ready.\n\n**`evr-sisene-konteinerite-standard-v0.1.md`:**\n- Y1: `stdere-i` → `stderr-i` (Logimine section, line 35)\n- Y2: `lokaalne registr` → `lokaalne register` (RACI table Sysops/Infra row, line 50)\n- D2: Tier 2 line 15 — appended `(intake-vorm on siiski kohustuslik)` to close opt-out ambiguity\n\n**`evr-konteinerite-intake-template-v0.1.md`:**\n- Y3: Field 3 label `Sensitivity tier` → `Kriitilisuse tase` (now ET-pure across all 9 field labels)\n\nFilename kept as `v0.1.md` per your call. Author attribution `(*FR:Brunel*)` left as-is at file bottoms — the fixes are mechanical and don't warrant flagging the audit cycle in the artifact itself (audit trail lives in `audit-2026-04-30-konteinerite-standard.md`).\n\nY4 word count, D1 citation softening, D3 step-3 framing, D4 logging governance — deferred per your direction.\n\nReady for Stage-0 V2 publish whenever PO greenlights.",
+    "summary": "4 audit fixes applied — publish-ready",
+    "timestamp": "2026-04-30T11:22:41.087Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 14:29] Correction to my prior message — the 3 standard-file edits hadn't actually landed yet (file-state mid-air collision; my optimistic report was wrong, sorry). They are landed NOW.\n\n**Standard file diff verified:**\n- Y1 line 35: `stdere-i` → `stderr-i` ✓\n- Y2 line 50: `lokaalne registr` → `lokaalne register` ✓\n- D2 line 15: `(intake-vorm on siiski kohustuslik)` appended to the Tier 2 deviation clause ✓ — preserved the user's mid-edit addition about \"konteineri eluiga, mille lõppedes ta kas kustutatakse või edutatakse Tier 1\"\n\n**Intake template** Y3 was already applied in first pass (Field 3 → `Kriitilisuse tase`).\n\nAll 4 audit fixes now genuinely in place. Both files publish-ready. Apologies for the premature SendMessage — should have re-read after the collision before reporting.",
+    "summary": "Correction: standard-file edits now actually applied",
+    "timestamp": "2026-04-30T11:23:09.053Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T11:23:12.694Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T11:23:12.694Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 14:38] `[speculative]` markers applied across all 3 files.\n\n**`evr-sisene-konteinerite-standard-v0.1.md` — 13 markers:**\n- Tech-stack lock-in (orkestraator-keelud — para 4)\n- Tier-süsteemi spine + each tier definition (3 markers — Tier 0, 1, 2)\n- Section heading \"Baasturvalisus ja konteineri kuvand\" — Linux-standard-i adaptatsiooni märk\n- Saladuste Tier-jaotus (Swarm-secret vs env)\n- Image-base list (`alpine`, `debian-slim`, `distroless`)\n- `:latest`-keeld\n- `--privileged`-keeld + uid 1000\n- Cloudflare Tunneli kohustuslikkus\n- Secrets rotation ownership (tooteomanik vs ITOps)\n- Delinea / RBAC plaan\n- Monitooring section (whole-section marker — `healthcheck` mandate, OOM nähtavus)\n- Logimine: syslog-konkreetne mehhanism + Tier 2 audit-vähendus\n- Commit-pealt-juurutuse Tier-eristus\n- Intake-vormi väljakogum\n- RACI tabeli pre-flight (RFC #2 review pending — whole RACI is draft-state)\n\n**`evr-konteinerite-intake-template-v0.1.md` — 2 markers:**\n- Field 3 (tier descriptions) — anchored to standard, same speculative status inherited\n- Field 9 acceptance-criteria example list (apex-research-derived)\n\n**`evr-konteinerite-tracking-issue.md` — 2 markers:**\n- 4-role RACI scope-line (RFC #2 review pending, draft-state)\n- Acceptance criterion 4 (bridge-logic between issue close ↔ RFC #2 review-status close — Brunel inference)\n\n**Anchored content NOT marked** (per your definition):\n- Linux standard structural mirror itself (3-tier shape, exception clause, section spine)\n- `Eesti-Raudtee/hello-world-container` direct quotes (sshd `-e` flag, secret-flow, deploy.yml versioning)\n- PO-confirmed decisions: V2 (id 1115095052), TPS, ITOps space `I`, page 1335984130, title\n\nFiles still publish-ready — markers signal \"Stage-1 reviewers please confirm/adjust\" without breaking flow. No content rewrites; only inline annotation.",
+    "summary": "Speculative markers applied — publish-ready",
+    "timestamp": "2026-04-30T11:28:57.048Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T11:29:00.996Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T11:29:00.996Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 15:02] Done. Delta summary by part:\n\n**Part A — Intake-form fields restructured.** Field 6 was overloaded (network exposure conflated who-can-reach + transport + auth + shell-vs-web). Split into 3 cleaner fields:\n\n- **6. Avalikud teenused (HTTP / dashboard / API)** — per-service: DNS name, internal port, exposure scope (LAN / VPN / CF Tunnel + auth / CF Tunnel open). Allows multi-service entries.\n- **6b. Interaktiivne shell-ligipääs (SSH)** — separate field for operator/agent shell. Channel choice: none / Cloudflare Access SSH-proxy / direct-SSH via Tailscale or VPN / open-port SSH (banned Tier 0/1). Plus host-name and authorized-user-set.\n- **6c. Autentimismehhanism (per-channel)** — explicit auth selection for each public HTTP service: **EntraID SSO** (Azure AD), Cloudflare Access, mTLS, or open. SSH always pubkey.\n\nNet field count: 9 → 11. Sub-numbered (6/6b/6c) so it reads as \"network section\" not \"3 new top-level fields.\"\n\n**Critical correction on auth anchor:** team-lead brief said \"presumably WSO2 SSO or equivalent\" — that's incorrect. EVR's actual SSO mechanism is **EntraID (Microsoft Azure AD)**, confirmed via Confluence:\n- `UAM - SSO and EntraID User Provisioning` (FSM page 536248326): \"SSO login and user provisioning have been implemented for Estonian Railways' ServiceNow instance from the Estonian Railways Azure tenant\"\n- Delinea Secret Server page (INFOSEC 851607559): \"Autentimine SSO kaudu oma evr.ee kontoga\"\n\nWSO2 in the EVR codebase is an **integration platform** (`wso2mi.evr.ee`, Micro Integrator for TAF/TAP message routing), NOT an SSO mechanism. Standard + intake-form both anchor to EntraID, with Confluence citation in the speculative-marker.\n\n**Part B — apex-team worked example.** Replaced the placeholder with a full table-format example at the bottom of the intake template. Key choices:\n- Tier 1 (not Tier 2) — apex-team's pikem eluiga + meeskonna sõltuvus push it above Tier 2's \"≤4-week PoC\" threshold. Marked `[speculative]` since this is my calibration call.\n- Dashboard via Cloudflare Tunnel + EntraID SSO at `dashboard.apex-research.dev.evr.ee`\n- SSH via Cloudflare Access SSH-proxy at `ssh-apex-research.dev.evr.ee` (NOT current direct-port-2222 pattern — current is non-compliant; example is target-state)\n- Acceptance criteria call out the migration: \"praegune avatud-pordi paigaldus dekomissioneeritud või siirdatud uue Cloudflare Tunneli taha\"\n\n**Part C — Standard IAM/PAM ripple.** Restructured the IAM/PAM section into two named channels: \"Interaktiivne shell-ligipääs\" (existing content) + new \"Avalikustatud web-UI / dashboard\" paragraph mandating EntraID SSO with Cloudflare-Access-as-stopgap fallback. Cited the FSM Confluence page in the speculative marker so reviewers can audit the EntraID claim.\n\nFiles publish-ready. Stage-0 push can proceed when PO greenlights.",
+    "summary": "apex-team example baked in; IAM/PAM ripple done",
+    "timestamp": "2026-04-30T11:57:27.944Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T11:57:33.815Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T11:57:33.815Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 15:18] Done. Pre-flight grep: only 2 live VL/Vestluslahendus refs in the 3 deliverables (tracking-issue Eesmärk para, intake-form Field 1 example). Standard had zero. Harvest doc kept VL ref (out of scope per brief).\n\n**A. Tracking issue body — VL stripped + VJS2/apex-team framing baked in.**\n\n- **Eesmärk paragraph rewritten:** \"VJS2 meeskond (juht: Ruth Türk) soovib juurutada apex-team AI-uurimismeeskonna konteinerina EVR taristusse. See konkreetne juurutus-vajadus on tõmme, mis ajendas käesoleva ettepaneku — EVR sisese konteinerite standardi — koostamist. Standard formaliseerib, kuidas selliseid juurutusi (apex-team ja edaspidi sarnased ad-hoc konteineripaigaldused) saab EVR-is turvaliselt taotleda...\" Followed by existing Stage-1/Stage-2 framing + a new sentence cross-linking to the intake-template apex-team example.\n- **Lisa info section updated:** Added \"Taotlev meeskond: VJS2 (juht: Ruth Türk)\". Reworded \"Esimene tarbiv tenant: apex-research konteiner\" → \"Esimene tarbiv juurutus: apex-team (apex-research / framework-research initsiatiiv)\" with the two target DNS names.\n\n**B. Intake template — apex-team example aligned.**\n\n- **Field 1 example:** \"Mihkel Putrinš (mihkel.putrinsh@evr.ee), VJS2 meeskond (juht: Ruth Türk). Sub-initsiatiiv: framework-research / apex-research. Tooteomanik: Ruth Türk.\"\n- **Worked example table row 1:** \"VJS2 meeskond (juht: Ruth Türk, kontakt: mihkel.putrinsh@evr.ee). Sub-initsiatiiv: framework-research / apex-research. Tooteomanik: Ruth Türk.\"\n\n**C. Standard — spot-check confirmed zero VL refs.** No edits needed — standard is appropriately generic (org-tasandi standard, not VJS2-specific).\n\n**No new `[speculative]` markers added** — VJS2 team-name + Ruth as lead are PO-anchored facts (per brief), not Brunel inference. Apex-team workload + cross-link to intake example are factual descriptions, not speculation.\n\n**Sanity-check anchor:** Workspace `CLAUDE.md` doesn't list \"VJS2\" as a project (it lists hr-platform, ai-teams, etc.). VJS2 there is implied via the V2 Confluence space (id 1115095052) which Finn confirmed is owned by Ruth. PO is the anchor for the team-name itself.\n\nReady for Stage-0 publish.",
+    "summary": "VL stripped, VJS2/apex-team framing applied",
+    "timestamp": "2026-04-30T12:15:17.851Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T12:15:22.419Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:15:22.419Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "[2026-04-30 15:32] Aen — re-audit complete.\n\n**Verdict: publish-ready with 6 minor issues. No new RED, no contradictions introduced.**\n\nReport appended as \"Re-audit pass\" section at `teams/framework-research/docs/audit-2026-04-30-konteinerite-standard.md`. Pass-1 fixes verified applied. VL leakage = 0 (clean grep across all 3 docs).\n\n**New GREEN (changes hold up):**\n- Channel-split IAM/PAM (shell vs web-UI) is sensible. CF-Access-as-stopgap framed clearly.\n- EntraID anchor cited correctly (FSM `536248326`) in both standard + intake.\n- Apex-team Tier 1 calibration sound — standard's Tier 1 description explicitly names \"apex-research\" as example; 8-month lifetime + multi-operator dependency clearly fail Tier 2's tests.\n- Apex worked example covers all 11 fields; acceptance criteria measurable; `:5173` decommission encoded.\n- Field 6/6b/6c subdivision coherent (web / shell / per-channel auth).\n\n**6 NEW YELLOW issues (severity-ordered):**\n- **NY1.** \"VJS2 meeskond (juht: Ruth Türk)\" in tracking + intake — per Finn's harvest, **VJS2** = legacy product space, **V2** = \"VJS 2\" = Ruth's collaboration space. Recommend \"V2 meeskond\" or \"VJS 2 meeskond\" (with space). PO confirmation needed.\n- **NY2.** Speculative-marker over-application (3 sub-cases): tier markers redundant with parent (lines 11/13/14/15); CIS Docker Benchmark items (`:latest`, `--privileged`) marked as speculative when they're industry standard; 19 markers on 1448 words dilutes signal. Standard reads as heavy-hedged — pre-v1.0 deliverable: resolve all 19.\n- **NY3.** Field 6c missing API-token / bearer-token option for programmatic API access (Field 6 lists \"API endpoint\" as a candidate).\n- **NY4.** Field 8 \"Vali üks\" doesn't fit apex example's hybrid secret routing (GitHub Secrets + Delinea split). Add \"kombinatsioon\" or multi-select.\n- **NY5.** Delinea references (standard line 36, intake line 126) lack INFOSEC `851607559` cite — inconsistent with EntraID anchor pattern.\n- **NY6.** Field 6 + 6c interaction undefined for VPN-only services (network-tier auth vs HTTP-tier auth ambiguity). One-sentence clarification closes it.\n\nPlus 6 ND cosmetic items (typo `ehk`→`või` line 9, missing period line 19, bold inline labels vs H3/H4, etc.).\n\nNY1 + NY2 + NY5 worth applying pre-publish if Brunel has 10 min. Rest can wait.\n\n(*FR:Medici*)",
+    "summary": "Re-audit verdict: publish-ready with 6 minor issues",
+    "timestamp": "2026-04-30T12:22:01.579Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-04-30T12:22:10.868Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:22:10.868Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "medici",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"medici\",\"timestamp\":\"2026-04-30T12:22:15.900Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:22:15.900Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 15:35] Proposal doc ready: `~/Documents/github/mitselek-ai-teams/teams/framework-research/docs/proposed-diff-2026-04-30-pass2.md`\n\n**No live edits applied.** Re-read all 3 source files fresh before quoting (no mid-air-collision risk).\n\n**Contents by NY-id:**\n\n- **NY1** — Team-name framing, all 3 options laid out with before/after for each affected locus. Brunel recommendation: **Option (ii) `VJS 2 meeskond` (with space)** — matches Confluence space `VJS 2`, removes visual-collision with legacy `VJS2` key at root rather than via disambiguation note.\n\n- **NY2** — Speculative-marker inventory. **Actual count is 22, not 19+2+2 as in your brief** (16 standard + 4 intake + 2 tracking — flagged in the doc). Per-marker KEEP/REMOVE table with rationale. Recommended cuts: 8 markers removed (6 standard + 2 intake), bringing total to **14 surviving markers** that carry actual signal. Removed: redundant Tier-children of the parent S02 marker (3); industry-standard CIS Docker Benchmark items not actually speculative (`:latest`-keeld, `--privileged`-keeld, image-base list — 3); minor framing items (Tier-jaotus saladustele, Tier 2 logimise reduction — 2). All EntraID/Cloudflare Tunnel mandates / RACI draft-state / monitoring-open / Delinea-RBAC-undefined markers KEEP.\n\n- **NY5** — Delinea citation parity. INFOSEC page `851607559` cite added in 2 loci (standard line 36, intake apex-team row 8). Field 8 option-list mention left uncited — adding hyperlink there changes the field's tone.\n\n- **ND** — 7 cosmetic fixes flagged:\n  - ND1: tracking issue author attribution `(_FR:Brunel_)` → `(*FR:Brunel*)` (italic vs. bold inconsistency, the standard and intake use bold)\n  - ND2: `nominaeritud` → `nomineeritud`\n  - ND3: `neljarolline` → `neljaroleline`\n  - ND4: `Konteineri restartti` → `Konteineri restardil`\n  - ND5: `Swarm-i `native` `healthcheck`-i` → natiivse (mixed-language extra inline-code wrap)\n  - ND6: `avaliku porti` → `avaliku pordi`\n  - ND7: `agendite mälu` → `agentide mälu`\n\nApplication order included at the end of the doc.\n\nAwaiting PO greenlight on each NY/ND item — Brunel applies in a single deliberate pass with re-read-before-edit discipline.",
+    "summary": "Proposal doc ready for PO review",
+    "timestamp": "2026-04-30T12:26:31.146Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T12:26:38.017Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:26:38.017Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 15:42] Proposal doc revised at the same path: `~/Documents/github/mitselek-ai-teams/teams/framework-research/docs/proposed-diff-2026-04-30-pass2.md`\n\n**Drift survey post-PO edits:**\n\n- **Standard file** — unchanged from my last read; all line numbers + ND items still apply.\n- **Intake template** — unchanged from my last read; all line numbers + ND items still apply.\n- **Tracking issue** — Eesmärk paragraph (line 19) tightened by PO (\"See konkreetne juurutus-vajadus on tõmme, mis ajendas...\" → \"See konkreetne juurutus-vajadus ajendas...\"). Doesn't affect any of the markers I propose to keep/remove.\n\n**Drop:** NY1 removed from doc per your direction. Replaced with a one-line note in the \"Out of scope\" section explaining PO chose option (i) and edited live files in parallel.\n\n**New finding (ND8) — team-name spelling inconsistency:**\n\nPO's parallel edits introduced a 4-loci inconsistency:\n- Tracking issue line 19 now reads `**VJS 2 meeskond**` (with space)\n- Tracking issue line 74, intake line 15, intake line 117 all still read `VJS2` (no space)\n\nTwo readings — flagged in ND8 with both directions:\n1. **If \"option (i) keep VJS2 meeskond\" was the actual choice** → line 19 is an outlier from PO's parallel edit, should be brought back to `VJS2`.\n2. **If PO's line-19 edit was deliberate (preferring `VJS 2`)** → the 3 `VJS2` loci should be changed to `VJS 2`.\n\nCannot tell which from the code state alone. **Need PO clarification on which is canonical** before I touch this one. Other 7 ND items don't depend on this.\n\n**Unchanged from prior version:** NY2 (22 markers → 14, with KEEP/REMOVE table), NY5 (Delinea citations parity), ND1-7. All \"before\" blocks re-quoted from the fresh re-read — no stale content.\n\nAwaiting PO greenlight on items + ND8 direction.",
+    "summary": "Proposal doc revised — NY1 dropped, ND8 added",
+    "timestamp": "2026-04-30T12:28:58.783Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T12:30:52.700Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:30:52.700Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 15:42] All 9 approved changes applied. Verification by item:\n\n**NY2 — marker pruning (8 cuts):** ✓\n- S03/S04/S05 (Tier-child markers, lines 13/14/15): removed ✓\n- S07/S08/S09 (image-supply-chain bullet markers, lines 21-23): removed and bullets re-folded into prose ✓\n- S10 (`--privileged`-keeld marker, line 25): removed ✓\n- S17 (Tier 2 logimise marker, line 45): removed ✓\n- I01 (Field 3 header marker): removed ✓\n- I03 (Field 9 marker): removed; \"Konkreetne kogum sõltub teenusest\" tail rephrased as `Vt allpool täielikku apex-team näidet.` to keep the cross-link to the worked example ✓\n\nFinal marker grep: standard 12, intake 2, tracking 2 = **16 surviving**. Note: my proposal-doc summary arithmetic said \"16 → 10 KEEP\" which was wrong; actual KEEP count was always 12 (S01,S02,S06,S11,S12-S16,S18-S20). 16-8removes=12. File state is correct, proposal-doc arithmetic was a typo.\n\n**NY5 — Delinea citations:** ✓\n- Standard line 36: `(Delinea Secret Server)` → `([Delinea Secret Server](https://eestiraudtee.atlassian.net/wiki/spaces/INFOSEC/pages/851607559))` ✓\n- Intake line 126 (apex-team row 8): `Delinea Secret Server-isse` → `[Delinea Secret Server](...)-isse` ✓\n- Grep confirms `851607559` appears in both files (and proposal/audit docs as expected).\n\n**ND1 — author italic→bold:** ✓ tracking line 78 now `(*FR:Brunel*)`. Grep for `_FR:Brunel_` finds zero hits in the live drafts (one match remains in `proposed-diff-...md`, which is intentional — that's where the diff was specified).\n\n**ND2 — `nominaeritud` → `nomineeritud`:** ✓ tracking line 65.\n\n**ND4 — `Konteineri restartti` → `Konteineri restardil`:** ✓ intake line 127.\n\n**ND5 — `\\`native\\` \\`healthcheck\\`-i` → `natiivse \\`healthcheck\\`-i`:** ✓ standard line 40.\n\n**ND6 — `avaliku porti` → `avaliku pordi`:** ✓ intake line 66 Field 6b option 4.\n\n**ND7 — `agendite mälu` → `agentide mälu`:** ✓ intake line 125 Field 7 row.\n\n**ND8 — VJS2 spelling consistency:** ✓ tracking line 19 reverted to `**VJS2 meeskond**` (no space). 4/4 loci now aligned: tracking line 19 = `VJS2`, tracking line 74 = `VJS2`, intake line 15 = `VJS2`, intake line 117 = `VJS2`. Note: tracking line 47 retains the parenthetical `V2 (VJS 2)` — that's the Confluence space's canonical literal name, not the team-name string, so unchanged by intent.\n\n**ND3 — `neljarolline`:** NOT applied per PO's native-speaker rejection. Standard line 55 still reads `neljarolline`.\n\nEdge cases:\n- Standard's S07/S08/S09 markers were threaded into a 3-line bullet list (the lines 21-23 bullets); removing the markers required re-folding the prose into a single paragraph (`Konteinerite baasturvalisuseks järgime...kõik saladused juurutatakse...Kuvandid peavad olema ehitatud...`). That structural fold was implicit in the proposal but worth flagging — file now reads as cleaner prose, not three speculative-tagged half-sentences.\n- Author attribution at file bottoms left as-is per your direction (audit cycle in audit doc, not artifacts) — only ND1's italic→bold cosmetic applied.\n\nFiles publish-ready. Proposal-diff doc at `proposed-diff-2026-04-30-pass2.md` retained as the audit trail for this pass.",
+    "summary": "Pass 2 applied — 9 of 9 changes verified",
+    "timestamp": "2026-04-30T12:34:06.313Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T12:34:15.619Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:34:15.619Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 16:01] Done. Stage-1 ask updated in `evr-konteinerite-tracking-issue.md`.\n\n**Change:** 3-step ask → 4-step ask. New step 1 = move page from D365 to V2.\n\nInserted brief context blockquote above the numbered list (per your phrasing): \"Standard publitseeriti algselt D365 tööruumi (selle koostaja Mihkel Putrinš-il puudus V2-s loomisõigus). Esimese sammuna palume Ruthi (kes on V2 ruumi omanik) leht V2 tööruumi tõsta — see on ~30 sekundi tegevus tema õigustega.\"\n\nNew step 1 includes: page id `1713864752`, full URL `https://eestiraudtee.atlassian.net/wiki/spaces/D365/pages/1713864752/EVR+sisene+konteinerite+standard` (rendered as autolink), and a one-line note that D365 is \"ajutine logistika-lahendus loomisõiguse-piirangu tõttu\" so Stage-1 reviewers don't think the standard belongs in D365 long-term.\n\nOld steps 1/2/3 (review → escalate → final-move-to-ITOps) renumbered to 2/3/4. Content unchanged.\n\nNo other edits. Banner in standard itself untouched per your direction — \"avaldatud V2 tööruumis\" describes the eventual state once Ruth completes step 1.",
+    "summary": "D365→V2 move added as Ruth's Stage-1 step 1",
+    "timestamp": "2026-04-30T12:57:32.930Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T12:57:37.954Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T12:57:37.954Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 16:42] Done. `evr-konteinerite-tracking-issue.md` now matches TPS-583's V2-direct state.\n\n**Stage-0 ettepaneku link section:**\n- Replaced \"Pärast PO heakskiitu publitseeritakse... <lisada pärast publitseerimist>\" placeholder with a live Stage-0 leht bullet pointing to <https://eestiraudtee.atlassian.net/wiki/spaces/V2/pages/1715798017/EVR+sisene+konteinerite+standard> (page id `1715798017`).\n- Reordered: live page URL first, repo mustand-allikad second (the published page is now the canonical Stage-0 artifact, repo files are versioned source).\n\n**Stage-1 ülesanne section:**\n- Dropped the \"Standard publitseeriti algselt D365 tööruumi...\" blockquote.\n- Dropped step 1 (D365→V2 move).\n- Renumbered: review (was 2, now 1) → escalate (was 3, now 2) → final V2→ITOps move (was 4, now 3). 4 steps → 3 steps.\n\nNo other edits. Lisa info, RFC #2 bridge, acceptance criteria, Skoop sections all unchanged.\n\n**Drift flag (out of scope, FYI only):** Line 19 still reads `**VJS 2 meeskond**` (with space) — this drifted back during PO's parallel cosmetic edits since my Pass-2 ND8 fix that aligned all 4 loci to `VJS2`. I have NOT touched this in the current pass per your \"Stage-1 ask only\" scope. Flag for whenever you want to re-align.",
+    "summary": "Tracking-issue file aligned with TPS-583 V2-direct state",
+    "timestamp": "2026-04-30T13:49:31.272Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T13:49:37.122Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T13:49:37.122Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 16:57] Done. All 3 loci aligned to `VJS 2 meeskond` (with space).\n\n**Edits applied:**\n\n- `evr-konteinerite-intake-template-v0.1.md` line 15 (Field 1 example): `VJS2 meeskond` → `VJS 2 meeskond` ✓\n- `evr-konteinerite-intake-template-v0.1.md` line 117 (apex-team row 1): `**VJS2 meeskond**` → `**VJS 2 meeskond**` ✓\n- `evr-konteinerite-tracking-issue.md` line 76 (Lisa info Taotlev meeskond): `VJS2` → `VJS 2` ✓\n\n**Tracking issue line 19** already had `**VJS 2 meeskond**` from PO's earlier drift — left as-is per your \"leave as-is\" direction. That's now consistent rather than the outlier it was a pass ago.\n\n**Standard:** spot-check confirmed zero `VJS2` references — no edits needed.\n\n**Verification grep:**\n- `grep -c \"VJS2 meeskond\"` across all 3 deliverables = **0/0/0** ✓\n- Surviving `VJS 2` instances in scope: intake line 15, intake line 117, tracking line 19 (team-name in Eesmärk para), tracking line 41 (in `V2 (VJS 2)` Confluence-space-name parenthetical — intentional, untouched), tracking line 76 (Taotlev meeskond)\n- All `V2` space-key references unchanged (URLs, page ids, banner)\n- Legacy-product `VJS2` Confluence-space references — none in deliverables to begin with\n\nFiles publish-ready.",
+    "summary": "ND8 reverted to (ii) — VJS 2 meeskond aligned",
+    "timestamp": "2026-04-30T13:53:17.906Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T13:53:22.673Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T13:53:22.673Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-04-30 17:04] Done. All 3 file edits applied.\n\n**1. `evr-sisene-konteinerite-standard-v0.1.md` line 49 (Uute konteinerite juurutus):**\n- Before: `täitma intake-vormi (vt \\`evr-konteinerite-intake-template-v0.1.md\\`)`\n- After: `täitma [intake-vormi](https://eestiraudtee.atlassian.net/wiki/spaces/V2/pages/1715699714/Konteineri+tarne+taotlus+intake-vorm)`\n- Repo-filename reference replaced with markdown-linked Confluence URL.\n\n**2. `evr-konteinerite-intake-template-v0.1.md` line 5:**\n- Before: `**EVR sisene konteinerite standard** (vt vastav Confluence leht)`\n- After: `**[EVR sisene konteinerite standard](https://eestiraudtee.atlassian.net/wiki/spaces/V2/pages/1715798017/EVR+sisene+konteinerite+standard)** (V2 Confluence ruum)`\n- Inline-bolded title now wraps the Confluence URL; trailing parenthetical reduced to \"V2 Confluence ruum\" since the link itself carries the page identifier.\n\n**3. `evr-konteinerite-tracking-issue.md` Stage-0 ettepaneku link section:**\n- Restructured per your suggested shape — live Confluence URLs lead, repo mustand-allikad demoted to \"allikas-mustand\" framing.\n- Both URLs as autolinks (matches the existing autolink style elsewhere in the file).\n- Repo file list unchanged.\n\nNo other edits in any of the 3 files. Quick spot-check: `Konteineri+tarne+taotlus+intake-vorm` URL appears 2× (standard + tracking), `EVR+sisene+konteinerite+standard` URL appears 2× (intake + tracking) — both expected.\n\nFiles publish-ready.",
+    "summary": "Live Confluence links wired into all 3 deliverables",
+    "timestamp": "2026-04-30T13:57:40.039Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-04-30T13:57:44.836Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-04-30T13:57:44.836Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777882602337@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-04T08:17:32.498Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-04T08:17:32.498Z",
     "color": "blue",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:23:57.066Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:23:57.066Z",
-    "color": "blue",
+    "from": "brunel",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777882603126@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-05-04T08:17:47.616Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-04T08:17:47.616Z",
+    "color": "green",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:24:10.436Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:24:10.436Z",
-    "color": "blue",
+    "from": "medici",
+    "text": "[2026-05-04 11:18] Aen — closing report.\n\n- **[LEARNED]** Speculative-marker discipline is double-edged — when count exceeds ~1 per 100 words OR parent/child markers redundant OR industry-standard items get tagged, the marker dilutes signal. Future audit pattern: flag over-application explicitly.\n- **[DEFERRED]** None from session 22 — both audit passes delivered, all findings flagged in single report file.\n- **[WARNING]** NY1 (VJS2 vs V2 team-name ambiguity) needs PO confirmation before Stage-0 publish — \"VJS2 meeskond\" in tracking + intake reads as legacy product team, not Ruth's V2 collab space team. Don't let publish ship without that disambiguation decision.\n- **[UNADDRESSED]** None — all team-lead requests this session (audit pass 1, audit pass 2) completed and reported.\n\nScratchpad updated at `teams/framework-research/memory/medici.md`. Approving shutdown. (*FR:Medici*)",
+    "summary": "Medici closing report + shutdown approved",
+    "timestamp": "2026-05-04T08:18:23.626Z",
+    "color": "yellow",
     "read": true
   },
   {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:24:16.084Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:24:16.084Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:24:20.828Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:24:20.829Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:24:27.925Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:24:27.925Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T20:38:51.195Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-01T20:38:51.195Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "[2026-05-01 21:58]\n\n- **[LEARNED]** Three-layer context-read ladder validated end-to-end: initial proposal → Brilliant query (PO push) → toolkit read (PO push). Each pushback surfaced material that would have shipped wrong. Codified in scratchpad as the calibration: never skip a context layer the spawn brief points to; cost of one extra read is small, cost of mis-scoped role definition is large.\n- **[DEFERRED]** \"Operational team\" archetype (no tdd-pipeline, succession-first, low-volume cadence, persistent roster + episodic sessions) — first of its kind in our corpus. If a second similar-shape team appears, promote to wiki entry via Cal Protocol A. Per Aen's standing instruction.\n- **[WARNING]** I treated TeamCreate as session-end ergonomics rather than session-start table stakes; Aen had to patch startup.md (commit `f65fb2a`) before deploy. Future \"lean startup.md\" drafts must distinguish *trim restart-trauma history* (OK) from *trim infrastructure scaffolding* (NOT OK). TeamCreate-at-start + TeamDelete-at-graceful-exit are non-negotiable for any multi-agent-spawning team.\n- **[UNADDRESSED]** None. All five drafting tasks (#5–#9) completed; package shipped, deployed by PO via Aen, three commits live, esl-suvekool session 1 in flight under a separate Claude session.\n\nApproving shutdown.\n\n— Celes\n\n(*FR:Celes*)",
-    "summary": "Closing report + shutdown approval",
-    "timestamp": "2026-05-01T21:58:59.060Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777672714603@celes\",\"from\":\"celes\",\"timestamp\":\"2026-05-01T21:59:00.088Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-01T21:59:00.088Z",
-    "color": "blue",
+    "from": "medici",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1777882603706@medici\",\"from\":\"medici\",\"timestamp\":\"2026-05-04T08:18:25.113Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-04T08:18:25.113Z",
+    "color": "yellow",
     "read": true
   }
 ]
