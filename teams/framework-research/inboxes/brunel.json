@@ -75,11 +75,5 @@
     "summary": "Live-link refs across standard.md + tracking-issue.md",
     "timestamp": "2026-04-30T13:56:51.082Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777882603126@brunel\",\"from\":\"team-lead\",\"reason\":\"session 22 extension close\",\"timestamp\":\"2026-05-04T08:16:43.126Z\"}",
-    "timestamp": "2026-05-04T08:16:43.126Z",
-    "read": true
   }
 ]

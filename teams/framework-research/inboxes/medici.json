@@ -19,11 +19,5 @@
     "timestamp": "2026-04-30T12:17:41.880Z",
     "color": "yellow",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1777882603706@medici\",\"from\":\"team-lead\",\"reason\":\"session 22 extension close\",\"timestamp\":\"2026-05-04T08:16:43.706Z\"}",
-    "timestamp": "2026-05-04T08:16:43.706Z",
-    "read": true
   }
 ]

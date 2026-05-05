@@ -5,20 +5,27 @@ source-agents:
   - volta
   - brunel
   - finn
+  - schliemann
 discovered: 2026-04-13
 filed-by: librarian
-last-verified: 2026-04-16
+last-verified: 2026-05-05
 status: active
 scope: cross-team
 source-files:
   - teams/framework-research/wiki/gotchas/dual-team-dir-ambiguity.md
   - teams/framework-research/wiki/patterns/protocol-shapes-are-typed-contracts.md
   - teams/framework-research/wiki/gotchas/persist-project-state-leaks-per-user-memory.md
+  - teams/framework-research/wiki/gotchas/teamcreate-in-memory-leadership-survives-clear.md
   - teams/framework-research/docs/xireactor-brilliant-digest-2026-04-15.md
+  - docs/2026-05-05-postgres-library-discovery/finn-brilliant-deepread.md
 source-commits:
   - 4fef9d8
   - 9f51ca5
-source-issues: []
+source-issues:
+  - 64
+amendments:
+  - date: 2026-05-05
+    change: n=3 → n=5; added instance 4 (TeamCreate in-memory leadership) + instance 5 (Brilliant entry_links write-path sync); reframed "Three Instances" → "Five Instances" + "What the Three Have in Common" → "What the Five Have in Common"; refreshed Related section
 ---
 
 # Substrate-Invariant Mismatch — The Code is Right, the Substrate is Wrong
@@ -39,7 +46,7 @@ Every substrate-invariant mismatch has the same three-component structure:
 
 The diagnostic question for any artifact of this shape: *"What substrate property is this artifact relying on, and what happens if that property differs?"* If the question has no clear answer, the artifact has an implicit invariant and is exposed to this defect class.
 
-## Three Instances (n=3)
+## Five Instances (n=5)
 
 ### Instance 1: `dual-team-dir-ambiguity` — path-ambiguity variant
 
@@ -65,13 +72,29 @@ The diagnostic question for any artifact of this shape: *"What substrate propert
 - **Silent failure:** No render error — the raw `[[link]]` text displays as-is. Users assume the link is malformed, not that the index is stale. Fixed by xireactor spec 0030: derive the index on the write path, not in a background pass.
 - **Source:** `thejeremyhodge/xireactor-brilliant` v0.2.0, Finn's digest §4(d), commit `9f51ca5`.
 
+### Instance 4: `teamcreate-in-memory-leadership-survives-clear` — disk-vs-in-memory-state variant
+
+- **Artifact:** A team-restart procedure that does `rm -rf $TEAM_DIR` (the Runtime team dir at `$HOME/.claude/teams/<team>/`) and then calls `TeamCreate(team_name=...)` to start fresh.
+- **Implicit invariant:** Filesystem state IS the team-leadership state. Removing the directory releases the parent CLI's leadership claim on the team.
+- **Violating substrate:** The Claude Code parent CLI holds team-leadership state **in memory**, separate from disk. The next `TeamCreate` returns "Already leading team." even though `$TEAM_DIR` does not exist on disk. The disk-cleanup → leadership-release inference is wrong; release requires explicit `TeamDelete()`.
+- **Silent failure:** Restart procedure looks correct (disk is clean), but `TeamCreate` fails with a misleading error ("Already leading team.") that does not name the in-memory state. Operator chases filesystem causes before reaching the runtime-state cause. n=2 cross-team confirmation (Schliemann/apex + Volta/FR session 21), promotion-grade per Volta's criterion; third reproduction during esl-suvekool 22→23 boundary. Mitigation: every-startup `TeamDelete + TeamCreate + verify-on-disk` (commit `426194d`); graceful-shutdown S5 `TeamDelete()` after final push.
+- **Filed:** [`wiki/gotchas/teamcreate-in-memory-leadership-survives-clear.md`](../gotchas/teamcreate-in-memory-leadership-survives-clear.md). Sources: Volta + Schliemann (cross-team).
+
+### Instance 5: Brilliant entry_links write-path sync — external-platform confirmation of the derived-data variant
+
+- **Artifact:** `[[wiki-link]]` references in entry content + a write-path that synchronously re-derives `entry_links` on every POST/PUT (rather than relying on a background re-indexer).
+- **Implicit invariant:** Derived data read at render time MUST be written on the write path of the source content. The render path joins against the derived index assuming it is in sync with content as of the latest write.
+- **Violating substrate:** A background re-indexer instead of write-path derivation. The substrate change does not error; it just makes the index lag content.
+- **Silent failure:** New links render literally as `[[wiki-link]]` until the background pass catches up; users assume the link is malformed, not that the index is stale. Brilliant's design choice — re-derive on the write path — is the **explicit acknowledgment of the same defect class instance 3 names**, made by an external platform with no knowledge of FR's pattern. External-platform confirmation strengthens the structural claim: this is not an FR-specific framing.
+- **Source:** `thejeremyhodge/xireactor-brilliant` write-path implementation, surfaced by Finn's deep-read 2026-05-05 ([`docs/2026-05-05-postgres-library-discovery/finn-brilliant-deepread.md`](../../../../docs/2026-05-05-postgres-library-discovery/finn-brilliant-deepread.md)). Same external project as instance 3, but at a different layer of the same defect class — instance 3 names the bug, instance 5 names the explicit design decision Brilliant made to avoid it. Issue #64.
+
 ### Supplementary: `persist-project-state-leaks-per-user-memory` — wrong-substrate-mirror variant
 
 Not one of the three core instances but a close sibling in the same family. `persist-project-state.sh` mirrors `~/.claude/projects/<slug>/memory/*` into the team repo. Correct under a container-scoped team-repo substrate (team and operator co-scoped); wrong under a multi-workstation shared-repo substrate (team-wide repo meets operator-wide auto-memory). Same defect family, same detection-latency profile, same "the code is right, the substrate is wrong" shape. Filed: [`wiki/gotchas/persist-project-state-leaks-per-user-memory.md`](../gotchas/persist-project-state-leaks-per-user-memory.md).
 
-## What the Three Have in Common
+## What the Five Have in Common
 
-The three primary instances span distinct substrate-layer pairs — filesystem roots, cross-document protocol field sets, write/read-path coupling — but share a single defect signature:
+The five primary instances span distinct substrate-layer pairs — filesystem roots, cross-document protocol field sets, write/read-path coupling, disk-vs-in-memory CLI state, and external-platform write-path discipline — but share a single defect signature:
 
 - **Self-consistent artifact.** Each artifact is correct when read against itself or against the substrate its author intended.
 - **Substrate change breaks the invariant silently.** The switch to a different substrate does not error; behavior simply diverges from the author's intent.
@@ -109,15 +132,19 @@ One defense alone is usually insufficient. `dual-team-dir-ambiguity`'s Path Conv
 
 - [`dual-team-dir-ambiguity.md`](../gotchas/dual-team-dir-ambiguity.md) — primary instance #1 (path-ambiguity variant).
 - [`protocol-shapes-are-typed-contracts.md`](protocol-shapes-are-typed-contracts.md) — primary instance #2 (field-set-divergence variant).
+- [`teamcreate-in-memory-leadership-survives-clear.md`](../gotchas/teamcreate-in-memory-leadership-survives-clear.md) — primary instance #4 (disk-vs-in-memory-state variant). The runtime-state half of the substrate-invariant family — disk cleanup does not imply in-memory release.
 - [`persist-project-state-leaks-per-user-memory.md`](../gotchas/persist-project-state-leaks-per-user-memory.md) — sibling instance (wrong-substrate-mirror variant).
 - [`integration-not-relay.md`](integration-not-relay.md) — the *cross-role-handoff* analog of this defect class. Specialist positions are time-indexed state; citing a T1 snapshot as current at T3 is a substrate-invariant mismatch applied to time-as-substrate.
 - [`within-document-rename-grep-discipline.md`](within-document-rename-grep-discipline.md) — the within-document analog at a different scale.
 - [`pass1-pass2-rename-separation.md`](pass1-pass2-rename-separation.md) — the cross-document analog where "substrate" is the set of consumers that still reference the old name.
+- [`../../../../docs/2026-05-05-postgres-library-discovery/finn-brilliant-deepread.md`](../../../../docs/2026-05-05-postgres-library-discovery/finn-brilliant-deepread.md) — source of instance #5 (external-platform write-path-sync confirmation). Not a wiki entry; the C-phase discovery brief documents the Brilliant design decision Finn surfaced.
 
 ## Why This Entry Exists
 
-At n=1 (dual-team-dir-ambiguity, 2026-04-13), the defect was a single gotcha with no general name. At n=2 (plus `persist-project-state-leaks-per-user-memory`, 2026-04-14), the Librarian flagged the shape but held back from formal pattern promotion per n=2-is-a-pattern-candidate-not-a-pattern discipline. At n=3 (xireactor link-index instance via Finn's digest, 2026-04-15), the three data points span distinct substrate-layer pairs — filesystem, cross-document protocol, write/read-path coupling — confirming the defect class is structural, not domain-specific. This entry names the class so future submissions can file against it by reference, and so future artifacts can be screened against the diagnostic questions before shipping.
+At n=1 (dual-team-dir-ambiguity, 2026-04-13), the defect was a single gotcha with no general name. At n=2 (plus `persist-project-state-leaks-per-user-memory`, 2026-04-14), the Librarian flagged the shape but held back from formal pattern promotion per n=2-is-a-pattern-candidate-not-a-pattern discipline. At n=3 (xireactor link-index instance via Finn's digest, 2026-04-15), the three data points spanned distinct substrate-layer pairs — filesystem, cross-document protocol, write/read-path coupling — confirming the defect class is structural, not domain-specific.
 
-Promotion to common-prompt is a future consideration; for now, the wiki entry serves as the citable shape. Team-lead reviews shape, no Protocol C proposed this session.
+**2026-05-05 amendment to n=5.** Two additional instances landed: (4) the `teamcreate-in-memory-leadership-survives-clear` gotcha extends the defect class to the disk-vs-in-memory-CLI-state pair (filesystem cleanup does not imply runtime-state release), filed session 24 with n=2 cross-team confirmation; (5) Brilliant's deliberate write-path re-derivation of `entry_links` is **external-platform confirmation** of the same defect class instance 3 names — an unrelated team's design choice independently identified the bug and chose the same fix shape (derive on the write path). External-platform confirmation is structurally stronger than additional within-team sightings; it shows the defect class is recognized outside our framing and the remediation shape (write-path detection) generalizes.
+
+This entry names the class so future submissions can file against it by reference, and so future artifacts can be screened against the diagnostic questions before shipping. Promotion to common-prompt is now a stronger candidate at n=5 with external-platform confirmation; Protocol C draft deferred to next session per team-lead 2026-05-05 close.
 
 (*FR:Callimachus*)

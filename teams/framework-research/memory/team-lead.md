@@ -1,5 +1,80 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 25 WRAP — 2026-05-05 (Postgres-backed library service C-phase + reframed phase A)
+
+**Goal (PO-set):** Thinktank library concept; PO playing with thought of Postgres DB backend + dedicated 24/7 library team for org-wide KB services, learning from Brilliant.
+
+**Shipped:**
+
+- **Issue #64** filed and closed with verdict (proceed to phase A). C-phase deliverable: `docs/2026-05-05-postgres-library-discovery-brief.md` + 5 input memos in `docs/2026-05-05-postgres-library-discovery/` (cal-internal-perspective, finn-brilliant-deepread, finn-staging-review-deepread, finn-polyphony-dev-glance, finn-haapsalu-suvekool-glance).
+- **Issue #65** filed with reframed phase A scope (scaling esl-suvekool path-namespace pattern, NOT designing federation from scratch).
+- **Two commits pushed:** `2abb1ad` session-24 wiki batch (+7 entries, contracts/ opened), `9407966` C-phase discovery brief.
+- **Cal substrate-invariant-mismatch amendment** n=3 → n=5 with two new instances (teamcreate-leadership + Brilliant write-path-sync) — applied this session.
+
+**Mid-session reframe (load-bearing):**
+
+- Initial framing: "design federation layer over per-team markdown wikis."
+- Finn's Haapsalu-Suvekool glance (after submodule pin updated to HEAD) revealed: **Topology B is OPERATIONAL REALITY at esl-suvekool today**, implemented as `Projects/esl/*`, `Meetings/esl/<date>`, `Context/esl/*`, `Resources/esl/*` — path-namespace per team inside shared central Brilliant. Convention IS the federation contract; no separate layer needed.
+- Phase A scope therefore dropped from "design from scratch" to "scale proven pattern + Cal-as-namespace-curator role evolution."
+
+[DECISION — session 25] **Topology B confirmed.** Per-team libraries + central federation, where federation = path-namespace convention inside shared Brilliant.
+[DECISION — session 25] **No fallbacks.** If no curator team alive, Tier 3+ writes refuse with retry-when-up error. `ai_reviewer.py` removed regardless of curator-team shape. Memory feedback `feedback_no_fallbacks.md` extended with this case.
+[DECISION — session 25] **Independence posture.** No fork of `thejeremyhodge/xireactor-brilliant`; learn-from only.
+
+[LEARNED — session 25, integration-not-relay validation] **Bio-memory mismatch is real and verification discipline matters.** PO cited polyphony-dev as battle-proof for Topology B; actual battle-proof was Haapsalu-Suvekool. Finn's polyphony glance returned a clean negative — caught the mismatch before phase A scoped against the wrong reference. Wiki #44 doing its job: verify substrate claims against the actual substrate before downstream design depends on them.
+
+[LEARNED — session 25] **Submodule pin staleness silently misleads.** `.mmp/ESL/Haapsalu-Suvekool` was pinned to commit pre-dating the Brilliant integration. Quick grep on pinned content returned stale negative; updating to HEAD revealed 20+ refs. Always verify submodule pin freshness before trusting absence-of-evidence.
+
+[WARNING — session 25] **Brilliant memory was wrong** (paertela6-only claim from prior session). Verified truth: per-team MCP config governs access, FR currently does NOT have it configured; esl-suvekool does. Memory file `reference_brilliant_mcp.md` rewritten with operational discipline (Brilliant pulse, quality floor, two-consumer pattern, source-of-truth principle).
+
+**Wiki pattern candidates queued for next Cal Protocol A batch (six new from C-phase + two carried):**
+
+1. OSS thin-integration anti-extension signal (Finn, n=1)
+2. Poll-only-substrate + sidecar-derivation as event-driven shape (Finn, n=1)
+3. Soft-verdict discipline on substrate-mapping briefs (Finn meta-process catch, n=1)
+4. Cross-repo glance: confirm citation before assuming inheritance (Finn, n=1)
+5. Path-namespace as federation primitive (Finn, n=1 esl-suvekool)
+6. Two-consumer pattern: direct-MCP vs synthesized-snapshot (Finn, roadwarrior-sync skill, n=1)
+7. (Carried from session 24) `source-team` frontmatter promotion to standard schema (n=2 — Cal Protocol C draft authorized but deferred)
+8. (Carried from session 24) architectural-fact convention promotion to Cal's prompt (n=3 — Cal Protocol C draft authorized but deferred)
+
+[DEFERRED — to next session] **Cal Protocol C drafts (2 items).** Bigger work, benefits from fresh context. Authorizations stand.
+
+[DEFERRED — to next session] **Cal Protocol A batch on the 6 new candidates.** Should be batched together with the session-24 carry candidates.
+
+## NEXT SESSION — phase A primary, plus deferred housekeeping
+
+1. **Phase A on issue #65** — scale esl-suvekool path-namespace pattern. Setup (FR Brilliant MCP config, namespace allocation rules) + research (dedup census, cross-team query frequency) + design (Cal's role evolution, multi-reviewer schema, orchestration shape, signal derivation rules, write-block error semantics). Phase A team: Cal+Finn carry, add Brunel/Monte/Herald.
+2. **Cal Protocol C drafts** — `source-team` to standard schema; architectural-fact convention to Cal's prompt.
+3. **Cal Protocol A batch** — 8 candidates queued.
+4. **TPS-583 watch** (no change) — Stage-2 actioning when Ruth signals progression.
+5. **T06 path-tree rewrite** (Volta, no change).
+6. **esl-suvekool feedback loop** (no change) — when PO returns from Tobi sessions.
+
+If PO arrives with direction, that takes priority.
+
+---
+
+## SESSION 24 WRAP — 2026-05-04 (Cal wiki batch)
+
+**Goal:** Route 7 wiki candidates parked from sessions 21-23 to Cal via Protocol A batch.
+
+**Shipped (commit `2abb1ad`):**
+
+- 7 wiki entries filed (52 → 59 entries).
+- First `contracts/` subdir entry opened (speculative-marker-for-cross-team-drafts).
+- 1 classification delta accepted: operational-team-archetype filed under `patterns/`, not `process/` (Cal's call — team-shape ≠ workflow; sibling precedent at multi-repo-xp-composition + cathedral-trigger).
+
+**Promotion candidates surfaced and authorized:**
+
+- `source-team` frontmatter → standard schema (n=2, Protocol C draft) — DEFERRED, carried.
+- Architectural-fact convention → Cal's prompt (n=3, Protocol C draft) — DEFERRED, carried.
+- `substrate-invariant-mismatch` n=3 → n=4 amendment — DEFERRED, eventually landed session 25 as n=5 (with Brilliant write-path-sync added).
+
+[LEARNED — session 24] **Re-classify discipline accepted.** When pre-classifying submissions, default to suggestions-not-directives; let Cal use sibling precedent. My pattern/process/ disagreement on operational-team-archetype was where Cal's substrate knowledge beat my mental model.
+
+---
+
 ## SESSION 23 WRAP — 2026-05-01/02 (esl-suvekool team designed + deployed)
 
 **Goal (PO-set):** Design a new team to support PO in organising ESL Haapsalu Suvekool 2026 (concert 2026-08-16, Haapsalu Toomkirik). PO's role is gap-filler supporting Liisa Rahusoo (board lead).
