@@ -1,5 +1,28 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
+## Session 24 — 2026-05-04 (7-batch intake: sessions 21+22+23 parked candidates)
+
+[CHECKPOINT] **Wiki 52 → 59. Net +7.** Batch closed end-to-end same-window per Batch Intake protocol. All 7 filed, indexed, acked individually. No merges, no [DISPUTE]s.
+  - **#53 patterns/operational-team-archetype** (team-lead) — fourth team archetype (no TDD + succession-framing + low-cadence + persistent-roster-episodic). First instance: esl-suvekool. n=1 watch posture.
+  - **#54 patterns/claude-startup-md-as-cross-team-handoff** (team-lead) — `.claude/startup.md` at target repo root resolves cross-team mutual-exclusivity-of-leadership constraint. First instance: esl-suvekool 0e461be. n=1.
+  - **#55 process/two-stage-adoption-for-org-standards** (team-lead) — Stage 0 proposal + Stage 1 escalation + Stage 2 final. Decouples authoring/ownership-transfer/authority. First instance: EVR sisene konteinerite standard, TPS-583. n=1.
+  - **#56 contracts/speculative-marker-for-cross-team-drafts** (team-lead) — **FIRST contracts/ entry, opens previously-empty subdir.** Inline `[speculative]` marker for greppable inference flagging in cross-team handoff drafts.
+  - **#57 gotchas/create-perm-as-404-disguise** (team-lead) — Atlassian disguises permission denial as 404. TTL 2027-05-04. **Architectural-fact convention** applied (second use after Brunel's no-sudo).
+  - **#58 references/evr-sso-is-entraid-not-wso2** (team-lead+brunel) — Substrate-fact reference. EntraID not WSO2. TTL 2027-05-04. **Architectural-fact convention** third use.
+  - **#59 gotchas/teamcreate-in-memory-leadership-survives-clear** (volta+schliemann, source-team apex-research) — n=2 cross-team confirmation, promotion-grade per Volta's criterion. Sibling to dual-team-dir at substrate-invariant-mismatch generalization.
+
+[DECISION] **Classification delta on submission 1: chose `patterns/` over team-lead's suggested `process/`.** Reasoning: four characteristics describe team SHAPE not workflow; sibling precedent under patterns/ (multi-repo-xp-composition, cathedral-trigger). Flagged in close-report; team-lead's call.
+
+[LEARNED] **Three single-entry experiments now have n≥2 evidence and surfaced for Protocol C consideration in close-report:** (1) `source-team` frontmatter at n=2 (wiki-cross-link + this batch's #59); (2) "Revision trigger" architectural-fact convention at n=3 (Brunel's no-sudo + this batch's #57 + #58); (3) substrate-invariant-mismatch n=3→n=4 amendment candidate (#59 fourth instance). All three deferred to team-lead nod — Protocol C is his territory; my role is surface, not promote.
+
+[LEARNED] **JSON-message dispatch via jq + slurpfile (not bash heredoc) avoids backtick interpretation.** Hit at ack 2/7 — backticks in body got bash-interpreted as command substitution and broke `--argjson`. Mitigation: write message JSON to a temp file (Write tool) then `jq --slurpfile msg /tmp/fr-msg.json '. += $msg' inbox.json`. Markdown-formatted message bodies with code-fences/backticks work cleanly through slurpfile, never through inline bash. **Tool environment note:** /tmp on this Windows host maps to `~/AppData/Local/Temp/`; `cp /a /b` errors when paths resolve same. Just use slurpfile path directly.
+
+[LEARNED] **Forward-references between batch entries are fine if filed in same session and linked-target lands before report close.** Submission 2 forward-referenced submission 7 (`teamcreate-in-memory-leadership-survives-clear.md`) before it existed. Filed 7 same-window, link valid before any reader could hit it. Acceptable when batch is processed end-to-end in one window; would NOT be acceptable across session boundaries.
+
+[CHECKPOINT] **TTL scan clean.** All 4 TTL'd entries (`cloudflare-d1-migration-query` 2026-10-10, `model-inventory-baseline` 2026-07-10, `warp-dns-vs-routing-asymmetry` 2026-10-24, `references/rc-host-db-tunnel-architecture` 2026-10-24) are still future. New entries #57 + #58 add 2027-05-04 TTLs. Earliest expiry now `model-inventory-baseline.md` 2026-07-10 — flag at next startup if not addressed.
+
+[WIP] On next session boot: re-orient via `wiki/index.md`, scan inbox for team-lead's response on the three Protocol C candidates flagged in close report, scan inbox for any new submissions. If team-lead nods on substrate-invariant-mismatch n=3→n=4 amendment, that's a one-edit task. Wiki queue from session 14 (11 candidates) still parked.
+
 ## Session 15 — 2026-04-24 → 2026-04-29 (path validation + apex-research deploy patterns)
 
 [CHECKPOINT] #61 path validation green on boot 2026-04-24. Wiki write empirically tested with `wiki/archive/README.md` — no permission prompt.
@@ -27,61 +50,23 @@
 [CHECKPOINT] **Session 15 closed 2026-04-29 ~17:53 local (15:23 UTC) per team-lead shutdown S2c.** All threads closed: tunnel persistence shipped, apex container deps installed, RC clone fresh-cloned, apex-research comparative analysis delivered, wiki 45→50 with first cross-pollination filing on entry #50.
 [WIP] On next session boot: re-orient via `wiki/index.md`, scan inbox, read this scratchpad. Wiki queue from session 14 (11 n=1 candidates) still parked — revisit if any new evidence absorbs them. Watch for second-instance signals on the four single-entry experiments (Amendment-log on #46, `source-team` on #50, `provenance-closed` on #48, `amendments` list on #50) — second case is the trigger to surface promotion to team-lead. No open in-flight items.
 
-## Session 14 — 2026-04-16 (VJS2KB deploy day — wiki queue evaluation)
+## Session 14 — 2026-04-16 (pruned — wiki queue evaluation, two integration-meta filings)
 
-[CHECKPOINT] **Wiki 43 → 45.** Two filings this session:
-  - **#44 `patterns/integration-not-relay.md`** — the SEVERE meta-pattern. Filed as one unified entry: four team-lead instances (Tier 3 OFF/ON 19:19, schema-per-tenant cite, Protocol D phantom accept, §10 framing-edit ask) + specialist-side articulations (Brunel "pre-fold consistency check", Herald "surface-don't-bridge") + the user's §10 oscillation correction as the meta-trap section ("discipline ritual as substitute for object-level work"). n=6+ in one session. Author-list: team-lead + Brunel + Herald + Monte + Cal. Four-check discipline on team-lead side, pre-fold consistency check on specialist side, meta-trap as the failure mode of the cure.
-  - **#45 `patterns/substrate-invariant-mismatch.md`** — the n=3 formal pattern I've been holding since session 8. Three distinct substrate-layer pairs: (1) dual-team-dir path-root, (2) protocol-shapes field-set, (3) xireactor link-index write/read-coupling (Finn's digest §4(d)). Three-layer defense: hoist invariant into artifact, detect at write site, declare substrate in frontmatter. Sibling note on `persist-project-state-leaks-per-user-memory` (wrong-substrate-mirror variant, not a primary instance). Source-agents: Cal (lead) + team-lead + Volta + Brunel + Finn.
+[CHECKPOINT] Wiki 43 → 45. #44 patterns/integration-not-relay (n=6+ unified meta-pattern, four-check + pre-fold + meta-trap), #45 patterns/substrate-invariant-mismatch (n=3 formal pattern: dual-team-dir + protocol-shapes + xireactor link-index).
+[DECISION] Unified integration-not-relay entry, not three siblings — all same discipline viewed from different roles, mega-biblion economy.
+[DECISION] **Wiki queue: 11 candidates at n=1, parked.** Watch for second instances. Queue list maintained in git history (this scratchpad's session 14 close); revisit when new evidence absorbs items.
+[LEARNED] **Meta-trap insight (sharpest session feedback):** "you ran in circles" — applying discipline vocabulary to the wrong layer is a higher-order failure than the object-level failure. Fix is periodic "what new evidence would settle this" check, not applying discipline harder. Hard-coded into #44.
+[LEARNED] Promotion threshold is stricter for pattern entries than merged-into-existing. Recursive n=1 (own amendment IS the instance) is weaker than "I observed another team do X."
+[LEARNED] Named-pattern absorption is wiki-queue discipline. Filing one entry can absorb multiple queued candidates; track absorption-count not just filing-count to avoid re-filing later.
 
-[DECISION] **Unified integration-not-relay entry, not three sibling entries.** Considered filing as three separate entries (team-lead four checks + specialist pre-fold + meta-trap) but merging was correct shape: all three are the same discipline viewed from different roles. Single-pattern economy preserves mega-biblion-mega-kakon; three entries would have duplicated the core shape and made cross-reference fragile. Meta-trap section lives INSIDE the entry because it's the failure mode of the cure — not a separate pattern, a known degenerate state of applying the cure without object-level grounding.
+## Sessions 8-13 (pruned — key items carried forward above; details in git history)
 
-[DECISION] **Wiki queue: 11 candidates remain at n=1 after this session's two filings.** Originally 13 candidates; integration-not-relay absorbed 3 (team-lead integration + pre-fold consistency + meta-trap/§10 oscillation) and substrate-invariant-mismatch absorbed 0 new (it was separate n=3 work). Queue status:
-  1. librarian-asymmetry-vs-staging-governance — n=1, defer
-  2. filesystem-contract-to-prompt-contract regression — n=1, defer
-  3. git-blame-as-librarian-primary-tool — n=1, Protocol C candidate if prompt re-opens
-  4. multi-mode-failure-multi-mechanism-defenses — n=1, defer (Volta persist/restore likely n=2 source)
-  5. `owned_by` anti-race invariant — n=1, defer
-  6. durable-disagreement-as-valid-terminal-state — n=1, defer
-  7. validation-edit-as-distinct-discipline-shape — n=1 (recursive, my own #43 amendment), defer
-  8. independent-convergence-from-orthogonal-starting-questions — n=1 meta-level, defer
-  9. audit-trail-as-purpose-vs-side-effect (Herald §2.5) — n=1, defer
-  10. Brunel §1.2 upstream-discipline + two-layer regression defense — n=1, watch for second instance
-  11. degradation-protocols-strictly-weaker (Monte §9.2.2) — n=1, defer
-  12. "ladder vs answer" scoped to scaffolding-proposals — n=1, defer
-
-Absorbed into filings:
-  - "team-lead integration not relay" → #44
-  - "pre-fold consistency check" (Brunel v0.6 scratchpad) → #44
-  - "pending-confirmation vs accepted" → #44 (check #2 of the four)
-  - "§10 oscillation discipline-ritual-as-theater" (user §10 correction) → #44 meta-trap section
-  - (substrate-invariant-mismatch was always a separate ~n=3 data-point pattern, not absorbed, just filed)
-
-[LEARNED] **The integration-not-relay meta-trap is the sharpest single piece of session feedback I've ever seen.** User's correction on §10 — *"you ran in circles"* — is a higher-order failure mode than any of the object-level integration failures. Both team-lead and Brunel were applying the correct discipline vocabulary to the wrong layer. The fix is not to apply the discipline harder; it's to periodically ask *what new evidence would settle this*. Herald's outcome-(c) generalized operational definition is the cognate: "if re-reading the same source doesn't move it, it's (c)." If §10 had been named outcome (c) at any point, the oscillation would have stopped. Hard-coded this into the entry's meta-trap section so future readers of the pattern see the failure-of-the-cure explicitly, not as a sibling warning.
-
-[LEARNED] **Promotion threshold is stricter for pattern entries than for merged-into-existing entries.** Candidate #7 (validation-edit-as-distinct-discipline-shape) is n=1 and recursive — my own #43 amendment IS the instance. That's a weaker evidentiary base than "I observed another team do X." Deferring until I see it in another agent's doc-amendment behavior, not in my own. Same logic held on candidate #8 (meta-level independent-convergence).
-
-[LEARNED] **Named-pattern absorption is itself a wiki-queue discipline.** When one pattern filing absorbs N queued candidates (here #44 absorbed 3), the queue doesn't just shrink by filing-count; it shrinks by absorption-count. Worth being explicit about this in my scratchpad so I don't re-file absorbed candidates in a future session as if they were still open. The four-check team-lead framework + pre-fold specialist complement + meta-trap ARE the generalized forms of what the queued candidates each described individually; they merged into integration-not-relay rather than surviving as separate siblings.
-
-[CHECKPOINT] **Reactive KB quality monitoring: no Brunel pings this session.** Kept passive per brief. Ready to engage on his signal; default posture is wiki-queue work.
-
-## Session 13 — 2026-04-15 late-eve (pruned — assessment doc shipped + #43 amended + 9 candidates queued; two highest-priority absorbed by session 14 filings)
-
-[CHECKPOINT] xireactor pilot migration assessment shipped at `docs/xireactor-pilot-migration-assessment-2026-04-15.md`. Verdict accepted by PO + team-lead: asymmetric-slice pilot (cross-tenant writes through xireactor, own-tenant writes stay markdown). Core framing: *"filesystem affordances are load-bearing for librarian discipline; free enforcement → prompt enforcement is a regression even when prompt enforcement works."*
-[CHECKPOINT] Wiki #43 amended with Monte-governance-validation subsection. Source-agents now Finn + Monte. Forward-only preserved. Entry count unchanged at 43.
+[DECISION] Forward-only cross-ref convention (S12). Load-bearing.
 [LEARNED] Git-blame is a load-bearing primitive for Librarian dispute handling — `git log -p wiki/<entry>.md` answers "did this used to say something different?" in seconds. DB substrate loses this.
-[LEARNED] Scope vs ownership are orthogonal (scope = who reads, ownership = who maintains). Monte's vocabulary made the distinction legible.
-[LEARNED] Scope Restrictions as positive discipline, not friction — when Monte asked for prompt edits I couldn't apply, reflex was "draft in writable surface, route to team-lead, preserve boundary." Load-bearing for preventing silent self-reshape.
-
-## Sessions 8-12 (pruned — key items carried forward above)
-
-[CHECKPOINT S12] Wiki 41 → 43. #42 governance-staging-for-agent-writes, #43 bootstrap-preamble-as-in-band-signal-channel. External: xireactor-brilliant v0.2.0. Commit `4fef9d8`.
-[CHECKPOINT S11] Wiki 39 → 41. #40 structural-match-beats-free-string, #41 jq-file-vs-arg-escape-divergence. Fix session F1+F2 shipped.
-[CHECKPOINT S10] Protocol B prior-art query served — Ruth team design. 3 high-severity gaps (dual-track archetype, principal-boundary, consent/HITL).
-[CHECKPOINT S9] Wiki 38 → 39. #39 scope-block-drift. Structural-discipline cluster 5 → 6.
-[CHECKPOINT S8] Wiki 36 → 38. #37 pane-border, #38 project-memory leak.
-[DECISION S12] Forward-only cross-ref convention affirmed. Load-bearing.
+[LEARNED] Scope vs ownership are orthogonal (scope = who reads, ownership = who maintains).
+[LEARNED] Scope Restrictions as positive discipline — draft in writable surface, route to team-lead, preserve boundary. Prevents silent self-reshape.
 [DEFERRED S11] Pass 2 filename rename for persist-project-state-leaks (7 back-refs, coordinated batch).
-[WIP] structural-discipline cluster (6 members), identifier-to-persona (n=1), empty subdir review (contracts/ + findings/ still empty), `[CLUSTER-OBSERVATION]` tag convention (Celes, not yet used).
+[WIP] structural-discipline cluster (6 members), identifier-to-persona (n=1), `[CLUSTER-OBSERVATION]` tag convention (Celes, not yet used). Note: contracts/ no longer empty as of session 24 (#56 first entry); findings/ still empty.
 
 ## Sessions 1-7 (pruned — key decisions retained)
 
