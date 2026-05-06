@@ -2,17 +2,20 @@
 source-agents:
   - brunel
   - monte
+  - herald
 discovered: 2026-05-05
 filed-by: librarian
-last-verified: 2026-05-05
+last-verified: 2026-05-06
 status: active
-confidence: medium
+confidence: high
 source-files: []
 source-commits:
   - "07abf35"
-source-issues: []
+source-issues:
+  - "65"
 amendments:
   - "2026-05-05: Instance A first-person addendum (Brunel near-miss substrate observations) + git show origin/<branch>:<file> recovery primitive added to §How to apply"
+  - "2026-05-06: n=2 → n=7 cumulative; source-agents extended [brunel, monte] → [brunel, monte, herald]; added Phase A.3 + Phase B evidence cluster (5 Phase A.3 instances + 2 Phase B instances) including dirty-main-worktree-bypass sub-pattern (Herald PR #11 + PR #12, n=2 cumulative on this sub-shape); cross-link to substrate-invariant-mismatch Instance 6 noting the orthogonality (worktree-isolation works for git workflows; harness inbox layer needs separate fix)"
 related: []
 ---
 
@@ -131,11 +134,39 @@ Per FR's existing memory rule (*"use isolation: worktree when spawning parallel 
 
 **Team-lead ratified the autonomous decision at 16:33:** *"worktree-isolation autonomous decision is the superior approach. Adopting as default for Phase A.2+ specialist work."*
 
+### Phase A.3 evidence cluster (S26 close, 2026-05-05) — n=3, n=4, n=5
+
+After the team-lead's ratification, Phase A.3 produced three additional instances within the same session, all Herald-side:
+
+**Instance C — Herald table fix (n=3, PR #7).** Mechanical fix to envelope §4 4-col table header; worktree off `origin/main` bypassed contention with concurrent envelope-v1.1 work on a separate Herald branch.
+
+**Instance D — Herald deliverable C (n=4, PR #9).** Two-pattern asymmetry decision matrix shipped in independent worktree; no conflict with concurrent §3.5 CuratorAuthority work in a different specialist's branch on the shared clone.
+
+**Instance E — Herald envelope-v1.1 (n=5, PR #10).** CuratorAuthority typed shape integration in independent worktree off `origin/main`; clean merge against concurrent SemVer-bump prep.
+
+### Phase A.3 sub-shape — dirty-main-worktree-bypass (S26 + S27, n=2 cumulative on this sub-shape)
+
+**Instance F — Herald SemVer-bump (S26 n=6, PR #11).** First instance of a specific sub-shape: **using worktree to bypass dirty main-worktree state held by another specialist.** Aen had unstaged markdown-linter edits in main worktree; `git fetch && git worktree add ... origin/main` cleanly bypassed the dirty state. Worktree-isolation here is not just specialist-vs-specialist — it's specialist-vs-team-lead (where team-lead's working state is separately holding uncommitted edits).
+
+**Instance G — Herald 04-spec drafting (S27 n=7, PR #12).** Phase B reproduction of the same sub-shape. `prism-wt-herald-03` worktree off `origin/main`; bypassed Aen's unstaged main-worktree lint edits on `01/02/Monte`. PR #12 shipped 12:14, v0.1.1 amendment commit pushed 12:36. **Same sub-shape as PR #11; n=2 cumulative on dirty-main-worktree-bypass surface.**
+
+The dirty-main-worktree-bypass is a named sub-shape worth carving out: the worktree-isolation discipline applies not only to multi-specialist parallel work but also when *any* sibling agent's main-worktree state holds uncommitted changes that would block branch operations.
+
+### Phase B evidence — multi-specialist + multi-instance-per-specialist
+
+**Instance H — Herald 02 §4 R9-amendment (S27, n=7 → cumulative).** `prism-wt-herald-02-r9` worktree off `origin/main`. **Two Herald worktrees + Brunel + Monte parallel branch work, all on the shared `mitselek/prism` clone, zero conflict observed.** This is the strongest evidence yet for the discipline at scale: not just multiple specialists but multiple instances per specialist, all isolated cleanly.
+
+The cumulative count at session 27 close: **n=7 across 5 work types and 4 specialists** (Brunel + Monte + Herald + Aen as bypass-counterparty), all shipped clean.
+
+### Cross-link to substrate-invariant-mismatch Instance 6 (orthogonality)
+
+Per Aen's 12:54 sharpening, S27 also surfaced `wiki/patterns/substrate-invariant-mismatch.md` Instance 6 (worktree-OUTBOUND harness inbox failure) and the standalone `wiki/patterns/worktree-spawn-asymmetry-message-delivery.md`. Herald's evidence chain above is **additional data that the substrate failure is harness-inbox-specific, NOT all worktree outbound** — git-push from worktree works (PR #12 + PR #13 both shipped cleanly via push).
+
+The orthogonality is structurally important: **worktree-isolation works for git workflows (this entry's discipline); harness inbox layer needs a separate fix (the substrate-mismatch Instance 6 + standalone worktree-asymmetry entry).** A future reader reaching for "should I use worktrees?" should not be deterred by the harness-inbox failure mode — the git-substrate works, and the inbox-substrate failure has its own codified workaround (team-lead relay path).
+
 ## Promotion posture
 
-n=2 within-session-empirical, both substantive (one near-miss caught before damage, one collision-resolution shipped clean). Team-lead explicitly endorsed pattern-class filing at this n + adopted worktree-isolation as default for Phase A.2+ specialist work.
-
-**Watch for session-tempo n=3** (a future session producing a third instance) to consider promotion to `common-prompt.md` as a team-wide rule. The current memory-rule formulation (*"use isolation: worktree when spawning parallel agents..."*) already lives in user memory; common-prompt promotion would lift it into the team's L1 standards layer.
+**n=7 cumulative, 5 work types, 4 specialists.** Substantially past the previously-stated session-tempo n=3 trigger. **Promotion to common-prompt as a team-wide rule is now strongly indicated.** The dirty-main-worktree-bypass sub-shape + the multi-instance-per-specialist evidence + the orthogonality framing (worktree-isolation good for git; orthogonal to harness-inbox issues) make this entry a stronger Protocol C candidate than n-count alone suggests. Aen has the call on Protocol C draft timing; the n=7-with-sub-shape signal is recorded for the next Protocol C cycle.
 
 ## Substrate-level analog to coordination-layer patterns
 

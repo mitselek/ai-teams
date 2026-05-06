@@ -95,11 +95,5 @@
     "timestamp": "2026-05-05T13:02:20.475Z",
     "color": "blue",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778051177137@finn\",\"from\":\"team-lead\",\"reason\":\"Session 26 wrap. Phase A on Prism structurally final. Your handoff brief (`finn-phase-a-handoff-brief-2026-05-05.md`) was the audience-tuned input that anchored the architecture team's work — it did its job. PO requested clean restart for fresh session. Per common-prompt §Shutdown Protocol: write WIP state to scratchpad, send closing report with [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] (1 bullet each, max), approve shutdown. Three optional task ideas from earlier (FR↔apex dedup census, entry_links vs source-team schema, apex evolution check) still parked as DEFERRED — preserve as session-27 idle-cycle candidates.\",\"timestamp\":\"2026-05-06T07:06:17.137Z\"}",
-    "timestamp": "2026-05-06T07:06:17.137Z",
-    "read": true
   }
 ]

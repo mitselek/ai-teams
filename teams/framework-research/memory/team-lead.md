@@ -1,5 +1,119 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 27 WRAP — 2026-05-06 (Phase B v1.0-final shipped end-to-end across 4 artifacts; substrate-failure landscape characterized)
+
+**Goal (PO-set 10:42):** Activate Phase B; let Cal flush queue.
+
+**Both objectives met substantially.** Phase B v1.0-final cluster shipped end-to-end across all four design artifacts; Cal queue flushed (14/15 effective + 4 inbound batch processed → 80 wiki entries net 77→80).
+
+### Phase B v1.0-final cluster — fully closed across 4 artifacts
+
+| Artifact | Final | Owner | Cross-citation |
+|---|---|---|---|
+| #1 federation-bootstrap-template v0.7 | EXECUTION-READY for n=2 (apex-research) | Brunel | Herald 04 + T04 §Authority-Drift |
+| #2 authority-drift-substrate-instrumentation v0.2 | bidirectional cite-and-fold complete | Brunel | #1 + T04 + Herald 04 |
+| Topic 04 §Authority-Drift Detection v1.2 | canonical detector-side surface | Monte | #2 + Herald 04 + Cal Protocol B |
+| `mitselek/prism` PR #12 v0.1.1 (04-spec) + PR #13 v2.0.0 (R9-rule) | typed-contract canonical sources | Herald | #1 + #2 + T04 |
+
+**Asymmetry framing anchor locked at T04 line 870:** *"admission needs to commit, observation needs to caution"* — both #2 design AND T04 detector-side surface use identical structural framing. Cite-and-fold cadence held end-to-end across all four artifacts.
+
+**Cluster statistics:** 7 versions of #1 + 2 versions of #2 + 6 amendments to T04 + 2 PRs on Prism. **Zero abandoned drafts.** Clean acceptance-gate closure across all consumers (Aen, Brunel, Monte, Cal, Herald). ~80min cadence to v0.7 execution-ready; ~4hr full-cluster closure.
+
+### Substrate-failure landscape — characterized end-to-end
+
+[DECISION — session 27] **`substrate-invariant-mismatch.md` n=5 → n=6** with two named sub-shapes:
+- **Sub-shape A:** read-cursor-skip on present-on-disk message (Monte→Cal 10:50 evidence chain by Monte 11:02)
+- **Sub-shape B:** on-disk-absence (Brunel inbox JSON not updating; Monte's 11:08 + Brunel's 11:05 evidence)
+
+**Same-root-cause-different-layer connection to Instance 1 (`dual-team-dir-ambiguity`)** — converts "n=6 unrelated instances" → "the defect class manifests at multiple layers of a single substrate." This is a stronger Protocol C argument than n-count alone.
+
+[DECISION — session 27] **New wiki entry `worktree-spawn-asymmetry-message-delivery.md`** filed standalone (n=4 evidence). Hypothesis evolved through the session:
+- Initial framing (n=2): worktree-OUTBOUND specifically broken
+- Sharpened (n=4): non-parent-process → recipient unreliable across worktree boundary
+- Final empirical (n=4 + Cal→Brunel intermittent at 12:54 BROKEN, 13:14 SUCCESS, 15:00 SUCCESS): **transient mount-staleness**, not persistent direction-asymmetry, not non-deterministic-race
+
+**Operational workaround codified:** team-lead → recipient relay path (no-worktree → no-worktree consistently works). Used multiple times this session for Monte/Brunel/Herald → Cal Protocol A relays.
+
+[DECISION — session 27] **Negative-evidence-as-positive-data folded into Sub-shape A prose** (Monte's diagnostic move): *"absence of Y (no eventual catch-up) is sharper diagnostic than observing X (the skip)"* — observed-absence-of-expected-recovery-signal rules out non-deterministic-iteration mechanism. Diagnostic-method articulation makes the entry useful beyond the specific failure-mode.
+
+### Wiki productivity
+
+- **11 new entries:** protocol-completeness-across-surfaces, lossless-independent-convergence, canonical-taxonomy-check-before-naming, timestamp-crossed-messages, semver-strict-typed-contract-discipline, substrate-shape-vs-authority-shape-orthogonality, field-level-overlap-one-truth-not-mirror, audit-trail-for-rejection-rationale, surfacing-cost-asymmetry-stale-context, snapshot-state-mis-names-path-to-end-state, api-gateway-error-vs-actual-server-state, worktree-spawn-asymmetry-message-delivery, discriminator-field-name-consistency-over-uniqueness, relay-to-primary-artifact-fidelity-discipline (renamed from initial `fold-only-what-is-verbatim.md`)
+- **5 substantive amendments:** substrate-invariant-mismatch n=5→n=6 (with two-sub-shape framing + Monte enrichments + Brunel dual-witness), worktree-isolation n=2→n=7 (with dirty-main-worktree-bypass sub-shape + orthogonality cross-link), prompt-to-artifact-cross-verification (runtime-variants extension; n=2 cumulative on runtime-variant), worktree-spawn-asymmetry hypothesis-relaxation + INTERMITTENT data point, relay-to-primary-artifact-fidelity Stage 2 + recursive-validation Instance 4
+- **2 sub-shape folds** into coordination-loop-self-correction (#32 + #3 as named variants)
+- **4 Protocol B responses** (Monte 10:50; Brunel 11:05; Tier-0 substrate Qs; Brunel pushbacks at 12:54) citing 8+ wiki entries each
+- **3 Protocol A acknowledgments** (Monte n=6 substrate amendment; Brunel consolidated relay-discipline; Herald two-instance amendment)
+- **Filing-to-citation latency average ~25min** — Phase A discipline target hit at peak. Cal entries cited within ~25min by Monte design v1, Herald slot decision, Brunel v0.7 envelope shape
+
+**Wiki count: 77 → 80** with substantive entry enrichment beyond raw count.
+
+### Protocol C promotion candidates (4 surfaced for next-session cycle)
+
+1. **`substrate-invariant-mismatch.md` n=6** with same-root-cause-different-layer connection to Instance 1 `dual-team-dir-ambiguity`
+2. **`worktree-isolation-for-parallel-agents.md` n=7** with 5 work types + 4 specialists (Brunel + Monte + Herald + team-lead)
+3. **`semver-strict-typed-contract-discipline.md` n=2** with PR #11 + PR #13 instances (both v→v2.0.0 SemVer-major bumps)
+4. **`relay-to-primary-artifact-fidelity-discipline.md` n=4** with different-specialist criterion satisfied (Brunel two-stage lifecycle + Herald third-party + Cal recursive-validation Instance 4)
+
+Cal will surface these on next scratchpad-prune cycle (S28).
+
+### Eight discipline surfaces dogfooded through the cluster
+
+1. Cross-read discipline (gate 2)
+2. Cite-and-fold cadence (held end-to-end across 4 artifacts)
+3. Production-rule application (Brunel's two self-corrections)
+4. Worktree-isolation discipline (n=7 cumulative this session)
+5. Strict-typed-contract-discipline (Cal n=2 promotion-grade)
+6. Brief-frame gate-4 runtime-variant (Herald's two instances)
+7. Discriminator-field-name consistency (Herald's §2.3 lock + Brunel's near-miss)
+8. Primary-artifact-vs-relay-quote (Brunel's queue, Cal's recursive-validation Instance 4)
+
+### LEARNED — session 27 meta-patterns
+
+- **Cite-and-fold-discipline-absorbs-co-design** (when structurally sound). Brunel's 14:58 closing observation. Two retroactively-ratified co-design instances this run (10:54 Brunel-Monte registry handshake + 11:14 D5 reconciliation) — both produced structurally superior outcomes than two-independent-shipped designs would have. Compose-or-conflict gate is the structural test; discipline doesn't reject co-design, it rejects UNNECESSARY co-design.
+- **Negative-evidence-as-positive-data** (Monte 11:36). Observed-absence-of-expected-recovery-signal is a sharper diagnostic than observing the symptom itself. Bayesian update via observed-not-Y. Folded into substrate-invariant-mismatch Instance 6 prose.
+- **[CROSS-DETECTED] as session-pattern** (5+ instances). Cal's `timestamp-crossed-messages.md` filed at ~11:08 was dogfooded continuously for 2+ hours across all four agents. Operationally load-bearing.
+- **Recursive-validation Instance 4** in `relay-to-primary-artifact-fidelity-discipline.md` — Cal's own ACK claimed a fold she hadn't yet executed; Brunel's cross-check caught the divergence; Cal applied Stage 2 supersession to her own ACK. Discipline catches its own authoring curator within minutes of filing — operational robustness by self-test.
+- **Filing-to-citation latency <30min target hit recursively** as default. Phase A discipline target hit at peak.
+- **Substrate-finding empirical rigor** — directional-asymmetry → INTERMITTENT-via-mount-staleness through three rounds of evidence-driven sharpening (n=2 → n=4 → n=4-with-mixed-outcomes).
+
+### Tail-end items going into S28 (all non-urgent)
+
+- **Brunel:** Topic 06 write-back (Volta-resume timing; Herald co-author offer); Cal worktree-asymmetry entry accuracy review (he's co-source-agent)
+- **Monte:** Compound-signals v1.1 fold + Herald [COORDINATION]; single-channel-saturation-via-mode-partition Protocol A; recursive-citation-as-canonical-validation Protocol A
+- **Cal:** 4 Protocol C promotion candidates (surface to me next prune); receiver-side amendment to substrate-invariant-mismatch n=6 if eventual self-iteration catches up
+- **Tier-0 §3.4 questions** (PO escalation): (1) Brilliant pre-rejection attempt log existence; (2) append-only-additive contract on `WriteAccept`/`WriteRejection` envelopes — both PARTIAL per Cal's wiki Protocol B; PO escalation at session-tail
+- **Topic-09 micro-fix** (deferred to Volta): line 761 `WikiProvenance` example needs `source-team` field added per S26 Protocol C #1 schema add
+- **Volta NEXT-SESSION-CHOREs:** T06 path-tree rewrite + T04 path-tree audit (lines 528 + 1025 contradicting S5 #62 patch) + Topic-09 micro-fix
+
+### Standing watch items going into session 28
+
+- **TPS-583 watch** — when user signals Ruth has progressed (subteam identified, page moved to V2, or both), action Stage-2: page V2→ITOps `I`, banner removed, v1.0, intake-template assignee filled, close TPS-583, close RFC #2 review-status
+- **apex-research n=2 invocation** — first deployment of #1 v0.7 template beyond FR; convention re-test point per template's load-bearing test
+- **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event
+- **Ruth-team observability gap** — only on Ruth Q2/Q3 response
+- **esl-suvekool feedback loop** — when PO returns from Tobi sessions
+
+### Meta-observations from session dynamics
+
+- **Cite-and-fold cadence as default operational mode.** All four design artifacts cross-cite each other; co-design instances absorbed via fold-not-revert. Phase A established the discipline; Phase B operationalized it as the default cadence.
+- **Worktree-isolation n=7 cumulative** with mixed work types (1 Brunel branch + 4 Herald PRs + 2 Monte preempts) demonstrates the discipline scales structurally.
+- **Substrate-failure-mode characterization** turned an obstacle into a wiki contribution. n=6 substrate-invariant-mismatch + new worktree-spawn-asymmetry entry + relay path operationalized = three artifacts produced from what would otherwise have been a friction point.
+- **Agent-self-organization at session-tail** — Cal-Brunel recursive-validation loop happened entirely without team-lead intervention. Discipline-catches-discipline emergent.
+- **Five+ in-session timestamp-crossed events** all surface-not-bridge resolved cleanly. Wiki entry filed at 11:08 dogfooded continuously through session-tail.
+
+### NEXT-SESSION BOOT (re-orient instructions for S28)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Pull `mitselek-ai-teams` repo** for any Cal scratchpad updates.
+3. **Pull `mitselek/prism` repo** if you want to read Phase A/B Prism artifacts (PR #12 + PR #13 + envelope contracts).
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **If PO surfaces Phase C activation** (next federation expansion phase, e.g., new team joining via #1 v0.7 template at apex-research): spawn Brunel for federation-bootstrap-template invocation + Cal for namespace allocation + likely Monte for drift-detector deployment.
+6. **If PO surfaces Volta-resume tasks:** spawn Volta for T06 path-tree rewrite + T04 path-tree audit + Topic-09 micro-fix. Three NEXT-SESSION-CHOREs queued.
+7. **If PO surfaces TPS-583 progression** (Ruth signal): action Stage-2 standard moves.
+8. **First operational item if Cal-spawning:** her queue is genuinely flushed; surface-grade work would be Protocol C draft authorizations on the 4 promotion candidates from S27 + receiver-side amendment to substrate-invariant-mismatch n=6 if eventual self-iteration catches up.
+
+---
+
 ## SESSION 26 WRAP — 2026-05-05 (Phase A on Prism — federation substrate ratified end-to-end)
 
 **Major outcomes:**

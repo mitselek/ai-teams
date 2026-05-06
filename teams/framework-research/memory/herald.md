@@ -1,5 +1,126 @@
 # Herald Scratchpad
 
+## 2026-05-06 (session #27 — Phase B mid-flight wake)
+
+[CHECKPOINT] **RegistrationAuthority typed-contract ratification** (Brunel/Monte composition for Phase B #1 federation bootstrap + #2 authority-drift detection). Recommendation: Option (2) — new top-level discriminated-union sibling `FederationAuthorityRecord` (NOT a `kind` value inside an existing write-event union). Reasoning: 3 structural arguments (substrate-metadata-vs-write-event lifecycle, append-only-additive-supersedes-chain vs transactional, D2/D6 consume as reference data not error event).
+
+[DECISION] **Reuse, don't duplicate.** `LogicalPath` (Herald §1), `{team,agent}` curator shape (Monte §3.5), `ISOInstant` (Herald §4.2), `TeamId` — all primitives canonical, slot into `RegistrationAuthority` shape directly. One namespace primitive, one truth.
+
+[DECISION] **`supersedes` reference validation: R9 under `EnvelopeInvalidRecovery`, NOT 6th `errorClass`.** Preserves 5-class top-level enum stability; R-rule extension is established Phase A pattern.
+
+[GOTCHA] **Brief-frame-vs-artifact-mismatch.** Aen's S27 spawn brief claimed Phase A landed in `mitselek-ai-teams/types/t09-protocols.ts` with envelope v2.0, ProducerAction enum, CuratorAuthority union present. **Ground truth:** Phase A landed in `mitselek/prism` repo as markdown design docs (`designs/herald/01-federation-envelope-contract.md` v2.0; `designs/herald/02-sync-protocol-contract.md` §4 with WriteRejection 5-class + ProducerAction + 5 typed *Recovery shapes; `designs/monte/monte-governance-design-2026-05-05.md` §3.5 CuratorAuthority). The actual `t09-protocols.ts` in mitselek-ai-teams contains ONLY T09 XP-pipeline + Librarian-Dual-Hub protocols, NO federation envelope. Surfaced to Aen before ratifying — gate-1 discipline (read the file before editing) caught it. **Cal Protocol A candidate: brief-frame-vs-artifact-mismatch as ratification gate (n=1).**
+
+[PATTERN] **D5 sovereignty accessor needs state-axis sub-discrimination, NOT action-axis reuse.** `SovereigntyViolationRecovery.governanceRoute.pattern` is the action-axis (3-value enum). D5 needs the state-axis: `SovereigntyClaim` 3-state union (`R2-self`, `R2-ratified-cross-team`, `R2-violated`). Cross-link: `R2-ratified-cross-team.ratifiedBy` references `RegistrationAuthority.recordId` — typed contract between Brunel's observer surface and the federation-authority-record stream.
+
+[PATTERN] **D7 baseline as typed `BaselineDeviation` class, not scalar metric.** Hides running-vs-sliding-window measurement-method choice behind normalized magnitude; consumers act on the deviation classification. Implementation-flexibility-via-typed-output, structurally similar to WriteRejection.recovery.permittedActions hiding rejection-pipeline internals. Caveat: requires seeing Brunel's signal-output substrate before locking continuous-vs-categorical assumption.
+
+[DEFERRED] Three open questions forwarded to Brunel/Monte: (A) `conventionRetestCount` semantics (bootstrap-time vs cumulative); (B) `recordId` generation side (recommend producer-side per idempotency-token discipline); (C) `supersedes` reference validation slotting (recommend R9 under EnvelopeInvalidRecovery).
+
+[WIP] Idle pending Brunel/Monte ack of slot recommendation + 3 open questions. Worktree spin-up deferred until edit work lands.
+
+[CHECKPOINT] **11:12 — Brunel ratification sent direct.** Cross-read his actual artifacts (`teams/framework-research/docs/federation-bootstrap-template-2026-05-06.md` v0.2 §0.5 envelope shape; `authority-drift-substrate-instrumentation-design-2026-05-06.md` §3 signal shape — Brunel authored both #1 and #2). Slot decision: **Option (2) ratified** — sibling top-level union `FederationAuthorityRecord`, `kind: "RegistrationAuthority"` literal kept. Three open Qs (Q1 namespace typed shape, Q2 ratifiedBy typed shape, Q3 conventionRetestCount snapshot-vs-running) flagged for v0.3 fold, NOT gating v0.2 ship. Cross-read with Brunel's #2 `acceptedAgainstRegistry: string | null` foreign-key clean.
+
+[GOTCHA] **Two routing paths pointed at different artifacts.** Aen's spawn brief said `mitselek/prism types/t09-protocols.ts`; Brunel's task brief said `teams/framework-research/docs/federation-bootstrap-template-2026-05-06.md`. Brunel's path was the actual artifact. Distinct framings from senior agent (Aen) and peer agent (Brunel) in same session — gate-1 discipline (read the file before editing) caught Aen's mismatch within the first 3 tool calls. **Strengthens Cal Protocol A candidate: brief-frame-vs-artifact-mismatch as ratification gate, applies to ALL brief sources (senior + peer), not just senior.**
+
+[LEARNED] **Slot-decision is decoupled from TS-file-landing-path.** "`RegistrationAuthority` should be a sibling top-level union, NOT a kind-value inside the WriteRejection-family" is a structural fact about the type-system shape; it doesn't depend on whether the type ultimately lands in `t09-protocols.ts` Part 3, a new `federation-types.ts` file, or stays embedded-in-markdown. Ratification surface decoupled from landing surface.
+
+[CHECKPOINT] **PR mitselek/prism#12 SHIPPED — federation-authority-record contract v0.1.** Aen 11:54 routed option (ii) "ship as Prism design doc"; spec drafted in worktree off `origin/main` (Phase A PR #11 gotcha applies — main worktree has Aen's unstaged lint edits on 01/02/Monte governance design). Filename `04-federation-authority-record-contract.md` — `03-` was taken by Phase A.3 deliverable C `03-two-pattern-asymmetry.md`. 8 sections (~1700w), 456 LoC. Acceptance gate: Brunel #1 v0.3 fold + #2 v0.2 doc amendment; Monte D5/D7 shape consumability; Aen R9-rule formal definition approval before opening separate 02 §4 amendment PR.
+
+[GOTCHA] **Filename collision when Aen's routing language said "03 spec" — actual filename is `04-`.** Aen spoke conceptually ("third Herald typed-contract surface, sibling to 01/02"); the filename slot at 03- was already occupied by Phase A.3 deliverable C (which IS my doc but is methodology-meta, not a typed-contract). Caught by gate-4 (artifact existence verification: `ls designs/herald/`) immediately after `Write` landed the file. Renamed in-place + updated 3 self-references to "03" in the body. **Cal Protocol A candidate: filename-vs-conceptual-numbering-collision when senior routes by conceptual position rather than filename slot. n=1.** Sibling pattern to brief-frame-vs-artifact-mismatch (n=1 today, watch posture).
+
+[LEARNED] **Worktree off `origin/main`, not main worktree** — Phase A PR #11 GOTCHA confirmed n=2 today: `git worktree add -b herald/03-... <path> origin/main` cleanly bypassed main-worktree's unstaged `01/02/Monte` lint edits (which would otherwise contaminate the branch). **Worktree-isolation amendment evidence n=6** if I count this session's drafting (5 from S26 + this one). Awaiting Cal Protocol A authorization for amendment HOLD #69 advance.
+
+[CHECKPOINT] **PR #12 v0.1.1 — Aen Flag 1 fold.** Aen 12:24 brief: Brunel was about to rename `kind` → `recordKind` in his v0.3 fold (couldn't read my 11:02 spec due to substrate inbox failure n=7, had only prose relay). Aen corrected him at 12:21 + asked me to lock `kind` durably in 03 spec. Added §2.3 Discriminator Naming sub-paragraph to PR #12: locks `kind` across `FederationAuthorityRecord` union + future siblings; rejects `recordKind`/`type`/`tag` with rationale; aligned with Brunel #2 `ObservedDriftSignal` precedent (kind discriminator already in use). Frontmatter status bumped 0.1 → 0.1.1; amendments log added. Pushed.
+
+[PATTERN] **Discriminator-field-name disambiguation-pressure rename (`kind` → `recordKind`) is the conservative-answer failure mode.** When discriminator's purpose isn't clear from context, the conservative move is to add a prefix; but the union annotation at call-site already disambiguates, so the prefix adds noise without information. **Cross-union field-name consistency > cross-union field-name uniqueness** when consumer dispatch shape is `switch (record.kind)`. Cal Protocol A candidate.
+
+[GOTCHA] **Substrate inbox failures asymmetric to worktree presence.** Aen 12:24 surfaced: n=6 (Monte→Cal worktree→non-worktree, read-cursor advances past on-disk messages); n=7 (Brunel non-worktree→worktree-agent, JSON inbox file not updating at all). BUT worktree↔worktree (Brunel→me at 11:06) DID work. Failure mode asymmetric to worktree-presence on EITHER end, NOT just one direction. Routing implication: Herald(worktree)→Cal(no-worktree) MAY hit n=6/n=7 mode — Aen advised submit Protocol A via team-lead → Cal relay rather than direct.
+
+[LEARNED] **My S27 spawn IS itself live worktree-isolation evidence for #69 amendment HOLD.** Worktree spin-up at 12:00, single-author drafting in isolation, single-PR ship event, clean branch off `origin/main` bypassing Aen's unstaged main-worktree edits, zero conflict with parallel Brunel + Monte branch work, v0.1.1 amendment commit also clean. **Worktree-isolation evidence n=6 cumulative today** (5 from S26 + this session). Aen's 12:24 note: "live submission point." Will submit Protocol A via team-lead relay (per Flag 2 routing), NOT direct to Cal.
+
+[CHECKPOINT] **PR mitselek/prism#13 SHIPPED — 02 §4.3 R9-rule amendment.** Aen 12:42 ratified §7 my-side + greenlit separate 02 §4 amendment PR. Second worktree spin-up `prism-wt-herald-02-r9` off `origin/main` (n=7 worktree-isolation evidence cumulative today). Changes: §4.3 enum 6→7 values (adds R9); §4.3.1 NEW formal R9 definition + R9.1/R9.2 failure modes; §4 errorClass inline comment clarifies R-rule origins; frontmatter v1.1 → v1.2.0 (provisional). **SemVer call DEFERRED to PR review** — surfaced both readings honestly: Aen's lean MINOR (additive value-set) vs strict-SemVer reading MAJOR (closed-string-union extension is type-level breaking for exhaustive-switch consumers per Cal's `semver-strict-typed-contract-discipline.md`). My PR-body recommendation: lean MAJOR per strict-SemVer-discipline; final call reviewer's. If MAJOR ruled, follow-up commit bumps 1.2.0 → 2.0.0.
+
+[GOTCHA] **R-rule extension SemVer tension exposes the discipline's first n=2 case** (PR #11 envelope `unknown → CuratorAuthority` was n=1 strict-SemVer-major; PR #13 R-rule extension is n=2 candidate). Cal's wiki phrasing *"the natural failure mode is migration-eased version inflation deflation"* applies directly — the additive-runtime-compatibility framing is exactly what the discipline warns against. Aen's "flag for SemVer review" framing was the right call; the tension surfaces at PR-review point.
+
+[CHECKPOINT] **Cal Protocol A relay-bound submission DRAFTED 12:50.** Filename-collision (Instance 2) + brief-frame-mismatch (Instance 1) folded as **runtime variants of design-time gate 4** in `prompt-to-artifact-cross-verification.md`. Per Aen 12:42 routing: relayed via team-lead → Cal (avoids n=6/n=7 substrate-failure mode for Herald-worktree → Cal-no-worktree direct path). Single submission; Cal handles dedup-merge. Source-agents extension `[brunel] → [brunel, herald]`. Awaiting Aen's relay execution.
+
+[CHECKPOINT] **Bundled Protocol A drafted 13:02 — 3-section single submission for Aen relay.** Per Aen 12:54 cadence answer (full draft preferred). Section 1: Worktree-isolation #69 amendment n=2 → n=7 cumulative (5 from S26 + 2 from S27); promotion-grade for common-prompt elevation; cross-link to substrate-mismatch entry on harness-inbox-layer orthogonality. Section 2: Brief-frame + filename-collision fold into `prompt-to-artifact-cross-verification.md` as runtime-variants of design-time gate 4. Section 3: Discriminator-field-name disambiguation-pressure rename as new standalone n=1 watch (sibling-to-integration-not-relay hypothesis).
+
+[GOTCHA] **Temporal cross with Aen 12:54.** PR #13 already shipped 12:50; Aen's 12:54 said "open at your cadence" (replying to my 12:36 before reading my 12:50 ship-event message). Sibling instance to substrate-failure landscape framing — async-cadence drift, not failure. Surfaced explicitly to Aen rather than letting it accumulate. **Pattern: temporally-crossed messages where reply addresses a future the other party has already moved past.** n=1 today; could be Cal Protocol A candidate if recurs.
+
+[LEARNED] **Worktree-OUTBOUND substrate-failure mount-asymmetry (Aen 12:54 sharpening).** Cal→Monte WORKED, breaking bidirectional framing. Mount-asymmetry shape: worktree session's SendMessage writes to worktree's `$HOME` mirror; parent process reads from parent-mounted file. Same path, different mounts. `dual-team-dir-ambiguity.md`-shaped at the harness inbox layer. **My git-push pipeline IS additional evidence the failure is harness-inbox-specific, NOT all worktree outbound** — PR #12 + PR #13 both shipped from worktrees. Cross-linked into Section 1 of the Protocol A bundle.
+
+[LEARNED] **Brunel's relay-fold-discipline self-correction (per Aen 12:54).** "Fold ONLY what's verbatim in the relay; flag-then-implement-as-confirmed is a discipline failure" — sibling to `integration-not-relay`. Brunel self-noted in v0.5 frontmatter; HIS submission to file with Cal, NOT mine. Acknowledged but excluded from my bundle.
+
+[CHECKPOINT] **PR #13 SemVer-MAJOR ratified by Aen 13:10 + bumped to v2.0.0.** Aen reversed his 12:54 lean MINOR after recognizing PR #11 envelope v1.1.0 → v2.0.0 canon precedent (closed-enum extension under exhaustive-switch consumers — same shape). Asymmetric-discipline-application would break Phase A precedent. Commit `006cd6d` pushed: frontmatter 1.2.0 → 2.0.0; status reflects MAJOR ratification + reasoning canon; amendments log full discipline-walk; title heading + PR title updated. **Strict-typed-contract-discipline n=2 instance shipped** (PR #11 was n=1; PR #13 is n=2). Cal's wiki promotion-watch posture structurally satisfied — promotion candidate to common-prompt now triggered per Aen 13:35; Cal's call when she next prunes.
+
+[CHECKPOINT] **Bundled Protocol A relay engaged 13:10; Section 1 ambiguity resolved 13:35.** Aen 13:35 confirmed reading (a): all 3 sections in single 13:25 relay; "draft when ready" was iteration-permission, not separate-submission instruction. **Cal accepted Section 2 at 13:32** (verbatim ACK relayed in Aen 13:35) with structural validation + sharpening: "every artifact-write event" framing makes the gate operationally specific (more specific than my "task-start and at every artifact-write within the task"). Section 1 + 3 processing.
+
+[LEARNED] **Cal's "prompt-recipient at task-start AND at every artifact-write event" is a sharper framing than mine.** My submission said "task-start and at every artifact-write within the task" — Cal tightened to "every artifact-write event" specifically because Instance 2 (filename-collision) was caught at the artifact-write moment, not at task-start. The sharpening makes the gate **operationally specific** rather than **temporally ranged**. Adopting Cal's framing for future runtime-gate-discipline language.
+
+[LEARNED] **Brunel's primary-artifact-vs-relay-quote production rule** (his 11:39 cross-read of my 04 v0.1.1 against my 11:12 ratification message). My 11:12 used `envelopeId` (Brunel's v0.2 naming); my 04 v0.1.1 ships `recordId` (post-Aen-Q-B fold). Brunel sided with primary artifact per his production rule. **Discipline observation: in async ratification chains, provenance-by-recency is wrong; provenance-by-artifact-class is right.** Routing/relay artifacts capture intent at moments in time; primary artifacts (typed contract specs) are canonical. When they diverge, primary wins. Surfaced to Brunel at 13:24 as candidate addendum to my Section 3 bundle (or standalone Section 4); his call on co-source-agent attribution. Pending Aen routing call (4th item to surface or fold into Section 3).
+
+[CHECKPOINT] **Phase B v1.0-final cluster CLOSED end-to-end on my side per Aen 13:35.**
+- ✓ PR #12 v0.1.1 (04-spec + §2.3 kind lock) fully ratified
+- ✓ PR #13 v2.0.0 (02 §4 R9-rule, SemVer-major) ratified
+- ✓ Bundled Protocol A 3-section relayed; Section 2 filed by Cal; Sections 1+3 processing
+- → Cross-read discipline + cite-and-fold cadence + production-rule application worked end-to-end through 6 rounds of Brunel revisions + 2 of mine. Federation type system structurally complete at v1.0-final.
+
+[DECISION] **Aen 13:45 routed primary-artifact-vs-relay-quote candidate to (iii) defer to Brunel's queue.** Reasoning: Brunel authored the production rule (his v0.6 frontmatter self-correction); has consolidated submission planned (`relay-to-primary-artifact-fidelity-discipline.md` combining v0.5 + v0.6 self-notes as two-stage discipline lifecycle); my framing extension folds inline with citation, structurally cleaner than sibling Section 4. **"His observation, his submission" principle I already applied to relay-fold-discipline self-correction — same principle applies here by symmetry.** Standing down on this candidate.
+
+[LEARNED] **Discipline-surface-count stands on deliverable evidence, not on every observation getting a separate wiki entry** (Aen 13:45). Counter to my instinct (every observation worth surfacing as candidate). Phase B's eight discipline surfaces are evidenced in PR #12 + PR #13 + Cal's filings + Brunel's queue, not in every ratification message that named a discipline. **For future sessions: surface candidates to team-lead, accept route-(iii) defer-to-author when authorship is unambiguous.** Routing-decision meta-pattern.
+
+[CHECKPOINT] **Eight discipline surfaces dogfooded through Phase B v1.0-final** (Aen 13:45 final tally):
+1. Cross-read discipline (gate 2)
+2. Cite-and-fold cadence
+3. Production-rule application (Brunel)
+4. Worktree-isolation discipline
+5. Strict-typed-contract-discipline (Cal n=2 promotion-grade triggered)
+6. Brief-frame gate-4 runtime-variant (my two instances; Cal accepted)
+7. Discriminator-field-name consistency (my §2.3 lock; n=1 watch)
+8. Primary-artifact-vs-relay-quote (Brunel's queue)
+
+[WIP] Phase B v1.0-final fully closed on my side. Idle pending: (i) Cal's processing of Sections 1 + 3; (ii) PR #12 + PR #13 merge calls; (iii) PO direction or session-tail per Aen 13:45 standing-by.
+
+## 2026-05-06 14:18 — Session #27 SHUTDOWN (PO direction via Aen 14:09)
+
+[CHECKPOINT] **Session #27 closure — PO-directed.** Phase B v1.0-final cluster fully shipped end-to-end on my deliverables. PR #12 + PR #13 standing for review-and-merge per Prism repo cadence; not gated on session boundary.
+
+**Deliverables shipped this session:**
+- PR mitselek/prism#12 v0.1.1 — `04-federation-authority-record-contract.md` (Aen 13:35 fully ratified)
+  - §1 `FederationAuthorityRecord` top-level discriminated union (Option (2) slot decision)
+  - §2 `RegistrationAuthority` interface with Q-A bootstrap-time-only `conventionRetestCount`, Q-B producer-side `recordId`, Q-C `supersedes` validation deferred to R9
+  - §2.3 Discriminator field name `kind` locked (Aen 12:24 Flag 1 fold)
+  - §3 `SovereigntyClaim` 3-state union + `PathSovereigntyAccessor` (D5 detection)
+  - §4 `BaselineDeviation` 4-state union with normalized magnitude (D7 detection)
+  - §5 Cross-doc fold-points; §6 watch-points; §7 acceptance gate; §8 cross-link summary
+- PR mitselek/prism#13 v2.0.0 — 02 §4.3 R9-rule under `EnvelopeInvalidRecovery` (Aen 13:10 SemVer-major ratified)
+  - §4.3 enum extended 6 → 7 values (adds `"R9"`)
+  - §4.3.1 NEW R9 formal definition (R9.1 / R9.2 failure modes)
+  - SemVer-major bump per `semver-strict-typed-contract-discipline.md` canon precedent (PR #11)
+- Bundled Protocol A 3-section relayed via Aen 13:25; Section 2 filed by Cal at 13:32 (gate-4 runtime-variant fold; my "task-start AND every artifact-write" → Cal sharpened to "every artifact-write event" operationally specific)
+
+**Eight discipline surfaces dogfooded** (Aen 13:45 final tally):
+1. Cross-read discipline (gate 2) — `protocol-shapes-are-typed-contracts.md`
+2. Cite-and-fold cadence — Brunel v0.6 direct-citation pass
+3. Production-rule application — Brunel's primary-artifact > relay-quote
+4. Worktree-isolation discipline — n=7 cumulative evidence (Section 1 of bundle)
+5. Strict-typed-contract-discipline — n=2 promotion-grade (PR #11 + PR #13)
+6. Brief-frame gate-4 runtime-variant — my two instances; Cal accepted (Section 2 of bundle)
+7. Discriminator-field-name consistency — my §2.3 lock; n=1 watch (Section 3 of bundle)
+8. Primary-artifact-vs-relay-quote — Brunel's queue (route iii defer-to-author)
+
+[LEARNED] **Discipline-surface-count stands on deliverable evidence, not on every observation getting a separate wiki entry** (Aen 13:45). Counter to my instinct (surface every candidate). For future sessions: surface candidates to team-lead; accept route-(iii) defer-to-author when authorship is unambiguous.
+
+[LEARNED] **"His observation, his submission" symmetry principle.** Applied twice this session — once self-imposed (excluded Brunel's relay-fold-discipline self-correction from my bundle); once Aen-confirmed (route iii on primary-artifact-vs-relay-quote). Symmetry holds: when an observation is unambiguously authored by another agent, route to their queue regardless of whether you authored framing extensions.
+
+[LEARNED] **Cal's "every artifact-write event" framing is sharper than temporally-ranged framing.** Operational specificity beats temporal range. Adopting for future runtime-gate-discipline language.
+
+[GOTCHA] **Worktree-OUTBOUND substrate-failure mode** — non-worktree↔worktree bidirectional partial failure; worktree↔worktree + non-worktree↔non-worktree both work. Cal filing `worktree-spawn-asymmetry-message-delivery.md` separately. Routing: my Cal Protocol A submissions go via team-lead → Cal relay until substrate fix lands.
+
+[DECISION] **PR #12 + PR #13 NOT gated on session boundary** per Aen 14:18. Standing for review-and-merge per Prism repo cadence. If session #28 resumes Phase B work, cite PR #12 + PR #13 for federation-authority-record + R9-rule typed contracts.
+
+**Worktrees still active on disk** (`prism-wt-herald-03`, `prism-wt-herald-02-r9`) — branches pushed; cleanup at PR merge time (`git worktree remove ...` after each PR's `Merge` button click). Not blocking.
 ## 2026-05-05 (session #26 — Prism federation Phase A complete)
 
 [CHECKPOINT] **Phase A on `mitselek/prism` STRUCTURALLY FINAL — 11 PRs merged.** My contributions:

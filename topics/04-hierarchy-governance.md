@@ -322,6 +322,7 @@ Audit authority is separated from executive authority. The auditor assesses; the
 | **Cross-team health** | Medici (home team) | L1/PO assigns | Advisory — findings to L1 | Report to L1, who routes to audited team |
 | **Code review** | Marcus (or equivalent) | Team-lead assigns per PR | Binding within team — GREEN required for merge | Review verdict on PR |
 | **Spec review** | Domain expert | Team-lead assigns | Advisory — recommendations | Review comments on spec |
+| **Authority drift (federation-scale)** | Substrate-typed drift detector (sidecar over poll-stream) | Continuous (per poll cycle) on shared firehose | Advisory — typed `ProducerAction` emission; observe-only, no authority delegated | Per-team weekly digest (primary) + per-event escalation on typed-invariant breach (exception). Recipients: L1 (typed-invariant) or digest-aggregator (statistical); never named curator directly |
 
 ### Cross-Team Audit Flow
 
@@ -356,6 +357,54 @@ Target team-lead decides action:
 - Message another team's specialists directly (must go through team-lead)
 - Block another team's work (audit findings do not create blockers unless PO escalates)
 - Override a team-lead's decision on how to handle a finding
+
+### Federation-Scale Drift Detection Flow
+
+```
+Substrate poll-stream
+    │  (envelope log, RegistrationAuthority records)
+    v
+Drift detector reducer
+  - Typed-invariant signals (D1/D2/D5/D6) — single envelope, binary
+  - Statistical signals (D3/D4/D7/D8) — time-window, BaselineDeviation
+    │
+    v
+Severity classification
+  - "info" (telemetry only)
+  - "warning" (substrate-typed mismatch, no authority crossing)
+  - "breach" (authority-line crossed)
+    │
+    ├── Typed-invariant breach → per-event escalation
+    │       │
+    │       v
+    │   ProducerAction: escalate-to-team-lead
+    │       │
+    │       v
+    │   L1 router → team-lead-of-accused-team
+    │       │
+    │       v
+    │   Team-lead decides corrective action:
+    │     ├── Accept signal → implement fix
+    │     ├── Reject signal → explain to L1 → L1 mediates or escalates
+    │     └── Defer signal → log with reason and timeline
+    │
+    └── Statistical / info+warning → per-team weekly digest
+            │
+            v
+        Digest-aggregator → team-lead (digest cadence, not per-event)
+```
+
+The flow mirrors the Cross-Team Audit Flow above structurally — auditor (drift detector) produces findings; L1 routes; audited team-lead decides action. Difference: detector is substrate-resident sidecar, not Medici-as-agent; cadence is continuous, not per-session; output is typed (`ProducerAction`), not prose; recipient routing is severity-graded (per-event vs digest).
+
+### What the Drift Detector May NOT Do (Federation-Scale)
+
+- Auto-correct violations (would collapse separation of powers — substrate IS NOT governance)
+- Route signals to per-namespace curator as governance-recipient (curator is signal *subject*, not *recipient*; per Cal Protocol B 2026-05-06)
+- Block writes (the detector observes post-admission; admission control is bootstrap's domain, not drift's)
+- Override team-lead's corrective decision (detector emits typed signals; downstream consumers integrate per `wiki/patterns/integration-not-relay.md`)
+- Read scratchpad content or message bodies (detector consumes envelope poll-metadata only; narrative-detection is Medici's single-team scope)
+
+The boundary is structural: drift detection is observe-only, advisory, substrate-resident, and below the governance layer (per `wiki/patterns/substrate-shape-vs-authority-shape-orthogonality.md` — corrective authority lives above the substrate, not at the substrate's write-authority layer).
 
 ---
 
@@ -800,12 +849,57 @@ How does this governance model behave as team count grows?
 
 | Failure | Description | Detection | Recovery |
 |---|---|---|---|
-| **Authority drift** | An agent regularly makes decisions above its level | Decisions appear in scratchpads/PRs without corresponding authority | Medici audit flags; team-lead or L1 corrects |
+| **Authority drift (single-team)** | An agent regularly makes decisions above its level | Decisions appear in scratchpads/PRs without corresponding authority (narrative-detected) | Medici audit flags; team-lead or L1 corrects |
+| **Authority drift (federation-scale)** | A team writes outside its namespace, or a curator emits accepts outside its scope | Substrate-typed signals from envelope poll-stream (no scratchpad reads required) | Drift detector emits advisory `ProducerAction` → L1 router → audited team-lead (see §Authority-Drift Detection at Federation Scale) |
 | **Governance bypass** | Agent skips escalation and acts directly | Action taken without required approval in decision log | Post-hoc audit by Medici; PO reviews |
 | **Bottleneck** | L1 (or PO acting as L1) becomes the constraint on team velocity | Handoff requests age; teams idle waiting for routing | Deploy manager agent; increase L1 autonomy |
 | **Policy gap** | A decision type not in the matrix arises | Agent is unsure who decides; asks multiple parties | Agent escalates to next level up; PO adds to matrix |
 | **Dual authority** | PO and manager agent both give directives to same team | Conflicting instructions; team-lead cannot comply with both | Clear handoff: when L1 is deployed, PO addresses L1, not team-leads directly (except emergencies) |
 | **Audit overreach** | Auditor treats findings as binding directives | Audited team receives "you must" language from non-authority | Team-lead pushes back; L1 mediates |
+
+---
+
+## Authority-Drift Detection at Federation Scale (*FR:Montesquieu*)
+
+Single-team authority drift is narrative-detected — Medici reads scratchpads, peer agents flag inconsistencies, MEMORY.md amendments capture incidents. This does not scale beyond a handful of teams. At federation scale (n=10+ teams), narrative detection misses violations because no human or agent holds context on all teams' scratchpads simultaneously.
+
+### Substrate-typed detection
+
+The federation observes drift via **substrate-typed signals derived from the same poll-stream that Phase A's federation-bootstrap sidecar consumes** — different reducer over a shared firehose. Detection lives below the governance layer. The detector emits *advisory* signals via the existing `ProducerAction` enum (`escalate-to-team-lead`, `escalate-to-governance`); corrective authority is a separate decision made by an actor above the substrate.
+
+The placement is structural, not convenience: if the substrate auto-corrected violations, the substrate would become governance, and the separation of powers would collapse on first autonomous correction. The asymmetry — **admission needs to commit, observation needs to caution** — keeps binding-by-bootstrap separate from advisory-by-drift.
+
+### Signal classes
+
+Two detection mechanics, two false-positive profiles:
+
+**Typed-invariant signals** (binary detection, single envelope, false-positive rate bounded by Phase A contract correctness):
+- Path-namespace breach: `sourceTeam ≠ leading segment of logical_path` without authorization
+- CuratorAuthority overreach: `WriteAccept.curator ≠ latest-non-superseded-RegistrationAuthority(team).curator`
+- R2 sovereignty boundary crossing: `SovereigntyClaim.state === "R2-violated"` (consumes Brunel's typed 3-state union from observer surface; substrate has done the classification work)
+- Authority-floor regression: structurally-valid `RegistrationAuthority.supersedes` chain advances without corresponding §3.4 ratification record (invalid `supersedes` references — broken-chain — are handled separately as substrate-validation R9-rule under `EnvelopeInvalidRecovery`, not as authority-floor signal, per Herald Directive C in Brunel v0.3)
+
+**Statistical signals** (time-window aggregation, threshold-tuned, false-positive rate governed by tuning, consumes Brunel's typed `BaselineDeviation` 4-state union):
+- Cross-namespace WriteAccept anomaly (`BaselineDeviation` per-team)
+- ContentCategory misclassification (recurring)
+- Rejection-rate anomaly (per-team `errorClass` distribution `BaselineDeviation`)
+- Admission-velocity anomaly (`RegistrationAuthority` envelope rate via supersedes-chain traversal — cumulative count derived detector-side, not stored on envelope)
+
+`BaselineDeviation` severity mapping: `within-baseline` → no signal, `deviating-conservatively` → info, `deviating-aggressively` → warning, `insufficient-data` → info-with-flag. This typed-output discipline preserves implementation-flexibility on Brunel's measurement-method side while giving the detector a stable severity contract.
+
+### Output design — digest-first, escalate by exception
+
+Per-team weekly digest is the primary output mode; per-event escalation is the exception. Typed-invariant breaches escalate per-event; statistical signals route to digest by default. The two output modes carry different load profiles (advisory-fatigue load vs. breach load) and do not compete for the same channel.
+
+### Recipient and authority chain
+
+Drift advisories route per Topic 04 cross-team-audit precedent: **L1 router → team-lead of accused team → team-lead decides corrective action**. The per-namespace curator named in a drift signal is the *subject* of the signal, not the *recipient* of governance authority. The detector emits typed signals; downstream consumers decide. By construction, this introduces no co-ownership / shared-curatorship — drift detection is observe-only, no authority delegated.
+
+The per-namespace curator's authority is **write-authority only, not corrective-authority** — confirmed by Cal Protocol B resolution (2026-05-06) citing Surface 1 §1.1 ("each curator is sole-writer for their team's namespace shard") and `wiki/patterns/substrate-shape-vs-authority-shape-orthogonality.md` (substrate-shape and authority-shape are orthogonal axes; corrective authority lives above the substrate at governance layer, not at the substrate's write-authority layer). Severity ceilings under this resolution do NOT shift; the binding-bootstrap-vs-advisory-drift asymmetry holds in its existing form. ProducerAction emission targets are L1 (typed-invariant breach) or digest-aggregator (statistical signal); never the named curator directly.
+
+### Reference
+
+Full design lives in `teams/framework-research/memory/montesquieu.md` (session 27 design v1, 2026-05-06). Typed-shape contracts (`SovereigntyClaim`, `BaselineDeviation`, `RegistrationAuthority`) ratified by Herald and live in `prism/designs/herald/04-federation-authority-record-contract.md` (Herald 04 spec v0.1.1; discriminator field `kind` confirmed at §2.3). Federation bootstrap template at `teams/framework-research/docs/federation-bootstrap-template-2026-05-06.md` v0.6 emits the typed `RegistrationAuthority` record with `kind` discriminator and producer-generated `recordId`. Cal Protocol B resolution (2026-05-06) confirmed L1-router → team-lead-of-accused-team as recipient default; pending-flag retired. Compound-drift-signal typed contract scheduled for v1.1 amendment when fold lands.
 
 ---
 
@@ -827,7 +921,7 @@ How does this governance model behave as team count grows?
 
 3. ~~**Emergency authority override**~~ → Resolved. See §Emergency Authority Protocol. Time-bounded, scope-limited emergency authority with mandatory post-hoc PO review. Four escalation levels: PO present → PO unavailable with manager agent → PO unavailable without manager agent → blocking production incident.
 
-4. **Governance compliance audit** — Medici audits knowledge health. Who audits governance compliance — whether agents are actually following the delegation matrix? Is this a Medici responsibility, a separate role, or a PO spot-check?
+4. ~~**Governance compliance audit**~~ → Resolved at federation scale via substrate-typed drift detection (see §Authority-Drift Detection at Federation Scale). Medici continues to handle single-team narrative-detected drift; federation-scale compliance is observed via the substrate poll-stream reducer (joint with Phase B bootstrap), with advisory routing through L1 → team-lead. Single-team drift detection (Medici) and federation-scale drift detection (substrate detector) compose: Medici reads scratchpad evidence the substrate cannot see; substrate detector reads envelope evidence Medici cannot scale to.
 
 5. ~~**Direct link governance lifecycle**~~ → Resolved via T03/T04 coordination with Herald. L1 performs periodic reviews triggered by: time-based (30 sessions), inactivity (10 sessions), scope change, incident, or on-demand. Review process and registry extension defined in T03 Protocol 2. Authority to revoke is L1 per delegation matrix Rows 27-28.
 

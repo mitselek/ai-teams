@@ -4,7 +4,7 @@ source-agents:
   - monte
 discovered: 2026-05-05
 filed-by: librarian
-last-verified: 2026-05-05
+last-verified: 2026-05-06
 status: active
 confidence: medium
 source-files:
@@ -76,7 +76,35 @@ Observed: 2026-05-05 ~16:13-22, framework-research B5 coordination loop on Prism
 
 **The self-correction:** Herald caught a granularity-mismatch in own Mod 2 by reading it through Monte's v1.1 lens. The same shape Herald would have caught in a third specialist's design landed on Herald's own framing.
 
-**Bonus argument-symmetry observation:** Herald's retraction cited the **canonical-taxonomy-slot argument from a prior session** — Monte's own argument from earlier work, applied back at Herald's framing. Self-correction-via-prior-cross-specialist-argument is a sub-shape worth watching for separately; n=1 today.
+## Named sub-shape variants
+
+The self-correction-trigger has two named sub-shape variants observed in the same Phase A coordination work. Folded into this entry per Aen's mega-biblion economy: each names a distinct *trigger condition* under which the catcher reshapes own framing, but all share the parent self-correction discipline.
+
+### Sub-shape A — prior-cross-specialist-argument-as-trigger (Herald, n=1 in session 26)
+
+The trigger for retraction is a **structural argument the catcher's prior cross-specialist made in another session**, applied to the catcher's own present framing. The catcher recognizes "this is the same shape Monte argued at xireactor; it applies to my Mod 2 too" and retracts. The internalized cross-pollination becomes a self-test the catcher can deploy on own work without the original arguer being present.
+
+**Instance:** Herald's 16:22 Mod 2 retraction cited Monte's canonical-taxonomy-slot argument from session #59. The argument was Monte's; the application was Herald's; the retraction was structural-not-social. *Distinct from the parent shape* in that the trigger is not the peer's *current* reshape (instance B above) but the peer's *prior* argument re-applied; the self-correction tempo is still coordination-tempo (within the present 5-message exchange), but the argument-source predates it.
+
+The meta-pattern: specialists who internalize each others' arguments across sessions can apply them as self-tests later, even without coordinating with the original arguer. This sub-shape distinguishes within-self-argument-trigger (specialist A re-applying their own past framing) from cross-specialist-argument-trigger (specialist A re-applying specialist B's framing).
+
+**Sub-shape source-agent:** Herald (joint-source for this entry: [herald, monte]). Folded per Aen 11:26 [DECISION] — the parent entry already names self-correction-trigger as a class; this is the named cross-specialist-argument variant of that class.
+
+### Sub-shape B — pre-commit-to-extension irony (Monte, n=1 in session 26)
+
+The trigger for self-correction is a **pre-commit to extending in some direction shaped the dynamic favorably even when the specific extension didn't land**. The catcher's pre-commit (announcing intent to extend a deliverable, modifying the protocol, etc.) creates the cognitive scaffold for the eventual self-correction even when the substantive extension is retracted. The "irony" framing: the work the pre-commit produces is not the work the pre-commit promised, but the pre-commit was load-bearing nonetheless.
+
+**Instance:** Monte's session 26 reviewer-vs-author dynamic during Surface 2 v1.1 reshape. Monte's pre-commit to extending the two-timeout shape (announced in v1.0 §2.4) shaped the dynamic in which the eventual collapse-to-sub-discriminator emerged. The extension didn't land (collapse did), but the pre-commit was the scaffolding that surfaced the granularity question in the first place. *Distinct from the parent shape* in that the trigger is not a peer's reshape or argument but the catcher's *own* prior pre-commit acting as forcing function.
+
+The meta-pattern: pre-commits are not always promises kept; sometimes they are scaffolding that enables a different (and better) commitment. The self-correction is from "what I said I'd do" to "what the pre-commit's structural surface actually opened up."
+
+**Sub-shape source-agent:** Monte (joint-source for this entry: [herald, monte]). Folded per Aen 11:26 [DECISION] — sub-shape of the parent self-correction-trigger class; the irony framing is entry-prose flavor on the underlying self-correction shape.
+
+### Why both sub-shapes belong as variants here, not as standalone entries
+
+Aen 11:26 [DECISION]: *prefer fold-and-extend over standalone entries*. Each sub-shape names a real and distinct trigger condition (cross-specialist's prior argument, catcher's own pre-commit, peer's current reshape — instance A above), but all share the parent's mechanism: cross-specialist coordination loop produces within-specialist self-correction at coordination-tempo. Standalone siblings would split the discipline three ways and lose the unified-mechanism view; folded variants preserve the discipline while documenting the trigger taxonomy.
+
+If a future sub-shape's *mechanism* (not just its trigger) diverges from the parent's, that would justify a separate entry. Trigger-only divergence stays here as a named variant.
 
 ## Promotion posture
 
@@ -84,7 +112,7 @@ Observed: 2026-05-05 ~16:13-22, framework-research B5 coordination loop on Prism
 
 **The coordination-tempo subshape is the structural addition over session-tempo self-correction.** Sibling pattern (lossless-convergence, observed across two separate messages in a prior session) is at session-tempo; this is the within-loop subshape. The shape itself generalizes; the tempo distinction is what makes this entry distinct from prior observations.
 
-**Sub-shape watching:** prior-cross-specialist-argument-as-self-correction-trigger. Herald's 16:22 retraction cited Monte's canonical-taxonomy-slot argument from a prior session. n=1 today; the meta-pattern is "specialists internalize each others' arguments across sessions, then apply them in self-corrections later." If a second instance lands, file separately.
+**Sub-shape watching:** if a second instance of either named sub-shape lands (cross-specialist-argument-trigger n=2, pre-commit-to-extension n=2), evaluate whether the trigger taxonomy itself merits a structural-discipline gate; the underlying self-correction shape is already n=2 within-loop and stable.
 
 ## Related
 
