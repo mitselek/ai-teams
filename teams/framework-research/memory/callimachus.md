@@ -1,53 +1,41 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 25 — 2026-05-05 (issue #64 C-phase, Cal-half + n=5 amendment)
+## Session 26 — 2026-05-05 (Phase A end-to-end: 3 Protocol Cs, 9 wiki entries, Brunel amendment, Phase A STRUCTURALLY CLOSED 17:25)
 
-[CHECKPOINT] **C-phase memo delivered.** `docs/2026-05-05-postgres-library-discovery/cal-internal-perspective.md` (985 words, slightly over the 600-800 target — flagged to team-lead). Lean: **proceed-to-A** scoped to federation-and-query-layer, NOT wholesale migration. Five load-bearing primitives identified (git-blame, git-log, directory-as-typed-contract, hand-authored Related prose, grep-as-filter). Three [WARNING] flags on unverifiable claims (Brilliant maturity dependent on Finn's verification, 5-10% deduplicable estimate is eyeball, cross-team query frequency is unmeasured). Companion: Finn's `finn-brilliant-deepread.md` (parallel half).
+[CHECKPOINT] **Wiki 59 → 69 (+10 today).** Six Protocol A from Aen's brief: oss-thin-integration, poll-only-substrate-sidecar-derivation, soft-verdict-discipline (process/), cross-repo-glance (process/), path-namespace-as-federation-primitive, two-consumer-pattern. Three Protocol Cs shipped: #1 `source-team` schema add, #2 architectural-fact convention to own prompt, #3 `source-agents` plurality reconciliation across `t09-protocols.ts:401`+`topics/09:761`+`prompts/callimachus.md:330` (my own #2-introduced dangling ref folded in via gate-1 of #3 draft). Three more Protocol As filed in-session via Aen-routed submissions: no-future-proofing (n=many promoted from user memory), dispatch-granularity-matches-recovery-handler (n=1, herald+monte), coordination-loop-self-correction (n=2, herald+monte), worktree-isolation-for-parallel-agents (n=2 herald+monte→Brunel amendment 16:54 added first-person + git-show-origin recovery primitive). Finn ack'd all 6 batch entries no-DISPUTE. Phase A.1 namespace allocation Protocol B answered for Brunel (`fr/`+`Projects/fr/wiki/*`, both Aen-ratified 16:24).
 
-[CHECKPOINT] **Substrate-invariant-mismatch amended n=3 → n=5.** Two new instances:
-  - **Instance 4: `teamcreate-in-memory-leadership-survives-clear`** (disk-vs-in-memory-state variant) — surfaced session 24 filing #59. n=2 cross-team confirmation (Schliemann/apex + Volta/FR session 21). Disk cleanup does not imply runtime-state release.
-  - **Instance 5: Brilliant `entry_links` write-path sync** (external-platform confirmation of derived-data variant) — Finn deep-read 2026-05-05. Same external project as instance 3 but at a different layer: instance 3 names the bug, instance 5 names the explicit fix-shape Brilliant chose. **External-platform confirmation strengthens the structural claim more than within-team n+1 sightings.**
-  - Frontmatter: added `schliemann` to source-agents, added two source-files, added `source-issues: [64]`, added `amendments` log entry, bumped `last-verified` to 2026-05-05.
-  - Renamed "Three Instances (n=3)" → "Five Instances (n=5)"; "What the Three Have in Common" → "What the Five Have in Common"; updated "Why This Entry Exists" closing paragraph.
-  - Index entry updated to n=5 with new layer enumeration + Schliemann added to sources.
+[LEARNED-CLUSTER session 26]:
+- **Memory-claimed n underestimates real usage** (Aen 15:50). Promotion narrative for `source-team` was n=2; gate-1 found n=8 actual / n=6 cross-team. Gate-1 grep is *discovery*, not confirmation. Always grep before drafting Protocol C.
+- **n-axis specification when deferring** (Aen 16:14). Distinguish *instance count of pattern* from *cardinality of dimension claimed across*. Today's path-namespace+two-consumer = n=2 entries / n=1 deployment-axis. Schema-extension thresholds match the axis the pattern claims to vary along.
+- **Gates compound across drafts** (Aen 15:53). Protocol C #2 introduced a dangling reference at `callimachus.md:330` ("append source-agent"); gate-1 of #3 draft caught it. Same gotcha-pattern `wiki/patterns/within-document-rename-grep-discipline.md` warns against — recursive validation.
+- **Consumer-orientation, both halves** (Aen 16:13+16:24+16:33). Grep cross-team consumers first. Aligned-ahead = ship (we're catching up); not-yet-aligned = wait or actively coordinate. **Operational wedge = cost asymmetry**: grep is cheap, misclassification cascades. Eratosthenes-already-on-plural was canonical instance.
+- **Citation hygiene in Protocol B** (Aen 16:24). Cite class-by-name for non-wiki disciplines ("user memory," "common-prompt"); never fabricate wiki paths. Path-(b) opportunistic: promote high-n disciplines to wiki entries when idle.
+- **Filing-to-citation latency <30min** (Aen 16:13). `poll-only-substrate-sidecar-derivation.md` filed ~16:00 was cited in 16:11-12 alignment directive. Filing bar: complete-enough-to-cite from minute one, not "polish later."
+- **Structural Change Discipline gate 2 payoff verified.** Cross-reading prompt vs TS interface surfaced `source-agents` plurality drift that would have remained latent.
+- **Curation produces structural improvement** (Herald 16:46, Monte 16:48 explicit endorsements — checklist distillation, sibling carve-out, layer-shift cross-reference). Submitter brings observed-pattern + evidence; curator brings structural framing + cross-pollination synthesis. Together produce entries sharper than either alone.
 
-[LEARNED] **External-platform confirmation is a stronger Protocol C signal than additional within-team sightings.** Instance 5 is a deliberate design choice by an unrelated team that independently identified the same defect class and chose the same remediation shape. This is closer to "independent rediscovery" than to "n+1 within-team report" — closer to organic-reuse-as-strongest-signal (session 15 [LEARNED]). Worth naming explicitly in the entry's closing paragraph for future Protocol C consideration.
+[CONTRACTS]:
+- **Monte 16:36 Surface 1 design commitment**: federation-curators-as-class scoped per-namespace; peer curators for OTHER teams; Cal stays sole-writer for FR namespace. **If Surface 1 introduces co-ownership/shared-curatorship for ANY namespace, namespace-placement decision must be revisited per Cal's flag.** Verify on Monte's eventual draft.
+- **Aen 16:46 ratified phrasing for #4 lossless-convergence filing** (when it lands): "session #59 first observed; not filed at the time; today's Herald-Monte submission is the n=2 making it promotion-grade." source-agents stays [herald, monte]; #59 instances cite via prose only (schema-purity per Aen 16:43).
+- **Aen 17:25 amendment direction**: worktree-isolation entry now n=3 confirmed empirically (Brunel+Herald table fix+Herald deliverable C). Brief amendment when Herald submits next batch.
 
-[LEARNED] **Single-Edit-per-turn discipline held throughout the amendment.** Six sequential Edits (frontmatter → heading → instances 4+5 insertion → "Have in Common" → Related → Why This Exists), no consecutive-Edit failures. Index update was a seventh Edit on a different file. Plus one Read between the heading-bump and the instances-insert because I needed to verify line context. Confirms the session-15 mitigation: serialize Edits, do not batch.
+[WATCH-CANDIDATES — n=1 parked, promote on next instance]:
+- **Field-rename-when-pattern-docs-depend-on-old-name** (Aen 15:53). Both `pass1-pass2-rename-separation.md` + `within-document-rename-grep-discipline.md` use `source-agent` as canonical singular example. Future field rename will hit it.
+- **Dispatch-enum-stability sub-claim** (Herald 16:46). Twins-as-sub-discriminator more important under external schema versioning. Inside `dispatch-granularity-matches-recovery-handler.md` as tension carve-out; promote to sibling at n=2.
+- **`source-events:` frontmatter for behavior-pattern entries** (Monte 16:48). Worktree-isolation, coordination-loop-self-correction, integration-not-relay all leave file/commit fields empty — n=3 already on the gap. Promote to Protocol C if pattern recurs.
+- **Source-team semantic extension to observation-of-deployment** (path-C parked per Aen 16:14). Today's entries #5+#6 are n=1 on the deployment-axis. n=2 trigger = second independent deployment producing observation-class entries.
+- **Placeholder + amendment-channel pattern** (worktree-isolation Brunel amendment 16:54). When agent A submits but agent B has substrate observations, placeholder + amendment-channel preserves clean filing + clean attribution. Brunel endorsed as generalizable; n=1 today (worktree-isolation), promote on second instance.
 
-[DEFERRED to next session] **Three Protocol C drafts** carry forward (now load-bearing — substrate-invariant-mismatch at n=5 with external confirmation may meet promotion threshold):
-  - `source-team` frontmatter convention (n=2)
-  - "Revision trigger" architectural-fact convention (n=3)
-  - substrate-invariant-mismatch n=5 — Protocol C is now a stronger candidate than at n=3, especially with external-platform confirmation. Team-lead noted this in his close message.
+[NEXT-SESSION QUEUE — Aen 17:25, ~13 patterns pending]: Phase A.1 coord loop (#3 pre-commit-to-extension Monte n=1, #4 lossless-convergence joint n=2 ratified-phrasing, #5 canonical-taxonomy-check Monte n=2, #11 protocol-completeness Herald+Monte joint promotion-grade). Phase A.2/A.3 (field-overlap-one-truth Herald n=1, audit-trail-for-rejection Monte n=1, substrate-vs-authority Monte M2 rejection n=1, asymmetries-live-above-substrate Herald n=1). Herald process queue (#32-#35: cross-specialist-argument-trigger n=1, timestamp-crossed-messages n=5 cumulative, surfacing-with-stale-inbox n=1, snapshot-state-mis-names-path n=1, 504-API-vs-server-state n=1). Worktree-isolation amendment to n=3 when Herald submits.
 
-[DEFERRED to next session] **Six new wiki candidates from today's research** — OSS-thin-integration, poll+sidecar, soft-verdict-discipline, cross-repo-glance, path-namespace-as-federation, two-consumer-pattern. Protocol A batch next session.
+[NEXT-SESSION BOOT]: re-orient via `wiki/index.md` (69 entries). Topic-09 `source-team:` example refresh is 5-min micro-fix when convenient. Verify Monte's Surface 1 constraint commitment on his eventual draft. Phase B (federation bootstrap, authority-drift detection, T04 codification) is NOT STARTED — wakes on PO direction or session-tail signal.
 
-[DEFERRED to next session] Wiki queue from session 14 (11 n=1 candidates) — still parked, watch posture.
+## Sessions 24-25 — 2026-05-04/05 (pruned — Protocol C candidates surfaced, all resolved in session 26)
 
-[WIP] On next session boot: re-orient via `wiki/index.md`, scan inbox, read this scratchpad. Three Protocol C drafts are top of queue, then six-candidate batch intake. Watch for Phase 2 health-sensing on cross-team-query gaps (today's session surfaced this as a blind spot in our gap-tracking).
-
-## Session 24 — 2026-05-04 (7-batch intake: sessions 21+22+23 parked candidates)
-
-[CHECKPOINT] **Wiki 52 → 59. Net +7.** Batch closed end-to-end same-window per Batch Intake protocol. All 7 filed, indexed, acked individually. No merges, no [DISPUTE]s.
-  - **#53 patterns/operational-team-archetype** (team-lead) — fourth team archetype (no TDD + succession-framing + low-cadence + persistent-roster-episodic). First instance: esl-suvekool. n=1 watch posture.
-  - **#54 patterns/claude-startup-md-as-cross-team-handoff** (team-lead) — `.claude/startup.md` at target repo root resolves cross-team mutual-exclusivity-of-leadership constraint. First instance: esl-suvekool 0e461be. n=1.
-  - **#55 process/two-stage-adoption-for-org-standards** (team-lead) — Stage 0 proposal + Stage 1 escalation + Stage 2 final. Decouples authoring/ownership-transfer/authority. First instance: EVR sisene konteinerite standard, TPS-583. n=1.
-  - **#56 contracts/speculative-marker-for-cross-team-drafts** (team-lead) — **FIRST contracts/ entry, opens previously-empty subdir.** Inline `[speculative]` marker for greppable inference flagging in cross-team handoff drafts.
-  - **#57 gotchas/create-perm-as-404-disguise** (team-lead) — Atlassian disguises permission denial as 404. TTL 2027-05-04. **Architectural-fact convention** applied (second use after Brunel's no-sudo).
-  - **#58 references/evr-sso-is-entraid-not-wso2** (team-lead+brunel) — Substrate-fact reference. EntraID not WSO2. TTL 2027-05-04. **Architectural-fact convention** third use.
-  - **#59 gotchas/teamcreate-in-memory-leadership-survives-clear** (volta+schliemann, source-team apex-research) — n=2 cross-team confirmation, promotion-grade per Volta's criterion. Sibling to dual-team-dir at substrate-invariant-mismatch generalization.
-
-[DECISION] **Classification delta on submission 1: chose `patterns/` over team-lead's suggested `process/`.** Reasoning: four characteristics describe team SHAPE not workflow; sibling precedent under patterns/ (multi-repo-xp-composition, cathedral-trigger). Flagged in close-report; team-lead's call.
-
-[LEARNED] **Three single-entry experiments now have n≥2 evidence and surfaced for Protocol C consideration in close-report:** (1) `source-team` frontmatter at n=2 (wiki-cross-link + this batch's #59); (2) "Revision trigger" architectural-fact convention at n=3 (Brunel's no-sudo + this batch's #57 + #58); (3) substrate-invariant-mismatch n=3→n=4 amendment candidate (#59 fourth instance). All three deferred to team-lead nod — Protocol C is his territory; my role is surface, not promote.
-
-[LEARNED] **JSON-message dispatch via jq + slurpfile (not bash heredoc) avoids backtick interpretation.** Hit at ack 2/7 — backticks in body got bash-interpreted as command substitution and broke `--argjson`. Mitigation: write message JSON to a temp file (Write tool) then `jq --slurpfile msg /tmp/fr-msg.json '. += $msg' inbox.json`. Markdown-formatted message bodies with code-fences/backticks work cleanly through slurpfile, never through inline bash. **Tool environment note:** /tmp on this Windows host maps to `~/AppData/Local/Temp/`; `cp /a /b` errors when paths resolve same. Just use slurpfile path directly.
-
-[LEARNED] **Forward-references between batch entries are fine if filed in same session and linked-target lands before report close.** Submission 2 forward-referenced submission 7 (`teamcreate-in-memory-leadership-survives-clear.md`) before it existed. Filed 7 same-window, link valid before any reader could hit it. Acceptable when batch is processed end-to-end in one window; would NOT be acceptable across session boundaries.
-
-[CHECKPOINT] **TTL scan clean.** All 4 TTL'd entries (`cloudflare-d1-migration-query` 2026-10-10, `model-inventory-baseline` 2026-07-10, `warp-dns-vs-routing-asymmetry` 2026-10-24, `references/rc-host-db-tunnel-architecture` 2026-10-24) are still future. New entries #57 + #58 add 2027-05-04 TTLs. Earliest expiry now `model-inventory-baseline.md` 2026-07-10 — flag at next startup if not addressed.
-
-[WIP] On next session boot: re-orient via `wiki/index.md`, scan inbox for team-lead's response on the three Protocol C candidates flagged in close report, scan inbox for any new submissions. If team-lead nods on substrate-invariant-mismatch n=3→n=4 amendment, that's a one-edit task. Wiki queue from session 14 (11 candidates) still parked.
+[CHECKPOINT] S24 wiki 52→59 (7-batch intake, sessions 21-23 parked candidates filed). S25 substrate-invariant-mismatch amended n=3→n=5 with external-platform confirmation (Brilliant entry_links sync as instance 5). Three Protocol C candidates surfaced for next session: source-team (n=2 narrative; gate-1 grep in S26 corrected to n=8 actual / n=6 cross-team), architectural-fact convention (n=3), substrate-invariant-mismatch n=5 promotion-grade.
+[LEARNED] External-platform confirmation is a stronger Protocol C signal than within-team n+1 sightings — independent rediscovery beats repeated reports.
+[LEARNED] JSON-message dispatch via jq + slurpfile avoids backtick interpretation in inboxes; Single-Edit-per-turn discipline holds through multi-edit amendments; forward-references within batch are fine if both filed same session.
+[CHECKPOINT] TTL scan clean S24; earliest expiry `model-inventory-baseline.md` 2026-07-10 — flag in S27 if not addressed.
 
 ## Session 15 — 2026-04-24 → 2026-04-29 (pruned — path validation + apex-research deploy patterns)
 

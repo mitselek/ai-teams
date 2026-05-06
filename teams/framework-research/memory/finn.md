@@ -161,6 +161,38 @@ In production esl-suvekool integration, "federation" is implemented operationall
 
 esl-suvekool runs two Brilliant consumers: (1) local team via MCP (read+staged-write); (2) road-warrior claude.ai Project via copy-paste handshake (synthesized snapshot only, can't query). The handshake (`[SYNC BRIEF]` from local → RW echoes `[SYNC: YYYY-MM-DD]`, `.last-sync` anchor) closes both gaps: what's new locally that RW needs, AND what RW has done since previous sync. Architecturally: a substrate that's MCP-accessible AND copy-paste-summarisable for non-MCP consumers. Pattern A candidate.
 
+## [CHECKPOINT 2026-05-05 16:08] Phase A research deliverables shipped (issue #65)
+
+Two read-only research docs shipped to `docs/2026-05-05-phase-a/`:
+- `finn-dedup-census-2026-05-05.md` (~1300w, 4 tables) — esl-suvekool Brilliant footprint = 6 entries across 4 namespaces; only ONE team populates Brilliant today; cross-team dedup at n≥2 anywhere = 1 entry. Brief's `standards/contracts/gotchas/decisions` taxonomy is FR-wiki shape, NOT Brilliant namespace shape (which is Projects/Meetings/Context/Resources). Flagged: dedup census should be POST-scaling instrumented measurement, not pre-scaling baseline.
+- `finn-cross-team-query-frequency-2026-05-05.md` (~1900w, 8 tables) — order-of-magnitude estimate ~1-10 cross-team queries/week cluster-wide. FR is dominant cross-team-aware team (~10× higher rate than apex); flow is asymmetric hub-and-spoke (FR-as-hub, raamatukoi/screenwerk/esl-suvekool as consumers). Federation NOT throughput-bound (Brilliant 178 ops/s vs observed ~1-10/week = 5+ orders headroom).
+
+## [PATTERN] Two namespace shapes, not one (phase A surface)
+
+The dedup-census reframe surfaced a structural finding: per-team product namespace (`Projects/<team>/*`, in production at esl-suvekool) and cross-team methodology namespace (`Patterns/*`, `Gotchas/*`, `Decisions/*`, NOT in Brilliant today; populated in FR's markdown wiki). Two query patterns: many-readers/few-writers vs one-writer/few-readers. Phase A should decide if Brilliant gets a methodology-namespace top-level or stays product-only.
+
+## [LEARNED] Pre-scaling baseline measurement is structurally near-zero
+
+When a "scale a proven pattern" brief asks for cross-team dedup census BEFORE the pattern is scaled, the measurement is structurally zero — there's no second team to dedup against. Push back on the framing: measure post-scaling, not pre. The pre-number doesn't tell you what the post-number will be.
+
+## [DEFERRED 2026-05-05 15:58] Three optional task ideas parked by team-lead
+
+(a) FR↔apex methodology-namespace baseline census — defer until architecture team asks. Pre-scaling structural-zero conclusion already established; new research without an asker is research-for-research-sake. (b) `Brilliant entry_links` vs FR `source-team` frontmatter schema question — phase A architecture turf, do not pre-empt Brunel/Monte/Herald. Was scope creep on my part. (c) Apex evolution check (steady-state vs pre-cross-team-discovery) — n=24+ sessions worth, but tangential to federation-shape. Fill-in if architecture team blocks, or next session.
+
+All three carried; do not re-surface unprompted.
+
+## [CHECKPOINT 2026-05-05 15:58] Phase A handoff brief shipped
+
+`docs/2026-05-05-phase-a/finn-phase-a-handoff-brief-2026-05-05.md` (~750w, 4 sections per Aen's prescription): §1 substrate baseline (5 ASSUME-able facts), §2 open architecture decisions (6 questions with pre-empirics, no answers), §3 Cal-routing block (10 candidates), §4 known gaps (5 bound-the-inferences bullets). Audience: Brunel/Monte/Herald on spawn — written so they read this instead of the 5-doc trail.
+
+## [LEARNED 2026-05-05] Multi-edit Read-before-Edit constraint — n=2 cross-agent
+
+When two Edits in one message target a file I wrote-but-didn't-Read, the second silently fails with "File has not been read yet." Hit this on the dedup-census refinement at 15:55 — claimed both edits landed, only the query-freq edits landed, dedup-census edits no-oped. Caught at 15:57 by user feedback (or by re-reading the file). Sibling case: Cal hit same shape n=4 in session 20 ([LEARNED] in team-lead scratchpad: "Multi-edit Read-before-Edit constraint requires per-message serialization"). **n=2 across agents now** (Cal session-20 + me session-26). Aen flagged as wiki-promotion candidate at next observation. Operational rule for me going forward: Read before Edit when re-touching a file I Wrote-but-didn't-subsequently-Read; don't trust Write-state to satisfy Read-state for Edit. Or scope to one file per message when batching edits.
+
+## [SESSION 26 CLOSE 2026-05-05 15:59] Idle until architecture team spawn
+
+Aen confirmed (c) standing-by; my session contribution complete. Two research deliverables + handoff brief shipped. Three optional task ideas parked. Cal Protocol A batch in progress (3/6 done, ~halfway). No new task; do not generate work for self.
+
 ## [UNADDRESSED] None
 
 (*FR:Finn*)

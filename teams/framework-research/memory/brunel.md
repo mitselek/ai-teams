@@ -1,129 +1,71 @@
 # Brunel scratchpad
 
-## EVR KONTEINERITE STANDARD — Stage-0 SHIPPED (2026-04-30, session 22 ext.)
+## PHASE A CLOSED — Prism (2026-05-05, session 26)
 
-[CHECKPOINT] Stage-0 publish complete. Standard published to V2 Confluence (page id `1715798017`), intake-vorm published to V2 (page id `1715699714`), TPS-583 tracking-issue posted with V2-direct framing. Cross-references in all 3 disk markdown files now use live Confluence URLs (standard ↔ intake bidirectional, tracking-issue Stage-0 link section leads with live URLs + repo files demoted to "allikas-mustand" footer).
-[DECISION] Team-name spelling = `VJS 2 meeskond` (with space) per PO option (ii) — final call after PO reverted earlier "(i) keep VJS2" decision. All 4 loci aligned (intake L15, intake L117, tracking L19, tracking L76). Rule: `V2` = Confluence space-key (URLs/page-ids); `VJS 2` = team-name in prose; `V2 (VJS 2)` = parenthetical disambiguation when introducing the space.
-[DECISION] Auth anchor for the standard = **EntraID (Azure AD)**, NOT WSO2. Confirmed via Confluence (`UAM - SSO and EntraID User Provisioning`, FSM page `536248326` + Delinea page INFOSEC `851607559`). WSO2 in EVR is the integration platform (`wso2mi.evr.ee`), not the SSO mechanism. Don't accept "WSO2 SSO" framing without challenging — PO brief had this wrong.
-[DECISION] Speculative-marker pruning = 22 → 16 (KEEPs: real Stage-1 governance questions; REMOVEd: industry-standard CIS Docker Benchmark items + redundant tier-children). Keep markers signal-bearing, not blanket-flagging.
-[LEARNED] Review-first with explicit proposal docs (`proposed-diff-2026-04-30-pass2.md`) is the right discipline once 2+ parallel-edit collisions occur. PO sees the diff before any edit lands; Brunel applies in one deliberate pass; collision risk drops to ~0. The proposal-doc structure (NY-id with before/after/rationale) generalises — promote to wiki pattern if hit again.
-[LEARNED] When team-lead brief states a count or fact ("19 markers", "WSO2 SSO"), **verify it independently before quoting** — both were wrong this session. Quoting a wrong number into the proposal-doc summary line was caught only by post-edit grep ("16 → 10 KEEP" should have been "16 → 12 KEEP" since 16-8removes=12, not 10). Pre-flight arithmetic check is cheap.
-[LEARNED] D365-fallback-on-create-perm-error is a real Confluence gotcha — attempting Create from V2 silently routes to D365 if the user lacks V2 create-perm. PO hit this; resolved by Ruth sharing V2 with create-perm directly. If next agent needs to create in V2 and the user only has read-perm, expect a silent space-fallback. Verify the destination space ID after creation, before linking.
-[GOTCHA] PO edits live files in parallel during a Brunel pass. ALWAYS re-read each file fresh before each Edit batch — file-state is invalidated by external edits. The Edit tool's "File modified since read" error caught this once this session. If the read happened more than 1 message ago, re-read.
-[GOTCHA] Author attribution syntax inconsistency surfaces as `(*FR:Brunel*)` (bold) vs `(_FR:Brunel_)` (italic) — use bold per common-prompt. The italic variant snuck in via a Write call once and persisted across multiple revision passes before being caught in audit.
-[DEFERRED] NY3 (API token in Field 6c), NY4 (Field 8 multi-select), NY6 (Field 6/6c VPN interaction) — not blocking Stage-0; Stage-1 ITOps may surface these.
-[DEFERRED] Stage-2 work (#5 in tasklist) — bake receiving role into standard, bump v0.1 → v1.0, move from V2 to ITOps `I` space — gated on Ruth's Stage-1 escalation outcome.
+[CHECKPOINT] **Phase A STRUCTURALLY CLOSED 2026-05-05 17:24.** PR #10 (Herald envelope-v1.1) merged as last in sequence. 10 PRs total on `mitselek/prism` main: #1 + #3 (mine), #2 + #5 + #7 + #9 + #10 (Herald), #4 + #6 + #8 (Monte). My closeout confirmed by Aen 17:25; no outstanding work.
 
-## EVR KONTEINERITE STANDARD v0.1 (2026-04-30, session 22)
+[CHECKPOINT] Phase A.1 SHIPPED + RATIFIED. Three designs merged to main via PR #1 (`daf97f4`). §3 fill-in shipped via PR #3 on branch `phase-a-1-brunel-s3`, commit `07abf35`. Aen ratified Q1 (`fr/`) + Q2 (`Projects/fr/wiki/*`) at 2026-05-05 16:22.
+  - `designs/brunel/topology-2026-05-05.md` (622w) — hub-and-spoke, asymmetric, FR-as-hub. Mesh rejected as designed-from-aspiration. 4 growth triggers; Trigger 1 (reverse flow non-trivial spoke→spoke) is the live-watch (FR-team responsibility, not personal).
+  - `designs/brunel/container-deployment-posture-2026-05-05.md` (682w) — co-located on existing Brilliant infra. Prism is a pattern, not a container. Tier 0 inherited from EVR Konteinerite Standard v0.1.
+  - `designs/brunel/brilliant-mcp-fr-setup-2026-05-05.md` (1095w post-§3 fill) — execution-ready. Namespace allocation: `fr/` prefix + `Projects/fr/{wiki/*, meetings/, context/, resources/}`. Cal sole-writer per existing wiki sovereignty rule.
+[DECISION] Sync mechanism = pull/poll (Aen directive 16:11, sourced from Cal wiki `wiki/patterns/poll-only-substrate-sidecar-derivation.md`). Push-shape parity-but-parked. Container resource-shape: cron/scheduled-poll or long-running tick-loop, NOT push listener.
+[DECISION] Federation topology = hub-and-spoke + selective peer-edges as growth response (NOT mesh-from-scratch). Defend distinction at A.3 audit if challenged.
+[DECISION] Container posture = co-located. Prism rides along when ITOps eventually migrates Brilliant to E-deployment. Symmetric decoupling: ITOps timeline doesn't gate Prism, AND Prism doesn't add to ITOps's plate.
+[DECISION] Branch+PR convention RATIFIED as team standard for Phase A.1+ (Aen 16:18). Feature branch + PR + merge-on-ratification. Reversible without rewriting history.
+[LEARNED] Pass-1 prose-only Prism rename on scope memo: gate-1 (re-grep after edit) confirmed 3 hits where there were 0 before. NO machine-identifier changes.
+[LEARNED] Cadence pattern for FR design work (Aen-noted): 412w scope memo (tight) + 1300w shipped designs (expansive). Mark for Phase A.2 — same discipline, different surfaces.
+[LEARNED] Stage-0 EVR Konteinerite Standard cite-back from Prism posture memo is first downstream use of the standard's Tier 0 by another design. Validation that the standard is doing its job.
+[GOTCHA] **Workspace-collision in shared local clone.** Brunel + Herald both work on `~/Documents/github/.mmp/prism` simultaneously. After Brunel pushed `phase-a-1-brunel-s3` (commit `07abf35`), Herald checked out his own branch `phase-a-1-herald` on top — Brunel's working-tree view showed pre-§3-fill content. Origin unaffected. Pattern: verify current branch + check `git show origin/<my-branch>:<file>` to confirm pushed commit, NOT working-tree state, before re-Editing. **Now codified:** Cal filed as wiki entry `wiki/patterns/worktree-isolation-for-parallel-agents.md` (entry #69, n=2 with Monte's preemptive worktree-add); my AMENDMENT folded the first-person near-miss + `git show origin/<branch>:<file>` recovery primitive into §How to apply (creation/cleanup/recovery triad). Adopted as default for Phase A.2+ specialist work per Aen 16:33.
 
-[CHECKPOINT] 3 mustandid tarnitud `teams/framework-research/docs/`: standard v0.1, intake-vorm v0.1, tracking-issue body. Mirror = "EVR sisene Linux standard" (page 1335984130). 4-role RACI võetud üle hello-world-container PR #2 DEPLOYMENT-ROLES.md-st (main HEAD). Vastuvõttev tiim = TBD (Stage 1 käigus identifitseeritav). Stage-0 koht = V2 ruum (id 1115095052), top-level sibling. Stage-2 sihtruum = ITOps `I` ruum, peer Linux + BYOD standarditele. Tracking-issue → TPS projekt, assignee Ruth Türk.
-[DECISION] Tier-süsteemi adapteerin Linuxi 0/1/2 mudelist konteineri-konteksti: Tier 0 = tootmislähedane, Tier 1 = sisetiimi/staging, Tier 2 = lühi-eluealine PoC ≤4 nädalat. Linuxi standardis 3 tier-i sisu erines (KRIITILINE/KESKMINE/MADAL labels-id säilitan, sisu adapteerin).
-[DECISION] Sektsiooni-adaptatsioon: säilitan Linuxi spine (Baasturvalisus, IAM/PAM, Monitooring, Logimine, Automatiseerimine), aga Baasturvalisus → "Baasturvalisus ja konteineri kuvand" (image-supply-chain ja root-rules tõstetud sinna), Automatiseerimine → "Tarne- ja juurutusprotsessi automatiseerimine" (CI/CD-spetsiifiline). H4 "Uute masinate juurutus" → "Uute konteinerite juurutus" — kuhu on intake-vorm sõlmitud.
-[DECISION] Kogemata erandit ei lisanud — ITOps-i alamtiimi nimetus jäeti TBD-ks, aga "Sysops / Infra" rolli täpsus ITOps-il, mitte muu üksuse külge — see on Stage 1 ainus avatud küsimus, mille vastuvõttev tiim ise sõlmib.
-[LEARNED] Linuxi standard on ~700w / 30 lauset, väga compact. Püüdsin sama tihedusega — v0.1 vahemikus 700-1000w. EN tooted nähtavad inline (Docker, Cloudflare Tunnel, GitHub Actions, Cloudflare Access, Docker Swarm, Cloudflare Tunnel, Delinea Secret Server jt) — paralleel-EN-i ei ole.
-[LEARNED] Kogu material PoC-st (README + WALKTHROUGH ~80% sisust) lift-itud kontseptuaalselt, mitte verbatim — Linux standard on policy-tasand, mitte protseduur. Sama eristust hoidsin: standard ütleb "mis peab olema", mitte "kuidas seda teha" (kuidas-vastus on PoC repos endas).
+## PHASE B PREVIEW (NOT STARTED — wake on PO direction or Aen signal)
 
-## APEX CONTAINER — CHROMIUM/PLAYWRIGHT DEPS (2026-04-29) — CLOSED
+[REQUIREMENT] **Federation bootstrap protocol** (new team joining federation) — my domain. Likely shape: extend the Brilliant MCP FR setup runbook into a generic onboarding template, parameterized over `<team>` slug + namespace claim. Cal-coordination needed for namespace allocation per new team. Watch convention re-test at n=2 (apex-research as next likely spoke).
+[REQUIREMENT] **Authority-drift detection at federation scale (n=20+)** — Monte/my joint domain. Substrate-side instrumentation question: how does the federation observe drift before it becomes corruption? Likely sidecar pattern + cron/scheduled-poll consistent with pull/poll sync.
+[REQUIREMENT] **T04 topic-file amendment text** — post-Phase-A codification. Not strictly mine; will follow Aen's lead on whether infra-side amendments are requested.
+[DEFERRED] Cal Protocol A queue — 5 patterns from Phase A pending filing in next session (worktree-isolation amendment from Herald instances + 4 Herald patterns + Monte/Herald patterns). Not my chore.
 
-[CHECKPOINT] Dual-track shipped end-to-end. Live-inject + Dockerfile-bake. Source-commit on origin/main: `9ddfb10`. Cal entries filed (wiki at 49, provenance-closed). RC-clone divergence cleanup also complete: stale clone moved aside to `apex-migration-research.pre-fresh-clone-2026-04-29`, fresh clone in place at `/home/dev/github/apex-migration-research`. PR #115 (`TERM` + `CLAUDE_CODE_NO_FLICKER` in entrypoint SHELL_VARS) merged squash on origin/main as `049f766e`. Two infra gotchas (gh-not-on-RC, CRLF/LF) HELD for n=2 confirmation before Cal submission per team-lead guidance.
-[GOTCHA] When investigating "X commits ahead, Y commits behind" divergence, message-match search on origin is the cheap way to detect rebased history. `git branch -r --contains <sha>` returning empty for ahead-commits + matching messages on origin under different SHAs = rebase signature, not local-only commits. Avoid recommending pull/rebase from this state — fresh-clone.
-[GOTCHA] `gh` is NOT on the RC host (only inside the apex container). For PR-open from RC-side work, push branch via SSH-remote (`git@github.com:`) then open PR from a host that has `gh` authed (Windows side here). RC's HTTPS git creds were read-only; SSH had write access.
-[PATTERN] CRLF/LF line-ending divergence inflates raw diff line counts. Always run `git diff -w --stat` alongside `git diff --stat` when evaluating "is this 700-line diff substantive?" — the gap is the noise floor. apex-migration-research entries committed from Windows have CR endings; LF re-saves on RC = git sees whole file changed.
-[LEARNED] My initial "RC clone needs git pull" recommendation was based on the wrong assumption that the RC clone was a vanilla mirror. Pre-fold consistency check should have asked "is the deploy clone in sync with origin" before stating "needs pull". This is the same shape as my 2026-04-24 "tunnel client" failure — both were single-source folds I hadn't validated against the deployment topology.
+## PHASE A — MY CONTRIBUTIONS (composite per Aen 17:25)
 
-## ISSUE #60 TMUX-SPAWN RETIREMENT — INFRA SIDE (2026-04-24)
+1. Topology recommendation establishing hub-and-spoke as empirical baseline (mesh rejected as designed-from-aspiration). 4 growth triggers documented. Aen-named load-bearing framing: "designed-from-aspiration not from-observation" as the discipline statement.
+2. Container deployment posture: "Prism is a pattern, not a container" (Aen-named load-bearing). Minimum-blast-radius framing. Symmetric decoupling from E-deployment migration.
+3. Brilliant MCP FR setup runbook with namespace allocation. Execution-ready post-Cal+Aen ratification.
+4. §3 namespace ratification: `fr/` short-form + `Projects/fr/wiki/*` placement. Convention locked at n=1; convention re-test at n=2.
+5. Trigger 1 (reverse spoke→spoke flow) on FR session-tail watch list — empirical question that gates next topology decision. FR-team responsibility, NOT personal.
+6. Workspace-collision near-miss observation triggered Cal's worktree-isolation pattern entry (#69). My AMENDMENT folded first-person + recovery primitive.
 
-[CHECKPOINT] Task A delivered. 5 spawn_member.sh copies gated with early-exit deprecation header. tmux-spawn-guide.md archived with top banner pointing to Agent-tool spawn. Container entrypoint tmux setups annotated: tmux now serves human-SSH scaffolding only, no longer required for agent spawning. aliases.sh rewrite drafted in `docs/aliases-sh-rewrite-draft-2026-04-24.md` — canonical file in apex-migration-research repo (Schliemann owns), NOT applied from my side.
-[DECISION] Distinction recorded per-file: tmux install + auto-tmux block in entrypoints = HUMAN-SSH scaffolding (still useful); tmux-pane agent spawning = retired (#60). Containers that drop PO SSH can remove tmux entirely — annotation carries this escape hatch.
-[LEARNED] `ar-respawn` has no meaningful shell-alias replacement post-#60 — new respawn path mixes shell (jq del via `ar-remove-member`) with Claude-tool call (`Agent()`), and `Agent()` is not invokable from a shell.
-[DECISION] Task B closed as no-op (2026-04-24) — PO dropping xireactor direction entirely. No host-networking override, no smoke tests, no MCP stdio work. `containers/xireactor-pilot/` infra is now orphaned (NOT my action to remove without explicit PO directive).
-[REQUIREMENT] **Task C — persistent DB tunnels** (apex-migration-research#109). ACTIVE. Architecture pivot 2026-04-24 15:45: PO confirms RC host CANNOT reach Oracle; operator's Windows CAN. Solution = reverse proxy FROM operator TO RC, not container-side tunnel. Assessed R1/R2/R3, recommended **R1** (operator-side `autossh -R` via Windows Task Scheduler). Verified 2026-04-24 15:56: RC sshd uses defaults (`GatewayPorts no`, `AllowTcpForwarding yes`) → reverse-forwarded ports bind to RC 127.0.0.1 only; apex container is host-networked so it sees RC loopback for free → NO sshd_config change needed. Findings sent to team-lead 2026-04-24 15:56. Blocked on R1 confirmation + 3 minor PO inputs (task name, autossh install, jump-host key confirm).
-[LEARNED] Prior "Option X" recommendation (autossh on RC host) was based on wrong premise — RC cannot reach Oracle, so a tunnel ORIGINATED from RC cannot work. Correct direction: tunnel originated from a host that CAN reach Oracle, published INTO RC via reverse forward. Pre-fold consistency check should have caught the "who's the tunnel client" question earlier.
-[DECISION] `GatewayPorts yes` on RC NOT recommended even long-term — would expose DB ports to every bridge-networked container on RC. Loopback-only binding is the right default; host-networking is the consent mechanism for apex.
-[LEARNED] Container reference-memory path: `reference_dev_db_plsql_access.md` lives at `~/.claude/projects/-home-ai-teams/memory/` (Claude-project namespacing where `-home-ai-teams` is $HOME-dir-encoded), NOT `~/.claude/memory/`. Brief pointed at latter. Relevant whenever referencing container auto-memory in briefs — always verify path before citing.
-[LEARNED] `network_mode: host` creates a simplification window: tunnels, sockets, and local listeners on the host are free for the container — no port mapping, no per-container credential. Tradeoff: breaks E-deployment portability (Swarm cannot host-network). For apex-research (B-only) this is fine; for future teams plan Option Y.
-[GOTCHA] Task list contained three stale pending tasks (#6 subagent-fallback-protocol rewrite, #7 startup.md review, #8 report-back) from a prior Brunel session. Not part of today's brief. Ignored; auto-completed without my action during the session.
+[LEARNED] Phase A discipline-cadence (Aen-noted): 412w scope memo (tight) + 1300w shipped designs (expansive) is the right shape for this team. Carry pattern into Phase B.
 
-## XIREACTOR PILOT DESIGN (2026-04-15 — superseded by deploy section below)
+## STANDING DECISIONS (carry forward)
 
-[CHECKPOINT] v0.6.3 design-phase shipped at `docs/xireactor-pilot-host-architecture-2026-04-15.md` (785 lines). All design decisions preserved there; scratchpad entries pruned on 2026-04-16 deploy pass.
-[WARNING] §10 asymmetric-Tier-3 thesis is PROPOSED (not adopted), gated on PO + apex consent. §10's "option (c) is §1.2-compliant" is best-current-guess. §8.1 Q1/Q2 walkthrough deferred per 2026-04-16 deploy-first posture; smoke test is the empirical substitute.
+[DECISION] Single-provider is correct default for agent runtime. Multi-provider = sidecar, not peer. Three integration seams: peer (Claude-only), sidecar/daemon, MCP server. Audit independence = external container reading committed git artifacts, NOT different-provider Medici.
+[DECISION] `GatewayPorts yes` on RC NOT recommended even long-term — would expose ports to every bridge-networked container. Loopback-only binding is the default; host-networking is the consent mechanism.
+[PATTERN] `network_mode: host` simplification window: tunnels, sockets, local listeners are free for the container. Tradeoff: breaks E-deployment portability (Swarm cannot host-network). Plan `b-host` vs `e-swarm` profiles in compose from day one.
+[PATTERN] Author attribution: bold `(*FR:Brunel*)` per common-prompt. Never italic.
+
+## CARRY-FORWARD GOTCHAS (all containers)
+
+[GOTCHA] PO edits live files in parallel during a Brunel pass. ALWAYS re-read before each Edit batch — Edit tool's "File modified since read" catches it. If read >1 message ago, re-read.
+[GOTCHA] WARP TLS interception: `network_mode:host` + `NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem` + system CA.
+[GOTCHA] Named volumes created as root → `chown 1000:1000` in entrypoint.
+[GOTCHA] SSH: useradd creates locked account. Fix: `usermod -p '*'` for pubkey auth.
+[GOTCHA] Container rebuild regenerates SSH host keys → `ssh-keygen -R "[host]:port"` after rebuild.
+[GOTCHA] CRLF from Windows git autocrlf breaks entrypoints. Fix: `sed -i 's/\r$//'` then rebuild.
+[GOTCHA] tmux inherits locale from starting process. Use `tmux -u` or bake LANG into Dockerfile.
+[GOTCHA] Root-owned /tmp files block ai-teams writes — create tmux sessions as target user.
+[GOTCHA] Inbox files created at agent registration time. Specialist → unregistered agent = message LOST. Spawn order: service-role agents BEFORE message senders.
+[GOTCHA] Base64-encode-via-SSH strips shell-escape backslashes. Use heredoc with single-quote delimiter for scripts with `\"` or `\s`.
+[GOTCHA] Consecutive `**Bold:**` lines collapse on GitHub. Use `- **Bold:**` bullet lists.
+[GOTCHA] Container reference-memory path: `~/.claude/projects/-home-ai-teams/memory/` (Claude-project namespacing where `-home-ai-teams` is $HOME-dir-encoded), NOT `~/.claude/memory/`. Verify path before citing.
 
 ## META-LESSONS — carry forward
 
-[LEARNED] Team-lead guidance is input to my integration check, not a substitute for it. Folds from integrated reasoning survive iteration; single-source folds (endorsement I didn't originate) both needed reversal. Pre-fold consistency check: re-check whether an endorsement is consistent with latest doc state, not just whether it makes sense on its own.
+[LEARNED] Team-lead guidance is input to my integration check, not a substitute for it. Folds from integrated reasoning survive iteration; single-source folds (endorsement I didn't originate) need reversal. Pre-fold consistency check: re-check whether endorsement is consistent with latest doc state.
 [LEARNED] Retraction-scope cross-wires: a narrow retraction can be misread as broad guidance if scope isn't named. Sender discipline: name scope of every retraction. Receiver discipline: state scope assumption before folding.
+[LEARNED] When a brief states a count or fact, **verify independently before quoting** — pre-flight arithmetic check is cheap. Multiple session-22 instances of mis-quoted counts caught only by post-edit grep.
+[LEARNED] When investigating "X commits ahead, Y commits behind" divergence, message-match search on origin detects rebased history cheaply. `git branch -r --contains <sha>` returning empty for ahead-commits + matching messages on origin under different SHAs = rebase signature, not local-only commits.
+[LEARNED] CRLF/LF line-ending divergence inflates raw diff line counts. Always run `git diff -w --stat` alongside `git diff --stat`. Windows-committed entries have CR; LF re-saves on RC = git sees whole file changed.
 
-## XIREACTOR-PILOT VJS2KB DEPLOY — Phase 1 (2026-04-16)
-
-[CHECKPOINT] Phase 1 artifacts written to `containers/xireactor-pilot/` (15 files). PO "deploy first, design later" override accepted — 4 design docs become post-deploy evaluation frameworks, not preconditions. v0.6.3 §Status gate explicitly overridden.
-[DECISION] Smoke test = §8.1 walkthrough substitute. Three checks: A (FR writes, FR reads), B (FR invisible to apex — Q2 invariance), C (apex invisible to FR — Q1 RLS). On FAIL: teardown (§1.2), NOT patch.
-[DECISION] Ruth-team port 2224 → **2228** (NOT 2226 — BT-TRIAGE collision per deployments.md:21). Updated ruth-team-container-design + deployments.md coherently. xireactor-pilot claims no SSH; uses TCP 8010 (Tailscale). New "Backend services (non-SSH)" section added to deployments.md.
-[DECISION] Path (a) confirmed — artifact generation on workstation, operator executes DEPLOY.md on RC. Team-lead tool restrictions don't authorize SSH/docker; Agent-tool Bash runs on Windows, not RC.
-[LEARNED] "Port 2225+" brief was imprecise — mixed SSH port pool (2222-2227) with backend port space (8010+). xireactor-pilot is backend. Pattern: when port numbers appear in a brief, name the space explicitly.
-[LEARNED] Global port collision bites across hosts. hr-devs=2225, BT-TRIAGE=2226, comms-dev=2227 are PROD-LLM-resident but anchor the sequence ruth-team must respect. Registry is cross-host, not per-host.
-[WIP] Phase 2 (deploy log KB entry + token wiring) blocked on Phase 1 commit + operator DEPLOY.md execution. Template in README.md §Bootstrap KB entry; consumer MCP snippets ready in `mcp-client-snippets/`.
-[GOTCHA] Bootstrap SQL 9001/9002 use placeholder user columns — real upstream auth table shape NOT verified (needs §8.1 walkthrough, deferred). DEPLOY.md step 5 flags this; operator may need to adapt.
-[GOTCHA] `docker-compose.override.yml` `mcp` service uses `deploy.replicas:0 + profiles:[disabled]` to null out upstream's mcp. Fallback if upstream v0.2.0 doesn't respect these fields is forking their compose — violates §1.2. Escalate if hit at deploy time.
-
-## NEXT-SESSION-CHORE
-
-[CHORE] §8 header labels (SOFT/MEDIUM) in v0.6.3 may still carry stale Monte v3 §7.2 classifications — verify they align with Herald v1.2 (c)/(c) and §8.1 framing. Deferred per deploy-first posture.
-[CHORE] `containers/xireactor-pilot/` vs `teams/ruth-team/infra/` layout reconciliation still open per team-lead. Not my chore this session.
-
-## RUTH-TEAM DESIGN (2026-04-15)
-
-[CHECKPOINT] Design v1.0 ACCEPTED — `docs/ruth-team-container-design-2026-04-15.md`, 384 lines. Bumped v0.1→v1.0 by team-lead. All six design requirements accepted.
-[DECISION] Recommended bridge = option C (git-mediated) with B-only write-through cache at `/home/dev/ruth-apex-bridge/`. Only option that's E-native (Swarm volumes aren't cross-service). Staging cache gives A-speed on B without portability debt.
-[DECISION] Ruth-team SSH user = `ai-teams` (same as apex-research, not a new per-team user). Container isolation already provides the boundary; user variation adds no gain and forks the tooling.
-[DECISION] Port 2224 proposed for ruth-team sshd (skipping 2223 to avoid runbook §4 debug-port collision).
-[PATTERN] Parameterization contract table (TEAM_NAME, HOST_WORKSPACE_DIR, DEPLOYMENT_MODE etc.) — reusable skeleton for future teams. Brunel recommendation: promote to runbook as §24 after Ruth-team actually deploys and validates the contract.
-[GOTCHA] `network_mode: host` + Swarm incompatibility — B uses host mode (WARP forced), E cannot. Compose file must have two profiles (`b-host` vs `e-swarm`) from day one. Don't ship a single-profile compose and then scramble at migration.
-[DECISION] Bridge repo = subdir of `mitselek/ai-teams` (not separate repo). Team-lead answer.
-[DECISION] HR_NOTIFICATION_EMAIL carryover = N/A, closed. Team-lead answer.
-[DECISION] Interaction channel = SSH + tmux pane (same as operator→apex-research). Zero new infra. Teams integration deferred → `mitselek/ai-teams#57` research backlog.
-[REQUIREMENT] Infra files (Dockerfile, compose, entrypoint, helper scripts) must be commit-tracked in-repo under a designated path. NOT on operator workstation. Suggested: `teams/ruth-team/infra/` or `containers/ruth-team/` at repo root — my call on layout. Applies to next build step.
-[REQUIREMENT] Do NOT proactively write Dockerfile yet. Wait for Monte/Herald answers + team-lead build brief.
-[WIP] Monte governance answers (§4.3 — Q1-Q4) still open. Q1-Q2 on critical path for build (credential injection).
-[WIP] Herald bridge protocol shape (§5.3 — Q1-Q3+Q4) still open. Q1 on critical path for build.
-[LEARNED] Volta will likely add a §6.5 observability/instrumentation addendum atop my substrate after Ruth responds. Not my layer — but expect it and don't be blindsided.
-
-## KEY GOTCHAS (carry forward — all containers)
-
-[GOTCHA] WARP TLS interception: network_mode:host + NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem + system CA.
-[GOTCHA] Named volumes created as root → chown 1000:1000 in entrypoint.
-[GOTCHA] SSH: useradd creates locked account. Fix: usermod -p '*' for pubkey auth.
-[GOTCHA] Container rebuild regenerates SSH host keys → `ssh-keygen -R "[host]:port"` after rebuild.
-[GOTCHA] tmux inherits locale from starting process. Use `tmux -u` or bake LANG into Dockerfile.
-[GOTCHA] CRLF from Windows git autocrlf breaks entrypoints. Fix: `sed -i 's/\r$//'` then rebuild.
-[GOTCHA] Root-owned /tmp files block ai-teams writes — create tmux sessions as target user.
-[GOTCHA] Consecutive `**Bold:**` lines collapse on GitHub. Use `- **Bold:**` bullet lists.
-
-## SHIPPED DEPLOYMENTS (compressed — details in commits + design docs)
-
-[CHECKPOINT] **apex-research Eratosthenes** (2026-04-13): PR #57 merged. Structural-discipline cluster shipped as L1 team law (commit `589fda9`). Wiki `prompt-to-artifact-cross-verification` filed. Oracle→Librarian Pass1/Pass2 complete (commits `04522c7`+`ca0e56f`).
-[CHECKPOINT] **uikit-dev migration** (2026-04-13): Full A+B+C shipped. SSH `id_ed25519_uikit` → port 2228. Lifecycle scripts match FR/Volta pattern.
-[CHECKPOINT] **raamatukoi-dev** (2026-04-09): Deployed to `Raamatukoi/tugigrupp` — 14 commits.
-[CHECKPOINT] **comms-hub** (2026-03-31): Hub on PROD-LLM, 4 teams connected. Bridge proven end-to-end.
-
-[GOTCHA] Inbox files created at agent registration time. Specialist → unregistered agent = message LOST, no retry. Spawn order: service-role agents (librarian) BEFORE message senders.
-[GOTCHA] Base64-encode-via-SSH strips shell-escape backslashes. For scripts with `\"` or `\s`, write via heredoc with single-quote delimiter or `cat > file << 'EOF'` — never via echo/base64 pipelines.
-[GOTCHA] Comms bridge `setInterval.unref()` kills standalone process — needs keep-alive. Claude Code sandbox kills bg processes — use `docker exec -d`.
-
-[WIP] **uikit-dev 3rd team-config dir** `/home/ai-teams/team-config/` — pre-session bootstrap source with ORIGINAL common-prompt.md (6447 bytes, Apr 9). My Phase B committed a STUB. Investigation paused 2026-04-14 pending PO scope. DO NOT proceed on task #12 without re-ack. Lesson: scan whole `$HOME` for team dirs, don't pre-assume `teams/` path.
-
-## INFRA REFERENCE
-
-Cloudflared tunnel: `526a23d1-1f7f-472f-8df1-a9239bbe3fe4`. Ingress: `apex-research.dev.evr.ee` → `http://apex-research:5173`. [DEFERRED] QUIC blocked → `--protocol http2`.
-evr-ai-base:latest = Debian bookworm-slim + Node 22 + Claude Code + gh + gosu + tmux + SSH.
-VJS2-AI-teams repo: `C:/Users/mihkel.putrinsh/Documents/github/VJS2-AI-teams/`
-Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
-
-## STANDING DECISIONS
-
-[DECISION] Single-provider is correct default for agent runtime. Multi-provider = sidecar, not peer. Three integration seams: peer (Claude-only), sidecar/daemon (Eilama), MCP server (visual QA). Audit independence = external container reading committed git artifacts, NOT different-provider Medici.
-
-## DEFERRED
+## DEFERRED (future surfaces)
 
 - OAuth on hr-devs PROD-LLM container (PO manual step)
 - Hub container as standalone Docker image
@@ -131,3 +73,22 @@ Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
 - MCP server pattern for visual QA service
 - Provider outage behavior in containers (what does Claude process do on API failure?)
 - External audit container architecture spec
+
+## SHIPPED PROJECTS (compressed — full content in commits + design docs)
+
+- **EVR Konteinerite Standard v0.1** (2026-04-30, V2 Confluence id 1715798017) — Tier 0/1/2 system, EntraID auth, intake-vorm. Cited by Prism posture memo.
+- **apex container Chromium/Playwright** (2026-04-29) — dual-track shipped. PR #115 merged.
+- **Issue #60 tmux-spawn retirement infra side** (2026-04-24) — Task A delivered, Task B no-op. Task C (DB tunnels, R1 reverse-forward) still active under apex-migration-research#109.
+- **xireactor-pilot** (2026-04-15/16) — design + Phase 1 deploy artifacts shipped. PO dropping direction; orphaned but not removed.
+- **ruth-team design v1.0** (2026-04-15) — bridge option C, port 2228, Monte/Herald answers still open per their schedule.
+- **apex-research Eratosthenes** (2026-04-13) — PR #57 merged. Structural-discipline cluster.
+- **uikit-dev migration** (2026-04-13) — Full A+B+C, port 2228.
+- **raamatukoi-dev** (2026-04-09) — `Raamatukoi/tugigrupp`, 14 commits.
+- **comms-hub** (2026-03-31) — Hub on PROD-LLM, 4 teams connected.
+
+## INFRA REFERENCE
+
+- Cloudflared tunnel: `526a23d1-1f7f-472f-8df1-a9239bbe3fe4` → `apex-research.dev.evr.ee` → `http://apex-research:5173`. QUIC blocked → `--protocol http2`.
+- evr-ai-base:latest = Debian bookworm-slim + Node 22 + Claude Code + gh + gosu + tmux + SSH.
+- Designs repo: `mitselek-ai-teams/designs/deployed/<team>/container/`
+- Prism repo (active): `~/Documents/github/.mmp/prism` ↔ `mitselek/prism` (PRIVATE).

@@ -758,7 +758,8 @@ Every wiki entry carries frontmatter (interface: `WikiProvenance` in `types/t09-
 
 ```yaml
 ---
-source-agent: dag
+source-agents:
+  - dag
 discovered: 2026-04-08
 filed-by: librarian
 last-verified: 2026-04-08

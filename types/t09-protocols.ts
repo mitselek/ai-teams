@@ -397,8 +397,14 @@ export interface PromotionProposal {
  * Source: T09 § "Provenance, Source Linking, and Staleness".
  */
 export interface WikiProvenance {
-  /** Agent that originally discovered this knowledge. */
-  sourceAgent: string;
+  /**
+   * Agents that originally discovered or contributed to this knowledge.
+   * List form supports dedup-merge cross-credit (Protocol A: when an
+   * exact-match submission arrives, the new submitter is appended to
+   * `sourceAgents` rather than overwriting). Single-source entries are
+   * single-item arrays. Promoted to plural per Protocol C 2026-05-05.
+   */
+  sourceAgents: string[];
   /** ISO date when the knowledge was discovered. */
   discovered: string;
   /** Always "librarian" — the Librarian is the sole writer to the wiki. */
@@ -412,6 +418,13 @@ export interface WikiProvenance {
   sourceCommits?: CommitSha[];
   /** Source issues or PRs this entry references (e.g., "#42"). */
   sourceIssues?: string[];
+  /**
+   * Originating team, when this knowledge was cross-pollinated from another
+   * team's wiki. Omit for in-team origin. Promoted to standard schema after
+   * n=6 cross-team-sourced entries (apex-research × 2, uikit-dev × 4) across
+   * FR sessions 20-23. Promoted to schema 2026-05-05 per Protocol C.
+   */
+  sourceTeam?: string;
   /**
    * Time-based expiry for external-system knowledge (Entu, D1, Jira, APIs)
    * that has no source file to track. ISO date; the Librarian flags expired

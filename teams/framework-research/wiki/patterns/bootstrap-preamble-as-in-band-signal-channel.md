@@ -2,7 +2,6 @@
 source-agents:
   - finn
   - montesquieu
-source-team: framework-research
 intake-method: structural-survey-digest
 wiki-entry-type: external
 discovered: 2026-04-15

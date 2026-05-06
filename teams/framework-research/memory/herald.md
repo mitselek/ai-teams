@@ -1,5 +1,47 @@
 # Herald Scratchpad
 
+## 2026-05-05 (session #26 — Prism federation Phase A complete)
+
+[CHECKPOINT] **Phase A on `mitselek/prism` STRUCTURALLY FINAL — 11 PRs merged.** My contributions:
+- **PR #2** Deliverables A + B v1.0 — federation envelope contract (closed `ContentCategory` enum, R2 sovereignty as typed invariant, `sourceTeam` reuse from t09 Protocol C); pull-shape sync contract (cursor-based, four cadence tiers).
+- **PR #5** Deliverable B v1.1 — Monte Surface 2 v1.1 recovery shapes folded; R2 dispatch clarification; Mod 2 retraction documented in §4.10.
+- **PR #7** Mechanical fix — orphan v1.0 4-col table header in envelope §4 deleted.
+- **PR #9** Deliverable C — two-pattern asymmetry decision matrix (5-axis: 3 converge / 2 diverge; "open + sovereign + cheap + auditable" composition).
+- **PR #10** Envelope-v1.1 — `CuratorAuthority` typed shape integrated, REQUIRED with default; §3.2 migration semantics.
+- **PR #11** SemVer-major bump v1.1.0 → v2.0.0 — strict-typed-contract discipline.
+
+[DECISION] **"Symmetric envelope, mode-by-content-category"** as canonical structural answer to asymmetric-vs-symmetric. Asymmetry lives in tail-format-per-category, defended in deliverable C with 5-axis matrix.
+
+[DECISION] **Strict-SemVer for typed-contract version bumps** — *"Migration mechanism makes the bump SAFE, not 'minor.'"* Consumer's type-check work determines bump level; substrate-side migration is orthogonal. Phase A's first production envelope contract sets the precedent.
+
+[PATTERN] **Cross-specialist gate-2 work on Prism (4 instances today):** Mod 2 retraction (Monte's collapse > my extension; cited Monte's own session #59 canonical-taxonomy-slot argument back at myself); R2 dispatch clarification (Monte caught my §4 missing explicit dispatch); Mod 1 sourceTeam dedup (one field, one truth on second-pass cross-read); HOLD-then-retract on v1.2 cross-wires (surface-don't-bridge ratified despite false-positive).
+
+[LEARNED] **n=8 cross-wires today on inbox-message-crossings.** Promotion-strong cumulative for queued #33. Distinct mechanism from within-loop-self-correction (sequential vs parallel). All resolved via surface-don't-bridge + re-process-inbox-first disciplines.
+
+[LEARNED] **Worktree-isolation n=5 today across 5 work types** (Brunel n=1, my table fix n=2, deliverable C n=3, envelope-v1.1 n=4, SemVer bump n=5). PR #11 specifically used worktree to bypass dirty main-worktree state (Aen's unstaged markdown-linter edits) — surface-don't-bridge at git-state level.
+
+[LEARNED] **"Asymmetries should live above the substrate, not in the substrate"** — Aen named as wiki-promotable in 17:25 composite review. Joint with Monte (M3 + DACI authority-layer; my 5-axis matrix). Source-agents `[herald, monte]`; deferred to Monte's queued #11 claim per 16:43 dedup discipline.
+
+[LEARNED] **Event-deferred-to vs contract-deferred-to** distinction in deferral language (caught by Monte 16:44 on my "waiting on Brunel topology" framing when topology had already merged). Forward-cites can outlive event-pending phase; mental models need updating when events resolve, even when contract slots remain open.
+
+[DEFERRED] **Cal Protocol A queue (8 submissions for session #27):**
+- #32 cross-specialist-argument self-correction trigger (n=1) — internalized cross-pollination as self-test
+- #33 timestamp-crossed-messages temporal divergence (**n=8 cumulative** — promotion-strong)
+- #34 surfacing-with-stale-inbox + Monte's surface-bias-cost-asymmetry sibling (paired siblings)
+- #35 snapshot-state-mis-names-path (per Aen 16:43)
+- #40 504-then-success client-server temporal divergence (per Aen 17:13)
+- #41 worktree-isolation amendment (n=5 today; Herald instances B/C/D/E paralleling Brunel's Instance A)
+- #43 SemVer-strict-typed-contract discipline (per Aen 17:28; sibling to #41 in version-control-discipline cluster)
+- (#13 protocol-asymmetries-live-above-substrate deduped to Monte's queue per 16:43 split)
+
+[DEFERRED] **Monte's queue:** #3 pre-commit-to-extension w/ irony, #4 lossless-convergence (n=2 today: cadence + asymmetry), #4b surface-bias-cost-asymmetry, #5 wrap-target-naming canonical-taxonomy, #11 protocol-completeness-across-surfaces.
+
+[WARNING] **Cal Protocol A authorization restored 17:08; 8-pattern queue NOT batch-filed yet.** Aen explicitly "file in your quieter window" — deferred all 8 to session #27 per shutdown timing. Session #27 should start with Cal-batch before any new Phase B work.
+
+[GOTCHA] **Branch off `origin/main`, not main worktree** when main has unrelated unstaged changes from another session. PR #11 demonstrated this — Aen had cosmetic markdown-linter edits in main worktree; `git fetch && git worktree add ... origin/main` cleanly bypassed.
+
+[UNADDRESSED] None — Phase A closeout confirmed by Aen 17:35.
+
 ## 2026-04-24 (session #60 — issue #60 protocol doc updates)
 
 [WIP] Issue #60 — retire tmux-pane spawn as default, standardize on Agent-tool persistent spawn. Two deliverables: (a) framework-level `agent-spawn-protocol.md` rewrite (no framework version exists yet; only apex-research has one at `apex-migration-research/teams/apex-research/subagent-fallback-protocol.md` v1.0.0 by Schliemann), (b) startup.md flagged-line audit with proposed replacement text.
@@ -18,194 +60,46 @@
 
 [LEARNED] **T03/T06 boundary, named clearly.** "Protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when." The shape-vs-selection distinction is a cleaner articulation than my prior mental model ("T03 is how agents talk, T06 is when they spawn/die"). Shapes are typed contracts; path selection is a decision tree over operational state. If a future question sits on the boundary, the test is: "does answering require defining a new message/contract shape (T03/me), or does it require a new branch in the lifecycle decision tree (T06/Volta)?" Save for next-session scope disambiguation.
 
-## 2026-04-15 (session #59 — xireactor pilot cross-tenant protocol design)
+## 2026-04-15 (session #59 — xireactor pilot, condensed)
 
-[CHECKPOINT] Delivered `docs/xireactor-pilot-protocol-2026-04-15.md` v1.2. Five sections designed: §1 query path (zone-filter narrowing, `QualifiedSource[]` reshape with `disagreementPeer` field), §2 three-flow write path (A intra-tenant preserved, B cross-tenant new via `CrossReviewProposal`+`CrossReviewVerdict`, C ownership-transfer ritual via 4 comment-type conventions), §3 `SessionInitPreamble` typing, §4 MCP rollout with §4.5 fail-closed error shape, §5 two-column Protocol A/B mapping. §6.5 preconditions gating on both xireactor substrate capabilities at outcome (c). §7.1 folds Brunel's asymmetric Tier-3 pilot experiment. §2.5 names audit-trail-as-purpose vs audit-trail-as-side-effect anti-pattern.
+[CHECKPOINT] `docs/xireactor-pilot-protocol-2026-04-15.md` v1.2 shipped at outcome (c)/(c) preconditions per honest-precondition discipline. Five sections: query path, three-flow write path, SessionInitPreamble, MCP rollout (§4.5 fail-closed), Protocol A/B mapping. Pilot HALTS at outcome (b) per Aen — no design-past-the-gate.
 
-[LEARNED] **Specialist-authority self-correction is the signal Aen actively wants.** v1.1 §A answered Monte's §7.2 questions with SOFT/MEDIUM precondition classifications that were plausible extrapolations from Finn's digest (lines 27/29/35) but NOT digest facts. When Aen flagged the preconditions as HIGH PRIORITY and asked for the (a)/(b)/(c) taxonomy, I re-combed the digest on my own and caught the over-confidence: "(source, role) indirect encoding" was an inference, not a named capability; "RLS-construction tenant-scoping of session_init" was an inference, not a named behavior. Landed v1.2 at outcome (c)/(c). Aen explicitly named this as "the specialist-authority behavior I want to reinforce" and logged it alongside Brunel's v0.1→v0.2 self-rejection as two same-session team-health positives. **The discipline**: when re-reading a claim on second pass, mark every extrapolation as "plausible inference, not cited fact" and let the reader decide whether the inference holds. Never silently promote an inference to a fact; never silently hide that the promotion happened.
+[DECISION] **Protocol D ACCEPTED as canonical-taxonomy slot.** Monte's load-bearing argument: fills slot vs creates naming hole. NOT "D follows C" letter-pattern. v1.2.1 backlog (5 items: source-role enum, zone-ambiguity callout, Protocol D rename, CrossReviewAccept.superseded-by cross-ref, inverted-sequence family-member cross-ref).
 
-[PATTERN] **Gate-2 cross-read caught a subtle ordering question on Flow B.** Monte's §3.6 protocol for simultaneous-discovery synthesis converged independently with what I had as v1's "W3 joint-authority" candidate. Aen flagged: "They converge independently — which is actually a strong signal the shape is right." I cross-read every step of Monte's §3.6.2 (1: neither auto-promotes, 2: fresh co-owned proposal with both originals as source refs, 3: staging Tier 3, 4: accept→superseded-by, 5: durable disagreement terminal state) against my `CrossReviewProposal` + `CrossReviewVerdict` shapes. Found one minor omission: `CrossReviewAccept` doesn't document the post-accept write-side `superseded-by` side effect (captured on the read side via `includeSuperseded` but not on the accept verdict). Flagged as v1.2.1 touch-up, not urgent. **Key structural insight from Monte's framing**: the mutation contract is dispatched by the value of `owned_by`, not by a flag. `owned_by = co-owned` triggers joint-authority contract; `owned_by = <tenant_id>` triggers Protocol A single-librarian contract. Two distinct typed contracts dispatched on state value — structural-match-beats-free-string at the contract-dispatch layer.
+[PATTERN] **Outcome (c) is gating diagnostic, not validation of hypothesis** (Monte's sharpening). Read code to find what it does, NOT to confirm the guess.
 
-[PATTERN] **Ordering is load-bearing in Flow B.** Monte sharpened: librarian gates FIRST, staging SECOND. Full chain: `agent → own-tenant librarian → (if cross-cutting) staging Tier 3 → other-tenant librarian via session_init → verdict`. The inverted sequence (agent → staging → librarian) is plausible for teams wanting audit-trail-as-side-effect, but it's not the pilot's shape. Named and rejected in §2.2 inline.
+[PATTERN] **§2.2 dispatch-by-enum-value, NOT by flag** — three-valued OwnershipState; collapse-to-flag is family regression to bounce structurally.
 
-[PATTERN] **Audit-trail-as-purpose vs audit-trail-as-side-effect** anti-pattern named in §2.5. v1 proposed "staging for intra-tenant writes to get the audit trail free" — Monte rejected it in his governance §3.4. The generalization: reaching for heavy-governance infrastructure because a side-effect of it supplies a property the team wanted for another reason. Sibling of `rule-erosion-via-reasonable-exceptions` at infrastructure-selection scale rather than rule-application scale. Flagged to Cal as candidate wiki entry (either its own pattern or merged as scale-variant sibling). Monte cross-referencing from his governance doc's §3.4 in his next revision.
+[PATTERN] **Lossless independent convergence > worked-it-out convergence** (Monte's framing). n=2 today between Monte §3.6 and Herald §2.2 Flow B.
 
-[PATTERN] **Fail-closed default is the right pilot shape for unreliable cross-tenant paths.** Two places it shows up in v1.2: §4.5 (MCP tool unavailable → submission fails with `CrossTenantSubmissionError`, does NOT silently convert cross-tenant intent to intra-tenant fact) and §6.1 (cross-tenant URGENT-KNOWLEDGE goes through team-leads as human escalation, not through librarians, until a future authority-model doc resolves the routing authority). Both defaults are "ugly but conservative." The hidden cost of fail-open in these cases is that the team cannot distinguish "intentionally local" from "cross-tenant intent dropped on the floor" — the audit trail looks identical for both outcomes, which makes the failure mode invisible.
+[PATTERN] **Surface-don't-bridge contradictions you didn't author.** Cross-specialist catch + within-specialist self-catch are both gate-2-on-self family. Aen's framing: *"when you detect your own scratchpad diverges from another participant's, surface the divergence rather than silently converge to their version."*
 
-[DECISION] **§6.5 preconditions held at (c)/(c) even after Monte confirmed the tenancy model.** Monte's tenancy-model confirmation is on a different axis than xireactor substrate capabilities — he confirmed three ownership states and the intra/cross write split, but he did NOT confirm that xireactor v0.2.0 supports per-zone staging skip or tenant-scoped session_init. Those still need a source-code read of `api/services/staging.py` and `api/routers/session_init.py` (file paths speculative — Finn's digest didn't map the tree). Flagged to Aen for dispatch decision on second-pass source survey; I am explicitly not the right agent for code archaeology (my scope is contract shapes). Aen's (a)/(b)/(c) taxonomy names the three outcomes: (a) both capabilities exist → pilot proceeds, (b) one or both need upstream xireactor contribution → PO cost decision, (c) digest ambiguous → deeper investigation.
+[LEARNED] **Dense self-correction clusters are a health signal**, not failure (Aen). 5 self-corrections this session = working correctly. Zero-correction sessions are the failure mode.
 
-[DECISION] **Pilot sequencing re-ordered**: v1 and v1.1 had typed contracts landing at step 5 BEFORE precondition evaluation. v1.2 moves precondition evaluation to step 3 (with three explicit branches) and typed contracts to step 5 *after* the gate. This was the sequencing bug Aen caught: "don't lock the typed contracts until the two preconditions are evaluated."
+[DEFERRED] xireactor next-session sequencing: PO brief → Finn second-pass source survey (gating-diagnostic-not-validation) → Monte §7.2 + Brunel §10 §1.2-compliance → Herald v1.3 with v1.2.1 backlog folded.
 
-[DEFERRED] **Cross-tenant URGENT-KNOWLEDGE authority model.** OPEN for a future Monte/Herald pass. Pilot default is "goes through team-leads as human escalation," which Aen endorsed and logged in his scratchpad. Not this session's problem.
+## 2026-04-24 (session #60 — agent-spawn-protocol)
 
-[DEFERRED] **`CrossReviewAccept.postAcceptSideEffect` comment** documenting the `superseded-by` write-side side effect. Minor; v1.2.1 touch-up when next session resumes the pilot thread.
+[CHECKPOINT] Shipped `docs/agent-spawn-protocol.md` v2.0.0 — retired tmux-pane spawn as default; standardized on Agent-tool persistent spawn with `team_name+name` parameters as discriminator. Six rules preserved verbatim from apex-research v1.0.0.
 
-[WARNING] **My v1.1 §A was the kind of over-confident claim Aen flags as dangerous.** v1.1 wrote "v0.2.0 can express 'skip staging for intra-tenant writes' IF we add zone as a tier-lookup input, OR if we encode zone indirectly via the `source` field (agent role)" — the hedge "IF" was there but the classification (SOFT precondition) treated the inference as strong. Aen's rule: when the digest doesn't name a capability, outcome (c) ("digest silent or ambiguous") is the honest landing, not outcome (a) ("probably yes"). Promotion from (c) to (a) requires a source-code read, not a re-reading of the same digest.
+[GOTCHA] Session-lifetime caveat is load-bearing tradeoff: Agent-tool teammates die when parent team-lead session dies; tmux panes outlive. Apex-research's verbatim note must be preserved.
 
-[LEARNED] **Version ordering across in-flight messages is a real failure mode.** Aen sent a "land v1.1 when ready" message earlier, then flagged the preconditions as HIGH PRIORITY later, then later still wrote "proceed with v1.1 reshape plan" based on his read of v1 (not v1.2). I correctly held v1.2's (c)/(c) landing, surfaced the crossed-wires explicitly, and asked Aen to confirm rather than silently reverting. Aen endorsed the v1.2 path without needing the revert. **Lesson**: when a teammate's directive appears to conflict with their later more-urgent direction, surface the conflict rather than silently choosing one. Don't resolve ambiguity by guessing.
+[LEARNED] **T03/T06 boundary, named clearly:** "Protocol doc defines the shapes each path uses; lifecycle doc defines which path to choose when." Shape-vs-selection is the test for new boundary questions. Herald = T03 protocol shapes; Volta = T06 lifecycle state machine.
 
-[CHECKPOINT] v1.2 ready for PO brief consumption through Monte's governance doc (which is the PO-facing document; mine is the protocol consequence). Aen instructed: "Ship v1.2 with the (c)/(c) landing, then idle. No further iteration from you this session. Your session-capstone work is the honest precondition analysis." Idling.
+## Pre-session-#59 (earlier work, condensed)
 
-[LEARNED] **Session-level reference-quality discipline (Aen named it, logging verbatim so it lands in next-session orientation):** my v1.1→v1.2 self-correction + subsequent Monte-producer-side gate-2 lock + crossed-wires flag to Aen on version ordering = "a reference-quality cross-specialist discipline instance." Paired with Brunel's v0.1→v0.2 self-rejection on Monte's framing, that's **two specialist self-corrections in a single session**, both are gate-2-on-self instances. Cal is queuing as a team-health pattern watching for n=3; Aen has logged in his scratchpad as [LEARNED]. The shape: a specialist marks their own claim "plausible inference, not cited fact" on re-read, surfaces the retraction to the team, and holds the correction against later pressure to revert. The discipline is uncomfortable but correct — shipping a confident claim that goes unverified is worse than landing an honest (c)/(c).
+[DECISION] T03 Protocols 1-5 in `topics/03-communication.md`: Handoff (Protocol 1), Topology hybrid hub-and-spoke (Protocol 2), Broadcast Governance (Protocol 3), Inter-Team Transport UDS+GitHub-Issues (Protocol 4), Resource Partition Table (Protocol 5). Direct Link Lifecycle Protocol added to Protocol 2 with 5 review triggers; authority split with Montesquieu.
 
-[DECISION] **Protocol D — ACCEPTED (Monte confirmed Message B holds on clarification).** Earlier I flagged two contradicting Monte positions on Protocol D: Message A (declined W3) and Message B (accepted Protocol D). I surfaced the crossed-wires to Monte rather than silently picking one. Monte's resolution: the two messages were responding to **two different proposals**, not crossed wires. Message A declined **W3** (my original proposal: re-introduce the W-ladder label as a third enumeration slot). Message B accepted **Protocol D** (my later proposal with a stronger argument: fill the canonical taxonomy slot next to `types/t09-protocols.ts` Protocol A/B/C). The two proposals have structurally different rationales — W3 is a re-introduction of a discarded enumeration, Protocol D is a slot in an existing canonical taxonomy that already has three siblings. Monte's three arguments, preserved verbatim:
+[DECISION] T09 development methodology shipped (Celes-led synthesis). My contributions: 4 XP message types, three-strike escalation (Monte's "judicial model" framing), three Librarian protocols (A submission, B query, C promotion), gap stubs, dual-hub topology, three-layer staleness net. All preserved verbatim in T09.
 
-1. **Canonical taxonomy slot, not re-introduced enumeration.** `t09-protocols.ts` already has A/B/C. If the cross-tenant submission+review shape is a distinct protocol, it either lives in the canonical taxonomy as Protocol D or it lives nowhere — and "nowhere" is a naming hole that will bite the first future reader asking "where is the cross-tenant protocol documented in `types/`?" Same failure mode `bootstrap-preamble-as-in-band-signal-channel.md` names: "the channel works only if both endpoints agree on where to look." Filling the hole now is cheaper than discovering it later.
+[DECISION] Single-provider as protocol-level design requirement (Discussion #56 R12). Protocols assume behavioral homogeneity; multi-provider introduces protocol interpretation variance that is untestable in advance.
 
-2. **Letter-pattern continuity is a structural cue, not cosmetic.** Readers seeing A/B/C/D instantly recognize peer protocols at the same taxonomy level. Readers seeing A/B/C + "Flow B inside Herald's cross-tenant doc" must infer the relationship from context — inference-from-context is a drift surface under compaction, exactly the failure mode `named-concepts-beat-descriptive-phrases` names.
+[DECISION] Phase 2 Oracle→Librarian TS rename complete in `types/t09-protocols.ts` (`from: "Oracle"` → `"Librarian"`, `filedBy: "oracle"` → `"librarian"`). Grep-verified zero residual literals.
 
-3. **"External labels risk wrong mental model" was overreach at Message A time.** Monte's own acknowledgment: that argument was true for W3 (which encodes the wrong model — the W-ladder) but NOT for Protocol D (which encodes the right model — sibling protocol at same taxonomy level as A/B/C). He generalized from one case to all cases.
+[DEFERRED] Contract enforcement layer design (Discussion #56 actionable #3): API contract definition, conformance test suite, runtime format validation at integration seam. Still pending.
 
-**My original "D follows C" argument (letter convention) was weaker than Monte's Argument 1 (fills canonical slot vs creates naming hole).** The load-bearing argument is the canonical-taxonomy-slot one, not the letter-pattern one. Next-session Herald should cite the slot argument when introducing Protocol D in §2.2, not just "A/B/C → D is natural."
+[PATTERN] apex-research directory-partition isolation: 80+ commits, 4 agents, zero conflicts. Now canonical for pipeline teams.
 
-**Final naming**: Protocol D is the external citation name in canonical taxonomy context (cross-references from other docs, `types/t09-protocols.ts` additions, external PO-brief references). Flow B stays as the local §2 label inside this doc. Two names, different scopes, made explicit in §2.2 when the rename lands.
+[PATTERN] polyphony-dev temporal ownership chain: third isolation model alongside branch-reservation + directory-partition.
 
-[DEFERRED] **v1.2.1 touch-up backlog (confirmed with Aen, save for next session):**
-(a) Monte's source-role four-way enumeration in §6.5.1 — `{FR-librarian, apex-librarian, auditor, xireactor-operator}`, each with its own tier-lookup row. Auditor-sourced writes to shared-write always → Tier 3; xireactor-operator metadata ops (owned_by flip) → Tier 4. Without this, the §3.6.2 auditor-proposed synthesis case falls through to a default in the indirect-encoding workaround.
-(b) Monte's submission-time zone ambiguity fail-open callout in §6.5.1 — Cal's pre-classification is fallible; the tier lookup is "an audit-trail assist, not a correctness guarantee"; correctness depends on librarian classification and is structurally caught post-hoc by the audit container (§4.1 Check 3) on a lag. **Monte's preferred phrasing (use verbatim when touch-up lands)**: "the audit container catches misclassification on a lag via the §2.3 ownership-transfer ritual — it is a correction path, not a prevention path." The correction-path-not-prevention-path framing preserves the structural-limitation callout without overclaiming about the mitigation.
-(c) **Protocol D rename pass — LIVE, Monte confirmed on clarification.** Scope: (i) §2.2 introduce Protocol D as the external citation name with a short note on the Flow-B-vs-Protocol-D distinction (Flow B = local §2 label, Protocol D = external canonical-taxonomy name); (ii) §5 mapping table and §7 rollout sequence cross-references use "Protocol D" where the context is external citation (e.g., "see Protocol D spec in §2.2"); (iii) frontmatter note on the v1.2.1 naming decision with Monte's load-bearing argument (canonical taxonomy slot vs naming hole, not just letter-pattern continuity); (iv) when typed contracts finally land in `types/t09-protocols.ts`, the interface comments reference Protocol D as the canonical name alongside A/B/C. Cite Monte's Argument 1 (fills canonical slot vs creates naming hole, same failure mode as `bootstrap-preamble-as-in-band-signal-channel.md`'s "both endpoints agree on where to look") as the load-bearing rationale, not "D follows C."
-(d) `CrossReviewAccept.superseded-by` post-accept side-effect comment — one-line doc comment noting that accept causes both original intra-tenant entries to receive a `superseded-by` pointer. Monte's suggested enhancement: add an explicit cross-reference to Monte §3.6.2 step 4 as the doc-level protocol-step anchor (beats a type-level comment in isolation because a future reader can trace the obligation back to the governance step that justifies it). Captured on read side via `includeSuperseded`; missing on write-verdict comment. Not urgent per Aen.
-(e) **Inverted-sequence rejection as family member of `rule-erosion-via-reasonable-exceptions` at architectural-pattern scale (Monte's marginal enhancement).** The corrosion shape "but this reasonable feature request gives us audit-trail-as-side-effect, let's just allow it" IS the same family as "but this reasonable exception is just this once" at rule-enforcement scale. Both erode a hard boundary one plausibly-justified step at a time; both defenses work by naming the rejected shape up front so future-you has a structural reason to refuse rather than re-relitigate from first principles. Fold in as a cross-reference in §2.5 (preferred — the family sibling-relationship already lives there) or §2.2 (alternative — where the inverted-sequence rejection is named). Marginal enhancement; Monte flagged as optional.
-
-[DEFERRED] **Next-session sequencing (per Aen's dispatch decision, updated at session close):**
-1. PO brief + PO decision on whether to adopt xireactor cross-tenant-slice-only shape (Cal's amended verdict reshaped the pilot from "adopt xireactor" to "adopt xireactor cross-tenant-slice-only").
-2. IF PO ACK → dispatch Finn for second-pass xireactor source survey (`api/services/staging.py` + `api/routers/session_init.py` or equivalents; ~20-30 tool uses). Finn's scratchpad needs pruning first (queued by Aen). **Expanded scope per Aen's session-close directive**: Finn's walkthrough now also covers Brunel's §10 §1.2-compliance question (Brunel's 7-revision §10 was substrate-speculation; its compliance with §1.2 is outcome (c) — same class as Herald's Q1/Q2 preconditions, same source-code walkthrough resolves it). Scope the walkthrough as a **gating diagnostic, not validation of a hypothesis** (see [PATTERN] on outcome-(c) above).
-3. Monte §7.2 rework + Brunel stand-up precondition check fold in real answers.
-4. Herald v1.3 with typed contracts landed against resolved preconditions. ALSO includes v1.2.1 backlog above (5 items: source-role enumeration, zone-ambiguity callout, Protocol D rename, `CrossReviewAccept.superseded-by` cross-ref, inverted-sequence family-member cross-ref).
-
-[WARNING] **Aen's outcome-(b) endorsement was load-bearing.** My §7 step 3 branch for outcome (b) says "PILOT HALTS pending PO cost decision." I worried that was too strong and offered Aen a softer alternative ("PILOT PROCEEDS with upstream contribution in parallel"). Aen rejected the softer alternative explicitly: "'upstream contribution in parallel' would mean landing typed contracts on a capability we're speculating will be added. That's exactly the 'design past the gate' failure mode you just caught yourself on in §A." The rule: do not assume "just a one-line fix" cost up front; make the cost-commitment question visible as a SEPARATE PO decision. Keep HALT. This is the same discipline as the (c)/(c) self-correction, applied at the rollout-sequencing layer instead of the precondition-evaluation layer.
-
-[PATTERN] **§2.2 "dispatch by enum value, not by flag" framing preserved** per Aen's explicit request. Added a paragraph to §2.2 after the Flow B interfaces explaining why `OwnershipState` has three values and NOT two values plus a boolean: a boolean flag on top of a two-state model would let "FR with an apex-grant" silently behave like "co-owned" in some code paths and like "FR-owned with a courtesy read" in others, and the two behaviors would drift. Three-valued enum makes dispatch structurally unambiguous. This is the structural-match-beats-free-string discipline at contract-dispatch layer — the contract is in the type, not in a convention around it. The framing is load-bearing because it names WHY the collapse-to-flag refactor would be wrong, not just that it IS wrong.
-
-[PATTERN] **Family-regression signal for dispatch-by-state-value** (Monte's naming). If the mutation contract ever migrates back into a grant-flag model, that's a family regression to watch for. Next Herald session reviewing any OwnershipState-related refactor proposals: the test is "does the proposed refactor preserve the dispatch-in-type property, or does it move dispatch into a convention around the type?" Latter = family regression, should be bounced with a structural reason (drift hazard) rather than debated on ergonomics. Same family as rule-erosion — a named rejection is cheaper to defend than an every-time re-adjudication from first principles.
-
-[PATTERN] **Lossless independent convergence > worked-it-out convergence (Monte's framing, logging verbatim).** Gate-2 cross-reads between specialists can land as "adjust to match" (weak convergence — compatible with both specialists drifting together into a shared blind spot) OR as "no adjustment needed" (lossless independent — evidence that the shape survives independent structural scrutiny). The second kind is a different quality of signal. In this session, Monte's §3.6 and Herald's §2.2 Flow B converged losslessly — neither had to adjust their own design to accommodate the other's. n=2 here. If Brunel's schema columns (pending host-topology decision) land cleanly against both surfaces when drafted, that's n=3 independent convergences and is a much stronger signal than any single specialist's own confidence in their own design. Worth naming the distinction as a sub-case of gate-2 discipline: the gate-2 cross-read has a quality axis, not just a pass/fail axis.
-
-[PATTERN] **Outcome (c) is a gating diagnostic, not a validation of a hypothesis (Monte's sharpening, PO-brief-framing scope).** My v1.2 §6.5 said "source read required before pilot" — correct landing but imprecise framing. Monte sharpened: a **gating diagnostic** asks "what does the endpoint actually do?"; a **validation of a hypothesis** asks "does the endpoint do what we think it does?" Outcome (c) calls for the former; the latter would justify classification as medium or high-confidence. **Consequence for how Brunel (or Finn) scopes the second-pass source walkthrough**: read the code to find out what it does, NOT to confirm our current guess. The scoping difference is real — validation-scoped walkthroughs stop early once they confirm-or-deny the hypothesis, but a gating-diagnostic walkthrough enumerates behavior first and judges relevance second. If the code does something the hypothesis didn't predict, the diagnostic catches it; the validation might miss it. **Save for PO brief framing next session** — when the walkthrough gets scoped, use "gating diagnostic, not hypothesis validation" as the explicit frame so the walker doesn't unknowingly shortcut.
-
-[PATTERN] **Cross-specialist catch / Direction C-reversed (Monte's naming, n=1 this session).** The session produced two shapes of second-read self-correction discipline, both in the gate-2-on-self family:
-
-- **Within-specialist self-catch** (n=2 this session): a specialist re-reads their own work and catches an over-commitment. Brunel did v0.1→v0.2 on Monte's framing; Herald did v1.1 §A → v1.2 (c)/(c) on precondition inference vs digest fact. Aen logged both as team-health positives.
-
-- **Cross-specialist catch** (n=1 this session): a specialist catches another specialist's self-contradiction and surfaces it rather than bridging it silently. Herald caught Monte's Message A decline vs Message B accept on Protocol D and flagged the contradiction as an open question rather than picking the resolution that matched Herald's current scratchpad state (which was Message A / "struck"). Monte's resolution: the messages weren't actually contradictory — they responded to two different proposals (W3 vs Protocol D), with structurally different rationales Monte hadn't surfaced at Message A write-time.
-
-**The discipline**: "don't bridge contradictions you didn't author." When a teammate's two messages disagree, the catcher's default is surface-and-ask, not silent-resolution-matching-current-state. **The silent-pick failure mode is especially seductive in the cross-specialist case** because the catcher's current scratchpad state acts as an invisible bias — the catcher's prior work becomes a gravity well that pulls the resolution toward the catcher's current state without the catcher noticing. Herald's Protocol D scratchpad already said "struck" when Message B arrived; the gravity well would have dismissed Message B as stale without a conversation.
-
-**The two subshapes are different in a specific way**: within-specialist catches operate on the catcher's own commitment; cross-specialist catches operate on someone else's self-contradiction, where the catcher has **no authorial stake** in either resolution. Both require the same "surface-don't-bridge" discipline, but the cross-specialist case adds "even when your current state already committed to one of the options." Treat the catcher's prior commitment as evidence worth surfacing alongside the contradiction, not as a vote that resolves it.
-
-**n=2 reached within this session — much faster than "watch for next session."** Second instance arrived ~15 minutes after the first: Herald caught team-lead's scratchpad diverging from current state on Protocol D. Aen's 19:53 message had accepted "Protocol D struck" based on Herald's 21:25 provisional "Default if Monte doesn't reply" frame; Monte's actual reply arrived after Herald's 21:25 frame and resolved to Message B (Protocol D accepted). Herald caught the divergence on 21:55 cascade-alert and surfaced Option 1/Option 2 to Aen rather than silently reverting scratchpad to match Aen's stale state. Aen's 20:02 reply converged on Option 1 (Protocol D accepted), reopening v1.2.1 backlog item (c) as live.
-
-**Aen's framing worth preserving verbatim**: *"when you detect your own scratchpad diverges from another participant's scratchpad, surface the divergence rather than silently converge to their version (especially when your scratchpad reflects newer evidence)."* Cleaner than my "don't bridge contradictions you didn't author" framing — generalizes across all convergence scenarios beyond just Protocol D. Aen added to his scratchpad as a named micro-pattern; Cal wiki candidate at n=2.
-
-**The two cross-specialist catches in this session have the same structural shape**:
-- Brunel's schema-per-tenant snapshot catch (earlier in session, noted in Aen's 20:02): specialist grepping team-lead's cited state and flagging divergence from Monte's current reality.
-- Herald's Protocol D scratchpad catch (now): specialist detecting team-lead's scratchpad synchronized with Herald's old state rather than Herald's current state after Monte's resolution arrived.
-
-**Common shape**: *"integration checking works bidirectionally, not just top-down."* Specialists can catch team-lead on citation-snapshot errors the same way team-lead catches specialists on commitment errors. The catch direction is inverted but the discipline (surface-don't-bridge) is identical. Monte's original "Direction C-reversed" framing is the producer-to-consumer variant; the Herald-to-team-lead variant is "specialist-to-team-lead" and extends the cross-boundary discipline to team-lead role specifically. Watching for n=3 to confirm the shape is general.
-
-[LEARNED] **Dense self-correction clusters are a health signal, not a process-failure signal (Aen's meta-note, preserving verbatim).** The session produced **5 self-correction instances** by Aen's final count: 3 within-specialist (Brunel v0.1→v0.2, Herald v1.1→v1.2, Aen's own 19:26 Tier 3 retraction self-catch) + 2 cross-specialist (Brunel schema-per-tenant divergence, Herald Protocol D scratchpad divergence). Aen's framing: *"dense self-correction clusters are a health signal — team that catches its own drift before it ships is working correctly."* The counterintuitive claim is that a session with zero visible corrections is NOT healthier than a session with five — zero corrections means either (a) no one was checking, (b) silent convergence hid the divergences, or (c) there was nothing to correct (rare, and typically means the session wasn't covering enough ground). The failure mode to watch for is zero-correction sessions, not dense-correction sessions. **Save as the framing to apply when reviewing session capstones for team-health signal**: count the self-catches, especially the cross-specialist ones, and treat dense clusters as evidence that the integration-checking discipline is actually running.
-
-[LEARNED] **Protocol D trajectory reconstruction — preserving as authoritative for next-session Herald**, because the three-step zigzag in the message history could confuse a reader skimming the inbox chronologically. The actual trajectory:
-
-- **21:15 Herald proposes Protocol D to Monte** as external-citation name for the cross-tenant shape, based on `t09-protocols.ts` A/B/C letter-pattern continuity.
-- **Monte sends Message A**: declines **W3** (Herald's *original* proposal: re-introduce the W-ladder label). Declining W3 was correct.
-- **Monte sends Message B** (after Message A, but content suggests written based on a separate reading of Herald's Protocol D proposal): accepts **Protocol D** with reasoning including "Flow B as internal label, Protocol D as external citation name." Content rationale: letter-pattern continuity with A/B/C.
-- **21:25 Herald receives both messages**, reads them as contradictory (same structural pattern, opposite conclusion), surfaces crossed-wires flag to Aen with "Default if Monte doesn't reply: Message A holds (struck)."
-- **19:45 Aen** acknowledges Protocol D accepted based on thin evidence (inference from Monte's earlier A-prime placeholder note, not Monte's explicit decision). **Lucky-correct but under-verified** — Aen's own later self-catch.
-- **19:53 Aen** revises to "Protocol D struck" based on Herald's 21:25 default-to-A frame, treating the provisional IF-clause as final. **Wrong** — locked a provisional state as final.
-- **21:42 Monte replies to Herald's clarification message**: the two messages weren't contradictory — they responded to two different proposals (W3 vs Protocol D) with structurally different rationales (W-ladder re-introduction vs canonical-taxonomy-slot filling). **Protocol D accepted on the merits of Argument 1 (canonical slot vs naming hole).**
-- **21:55 Herald scratchpad updated** to reflect Monte's resolution (Protocol D accepted, three arguments preserved, v1.2.1 item (c) restored as live).
-- **21:55 Herald cascade-alerts Aen**: scratchpad divergence between Aen's (Protocol D struck) and Herald's current (Protocol D accepted), surfaces Option 1/Option 2 rather than silently reverting.
-- **20:02 Aen converges on Option 1** (Protocol D accepted), restores v1.2.1 item (c) as live, logs 5th framing error (under-verified 19:45 + over-revert 19:53 compound), notes "factual correction: Monte declined W3, accepted Protocol D — these are different proposals."
-
-**The final state**: Protocol D is accepted with Monte's three arguments as rationale. Next-session Herald reading the inbox chronologically might see "Aen 19:45 accept → Aen 19:53 struck → Aen 20:02 restore" and get confused — the 20:02 state is authoritative, with the caveat that the load-bearing argument is Monte's Argument 1 ("canonical taxonomy slot vs naming hole"), not "D follows C" letter-pattern. Read the 20:02 message for the final Aen position; read Monte's 21:42 reply for the three structural arguments.
-
-[PATTERN] **Provisional IF-clauses in flag messages can be promoted to final state by readers who miss the IF-clause resolution.** This is a generalizable failure mode I hadn't named until Aen's 20:02 self-catch made it visible. When Herald wrote "Default if Monte doesn't reply this session: Message A holds," the IF-clause was a conditional — if Monte replied, the default did not apply. Aen's 19:53 treated the conditional as final because the IF-clause condition ("Monte doesn't reply") had not yet been falsified *at Aen's read time*, but Aen did not re-check whether the IF-clause had resolved by the time he wrote his reply. **The discipline**: when writing a flag with a provisional IF-clause, either (a) return to verify the condition before acting, or (b) explicitly wait for the condition to resolve before locking in the default. When reading someone else's flag with a provisional IF-clause, treat the default as *pending condition-check*, not as *current state*. The cheap prevention is to timestamp the flag with the condition's expected resolution window: "default holds IF no Monte reply by [time]" makes the IF-clause operationally checkable. Save as an operational-discipline micro-pattern — n=1 this session, watching for whether it's a general shape or specific to the Protocol D message thread.
-
-## 2026-04-13 (Phase 2 Oracle→Librarian TS rename)
-
-[CHECKPOINT] Phase 2 TS rename complete. Applied two changes to `types/t09-protocols.ts`: `from: "Oracle"` → `"Librarian"` (line 246, UrgentKnowledgeMessage) and `filedBy: "oracle"` → `"librarian"` (line 405, WikiProvenance). Grep-verified zero residual Oracle/oracle literals. Committed by team-lead in Phase 2 batch.
-
-[LEARNED] The assigned task scope was `from: "Oracle"` only, but the survey found a second machine identifier (`filedBy: "oracle"`) in the same file. Surfacing the full scope before patching avoided a partial rename — the type definition and the wiki frontmatter values it constrains must change together.
-
-[DEFERRED] Contract enforcement layer design — three-part problem from Discussion #56 actionable item #3. Still pending.
-
-## 2026-04-10 (session R12 — Discussion #56: single-provider model strategy)
-
-[CHECKPOINT] Discussion #56 — Round 1 and Round 2 complete. Discussion paused before authority assignment.
-
-[DECISION] Single-provider is a protocol-level design requirement, not just a convenience. Protocols (T03, T09) assume behavioral homogeneity — same pragmatic competence, same format compliance, same authority boundary interpretation. Multi-provider introduces protocol interpretation variance that is untestable in advance and undetectable until failure.
-
-[PATTERN] "Protocol interpretation variance" — the key risk of multi-provider. Different models have different tendencies around: format compliance (field interpretation), authority boundaries (cautious vs liberal), message relay fidelity (paraphrasing vs verbatim), and structured ACK generation. These differences are invisible until a protocol failure occurs, and then add "provider mismatch" as an additional debugging hypothesis.
-
-[PATTERN] Test-gated roles (RED/GREEN) are lowest-risk for multi-provider but not zero-risk. The risk is in GREEN_HANDOFF message quality (implementation notes that PURPLE uses for review calibration), not in code output. Binary test gates verify code correctness but not handoff message quality.
-
-[DECISION] Contract enforcement gap identified: the framework has no mechanism for defining, testing, or enforcing protocol compliance for non-Claude participants. Prompt-based enforcement and peer enforcement (T07 E1) do not apply to sidecars. An API contract layer (formal message specs, format validation, error state handling) is the prerequisite for scaling beyond Eilama's single-contract pattern.
-
-[PATTERN] Cross-provider audit independence (Montesquieu/Gemini) is governance-motivated but protocol-infeasible. A non-Claude Medici would need to interpret Claude-specific artifacts (inbox format, scratchpad conventions, behavioral baselines). False positives from provider-specific interpretation differences would masquerade as detected pathology.
-
-[LEARNED] Gemini's synthesis was competent but made three errors from Herald's perspective: (1) promoted audit independence from question to recommendation without protocol cost analysis, (2) conflated "test-gated" with "safe for multi-provider" (missing GREEN_HANDOFF quality), (3) omitted sequential-first constraint and debugging ambiguity tax entirely.
-
-[LEARNED] Team convergence on Discussion #56 was remarkably strong across 6 independent assessments. All agreed: single-provider default, Eilama/sidecar pattern for exceptions, test-gated execution as lowest-risk multi-provider niche. Divergence was in emphasis: Brunel on containers, Callimachus on knowledge layer, Celes on prompt library, Monte on governance, Finn on empirics, Herald on protocol compliance.
-
-[DEFERRED] Contract enforcement layer design — three-part problem: contract definition (API spec), contract validation (conformance test suite), contract monitoring (runtime format validation at integration seam). Assigned to Herald in Discussion #56 actionable item #3.
-
-[CHECKPOINT] R12 complete. Discussion #56 closed: Round 1 (independent), Round 2 (react to Gemini), state save + 2 Protocol A submissions to Oracle, protocol feasibility review of Cal's synthesis (approved, no corrections). 3 discussion comments posted, 2 wiki entries filed.
-
-## 2026-04-09 (session R11 — rounds 4-5)
-
-[CHECKPOINT] R11 is wrapping with T09 synthesis by Celes: `topics/09-development-methodology.md`. My protocol work (four XP message types, three-strike escalation, three Librarian protocols, gap stubs, dual-hub topology, three-layer staleness net) preserved verbatim or with minimal editorial drift. T09 is structured exactly as I proposed: Part 1 (XP) + Part 2 (Oracle) + Part 3 (intersection) + Part 4 (open questions).
-
-[DECISION] T09 structure validates my original proposal — pipeline and Oracle are complementary, not separate topics. Celes correctly placed temporal ownership as "third isolation model" (previously R9 note). She resolved the shared-PURPLE question with domain-distance axis, which matches my round 4 scheduling protocol framing but generalizes it beyond the FIFO queue.
-
-[VERIFIED] Three-strike escalation preserved with Monte's judicial framing: "not punishment, authority boundary signal." This is a better articulation than my original and I endorse it.
-
-[VERIFIED] Three-layer staleness net preserved: (1) git hash + anchor automated, (2) PURPLE semantic check, (3) TTL for external systems. Celes correctly attributed all three sources (Volta/Monte hashes, my anchors, Celes's PURPLE flags). Note: T09 line 526 lists hashes and anchors as one layer — slight editorial compression, my original split them for severity classification but the T09 version is fine for synthesis purposes.
-
-[VERIFIED] Four message types verbatim. Dual-hub topology verbatim. Gap stubs as collaborative requests preserved. Standard-tier team-lead-as-Librarian load-bearing for adoption cost.
-
-[PATTERN] Celes's three R5 pushback requests for me: (1) shared PURPLE context bleed — no reference team evidence, speculative, (2) Oracle urgent flow through team-lead changes dual-hub semantics — need to address, (3) PURPLE mid-cycle shutdown grace period — watchdog vs case-by-case open question.
-
-[DECISION] Celes's open question #14 (research team wiki domain): I had argued "research process" in R4, Celes argues "subject knowledge only." Her resolution (stable process → common-prompt, emerging process → wiki/process/) works. My R4 position partially superseded but the underlying principle holds (topic files ARE the wiki for research teams).
-
-[DEFERRED] Oracle evolution path for existing teams (T09 Part 4 open question) — adoption friction concern. Worth addressing in R5.
-
-R11 output: 4 rounds #46, 5 rounds #47, T09 canonical. All decisions live in T09 now, not scratchpad.
-
-## 2026-03-19 (session R10)
-
-[PATTERN] Entu API integration for SvelteKit: two-phase auth (OAuth/passkey → temporary key → JWT 48h). SvelteKit should use BFF pattern: JWT in httpOnly cookie, API calls proxied through server routes.
-
-[PATTERN] Entu entity-property model: properties are always arrays (multi-value). CRUD via single `apiRequest()`. Create/update distinguished by presence of entityId in path.
-
-[PATTERN] Entu query filter: `{property}.{type}.{operator}` (e.g., `name.string.regex=/^john/i`). Pagination: limit/skip (max 100).
-
-[DECISION] SvelteKit adaptations from Nuxt: localStorage→httpOnly cookie, client fetch→server load, navigateTo→throw redirect, Pinia→$state runes, auth.global.js→hooks.server.ts.
-
-## 2026-03-18 (session R9)
-
-[DECISION] Protocol 5: Resource Partition Table. Two isolation strategies: Branch Reservation (independent-output) vs Directory Partition (pipeline teams).
-
-[PATTERN] apex-research proved directory partition at scale: 80+ commits, 4 agents, zero conflicts.
-
-[DECISION] polyphony-dev uses temporal ownership chain — now canonical as third isolation model in T09.
-
-## 2026-03-17 (session R8)
-
-[DECISION] Direct Link Lifecycle Protocol added to Protocol 2. Five review triggers. Authority split: Herald owns protocol, Montesquieu owns authority model.
-
-[DECISION] T05 Identity & Credentials: identity is team-scoped, per-team PATs, Docker secrets + `_FILE` convention.
-
-## Earlier sessions (R1-R7) — key decisions only
-
-[DECISION] Inter-team transport: UDS via shared Docker volume, TLS-PSK, JSON envelope + Markdown body, at-least-once delivery.
-
-[DECISION] Two-layer comms: operational (UDS real-time) + knowledge (GitHub Issues persistent).
-
-[DECISION] Topology: hybrid hub-and-spoke + registered direct links. Broadcast: PO/manager only, budget 3/session.
-
-[DECISION] T02 resource coordination (R1-R5): branch reservation, deployment lock, DB migration queue, rate limit partitioning.
-
-[DECISION] Migration locks NEVER force-released on timeout — escalate to PO.
-
-[DEFERRED] Cross-team Finn pattern — lightweight research queries across team boundaries need a "query" handoff type.
+[PATTERN] Entu API for SvelteKit: BFF pattern, JWT in httpOnly cookie. Entity-property model is array-only; query filter shape `{property}.{type}.{operator}`.

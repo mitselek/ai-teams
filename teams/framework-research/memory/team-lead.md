@@ -1,5 +1,148 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 26 WRAP — 2026-05-05 (Phase A on Prism — federation substrate ratified end-to-end)
+
+**Major outcomes:**
+
+- **Codename "Prism" committed** (PO ratified mid-session). Optical lineage: Obsidian (volcanic glass) → Brilliant (cut diamond) → Prism (refractor — federation as one substrate, multiple per-team views).
+- **`mitselek/prism` private repo bootstrapped.** Local clone at `~/Documents/github/.mmp/prism/`. Brunel handled bootstrap; root commit `2f26706`.
+- **Phase A STRUCTURALLY FINAL** — 11 PRs merged on `mitselek/prism` main. Federation substrate primitives ratified into typed contracts. Envelope contract at v2.0.
+
+**Architecture team activated this session** (Brunel, Monte, Herald) plus Cal + Finn carried.
+
+### 11 PRs merged on `mitselek/prism` main
+
+| PR | Author | Phase | Content |
+|---|---|---|---|
+| #1 | Brunel | A.1 | Topology + container posture + setup-blocked |
+| #2 | Herald | A.1 | Deliverables A + B v1.0 (envelope + sync) |
+| #3 | Brunel | A.1 | §3 namespace allocation (`fr/` + `Projects/fr/wiki/*`) |
+| #4 | Monte | A.1 | Surface 2 v1.0 + v1.1 (write-block error semantics) |
+| #5 | Herald | A.1 | v1.1 (Monte recovery shapes fold + R2 dispatch + Mod 2 retraction) |
+| #6 | Monte | A.2 | Surface 1 M3 + Surface 3 DACI |
+| #7 | Herald | A.1-fix | Stale table header |
+| #8 | Monte | A.2-mod1 | sourceTeam dedup |
+| #9 | Herald | A.3 | Deliverable C — two-pattern asymmetry decision matrix |
+| #10 | Herald | A.3 | Envelope-v1.1 (CuratorAuthority required + integrated) |
+| #11 | Herald | A.3 | SemVer bump 1.1.0 → 2.0.0 |
+
+### Substrate primitives ratified into typed contracts
+
+- **Hub-and-spoke topology** (FR-as-hub) + 4 documented growth triggers
+- **Pull/poll sync mechanism** (Brilliant poll-only substrate, observed-fact)
+- **`fr/` short-form namespace + `Projects/fr/wiki/*` placement** (Cal-curator sole-writer preserved)
+- **Symmetric envelope, mode-by-content-category** (resolves two-pattern asymmetry structurally)
+- **R2 sovereignty** (`producer.team === logicalPath.team`) as typed invariant
+- **5-class WriteRejection enum** (closed) + sub-discriminator approach (`kind: "endpoint-unreachable" | "review-timeout"`)
+- **CuratorAuthority discriminated union** required at v2.0 (`mode: "self" | "ratified-cross-team"`)
+- **ProducerAction closed enum** (`wait-and-repoll | fix-and-resubmit | escalate-to-team-lead | escalate-to-governance | abandon`) — operationalizes no-fallback discipline as contract teeth
+- **M3 federation-curators-as-class** (asymmetric DACI: methodology-target-decides + product-no-write-allowed + observation-target-decides)
+- **§3.4 ratification protocol** preserves R2 by routing cross-team writes through target-curator's producer identity
+- **Strict-SemVer for typed contracts** as precedent (migration mechanism makes bump SAFE; SemVer level reflects whether consumers must change code)
+
+### Composite framing (Herald deliverable C §3-§5)
+
+*"Substrate sees one substrate; asymmetry lives in interpretation, not in shape."* Three axes converge (envelope shape, sync mechanism, error-recovery family); two diverge (curation authority, reader cardinality). Composition produces federation that is simultaneously **open** (cross-team contribution allowed via ratification) + **sovereign** (R2 enforced for product) + **cheap** (substrate-level federation reads) + **auditable** (`CuratorAuthority` + `sourceTeam` make all attribution machine-checkable).
+
+### Wiki contributions today (66 → 69)
+
+- 66 `wiki/patterns/no-future-proofing.md` (n=many across sessions; promoted from user memory)
+- 67 `wiki/patterns/dispatch-granularity-matches-recovery-handler.md` (n=1, watch)
+- 68 `wiki/patterns/coordination-loop-self-correction.md` (n=2 promotion-grade)
+- 69 `wiki/patterns/worktree-isolation-for-parallel-agents.md` (n=2 with Brunel first-person amendment; n=5 empirically by session-end)
+
+[DECISION — session 26] **Phase A on Prism federation substrate complete at v2.0.** All design surfaces ratified. Substrate primitives become the typed contract foundation for the federation.
+
+[DECISION — session 26] **Strict-SemVer-as-typed-contract-discipline ratified as precedent.** Migration mechanism (substrate-side backfill) is orthogonal to consumer's type-check work. Minor bump = strictly additive; major bump = type-checking changes for consumers. Source: Herald PR #11 §3.2.
+
+[DECISION — session 26] **Branch+PR convention for Phase A+ design work.** Each agent ships a feature branch + PR; team-lead ratifies-and-merges per merge action. Reversible without history rewrite; supports composite review.
+
+[DECISION — session 26] **Worktree-isolation as default for parallel agent work.** n=5 dogfooded today (Brunel + Monte preempt + Herald table-fix + deliverable C + envelope-v1.1 + SemVer bump). Memory rule `feedback_no_fallbacks.md`'s "use isolation: worktree" guidance is empirically validated. Apply from session 27 onwards by default for any parallel-specialist branch work.
+
+### [LEARNED — session 26 cluster] (compress on next session-tail)
+
+- **Cross-wires-in-flight is a structural reality at coordination tempo** (n=8 cumulative today: inbox-message crossings + git-state crossings + PR-merge-vs-cross-read crossings)
+- **Surface-don't-bridge** ratified even with false-positive HOLD (Herald 16:38). Refinement: *"is this divergence likely to have been resolved by a message I haven't read yet?"* — re-process inbox first if surfacing-cost > re-read-cost
+- **Cherry-pick is the recovery for committed-and-pushed-but-orphaned commits.** Stash applies only to uncommitted changes. Different recoveries for different states. (Herald correction of my 16:31 path-misnaming.)
+- **Snapshot-state-at-ratification-time can mis-name the path-to-end-state** even when end-state is correct (my 16:38 stash-workflow misnaming)
+- **Coordination-loop self-correction runs at coordination-tempo, not just session-tempo** (n=2 within-loop self-corrections in single 5-message exchange — Monte v1.0→v1.1 + Herald Mod 2 retraction)
+- **Field-level overlap is a class-of-bug gate-2 catches reliably** — one field, one truth beats N fields with documented mirror invariant (Herald sourceTeam dedup catch)
+- **Audit-trail-for-rejection-rationale paragraph** protects against future re-duplication (Monte §3.5 "Why sourceTeam is not duplicated here" cite-back)
+- **Substrate-shape vs authority-shape orthogonality** (Monte M2 rejection) — *"topology design that conflates them imports the wrong failure mode"*
+- **Asymmetries should live above the substrate, not in the substrate** (Herald deliverable C §3-§5 composition framing) — wiki-promotable, joint Herald-Monte
+- **Pre-commit-to-extension shapes reviewer-vs-author dynamics favorably** (Herald's opening [COORDINATION] move) — even with retraction-strengthens-pattern irony
+- **Protocol-completeness across surfaces** (Herald spotted, Monte named): every error-class escalation has a ratification path back to a legitimate write — n=1 promotion-grade
+- **Dense correction clusters are a team-health signal** (Herald's session-tail observation: 5 within-loop self-corrections + 2 cross-team race-conditions + 1 false-alarm-with-recovery = working correctly)
+- **504-then-success API-gateway-error-vs-actual-server-state** (Herald's gh pr create observation): *"API gateway errors are not necessarily request-failures; verify state before retrying"*
+- **412w-scope-memo + 1300w-shipped-design cadence** (Brunel's discipline) is the right team-shape — tight scope, expansive design — held across all three architecture specialists
+- **Eratosthenes-already-aligned** ([LEARNED] from this morning): cross-team consumer leading the team on schema. Inverse: when planning typed-contract change, if consumer NOT yet aligned, change is premature
+- **n-axis discipline** for promotion: distinguish *instance count of pattern* from *cardinality of dimension you're claiming pattern across*
+- **Meta-coordination has compounding-cost shape** (Monte's framing): paying it incurs setup; clearing it unlocks throughput multiplier — don't interleave
+- **Filing-to-citation latency <30 min** today (Cal `poll-only-substrate-sidecar-derivation.md` filed and cited in alignment directive within minutes); *complete-enough-to-cite is the bar from minute one, not "we'll polish later"*
+
+### [WIP — Cal Protocol A queue, ~13 patterns deferred to next session]
+
+**Promotion-grade or n=2 cumulative:**
+- #4 lossless-convergence Herald-Monte (joint, n=2 cumulative w/ session #59 — auto-promotes per Cal's schema-purity discretion: source-agents `[herald, monte]`, prose attribution to session-59 historical instance)
+- #5 canonical-taxonomy-check before naming wrap targets (Monte, n=2 cumulative w/ session #59)
+- #11 protocol-completeness-across-surfaces (Herald+Monte joint, promotion-grade by Herald's stated criterion)
+
+**Watch (n=1):**
+- #3 pre-commit-to-extension irony (Monte)
+- #6b self-correction-via-prior-self-argument (Herald — currently parked as sub-shape of #68)
+- #32 cross-specialist-argument self-correction trigger (Herald)
+- #33 timestamp-crossed-messages (n=8+ cumulative today; split or merged at Cal's discretion — strong promotion candidate)
+- #34 surfacing-with-stale-inbox + Monte's surface-bias-cost-asymmetry sibling
+- #35 snapshot-state-mis-names-path-to-end-state (n=1, my path-misnaming)
+- #40 504-then-success client-server temporal divergence
+- #41 worktree-isolation amendment (Brunel + Herald n=5 today)
+- #43 SemVer-strict-typed-contract discipline
+- field-level-overlap one-truth-not-mirror (Herald, sibling to #67)
+- audit-trail-for-rejection-rationale (Monte sub-shape, n=1)
+- substrate-vs-authority-shape orthogonality (Monte M2 rejection, n=1) — promotable on next sighting
+- asymmetries-live-above-substrate (Herald deliverable C composition)
+
+Herald + Monte coordinated on submission split per 16:43 [COORDINATION]. Cal will dedup-merge per Protocol A step 5 if duplicates surface. Cal's scratchpad pruned to 73 lines with headroom for ~13 patterns; will likely re-prune mid-session 27.
+
+### [WIP — Phase B (NOT STARTED)]
+
+Wakes on PO direction. Three workstreams:
+
+1. **Federation bootstrap protocol** (new team joining federation) — Brunel's domain. Likely shape per Brunel's preview: parameterize FR Brilliant MCP runbook over `<team>` + namespace claim; Cal-coordination per new team for namespace allocation. Convention re-test at n=2 (apex-research likely next).
+2. **Authority-drift detection at federation scale** (n=20+) — Monte/Brunel joint. Substrate-side instrumentation; likely sidecar + cron-poll consistent with pull/poll sync.
+3. **T04 topic-file amendment text** — post-Phase-A codification (Volta's chore from session 21).
+
+### Standing watch items going into session 27
+
+- **Trigger 1 (reverse spoke→spoke flow >2 teams within a quarter)** — empirical question that gates next topology decision (hub-and-spoke → hybrid trigger). FR session-tail responsibility, not Brunel's.
+- **Topic-09 source-team example refresh** (Cal micro-fix, 5-line edit when convenient)
+- **Source-team semantics extension watch** — needs n=2 *distinct deployments* producing observation-class entries before Protocol C extension justified (Cal's n-axis disambiguation)
+- **TPS-583 watch** — Stage-2 actioning when Ruth signals (no change from session 22)
+- **T06 path-tree rewrite** (Volta — pending from session 19/20)
+- **esl-suvekool feedback loop** — when PO returns from Tobi sessions
+- **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event
+- **Ruth-team observability gap** — only on Ruth Q2/Q3 response
+
+### Meta-observations from session dynamics
+
+- **Decision-cadence chain unblocked specialists fast:** 16:11 sync directive (mine) → 16:22 namespace ratification (mine) → §3 ship same-day (Brunel). Each downstream unblock arrived within ~10 min of upstream decision.
+- **Cross-wires count ended n=8** across mostly inbox-message and git-state crossings. The pattern itself became a team-health observation rather than a coordination failure.
+- **Team-shape "412w scope-memo + 1300w shipped-design"** (Brunel observation) held across all three architecture specialists — tight scope, expansive design.
+- **Worktree-isolation surfaced organically from a near-miss, not postmortem.** Brunel hit it first; Monte caught preemptively; Herald dogfooded n=5. Pattern landed at n=2 by session-end.
+- **Agent reuse rule held:** spawned each architecture agent once at 16:11/16:12; kept them alive across phases A.1→A.2→A.3. No name-2 duplicates today.
+
+### NEXT-SESSION BOOT (re-orient instructions for session 27 me)
+
+1. Read `startup.md` first (always) — its #62 patch keeps Step 2 collapsed to `TeamDelete + TeamCreate + verify`.
+2. Pull `mitselek-ai-teams` repo for any Cal scratchpad updates from agent-side persists.
+3. Pull `mitselek/prism` repo if you want to read the canonical Phase A artifacts on disk; otherwise you can read this scratchpad's PR table and the prism repo lives.
+4. Don't pre-spawn any agent at session start. Wait for PO direction. Phase B activation is the most likely next direction.
+5. **If PO surfaces Phase B activation:** spawn Brunel + Monte. Herald wakes on demand for protocol contract questions. Cal carries.
+6. **If PO surfaces something else entirely:** ask which team is needed. The framework-research team's standing work (TPS-583 watch, T06 path-tree, etc.) is all NEXT-SESSION CHOREs not blocking.
+7. **First operational item if Cal-spawning:** her queue has ~13 pattern submissions to file. She can file early-session in idle cycles before any new design work blocks her.
+
+---
+
 ## SESSION 25 WRAP — 2026-05-05 (Postgres-backed library service C-phase + reframed phase A)
 
 **Goal (PO-set):** Thinktank library concept; PO playing with thought of Postgres DB backend + dedicated 24/7 library team for org-wide KB services, learning from Brilliant.

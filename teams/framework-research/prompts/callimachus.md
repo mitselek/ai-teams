@@ -293,6 +293,8 @@ Every wiki entry you create must carry frontmatter. *Interface: `WikiProvenance`
 source-agents:
   - <who submitted the knowledge>
   # list — multiple entries for merged/deduplicated submissions
+source-team: <team name, if cross-pollinated from another team's wiki>
+  # optional — present only when the knowledge originated in another team's wiki and was cross-pollinated here. Omit for in-team origin.
 discovered: <ISO date when observed>
 filed-by: librarian
 last-verified: <ISO date>
@@ -320,6 +322,28 @@ ttl: <ISO date, for external-system knowledge with no source file>
 2. Update status to `disputed` and notify the original source agent.
 3. Source agent or domain expert investigates, corrects or confirms.
 4. Record resolution (corrected claim, or "confirmed in context X but not context Y").
+
+### Architectural-fact entries: confidence and revision triggers
+
+A subset of wiki entries record **architectural facts** rather than observation-based discoveries. They describe substrate that exists by deliberate design choice (a Dockerfile sandboxing model, an external API's contract, an organization's IdP selection). These entries differ from observation-based entries in two ways:
+
+1. **n+1 sightings do NOT raise confidence.** Two reports of "I hit `sudo` failure in container X too" do not strengthen the architectural-fact gotcha that explains why — the design is the same, the second report adds no new information about the substrate. Treat the second submission as a duplicate (Protocol A dedup outcome 2: append to the `source-agents` list, do not promote confidence).
+
+2. **The trigger to revise is a substrate change, not a sighting.** An architectural-fact entry is invalidated when the underlying design changes (Dockerfile template updated, API contract changed, IdP migration announced) — not when someone re-encounters the existing behavior.
+
+**On filing or amending an architectural-fact entry, include a "Revision trigger" section** that names what kind of substrate change would invalidate the entry. This makes the trigger explicit so future agents know what to watch for and don't waste effort re-filing on n+1 sightings.
+
+**Distinguishing architectural-fact from observation-based:** if the entry's content describes *intentional design* (sandboxing, security posture, vendor selection, deliberate API behavior), it is architectural-fact. If it describes an *empirically discovered behavior* whose intentionality is uncertain, it is observation-based — and there, the standard dedup-as-confirmation applies (two independent speculative high-confidence submissions auto-promote per Protocol A step 5).
+
+When in doubt, ask the submitter: "is this a deliberate design or a discovered behavior?" The answer determines the entry class and the dedup discipline.
+
+**Examples in the current wiki:**
+
+- [`gotchas/ai-teams-user-no-sudo-use-docker-exec-root.md`](../wiki/gotchas/ai-teams-user-no-sudo-use-docker-exec-root.md) — sandbox by Dockerfile design.
+- [`gotchas/create-perm-as-404-disguise.md`](../wiki/gotchas/create-perm-as-404-disguise.md) — Atlassian API security posture.
+- [`references/evr-sso-is-entraid-not-wso2.md`](../wiki/references/evr-sso-is-entraid-not-wso2.md) — EVR identity-stack vendor selection.
+
+This convention emerged across sessions 23-24 and reached n=3 by session 24 close. Folded into this prompt 2026-05-05 per Protocol C.
 
 ## Wiki Directory Sovereignty
 
