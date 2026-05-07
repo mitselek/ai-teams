@@ -33,20 +33,25 @@
 - **Cal's grep-discipline catches memory drift in both directions.** S26 [LEARNED] noted memory underestimates (n+1 sightings under-recorded); S28 inverse (Cal's S27 wrap-note claimed n=2 SemVer, real n=1, caught up-front by Cal before proposal). Discipline ratifies as: *"grep before Protocol C, in either direction."* Folded into Cal's scratchpad as curatorial process; not promoted (n=2 cumulative is bracketing data, not pattern).
 - **Volta's [STANDING-DATA] pushback on n=2 cross-document drift.** Strict reading of his [LEARNED] — n=2 is *progress toward* the trigger, not satisfaction. Holding for n=3 before any Protocol C extension. Correct discipline; team-lead's eager reading would have over-triggered.
 
-### WARNING — session 28
+### Skill amendments — session 28 (patched mid-close per S28 first-invocation feedback)
 
-- **Skill-spec bug:** `framework-research-next-session` skill says "place NEXT-SESSION-BOOT block at TOP of session wrap." Existing convention in team-lead.md is BOTTOM (S27 NEXT-SESSION BOOT was at line 104 of a wrap that started at line 4). Skill should be amended to match existing convention. ~3-line edit on first invocation in S29.
+- **TOP → BOTTOM placement (self-spotted):** Original skill said NEXT-SESSION-BOOT block at TOP of session wrap; existing convention is BOTTOM (S27 NEXT-SESSION BOOT was at line 104 of a wrap that started at line 4). Patched 2026-05-07.
+- **Push-confirmation gate removed (PO feedback):** Original skill required a separate user confirmation before push at S4. PO ratified that push is canonical part of S4 every session — gating it separately is friction, not safety. Step 1 prompt updated to "Ready to commit, push, and shut down" — single confirmation covers commit + push + shutdown. Patched 2026-05-07.
+
+Both bugs fixed during the closing protocol of S28 (the skill's own first invocation). Lessons:
+
+- **First-invocation skills surface latent assumptions.** This skill was tested by being run, not by being reviewed. Both bugs were invisible during authoring; both became obvious within ~10 minutes of the skill executing. Skills like procedures: write them, run them, fix them on first contact.
+- **When authoring procedural skills for established workflows, default to fewer gates not more.** The push-confirmation gate was a defensive over-correction; the actual workflow had push as canonical session-end every time. The skill's job is to enforce discipline that is currently being skipped (NEXT-SESSION-BOOT block), not to add discipline that the user has already internalized (push at session-end).
 
 ### NEXT-SESSION BOOT (re-orient instructions for S29)
 
 1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
 2. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
 3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
-4. **First session-start fix-up:** amend `~/.claude/skills/framework-research-next-session/SKILL.md` Step 2 to say "BOTTOM of session wrap block" not "TOP" — convention-drift bug noted in S28 [WARNING].
-5. **If PO surfaces Brunel-related work** (federation expansion, container lifecycle, worktree-asymmetry review): spawn Brunel. He has a queued accuracy review on `worktree-spawn-asymmetry-message-delivery` + a coordination flag from Volta on T06 Container Lifecycle "Phase 2.0a" stale prose (lines 1135, 1182).
-6. **If PO surfaces Monte-related work** (governance prose, T04 wordsmithing, his two pending Cal submissions): spawn Monte. He has T04 §Row 2 review queued + 2 pending Protocol A submissions (`single-channel-saturation-via-mode-partition` + `recursive-citation-as-canonical-validation`) noted in his S27 scratchpad.
-7. **If PO surfaces a third instance of cross-document drift** (any agent reports prose-procedure mismatch): n=3 reached, Protocol-C-extension trigger activates per Volta's [STANDING-DATA]. Spawn Cal for promotion drafting.
-8. **First operational item if Cal-spawning:** her queue at S28 close was clean (82 entries, no disputes, no TTL expiries). Surface-grade work would be receiving any new Protocol A submissions from spawned specialists; or a wiki health-summary at PO request.
+4. **If PO surfaces Brunel-related work** (federation expansion, container lifecycle, worktree-asymmetry review): spawn Brunel. He has a queued accuracy review on `worktree-spawn-asymmetry-message-delivery` + a coordination flag from Volta on T06 Container Lifecycle "Phase 2.0a" stale prose (lines 1135, 1182).
+5. **If PO surfaces Monte-related work** (governance prose, T04 wordsmithing, his two pending Cal submissions): spawn Monte. He has T04 §Row 2 review queued + 2 pending Protocol A submissions (`single-channel-saturation-via-mode-partition` + `recursive-citation-as-canonical-validation`) noted in his S27 scratchpad.
+6. **If PO surfaces a third instance of cross-document drift** (any agent reports prose-procedure mismatch): n=3 reached, Protocol-C-extension trigger activates per Volta's [STANDING-DATA]. Spawn Cal for promotion drafting.
+7. **First operational item if Cal-spawning:** her queue at S28 close was clean (82 entries, no disputes, no TTL expiries). Surface-grade work would be receiving any new Protocol A submissions from spawned specialists; or a wiki health-summary at PO request.
 
 ### Standing watch items going into S29
 
