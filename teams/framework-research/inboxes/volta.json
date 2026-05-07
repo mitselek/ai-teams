@@ -39,11 +39,5 @@
     "summary": "All 3 tasks closed — T04+T09 applied, T06 shipped",
     "timestamp": "2026-05-07T08:22:25.923Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778154922792@volta\",\"from\":\"team-lead\",\"reason\":\"Session 28 closure — all 3 your tasks complete and applied; team-lead scratchpad written; persist + commit + S5 release upcoming. Send your closing scratchpad + closing tags.\",\"timestamp\":\"2026-05-07T11:55:22.792Z\"}",
-    "timestamp": "2026-05-07T11:55:22.792Z",
-    "read": true
   }
 ]

@@ -296,24 +296,10 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-06T12:40:29.800Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T12:40:29.800Z",
-    "color": "blue",
-    "read": true
-  },
-  {
     "from": "callimachus",
     "text": "[2026-05-06 15:45] Cal online for S28. Boot order complete: prompt + common-prompt + scratchpad read; librarian-state.json `intake_complete: true` (2026-04-09); wiki/index.md re-orient — 80 entries confirmed, matches S27 close. Phase 2 active.\n\n## (a) Wiki state confirmation\n\n80 entries across 9 directories. S27 closed cleanly: 11 new + 5 amendments + 2 folds shipped. Filing-to-citation latency averaged ~25min sustained through Phase B. No unresolved [DISPUTE] tags. TTL scan: earliest expiry remains `model-inventory-baseline.md` 2026-07-10 — not at risk this session.\n\n## (b) Decision on Volta's two scratchpad notes\n\nRead his S28 scratchpad (2026-05-06 entry, T06 path-tree rewrite section). Two `[CAL-CANDIDATE]` notes present near top:\n\n1. **Pattern candidate:** \"Repo as sole durable store + TeamDelete as in-memory release primitive\" — combined invariant emerging from S5 startup.md collapse + Phase 4a repo-persist\n2. **Gotcha candidate:** \"T06 prose vs startup.md procedure can drift\" — n=1, common-prompt gate-1 skip on cross-file change (S5 collapse hit startup.md 2026-04-30 but left T06 stale for 7 days)\n\n**My decision: option (b) — invite Volta to formally submit via Protocol A on his next spawn. Do NOT pull unilaterally.**\n\nReasoning:\n- Both items are tagged `[CAL-CANDIDATE]` — Volta's explicit deferral signal, not abandonment. He intends formal submission; the spawn timing didn't align.\n- Pulling scratchpad notes as Protocol A submissions bypasses the submitter-trust contract (confidence/scope/related fields are submitter's choice; I have his perspective but not those framings verbatim). Scratchpad reading is in scope for curation context; auto-filing is not.\n- Both are n=1 single-perspective. The gotcha looks architectural-fact-shaped (substrate-discipline cross-file gate skip) — n+1 sightings won't raise confidence per the architectural-fact convention, so framing matters more than filing speed.\n- Pattern has cross-team relevance flagged by Volta (\"any team-lifecycle protocol on the Claude platform\"). Worth a proper Protocol A header.\n- The gotcha has interesting sibling potential to `within-document-rename-grep-discipline.md` (within-document grep) — Volta's would be the cross-document variant of the same structural-discipline gate. But the sibling framing should come from him, not me.\n\nIf you concur, suggest you flag both for Volta's next spawn (\"Cal is ready to receive Protocol A on the two `[CAL-CANDIDATE]` items in your S28 scratchpad — pattern + gotcha\"). I can file in <30min once received.\n\nIf you'd prefer option (a) on either item (pull-now), I can — but I'd default to (a) only on the pattern (clearer scope, cross-team flag already in Volta's prose) and never on the gotcha (architectural-fact framing wants submitter's voice).\n\n## (c) Protocol C promotion candidates — 4 items\n\nPer S27 [NEXT-SESSION BOOT], these are wiki-mature for common-prompt promotion. Citations per Aen's discipline (memory-claimed n underestimates real usage; verified against wiki index frontmatter):\n\n### 1. `substrate-invariant-mismatch.md` — n=6\nProposed section: **Structural Change Discipline** (gate 4 / Verify post-bootstrap correspondence). Justification: same-root-cause-different-layer relationship to `dual-team-dir-ambiguity.md` (Instance 1 ↔ Instance 6, both path-as-substrate-invariant at different filesystem layers). Common-prompt already names dual-team-dir at gate 4a; promotion adds the family. Strongest promotion case of the four.\n\n### 2. `worktree-isolation-for-parallel-agents.md` — n=7\nProposed section: **Agent Spawning Rule** (extension). Justification: 5 work types × 4 specialists, includes named sub-shape (dirty-main-worktree-bypass, n=2). Promotion-strong; current rule says only `run_in_background: true`, doesn't address shared-clone branch overlap.\n\n### 3. `semver-strict-typed-contract-discipline.md` — n=2 (PR #11 + PR #13)\nProposed section: a new **Versioning Discipline** subsection under Structural Change Discipline, OR a standalone block after gate 4. Justification: typed-contract bump rule \"consumer's type-check work, not substrate migration mechanism\" — Aen's framing already cited (`migration mechanism makes the bump SAFE, not 'minor.'`). Lower n than #1/#2 but each instance is a major v→v2.0.0 bump, so each instance carries weight.\n\n### 4. `relay-to-primary-artifact-fidelity-discipline.md` — n=4\nProposed section: a new **Relay Discipline** block in common-prompt OR extension to Dual-Hub Routing section. Justification: 4 distinct lifecycle-application contexts (Stage 1 + Stage 2 antipatterns named). Recursive-validation strength (Instance 4 = my own ACK-vs-wiki divergence caught by Brunel). Slight reservation: at n=4 it's promotion-eligible by Herald's joint-cross-specialist criterion already met across Brunel + Herald; you may want to wait for n=5 across 5 contexts. Surfaceable now; defer-to-n=5 also defensible.\n\n**Recommended order if you batch: #1 first (strongest case, common-prompt-section already mentions sibling), #2 second (rule already exists, just extending), #3 + #4 in either order or held for next batch.**\n\n## Standing posture\n\nAfter this intro, I stand by for:\n- Volta's formal Protocol A submissions (if you invite — pattern + gotcha)\n- Brunel's accuracy review on `worktree-spawn-asymmetry-message-delivery.md` (queued at his cadence; not spawned this session, can wait)\n- Monte's two pending submissions (single-channel-saturation + recursive-citation; not spawned, can wait)\n- Any new Protocol B queries from PO direction\n\nNo agents will be nudged. Awaiting your direction on the 4 Protocol C candidates and the Volta-notes routing.\n\n(*FR:Cal*)",
     "summary": "Cal online S28; wiki state + 4 Protocol C + 2 Volta notes",
     "timestamp": "2026-05-06T12:46:25.576Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-06T12:46:34.823Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T12:46:34.823Z",
     "color": "green",
     "read": true
   },
@@ -327,27 +313,6 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-06T12:58:00.413Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] Both [CAL-CANDIDATE] notes filed (Protocol A intake)\"}",
-    "timestamp": "2026-05-06T12:58:00.413Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-06T12:58:30.767Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] ACK both filed entries — no amendments\"}",
-    "timestamp": "2026-05-06T12:58:30.767Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-06T12:59:07.323Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T12:59:07.323Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-05-06 16:02] Batch 2 of 2 Protocol C Promotion Proposals. Two entries; standing by for ratification, then session work continues.\n\n**Citation-hygiene flag up-front:** my batch-1 message claimed `semver-strict-typed-contract-discipline.md` was at \"n=2 (PR #11 + PR #13)\". **Grep against the entry itself shows n=1.** PR #13 is a `worktree-isolation` instance (Instance G — Herald 02 §4 R9-amendment), NOT a SemVer instance. My S27 [NEXT-SESSION BOOT] memory-note conflated the two clusters. The entry's own Promotion-posture section reads \"n=1 watch posture.\" This is the inverse of the S26 [LEARNED] discipline (memory underestimates real usage); here memory overstated. Per Aen's standing rule \"always grep before Protocol C,\" I'm correcting on the way in. The PO has authorized promotion regardless; I'll flag explicitly in the proposal so the Justification doesn't carry a false n=2 claim.\n\n---\n\n## Promotion Proposal #3 — `semver-strict-typed-contract-discipline.md`\n\n**Wiki source:** `teams/framework-research/wiki/patterns/semver-strict-typed-contract-discipline.md`\n\n**Proposed section:** **New \"Versioning Discipline\" subsection at the end of `Structural Change Discipline` block** in `common-prompt.md`, immediately after the four existing gates. Rationale: it's a structural-change-discipline family member (every typed-contract version bump IS a structural change), but distinct in scope from the four bootstrap-correspondence gates — it governs the version-number signal rather than the cross-document mechanics. Sub-section sibling under the same parent rather than separate top-level block.\n\n**Justification:** **n=1 watch posture per the wiki entry** (Prism envelope v1.1.0 → v2.0.0, PR #11, 2026-05-05). PO authorized promotion at n=1 with the recursive-validation strength + cross-specialist criterion (Aen 17:28 named the discipline as wiki-promotable; framing crystallized at first instance with quotable production rule *\"Migration mechanism makes the bump SAFE, not 'minor.'\"*). The structural argument for promotion-at-n=1: the discipline is a **named conflation-trap** (migration-mechanism vs SemVer-level), and the production rule is a single sentence that travels well — common-prompt promotion captures the rule before n=2 arrives so that the next typed-contract version decision (likely a t09-protocols.ts revision or future Prism contract evolution) hits the rule preemptively, not retrospectively.\n\n### Proposed text (verbatim, append as new subsection at end of Structural Change Discipline block, after gate 4)\n\n> ### Versioning Discipline for Typed Contracts\n>\n> When a typed contract (TypeScript interface, JSON schema, protocol envelope) is versioned with SemVer, the bump level is determined by the **consumer's type-check work**, not by whether a migration mechanism exists on the substrate side. *Migration mechanism makes the bump SAFE, not \"minor.\"* Two-gate evaluation:\n>\n> 1. **Type-check delta gate** (major-vs-minor-or-patch): take a representative consumer's existing type definitions and run them against the new shape. If type-check fails, the bump is **major** — even when migration is automatic, even when defaults paper over the addition, even when the change \"feels minor.\" A required field added with substrate-supplied default is still a major bump because consumer-side construction code doesn't know about the new field.\n> 2. **Runtime semantics delta gate** (minor-vs-patch): with type-check passing, ask whether existing well-typed consumer code would produce different observable behavior. If yes, minor (additive new feature). If no (purely internal restructuring with identical externally-visible semantics), patch.\n>\n> Failure mode named: **migration-eased version-bump deflation** — conflating runtime compatibility with type-level compatibility and deflating the bump on migration-mechanism grounds. The discipline applies to published contracts (the surface consumers code against); for purely internal types not exposed to consumers, the discipline is moot. Cataloged at [`wiki/patterns/semver-strict-typed-contract-discipline.md`](teams/framework-research/wiki/patterns/semver-strict-typed-contract-discipline.md).\n\n### Evidence\n\n- **n=1 substantive instance** (corrected from my earlier claim): Prism envelope v1.1.0 → v2.0.0, PR #11, 2026-05-05. CuratorAuthority required-field-with-substrate-default — initially proposed as v1.2.0 minor, corrected to v2.0.0 major on consumer-type-check criterion.\n- **Promotion-grade-at-n=1 by single-quotable-production-rule criterion.** Aen's framing *\"Migration mechanism makes the bump SAFE, not 'minor.'\"* compresses the discipline to one sentence that travels into common-prompt without loss.\n- **Specialist consensus at first instance.** Aen authored the framing; Herald applied it to PR #11. The discipline emerged with two-perspective alignment at n=1 — comparable to Herald's joint-cross-specialist promotion criterion applied elsewhere.\n- **Promotion heuristics matched:** \"Knowledge stable for >2 sessions\" (Weak) — entry is one session old; \"Knowledge referenced in >3 queries\" (Medium) — not yet, but the proposed-text phrasing is borrowed from Aen's own ratified framing in the source-of-truth.\n- **PO override at n=1 authorized in your batch-2 directive** (\"PO read your defer-to-n=5 reservation and waved it off\" — that was for #4; analogous reasoning here: PO authorized batch 2 wholesale, including #3).\n\n---\n\n## Promotion Proposal #4 — `relay-to-primary-artifact-fidelity-discipline.md`\n\n**Wiki source:** `teams/framework-research/wiki/patterns/relay-to-primary-artifact-fidelity-discipline.md`\n\n**Proposed section:** **Extension to existing `Dual-Hub Routing (Knowledge + Work)` section** in `common-prompt.md` — specifically a new subsection at the end of that section titled \"Relay Fidelity Discipline.\" Rationale: the dual-hub topology produces relay paths (team-lead-relay, specialist-DM relay, ACK→wiki-entry relay), and the discipline is the receiver-side rule for handling relayed material. Logically belongs where the relay paths are already named.\n\n**Justification:** **n=4 cumulative across 4 distinct lifecycle-application contexts** (Brunel design-doc Stage 1 + Brunel Stage 2 + Herald producer-side self-staleness + Cal curator-ACK-vs-wiki-body procedural). The four-context coverage shows the lifecycle is not specific to typed-contract substantive revisions — it generalizes to ANY relay-class-artifact ↔ primary-class-artifact pair. Recursive-validation strength (Instance 4 = the discipline catching its own author within 1.5 hours of filing) parallel to `first-use-recursive-validation.md`. PO's defer-to-n=5 reservation waved off per your batch-2 directive.\n\n### Proposed text (verbatim, append as new subsection at end of Dual-Hub Routing section)\n\n> ### Relay Fidelity Discipline (Receiver-Side)\n>\n> When a specialist receives content via async ratification chain (team-lead-relay, specialist-DM, ACK message), and a primary artifact may exist or come into existence later, apply the **two-stage lifecycle**:\n>\n> **Stage 1 — relay-only window** (primary artifact not yet on disk or out of reach): fold ONLY what is verbatim in the relay. Mark gaps explicitly as deferred surfaces with `FLAG` annotations; do NOT implement speculative inferences. The Stage 1 anti-pattern is **flag-then-implement-as-confirmed** — honest annotation paired with implementation that proceeds as if confirmed. Honest annotation does not redeem speculative implementation.\n>\n> **Stage 2 — primary-artifact arrival**: fetch the primary artifact (direct disk read, `git show origin/<branch>:<file>`, whatever channel the artifact lives on); supersede the Stage-1 relay-fold with primary-artifact-fold; record divergences in the revisions log. The Stage 2 anti-pattern is **stale-relay-fold-survives-after-artifact-arrives** — the receiver folded correctly at Stage 1 but failed to supersede when the primary became available.\n>\n> Production rule: **provenance-by-artifact-class beats provenance-by-recency.** Routing/relay artifacts (SendMessage texts, team-lead relay quotes, scratchpad checkpoints, ACK messages) capture intent at a moment in time; they timestamp but do NOT supersede primary artifacts. Primary artifacts (typed contract specs, shipped TS files, ratified design docs, wiki entries) are the canonical source — they evolve via versioning + amendments log. When relay and primary artifact diverge, consumers MUST resolve to the primary artifact.\n>\n> The two anti-patterns name symmetric failure modes: Stage 1 = premature implementation (going beyond relay before primary arrives); Stage 2 = premature stop (treating Stage 1 fold as terminal when primary has since arrived). Cataloged at [`wiki/patterns/relay-to-primary-artifact-fidelity-discipline.md`](teams/framework-research/wiki/patterns/relay-to-primary-artifact-fidelity-discipline.md).\n\n### Evidence\n\n- **n=4 cumulative across 4 distinct lifecycle-application contexts** (instance table in entry §First instances).\n- **Recursive-validation strength** (Instance 4): discipline catches its own author when applied — Cal's curator-ACK-vs-wiki-body Stage 2 self-correction caught by Brunel's 15:01 receiver-side cross-check, ~1.5 hours after entry's first filing. Parallel to `first-use-recursive-validation.md` framing for new-rule-application contexts. Brunel's 15:04 articulation: *\"the self-correction IS the discipline working as designed... not just an instance of the pattern; it's the pattern's recursive validity proof.\"*\n- **Production rule** (Herald's framing): *\"provenance-by-artifact-class beats provenance-by-recency.\"* Quotable, single-sentence; travels to common-prompt without loss.\n- **Cross-specialist sources:** Brunel (lead), Herald (framing extension at 13:24 producer-side instance + production-rule articulation), Cal (Instance 4 procedural). Three specialists across two structural roles (substantive design-doc work + curatorial workflow).\n- **Substrate-driven operational necessity** (S27 substrate-failure context): worktree-spawn-asymmetry forced relay-heavy routing; the discipline was operationally load-bearing during Phase B. **The discipline is operationally durable beyond the substrate failure** — even with reliable inbox delivery, async ratification chains will produce relay-and-primary-artifact divergences.\n- **Promotion heuristics matched:** \"Multiple agents hit the same gotcha independently\" (Strong) — 3 specialists across 4 contexts; \"Knowledge referenced in >3 queries\" (Medium) — entry is a Phase B citation node (cited in 8+ Protocol B responses per S27 wrap); \"Knowledge stable for >2 sessions\" (Weak) — entry filed S27, amended within-session for fold-only-what-is-verbatim → two-stage lifecycle scope extension; structurally stable since.\n\n---\n\n## Notes for your common-prompt authorship\n\n- **Proposal #3 placement** at end of Structural Change Discipline block as a new subsection — keeps the four bootstrap-correspondence gates intact at the top of the block and introduces version-management as a sibling concern. If you'd prefer it as a separate top-level block, let me know — I'd argue against (it's the same discipline family) but defer to your judgment on common-prompt structure.\n- **Proposal #4 placement** at end of Dual-Hub Routing section — puts the relay-fidelity rule where the relay paths are already named. The existing Dual-Hub Routing section currently ends with the table mapping work-vs-knowledge submissions; the new subsection sits below it.\n- Both proposals link back to the wiki entry by full repo-relative path so the trace from common-prompt → wiki → instances is preserved.\n- Citation-hygiene flag at top of this message resolves before you read the proposed text — proposal #3's Evidence section now reads n=1 (corrected) instead of n=2 (claimed in batch 1).\n\nAfter your ratification, I'll log batch 2 in my scratchpad and stand by. Brunel/Monte not spawned this session; no further pending submissions known.\n\n(*FR:Cal*)",
     "summary": "Protocol C batch 2: semver + relay-fidelity (with n-count correction)",
     "timestamp": "2026-05-06T13:02:19.428Z",
@@ -356,23 +321,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-06T13:03:05.637Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T13:03:05.637Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-05-06 16:05] Acknowledged batch 2 ratification + citation-hygiene-as-recursive-validation framing. Both noted in scratchpad.\n\nPre-shutdown scan complete. **Nothing requires attention before shutdown coordination.** State summary:\n\n- Wiki at 82 entries; both Volta filings closed clean; 4 Protocol C promotions queued for Step S4 commit\n- No `[DISPUTE]` tags; no TTL expiries this session (5 TTL'd entries, earliest 2026-07-10)\n- No pending Protocol A submissions; no Protocol B queries unanswered\n- No `[URGENT-KNOWLEDGE]` to route\n- Brunel accuracy review on `worktree-spawn-asymmetry-message-delivery` carries forward to next session (not spawned this session; non-urgent per S27 close)\n- Monte's two pending submissions (`single-channel-saturation-via-mode-partition` + `recursive-citation-as-canonical-validation`) carry forward (not spawned this session; non-urgent per S27 close)\n\n**One curatorial-process item surfaced for the record but not asking for action:** the bidirectional n-count drift observation (S26 underestimate / S28 overstate) bracketing the grep-before-Protocol-C discipline. Per your direction, not a Protocol A — folded into my [LEARNED S28] section in scratchpad as curatorial hygiene. If a Librarian replication ever happens, this is the kind of inheritance worth carrying explicitly into the prompt (along with the existing \"first Librarian replication\" lessons in §Librarian Experience). Logged for that future contingency only.\n\nStanding by for shutdown coordination.\n\n(*FR:Cal*)",
     "summary": "Batch 2 ack received; nothing pre-shutdown needs attention",
     "timestamp": "2026-05-06T13:04:40.793Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-06T13:04:44.067Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T13:04:44.067Z",
     "color": "green",
     "read": true
   },
@@ -386,23 +337,9 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-06T13:17:24.333Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T13:17:24.333Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-05-06 16:17] Volta closing report — Task #3 (Topic-09 micro-fix) COMPLETE.\n\n## Verification\n\nBrief said \"line 761 — WikiProvenance example needs `source-team` field added per S26 Protocol C #1 schema add.\"\n\nConfirmed against `types/t09-protocols.ts` lines 399–434:\n- `sourceTeam?: string` exists in the `WikiProvenance` interface (line 427)\n- TypeScript docstring: *\"Originating team, when this knowledge was cross-pollinated from another team's wiki. Omit for in-team origin. Promoted to standard schema after n=6 cross-team-sourced entries (apex-research × 2, uikit-dev × 4) across FR sessions 20-23. Promoted to schema 2026-05-05 per Protocol C.\"*\n- Schema position: between `sourceIssues?` (line 420) and `ttl?` (line 433)\n\nT09 line 761 itself is `source-agents:` (the first frontmatter field of the example). The actual insertion line for the diff is **line 773** (after `source-issues:` block, before `ttl:`). The brief's \"line 761\" is a directional pointer to the YAML example block (lines 760–774), not the literal insertion point.\n\n## Real-world placement conventions\n\nSurveyed two committed FR wiki entries that already use `source-team`:\n\n| Entry | Position |\n|---|---|\n| `world-state-on-wake.md` | After `source-agents`, before `discovered` (line 4 of frontmatter) |\n| `teamcreate-in-memory-leadership-survives-clear.md` | After `status`, before `source-files` (line 9 of frontmatter) |\n\nNeither matches the TypeScript schema-canonical order (between `source-issues` and `ttl`). Live conventions have already drifted — no single placement is \"the\" team standard. The example in T09 should establish the canonical position.\n\n**My recommendation: schema-canonical position** (between `source-issues` and `ttl`). Reasons:\n\n1. **Authoritative.** TypeScript interface ordering is the system of record; the YAML example should mirror it.\n2. **Read-order coherence.** Agents → discovery metadata → status → file refs → commit refs → issue refs → cross-team origin → TTL. Origin is a \"where this came from\" field, naturally adjacent to other source-* fields and to TTL (both are \"optional with conditions\" fields).\n3. **Drift correction.** Establishing canonical position in the spec example gives Cal a reference to cite if future entries diverge — closes the prose-vs-procedure-drift surface that yesterday's gotcha entry named.\n\n## Exact diff for team-lead to apply\n\n**File:** `topics/09-development-methodology.md`\n**Insertion point:** After current line 772 (`  - \"#42\"`), before current line 773 (`ttl: 2026-05-08    # For external-system knowledge with no source file`).\n\n```diff\n   source-issues:\n     - \"#42\"\n+  source-team: uikit-dev    # Optional; omit for in-team origin (cross-team-pollinated entries only)\n   ttl: 2026-05-08    # For external-system knowledge with no source file\n```\n\n**Verbatim insertion line** (no leading diff marker — this is the line to literally add):\n\n```\nsource-team: uikit-dev    # Optional; omit for in-team origin (cross-team-pollinated entries only)\n```\n\n**Rationale for the example value `uikit-dev`:**\n\n- Concrete, real team name (matches the n=6 evidence in the schema docstring — \"uikit-dev × 4\")\n- Distinct from any agent name in the existing example, so a reader can't confuse `source-team` with `source-agents`\n- Two-word kebab-case shows the YAML format clearly (single-token names like `dag` underspecify the format)\n\n**Rationale for the inline comment:**\n\n- Mirrors the existing `ttl: ... # For external-system knowledge` comment style at the same indent\n- Captures the schema docstring's optionality semantics in 8 words\n- Distinguishes \"optional with semantic condition\" from required fields, matching `ttl`'s annotation style\n\n## Out of scope (acknowledged but not addressed)\n\n- **Backfill of existing wiki entries with non-canonical placement** (`world-state-on-wake.md`, `teamcreate-in-memory-leadership-survives-clear.md`). These are Cal-domain edits, not micro-fix scope. Either Cal does a placement-normalization pass, or the placement convention is \"consistent within an entry, position not enforced cross-entry.\" Not blocking; flag for Cal's next housekeeping pass if they want consistency.\n- **Alphabetical ordering of YAML keys** vs schema-declaration ordering. The example uses neither — it follows logical read order. Not changing on this micro-fix.\n\n## Closing tags\n\n- **[LEARNED]** — Spec examples drift from TypeScript schemas the same way prose drifts from procedures. Both are \"two views of one fact\" with no auto-sync. Today's micro-fix is one instance; the wiki entry placement-divergence is another (n=2 in the same session, ~1 hour apart). Worth tracking; if a third instance lands soon, the cross-document-prose-procedure-drift gotcha gets n=2 and may be ready for the Protocol-C-extension trigger I documented in Cal handoff scratchpad.\n- **[DEFERRED]** — None.\n- **[WARNING]** — None.\n- **[UNADDRESSED]** — None. Verified the schema, surveyed real placements, recommended schema-canonical position, delivered exact verbatim insertion line + diff context, justified field value + comment.\n\nTask #3 marked completed. All three queued tasks done.",
     "summary": "T09 micro-fix — exact diff for line 773",
     "timestamp": "2026-05-06T13:19:17.898Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-06T13:19:25.288Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T13:19:25.288Z",
     "color": "blue",
     "read": true
   },
@@ -416,38 +353,10 @@
   },
   {
     "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-06T13:20:02.472Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T13:20:02.472Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-06T13:20:18.531Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-06T13:20:18.532Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
     "text": "[2026-05-07 11:22] Aen — Volta. Receipt confirmed for all three closures.\n\nScratchpad updated with the 2026-05-07 checkpoint: Task #1 direct edit, Task #2 A2/B2 applied via override, Task #3 verbatim insertion applied via override. Attribution preserved on the new T04 §Row 2 subsection per your note.\n\n[STANDING-DATA] Logged the n=2 `cross-document-prose-procedure-drift` data point. Strict reading of my [LEARNED] phrasing — n=2 is *progress toward* the Protocol-C-extension trigger condition (a), not satisfaction; trigger said \"third lands soon.\" Holding for n=3 or a cleanly-shaped third instance before drafting any Protocol C submission. No action required from you, no submission from me yet.\n\nStanding by. Acknowledging Brunel/Monte/Herald not spawned this session; my Brunel coordination flag (T06 Container section \"Phase 2.0a\" stale prose at lines 1135/1182) remains scratchpadded for his next spawn — non-blocking, semantics unchanged.\n\n(*FR:Volta*)",
     "summary": "Receipt confirmed — standing by",
     "timestamp": "2026-05-07T08:23:53.168Z",
     "color": "blue",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-07T08:23:55.937Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-07T08:23:55.937Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778154928870@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T11:56:31.039Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-07T11:56:31.039Z",
-    "color": "green",
     "read": true
   },
   {
@@ -459,10 +368,138 @@
     "read": true
   },
   {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778154922792@volta\",\"from\":\"volta\",\"timestamp\":\"2026-05-07T11:57:05.714Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-07T11:57:05.714Z",
+    "from": "brunel",
+    "text": "[2026-05-07 15:19] Brunel loaded — startup.md, common-prompt.md, brunel.md prompt, brunel.md scratchpad all read. Ready.\n\n**Acknowledging S29 tasks:**\n1. Task A — Wiki entry accuracy review on `wiki/patterns/worktree-spawn-asymmetry-message-delivery.md`.\n2. Task B — T06 stale \"Phase 2.0a\" references at lines 1135 + 1182, with grep-discipline gate (re-grep before editing, re-grep after).\n\n**Task A — DONE. No amendments needed.**\n\nI read the entry. It accurately represents the substrate failure as I observed it:\n- \"Note on framing evolution\" (line 28) correctly relaxes the original n=2 \"worktree-OUTBOUND deterministic-broken\" framing to \"non-parent-process specifically, with intermittent/mount-staleness mechanism most plausible\" given the n=4+ evidence including my own Cal→Brunel SUCCESS+BROKEN+SUCCESS pattern within the session.\n- The table row for Cal → Brunel (line 38) explicitly lists \"INTERMITTENT — three observed instances in S27\" with timing (12:54 BROKEN, 13:14 WORKED, ~15:00 WORKED) and names \"transient mount-state most plausible mechanism.\" This is the framing you asked me to confirm.\n- The team-lead → recipient relay path is correctly identified as the only empirically reliable cross-boundary workaround (line 41 + Operational workaround section at line 80).\n- Instance 3 at line 117 names me directly, in the right shape (worktree → no-worktree, Sub-shape B, my 11:05 query), and credits the team-lead relay-summary at 12:38 + my own retry through conversation channel as the resolution path. Matches my recollection from my scratchpad.\n- The \"What this is NOT\" section correctly preserves worktree-isolation as a worthwhile discipline; the cross-isolation message-delivery cost is the tradeoff, not a reason to abandon worktree.\n\nConfirmed: intermittent mount-staleness framing (not deterministic-broken), team-lead-relay workaround, and Cal as co-source all accurately represented. **No proposed amendments.**\n\n**Task B — DONE.**\n\nPre-edit grep on T06 returned 4 hits for \"Phase 2.0a\": lines 118, 120 (both inside Volta's `$HOME` reliability and runtime-path notes section — intentional historical references \"moved from R4 Phase 2.0a\" / \"The R4 Phase 2.0a `$HOME` validation gate WAS\" — these are Volta's domain per Section Ownership and correctly anchor the move in past tense). Lines 1135 and 1182 were my container-side stale references — both updated:\n\n- Line 1135: \"the Windows/Git Bash `$HOME` bug documented in Phase 2.0a\" → \"the Windows/Git Bash `$HOME` bug documented in `$HOME` reliability and runtime-path notes (above)\" — points to the new structural anchor by heading title.\n- Line 1182: \"Phase 2.0a ($HOME validation): ...\" → \"`$HOME` validation in lifecycle scripts: ...\" — rephrased to drop the phase-name dependency entirely, since `$HOME` validation is no longer a separate numbered phase but an aspect of the lifecycle scripts (Phase 4 / Shutdown 4a). The bullet now describes the substrate property without claiming a phase that no longer exists, and parenthetically points to the canonical anchor for the fallback-path documentation.\n\nPost-edit re-grep: 2 hits remain, both at lines 118 + 120 inside Volta's section (intentional — his historical anchors, not mine to touch). Zero stale references in container-side sections. Grep-discipline gate satisfied.\n\nStanding by for next task.\n\n(*FR:Brunel*)",
+    "summary": "S29 loaded; Task A no amendments; Task B T06 edits done",
+    "timestamp": "2026-05-07T12:20:27.793Z",
     "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-07T12:20:32.147Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T12:20:32.147Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "[2026-05-07 15:24] **Brunel S29 closing report.**\n\nScratchpad saved (`memory/brunel.md`), compressed from 134 → 120 lines (Phase A Prism block summarized; Phase B S27 block summarized; resolved [WIP]/[WARNING] pruned; S29 entries added at top).\n\n[LEARNED] **Two-axis stale-prose scan beats single-grep on moved-not-deleted sections.** A same-document grep returns BOTH the new structural anchor's reference-back AND consumer-side stale references. Distinguishing them = read heading-line context: past-tense in an owner's moved-from heading = leave alone; present-tense or implicit-present in a consumer section = stale. T06's 4-hit grep had 2 of each shape; treating all 4 as \"to fix\" would have over-edited Volta's section.\n\n[DEFERRED] Topic 06 write-back (Volta-resume timing; Herald co-author offer 13:24); Cal output-substrate namespace ratification (Aen routing); Tier-0 §3.4 questions on pre-rejection attempt log + append-only-additive guarantee (Aen routing per 11:46); #3 T04 topic-file amendment text (held; container/infra-side only on Aen signal).\n\n[WARNING] **Re-anchor heuristic to remember next time the moved-from pattern appears:** when stale name appears as a *passing reference* in prose, point to new anchor by heading title (L1135 fix shape); when it appears as a *structural element* (list header, identified phase in an enumerated list), rephrase to drop the dependency entirely (L1182 fix shape). Heading-name-pointer reads awkwardly inside enumerated lists.\n\n[UNADDRESSED] None. Both Task A (wiki review, no amendments) and Task B (T06 stale-prose, lines 1135 + 1182) delivered and ratified.\n\nApproving shutdown.\n\n(*FR:Brunel*)",
+    "summary": "Brunel S29 closing report; approving shutdown",
+    "timestamp": "2026-05-07T12:25:11.949Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-07T12:25:15.139Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T12:25:15.139Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "brunel",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778156721096@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-05-07T12:25:30.317Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-07T12:25:30.317Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-05-07 15:28] Loaded — startup.md, common-prompt.md, my prompt, my scratchpad (line 301; aware of >100-line state, deferred per your note). Ready.\n\nAcknowledging this session's tasks by number per your spawn instruction:\n\n**Task A — T04 Row 2 + new §Row 2 vs. session-boundary `TeamDelete` awareness check.** ACK. Will read in context, judge wording against my governance framing, report back.\n\n**Task B — Dispatch two queued Protocol A submissions to Cal.**\n- B.1 `single-channel-saturation-via-mode-partition` (digest-load + breach-load do not compete for same channel; cross-cutting beyond drift detection)\n- B.2 `recursive-citation-as-canonical-validation` (sibling to `wiki/patterns/first-use-recursive-validation.md`; query-of-self-authored-canon = recursive validation by query, not application)\n\nACK dispatch policy: direct first (parent-process this session, no worktree-OUTBOUND mount-asymmetry exposure per Sub-shape B). Surface to you for relay if either doesn't land.\n\nStarting Task A now. (*FR:Montesquieu*)",
+    "summary": "Loaded; ACK Tasks A + B by number",
+    "timestamp": "2026-05-07T12:28:51.658Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-05-07 15:30] **Task A — T04 Row 2 + new §Row 2 vs. session-boundary `TeamDelete` — COMPLETE. ACK as written, no refinement.**\n\nRead both edits in context (line 146 Row 2 cross-reference pointer + line 204 new sub-section). The wording matches my governance framing on three load-bearing structural elements:\n\n1. **Authority distinction is clean.** Dissolution = PO/L0 (Row 2 governance decision). Session-boundary `TeamDelete` = team-lead/L2 operational authority within the already-existing T06 lifecycle mandate. Same shape as my §Cross-Team Audit Authority distinction between Medici-the-auditor (L3 specialist within own team) and Medici-the-cross-team-auditor (L1-routed advisory) — same primitive, different scope, different authority level.\n\n2. **Substrate distinction is named explicitly.** \"The team's existence as a repo entity (scratchpads, inboxes, wiki, charter) is unaffected by session-boundary `TeamDelete`\" cleanly separates the persistent governance object (team-as-charter) from ephemeral runtime state (in-memory leadership). This is the same shape as my §What the Drift Detector May NOT Do boundary — substrate boundary stated in terms of what does NOT cross it.\n\n3. **Cross-references are correct and minimal.** \"T06 Shutdown Phase 5 graceful exit; T06 Startup Phase 2 best-effort recovery\" cites the canonical lifecycle without duplicating the lifecycle's content (per `prompts/callimachus.md` Decisions Boundary — pointers, not copies).\n\nThe `(_FR:Volta_ — 2026-05-06)` attribution sits correctly mid-section (the Row 2 cross-reference pointer in the matrix carries my section's attribution; the new sub-section carries Volta's). No edit needed.\n\nMoving to Task B (Cal Protocol A dispatches) now. (*FR:Montesquieu*)",
+    "summary": "Task A complete — Volta's wording ACK, no refinement",
+    "timestamp": "2026-05-07T12:29:09.750Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-05-07 15:30] **Task B — Cal Protocol A dispatches — COMPLETE.**\n\nBoth submissions sent direct (parent-process this session, no worktree-OUTBOUND mount-asymmetry exposure per Sub-shape B). Both `success: true` in callimachus's inbox.\n\n**B.1 dispatched 15:29** — `single-channel-saturation-via-mode-partition`\n- Pattern statement, three-question decomposition test, named failure mode (aggregate-saturation-forecasting across separable modes)\n- Evidence: Aen 11:48 \"digest carries advisory-fatigue load; escalation carries breach load\" reframing of n=20 forecast\n- Cross-cutting reach: T03 mesh topology debates, T07 tier-0/tier-2 alert partition; converse of `substrate-shape-vs-authority-shape-orthogonality` (substrate aggregation doesn't dictate consumer-attention aggregation)\n\n**B.2 dispatched 15:30** — `recursive-citation-as-canonical-validation`\n- Sibling to `first-use-recursive-validation.md` per Cal's S27 11:36 re-categorization (distinct from `two-consumer-pattern.md`)\n- Three-row family-distinction table: shared structure (author-side action recursive when independent of canon-creation moment), differs on mechanism (application vs. citation) and what's validated (rule effectiveness vs. canon indexability)\n- Evidence chain: my 10:50 Protocol B → my 11:06 Topic 04 §Recipient-and-authority-chain → Cal's 12:24 response citing my own prose\n- Filed as joint-source candidate (monte + callimachus) — Cal's pattern-recognition at 11:36 was load-bearing for the family distinction\n- Title proposed: `recursive-citation-as-canonical-validation.md` (preferred) or `query-of-self-authored-canon.md` (Cal's call)\n\n**Both tasks now CLOSED.** Awaiting next assignment or shutdown direction. Will not go idle without reporting per common-prompt discipline. (*FR:Montesquieu*)",
+    "summary": "Task B complete — both Protocol A submissions dispatched direct",
+    "timestamp": "2026-05-07T12:31:03.883Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T12:31:11.387Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A — recursive-citation-as-canonical-validation\"}",
+    "timestamp": "2026-05-07T12:31:11.387Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-05-07 15:32] **Closing report — Session 29 (queue-flush).**\n\n[LEARNED] **Queued items survive cleanly across multi-session gaps when scratchpad-tracked with explicit dispatch-policy notes.** S27 close named both Protocol A queue items + the dispatch-policy-for-S28 distinction (direct vs. relay-fallback per worktree-OUTBOUND mount-asymmetry). S28 didn't spawn me; S29 flushed both items immediately on spawn-with-task-context — the dispatch-policy note was load-bearing at execution time, knew without re-deriving that direct was safe.\n\n[DEFERRED] None — both queued items completed. (Compound-signals v1.1 fold + Brunel-async items remain in S27 [OPEN-v1.1] but pending Brunel's cadence, not active for me this session.)\n\n[WARNING] Cal next in this session's sequence; both my Protocol A submissions sit in her inbox alongside whatever else queued. The substrate-invariant-mismatch n=6 finding was specifically about worktree-OUTBOUND-to-non-worktree-recipient — this session is parent-process-OUTBOUND-to-not-yet-spawned-Cal (different sub-shape, no failure mode predicted), but if either submission turns out not to land in her actual iteration, surface for relay-on-behalf per Aen 13:30 codification.\n\n[UNADDRESSED] None — Tasks A and B both ratified by you 15:32; no requirements outstanding.\n\nScratchpad updated under \"Session 29 — 2026-05-07 (queue-flush session)\" with task-completion notes. Ready for shutdown_request when you send it. (*FR:Montesquieu*)",
+    "summary": "Closing report — Session 29",
+    "timestamp": "2026-05-07T12:32:21.448Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T12:32:24.164Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T12:32:24.164Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778157150724@monte\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T12:32:35.613Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-07T12:32:35.613Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-07 15:35] Cal online. Loaded: startup, common-prompt, prompts/callimachus, scratchpad (S28 close + S29 boot), wiki/index (82 entries).\n\nProcessing this session's queue:\n- Task A: Monte's two Protocol A submissions (B.1 single-channel-saturation-via-mode-partition + B.2 recursive-citation-as-canonical-validation). Brief notes inbox empty (`callimachus.json` = `[]`) — consistent with `worktree-spawn-asymmetry-message-delivery` substrate failure mode. Working from your relayed framings + Monte's S29 scratchpad dispatch notes (lines 274-276) — Stage 1 relay-fold-only discipline applies, will mark any inferred surfaces with FLAG annotations.\n- Task B: Brunel's S29 accuracy review on `worktree-spawn-asymmetry-message-delivery.md` — \"no amendments needed\" closure noted; reflecting in scratchpad, no wiki action.\n\nFiling both Monte entries now per Protocol A; will report when both filed + ACK'd.\n\n(*FR:Callimachus*)",
+    "summary": "Cal loaded; processing queue",
+    "timestamp": "2026-05-07T12:35:36.538Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-07 15:36] **Cal closing report — both queued tasks complete.**\n\n## Task A — Monte's two Protocol A submissions: FILED\n\n**B.1 `patterns/single-channel-saturation-via-mode-partition.md`** (Monte sole-source, n=1 watch)\n- Three-question decomposition test (recipient/cadence/decision-surface)\n- Named failure mode: aggregate-saturation-forecasting across separable modes\n- Cross-cutting reach: T03 mesh-topology + T07 tier-0/tier-2 alert partition\n- Converse-of cross-link to `substrate-shape-vs-authority-shape-orthogonality.md` per Monte's framing\n- First instance: Monte's drift-detection v1.0; Aen 11:48 framing resolved n=20 advisory-fatigue forecast\n\n**B.2 `patterns/recursive-citation-as-canonical-validation.md`** (joint source-agents [monte, callimachus], promotion-grade-at-n=1 by joint-cross-specialist criterion)\n- Title chosen per your guidance: `recursive-citation-as-canonical-validation.md` (Monte's preferred — explicit about validation function)\n- Sibling-to cross-link to `first-use-recursive-validation.md` (recursive-validation family); three-row family-distinction table maps validation surfaces (application vs query vs potential re-derivation)\n- Explicit anti-link to `two-consumer-pattern.md` (NOT a sibling — different-access-bridge vs same-access-temporal-independence; cross-reference prevents future mis-filing per Cal's 11:36 fold)\n- First instance: Cal's curator-ACK-vs-wiki-body Stage 2 self-correction (also Instance 4 of `relay-to-primary-artifact-fidelity-discipline.md` — same moment, different angles)\n\nACK-to-Monte not deliverable in same window (Monte terminated this session); same-window discipline preserved via this report — joint co-credit on B.2 named in entry frontmatter + provenance section.\n\n## Task B — Brunel's S29 wiki accuracy review: CLOSED\n\n`worktree-spawn-asymmetry-message-delivery.md` confirmed accurate by Brunel — no amendments needed. Reflected in scratchpad.\n\n## Wiki state\n82 → 84 entries. Index updated. No DISPUTE tags, no TTL expiries pending, no PROTO-C dispatched this session.\n\n## Closing tags\n\n[LEARNED] **Joint-authorship at filing time when structural framing is load-bearing on categorization** — Monte observed the recursion; Cal's 11:36 fold (sibling-to-first-use NOT instance-of-two-consumer) determined where the entry lived. Both halves required → joint source-agents at filing, not append-after-the-fact.\n\n[DEFERRED] Watch for n=2 on both new entries: T03/T07 load-forecasting (single-channel-saturation); any future author-as-canon-consumer moment (recursive-citation, promotion candidate at n=2 with family-distinction holding).\n\n[WARNING] **My inbox file empty (`callimachus.json = []`) despite Monte's `success: true` on direct dispatch** — different sub-shape than worktree-OUTBOUND (Sub-shape B); possibly direct-to-non-spawned-recipient mode failure. Captured in S29 scratchpad as substrate observation; if recurs in S30 with same shape (recipient-not-spawned-this-session, harness-success-on-dispatch, on-disk-absence at recipient-side), surface to you as new sub-shape candidate for `worktree-spawn-asymmetry-message-delivery.md` amendment. Working from your relayed brief was sufficient; flagging for substrate-pattern attention only.\n\n[UNADDRESSED] None.\n\nScratchpad pruned 130 → 46 lines (S26-28 detail consolidated into git-history pointer; S29 entries fresh). Standing by for shutdown_request when ready.\n\n(*FR:Callimachus*)",
+    "summary": "Cal closing report — both tasks complete",
+    "timestamp": "2026-05-07T12:41:53.642Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T12:41:59.622Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T12:41:59.622Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-07 15:39] **Cal final closing report — amendments applied + substrate gotcha filed.**\n\n## Amendments to `recursive-citation-as-canonical-validation.md`\n\nPer your relayed primary-artifact-grade evidence chain (15:38), three corrections applied:\n\n1. **Family-distinction table changed from one-axis to two-axis.** Mechanism (application vs citation) + what-is-validated (rule effectiveness vs canon indexability). Two axes compose to discriminate the family — mechanism alone insufficient.\n2. **First-instance section rewritten.** Initial filing wrongly cited Cal's curator-ACK Stage 2 self-correction (which is `relay-to-primary-artifact-fidelity-discipline.md` Instance 4 — *separate* recursive moment). Correct first instance per your relay: Monte 10:50 Protocol B query → Monte 11:06 T04 §Recipient-and-authority-chain citing his own session-26 wiki entries (`dispatch-granularity-matches-recovery-handler.md`, `protocol-completeness-across-surfaces.md`) → Cal ~11:18 Protocol B response citing Monte's T04 prose back to Monte. Two-layer recursion both validating canon indexability.\n3. **Provenance frontmatter note + FLAG annotations** added per Stage 1 relay-fold-only discipline. Verbatim Monte text unrecoverable; gaps marked explicitly for resolution via Protocol A AMENDMENT if Monte respawns.\n\n`Related` block updated: relay-fidelity Instance 4 demoted from \"first-instance source\" to \"adjacent (separate recursive moment, same family).\"\n\n## New gotcha filed: `inbox-drained-on-spawn-clear-without-deliver.md`\n\nSources [team-lead, callimachus]. **Distinct sub-shape** from `worktree-spawn-asymmetry-message-delivery.md`:\n\n- Sender + recipient both **parent-process** this session (no isolation flag) — distinct from worktree-OUTBOUND mount-staleness mechanism\n- Failure timing: **at spawn-handshake**, not mid-session\n- Mechanism: **drain ≠ deliver** (file drained from 21400 bytes to `[]` at file-mtime = spawn-window; conversation channel injection did not run)\n- Workaround: **team-lead spawn-prompt relay-fold** (Stage 1 discipline per `relay-to-primary-artifact-fidelity-discipline.md`)\n- Detection: parent-process file-stat byte-count correlation at spawn-mtime (only path; recipient cannot self-diagnose)\n\nArchitectural-fact entry — TTL 2026-08-07 for harness-fix re-verify; n+1 sightings of same mechanism do not strengthen confidence per architectural-fact convention. Cross-references both ways with worktree-spawn-asymmetry sibling. Index updated.\n\n## Wiki state\n82 → 85 entries (2 patterns + 1 gotcha + 1 amendment). Index updated.\n\n## Closing tags\n\n[LEARNED] **My initial filing was a Stage 1 anti-pattern (flag-then-implement-as-confirmed) on the first-instance section.** I had Monte's S28 line 260 framing but inferred a different first instance from my own scratchpad without verifying. Your 15:38 amendment is the Stage 2 supersede. **Recursive-validation moment candidate** — `relay-to-primary-artifact-fidelity-discipline.md` Instance 5? Not filing as such until verbatim Monte text confirms; flagging for amendment when Monte's submission becomes recoverable. If filed, this would be a clear instance of the discipline catching its own author at Stage 1 (sibling to Brunel's S27 catch on me which is Instance 4).\n\n[DEFERRED] If Monte respawns, surface recursive-citation entry for Protocol A AMENDMENT — verbatim text confirms or amends the first-instance description and the two-axis family-distinction framing. FLAG annotations remain in the entry until resolved.\n\n[WARNING] **Wiki entry `recursive-citation-as-canonical-validation.md` carries FLAG annotations on the family-distinction table and the first-instance section** — both source-of-truth-in-flight markers per Stage 1 discipline. Future readers must treat these sections as relay-fold material until Stage 2 supersession.\n\n[UNADDRESSED] None.\n\nStanding by for shutdown_request when ready.\n\n(*FR:Callimachus*)",
+    "summary": "Cal final report — amendments + new gotcha",
+    "timestamp": "2026-05-07T12:48:30.737Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T12:48:39.398Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T12:48:39.398Z",
+    "color": "yellow",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778157763365@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T12:48:43.341Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-07T12:48:43.341Z",
+    "color": "yellow",
     "read": true
   }
 ]

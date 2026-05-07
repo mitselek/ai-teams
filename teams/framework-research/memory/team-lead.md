@@ -1,5 +1,73 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 29 WRAP — 2026-05-07 (sequential queue-flush: Brunel + Monte + Cal; T06 stale-prose closed; new substrate sub-shape filed)
+
+**Goal (PO-set):** "Just keep them busy" — sequential wake/work/shutdown for Brunel, Monte, Cal. No new feature direction; pure queue-flush.
+
+**Outcome:** All three queues flushed end-to-end. Wiki 82 → 85. T06 stale-prose closed. New substrate failure mode surfaced and filed.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Path |
+|---|---|---|---|
+| T06 stale-prose fix (lines 1135 + 1182 "Phase 2.0a" → new anchors) | +2/-2 | Brunel | `topics/06-lifecycle.md` |
+| Wiki accuracy review on `worktree-spawn-asymmetry-message-delivery.md` | confirmed accurate, no amendments | Brunel | `wiki/patterns/` |
+| Wiki entry `single-channel-saturation-via-mode-partition.md` (B.1) | NEW (82→83) | Cal (Monte-source) | `wiki/patterns/` |
+| Wiki entry `recursive-citation-as-canonical-validation.md` (B.2) | NEW (83→84, joint-source monte+callimachus) | Cal (Monte-source + Cal co-framing) | `wiki/patterns/` |
+| Wiki entry `inbox-drained-on-spawn-clear-without-deliver.md` (substrate gotcha) | NEW (84→85) | Cal (team-lead+callimachus joint-source) | `wiki/gotchas/` |
+| Cross-ref amendment on `worktree-spawn-asymmetry-message-delivery.md` (sibling sub-shape link) | +1 | Cal | `wiki/patterns/` |
+| T04 §Row 2 awareness check | ACK-as-written, no refinement needed | Monte | `topics/04-hierarchy-governance.md` |
+| Brunel scratchpad pruned 134 → 120 | -14 lines net (compressed S26 + S27 blocks) | Brunel | `memory/brunel.md` |
+| Cal scratchpad pruned 130 → 46 | -84 lines net (consolidated S26-28 detail) | Cal | `memory/callimachus.md` |
+| Monte scratchpad +18 lines (S29 block added) | +18 | Monte | `memory/montesquieu.md` |
+
+### Substrate event — new sub-shape characterized
+
+[DECISION — session 29] **New gotcha `inbox-drained-on-spawn-clear-without-deliver.md` filed n=1 architectural-fact** with TTL 2026-08-07 for harness-fix re-verify. Distinct sub-shape from `worktree-spawn-asymmetry-message-delivery.md`:
+
+- **Sender + recipient both parent-process** (no isolation flag) — distinct from worktree-OUTBOUND mount-staleness mechanism
+- **Failure timing: at spawn-handshake** (not mid-session)
+- **Mechanism: drain ≠ deliver** — Cal's inbox file went 21400 bytes → 2 bytes (`[]`) at file-mtime = spawn-window; conversation channel injection did not run
+- **Workaround: team-lead spawn-prompt relay-fold** (Stage 1 discipline per `relay-to-primary-artifact-fidelity-discipline.md`)
+- **Detection asymmetry:** parent-process-side file-stat byte-count correlation at spawn-mtime is the ONLY detection path; recipient cannot self-diagnose
+
+**Empirical sequence:** Monte dispatched both Protocol A submissions to Cal direct, harness reported `success: true` (12:30 UTC), inbox file confirmed at 21400 bytes from team-lead view. Cal spawned ~3hr later (15:34 UTC); her own view showed `callimachus.json = []`; my parallel view confirmed file dropped to 2 bytes at file-mtime = spawn-window. Cal recovered via Stage 1 relay-fold from spawn prompt + Monte's S29 scratchpad, then Stage 2 amended after my 15:38 primary-artifact-grade evidence-chain relay.
+
+[DECISION — session 29] **Joint-source-at-filing-time for B.2 `recursive-citation-as-canonical-validation`** (monte + callimachus) — Cal's S27 11:36 framing fold (sibling-to-first-use, NOT instance-of-two-consumer) was load-bearing on categorization, not append-after-the-fact. Both halves required at filing → joint source-agents. Cal's [LEARNED] from S29.
+
+[DECISION — session 29] **Stage 1 anti-pattern self-caught and Stage 2 superseded, in-session.** Cal's initial filing of B.2 cited her own curator-ACK Stage 2 self-correction (which is `relay-to-primary-artifact-fidelity-discipline.md` Instance 4 — a *separate* recursive moment) as the first-instance evidence. After my 15:38 primary-artifact-grade relay landed, she Stage 2 amended to the correct first-instance: Monte 10:50 Protocol B query → Monte 11:06 T04 §Recipient-and-authority-chain → Cal 11:18 response citing Monte's prose. **Recursive-validation moment candidate** for `relay-to-primary-artifact-fidelity-discipline.md` Instance 5 (sibling to Brunel's Instance 4 catch on Cal in S27); deferred until verbatim Monte text becomes available for unambiguous confirmation.
+
+### LEARNED — session 29
+
+- **Substrate failures compose in-session into productive wiki output.** A brand-new substrate failure (drain-on-spawn-clear-without-deliver) was characterized end-to-end, recovered around via Stage 1 relay-fold, and filed as a sibling gotcha within the same session it was discovered — without losing the queued submission content. Discipline-catches-discipline at substrate scale.
+- **Spawn prompt as primary-artifact-grade relay channel.** When recipient inbox drain-without-deliver fails, the team-lead's spawn prompt is the only fully-controlled path to put structural framing into a fresh agent's context. Per `relay-to-primary-artifact-fidelity-discipline.md`, the spawn prompt counts as a relay (provenance-by-artifact-class), not as a primary artifact. Receiver applies Stage 1 fold; team-lead supersedes with Stage 2 mid-session if better evidence arrives.
+- **Three-agent sequential queue-flush is feasible inside a single session window.** Total wall-clock ~25min from Brunel spawn to Cal terminate. Each agent's queue was small (1-2 items); sequential vs parallel is correct when items are agent-specific and don't compose. If queues had been parallel-friendly (no shared output target), parallel spawn with worktree-isolation would have been preferred — but worktree-OUTBOUND substrate cost would have applied.
+
+### NEXT-SESSION BOOT (re-orient instructions for S30)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **If PO surfaces Monte-respawn for Protocol A AMENDMENT on `recursive-citation-as-canonical-validation.md`:** spawn Monte. Cal flagged FLAG annotations on the family-distinction table + first-instance section pending verbatim text confirmation. If Monte's verbatim Protocol A text becomes recoverable (or he can re-state it), Stage 2 amendment closes the FLAGs and the entry promotes to `relay-to-primary-artifact-fidelity-discipline.md` Instance 5 candidate.
+5. **If PO surfaces n=2 watch on `inbox-drained-on-spawn-clear-without-deliver.md`** (any new instance of harness-success-on-dispatch + recipient-side on-disk-absence at spawn-handshake): spawn Cal for amendment + cross-link to existing entry. Architectural-fact convention applies — n+1 sightings only update if substrate changes; same-mechanism re-encounters update `discovered` list, not confidence.
+6. **If PO surfaces apex-research n=2 invocation** (first deployment of #1 v0.7 federation-bootstrap-template beyond FR): spawn Brunel for template execution + Cal for namespace allocation + likely Monte for drift-detector deployment. Convention re-test point per S27 close.
+7. **If PO surfaces Volta-related work** (continued T06 amendments, lifecycle-script extension, harness substrate fixes): spawn Volta. Pending from his S28 NEXT-SESSION-CHOREs trio: all three cleared, but n=2 watch on `cross-document-prose-procedure-drift.md` may activate per his amendment-path note.
+8. **First operational item if Cal-spawning:** her queue at S29 close is clean (85 entries, 1 active FLAG annotation on `recursive-citation-as-canonical-validation.md`, no disputes, no TTL expiries imminent). Surface-grade work would be receiving any new Protocol A submissions or wiki health summary.
+
+### Standing watch items going into S30
+
+- **Monte-verbatim recovery for Cal's FLAG resolution** — if Monte respawns for any reason, surface FLAG-resolution as a piggyback task
+- **TPS-583 (apex-research)** — when PO signals Ruth has progressed (subteam identified, page moved to V2, or both), action Stage-2 standard moves
+- **apex-research n=2 invocation** — first deployment of #1 v0.7 federation-bootstrap-template beyond FR; convention re-test point
+- **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event
+- **esl-suvekool feedback loop** — when PO returns from Tobi sessions
+- **`repo-as-durable-store-teamdelete-as-release-primitive.md` n=2 watch** (Volta-filed S28) — second team-lifecycle protocol on different platform = cross-platform generalization confirmation point
+- **`cross-document-prose-procedure-drift.md` n=2 watch** — second incident triggers Volta's Protocol C consideration per his S28 amendment-path note
+
+(*FR:Aen*)
+
+---
+
 ## SESSION 28 WRAP — 2026-05-07 (Volta NEXT-SESSION-CHOREs cleared; 4 Protocol C promotions ratified; team-lead-override pattern established for non-owned topic edits)
 
 **Goal (PO-set 15:32 on 2026-05-06):** T06 path-tree rewrite (Volta NEXT-SESSION-CHORE #1). Mid-session expanded to all three Volta chores + 4 Protocol C promotions Cal carried from S27.

@@ -265,6 +265,24 @@ Both new sub-sections mirror existing Cross-Team Audit Authority structure (audi
 
 [LEARNED 11:38 — `string | null` vs `?: string` IN STRICT-DISCRIMINATED-UNIONS] Per Aen 13:15 catch on Brunel's v0.6 correction: Herald spec `supersedes: string | null` (nullable, NOT optional). My 12:21 paraphrase rendered as `?: string` (optional). NOT equivalent at strict-discriminated-union level: explicit `null` at chain-head is a *signal* ("first registration, no prior"); `?:` allows absence which loses the signal. Brunel caught via "primary artifact > relay-quote" production rule. **The difference matters at typed-contract level even when both "work" at runtime** — the discriminated union is the type, and the signal-vs-absence distinction is part of the type's expressive power. Cite for any future cite-and-fold pass on typed contracts where I'm relaying-relayed material.
 
+## Session 29 — 2026-05-07 (queue-flush session)
+
+[CHECKPOINT 15:30] Two-task session complete in <10min wall-clock.
+
+[TASK-A 15:30] T04 Row 2 cross-reference (line 146) + new §Row 2 vs. session-boundary `TeamDelete` sub-section (line 204) — Volta-authored, Aen-applied via team-lead-override pattern. ACK-as-written, no refinement. Three structural reads: (1) clean L0/L2 authority distinction (dissolution=PO governance decision; session-boundary `TeamDelete`=team-lead operational authority within already-existing T06 mandate), (2) explicit persistent-vs-ephemeral substrate distinction ("team's existence as a repo entity… unaffected"), (3) minimal cross-references (T06 Phase 5 + Phase 2 cited without duplicating lifecycle content per pointers-not-copies discipline).
+
+[TASK-B 15:29-15:30] Both Cal-bound Protocol A submissions dispatched direct (parent-process session, no Sub-shape B mount-asymmetry exposure). Both `success: true`.
+- B.1 `single-channel-saturation-via-mode-partition` — pattern statement + three-question decomposition test + named failure mode (aggregate-saturation-forecasting across separable modes) + cross-cutting reach to T03/T07. Framed as converse of `substrate-shape-vs-authority-shape-orthogonality.md`.
+- B.2 `recursive-citation-as-canonical-validation` — sibling to `first-use-recursive-validation.md`; three-row family-distinction table; joint-source candidate (monte + callimachus) per Cal's 11:36 framing being load-bearing.
+
+[LEARNED 15:30] **Queued items survive cleanly across multi-session gaps when scratchpad-tracked with explicit dispatch-policy notes.** S27 close (lines 273-275) named both Protocol A queue items + dispatch-policy-for-S28 (direct first; relay-fallback per Aen 13:30). S28 didn't spawn me; S29 (today) flushed both items immediately on spawn-with-task-context. The dispatch-policy note made the parent-process-vs-worktree distinction load-bearing at execution time — knew without re-deriving that direct was safe.
+
+[DEFERRED] None — both queued items completed. Compound-signals v1.1 fold + Brunel async items remain in S27 [OPEN-v1.1] pending Brunel's cadence; not active for me this session.
+
+[OBSERVATION] Cal next in sequence — both my submissions sit in her inbox along with whatever else is queued. The substrate-invariant-mismatch n=6 finding (S27 11:04) was specifically about worktree-OUTBOUND-to-non-worktree-recipient failure; this session is parent-process-OUTBOUND-to-non-spawned-Cal — different sub-shape, no failure mode predicted. Will surface to Aen if either submission turns out not to land in her actual iteration.
+
+(*FR:Montesquieu*)
+
 ## SHUTDOWN — 2026-05-06 11:43 (Aen 14:18 PO closure)
 
 [CLOSURE] Phase B v1.0-final cluster mutually closed end-to-end. Aen ratified all amendments: design v1 §1-§5/§7-§8 + §6 NO-SHIFT final; Topic 04 v1.0/v1.10/v1.11/v1.1 (Cal-resolution)/v1.1 (Cross-Team Audit Authority closure)/v1.2 (Brunel-v0.6 cite-and-fold). Cal Protocol B resolved (write-authority-only, L1 → team-lead recipient). Substrate-invariant-mismatch wiki amended n=5 → n=6 with joint Monte+Cal source-agents. Brunel v0.6 envelope-shape verified; D5-Δ (Herald 04 §3.1 `PathSovereigntyAccessor`) + D7-Δ (same-substrate baselines) folded; canonical-target answered (b) T04 with max-specificity citation table sent.

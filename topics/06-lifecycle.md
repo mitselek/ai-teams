@@ -1132,7 +1132,7 @@ Named volumes survive `docker stop`/`docker start`. The container is ephemeral; 
 
 **Container user:** `ai-teams` (UID 1000, GID 1000). Ubuntu 24.04's default UID 1000 (`ubuntu`) is renamed via `groupmod -n` + `usermod -l` in the Dockerfile.
 
-**`$HOME` inside container:** always `/home/ai-teams`. Volta's lifecycle scripts use `$HOME/.claude/teams/<team-name>` for the runtime team dir — this resolves correctly inside the container. No `$HOME` validation failures; the Windows/Git Bash `$HOME` bug documented in Phase 2.0a does not apply in the container environment.
+**`$HOME` inside container:** always `/home/ai-teams`. Volta's lifecycle scripts use `$HOME/.claude/teams/<team-name>` for the runtime team dir — this resolves correctly inside the container. No `$HOME` validation failures; the Windows/Git Bash `$HOME` bug documented in `$HOME` reliability and runtime-path notes (above) does not apply in the container environment.
 
 **Workspace init:** `entrypoint.sh` clones the repo on first start (`/home/ai-teams/workspace/` is empty on a fresh volume); subsequent starts do `git pull`. Race condition possible if both teams start simultaneously on a fresh volume — acceptable for current sequential-start usage.
 
@@ -1179,7 +1179,7 @@ The container is transparent to Volta's protocol. From the lifecycle protocol's 
 
 - **Phase 0 (Orient):** reads files from `/home/ai-teams/workspace/` — the cloned repo. Same paths as non-container usage.
 - **Phase 1 (Sync):** `git pull` inside container. GITHUB_TOKEN is available as env var for HTTPS auth.
-- **Phase 2.0a ($HOME validation):** `$HOME` is always `/home/ai-teams` — validation passes immediately. The Windows/Git Bash fallback path is never triggered.
+- **`$HOME` validation in lifecycle scripts:** `$HOME` is always `/home/ai-teams` — validation passes immediately. The Windows/Git Bash fallback path (documented in `$HOME` reliability and runtime-path notes) is never triggered.
 - **Phase 3 (Create):** `TeamCreate` writes to `/home/ai-teams/.claude/teams/<team-name>/` — on the team's named volume. Survives container restarts.
 - **Phase 4 (Restore inboxes):** reads from repo dir (`/home/ai-teams/workspace/teams/<team-name>/inboxes/`). Same path resolution as non-container.
 - **Shutdown Phase 4a (Persist inboxes):** writes to repo dir, then `git push`. GITHUB_TOKEN covers auth.

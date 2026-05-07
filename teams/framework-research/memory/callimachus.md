@@ -1,95 +1,48 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 28 — 2026-05-06 (PO-directed pull-now on Volta scratchpad notes; Protocol C batch 1 of 2 dispatched)
+## Session 29 — 2026-05-07 (queue-flush: Monte's two Protocol A submissions filed; Brunel review closed)
 
-[CHECKPOINT 2026-05-06 15:55]: **Wiki 80 → 82.** Two new entries from Volta's S28 `[CAL-CANDIDATE]` scratchpad notes, filed via PO-directed pull-now (override of my option-(b) defer recommendation):
-- `patterns/repo-as-durable-store-teamdelete-as-release-primitive.md` — combined-invariant fix-shape (Phase 4a + S5); confidence medium-high (combined-invariant n=1 / mitigation-pair n=3); cross-platform generalization framing flagged for Volta amendment
-- `gotchas/cross-document-prose-procedure-drift.md` — architectural-fact entry with Revision-trigger section; gate-1 missing-middle (cross-document within-team) between within-document-rename-grep and pass1-pass2-rename-separation; n=1 (FR S28 7-day drift window)
+[CHECKPOINT 2026-05-07 15:35]: **Wiki 82 → 85.** Two entries from Monte's S29 submissions + one new gotcha for the substrate event (Aen-confirmed at 15:38):
+- `patterns/single-channel-saturation-via-mode-partition.md` — Monte sole-source, n=1 watch. Three-question decomposition test. Converse-of cross-link to `substrate-shape-vs-authority-shape-orthogonality.md`. Cross-cutting reach T03/T07.
+- `patterns/recursive-citation-as-canonical-validation.md` — Joint source-agents [monte, callimachus]. Sibling to `first-use-recursive-validation.md`; explicitly NOT a `two-consumer-pattern` instance. Promotion-grade-at-n=1 by joint-cross-specialist criterion.
+- `gotchas/inbox-drained-on-spawn-clear-without-deliver.md` — sources [team-lead, callimachus]. Distinct sub-shape: spawn-handshake drain-without-deliver (drain ≠ deliver). Architectural-fact, TTL 2026-08-07. Workaround: team-lead spawn-prompt relay-fold per Stage 1 discipline. Cross-references both ways with worktree-spawn-asymmetry sibling.
 
-[CHECKPOINT 2026-05-06 15:55]: **Protocol C batch 1 dispatched** to team-lead. Two proposals: #1 substrate-invariant-mismatch n=6 → Structural Change Discipline gate 4 sub-bullet; #2 worktree-isolation-for-parallel-agents n=7 → Agent Spawning Rule extension. Proposed text verbatim provided per protocol.
+[AMENDMENT 2026-05-07 15:38]: **`recursive-citation-as-canonical-validation.md` amended** post-filing per Aen's relayed primary-artifact-grade evidence chain:
+- Family-distinction table changed from one-axis (validation-surface) to two-axis (mechanism + what-is-validated). Mechanism: application vs citation; what-is-validated: rule effectiveness vs canon indexability.
+- First instance section rewritten — initial filing wrongly cited Cal's curator-ACK Stage 2 self-correction (which is `relay-to-primary-artifact-fidelity-discipline.md` Instance 4, *separate* recursive moment). Correct first instance per Aen's relay: Monte 10:50 Protocol B query → Monte 11:06 T04 §Recipient-and-authority-chain citing his own session-26 wiki entries → Cal ~11:18 Protocol B response citing Monte's T04 prose back to Monte. Two-layer recursion both validating canon indexability.
+- Provenance frontmatter note added: filed under Stage 1 relay-fold discipline, verbatim Monte text unrecoverable, FLAG annotations on inferred surfaces.
+- `Related` block updated: relay-fidelity Instance 4 demoted from "first-instance source" to "adjacent (separate recursive moment, same family)."
 
-[CHECKPOINT 2026-05-06 15:59]: **Batch 1 RATIFIED** by Aen. Both #1 + #2 written to common-prompt verbatim per proposed text. Diff +4 -1; commit deferred to session-end with inboxes per Step S4. Volta-notes filing also confirmed on disk. Wiki at 82.
+[CHECKPOINT 2026-05-07 15:35]: **Brunel S29 accuracy review closed.** No amendments to `worktree-spawn-asymmetry-message-delivery.md` per team-lead brief. Brunel confirmed entry accurately represents intermittent mount-staleness framing + team-lead-relay workaround + co-source role. Closes queued review item from S28 NEXT-SESSION BOOT line 33.
 
-[CHECKPOINT 2026-05-06 16:02]: **Protocol C batch 2 dispatched** to team-lead. Two proposals: #3 semver-strict-typed-contract → new "Versioning Discipline" subsection at end of Structural Change Discipline block; #4 relay-to-primary-artifact-fidelity → new "Relay Fidelity Discipline (Receiver-Side)" subsection at end of Dual-Hub Routing section. **Citation-hygiene flag: corrected #3 from claimed-n=2 to actual-n=1** — my S27 [NEXT-SESSION BOOT] memory-note conflated PR #13 (worktree-isolation Instance G) with the SemVer cluster; the wiki entry's Promotion-posture is "n=1 watch posture." PO authorized promotion regardless. Caught by grep-before-Protocol-C discipline; correction surfaced on the way in. **Inverse of S26 [LEARNED] (memory underestimates real usage); here memory overstated — same discipline applies, opposite direction.**
+[ACK 2026-05-07 15:35]: Same-window acknowledgment to Monte not deliverable (terminated this session); sending closure summary to team-lead per relay-fallback discipline. Joint-source on B.2 means ACK names co-credit but Monte was sole observer; my framing contribution is the structural-categorization fold.
 
-[ACK 2026-05-06 15:50]: Same-window acknowledgment to Volta on both filings. Flagged for amendment: cross-platform generalization scope on pattern (point 3), discipline-extension framing on gotcha (point 3 — Protocol C path is Volta's call, not mine).
+[LEARNED S29 — load-bearing only]:
+- **Joint-authorship at filing time when the structural framing is load-bearing on categorization** — Monte observed the recursion; Cal's 11:36 fold (sibling-to-first-use, NOT instance of two-consumer-pattern) determined where the entry lived. Both halves required → joint source-agents at filing.
+- **Cross-reference-to-prevent-mis-filing pattern** — recursive-citation entry's `Related` block names two-consumer-pattern with explicit "NOT a sibling" framing. Anti-link prevents future readers from re-collapsing the distinction. Sibling discipline to `audit-trail-for-rejection-rationale` at the wiki-internal-cross-reference layer.
+- **Family-distinction tables strengthen sibling entries** — two-axis (mechanism + what-is-validated) maps the recursive-validation family more cleanly than one-axis (validation-surface). Two-axis discipline-extension candidate when sibling entries form a family.
+- **Mode-partition test structural at n=1, not n+1** — single-channel-saturation's three-question test fully exposed in first instance; fully-exposed-at-n=1 is architectural-fact-adjacent class for structural-test patterns.
+- **Stage 1 relay-fold caught its own consumer** — first instance section in initial filing was wrong (cited Instance 4 of relay-fidelity, a separate recursive moment); Aen's primary-artifact-grade relay (15:38) corrected to Monte→Cal→Monte citation chain. Stage 1 discipline ("fold ONLY what is verbatim in the relay") would have prevented the wrong-instance choice if I'd been stricter at filing time. **My initial filing was a Stage 1 anti-pattern (flag-then-implement-as-confirmed) on the first-instance section** — I had Monte's S28 line 260 framing but inferred a different first instance from my own scratchpad without verifying. Aen's amendment is the Stage 2 supersede. Recursive-validation moment of `relay-to-primary-artifact-fidelity-discipline.md` Instance 5? — not filing as such until verbatim Monte text confirms; flagging as candidate for n=5 promotion-evidence per S27 [PROTOCOL C PROMOTION CANDIDATES] note.
+- **Drain ≠ deliver as new architectural-fact** — Aen's parent-process disk verification (21400 bytes pre-spawn → 2 bytes at spawn-mtime, conversation channel got nothing) decoupled the file-drain from the conversation-deliver. Distinct from worktree-OUTBOUND mount-staleness mechanism. Workaround codified: team-lead spawn-prompt relay-fold (this session is the operational instance — Aen's spawn prompt to me carried the structural framing of both Monte submissions, which is what enabled filing without verbatim text).
 
-[VOLTA-RESPONSE 2026-05-06 15:56]: Both entries closed clean. **No amendments needed.** All 4 scrutiny flags resolved: (a) cross-platform generalization confirmed sound (Volta self-reports his "Claude-only" original framing was tighter than necessary — Cal-shaping improved scope); (b) missing-middle gate-1 framing concurred ("structural argument represents my position correctly, and improves on it"); (c) Protocol-C-adjacent boundary held — Volta documented 3 trigger conditions for future Protocol C: n=2 second incident, team-lead expressed interest, or tooling-revision-trigger looks unrealistic; (d) 7-day drift window verified. Volta marked both [CAL-CANDIDATE] → [CAL-FILED] in his scratchpad. Default-no-reply per notification-of-fact convention; no return ack sent. **Cal-shaping that improves on submitter framing is sometimes net-positive when scrutiny-flagged for amendment** — submitter-trust contract preserved by the amendment path; the framing improvements survived the consent loop.
+[CHECKPOINT 2026-05-07 15:35 — pre-shutdown scan]: Nothing requires attention. No DISPUTE tags, no TTL expiries, no pending Protocol A/B/C, no URGENT-KNOWLEDGE.
 
-[LEARNED S28 — load-bearing only]:
-- **Pattern-vs-gotcha distinction load-bearing on dedup outcome** — Volta's pattern claim looked like an exact match to existing `teamcreate-in-memory-leadership-survives-clear` gotcha. Read both side-by-side: gotcha records incident-shape; pattern records design-fix-shape. Different abstraction layers, different audiences. Filed as separate pattern with cross-references both ways. Anti-collapse: file separately when claim-class differs (incident vs fix-rule), even when subject overlaps.
-- **Architectural-fact convention applied at file-time** on the gotcha — "T06 prose vs startup.md procedure can drift" is structural-failure-mode, not empirical-observed-behavior. Revision-trigger section names what would invalidate (tooling addition or procedure consolidation). n+1 sightings will not strengthen confidence; the mechanism is fully exposed at n=1.
-- **Sibling-framing across three structural scales** — gate-1 grep family now spans within-document (callimachus+celes), cross-document-within-team (Volta, this session), cross-team (pass1-pass2-rename). Three-row table in the cross-document entry maps the three scopes. Sibling-completeness signal for the family.
-- **PO override is operational** — option-(b) defer was structurally defensible but PO had bandwidth-/visibility-priority reasons. Submitter-trust contract concerns acknowledged but not blocking when PO directs pull-now. Volta amendment path (Protocol A AMENDMENT) preserves submitter authorship retroactively.
-
-[CHECKPOINT 2026-05-06 16:03]: **Batch 2 RATIFIED** by Aen. #3 + #4 written to common-prompt verbatim — #3 as `###` subsection at end of Structural Change Discipline; #4 as `####` subsection inside Dual-Hub Routing. Cumulative session common-prompt diff: +25 -1, all 4 Protocol C promotions landed. Citation-hygiene catch acknowledged + framed as "discipline-catches-its-own-author" (recursive validation, parallel to relay-fidelity Instance 4). Aen explicitly closed: not asking for Protocol A on the curatorial-process observation.
-
-[CHECKPOINT 2026-05-06 16:05 — pre-shutdown scan]: Nothing requires attention. No DISPUTE tags, no TTL expiries, no pending Protocol A/B, no URGENT-KNOWLEDGE.
-
-[CHECKPOINT — final shutdown 2026-05-07 11:55]: **Wiki 80 → 82, +25 -1 common-prompt, 4 Protocol C promotions, 2 Volta filings clean.** Session 28 closes complete.
-
-[NEXT-SESSION BOOT — S29]:
-- Re-orient via `wiki/index.md` (82 entries).
-- Brunel accuracy review on `worktree-spawn-asymmetry-message-delivery.md` queued at his cadence — non-urgent.
-- Monte's two pending submissions queued at his cadence — `single-channel-saturation-via-mode-partition` + `recursive-citation-as-canonical-validation`. Non-urgent.
-- Watch for n=2 on `repo-as-durable-store-teamdelete-as-release-primitive.md` (Volta-filed S28) — second team-lifecycle protocol on different platform = cross-platform generalization confirmation point.
-- Watch for n=2 on `cross-document-prose-procedure-drift.md` — second incident triggers Volta's Protocol C consideration per his S28 amendment-path note.
-- TTL scan: earliest expiry remains `model-inventory-baseline.md` 2026-07-10 — flag if not addressed by then.
+[NEXT-SESSION BOOT — S30]:
+- Re-orient via `wiki/index.md` (85 entries).
+- **Recursive-citation entry has FLAG annotations** — verbatim Monte text unrecoverable per `inbox-drained-on-spawn-clear-without-deliver.md`. If Monte respawns, surface the entry for amendment-via-Protocol-A AMENDMENT to confirm/correct first-instance description and family-distinction framing.
+- Watch for n=2 on `single-channel-saturation-via-mode-partition.md` — T03 mesh-topology OR T07 tier-0/tier-2 alert partition.
+- Watch for n=2 on `recursive-citation-as-canonical-validation.md` — any author-as-canon-consumer moment; promotion candidate at n=2 with two-axis family-distinction holding.
+- Watch for n=2 on `inbox-drained-on-spawn-clear-without-deliver.md` — second sighting (different team or different topology) confirms harness-wide mechanism; promotion to common-prompt candidate.
+- Watch for n=2 on `repo-as-durable-store-teamdelete-as-release-primitive.md` (S28 Volta) — cross-platform team-lifecycle confirmation.
+- Watch for n=2 on `cross-document-prose-procedure-drift.md` — second incident triggers Volta's Protocol C consideration.
+- TTL scan: earliest expiry `model-inventory-baseline.md` 2026-07-10; new TTL `inbox-drained-on-spawn-clear-without-deliver.md` 2026-08-07 (harness-fix re-verify).
 - Cal stands by for new Protocol B queries.
 
-## Session 27 — 2026-05-06 (Phase B v1.0-final cluster CLOSED; wiki 69 → 80; 11 new entries + 5 amendments + 2 folds; recursive-validation moment)
+## Sessions 26-28 (heavily pruned — load-bearing items only; see git history + wiki index for entries)
 
-[CHECKPOINT — final]: **Wiki 69 → 80 (+11 new, +5 substantive amendments, +2 folds into existing entry). Phase B v1.0-final cluster fully shipped end-to-end.** Filing-to-citation latency average ~25min sustained; Phase A discipline target hit at peak.
-
-11 new wiki entries (S27): protocol-completeness-across-surfaces, lossless-independent-convergence, canonical-taxonomy-check-before-naming, timestamp-crossed-messages, semver-strict-typed-contract-discipline, substrate-shape-vs-authority-shape-orthogonality, field-level-overlap-one-truth-not-mirror, audit-trail-for-rejection-rationale, surfacing-cost-asymmetry-stale-context, snapshot-state-mis-names-path-to-end-state, api-gateway-error-vs-actual-server-state, worktree-spawn-asymmetry-message-delivery, relay-to-primary-artifact-fidelity-discipline (originally fold-only-what-is-verbatim, renamed + extended to two-stage), discriminator-field-name-consistency-over-uniqueness. (14 new files; some renamed/scope-extended → 11 distinct entries net.)
-
-5 substantive amendments: substrate-invariant-mismatch n=5→n=6 (Instance 6 with two sub-shapes + Monte enrichments + Brunel dual-witness on Sub-shape B + same-root-cause-different-layer relationship to Instance 1); worktree-isolation-for-parallel-agents n=2→n=7 (Phase A.3 cluster + dirty-main-worktree-bypass sub-shape + Phase B multi-specialist); prompt-to-artifact-cross-verification (runtime-variants extension n=2 cumulative); worktree-spawn-asymmetry-message-delivery (hypothesis-relaxation worktree-OUTBOUND → non-parent-process; INTERMITTENT framing with Cal→Brunel n=3 = 2 SUCCESS + 1 BROKEN; transient mount-state diagnosis); relay-to-primary-artifact-fidelity-discipline (rename + Stage 2 anti-pattern stale-relay-fold-survives-after-artifact-arrives + Instance 4 recursive-validation moment).
-
-2 folds into existing entry (mega-biblion economy per Aen 11:26): #32 cross-specialist-argument-as-trigger + #3 pre-commit-to-extension irony → sub-shape A + B in coordination-loop-self-correction.md.
-
-4 substantial Protocol B responses (Monte 10:50 curator-authority-shape-for-drift-recipient; Brunel 11:05 federation-bootstrap-template v0.5 cross-read; Aen 11:50 Tier-0-substrate-questions; Brunel 11:21 re-send pointer). Each citing 8+ wiki entries.
-
-4 Protocol A acknowledgments (Monte n=6 substrate-mismatch + Brunel consolidated relay-discipline + Brunel ACK-of-ACK with Stage 2 self-correction + Herald two-instance amendment).
-
-[LEARNED session 27 — load-bearing only]:
-- **Promotion-grade-at-n=1 by joint-cross-specialist criterion** (Herald's standard, applied to #11). Joint observation from two perspectives at first surfacing > n=1 single-perspective.
-- **Schema-purity holds across cumulative-n** — source-agents lists actual submitting agents; cumulative count cited in prose. Aen 16:43 discipline applied successfully.
-- **Mega-biblion fold beats sibling explosion** — folding sub-shapes under unified mechanism preserves structural coherence. Divergence rule: trigger-only divergence stays as named variant; mechanism divergence justifies separation.
-- **Merge-test for sender/receiver perspectives** — Aen test ("if principle is shared and only divergence is which side experienced cost, merge with two-side framing") preserves transactional view.
-- **Within-document-rename-grep discipline** held across fold + merge + rename ops. Cross-references stayed valid via entry-level link discipline.
-- **Cluster patterns formed organically** — typed-contract / coordination-discipline / version-control / federation-design clusters. Cluster citations dominate Phase B Protocol B responses (8+ entries each).
-- **Recursive validation as discipline-strength** — Instance 4 of relay-to-primary-artifact-fidelity-discipline IS my own ACK-vs-wiki divergence caught by Brunel. Discipline catches its own author. Same family as `first-use-recursive-validation.md`.
-- **Substrate failure-mode reframing** — "worktree-OUTBOUND specifically broken" (n=2) → "non-parent-process unreliable" (n=4+) → "INTERMITTENT with timing/mount-staleness mechanism" (n=4+ with Cal→Brunel 2-SUCCESS-1-BROKEN). Conservative framing scales with evidence.
-- **Source-files cite local paths** (`~/Documents/github/.mmp/prism/designs/`) for in-flight design docs; GitHub URL only when cross-team readability needed.
-
-[PROTOCOL C PROMOTION CANDIDATES — surface to Aen at next session prune]:
-1. `substrate-invariant-mismatch.md` n=6 with same-root-cause-different-layer connection to `dual-team-dir-ambiguity.md` (Instance 1 ↔ Instance 6 shared root cause: path-as-substrate-invariant; different layers).
-2. `worktree-isolation-for-parallel-agents.md` n=7 with 5 work types + 4 specialists + dirty-main-worktree-bypass sub-shape.
-3. `semver-strict-typed-contract-discipline.md` n=2 with PR #11 + PR #13 instances both v→v2.0.0 SemVer-major.
-4. `relay-to-primary-artifact-fidelity-discipline.md` n=4 with recursive-validation strength (Instance 4) — promotion candidate at n=5 across 5 lifecycle-application contexts.
-
-[GOTCHA — substrate observation]: **Inbox file unchanged from S26 close at session-end** (312 lines, last entry shutdown_request). All S27 inbound traffic routed via team-lead conversation-channel relay per `worktree-spawn-asymmetry-message-delivery.md` workaround. Substrate failure was operationally durable across the entire session; the wiki-as-active-citation discipline survived via the relay path. Phase B with worktree-spawned specialists is feasible only with team-lead relay path codified.
-
-[DEFERRED to S28]:
-- Topic-09 source-team example refresh (5-min micro-fix; surfaced to Aen 11:58, awaiting topic-owner or Volta action per Aen 12:12 [DECISION]).
-- Brunel's accuracy review of `worktree-spawn-asymmetry-message-delivery.md` (queued at his cadence; non-urgent).
-- Monte's two pending submissions: single-channel-saturation-via-mode-partition + recursive-citation-as-canonical-validation (his cadence; queued in his scratchpad).
-- Worktree-isolation amendment to n=8+ if Phase B continues to produce instances.
-- Substrate-failure resolution by Anthropic (out-of-scope for this team; archive worktree-spawn-asymmetry entry when fix lands).
-
-[NEXT-SESSION BOOT]:
-- Re-orient via `wiki/index.md` (80 entries).
-- Surface 4 Protocol C candidates to Aen.
-- Watch for Brunel accuracy review on worktree-asymmetry entry; fold corrections on receipt.
-- Watch for Monte's two pending submissions; file as standalone entries (recursive-citation as sibling to first-use-recursive-validation per agreed structural framing).
-- Phase B continuation depends on PO direction; Cal stands by for new Protocol B queries.
-
-## Session 26 — 2026-05-05 (heavily pruned — load-bearing items only)
-
-[CHECKPOINT] Wiki 59 → 69. Six Protocol A from Aen's brief + 3 Protocol Cs (#1 source-team schema; #2 architectural-fact convention; #3 source-agents plurality reconciliation). Three Phase A.1 Protocol As filed in-session (no-future-proofing, dispatch-granularity, coordination-loop-self-correction, worktree-isolation-for-parallel-agents).
-[LEARNED-CLUSTER — load-bearing]: Memory-claimed n underestimates real usage (always grep before Protocol C); n-axis specification when deferring (instance count vs dimension cardinality); gates compound across drafts (recursive validation); consumer-orientation both halves (grep cross-team consumers first; cost-asymmetry as operational wedge); filing-to-citation latency <30min target; curation produces structural improvement (submitter brings pattern + evidence, curator brings framing + cross-pollination).
-[CONTRACTS — still active]: Monte Surface 1 design commitment (federation-curators-as-class per-namespace; revisit if co-ownership introduced for any namespace).
-[WATCH-CANDIDATES carried to S28+]: field-rename-when-pattern-docs-depend-on-old-name; dispatch-enum-stability sub-claim (carved-out in dispatch-granularity); `source-events:` frontmatter gap (n=3 on gap); source-team semantic extension to observation-of-deployment (n=2 trigger); placeholder + amendment-channel pattern (Brunel endorsed generalizable, n=1).
+[S26]: Wiki 59 → 69. Six Protocol A from Aen + 3 Protocol Cs (source-team schema; architectural-fact convention; source-agents plurality). Memory-claimed n underestimates real usage (grep before Protocol C); filing-to-citation latency <30min target; curation produces structural improvement (submitter brings pattern + evidence, curator brings framing + cross-pollination).
+[S27]: Wiki 69 → 80. Phase B v1.0-final cluster CLOSED. Recursive-validation moment Instance 4 (relay-fidelity caught its own author). Schema-purity (source-agents lists actual submitters; cumulative-n in prose). Mega-biblion fold beats sibling explosion. Substrate failure-mode reframing (worktree-OUTBOUND → non-parent-process → INTERMITTENT with mount-staleness). Conservative framing scales with evidence.
+[S28]: Wiki 80 → 82. Volta scratchpad pull-now (`repo-as-durable-store-teamdelete-as-release-primitive` + `cross-document-prose-procedure-drift`); 4 Protocol C promotions ratified (substrate-invariant-mismatch n=6, worktree-isolation n=7, semver-strict, relay-to-primary-artifact-fidelity). Pattern-vs-gotcha distinction load-bearing on dedup outcome. Architectural-fact convention applied at file-time. Citation-hygiene catch ("memory overstated"; inverse of S26 underestimate — same discipline, opposite direction).
 
 ## Sessions 14-25 (heavily pruned — load-bearing items only; git history has details)
 
