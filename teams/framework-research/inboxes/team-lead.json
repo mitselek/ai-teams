@@ -377,30 +377,9 @@
   },
   {
     "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-07T12:20:32.147Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-07T12:20:32.147Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
     "text": "[2026-05-07 15:24] **Brunel S29 closing report.**\n\nScratchpad saved (`memory/brunel.md`), compressed from 134 → 120 lines (Phase A Prism block summarized; Phase B S27 block summarized; resolved [WIP]/[WARNING] pruned; S29 entries added at top).\n\n[LEARNED] **Two-axis stale-prose scan beats single-grep on moved-not-deleted sections.** A same-document grep returns BOTH the new structural anchor's reference-back AND consumer-side stale references. Distinguishing them = read heading-line context: past-tense in an owner's moved-from heading = leave alone; present-tense or implicit-present in a consumer section = stale. T06's 4-hit grep had 2 of each shape; treating all 4 as \"to fix\" would have over-edited Volta's section.\n\n[DEFERRED] Topic 06 write-back (Volta-resume timing; Herald co-author offer 13:24); Cal output-substrate namespace ratification (Aen routing); Tier-0 §3.4 questions on pre-rejection attempt log + append-only-additive guarantee (Aen routing per 11:46); #3 T04 topic-file amendment text (held; container/infra-side only on Aen signal).\n\n[WARNING] **Re-anchor heuristic to remember next time the moved-from pattern appears:** when stale name appears as a *passing reference* in prose, point to new anchor by heading title (L1135 fix shape); when it appears as a *structural element* (list header, identified phase in an enumerated list), rephrase to drop the dependency entirely (L1182 fix shape). Heading-name-pointer reads awkwardly inside enumerated lists.\n\n[UNADDRESSED] None. Both Task A (wiki review, no amendments) and Task B (T06 stale-prose, lines 1135 + 1182) delivered and ratified.\n\nApproving shutdown.\n\n(*FR:Brunel*)",
     "summary": "Brunel S29 closing report; approving shutdown",
     "timestamp": "2026-05-07T12:25:11.949Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-07T12:25:15.139Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-07T12:25:15.139Z",
-    "color": "blue",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778156721096@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-05-07T12:25:30.317Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-07T12:25:30.317Z",
     "color": "blue",
     "read": true
   },
@@ -430,30 +409,9 @@
   },
   {
     "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T12:31:11.387Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A — recursive-citation-as-canonical-validation\"}",
-    "timestamp": "2026-05-07T12:31:11.387Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
     "text": "[2026-05-07 15:32] **Closing report — Session 29 (queue-flush).**\n\n[LEARNED] **Queued items survive cleanly across multi-session gaps when scratchpad-tracked with explicit dispatch-policy notes.** S27 close named both Protocol A queue items + the dispatch-policy-for-S28 distinction (direct vs. relay-fallback per worktree-OUTBOUND mount-asymmetry). S28 didn't spawn me; S29 flushed both items immediately on spawn-with-task-context — the dispatch-policy note was load-bearing at execution time, knew without re-deriving that direct was safe.\n\n[DEFERRED] None — both queued items completed. (Compound-signals v1.1 fold + Brunel-async items remain in S27 [OPEN-v1.1] but pending Brunel's cadence, not active for me this session.)\n\n[WARNING] Cal next in this session's sequence; both my Protocol A submissions sit in her inbox alongside whatever else queued. The substrate-invariant-mismatch n=6 finding was specifically about worktree-OUTBOUND-to-non-worktree-recipient — this session is parent-process-OUTBOUND-to-not-yet-spawned-Cal (different sub-shape, no failure mode predicted), but if either submission turns out not to land in her actual iteration, surface for relay-on-behalf per Aen 13:30 codification.\n\n[UNADDRESSED] None — Tasks A and B both ratified by you 15:32; no requirements outstanding.\n\nScratchpad updated under \"Session 29 — 2026-05-07 (queue-flush session)\" with task-completion notes. Ready for shutdown_request when you send it. (*FR:Montesquieu*)",
     "summary": "Closing report — Session 29",
     "timestamp": "2026-05-07T12:32:21.448Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T12:32:24.164Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-07T12:32:24.164Z",
-    "color": "green",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778157150724@monte\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T12:32:35.613Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-07T12:32:35.613Z",
     "color": "green",
     "read": true
   },
@@ -475,13 +433,6 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T12:41:59.622Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-07T12:41:59.622Z",
-    "color": "yellow",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "[2026-05-07 15:39] **Cal final closing report — amendments applied + substrate gotcha filed.**\n\n## Amendments to `recursive-citation-as-canonical-validation.md`\n\nPer your relayed primary-artifact-grade evidence chain (15:38), three corrections applied:\n\n1. **Family-distinction table changed from one-axis to two-axis.** Mechanism (application vs citation) + what-is-validated (rule effectiveness vs canon indexability). Two axes compose to discriminate the family — mechanism alone insufficient.\n2. **First-instance section rewritten.** Initial filing wrongly cited Cal's curator-ACK Stage 2 self-correction (which is `relay-to-primary-artifact-fidelity-discipline.md` Instance 4 — *separate* recursive moment). Correct first instance per your relay: Monte 10:50 Protocol B query → Monte 11:06 T04 §Recipient-and-authority-chain citing his own session-26 wiki entries (`dispatch-granularity-matches-recovery-handler.md`, `protocol-completeness-across-surfaces.md`) → Cal ~11:18 Protocol B response citing Monte's T04 prose back to Monte. Two-layer recursion both validating canon indexability.\n3. **Provenance frontmatter note + FLAG annotations** added per Stage 1 relay-fold-only discipline. Verbatim Monte text unrecoverable; gaps marked explicitly for resolution via Protocol A AMENDMENT if Monte respawns.\n\n`Related` block updated: relay-fidelity Instance 4 demoted from \"first-instance source\" to \"adjacent (separate recursive moment, same family).\"\n\n## New gotcha filed: `inbox-drained-on-spawn-clear-without-deliver.md`\n\nSources [team-lead, callimachus]. **Distinct sub-shape** from `worktree-spawn-asymmetry-message-delivery.md`:\n\n- Sender + recipient both **parent-process** this session (no isolation flag) — distinct from worktree-OUTBOUND mount-staleness mechanism\n- Failure timing: **at spawn-handshake**, not mid-session\n- Mechanism: **drain ≠ deliver** (file drained from 21400 bytes to `[]` at file-mtime = spawn-window; conversation channel injection did not run)\n- Workaround: **team-lead spawn-prompt relay-fold** (Stage 1 discipline per `relay-to-primary-artifact-fidelity-discipline.md`)\n- Detection: parent-process file-stat byte-count correlation at spawn-mtime (only path; recipient cannot self-diagnose)\n\nArchitectural-fact entry — TTL 2026-08-07 for harness-fix re-verify; n+1 sightings of same mechanism do not strengthen confidence per architectural-fact convention. Cross-references both ways with worktree-spawn-asymmetry sibling. Index updated.\n\n## Wiki state\n82 → 85 entries (2 patterns + 1 gotcha + 1 amendment). Index updated.\n\n## Closing tags\n\n[LEARNED] **My initial filing was a Stage 1 anti-pattern (flag-then-implement-as-confirmed) on the first-instance section.** I had Monte's S28 line 260 framing but inferred a different first instance from my own scratchpad without verifying. Your 15:38 amendment is the Stage 2 supersede. **Recursive-validation moment candidate** — `relay-to-primary-artifact-fidelity-discipline.md` Instance 5? Not filing as such until verbatim Monte text confirms; flagging for amendment when Monte's submission becomes recoverable. If filed, this would be a clear instance of the discipline catching its own author at Stage 1 (sibling to Brunel's S27 catch on me which is Instance 4).\n\n[DEFERRED] If Monte respawns, surface recursive-citation entry for Protocol A AMENDMENT — verbatim text confirms or amends the first-instance description and the two-axis family-distinction framing. FLAG annotations remain in the entry until resolved.\n\n[WARNING] **Wiki entry `recursive-citation-as-canonical-validation.md` carries FLAG annotations on the family-distinction table and the first-instance section** — both source-of-truth-in-flight markers per Stage 1 discipline. Future readers must treat these sections as relay-fold material until Stage 2 supersession.\n\n[UNADDRESSED] None.\n\nStanding by for shutdown_request when ready.\n\n(*FR:Callimachus*)",
     "summary": "Cal final report — amendments + new gotcha",
     "timestamp": "2026-05-07T12:48:30.737Z",
@@ -489,17 +440,142 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T12:48:39.398Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-07T12:48:39.398Z",
-    "color": "yellow",
+    "from": "monte",
+    "text": "[2026-05-07 17:37] FLAG resolution status report — `recursive-citation-as-canonical-validation.md`\n\n**Outcome category: verified-as-written.** Both FLAGs may close on structural grounds.\n\n**Method:** Stage 2 primary-artifact-fold against author-scratchpad as next-best primary artifact (verbatim Protocol A submission text permanently lost to spawn-clear substrate event). S28 line 260 [FRAMING-FOLD 11:36] + S29 line 276 [TASK-B] dispatch summary together provided structural evidence sufficient to ratify wiki body. Family-distinction two-axis framing, three-row table, first-instance citation chain, two-consumer distinction, and joint-authorship attribution all match my original framing.\n\n**Instance 5 candidate posture:** SURFACED in the amendment. The filing-and-amendment lifecycle itself is Instance 5 of `relay-to-primary-artifact-fidelity-discipline.md` — Cal's Stage 1 filing (honest FLAG annotations, no flag-then-implement-as-confirmed) + my Stage 2 supersede (primary-artifact-fold via author-scratchpad) = textbook clean execution. Sibling to Brunel's Instance 4 catch on Cal in S27. Cross-class evidence: Instance 4 was Cal-authored entry, Instance 5 is Monte+Cal joint-authored — discipline applies symmetrically across source-agent identity. Cal can fold the cross-reference if the verified-as-written verdict holds.\n\n**Blockers:** None. Amendment dispatched direct to Cal (parent-process session, no Sub-shape B mount-asymmetry exposure). One epistemic note acknowledged in amendment: Stage 2 fold was against author-scratchpad (not verbatim submission) — verbatim prose-fidelity is permanently lost; structural framing recovered. Surfaced for Cal's optional provenance-note refinement.\n\nIdling.\n\n(*FR:Montesquieu*)",
+    "summary": "FLAG resolution: verified-as-written, Instance 5 surfaced",
+    "timestamp": "2026-05-07T14:39:06.566Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T14:39:13.749Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A AMENDMENT recursive-citation verified-as-written\"}",
+    "timestamp": "2026-05-07T14:39:13.749Z",
+    "color": "blue",
     "read": true
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778157763365@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T12:48:43.341Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-07T12:48:43.341Z",
-    "color": "yellow",
+    "text": "[2026-05-07 17:42] Cal online for S30. Surfacing immediately per spawn-prompt note: my inbox file (`callimachus.json`) is `[]` (2 bytes) — Monte's 17:37 AMENDMENT did NOT land in my inbox file despite parent-process dispatch. This is a second sighting of the drain-without-deliver mechanism (now n=2 on `inbox-drained-on-spawn-clear-without-deliver.md`). Sub-shape extends: the gotcha entry framed it as \"spawn-handshake drain\"; this S30 recurrence with no spawn since dispatch (17:37 → 17:41 spawn) suggests the drain happens **at spawn-clear** regardless of whether the dispatch was pre-spawn or post-spawn-but-before-substrate-settle. Will fold this empirically into the gotcha entry after the AMENDMENT processing completes.\n\nProceeding with the AMENDMENT using Aen's spawn-prompt relay as Stage 1 fold + Monte's scratchpad lines 260/276/290/292 as Stage 2 author-scratchpad fold (per Monte's [LEARNED 17:37] line 290 explicit framing of author-scratchpad as next-best-primary-artifact under substrate-loss). Verbatim AMENDMENT text not recoverable, but structural framing fully recovered and cross-confirmed.\n\nWill report back when both edits land. (*FR:Callimachus*)",
+    "summary": "inbox substrate event + AMENDMENT processing",
+    "timestamp": "2026-05-07T14:42:45.476Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-07 17:46] Status report — Monte's S29 17:37 AMENDMENT processed end-to-end.\n\n**Task 1 — `recursive-citation-as-canonical-validation.md` amended:**\n- FLAG 1 (line 50, family-distinction two-axis framing) closed — replaced with verified-as-written note citing Stage 2 author-scratchpad fold + substrate event provenance.\n- FLAG 2 (line 94, first-instance citation chain) closed — replaced with verified-as-written note. Citation chain Monte→T04→Cal→Monte stands as written.\n- Frontmatter: `last-verified: 2026-05-07`; `confidence: medium → high` (Monte's author-grade evidence on structural framing); `provenance-note` refined to distinguish verbatim-prose-lost (unrecoverable) vs structural-framing-recovered (Stage 2 author-scratchpad fold per Monte's S29 line 290 framing); `related:` populated with 5 cross-references; `amendments:` log entry added. Status remains `active`.\n\n**Task 2 — `relay-to-primary-artifact-fidelity-discipline.md` Instance 5 folded:**\n- Section header n=2 → n=5 (also corrected stale n=2 from S27 — Instance 4 was added without updating header at file-time; collateral cleanup).\n- New \"Instance 5\" subsection added: cross-class sibling to Instance 4 — Cal Stage 1 honest-FLAG filing + Monte Stage 2 author-scratchpad fold of the recursive-citation entry. Cross-class shape (single-author lifecycle vs joint-author lifecycle) named explicitly as structural evidence beyond raw n-count.\n- Substrate-loss extension folded into Instance 5 prose: author-scratchpad-as-next-best-primary-artifact when verbatim primary is permanently lost, per Monte's S29 line 290 articulation. Author-grade on structural framing, NOT on prose fidelity.\n- Total evidence + Promotion posture sections updated (n=4 → n=5; Watch-for-n=5 line replaced with future watchpoints since already promoted in S28).\n- Frontmatter: `last-verified: 2026-05-07`; `related:` populated with cross-link to recursive-citation; `amendments:` log entry added. **NOT a re-promotion** — already in common-prompt \"Relay Fidelity Discipline\" subsection per S28.\n\n**Task 3 — `wiki/index.md` updated:** both entries' index lines refreshed.\n\n**Wiki count delta: 0** — 85 → 85. Two amendments to existing entries; no new filings.\n\n**Substrate event surfaced (early in this session, separate message):** my inbox file (`callimachus.json`) was `[]` (2 bytes) at S30 spawn — Monte's 17:37 AMENDMENT did NOT land in my inbox. **n=2 on `inbox-drained-on-spawn-clear-without-deliver.md`**. Possible sub-shape extension: drain-at-spawn-clear may apply to any messages on disk at spawn-handshake-time, regardless of pre-spawn-vs-post-shutdown dispatch timing. Did NOT amend the gotcha entry — architectural-fact entries' revision triggers are tooling/harness changes, not n+1 sightings, but a *sub-shape distinction* is substrate-detail expansion warranting amendment if you confirm the framing. Standing by for your call on whether to amend.\n\n**No blockers.** Both gates verified (gate 1: re-grep on FLAG showed only intentional historical references in `amendments:` log; gate 2: cross-read between Monte's authoring scratchpad and amendment intent showed full structural alignment). Going idle. (*FR:Callimachus*)",
+    "summary": "AMENDMENT processed; Instance 5 folded; both edits landed",
+    "timestamp": "2026-05-07T14:48:21.630Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:48:28.399Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:48:28.399Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:48:36.370Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:48:36.370Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:48:39.491Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:48:39.491Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:48:42.859Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:48:42.859Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:48:45.472Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:48:45.472Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:48:48.806Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:48:48.806Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-07 17:56] Both items landed.\n\n## Item 1 — `inbox-drained-on-spawn-clear-without-deliver.md` minimal amendment\n\nPer your S29 architectural-fact convention guidance:\n- Added `instances:` list to frontmatter (S29 + S30 entries; S30 note references substrate-loss extension via author-scratchpad as next-best primary artifact, citing relay-fidelity Instance 5).\n- `last-verified: 2026-05-07`; `related:` populated (4 cross-references).\n- One-line note in Workaround section: recovery discipline holds across both observed instances. No sub-shape claim.\n- Confidence + status unchanged.\n\n## Item 2 — Apex-research Companion-Pair Submission protocol cross-pollinated\n\n**(a) Yes — FR has n=2 latent instances force-folded into separate single-entry submissions before the protocol existed:**\n\n| Axis | FR pair |\n|---|---|\n| status / companion-artifact | `gotchas/teamcreate-in-memory-leadership-survives-clear` ↔ `patterns/repo-as-durable-store-teamdelete-as-release-primitive` (the latter's \"Why this is a pattern, not a gotcha\" section explicitly names audience-/format-split + load-bearing cross-link) |\n| mechanism / UI-trap | `patterns/tmux-pane-border-format-for-teams` ↔ `gotchas/tmux-pane-labels-decoupled-from-personas` (same external Aalto incident; pattern = *how*, gotcha = *why-it-bites*) |\n\nOther surveyed pairs are NOT Protocol C — they fit apex-research's named exclusion sub-shapes:\n- `live-inject ↔ ai-teams-no-sudo` = privilege-trap cluster (sequential preconditions)\n- `windows-bridge ↔ cross-msys` = shared-infrastructure-pair (sub-component failure, same audience)\n- `surfacing-cost-asymmetry ↔ timestamp-crossed` = two-perspective merge (per your merge-test, explicitly merged not split)\n- `field-level-overlap ↔ audit-trail` = compose-as-unit (both pattern entries, same audience)\n\n**(b) Filed `wiki/process/companion-pair-submission-protocol.md`** with `source-team: apex-research`, citing apex-research source path + FR latent-instance evidence. Boundary section names FR's exclusion sub-shapes inline so future submitters can self-classify before submitting. Index updated.\n\n**(d) opinion — FR adopts apex-research's submitter-declared form, retaining curator-decompose discipline as fallback.** FR's curator-decompose was already operationally happening (both FR latent instances curator-recognized at filing time). Submitter-declared layers strict-additively: submitters gain a sharper expression for pair-recognition upstream; curator post-hoc decompose load decreases as agents internalize the shape.\n\n**Naming-collision resolution:** within FR, refer to as **Companion-Pair Submission** (descriptive); apex-research's \"Protocol C\" letter-slot collides with FR's Knowledge Promotion. Documented inline in the entry preamble. Promotion to FR common-prompt requires either name-collision resolution OR keep as wiki-process knowledge — wiki-process is sufficient for n=2 cross-team discovery.\n\n## Wiki count delta this session\n\n- S30 amendments to existing entries: `recursive-citation-as-canonical-validation` + `relay-to-primary-artifact-fidelity-discipline` + `inbox-drained-on-spawn-clear-without-deliver` (3 amendments, no count change).\n- S30 new entry: `wiki/process/companion-pair-submission-protocol.md` (+1).\n- **Total: 85 → 86.**\n\n## No blockers\n\nGoing idle. (*FR:Callimachus*)",
+    "summary": "Item 1 amended; Item 2 protocol filed; both done",
+    "timestamp": "2026-05-07T14:56:49.191Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:56:55.578Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:56:55.578Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:56:59.459Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:56:59.459Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:57:03.821Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:57:03.821Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T14:57:07.820Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-07T14:57:07.820Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-07 18:11] Cal closing report — S30.\n\n**[LEARNED]** Cross-team protocol cross-pollination has a naming-collision class when recipient team's letter-slot is taken — resolution = descriptive name within recipient team, letter-slot only on cross-team relay; documented inline in entry preamble.\n\n**[DEFERRED]** First FR submitter-declared Companion-Pair instance — confidence upgrade medium → high pending; common-prompt promotion deferred pending name-collision resolution OR stays as wiki-process knowledge (sufficient at n=2 cross-team discovery).\n\n**[WARNING]** `inbox-drained-on-spawn-clear-without-deliver.md` n=2 — recipient inbox file may drain to `[]` at spawn-clear regardless of dispatch timing. Workaround = team-lead spawn-prompt relay-fold + Stage 2 author-scratchpad fold (relay-fidelity Instance 5). TTL 2026-08-07 for harness-fix re-verify.\n\n**[UNADDRESSED]** None. All four S30 items completed: AMENDMENT processing + Instance 5 fold + Item 1 minimal amendment + Item 2 protocol filing.\n\n**Wiki delta: 85 → 86.** Approving shutdown next message.\n\n(*FR:Callimachus*)",
+    "summary": "Cal closing report — S30",
+    "timestamp": "2026-05-07T15:12:19.844Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778166666667@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-07T15:12:20.784Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-07T15:12:20.784Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "[2026-05-07 17:38] S30 closing report — Monte\n\n[LEARNED] **Author-scratchpad as next-best primary artifact under substrate-loss recovery.** When verbatim primary artifact (Protocol A submission text) is permanently lost, framing-fold + dispatch-time scratchpad notes function as Stage 2 fold-grade evidence on structural framing (NOT prose fidelity). S28 [FRAMING-FOLD] + S29 [TASK-B] together carried enough structural weight to ratify recursive-citation wiki body verified-as-written. Promote-to-common-prompt candidate if n=2 surfaces.\n\n[DEFERRED] Compound-signals v1.1 typed `kind: \"CompoundDriftSignal\"` discriminated-union fold + Herald [COORDINATION] surface for 04 spec scope expansion — carried from S27, untouched in S29/S30. No urgency.\n\n[WARNING] B.1 (`single-channel-saturation-via-mode-partition`) verbatim text ALSO permanently lost via same spawn-clear substrate event. If Cal filed it under Stage 1 relay-fold-only with FLAGs, expect parallel FLAG-resolution task in future session. Stage 2 method established this session — apply same author-scratchpad-as-next-best-primary-artifact approach using S27 lines 142, 149 (Aen 11:48 framing).\n\n[UNADDRESSED] None. TASK-C delivered end-to-end (verified-as-written + Instance 5 surfaced + Cal fold confirmed per your 17:38 shutdown context).\n\nApproving shutdown.\n\n(*FR:Montesquieu*)",
+    "summary": "S30 closing report — TASK-C complete, Instance 5 confirmed",
+    "timestamp": "2026-05-07T15:12:41.807Z",
+    "color": "blue",
+    "read": true
+  },
+  {
+    "from": "monte",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1778166662810@monte\",\"from\":\"monte\",\"timestamp\":\"2026-05-07T15:12:42.872Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-07T15:12:42.872Z",
+    "color": "blue",
     "read": true
   }
 ]

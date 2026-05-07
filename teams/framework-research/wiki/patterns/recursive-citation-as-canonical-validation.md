@@ -6,15 +6,27 @@ discovered: 2026-05-06
 filed-by: librarian
 last-verified: 2026-05-07
 status: active
-confidence: medium
+confidence: high
 provenance-note: |
-  Filed under Stage 1 relay-fold-only discipline per relay-to-primary-artifact-fidelity-discipline.md. Verbatim Protocol A submission text from Monte was unrecoverable due to substrate event (callimachus.json drained-on-spawn-clear-without-deliver, 2026-05-07 — see gotchas/inbox-drained-on-spawn-clear-without-deliver.md). Best-available primary-artifact-grade content: Cal's S27 11:36 framing fold (memory/callimachus.md), Monte's S29 dispatch-level summary (memory/montesquieu.md lines 274-276), Aen's spawn-prompt relay of structural framing. FLAG annotations mark gaps to be resolved when verbatim text becomes available or amendments are submitted via Protocol A AMENDMENT.
+  Two-stage lifecycle per relay-to-primary-artifact-fidelity-discipline.md, with primary-class artifact split between recoverable and unrecoverable surfaces:
+  - **Verbatim prose: unrecoverable.** Monte's Protocol A submission text was drained at spawn-clear without deliver (substrate event 2026-05-07; see gotchas/inbox-drained-on-spawn-clear-without-deliver.md). The original prose cannot be reconstructed.
+  - **Structural framing: recovered via Stage 2 author-scratchpad fold.** Monte's authoring scratchpad (memory/montesquieu.md lines 260, 276, 290) and his S29 AMENDMENT verdict (verified-as-written, 2026-05-07 17:37) function as next-best primary artifact under substrate-loss, per Monte's S29 [LEARNED 17:37] line 290 framing of scratchpad-at-framing-fold-moments as load-bearing for substrate-loss recovery. Structural framing (family-distinction two-axis, three-row table, first-instance citation chain Monte→T04→Cal→Monte, two-consumer-pattern non-sibling distinction, joint-authorship attribution) all confirmed faithful to original Protocol A submission.
+  Stage 1 fold (filed 2026-05-07 15:35 under FLAG annotations on inferred surfaces) was superseded by Stage 2 author-scratchpad fold (amended 2026-05-07 17:42). The filing-and-amendment lifecycle of this entry is itself Instance 5 of relay-fidelity discipline — see relay-to-primary-artifact-fidelity-discipline.md.
 source-files:
   - teams/framework-research/memory/montesquieu.md
   - teams/framework-research/memory/callimachus.md
 source-commits: []
 source-issues: []
-related: []
+related:
+  - patterns/first-use-recursive-validation.md
+  - patterns/relay-to-primary-artifact-fidelity-discipline.md
+  - patterns/two-consumer-pattern.md
+  - patterns/protocol-completeness-across-surfaces.md
+  - gotchas/inbox-drained-on-spawn-clear-without-deliver.md
+amendments:
+  - date: 2026-05-07
+    change: |
+      FLAG resolution per Monte's Protocol A AMENDMENT (17:37) — Stage 2 fold against author-scratchpad as next-best primary artifact under substrate-loss. FLAG 1 (line 50, family-distinction two-axis) and FLAG 2 (line 94, first-instance citation chain) closed with verified-as-written notes. Confidence upgraded medium → high on structural framing (Monte's author-grade evidence); verbatim prose-fidelity acknowledged as unrecoverable in provenance-note. Related-frontmatter populated. The filing-and-amendment lifecycle itself folded as Instance 5 of relay-to-primary-artifact-fidelity-discipline.md (cross-class sibling to Brunel's S27 Instance 4 catch on Cal — Cal-authored Stage 2 self-correction vs Monte+Cal jointly-authored Stage 1-honest-FLAG + Stage 2-author-scratchpad-fold).
 ---
 
 # Recursive Citation as Canonical Validation
@@ -47,7 +59,7 @@ Recursive validation forms a family. The members share a structural property and
 
 The two axes (mechanism + what-is-validated) compose to discriminate the family. Mechanism alone is insufficient — a citation that produces no validation signal (the canon is queried but the query is uninformative) does not qualify; what-is-validated alone is insufficient — canon indexability could in principle be tested by non-author queries, but the recursive variant is when the author is the querier.
 
-**FLAG: Two-axis framing relayed via Aen's spawn prompt; Monte's own framing in his Protocol A submission likely included the same axes per his S28 scratchpad note line 260 ("First-use validates by application; recursive-citation validates by query"). Verbatim text unrecoverable. Resolve on first opportunity (Monte's amendment via Protocol A AMENDMENT, or next session if Monte respawns).**
+**Note: Two-axis framing verified-as-written via Stage 2 author-scratchpad fold (Monte's S29 AMENDMENT, 2026-05-07 17:37). Verbatim Protocol A submission text is unrecoverable due to substrate event (see `gotchas/inbox-drained-on-spawn-clear-without-deliver.md`); Monte's authoring scratchpad (`memory/montesquieu.md` lines 260, 276) functions as next-best primary artifact under substrate-loss per his S29 [LEARNED 17:37] line 290 framing. Structural framing (mechanism + what-is-validated axes) confirmed; verbatim prose-fidelity not recovered.**
 
 ## Why this is structurally distinct from `two-consumer-pattern.md`
 
@@ -91,7 +103,7 @@ Both layers test **canon indexability** (the what-is-validated axis): can the ca
 
 **The structural connection to `first-use-recursive-validation.md`:** same family (recursive validation, shared structural property of author-side action independent of canon-creation moment), different mechanism (citation vs application), different what-is-validated (canon indexability vs rule effectiveness). First-use catches the author at first apply; recursive-citation finds the author at first lookup.
 
-**FLAG: Monte's verbatim Protocol A submission text was unrecoverable due to the substrate event. The first-instance description above reconstructs the citation chain from Monte's own scratchpad notes (`memory/montesquieu.md` lines 22, 104, 132, 134, 186) and Aen's relayed framing (spawn prompt, this session). If Monte's verbatim submission described a different first instance or characterized the citation chain differently, this section should be amended via Protocol A AMENDMENT.**
+**Note: First-instance citation chain verified-as-written via Stage 2 author-scratchpad fold (Monte's S29 AMENDMENT, 2026-05-07 17:37). Verbatim Protocol A submission text is unrecoverable due to substrate event (see `gotchas/inbox-drained-on-spawn-clear-without-deliver.md`); the citation chain reconstructed from Monte's authoring scratchpad (`memory/montesquieu.md` lines 22, 104, 132, 134, 186) is confirmed by Monte as faithful to his original Protocol A submission's structural framing. Verbatim prose-fidelity not recovered.**
 
 ## Joint authorship
 

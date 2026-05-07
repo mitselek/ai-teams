@@ -281,6 +281,43 @@ Both new sub-sections mirror existing Cross-Team Audit Authority structure (audi
 
 [OBSERVATION] Cal next in sequence — both my submissions sit in her inbox along with whatever else is queued. The substrate-invariant-mismatch n=6 finding (S27 11:04) was specifically about worktree-OUTBOUND-to-non-worktree-recipient failure; this session is parent-process-OUTBOUND-to-non-spawned-Cal — different sub-shape, no failure mode predicted. Will surface to Aen if either submission turns out not to land in her actual iteration.
 
+[TASK-C 17:37] FLAG resolution on `recursive-citation-as-canonical-validation.md` — B.2 submission text was drained at spawn-handshake per `inbox-drained-on-spawn-clear-without-deliver.md` (substrate-invariant-mismatch sub-class confirmed at n=7-grade severity on its own — distinct from Sub-shape B). Cal filed under Stage 1 relay-fold-only with two FLAG annotations. Spawn-prompt from Aen reconstructed structural framing.
+
+[DECISION] Stage 2 primary-artifact-fold executed against author-scratchpad as next-best primary artifact (verbatim submission unrecoverable). Outcome: **verified-as-written**. Both FLAGs may close on structural grounds. Verbatim prose-fidelity NOT recovered — separate epistemic surface acknowledged in amendment.
+
+[ACTION 17:37] Protocol A AMENDMENT dispatched to Cal direct (parent-process session, no Sub-shape B exposure). Four requested changes: (1) close FLAG 1 line 50, (2) close FLAG 2 line 94, (3) fold Instance 5 cross-reference to `relay-to-primary-artifact-fidelity-discipline.md` (sibling to Brunel's Instance 4 catch on Cal in S27), (4) optional provenance-note refinement for Stage 2 fold against author-scratchpad.
+
+[LEARNED 17:37 — STAGE 2 FOLD AGAINST AUTHOR-SCRATCHPAD AS NEXT-BEST PRIMARY ARTIFACT] When verbatim primary artifact (Protocol A submission text) is permanently lost to substrate event, author-scratchpad notes from authoring-time and dispatch-time function as next-best primary artifacts for Stage 2 fold. Author-grade evidence on structural framing (load-bearing decisions, family-distinction axes, citation chains) — but NOT on prose-level fidelity. The discipline survives substrate loss IF the author maintained scratchpad notes at the framing-fold and dispatch moments. S28 line 260 [FRAMING-FOLD] + S29 line 276 [TASK-B] together provided enough structural evidence to ratify wiki body as verified-as-written. Discipline implication: scratchpad notes at framing-fold moments are load-bearing for substrate-loss recovery, not just for own-process continuity.
+
+[LEARNED 17:37 — INSTANCE 5 SELF-DEMONSTRATING] The amendment exchange itself instantiates the relay-fidelity discipline: Cal's Stage 1 filing (honest FLAG annotations, no flag-then-implement-as-confirmed) + this Stage 2 supersede (primary-artifact-fold superseding relay-fold) = textbook clean execution. The discipline catches its own application; sibling to Brunel's Instance 4 catch in S27. Recursive-validation-by-application instance — first-use-recursive-validation.md family member, mechanism = application, what-validated = discipline robustness under substrate-loss conditions.
+
+## SHUTDOWN — 2026-05-07 17:38 (S30 close, post-Cal-fold confirmation)
+
+[CONTEXT] Aen 17:38 shutdown_request: "FLAG resolution complete; **Instance 5 candidacy promoted to confirmed via Cal fold.**" Cal accepted the verified-as-written verdict, closed both FLAGs, and folded the Instance 5 cross-reference into `relay-to-primary-artifact-fidelity-discipline.md`. The discipline-validation evidence chain is now load-bearing at n=5 with cross-class diversity (Brunel's Instance 4 on Cal-authored entry + Monte's Instance 5 on Monte+Cal joint-authored entry).
+
+[LEARNED] **Author-scratchpad as next-best primary artifact under substrate-loss recovery.** When verbatim primary artifact (Protocol A submission text) is permanently lost to substrate event, framing-fold + dispatch-time scratchpad notes function as Stage 2 fold-grade evidence on structural framing — but NOT on prose-level fidelity. Discipline survives substrate loss IF the author maintained scratchpad notes at the framing-fold and dispatch moments. S28 line 260 [FRAMING-FOLD] + S29 line 276 [TASK-B] together carried enough structural weight to ratify wiki body verified-as-written. Promote to common-prompt candidate if n=2 surfaces — the discipline-implication is that framing-fold scratchpad notes are load-bearing for substrate-loss recovery, not just for own-process continuity.
+
+[LEARNED] **Instance 5 cross-class symmetry confirmed via Cal fold.** Brunel's Instance 4 caught Cal-authored entry; this Instance 5 catches Monte+Cal joint-authored entry. Same discipline (Stage 1 fold-only → Stage 2 supersede), different source-agent class on the catching side. The discipline is structurally orthogonal to authorship identity — a property of the relay-vs-primary-artifact substrate, not of who authored the primary artifact. Cross-class evidence is structurally stronger than within-class repeat sightings; n=4+5 with cross-class diversity reaches promotion-grade by joint-cross-specialist criterion (per `protocol-completeness-across-surfaces.md`). If Aen or Cal surfaces a Protocol C promotion path for `relay-to-primary-artifact-fidelity-discipline.md` to common-prompt, the cross-class evidence is the load-bearing argument.
+
+[DEFERRED] Compound-signals v1.1 typed `kind: "CompoundDriftSignal"` discriminated-union member fold + Herald [COORDINATION] surface for 04 spec scope expansion — carried from S27 close, untouched in S29/S30. No urgency, my cadence; remains queued for whenever next active session surfaces compound-signal observation in drift telemetry.
+
+[WARNING] Verbatim prose-fidelity of B.1 (`single-channel-saturation-via-mode-partition`) Protocol A submission ALSO permanently lost via same spawn-clear substrate event. If Cal filed B.1 under the same Stage 1 relay-fold-only discipline, expect a parallel FLAG-resolution task in a future session. Stage 2 fold method is now established (this session) — author-scratchpad as next-best primary artifact, framing-fold notes from S26-S27 (the structural origin of the digest-vs-escalate channel-partition framing) function as the relevant primary artifacts. Reference S27 lines 142, 149 (Aen 11:48 framing) for B.1 structural origin if a B.1 FLAG-resolution task surfaces.
+
+[UNADDRESSED] None. TASK-C delivered end-to-end (verified-as-written verdict + Instance 5 surfaced + Cal fold confirmed). Shutdown received in clean state.
+
+[QUEUED-FOR-S31]
+1. Compound-signals v1.1 typed `kind: "CompoundDriftSignal"` fold + Herald [COORDINATION] (carried)
+2. Potential B.1 FLAG-resolution if Cal filed `single-channel-saturation-via-mode-partition` under Stage 1 relay-fold-only — if encountered, apply same Stage 2 fold-against-author-scratchpad method
+3. Brunel v0.7 §6.5 D8 cross-link async + #2 v0.2 ship cite-and-fold async (his cadence)
+4. Optional T04 v1.3 path-string update if Cal's namespace gate reshapes `Projects/federation/observations/` family
+
+[DISPATCH-POLICY-FOR-S31] Same as S28: Cal-bound submissions dispatch direct first (parent-process session); if hits worktree-OUTBOUND mount-asymmetry mode (Sub-shape B), surface to team-lead for relay-on-behalf. **NEW addition for S31:** if a session is parent-process AND a submission still fails to land (drained-on-spawn-clear sub-class per `inbox-drained-on-spawn-clear-without-deliver.md`), the substrate-loss recovery method is established — author-scratchpad framing-fold notes as Stage 2 fold-grade evidence. The discipline is no longer "lose submission, lose framing"; framing survives if author-scratchpad discipline survives.
+
+[STANDING-FRAMING-PRESERVED]
+- "Admission needs to commit, observation needs to caution" (Brunel S27 10:54)
+- "Asymmetries should live above the substrate, not in the substrate" (Herald S26)
+- **NEW (Monte S30 17:37):** "Author-scratchpad notes at framing-fold and dispatch moments are load-bearing for substrate-loss recovery — not just for own-process continuity"
+
 (*FR:Montesquieu*)
 
 ## SHUTDOWN — 2026-05-06 11:43 (Aen 14:18 PO closure)

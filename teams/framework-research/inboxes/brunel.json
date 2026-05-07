@@ -5,11 +5,5 @@
     "summary": "Tasks ratified, request closing report + shutdown",
     "timestamp": "2026-05-07T12:21:05.822Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778156721096@brunel\",\"from\":\"team-lead\",\"reason\":\"S29 task closure: both Task A and Task B delivered, ratified, and verified. Closing report received. Standing carry-forward items noted for next-session boot.\",\"timestamp\":\"2026-05-07T12:25:21.096Z\"}",
-    "timestamp": "2026-05-07T12:25:21.096Z",
-    "read": true
   }
 ]

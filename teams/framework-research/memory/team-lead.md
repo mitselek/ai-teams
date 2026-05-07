@@ -1,5 +1,66 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 30 WRAP — 2026-05-07 (Monte FLAG resolution + Cal AMENDMENT processing + apex-research Protocol C cross-pollination + n=2 substrate gotcha activation)
+
+**Goal (PO-set):** Resume Monte FLAG resolution per S29 NEXT-SESSION-BOOT step 4; glance at apex-research progress per S29 standing watch on n=2 federation invocation.
+
+**Outcome:** Three independent loops closed cleanly. Wiki 85 → 86 (+1 new entry, 4 amendments). n=2 substrate gotcha activated. apex-research standing watch re-characterized.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Path |
+|---|---|---|---|
+| `recursive-citation-as-canonical-validation.md` FLAGs closed | +22/-3 (verified-as-written via Stage 2 author-scratchpad fold; confidence medium → high) | Cal (Monte-AMENDMENT) | `wiki/patterns/` |
+| `relay-to-primary-artifact-fidelity-discipline.md` Instance 5 fold | +41/-7 (cross-class sibling to Instance 4: Cal Stage 1 honest-FLAG + Monte Stage 2 author-scratchpad fold; header-stale n=4 collateral catch on Instance 4 corrected) | Cal | `wiki/patterns/` |
+| `inbox-drained-on-spawn-clear-without-deliver.md` n=2 amendment | +15/-1 (architectural-fact convention: append `instances:` list, no sub-shape claim, recovery primitive note) | Cal | `wiki/gotchas/` |
+| `wiki/process/companion-pair-submission-protocol.md` (NEW) | NEW (85→86) | Cal (apex-research-sourced; cross-team `source-team: apex-research` attribution) | `wiki/process/` |
+| `wiki/index.md` updated for both new and amended entries | +5/-2 | Cal | `wiki/` |
+| Monte scratchpad +10 lines (S29-update for FLAG resolution outcome) | +10 | Monte | `memory/montesquieu.md` |
+| Cal scratchpad +43 lines (S30 block) | +43 | Cal | `memory/callimachus.md` |
+
+### LEARNED — session 30
+
+- **Recovery primitive for drain-on-spawn-clear is now n=2-proven.** Aen spawn-prompt relay-fold + author-scratchpad Stage 2 fold worked cleanly across both observed instances (S29 Monte→Cal 12:30 dispatch; S30 Monte→Cal 17:37 dispatch). Stage 1+Stage 2 lifecycle holds across substrate-loss instances; the discipline is no longer just theoretical. Folded into gotcha entry as one-line workaround note.
+- **Architectural-fact convention from S29 held under stress.** Cal initially proposed a sub-shape extension on the n=2 sighting ("drain-at-spawn-clear regardless of dispatch-timing-relative-to-recipient-lifecycle"). On evaluation: that's a *sharpening of the original framing's generality*, not a new sub-shape — both observed instances are pre-spawn-dispatch, post-spawn case is hypothetical. Architectural-fact convention prescribes minimal amendment (append `instances:`, no sub-shape claim) and Cal applied it cleanly. Discipline catches discipline drift.
+- **Convention diffusion happens without federation infrastructure.** apex-research adopted FR's dual-hub-routing pattern (Eratosthenes mirrors Cal's role; Protocol A/B mirror FR's shapes; routing table line-for-line) as a *governance pattern* for single-team operation, separate from federation-bootstrap-template. Knowledge-hub-as-team-role is more general than knowledge-hub-as-federation-curator. Worth noting as framework finding — federation-only is too narrow a frame for the dual-hub convention.
+- **Cross-team protocol cross-pollination at n=2 cumulative is filing-grade without promotion.** apex-research's Companion-Pair Submission protocol filed as `wiki/process/companion-pair-submission-protocol.md` with `source-team: apex-research` attribution. n=2 latent FR instances (status/companion-artifact axis: teamcreate-leadership-survives-clear ↔ repo-as-durable-store-teamdelete; mechanism/UI-trap axis: tmux-pane-border-format ↔ tmux-pane-labels-decoupled). Naming-collision resolution: descriptive name "Companion-Pair Submission" used to avoid Protocol-C letter-slot collision with FR's knowledge-promotion protocol — wiki-process placement is sufficient at n=2 cross-team discovery (no common-prompt promotion).
+- **Skill-side substrate-invariant-mismatch sub-shape candidate (S30 self-spotted at shutdown).** `framework-research-next-session` skill's CWD-as-context-signal invariant assumes single-repo session navigation. Failed at Step 0 because session legitimately touched apex-migration-research repo (refresh + `cd`); CWD drifted. Recovery is one-command (`cd` back), but the skill prescribes "stop immediately" — substrate-invariant-mismatch sub-shape: *a procedural guard whose invariant is a *narrower* version of the actual session-context*. Worth Cal evaluation next session for whether this fold-able into existing `substrate-invariant-mismatch.md` n=6 (Instances 1+6 are path-as-substrate-invariant) or warrants a new instance.
+
+### Standing watch update — apex-research n=2 invocation re-characterized
+
+S29 standing watch line: "apex-research n=2 invocation — first deployment of #1 v0.7 federation-bootstrap-template beyond FR; convention re-test point."
+
+S30 finding: **apex-research is NOT on a federation trajectory.** They run single-team with directory-ownership governance. Zero federation-bootstrap signals (no path-namespace, no CuratorAuthority, no WriteAccept/WriteRejection, no registry, no admission control). The convention re-test point would have to come from a different second team, OR apex-research re-scoping to federate.
+
+Cross-team interface to FR is dormant (one thin reference: "Quality audits performed by framework-research Medici remotely" — Medici hasn't been spawned in any FR session per logs). Worth re-characterizing the standing watch.
+
+### NEXT-SESSION BOOT (re-orient instructions for S31)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **If PO surfaces apex-research follow-up** (e.g., "did anything else happen on their side?", or asks about Companion-Pair Submission protocol): consider spawning Cal for either (a) querying apex-research's wiki state for additional cross-pollination candidates, or (b) cross-evaluating FR's existing wiki against apex-research's exclusion sub-shapes (privilege-trap cluster, shared-infrastructure-pair) for additional latent matches. Apex-research source path: `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research/teams/apex-research/common-prompt.md`.
+5. **If PO surfaces skill substrate-invariant-mismatch finding** (S30 LEARNED above): spawn Cal to evaluate whether the skill CWD-check failure-mode folds into existing `substrate-invariant-mismatch.md` n=6 (Instance 1 + Instance 6 are both path-as-substrate-invariant at different layers), or warrants a new instance. Decision matrix: if same-root-cause-different-layer holds, fold; if structurally distinct mechanism, file new instance.
+6. **If PO surfaces Volta-related work** (T06 amendments, lifecycle scripts, harness substrate fixes): spawn Volta. Pending from S28: all NEXT-SESSION-CHOREs cleared, but n=2 watch on `cross-document-prose-procedure-drift.md` may still activate per his amendment-path note.
+7. **If PO surfaces Brunel-related work** (federation expansion, container lifecycle, worktree-asymmetry review): spawn Brunel.
+8. **If PO surfaces Monte-related work**: Monte's S30 close was clean (FLAG resolution complete; Instance 5 candidacy promoted to confirmed via Cal's fold). His next surface-grade work item is Volta-style — open queue.
+9. **First operational item if Cal-spawning:** her S30 close was clean (86 wiki entries; substrate gotcha at n=2 with minimal-amendment posture; companion-pair protocol filed; no FLAG annotations; no TTL imminent). Surface-grade work would be receiving any new Protocol A submissions from spawned specialists, or evaluating the skill substrate-invariant-mismatch finding per item 5 above.
+
+### Standing watch items going into session 31
+
+- **Skill CWD-check substrate-invariant-mismatch sub-shape evaluation** (NEW S30) — fold-or-new decision deferred to Cal next session
+- **TPS-583 (apex-research)** — when PO signals Ruth has progressed (subteam identified, page moved to V2, or both), action Stage-2 standard moves
+- **apex-research n=2 invocation** — RE-CHARACTERIZED S30: not on federation trajectory; convention re-test point shifts to first non-FR-non-apex team that adopts federation-bootstrap-template, OR apex-research re-scoping (no signal of either)
+- **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event
+- **esl-suvekool feedback loop** — when PO returns from Tobi sessions
+- **`repo-as-durable-store-teamdelete-as-release-primitive.md` n=2 watch** (Volta-filed S28) — second team-lifecycle protocol on different platform = cross-platform generalization confirmation point
+- **`cross-document-prose-procedure-drift.md` n=2 watch** — second incident triggers Volta's Protocol C consideration per his S28 amendment-path note
+- **Companion-Pair Submission n=3+ FR instance watch** — third FR companion-pair instance would prompt Protocol C consideration (common-prompt promotion with naming-collision resolution); wiki-process placement is sufficient at n=2 cross-team discovery
+
+(*FR:Aen*)
+
+---
+
 ## SESSION 29 WRAP — 2026-05-07 (sequential queue-flush: Brunel + Monte + Cal; T06 stale-prose closed; new substrate sub-shape filed)
 
 **Goal (PO-set):** "Just keep them busy" — sequential wake/work/shutdown for Brunel, Monte, Cal. No new feature direction; pure queue-flush.

@@ -3,6 +3,13 @@ source-agents:
   - team-lead
   - callimachus
 discovered: 2026-05-07
+instances:
+  - date: 2026-05-07
+    session: S29
+    note: Cal spawned with Monte's two Protocol A submissions on disk (21400 bytes pre-spawn → 2 bytes at spawn-mtime); workaround = team-lead spawn-prompt relay-fold
+  - date: 2026-05-07
+    session: S30
+    note: Cal re-spawned with Monte's AMENDMENT on disk (Monte terminated hours pre-dispatch; dispatch parent-process success: true); inbox drained at S30 spawn-clear; workaround = team-lead spawn-prompt relay-fold + author-scratchpad as Stage 2 next-best primary artifact (per relay-to-primary-artifact-fidelity-discipline.md Instance 5)
 filed-by: librarian
 last-verified: 2026-05-07
 status: active
@@ -13,7 +20,11 @@ source-files:
 source-commits: []
 source-issues: []
 ttl: 2026-08-07
-related: []
+related:
+  - patterns/relay-to-primary-artifact-fidelity-discipline.md
+  - patterns/worktree-spawn-asymmetry-message-delivery.md
+  - patterns/substrate-invariant-mismatch.md
+  - gotchas/dual-team-dir-ambiguity.md
 ---
 
 # Inbox Drained on Spawn, Cleared Without Deliver
@@ -60,6 +71,8 @@ When team-lead is aware that a recipient has on-disk-queued messages (e.g., from
 4. **Surface the substrate event in the recipient's first message** so the recipient knows the relay-fold is the canonical path, not just one of multiple paths. (If the recipient assumes the inbox was already delivered, they may treat the relay-fold as redundant rather than load-bearing.)
 
 The recipient (e.g., Cal in the Phase B + Phase C chain) then files using the relay-fold material with explicit FLAG annotations on inferences beyond what is verbatim in the relay sources, per Stage 1 discipline.
+
+**Recovery discipline holds across both observed instances** (S29 and S30, 2026-05-07). The spawn-prompt relay-fold workaround was operationally durable in both cases — Stage 1 fold from the relay, Stage 2 supersede when primary-artifact-grade material becomes available (S30 added the substrate-loss extension: author-scratchpad as next-best primary artifact when verbatim primary is permanently lost; see `relay-to-primary-artifact-fidelity-discipline.md` Instance 5). Both instances confirmed the workaround; neither required a different recovery mechanism.
 
 ## Detection signal for parent-process observer
 

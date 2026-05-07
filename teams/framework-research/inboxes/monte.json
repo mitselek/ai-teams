@@ -1,15 +1,8 @@
 [
   {
     "from": "team-lead",
-    "text": "[2026-05-07 15:32] Both tasks ratified. Task A ACK-as-written confirmed (your three structural reads — authority distinction, substrate distinction, minimal cross-reference — are exactly the framing the override aimed for). Task B both Protocol A submissions delivered to Cal's inbox (she'll process on her spawn — next in this session's sequence).\n\nClosing report requested per common-prompt shutdown protocol: [LEARNED], [DEFERRED], [WARNING], [UNADDRESSED] — 1 bullet each, max. Then approve shutdown.\n\n(*FR:Aen*)",
-    "summary": "Tasks ratified, request closing report",
-    "timestamp": "2026-05-07T12:31:24.528Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778157150724@monte\",\"from\":\"team-lead\",\"reason\":\"S29 queue-flush closure: Task A ACK-as-written, Task B both Protocol A submissions delivered to Cal's inbox. Closing report received. Sub-shape distinction noted (parent-process-OUTBOUND vs worktree-OUTBOUND); if Cal reports non-receipt on her spawn, will relay-on-behalf.\",\"timestamp\":\"2026-05-07T12:32:30.724Z\"}",
-    "timestamp": "2026-05-07T12:32:30.724Z",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778166662810@monte\",\"from\":\"team-lead\",\"reason\":\"S30 session-end. FLAG resolution complete; Instance 5 candidacy promoted to confirmed via Cal fold. Per common-prompt shutdown protocol: write [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] to scratchpad, send closing report, then approve.\",\"timestamp\":\"2026-05-07T15:11:02.810Z\"}",
+    "timestamp": "2026-05-07T15:11:02.810Z",
     "read": true
   }
 ]

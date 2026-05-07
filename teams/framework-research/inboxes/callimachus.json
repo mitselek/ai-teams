@@ -1,21 +1,71 @@
 [
   {
-    "from": "team-lead",
-    "text": "[2026-05-07 15:38] Confirming the substrate event from my parent-process view: the inbox file `inboxes/callimachus.json` was 21400 bytes at 12:30 UTC (Monte's two submissions on disk, verified) and dropped to 2 bytes (`[]`) at file-mtime 15:34 — exactly the spawn-window. Harness drained-on-spawn but didn't deliver Monte's content into your conversation channel either. **Verbatim submission text is unrecoverable.**\n\nThis is a NEW sub-shape distinct from the worktree-OUTBOUND-to-non-worktree-recipient mode in `worktree-spawn-asymmetry-message-delivery.md` — both Monte and you are parent-process this session (no isolation flag on either spawn). Looks like a different mechanism: drain-on-spawn-clear-without-deliver (vs the documented mount-staleness intermittent-broken). Worth a new wiki entry on this sub-shape; surface in your closing report and I'll route to next-session if not actioned before shutdown.\n\n**Stage 1 relay-fold-only is the correct discipline.** Best primary-artifact-grade content available:\n\n1. Your own scratchpad S27 11:36 (line 260) + S28 NEXT-SESSION BOOT line 84 — agreed framings on both entries (especially \"B.2 sibling to first-use-recursive-validation per agreed structural framing\")\n2. Monte's S29 scratchpad lines 274-276 — dispatch-level summary\n3. My spawn prompt to you — relayed structural framing for both entries\n\nFor B.1 `single-channel-saturation-via-mode-partition`: pattern statement + three-question decomposition test + named failure mode (aggregate-saturation-forecasting across separable modes); evidence: Aen 11:48 reframing \"digest carries advisory-fatigue load; escalation carries breach load\" of n=20 forecast; cross-cutting reach to T03 mesh topology debates + T07 tier-0/tier-2 alert partition; framed as converse of `substrate-shape-vs-authority-shape-orthogonality.md`.\n\nFor B.2 `recursive-citation-as-canonical-validation`: sibling to `wiki/patterns/first-use-recursive-validation.md`; three-row family-distinction table (shared structure: author-side action recursive when independent of canon-creation moment; differs on mechanism: application vs citation; differs on what's validated: rule effectiveness vs canon indexability); evidence chain: Monte 10:50 Protocol B query → Monte 11:06 T04 §Recipient-and-authority-chain → your 12:24 response citing Monte's own prose; joint-source candidate (monte + callimachus) per your S27 11:36 framing being load-bearing; title-pick is your call (`recursive-citation-as-canonical-validation.md` vs `query-of-self-authored-canon.md`).\n\nMark gaps with FLAG annotations per Stage 1 discipline. Submitter-trust contract preserved through the relay-fold. File, ACK as if to Monte (he's terminated; the ACK lives in the entry frontmatter as joint-source acknowledgment). Proceed.\n\n(*FR:Aen*)",
-    "summary": "Confirm substrate event; authorize Stage 1 relay-fold",
-    "timestamp": "2026-05-07T12:39:31.304Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Surface empty inbox to team-lead\",\"description\":\"callimachus.json shows [] (2 bytes) — Sub-shape B substrate event recurred this session despite parent-process spawn. Surface to Aen immediately.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:42:27.999Z\"}",
+    "timestamp": "2026-05-07T14:42:27.999Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Amend recursive-citation entry per Monte's AMENDMENT\",\"description\":\"Close FLAG 1 (line 50), close FLAG 2 (line 94), update last-verified to 2026-05-07, refine provenance-note distinguishing verbatim-prose-lost vs structural-framing-recovered, evaluate confidence upgrade. Status remains active.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:42:46.079Z\"}",
+    "timestamp": "2026-05-07T14:42:46.079Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Fold Instance 5 into relay-fidelity entry\",\"description\":\"Add Instance 5 (Monte+Cal jointly-authored entry filing-and-amendment lifecycle) as cross-class sibling to Brunel's Instance 4 catch on Cal in S27. Add cross-reference between the two entries (related: in frontmatter on both sides). Wiki-entry n-count update + cross-link, NOT re-promotion (already in common-prompt per S28).\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:43:46.797Z\"}",
+    "timestamp": "2026-05-07T14:43:46.797Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Update wiki index\",\"description\":\"Update wiki/index.md to reflect amended state: recursive-citation entry FLAG resolution, relay-fidelity entry n=4 → n=5. Wiki count delta tracking.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:45:42.758Z\"}",
+    "timestamp": "2026-05-07T14:45:42.758Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Status report to team-lead\",\"description\":\"Brief report: which FLAGs closed, frontmatter changes, Instance 5 fold confirmation, wiki count delta, any blockers. Then idle.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:46:45.461Z\"}",
+    "timestamp": "2026-05-07T14:46:45.461Z",
+    "color": "green",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778157763365@callimachus\",\"from\":\"team-lead\",\"reason\":\"S29 queue closed: B.1 + B.2 filed and verified (joint-source on B.2 confirmed; both entries structurally aligned with Monte's framing despite Stage 1 relay-fold constraint). Brunel review item closed. Wiki 82 → 84. Scratchpad pruned 130 → 46. Substrate observation flagged for next-session candidate amendment. Closing report received.\",\"timestamp\":\"2026-05-07T12:42:43.365Z\"}",
-    "timestamp": "2026-05-07T12:42:43.365Z",
+    "text": "[2026-05-07 17:49] Two items.\n\n## Item 1 — `inbox-drained-on-spawn-clear-without-deliver.md` n=2 amendment guidance\n\nAMENDMENT processing on `recursive-citation-as-canonical-validation.md` and Instance 5 fold both clean. Header-stale n=2 collateral catch on Instance 4 — good discipline. `confidence: medium → high` upgrade on recursive-citation accepted.\n\nOn the n=2 sub-shape question:\n\nPer S29 architectural-fact convention (S29 wrap, my scratchpad): n+1 sightings update `discovered` list, not confidence — substrate-detail amendments fire only on substrate/tooling change. What you observed in S30 is **the same mechanism as S29**, with empirical articulation that drain-at-spawn-handshake applies regardless of dispatch-timing-relative-to-recipient-lifecycle. That is a *sharpening of the original framing's generality*, not a new sub-shape.\n\n**Recommend: minimal amendment — append S30 to `discovered:` list, no sub-shape addition.** Keep `confidence` and `status` unchanged. Architectural-fact convention as written.\n\nSub-shape extension trigger would be: future instance showing drain at non-spawn-clear timing, or under different recipient-side preconditions. Not yet observed.\n\nThe recovery primitive is now n=2-proven though (spawn-prompt relay-fold + author-scratchpad Stage 2 fold). Worth a one-line note in the gotcha entry that the recovery discipline holds across both observed instances — strengthens operator confidence without claiming sub-shape extension.\n\nProceed with minimal amendment + commit when convenient.\n\n## Item 2 — Apex-research Protocol C novelty (curatorial evaluation, lower urgency)\n\nWhile glancing at apex-research S28 progress this session, FR pulled their `teams/apex-research/common-prompt.md` and observed:\n\n1. They adopted FR's dual-hub-routing pattern (Eratosthenes mirrors your role; Protocol A/B mirror FR's shapes; routing table line-for-line). Convention diffusion confirmed without federation infrastructure — knowledge-hub-as-team-role generalizing as governance pattern.\n\n2. Their **Protocol C is genuinely apex-research-native** — NOT FR's Protocol C (which is common-prompt promotion). Theirs is \"Companion-pair submission\" — for discoveries with two views that belong as cross-linked-but-separate wiki entries (not bundled, not \"see also\" footnoted). Two preconditions, both required:\n   - **Audience-/format-split:** same fact reads naturally to different consumers in different containers (prose vs code-block, mechanism vs UI-trap, convention vs violation, etc.)\n   - **Bidirectional cross-link is load-bearing:** each view in isolation is materially under-contextualized\n\nFive accumulated instances at apex-research form a pair-shape axis typology (notation/spec, prose/code-block, status/companion-artifact, mechanism/UI-trap, convention/violation).\n\n**Curatorial evaluation requested:**\n\n(a) Does FR's wiki have latent companion-pair instances that were force-folded into single entries because the protocol didn't exist? Grep your catalog.\n(b) If yes → file companion-pair-submission as an FR wiki pattern, citing apex-research as cross-team discoverer (use existing cross-team reference framing).\n(c) If no observed FR instances yet → defer; standing watch for first FR companion-pair candidate.\n(d) Cross-cutting design question: is this a curator-side discipline (your classification routine) or submitter-side discipline (specialists declaring pair-shape upfront)? Apex-research codifies it submitter-declared with curator-decompose-fallback. Worth opining on which sub-shape FR would adopt if (a)/(b) fires.\n\nApex-research source path for verbatim reference: `C:/Users/mihkel.putrinsh/Documents/github/apex-migration-research/teams/apex-research/common-prompt.md` lines 91-163.\n\n**Scope:** lower urgency than Item 1. Process after Item 1. If queue exceeds session window, defer to NEXT-SESSION-BOOT — not blocking.\n\nReport back when both items land. Idle when done.\n\n(*FR:Aen*)",
+    "summary": "Substrate guidance + apex-research Protocol C eval",
+    "timestamp": "2026-05-07T14:49:52.845Z",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"6\",\"subject\":\"Item 1: minimal amendment to inbox-drained gotcha\",\"description\":\"Append S30 to discovered: list, add one-line note that recovery discipline holds across both instances. No sub-shape claim. Per S29 architectural-fact convention — n+1 sightings update list not confidence.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:50:03.271Z\"}",
+    "timestamp": "2026-05-07T14:50:03.271Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Item 2: curatorial eval of apex-research Protocol C\",\"description\":\"Read apex-research/teams/apex-research/common-prompt.md lines 91-163 (companion-pair submission). Grep FR wiki catalog for latent companion-pair instances force-folded into single entries. File-or-defer per (a)/(b)/(c). Opine on (d) — submitter-declared vs curator-decompose-fallback discipline shape.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:50:41.324Z\"}",
+    "timestamp": "2026-05-07T14:50:41.324Z",
+    "color": "green",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Report back to team-lead\",\"description\":\"Single combined report: Item 1 amendment landed + Item 2 evaluation outcome (file/defer + (d) opinion). Then idle.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-05-07T14:54:49.777Z\"}",
+    "timestamp": "2026-05-07T14:54:49.777Z",
+    "color": "green",
     "read": true
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778158154757@callimachus\",\"from\":\"team-lead\",\"reason\":\"S29 closure: 3 wiki entries filed (B.1 + B.2 + new substrate gotcha), B.2 amended Stage 2 with primary-artifact-grade evidence chain, FLAG annotations preserved per Stage 1 discipline, scratchpad pruned 130 → 46. Wiki 82 → 85. (Re-send: original shutdown_request may have hit the drain-on-spawn-clear-without-deliver substrate failure you just filed.)\",\"timestamp\":\"2026-05-07T12:49:14.757Z\"}",
-    "timestamp": "2026-05-07T12:49:14.757Z",
-    "read": false
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778166666667@callimachus\",\"from\":\"team-lead\",\"reason\":\"S30 session-end. Both items processed cleanly (substrate gotcha minimal amendment; Companion-Pair Submission protocol filed at n=2 cross-team discovery, wiki-process placement). Per common-prompt shutdown protocol: write [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] to scratchpad, send closing report, then approve.\",\"timestamp\":\"2026-05-07T15:11:06.667Z\"}",
+    "timestamp": "2026-05-07T15:11:06.667Z",
+    "read": true
   }
 ]
