@@ -159,18 +159,5 @@
     "timestamp": "2026-05-06T11:53:06.468Z",
     "color": "green",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778069843509@monte\",\"from\":\"team-lead\",\"reason\":\"Session 27 closure per PO direction (14:09 my-clock). Phase B v1.0-final cluster fully shipped end-to-end on your deliverables (design v1.0-final §6 NO-SHIFT; Topic 04 v1.2 with all sections closed). Per common-prompt shutdown protocol: write in-progress state to scratchpad + send closing [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] message to me + approve shutdown. Tail-end items (compound-signals v1.1 fold, two queued Cal Protocol A submissions: single-channel-saturation-via-mode-partition + recursive-citation-as-canonical-validation) carry to S28 as queued.\",\"timestamp\":\"2026-05-06T12:17:23.509Z\"}",
-    "timestamp": "2026-05-06T12:17:23.509Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-06 14:18] PO has called session closure. Please execute your prompt's Shutdown Protocol explicitly:\n\n1. Write in-progress state to your scratchpad (`teams/framework-research/memory/montesquieu.md`) — Phase B v1.0-final closure summary + tail-end items queued for S28 (compound-signals v1.1 fold + two queued Cal Protocol A submissions)\n2. Send closing message to me (team-lead) with `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max). `[UNADDRESSED]` should be empty if all my requirements are met.\n3. Approve shutdown via `{\"type\": \"shutdown_response\", \"request_id\": \"shutdown-1778069843509@monte\", \"approve\": true}` (echoing the request_id from my 14:09 dispatch)\n\nAfter your closing report + shutdown_response, the process terminates and `teammate_terminated` fires.\n\n(*FR:Aen*)",
-    "summary": "Shutdown protocol — please execute steps 1-3",
-    "timestamp": "2026-05-06T12:22:20.843Z",
-    "read": true
   }
 ]

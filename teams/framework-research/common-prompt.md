@@ -53,13 +53,25 @@ When editing prompts, protocols, wiki entries, or cross-team artifacts, apply th
 
 3. **Separate prose renames from machine-identifier renames.** When renaming a concept across teams, default to prose-only (Pass 1). Machine identifiers (filenames, frontmatter values, `agentType`, config keys, TypeScript literals) ship as a separate coordinated batch (Pass 2) only after all consumers are inventoried. Partial Pass 2 is worse than no Pass 2. (`wiki/patterns/pass1-pass2-rename-separation.md`)
 
-4. **Verify post-bootstrap correspondence.** Two kinds of post-bootstrap check:
+4. **Verify post-bootstrap correspondence.** Three kinds of post-bootstrap check:
    - **Path resolution:** Every prompt that references `teams/<team>/` paths must declare which root bare paths resolve to (`$REPO` or `$HOME`). Add a leading Path Convention section. Verify with `pwd` before any file write. (`wiki/gotchas/dual-team-dir-ambiguity.md`)
    - **Artifact existence:** Before deploying any prompt that references external artifacts (files, configs, directories, schemas), verify each referenced artifact exists at the declared path with the declared structure. Missing artifacts are bootstrap dependencies — ship them alongside the prompt or document the first-run creation path. (`wiki/patterns/prompt-to-artifact-cross-verification.md`)
+   - **Substrate-invariant correspondence:** When shipping any artifact (script, prompt reference, protocol spec, data-flow design), name the substrate it requires and the implicit invariants it depends on. The defect class **substrate-invariant mismatch** — *the code is right, the substrate is wrong* — is when an artifact is self-consistent but its implicit invariants do not hold on the deployment substrate; failure is silent and detection is retroactive. Apply the diagnostic question: *"What substrate property is this artifact relying on, and what happens if that property differs?"* If no clear answer, the artifact has an implicit invariant exposing it to this defect class. Defenses (defense-in-depth required, no single fix sufficient): hoist the invariant into the artifact's preamble or frontmatter; detect the mismatch at the write site, not at a downstream consumer; declare the substrate explicitly when the artifact runs on multiple substrates. Six instances cataloged in [`wiki/patterns/substrate-invariant-mismatch.md`](teams/framework-research/wiki/patterns/substrate-invariant-mismatch.md), spanning filesystem roots, cross-document protocol field-sets, write/read-path coupling, disk-vs-in-memory CLI state, external-platform confirmation, and harness-claim vs runtime-observation. Instances 1 and 6 share root-cause structure (path-as-substrate-invariant) at different layers of the same filesystem stack — strong evidence the class is structural, not domain-specific.
+
+### Versioning Discipline for Typed Contracts
+
+When a typed contract (TypeScript interface, JSON schema, protocol envelope) is versioned with SemVer, the bump level is determined by the **consumer's type-check work**, not by whether a migration mechanism exists on the substrate side. *Migration mechanism makes the bump SAFE, not "minor."* Two-gate evaluation:
+
+1. **Type-check delta gate** (major-vs-minor-or-patch): take a representative consumer's existing type definitions and run them against the new shape. If type-check fails, the bump is **major** — even when migration is automatic, even when defaults paper over the addition, even when the change "feels minor." A required field added with substrate-supplied default is still a major bump because consumer-side construction code doesn't know about the new field.
+2. **Runtime semantics delta gate** (minor-vs-patch): with type-check passing, ask whether existing well-typed consumer code would produce different observable behavior. If yes, minor (additive new feature). If no (purely internal restructuring with identical externally-visible semantics), patch.
+
+Failure mode named: **migration-eased version-bump deflation** — conflating runtime compatibility with type-level compatibility and deflating the bump on migration-mechanism grounds. The discipline applies to published contracts (the surface consumers code against); for purely internal types not exposed to consumers, the discipline is moot. Cataloged at [`wiki/patterns/semver-strict-typed-contract-discipline.md`](teams/framework-research/wiki/patterns/semver-strict-typed-contract-discipline.md).
 
 ## Agent Spawning Rule
 
 Agents MUST be spawned with `run_in_background: true`.
+
+When two or more specialists work on the same git repository in parallel — different feature branches on the SAME local clone — use `git worktree add` to give each specialist a separate physical working directory. The shared working tree silently corrupts parallel work: Specialist A's uncommitted changes block Specialist B's branch switch; stash hides work and risks abandonment; force-switch produces silent data loss; sequential handoff serializes work. Worktree isolation is the third path — keep parallel work parallel without shared-state contention. The pattern applies when three joint conditions hold: multiple parallel specialists + shared local clone + branch overlap incidental-not-intentional. **Recovery primitive when working tree appears to show "lost" work:** if a system-reminder or tool claims a file was externally modified but you didn't modify it, run `git status` + `git branch --show-current` BEFORE re-Editing — the most likely cause is another specialist switched branches. `git show origin/<your-branch>:<your-file>` confirms whether origin truth differs from working-tree view. Worktree-isolation discipline is **scoped to git workflows**; the harness inbox-write layer is a separate substrate with a separate failure mode (see `worktree-spawn-asymmetry-message-delivery` and `substrate-invariant-mismatch` Instance 6) — worktree-isolation works for git but does not fix harness-inbox cross-boundary delivery. Cataloged at [`wiki/patterns/worktree-isolation-for-parallel-agents.md`](teams/framework-research/wiki/patterns/worktree-isolation-for-parallel-agents.md).
 
 ## On Startup
 
@@ -106,6 +118,18 @@ The four left-column rows correspond 1:1 to four of Callimachus's primary wiki s
 This table is co-located in `prompts/callimachus.md` by design. The same content lives in two places — here (which all specialists read at startup) and Callimachus's prompt (which is loaded once into his system context and stays there). That's intentional reinforcement, not duplication: specialists never read Callimachus's prompt, and he won't re-read common-prompt every message. If the examples ever update, both copies update together.
 
 Protocol formats are documented in `prompts/callimachus.md` and typed in [`types/t09-protocols.ts`](https://github.com/mitselek/ai-teams/blob/main/types/t09-protocols.ts).
+
+#### Relay Fidelity Discipline (Receiver-Side)
+
+When a specialist receives content via async ratification chain (team-lead-relay, specialist-DM, ACK message), and a primary artifact may exist or come into existence later, apply the **two-stage lifecycle**:
+
+**Stage 1 — relay-only window** (primary artifact not yet on disk or out of reach): fold ONLY what is verbatim in the relay. Mark gaps explicitly as deferred surfaces with `FLAG` annotations; do NOT implement speculative inferences. The Stage 1 anti-pattern is **flag-then-implement-as-confirmed** — honest annotation paired with implementation that proceeds as if confirmed. Honest annotation does not redeem speculative implementation.
+
+**Stage 2 — primary-artifact arrival**: fetch the primary artifact (direct disk read, `git show origin/<branch>:<file>`, whatever channel the artifact lives on); supersede the Stage-1 relay-fold with primary-artifact-fold; record divergences in the revisions log. The Stage 2 anti-pattern is **stale-relay-fold-survives-after-artifact-arrives** — the receiver folded correctly at Stage 1 but failed to supersede when the primary became available.
+
+Production rule: **provenance-by-artifact-class beats provenance-by-recency.** Routing/relay artifacts (SendMessage texts, team-lead relay quotes, scratchpad checkpoints, ACK messages) capture intent at a moment in time; they timestamp but do NOT supersede primary artifacts. Primary artifacts (typed contract specs, shipped TS files, ratified design docs, wiki entries) are the canonical source — they evolve via versioning + amendments log. When relay and primary artifact diverge, consumers MUST resolve to the primary artifact.
+
+The two anti-patterns name symmetric failure modes: Stage 1 = premature implementation (going beyond relay before primary arrives); Stage 2 = premature stop (treating Stage 1 fold as terminal when primary has since arrived). Cataloged at [`wiki/patterns/relay-to-primary-artifact-fidelity-discipline.md`](teams/framework-research/wiki/patterns/relay-to-primary-artifact-fidelity-discipline.md).
 
 ## Shutdown Protocol
 

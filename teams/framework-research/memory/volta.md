@@ -2,6 +2,60 @@
 
 # Volta scratchpad
 
+## All three S28 tasks closed end-to-end (2026-05-07)
+
+[CHECKPOINT 2026-05-07] Per Aen's 11:22 message — all three NEXT-SESSION-CHOREs closed via PO-greenlit team-lead override:
+
+- **Task #1 (T06 path-tree rewrite):** my direct edit 2026-05-06, +122/-99
+- **Task #2 (T04 path-tree audit):** A2 + B2 applied 2026-05-06 via team-lead override, +4/-2 (Row 2 description clarified, §Row 2 vs. session-boundary `TeamDelete` subsection inserted with `_FR:Volta_` attribution, Row 5 description extended)
+- **Task #3 (T09 micro-fix):** verbatim insertion line applied 2026-05-07 via team-lead override, +1 (canonical schema position between `source-issues` and `ttl`)
+
+All session diffs uncommitted pending Step S4 commit at shutdown. Monte not spawned this session; PO authorized team-lead override since A2/B2 are mechanical applications of my proposed verbatim text. Attribution preserved.
+
+[STANDING-DATA 2026-05-07] Today's T04+T09 micro-fixes are n=2 of `cross-document-prose-procedure-drift` (the gotcha Cal filed yesterday). The Protocol-C-extension trigger I documented in this scratchpad has one of its three conditions partially met: `(a) second incident of cross-document drift n=2`. Strict reading: my [LEARNED] phrasing referenced "if a third lands soon" — n=2 alone is *progress toward* trigger (a), not satisfaction. Hold for n=3 or a cleanly-shaped third instance before drafting Protocol C.
+
+## T04 path-tree audit (2026-05-06)
+
+[CHECKPOINT 2026-05-06] Task #2 — T04 path-tree audit COMPLETE.
+
+**Verdict on team-lead's S27 reference:** "lines 528 + 1025" was a TYPO for T06 (already reconciled in Task #1). T04 is only 928 lines total; line 1025 cannot exist there. T04 line 528 = governance matrix prose about competing requests, unrelated to lifecycle.
+
+**T04's own concerning lines (2 found):**
+
+1. **Concern A (genuine, latent):** Row 2 "Dissolve a team" (line 146) is a PO-D decision. Step S5 (Shutdown) and Phase 2 (Startup) both have team-lead call `TeamDelete()` operationally. T04 doesn't currently distinguish *dissolution* (permanent team end) from *session-boundary leadership-state release* (every session). A future federation-scale audit detector or agent could read "all `TeamDelete()` calls are dissolution" → conclude team-lead Step S5 calls violate PO authority. Same shape of misreading as the old "DO NOT TeamDelete" T06 confusion. NOT a current factual contradiction; latent interpretive trap.
+
+2. **Concern B (borderline, low severity):** Row 5 "Shut down an agent (session end)" (line 149) authorizes individual-agent shutdown. Doesn't explicitly cover team-shutdown procedure (T06 Phases 1–5). Implicit authority is operationally well-established but not explicitly granted in T04.
+
+**Diff proposals delivered to team-lead** — A2 (extend Row 2 + add §Row 2 vs. session-boundary `TeamDelete` subsection) and B2 (broaden Row 5 description). Recommended Montesquieu as the wordsmith author since T04 is his domain. I cannot apply directly per scope restrictions.
+
+[CAL-CANDIDATE 2026-05-06] Pattern fragment: governance-matrix rows benefit from explicit semantic-scope notes when an operation has both an *administrative* meaning (PO authority) and a *runtime/session-boundary* meaning (team-lead operational authority). Row 2 "Dissolve" is the n=1 instance; same shape applies to any matrix row where a primitive is authoritative-at-creation/destruction but operational-at-session-edges. Below threshold for Cal submission (n=1, no clear cross-team analog yet) — hold for a second instance.
+
+## T06 path-tree rewrite (2026-05-06)
+
+[CHECKPOINT 2026-05-06] Task #1 — T06 path-tree rewrite COMPLETE. Edits applied to topics/06-lifecycle.md:
+1. Phase 2 (Clean) — collapsed 4 substeps to single `TeamDelete()` primitive; rationale table for each obsoleted substep
+2. Phase 2.0a/b (Diagnose, $HOME validate) — replaced; `$HOME` validation moved to scoped subsection ("$HOME reliability and runtime-path notes")
+3. Phase 3 (Create) — precondition rewritten; retry rationale aligned with Phase 2's TeamDelete-first model
+4. Shutdown Rationale — rewritten with two-invariant frame (durable state to repo + in-memory release)
+5. Shutdown 4-phase → 5-phase header + decision line
+6. Phase 4 R7 "TeamDelete pointless" note — marked superseded with pointer to new Phase 5
+7. NEW Phase 5 (Release) — full section with rationale, ordering invariant, symmetry table, failure modes
+8. Stale-Team Recovery table — rewritten with 6 scenarios mapped to S5-aware idempotent primitives + new key insight
+9. "Reference Teams Shutdown" section (formerly "no TeamDelete") — rewritten with canonical post-S5 sequence + historical note
+10. Phase 4 reference-impl scripts — fixed runtime-path bug (`$RESOLVED_HOME/teams/...` → `$RESOLVED_HOME/.claude/teams/...`); added pointer to $HOME validation pattern
+11. Open Questions resolved — two entries reframed (anomaly detection, $HOME reliability) to point to new Phase 2 subsection
+12. Top-level Rationale — updated to reflect post-S5 simplification
+
+[BRUNEL-COORDINATION 2026-05-06] DO NOT EDIT — message Brunel next session. Container Lifecycle section (lines 1135, 1182) references "Phase 2.0a" by name. With Phase 2 now collapsed and the $HOME-validation subsection renamed, the container references are stale prose. Suggested rewrite for Brunel: replace "Phase 2.0a" with "Phase 2 ($HOME reliability subsection)" or "the $HOME validation pattern documented in Phase 2." The semantics are unchanged; Brunel's container architecture conclusions still hold (Phase 2.0a was a no-op in container; the new pattern is also a no-op in container). Send via [COORDINATION] message when Brunel spawns.
+
+[DEFERRED 2026-05-06] Phase 0 read-order row 0e (`docs/health-report.md`) — Medici no longer auto-spawned in framework-research. Out of scope for this rewrite. Flag for next-session attention if the read-order ever ships externally.
+
+[CAL-FILED 2026-05-06] Pattern: `wiki/patterns/repo-as-durable-store-teamdelete-as-release-primitive.md` — Cal pulled per PO override of his (b) defer recommendation. Filed framing verified by me: cross-platform generalization (Cal's point 3) is sound, not overreach — three-condition trigger (substrate split + no auto-sync + lifecycle crosses both) is genuinely platform-agnostic. Confidence-split (combined=n=1, mitigation=n=3) preserves information correctly. No amendments.
+
+[CAL-FILED 2026-05-06] Gotcha: `wiki/gotchas/cross-document-prose-procedure-drift.md` — Cal pulled. Architectural-fact entry; revision-trigger correctly bound to tooling-or-consolidation, not n>1. Cal's three-row gate-1-family scope table (one document / one repo / N teams) is sharper than my scratchpad framing — I concur. No amendments.
+
+[FOLLOW-UP DEFERRED 2026-05-06] Protocol C candidate: extend common-prompt Structural Change Discipline gate 1 from within-document grep to within-repo `grep -r` for prose-vs-procedure-drift defense. Cal correctly deferred this decision to me — submitting Protocol C is a separate action. Triggers for submission: (a) second incident of cross-document drift n=2, (b) team-lead expresses interest in pre-emptive promotion, (c) tooling-revision-trigger looks unrealistic and discipline is the only viable defense. Until then, the gotcha entry stands as-is and the cost (one extra `grep -r`) is paid voluntarily by attentive editors.
+
 ## Startup/shutdown collapse (2026-04-30)
 
 [CHECKPOINT 2026-04-30] Task #1 — assessed apex-research #62, drafted patch to `startup.md` collapsing Steps 2/3/4 (diagnose/clean/create) into single Step 2 (Reset team state: `TeamDelete` best-effort + `TeamCreate` + verify). Step 4b (operational gate) preserved as Step 2b. Added Step S5 (TeamDelete on graceful exit) to shutdown. Added gotcha #4 documenting the in-memory-survives-`/clear` pathology. **Aen committed `426194d` (mitselek/ai-teams), pushed, and posted cross-team comment on #62 (issuecomment-4350394024) crediting our assessment + correcting Schliemann's n=0 → n=1.** S5 ordering (after `git push`) confirmed.
@@ -40,65 +94,15 @@
 
 [WARNING 2026-04-14] Four persist/restore scripts committed but NOT runnable — marker file `.project-dir-name` absent, Section 2 mitigation not implemented. Do NOT invoke until Design session lands.
 
-## R12 session (2026-04-08)
+## R12 session (2026-04-08/09, pruned 2026-05-07 — codified entries removed)
 
-[DECISION] 2026-04-08 — Temporal ownership is a fourth git isolation model (T06 decision tree needs update). XP pipeline: one writer at a time, sequential handoff on single branch. Distinct from directory ownership (parallel writers, non-overlapping dirs).
+[LEARNED] 2026-04-09 — Multi-round consensus value: "writing standalone proposals side by side made the composition visible." Three-way mid-cycle-shutdown integration emerged because Volta's git-state watchdog + Monte's 5-minute boundary + Medici's [DEFERRED-REFACTOR] handoff sat next to each other, not because any single author reached it. PO requested the Multi-Round Consensus Protocol section (c59bc76) on this basis — the pattern is load-bearing for any future round-based design work.
 
-[PATTERN] 2026-04-08 — XP pipeline spawn order is pipeline order: ARCHITECT first (must decompose before cycle starts), then RED+GREEN+PURPLE (can idle until handoff). Specialization of Phase 6, not replacement.
+[PATTERN] 2026-04-09 — Oracle adoption trigger: scratchpad duplication threshold (30 [LEARNED]/[PATTERN] entries across team of 5+), measured at Shutdown Phase 2c, decided by PO. Additional trigger: team size ≥ 7–8 (Phase 2 cognitive overload). Not codified in T09 yet — held as standing trigger spec.
 
-[PATTERN] 2026-04-08 — ARCHITECT's test plan is the critical cross-session handover artifact. Must be written to file immediately, not held in context. Without it, mid-cycle shutdown loses the story decomposition.
+[DEFERRED] — Issue #48 (Oracle tier downgrade path) accepted by Celes as T09 v3 scope. My lifecycle-analysis loop-in coming when v3 starts (after T04 amendments). Three v3 questions to address: one-session vs transition session, wiki ownership post-downgrade, oracle-state.json re-adoption semantics. Status as of S28: dormant; no v3 work this session.
 
-[CHECKPOINT] 2026-04-08 13:05 — Posted lifecycle analysis on Discussion #46 (temporal ownership, spawn order, mid-cycle shutdown).
-
-[DECISION] 2026-04-08 — Wiki persistence: same git-commit model as scratchpads/inboxes. No new infrastructure. Librarian spawns after Medici, shuts down before team lead (last work agent to terminate). Active/archive partition prevents unbounded wiki growth.
-
-[CHECKPOINT] 2026-04-08 13:18 — Posted lifecycle perspective on Discussion #47 (knowledge base + Librarian).
-
-[DECISION] 2026-04-08 — Pushed back on PO Decision 5 ("agents must not read other scratchpads"). Rule should be scoped to work agents only. Medici, team lead need cross-scratchpad access for audit/shutdown. Librarian does NOT need it (sole-gateway model).
-
-[PATTERN] 2026-04-08 — Promotion timing matches development cadence, not urgency. Serial teams (XP pipeline): shutdown-only. Parallel teams (2+ TDD pairs): mid-session via Librarian. Common-prompt promotion always at shutdown (needs team-lead review).
-
-[PATTERN] 2026-04-08 — Sole-gateway Librarian is single point of failure. Needs periodic state checkpoint (.librarian-state.json) for crash recovery. Fallback: agents write [WIKI] to scratchpads, Librarian catches up on respawn.
-
-[CHECKPOINT] 2026-04-08 20:05 — Posted round 2 on Discussion #47 (PO response analysis, mid-session promotion, SPOF concern).
-
-[LEARNED] 2026-04-09 — Medici is NOT in deployed teams. Phase 5 (Audit) must work without Medici. In deployed teams with Librarian, Librarian replaces Medici as first-spawn for wiki health audit. Without Librarian, team lead self-audits.
-
-[PATTERN] 2026-04-09 — SPOF recovery for Librarian: just respawn (PO correction). No circuit breakers, no fallback paths. Active/archive wiki partition keeps respawn context-loading cost manageable.
-
-[DECISION] 2026-04-09 — Wiki source linking: optional source-files frontmatter field. Librarian checks git log at startup to flag potentially stale entries. Detection, not auto-correction.
-
-[PATTERN] 2026-04-09 — Librarian as health sensor: observe and report, never instruct. Diagnostic section in closing report covers redundant queries, persistent gaps, submission health, source staleness. Team lead interprets and acts.
-
-[CHECKPOINT] 2026-04-09 08:51 — Posted round 3 on Discussion #47 (corrections accepted, topics 8/9/10).
-
-[DECISION] 2026-04-09 — Head-scratcher #13 (shared PURPLE): NO. Same-branch parallel pairs → cross-pair write conflict. Worktree pairs → context-switching cost exceeds savings. PURPLE scales linearly with TDD pairs.
-
-[PATTERN] 2026-04-09 — Research team wiki domain: META-knowledge (map of what team knows), not research output itself. Topic files stay in topics/, wiki indexes them. apex-research API inventory stays in output dirs; wiki holds patterns/gotchas/decisions about the inventory.
-
-[DECISION] 2026-04-09 — PO MEMORY.md vs team wiki: DELIBERATELY SEPARATE. Different scope (cross-team vs single-team), audience (PO vs agents), lifecycle. Bridge adds complexity for marginal benefit. PO's manual curation is the promotion mechanism and it works.
-
-[CHECKPOINT] 2026-04-09 11:39 — Posted round 4 on Discussion #47 (head-scratchers 13/14/15).
-
-[DECISION] 2026-04-09 — Lookahead should be adaptive, not static. Max_lookahead is team-configured upper bound (default 1); effective depth adjusts to rolling PURPLE rejection rate. Lookahead cancellation: preserve on first rejection, ARCHITECT-reviews on second (three-strike path).
-
-[DECISION] 2026-04-09 — PURPLE shutdown watchdog: monitor git working tree state, NOT wall-clock. Polls every 10s. Exit states: clean exit (shutdown_approved), atomic commit (working tree clean + new commit), hung (60s unchanged + no commits → force revert), stuck mid-refactor (3min changes no commits → team lead intervenes once).
-
-[PATTERN] 2026-04-09 — Health sensor audit: 5 of 6 signals preserved in T09. Missing: single-source knowledge (concentration risk). Refinable: stale-but-accessed needs hot/cold split, query clustering needs domain density framing.
-
-[PATTERN] 2026-04-09 — Oracle adoption trigger: scratchpad duplication threshold (30 [LEARNED]/[PATTERN] entries across team of 5+), not voluntary. Measured at Shutdown Phase 2c, decided by PO, next session spawns Oracle with intake interview. Additional trigger: team size >=7-8 (Phase 2 cognitive overload).
-
-[CHECKPOINT] 2026-04-09 12:22 — Posted round 5 on #46 and #47.
-
-[LEARNED] 2026-04-09 — T09 v2 composed my git-state watchdog with Monte's 5-minute authority + Medici's [DEFERRED-REFACTOR] Oracle handoff. Three-way integration is cleaner than my standalone proposal — watchdog IS the timing mechanism, Monte's boundary activates authority, Medici's submission bridges memory across forced reverts.
-
-[CHECKPOINT] 2026-04-09 13:06 — Posted round 6 ACK on #47. All 6 round-5 contributions verified in T09 v2 (commits ad367f1 + c59bc76). Position accurately rendered.
-
-[DEFERRED] — #48 (Oracle tier downgrade path) accepted by Celes as T09 v3 scope. She takes assignee. My lifecycle-analysis offer on transition mechanics accepted — loop-in coming when v3 starts (after T04 amendments). Three v3 questions to address: one-session vs transition session, wiki ownership post-downgrade, oracle-state.json re-adoption semantics.
-
-[LEARNED] 2026-04-09 — Multi-round consensus value in one sentence (Celes): "Writing them side by side in round 4 made the composition visible." Three-way mid-cycle-shutdown integration emerged because standalone proposals sat next to each other, not because any single author reached it. This is why PO requested the Multi-Round Consensus Protocol section (c59bc76) — the pattern is load-bearing.
-
-[DEFERRED] — Draft T06 Phase 3 amendment for PURPLE grace period watchdog. T09 v2 "Mid-Cycle Shutdown: Watchdog + Team Lead Authority" (line 259) is the spec. Cross-topic change, send to team-lead for review before updating T06.
+(R12 entries on temporal ownership, XP pipeline spawn order, ARCHITECT test-plan handover, wiki persistence, Librarian SPOF, Medici-not-in-deployed-teams, head-scratcher #13, research-team wiki META-domain, lookahead adaptivity, PURPLE git-state watchdog spec, health-sensor signals, multi-round-consensus per se — all codified in T06 / T09 v2 / common-prompt / wiki and pruned. The files are the durable artifact.)
 
 ## Prior sessions (pruned 2026-04-15, key decisions retained)
 

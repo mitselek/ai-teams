@@ -8,13 +8,15 @@ Spawning, scaling, shutdown, and handover of teams.
 
 Startup is a 7-phase sequence: **Orient → Sync → Clean → Create → Restore → Audit → Spawn**. Each phase has a precondition and a verifiable outcome. Skipping or reordering any phase produces a known failure mode (documented below).
 
-### Rationale
+### Rationale (_FR:Volta_ — rewritten 2026-05-06, S5-aware)
 
-Both reference teams (rc-team and hr-devs) converged on the same pattern independently, but with implementation scattered across prompts, scripts, and MEMORY.md entries. The core insight: `TeamCreate` is destructive — it requires a clean directory but must preserve inboxes. This forces a backup-delete-create-restore dance that is the single most fragile part of the lifecycle. Making it explicit and atomic prevents the most common startup failures.
+Both reference teams (rc-team and hr-devs) converged on the same pattern independently, but with implementation scattered across prompts, scripts, and MEMORY.md entries. The core insight (post-2026-04-30): the parent CLI's in-memory team-leadership state is the binding invariant — not disk state. `TeamCreate` requires that no team-leadership state is currently held; the only primitive that releases it is `TeamDelete`. Disk-level cleanup (`rm -rf`) is strictly weaker and was the source of repeated "Already leading team" failures.
+
+Once Phase 2 (Clean) is reduced to `TeamDelete()` and Phase 3 (Create) to `TeamCreate() + verify`, the rest of the protocol is straightforward: orient before sync, restore inboxes from the durable repo copy, audit before spawning, spawn agents under the duplicate-prevention gate. The fragile parts that the older protocol invented machinery to defend (inbox backup dance, `$HOME` validation in cleanup paths, dir-state diagnostic branches) collapse into single primitives or disappear entirely.
 
 ### Phase Ordering is Mandatory (_FR:Volta_ — amendment from restart test 3, 2026-03-13)
 
-Field test (2026-03-13, restart 3) showed the team-lead executed phases out of order AND mislabeled them (called Phase 3 Create "Phase 1: Sync"). The actual execution order was: Explore (not in protocol) → Phase 2.0 Diagnose + git pull (mixed) → Phase 3 Create (mislabeled) → read config files (should have been Phase 0) → Phase 5 Audit. Cost: 73.5k tokens and 2m18s wasted on an Explore agent that Phase 0 would have replaced.
+Field test (2026-03-13, restart 3) showed the team-lead executed phases out of order AND mislabeled them (called Phase 3 Create "Phase 1: Sync"). The actual execution order was: Explore (not in protocol) → diagnose + git pull (mixed) → Phase 3 Create (mislabeled) → read config files (should have been Phase 0) → Phase 5 Audit. Cost: 73.5k tokens and 2m18s wasted on an Explore agent that Phase 0 would have replaced.
 
 **Rule:** Execute phases in the numbered order. State the phase name before executing it. Each phase's precondition is that the previous phase completed successfully. `startup.md` provides the condensed executable checklist — follow it mechanically, step by step.
 
@@ -86,97 +88,59 @@ cd <team-config-repo> && git pull
 **Expected outcome:** Prompts, roster, and common-prompt are at HEAD.
 **Failure if skipped:** Stale prompts or roster — agents spawn with outdated instructions or wrong models.
 
-### Phase 2: Clean
+### Phase 2: Clean (_FR:Volta_ — rewritten 2026-05-06, S5-aware)
 
 **Precondition:** Orient and Sync complete. Team lead has read the roster, common-prompt, and own scratchpad (Phase 0), and pulled the latest config (Phase 1).
-**Action:** Four sub-steps, strictly ordered:
+**Action:** One primitive: `TeamDelete(team_name="<team-name>")` — best-effort, ignore "no team to delete".
 
 ```
-2.0. Diagnose team dir state
-2a.  Backup inboxes (if stale team dir exists)
-2b.  Kill zombie agent processes (tmux panes, background daemons)
-2c.  Remove stale team directory
+TeamDelete(team_name="<team-name>")   # best-effort
 ```
 
-#### Phase 2.0a: Validate `$HOME` (_FR:Volta_ — amendment from restart 4, 2026-03-13)
+**Expected outcome:** No team-leadership state held by the parent CLI process. Filesystem state at `$HOME/.claude/teams/<team-name>/` is irrelevant to subsequent phases — Phase 3's `TeamCreate` will write what it needs.
+**Failure if skipped:** `TeamCreate` in Phase 3 fails with "Already leading team. Use TeamDelete to end the current team before creating a new one."
 
-**Problem this solves:** Restart 4 field test revealed that `$HOME` resolves to an EMPTY STRING in some bash invocations on Windows/Git Bash. The diagnose script then checks `/teams/framework-research` (root path) instead of the correct user path. Other bash calls in the same session resolved `$HOME` correctly. Shell initialization is inconsistent across bash invocations on this platform.
+#### Why one primitive instead of the previous four-substep procedure (_FR:Volta_ — 2026-05-06)
 
-**Rule: Never use `$HOME` directly in path construction. Always resolve it first and validate.**
+The R1–R7 protocol had four sub-steps: diagnose dir state, backup inboxes, kill zombies, remove dir. The 2026-04-30 session-startup amendment (`startup.md` Step 2 collapse, gotcha #4) revealed all four were either obsolete or strictly weaker than `TeamDelete`:
+
+| Old sub-step           | Why obsolete                                                                                                                                                                                                                                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.0 Diagnose dir state | The relevant invariant is **in-memory team-leadership state held by the parent CLI**, not disk state. An empty dir does not mean a clean state; a present dir does not mean a recoverable one. The dir-state check costs an `ls` but determines no branch — both branches converge on `TeamDelete + TeamCreate`.               |
+| 2a Backup inboxes      | Runtime-dir inboxes are stale copies. The durable copy lives in the repo (Shutdown Phase 4a writes `inboxes/` to git). Phase 4 (Restore) reads from the repo, not the runtime dir. Backing up the runtime copy is pointless work.                                                                                              |
+| 2b Kill zombies        | For Agent-tool teams: agent processes terminate with the parent session — no zombies possible. For RC/tmux teams: pane cleanup is part of `rc-start.sh` / spawn lifecycle, not the post-bootstrap reset. If zombies do appear, that is a deployment-substrate concern, not a per-session reset concern.                       |
+| 2c `rm -rf $TEAM_DIR`  | **Strictly weaker than `TeamDelete`.** `rm -rf` cleans disk but cannot release in-memory leadership state. The 2026-04-30 startup confirmed this empirically: `rm -rf` ran clean, then `TeamCreate` returned "Already leading team" because the parent CLI's in-memory state survived `/clear`. Recovery required `TeamDelete` anyway. |
+
+`TeamDelete` is the single primitive that handles every prior-state scenario — fresh CLI, post-`/clear` CLI with surviving leadership, interrupted previous session, or wrong team name held by the lead. It is idempotent (returns "no team to delete" if nothing to clean) and platform-correct (releases both disk and in-memory state where they exist).
+
+**Why this matches the new Shutdown Step S5.** Shutdown Phase 5 (`TeamDelete` on graceful exit) is the *symmetric* primitive on the way out. When S5 has run, Phase 2's `TeamDelete` is a no-op — the cleanest possible startup. When S5 was skipped (crash, forced exit, missed step), Phase 2's `TeamDelete` is the recovery. The protocol is symmetric and idempotent on both ends.
+
+#### `$HOME` reliability and runtime-path notes (_FR:Volta_ — moved from R4 Phase 2.0a, 2026-05-06)
+
+The R4 Phase 2.0a `$HOME` validation gate was load-bearing for the old `rm -rf "$TEAM_DIR"` substep — a wrong `$HOME` would resolve `$TEAM_DIR` to a wrong path and the cleanup would silently miss. With the substep removed, the platform itself owns the runtime path, not the protocol scripts.
+
+**Where `$HOME` reliability still matters:**
+
+- **Phase 4 (Restore)** writes to the runtime dir (`$HOME/.claude/teams/<team-name>/inboxes/`). The reference script must validate `$HOME` before constructing the path — see Phase 4 reference implementation.
+- **Shutdown Phase 4a (Persist)** reads from the same runtime dir.
+- **Lifecycle scripts** (`restore-inboxes.sh`, `persist-inboxes.sh`) own this validation in one place rather than repeating it per phase.
+
+**Validation pattern (use in any script that references the runtime dir):**
 
 ```bash
-# Resolve HOME — do NOT trust $HOME on Windows/Git Bash
 RESOLVED_HOME="$HOME"
 if [ -z "$RESOLVED_HOME" ] || [ "$RESOLVED_HOME" = "/" ]; then
-  # Fallback: use /c/Users/<username> pattern (MSYS2/Git Bash)
-  RESOLVED_HOME="/c/Users/$(whoami)"
+  RESOLVED_HOME="/c/Users/$(whoami)"   # MSYS2/Git Bash fallback
 fi
-
-# Validate
-if [ ! -d "$RESOLVED_HOME" ]; then
-  echo "FATAL: Cannot resolve home directory. HOME='$HOME', fallback='$RESOLVED_HOME'"
-  echo "Manual intervention required."
-  exit 1
-fi
-
-TEAM_DIR="$RESOLVED_HOME/teams/<team-name>"
-echo "Using TEAM_DIR=$TEAM_DIR"
+[ -d "$RESOLVED_HOME" ] || { echo "FATAL: cannot resolve home"; exit 1; }
+TEAM_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
 ```
 
-**Why not just use absolute paths everywhere?** Absolute paths solve the immediate problem but create a new one: `startup.md` and protocol scripts become machine-specific. The `$HOME` validation gate is the correct fix because it keeps scripts portable while defending against the platform bug. However, `startup.md` (which IS machine-specific) SHOULD use absolute paths — it's the one place where portability doesn't matter.
-
-**Impact on all subsequent phases:** Every bash script in Phases 2-4 that references `$HOME` must use `$RESOLVED_HOME` instead, or must run this validation first. The reference implementations below are updated accordingly.
-
-#### Phase 2.0b: Diagnose (_FR:Volta_ — rewritten R7, 2026-03-15)
-
-Before touching the filesystem, check whether a stale runtime dir exists. This costs one `ls`.
-
-**Precondition:** `$RESOLVED_HOME` is validated (Phase 2.0a). `$TEAM_DIR` is set.
-
-**Key insight (R7, 2026-03-15):** The runtime dir (`$HOME/.claude/teams/<team-name>/`) is **ephemeral by platform design**. The Claude Code platform does not preserve team directories between CLI sessions. An empty runtime dir at startup is the **normal** state, not an anomaly. All durable state lives in the repo (scratchpads in `memory/`, inboxes in `inboxes/`, both git-tracked). The previous protocol (R1–R6) treated a missing runtime dir as anomalous and required investigation — this was wrong and wasted tokens every session.
-
-```bash
-# TEAM_DIR was set in Phase 2.0a — do NOT re-derive from $HOME
-if [ -d "$TEAM_DIR" ]; then
-  echo "STALE DIR — runtime dir exists (interrupted session or same CLI invocation). Will clean."
-else
-  echo "CLEAN — no runtime dir. Normal state between sessions."
-fi
-```
-
-| Scenario  | Meaning                                                          | What 2a–2c do                              |
-| --------- | ---------------------------------------------------------------- | ------------------------------------------ |
-| STALE DIR | Runtime dir left over from interrupted or same-invocation session | 2b kills zombies if needed, 2c removes dir |
-| CLEAN     | Normal state — platform cleaned up after last session            | 2a, 2b, 2c are all no-ops                 |
-
-Both scenarios converge to the same outcome: `$TEAM_DIR` does not exist. **Always run 2a–2c regardless** — they are idempotent and safe on empty state. No anomaly investigation is needed; the repo is the source of truth for all cross-session state.
-
-**Reference implementation (sub-steps 2a–2c):**
-
-```bash
-# TEAM_DIR was set in Phase 2.0a ($HOME validation) — do NOT re-derive from $HOME
-
-# 2a — no-op. Inboxes are persisted to the repo during Shutdown Phase 4a.
-# Runtime dir inboxes are stale copies — safe to discard with the dir in 2c.
-
-# 2b — kill zombies (RC: kill all non-%0 panes; local: N/A)
-# RC-specific: tmux kill-pane for each agent pane
-# Local: Agent tool processes terminate with parent session
-
-# 2c — remove stale dir (safe even if it doesn't exist)
-rm -rf "$TEAM_DIR"
-```
-
-**Expected outcome:** `$TEAM_DIR` does not exist. Ready for Phase 3 (Create).
-**Failure if skipped:**
-
-- Skip 2.0b → team lead wastes tokens investigating a non-problem
-- Skip 2b → zombie processes hold TTY → new spawn may fail or create invisible agents
-- Skip 2c → `TeamCreate` generates a random name (e.g. `cloudflare-builders-a7f3`) → inbox routing breaks, all `SendMessage` calls fail silently
+**`startup.md` is machine-specific by design** — it may use an absolute path for the runtime dir (e.g., `/c/Users/<username>/.claude/teams/<team-name>/`) instead of `$HOME`-derived. The lifecycle scripts (which travel across machines via the repo) keep the validation gate.
 
 ### Phase 3: Create
 
-**Precondition:** `$TEAM_DIR` does not exist. Inboxes backed up.
+**Precondition:** Phase 2 (Clean) ran `TeamDelete` — no in-memory leadership state held.
 **Action:** `TeamCreate(team_name="<team-name>")` with post-creation verification and retry.
 
 **Expected outcome:** Fresh `$TEAM_DIR` exists with `config.json` containing `leadSessionId`. No `inboxes/` subdirectory (TeamCreate does not create it).
@@ -206,7 +170,7 @@ rm -rf "$TEAM_DIR"
             This is a platform/tool bug. Cannot proceed."
 ```
 
-**Why TeamDelete before retry:** The first TeamCreate may have registered internal state (the tool returned `leadAgentId`) even though it didn't write config.json. A second TeamCreate without TeamDelete may say "Already leading team" but still not fix the disk state. TeamDelete clears the phantom internal state.
+**Why TeamDelete before retry:** The first TeamCreate may have registered internal state (the tool returned `leadAgentId`) even though it didn't write config.json. A second TeamCreate without TeamDelete may say "Already leading team" but still not fix the disk state. TeamDelete clears the phantom internal state. This is the same primitive Phase 2 (Clean) uses pre-create — the recovery is just "run Phase 2 again, then Phase 3 again."
 
 **Why max 2 attempts:** If the tool is fundamentally broken (disk permission issue, path bug), retrying indefinitely wastes time. Two attempts distinguish "transient glitch" from "systematic failure."
 
@@ -219,7 +183,9 @@ rm -rf "$TEAM_DIR"
 
 ```bash
 TEAM_CONFIG_DIR="<team-config-repo>/teams/<team-name>"
-# TEAM_DIR is the runtime dir, set in Phase 2.0a
+# TEAM_DIR is the runtime dir; resolve via the $HOME validation pattern
+# (see Phase 2 "$HOME reliability" subsection) before constructing it
+TEAM_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
 
 if [ -d "$TEAM_CONFIG_DIR/inboxes" ]; then
   mkdir -p "$TEAM_DIR/inboxes"
@@ -294,11 +260,16 @@ Medici reads all scratchpads, prompts, and common-prompt, then reports:
 
 ### Decision
 
-Shutdown is a 4-phase sequence: **Halt → Notify → Collect → Persist**. Team lead shuts down last. The repo is the sole durable store — the runtime dir is ephemeral.
+Shutdown is a 5-phase sequence: **Halt → Notify → Collect → Persist → Release**. Team lead shuts down last. The repo is the sole durable store; the runtime dir and the parent CLI's in-memory leadership state are both released cleanly on graceful exit.
 
-### Rationale
+### Rationale (_FR:Volta_ — rewritten 2026-05-06, S5-aware)
 
-The key insight from operational experience: the team directory must survive shutdown so that the next session can restore inboxes. `TeamDelete` destroys this. The shutdown sequence is designed so that no state is lost even if the session is interrupted between phases.
+Two invariants drive the shutdown sequence:
+
+1. **All cross-session state must reach the repo before the session ends.** Scratchpads (already in the repo dir, git-tracked) are committed. Inboxes (in the runtime dir, not git-tracked) are copied to the repo dir and committed. After Phase 4 (Persist), the runtime dir holds nothing load-bearing.
+2. **The parent CLI's in-memory team-leadership state must be released on graceful exit.** This state is independent of disk and survives `/clear`. If it is not released, the next session's `TeamCreate` fails with "Already leading team" — recoverable via the next session's Phase 2 `TeamDelete`, but the cleaner happy-path is to release it now. Phase 5 (Release) is the explicit primitive.
+
+R7 and earlier had only four phases; the conclusion at the time was "TeamDelete is unnecessary because the runtime dir is ephemeral." This conflated *runtime-dir* ephemerality (true — the platform may clean the dir between sessions) with *in-memory leadership state* persistence (also true — but not addressed by the platform's dir cleanup). The 2026-04-30 session-startup amendment to `startup.md` made the distinction empirically obvious and added Phase 5 (Release) as the symmetric counterpart to startup's Phase 2 (Clean). The two together make the protocol idempotent: clean entry + clean exit = no recovery work in the steady state.
 
 ### Phase 1: Halt
 
@@ -478,7 +449,7 @@ The next session's PURPLE queries the Librarian for `[DEFERRED-REFACTOR]` entrie
 
 #### Phase 4a: Persist inboxes to repo (_FR:Volta_ — 2026-03-13)
 
-**Problem this solves:** The previous protocol relied on the runtime dir (`$HOME/.claude/teams/...`) surviving between sessions. Phase 5 (Preserve) said "do NOT call TeamDelete" to keep inboxes alive. But the runtime dir is ephemeral — reboots, manual cleanup, or OS temp cleanup can destroy it. Field observation (2026-03-13): COLD START despite 5 prior commits in memory/. All closing reports from the previous session were lost because they existed only in the runtime dir's inboxes.
+**Problem this solves:** The R1–R6 protocol relied on the runtime dir (`$HOME/.claude/teams/...`) surviving between sessions. The pre-R7 shutdown phase (then named "Phase 5: Preserve" — *not* the current Phase 5: Release) said "do NOT call TeamDelete" in order to keep inboxes alive in the runtime dir. But the runtime dir is ephemeral — reboots, manual cleanup, or OS temp cleanup can destroy it. Field observation (2026-03-13): COLD START despite 5 prior commits in memory/. All closing reports from the previous session were lost because they existed only in the runtime dir's inboxes.
 
 **Key insight: there are TWO `teams/<team-name>/` directories:**
 
@@ -493,8 +464,9 @@ Scratchpads live in the repo dir and are already committed. Inboxes live in the 
 
 ```bash
 # Phase 4a: Persist inboxes
+# Use the $HOME validation pattern (see startup Phase 2 "$HOME reliability") to set $RESOLVED_HOME first
 TEAM_CONFIG_DIR="<team-config-repo>/teams/<team-name>"
-RUNTIME_DIR="$RESOLVED_HOME/teams/<team-name>"
+RUNTIME_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
 
 if [ -d "$RUNTIME_DIR/inboxes" ]; then
   mkdir -p "$TEAM_CONFIG_DIR/inboxes"
@@ -525,7 +497,44 @@ git push
 **Expected outcome:** All scratchpads, task snapshots, and pruned inboxes are committed and pushed.
 **Failure if skipped:** Next session has no scratchpad state and no inbox history — agents restart with amnesia, closing reports lost.
 
-**Note (_FR:Volta_ — R7, 2026-03-15):** Previous versions had a Phase 5 (Preserve) that said "do NOT call TeamDelete." This was removed because the runtime dir is ephemeral by platform design — the platform destroys it between sessions regardless. Phase 4 (Persist to repo) is the final shutdown step. The repo is the sole durable store. Calling TeamDelete is harmless (the platform will clean up anyway) but also pointless.
+**Note (_FR:Volta_ — superseded 2026-05-06, see Phase 5 below):** Earlier versions said "Phase 4 is the final shutdown step. Calling TeamDelete is pointless." This was wrong. The runtime *dir* is platform-managed, but the parent CLI's *in-memory team-leadership state* is not — it survives `/clear` independently of disk. Phase 5 (Release) below is the explicit primitive that releases it on graceful exit. See Phase 5 rationale and `startup.md` gotcha #4 for the empirical evidence (2026-04-30 session-startup).
+
+### Phase 5: Release (_FR:Volta_ — 2026-05-06, S5 propagation from `startup.md`)
+
+**Precondition:** Phase 4 (Persist) committed and pushed all session state. The repo holds the durable copy of scratchpads, task snapshot, and pruned inboxes.
+**Action:** Release the parent CLI's in-memory team-leadership state.
+
+```
+TeamDelete(team_name="<team-name>")
+```
+
+**Expected outcome:** `TeamDelete` returns success, or "no team to delete" (idempotent). The next session's Phase 2 (Clean) becomes a no-op rather than a recovery.
+**Failure if skipped:** The leadership state survives in the parent CLI process. If the same CLI is reused (e.g., post-`/clear` rather than fresh-start), the next session's Phase 3 `TeamCreate` fails with "Already leading team" — recoverable via Phase 2's `TeamDelete`, but the next session pays the recovery cost. On crash exit, Phase 5 cannot run; Phase 2 of the next session handles it. Phase 5 is the **happy-path optimization**, not the only mechanism.
+
+#### Why Phase 5 follows Phase 4 (commit + push), not the other way around (_FR:Volta_ — 2026-05-06)
+
+The order is load-bearing:
+
+1. Phase 4 must complete first because it depends on the runtime dir contents (`inboxes/`). `TeamDelete` *may* destroy the runtime dir as part of releasing leadership; even if the platform behavior preserves the dir today, the protocol must not depend on that behavior.
+2. Phase 4 commits and pushes before Phase 5 so that if Phase 5 errors (or the session crashes during Phase 5), all durable state is already on the remote. Phase 5 is best-effort by design.
+3. The S5 ordering invariant is documented in `startup.md` Step S5 and was confirmed during the 2026-04-30 session-startup design work.
+
+#### Symmetry with startup Phase 2 (_FR:Volta_ — 2026-05-06)
+
+| Boundary | Primitive                          | Purpose                                                                   |
+| -------- | ---------------------------------- | ------------------------------------------------------------------------- |
+| Startup  | Phase 2: `TeamDelete` (best-effort) | Release any leadership state held from prior session (recovery)           |
+| Shutdown | Phase 5: `TeamDelete`               | Release leadership state held by current session (happy-path cleanup)     |
+
+When both boundaries call `TeamDelete`, the steady state is: graceful-exit Phase 5 cleans up; the next session's Phase 2 runs against already-clean state and is a no-op. When Phase 5 was skipped (crash, forced exit), Phase 2 is the recovery and is exactly the same primitive — so the recovery path costs no extra protocol design. The protocol is idempotent on both ends.
+
+**Failure modes**
+
+| Failure                                              | Cause                                                       | Mitigation                                                                                          |
+| ---------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Phase 5 skipped because crash before Phase 4 finished | Crash, OOM, force-quit                                      | Next session's Phase 2 cleans up. Durable state already on remote (Phase 4 committed before Phase 5 by design). |
+| Phase 5 errors with "no team to delete"              | Already cleaned up by some other path (concurrent CLI, manual) | Idempotent — error is benign. Continue.                                                              |
+| Phase 5 ordered before Phase 4 by mistake             | Protocol misread; team lead reorders                        | `startup.md` Step S5 documents the ordering. Reference implementation (below) is sequential. T06 phase numbering enforces order. |
 
 ---
 
@@ -908,19 +917,26 @@ Files with defined owners and purpose:
 
 A "stale team" is one where the team directory exists from a previous session but the current session has no live team context. This is the normal state at the start of every session. The canonical startup protocol (Phases 2-4) handles this case by design.
 
-### When recovery is needed
+### When recovery is needed (_FR:Volta_ — rewritten 2026-05-06, S5-aware)
 
-| Scenario              | Symptom                                                     | Recovery                                                                                                               |
-| --------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Normal session start  | `$TEAM_DIR` exists with stale `config.json`                 | Standard startup: Phase 0 (Orient) → Phase 1 (Sync) → Phase 2 (Clean) → Phase 3 (Create)                               |
-| Crashed session       | `$TEAM_DIR` exists, scratchpads may be incomplete           | Same as above — scratchpads are best-effort                                                                            |
-| TeamDelete was called | `$TEAM_DIR` does not exist, no inboxes to restore           | Phase 0 → Phase 1 → Phase 2 (anomaly detected, see Phase 2.0 anomaly rules) → Phase 3 (Create) — inbox history is lost |
-| Wrong team name       | `$TEAM_DIR` exists under wrong name (e.g. `team-name-a7f3`) | Phase 0 → Phase 1 → Phase 2 (MISCREATION detected) → remove wrong dir → Phase 3                                        |
-| First-ever session    | `$TEAM_DIR` does not exist, no git history of team files    | Phase 0 → Phase 1 → Phase 2 (COLD START, expected) → Phase 3                                                           |
+| Scenario                              | Symptom                                                                                | Recovery                                                                                                               |
+| ------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Graceful exit, fresh start (steady)   | No leadership state held; `$TEAM_DIR` may or may not exist (platform-managed)          | Standard startup. Phase 2 `TeamDelete` is a no-op; Phase 3 `TeamCreate` succeeds first try.                            |
+| Same CLI, post-`/clear`               | Leadership state survives in parent CLI (gotcha #4); `$TEAM_DIR` may exist on disk     | Standard startup. Phase 2 `TeamDelete` releases the state; Phase 3 succeeds.                                           |
+| Crashed session                       | Leadership state may be held; `$TEAM_DIR` may exist with partial contents              | Standard startup. Phase 2 `TeamDelete` is best-effort; either branch resolves cleanly. Scratchpads from prior session restored from repo (Phase 4). |
+| Inboxes lost from runtime dir         | Repo-side inboxes (`teams/<team>/inboxes/`) are the source of truth                    | Standard startup. Phase 4 (Restore) reads from repo regardless of runtime-dir state.                                   |
+| Wrong team name in disk dir           | `$TEAM_DIR` exists under a non-canonical name (e.g. `team-name-a7f3`)                  | Standard startup. Phase 2 `TeamDelete(team_name="<canonical>")` releases the canonical-name state; the wrong-name dir on disk is platform garbage and does not block Phase 3. If it does block, manual `rm -rf` after Phase 2 cleans it up. |
+| First-ever session                    | No leadership state, no `$TEAM_DIR`, no committed inboxes in repo (cold start)         | Standard startup. Phase 2 no-op; Phase 4 no-op; equivalent to cold-start inbox state.                                  |
 
-### Key insight
+### Key insight (_FR:Volta_ — 2026-05-06)
 
-There is no special "recovery" procedure. The canonical startup protocol IS the recovery procedure. Every session starts by assuming the team is stale and cleaning it. This makes the protocol idempotent — running it on a clean state or a stale state produces the same result.
+There is no special "recovery" procedure. The canonical startup protocol IS the recovery procedure. Every session starts by calling `TeamDelete` (Phase 2) before `TeamCreate` (Phase 3). This makes the protocol **idempotent at both boundaries**:
+
+- Whether the prior session ended gracefully (Shutdown Phase 5 ran) or not (crash), Phase 2 produces the same outcome — no leadership state held by the parent CLI.
+- Whether the runtime dir is empty, stale, or populated, Phase 3 produces the same outcome — fresh `config.json` with current `leadSessionId`.
+- Whether the repo has prior inboxes or not, Phase 4 produces the same outcome — runtime-dir inboxes match repo state (or empty if cold start).
+
+Each boundary is one primitive that handles all input states. There is no diagnostic decision tree because no diagnosis is needed.
 
 ---
 
@@ -1013,18 +1029,25 @@ Shared knowledge files (`docs/` in hr-devs, `memory/` flat in rc-team):
 - `test-gaps.md` — Tess appends, team-lead triages
 - `api-contracts.md` — Sven + Dag write
 
-### Shutdown: ordered, confirmed, no TeamDelete
+### Shutdown: ordered, confirmed, with explicit `TeamDelete` release (_FR:Volta_ — rewritten 2026-05-06)
 
-Shutdown sequence (both teams):
+Shutdown sequence (canonical, post-S5):
 
-1. Stop all new work
-2. Send shutdown to all agents (broadcast or one-by-one)
-3. Wait for confirmation from each
-4. Save task list snapshot to memory/
-5. `git add teams/.../memory/ && git commit -m "chore: save team scratchpads" && git push`
-6. **DO NOT TeamDelete** — directory stays so next session can restore inboxes
+1. Stop all new work (Phase 1: Halt)
+2. Team-lead writes own scratchpad first; create task snapshot; send shutdown to all agents (Phase 2: Notify)
+3. Wait for `teammate_terminated` from each agent (Phase 3: Collect — not just `shutdown_approved`)
+4. Persist inboxes from runtime dir to repo with pruning (Phase 4a)
+5. `git add teams/.../memory/ teams/.../inboxes/ && git commit && git push` (Phase 4b)
+6. **`TeamDelete(team_name="<team-name>")`** — release in-memory leadership state (Phase 5)
 
 Each agent on shutdown: write WIP to scratchpad → send closing message (LEARNED / DEFERRED / WARNING, 1 bullet max each) → approve.
+
+**Historical note (_FR:Volta_ — 2026-05-06):** Earlier reference-team conventions said "DO NOT TeamDelete — directory stays so next session can restore inboxes." This was based on two assumptions, both since superseded:
+
+1. *"Inboxes live in the runtime dir."* — Yes for the live session; no for cross-session continuity. Phase 4a (added 2026-03-13) copies pruned inboxes to the repo, making the runtime-dir copy non-load-bearing post-shutdown. The repo is the sole source of truth on restore.
+2. *"`TeamDelete` is just disk cleanup, and the platform handles disk anyway."* — Wrong. `TeamDelete` releases the parent CLI's in-memory team-leadership state, which is independent of disk and survives `/clear`. The 2026-04-30 session-startup confirmed this empirically (gotcha #4 in `startup.md`).
+
+The reference teams' published prompts may still carry the older "no TeamDelete" advice; those are stale and should be updated when the team next does a structural prompt review. Citing this section is sufficient justification for the change.
 
 **Gotchas from practice:**
 
@@ -1056,8 +1079,8 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 - ~~How does handover work between sessions?~~ → Scratchpads + shared knowledge files + task snapshots, with defined write triggers and prune rules.
 - ~~How does a fresh team-lead self-orient without broad exploration?~~ → Phase 0 (Orient): read roster.json, common-prompt.md, and own scratchpad — 3 files, fixed order, zero exploration. (_FR:Volta_ — resolved 2026-03-13 restart 3)
 - ~~How to handle stale/wrong workDir in roster.json?~~ → Phase 0 workDir Resolution: validate after reading roster, fallback with WARNING, flag for correction. (_FR:Volta_ — resolved 2026-03-13 restart 3)
-- ~~How to distinguish "genuinely first session" from "lost state" when team dir is missing?~~ → Phase 2.0 Anomaly Detection: check git log for prior team memory commits. If found → anomaly, ask user. (_FR:Volta_ — resolved 2026-03-13 restart 3)
-- ~~What if `$HOME` is unreliable on the host platform?~~ → Phase 2.0a: validate `$HOME` before use, fallback to `whoami`-based path. `startup.md` uses absolute paths — it is machine-specific by design. (_FR:Volta_ — resolved 2026-03-13 restart 4)
+- ~~How to distinguish "genuinely first session" from "lost state" when team dir is missing?~~ → Distinction is no longer load-bearing. Phase 2 (Clean) is `TeamDelete` (idempotent on either state); Phase 4 (Restore) reads from repo (no-op on cold start). The protocol does not need to branch on dir existence. (_FR:Volta_ — superseded 2026-05-06 by S5 collapse; original resolution 2026-03-13 restart 3)
+- ~~What if `$HOME` is unreliable on the host platform?~~ → `$HOME` validation pattern (see Phase 2 "$HOME reliability" subsection): validate before use, fallback to `whoami`-based path. Validation is now scoped to Phase 4 (Restore) and Shutdown Phase 4a (Persist) — the only places that touch the runtime dir. `startup.md` uses absolute paths — it is machine-specific by design. (_FR:Volta_ — relocated 2026-05-06; original resolution 2026-03-13 restart 4)
 - ~~What if TeamCreate succeeds but config.json doesn't exist on disk?~~ → Phase 3 Verification and Retry: verify config.json after TeamCreate, retry with TeamDelete + TeamCreate (max 2 attempts), hard gate before any spawn. (_FR:Volta_ — resolved 2026-03-13 restart 4)
 - ~~What if agents are spawned into a non-functional team?~~ → Phase 3 verification is a hard gate for all subsequent phases. No agent spawn (including Medici in Phase 5) until config.json is confirmed on disk. (_FR:Volta_ — resolved 2026-03-13 restart 4)
 - ~~What if the runtime dir disappears between sessions and inboxes are lost?~~ → Shutdown Phase 4a persists pruned inboxes (last 100 messages per file) to the repo. Startup Phase 4 restores from repo, not `/tmp/`. Repo is the sole source of truth. (_FR:Volta_ — resolved 2026-03-13)
@@ -1077,7 +1100,7 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 
 6. **Can teams self-replicate or split?** — Not addressed. May be needed for scaling patterns. (Connects to T01-taxonomy.)
 
-7. **`$HOME` reliability across platforms** — Windows/Git Bash has inconsistent `$HOME` resolution across bash invocations within the same session. Phase 2.0a adds a validation gate, but the root cause (shell initialization inconsistency) is not understood. Does this affect other env vars? Does it happen on macOS/Linux? (_FR:Volta_ — discovered restart 4, 2026-03-13)
+7. **`$HOME` reliability across platforms** — Windows/Git Bash has inconsistent `$HOME` resolution across bash invocations within the same session. The `$HOME` validation pattern (Phase 2 "$HOME reliability" subsection) defends against this in the runtime-dir paths, but the root cause (shell initialization inconsistency) is not understood. Does this affect other env vars? Does it happen on macOS/Linux? (_FR:Volta_ — discovered restart 4, 2026-03-13)
 
 8. **TeamCreate silent failure** — TeamCreate can return success but not write config.json to disk. Phase 3 now has a retry loop, but the root cause is unknown. Is this a race condition? A permissions issue? Does it correlate with the `$HOME` bug? (_FR:Volta_ — discovered restart 4, 2026-03-13)
 

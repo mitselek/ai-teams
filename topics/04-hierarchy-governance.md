@@ -143,10 +143,10 @@ This is the central governance artifact. For any decision type, it specifies: wh
 |---|---|---|---|---|---|---|
 | **Team lifecycle** | | | | | | |
 | 1 | Create a new team | D | C | — | — | Always PO |
-| 2 | Dissolve a team | D | C | I | I | Always PO |
+| 2 | Dissolve a team (permanent — see §Row 2 vs. session-boundary `TeamDelete`) | D | C | I | I | Always PO |
 | 3 | Change team composition (add/remove agent role) | D | C | C | — | Always PO |
 | 4 | Spawn an agent within approved roster | I | — | D | — | Agent not in roster → escalate to PO |
-| 5 | Shut down an agent (session end) | I | — | D | I | — |
+| 5 | Shut down an agent (session end); execute team-shutdown procedure (T06 Phases 1–5) | I | — | D | I | Per T06 canonical lifecycle |
 | **Architecture & design** | | | | | | |
 | 6 | Architecture decision (cross-team) | D | C | C | — | Always PO |
 | 7 | Architecture decision (within team scope) | I | — | D | C | Affects other teams → escalate to L1/PO |
@@ -200,6 +200,8 @@ This is the central governance artifact. For any decision type, it specifies: wh
 | 47 | Knowledge promotion proposal acceptance (wiki entry → common-prompt candidate) | I | — | D | C (Librarian proposes) | Team-lead decides whether to forward to PO; final common-prompt amendment is Row 37 |
 | 48 | Librarian respawn authority (SPOF recovery) | — | — | D | — | Normal agent lifecycle per Rows 4-5; no special authority. Librarian state marker prevents re-running bootstrap. |
 | 49 | `[URGENT-KNOWLEDGE]` interrupt decision (whether to interrupt an affected agent with new knowledge) | — | — | D | C (Librarian flags relevance); C (affected agent receives) | Librarian never interrupts agents directly. Team-lead is the traffic controller. |
+
+**§Row 2 vs. session-boundary `TeamDelete`** (_FR:Volta_ — 2026-05-06): Row 2 governs *team dissolution* (permanent end — charter retired, members reassigned, repo `teams/<name>/` archived). The `TeamDelete()` primitive is also called at session boundaries (T06 Shutdown Phase 5 graceful exit; T06 Startup Phase 2 best-effort recovery) to release the parent CLI's in-memory team-leadership state. Session-boundary `TeamDelete` is the team-lead's operational authority and does not require PO approval. The semantic distinction: dissolution ends the team; session-boundary `TeamDelete` releases ephemeral leadership state. The team's existence as a repo entity (scratchpads, inboxes, wiki, charter) is unaffected by session-boundary `TeamDelete`.
 
 **Reading the ARCHITECT, PURPLE, and Librarian rows.** Rows 40-49 use the existing 5-column format with role qualifiers in the Specialist (L3) column. ARCHITECT, PURPLE, and Librarian are all L3 specialists with scoped authority — they are not a new hierarchy level (see §Level 3: Scope Authority Within L3). The qualifier in parentheses identifies which L3 role holds the specified authority. Cross-reference `topics/09-development-methodology.md` Part 1 (Authority Boundaries, lines 284-299) for the 6-column view that isolates ARCHITECT into its own column for easier reading within the XP pipeline context.
 

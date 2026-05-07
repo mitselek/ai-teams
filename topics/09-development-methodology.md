@@ -770,6 +770,7 @@ source-commits:
   - abc123
 source-issues:
   - "#42"
+source-team: uikit-dev    # Optional; omit for in-team origin (cross-team-pollinated entries only)
 ttl: 2026-05-08    # For external-system knowledge with no source file
 ---
 ```

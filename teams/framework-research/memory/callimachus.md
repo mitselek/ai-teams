@@ -1,5 +1,42 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
+## Session 28 — 2026-05-06 (PO-directed pull-now on Volta scratchpad notes; Protocol C batch 1 of 2 dispatched)
+
+[CHECKPOINT 2026-05-06 15:55]: **Wiki 80 → 82.** Two new entries from Volta's S28 `[CAL-CANDIDATE]` scratchpad notes, filed via PO-directed pull-now (override of my option-(b) defer recommendation):
+- `patterns/repo-as-durable-store-teamdelete-as-release-primitive.md` — combined-invariant fix-shape (Phase 4a + S5); confidence medium-high (combined-invariant n=1 / mitigation-pair n=3); cross-platform generalization framing flagged for Volta amendment
+- `gotchas/cross-document-prose-procedure-drift.md` — architectural-fact entry with Revision-trigger section; gate-1 missing-middle (cross-document within-team) between within-document-rename-grep and pass1-pass2-rename-separation; n=1 (FR S28 7-day drift window)
+
+[CHECKPOINT 2026-05-06 15:55]: **Protocol C batch 1 dispatched** to team-lead. Two proposals: #1 substrate-invariant-mismatch n=6 → Structural Change Discipline gate 4 sub-bullet; #2 worktree-isolation-for-parallel-agents n=7 → Agent Spawning Rule extension. Proposed text verbatim provided per protocol.
+
+[CHECKPOINT 2026-05-06 15:59]: **Batch 1 RATIFIED** by Aen. Both #1 + #2 written to common-prompt verbatim per proposed text. Diff +4 -1; commit deferred to session-end with inboxes per Step S4. Volta-notes filing also confirmed on disk. Wiki at 82.
+
+[CHECKPOINT 2026-05-06 16:02]: **Protocol C batch 2 dispatched** to team-lead. Two proposals: #3 semver-strict-typed-contract → new "Versioning Discipline" subsection at end of Structural Change Discipline block; #4 relay-to-primary-artifact-fidelity → new "Relay Fidelity Discipline (Receiver-Side)" subsection at end of Dual-Hub Routing section. **Citation-hygiene flag: corrected #3 from claimed-n=2 to actual-n=1** — my S27 [NEXT-SESSION BOOT] memory-note conflated PR #13 (worktree-isolation Instance G) with the SemVer cluster; the wiki entry's Promotion-posture is "n=1 watch posture." PO authorized promotion regardless. Caught by grep-before-Protocol-C discipline; correction surfaced on the way in. **Inverse of S26 [LEARNED] (memory underestimates real usage); here memory overstated — same discipline applies, opposite direction.**
+
+[ACK 2026-05-06 15:50]: Same-window acknowledgment to Volta on both filings. Flagged for amendment: cross-platform generalization scope on pattern (point 3), discipline-extension framing on gotcha (point 3 — Protocol C path is Volta's call, not mine).
+
+[VOLTA-RESPONSE 2026-05-06 15:56]: Both entries closed clean. **No amendments needed.** All 4 scrutiny flags resolved: (a) cross-platform generalization confirmed sound (Volta self-reports his "Claude-only" original framing was tighter than necessary — Cal-shaping improved scope); (b) missing-middle gate-1 framing concurred ("structural argument represents my position correctly, and improves on it"); (c) Protocol-C-adjacent boundary held — Volta documented 3 trigger conditions for future Protocol C: n=2 second incident, team-lead expressed interest, or tooling-revision-trigger looks unrealistic; (d) 7-day drift window verified. Volta marked both [CAL-CANDIDATE] → [CAL-FILED] in his scratchpad. Default-no-reply per notification-of-fact convention; no return ack sent. **Cal-shaping that improves on submitter framing is sometimes net-positive when scrutiny-flagged for amendment** — submitter-trust contract preserved by the amendment path; the framing improvements survived the consent loop.
+
+[LEARNED S28 — load-bearing only]:
+- **Pattern-vs-gotcha distinction load-bearing on dedup outcome** — Volta's pattern claim looked like an exact match to existing `teamcreate-in-memory-leadership-survives-clear` gotcha. Read both side-by-side: gotcha records incident-shape; pattern records design-fix-shape. Different abstraction layers, different audiences. Filed as separate pattern with cross-references both ways. Anti-collapse: file separately when claim-class differs (incident vs fix-rule), even when subject overlaps.
+- **Architectural-fact convention applied at file-time** on the gotcha — "T06 prose vs startup.md procedure can drift" is structural-failure-mode, not empirical-observed-behavior. Revision-trigger section names what would invalidate (tooling addition or procedure consolidation). n+1 sightings will not strengthen confidence; the mechanism is fully exposed at n=1.
+- **Sibling-framing across three structural scales** — gate-1 grep family now spans within-document (callimachus+celes), cross-document-within-team (Volta, this session), cross-team (pass1-pass2-rename). Three-row table in the cross-document entry maps the three scopes. Sibling-completeness signal for the family.
+- **PO override is operational** — option-(b) defer was structurally defensible but PO had bandwidth-/visibility-priority reasons. Submitter-trust contract concerns acknowledged but not blocking when PO directs pull-now. Volta amendment path (Protocol A AMENDMENT) preserves submitter authorship retroactively.
+
+[CHECKPOINT 2026-05-06 16:03]: **Batch 2 RATIFIED** by Aen. #3 + #4 written to common-prompt verbatim — #3 as `###` subsection at end of Structural Change Discipline; #4 as `####` subsection inside Dual-Hub Routing. Cumulative session common-prompt diff: +25 -1, all 4 Protocol C promotions landed. Citation-hygiene catch acknowledged + framed as "discipline-catches-its-own-author" (recursive validation, parallel to relay-fidelity Instance 4). Aen explicitly closed: not asking for Protocol A on the curatorial-process observation.
+
+[CHECKPOINT 2026-05-06 16:05 — pre-shutdown scan]: Nothing requires attention. No DISPUTE tags, no TTL expiries, no pending Protocol A/B, no URGENT-KNOWLEDGE.
+
+[CHECKPOINT — final shutdown 2026-05-07 11:55]: **Wiki 80 → 82, +25 -1 common-prompt, 4 Protocol C promotions, 2 Volta filings clean.** Session 28 closes complete.
+
+[NEXT-SESSION BOOT — S29]:
+- Re-orient via `wiki/index.md` (82 entries).
+- Brunel accuracy review on `worktree-spawn-asymmetry-message-delivery.md` queued at his cadence — non-urgent.
+- Monte's two pending submissions queued at his cadence — `single-channel-saturation-via-mode-partition` + `recursive-citation-as-canonical-validation`. Non-urgent.
+- Watch for n=2 on `repo-as-durable-store-teamdelete-as-release-primitive.md` (Volta-filed S28) — second team-lifecycle protocol on different platform = cross-platform generalization confirmation point.
+- Watch for n=2 on `cross-document-prose-procedure-drift.md` — second incident triggers Volta's Protocol C consideration per his S28 amendment-path note.
+- TTL scan: earliest expiry remains `model-inventory-baseline.md` 2026-07-10 — flag if not addressed by then.
+- Cal stands by for new Protocol B queries.
+
 ## Session 27 — 2026-05-06 (Phase B v1.0-final cluster CLOSED; wiki 69 → 80; 11 new entries + 5 amendments + 2 folds; recursive-validation moment)
 
 [CHECKPOINT — final]: **Wiki 69 → 80 (+11 new, +5 substantive amendments, +2 folds into existing entry). Phase B v1.0-final cluster fully shipped end-to-end.** Filing-to-citation latency average ~25min sustained; Phase A discipline target hit at peak.

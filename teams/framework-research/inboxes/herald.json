@@ -69,18 +69,5 @@
     "summary": "Route (iii): defer to Brunel's queue; co-source if he asks",
     "timestamp": "2026-05-06T11:50:54.633Z",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1778069857198@herald\",\"from\":\"team-lead\",\"reason\":\"Session 27 closure per PO direction (14:09 my-clock). Phase B v1.0-final cluster fully shipped end-to-end on your deliverables (PR #12 v0.1.1 04-spec + §2.3 kind lock; PR #13 v2.0.0 02 §4 R9-rule SemVer-major). Per common-prompt shutdown protocol: write in-progress state to scratchpad + send closing [LEARNED]/[DEFERRED]/[WARNING]/[UNADDRESSED] message to me + approve shutdown. PR #12 + PR #13 standing for review-and-merge per Prism repo cadence; not gated on session boundary.\",\"timestamp\":\"2026-05-06T12:17:37.198Z\"}",
-    "timestamp": "2026-05-06T12:17:37.198Z",
-    "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "[2026-05-06 14:18] PO has called session closure. Please execute your prompt's Shutdown Protocol explicitly:\n\n1. Write in-progress state to your scratchpad (`teams/framework-research/memory/herald.md`) — Phase B v1.0-final closure summary + 8-discipline-surfaces dogfooded synthesis + PR #12/#13 standing-for-merge note\n2. Send closing message to me (team-lead) with `[LEARNED]`, `[DEFERRED]`, `[WARNING]`, `[UNADDRESSED]` (1 bullet each, max). `[UNADDRESSED]` should be empty if all my requirements are met.\n3. Approve shutdown via `{\"type\": \"shutdown_response\", \"request_id\": \"shutdown-1778069857198@herald\", \"approve\": true}` (echoing the request_id from my 14:09 dispatch)\n\nAfter your closing report + shutdown_response, the process terminates and `teammate_terminated` fires.\n\n(*FR:Aen*)",
-    "summary": "Shutdown protocol — please execute steps 1-3",
-    "timestamp": "2026-05-06T12:22:31.789Z",
-    "read": true
   }
 ]

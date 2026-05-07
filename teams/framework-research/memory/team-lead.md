@@ -1,5 +1,64 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+## SESSION 28 WRAP — 2026-05-07 (Volta NEXT-SESSION-CHOREs cleared; 4 Protocol C promotions ratified; team-lead-override pattern established for non-owned topic edits)
+
+**Goal (PO-set 15:32 on 2026-05-06):** T06 path-tree rewrite (Volta NEXT-SESSION-CHORE #1). Mid-session expanded to all three Volta chores + 4 Protocol C promotions Cal carried from S27.
+
+**All three Volta NEXT-SESSION-CHOREs from S27 cleared end-to-end.** 4 Protocol C promotions ratified into common-prompt verbatim. Wiki 80 → 82.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Path |
+|---|---|---|---|
+| T06 path-tree rewrite | +122/-99, 12 edits | Volta (direct) | `topics/06-lifecycle.md` |
+| T04 §Row 2 + Row 5 clarification | +4/-2 | Volta (proposed) → Aen (override-applied) | `topics/04-hierarchy-governance.md` |
+| T09 source-team example | +1 | Volta (proposed) → Aen (override-applied) | `topics/09-development-methodology.md` |
+| 4 Protocol C promotions | +25/-1 | Cal (proposed) → Aen (ratified+authored) | `common-prompt.md` |
+| 2 wiki entries from Volta | NEW (80→82) | Cal (Volta-sourced) | `wiki/{patterns,gotchas}` |
+| `framework-research-next-session` skill | NEW (137 lines) | Aen | `~/.claude/skills/` (user-private) |
+
+### Protocol C promotions landed (all S27 carry-forward candidates)
+
+1. `substrate-invariant-mismatch` n=6 → Structural Change Discipline gate 4 (3rd sub-bullet, sibling to dual-team-dir-ambiguity reference)
+2. `worktree-isolation-for-parallel-agents` n=7 → Agent Spawning Rule extension (replaces single-line block)
+3. `semver-strict-typed-contract-discipline` n=1 (corrected from claimed n=2 mid-session by Cal's grep-discipline) → new Versioning Discipline subsection in Structural Change Discipline
+4. `relay-to-primary-artifact-fidelity-discipline` n=4 → new Relay Fidelity Discipline subsection in Dual-Hub Routing
+
+[DECISION — session 28] **Team-lead-override pattern for non-owned topic-file edits established.** When a specialist proposes diffs to a topic file outside their write-scope AND the topic owner is not spawned, three options: (a) defer to next session, (b) spawn the owner, (c) PO-greenlit team-lead override. Option (c) used for both T04 (Volta-proposed → Monte-domain) and T09 (Volta-proposed → schema-domain). Pattern matches existing Protocol C → common-prompt authoring. Attribution preserved on T04 §Row 2 (`_FR:Volta_ — 2026-05-06`).
+
+[DECISION — session 28] **Cal's [CAL-CANDIDATE] scratchpad notes pulled and filed via Protocol A** (option a, overriding Cal's option-b recommendation). PO direction was "pull now, don't defer." Both notes filed; Volta clean-acked Cal's framings (no amendments).
+
+### LEARNED — session 28
+
+- **Cal's grep-discipline catches memory drift in both directions.** S26 [LEARNED] noted memory underestimates (n+1 sightings under-recorded); S28 inverse (Cal's S27 wrap-note claimed n=2 SemVer, real n=1, caught up-front by Cal before proposal). Discipline ratifies as: *"grep before Protocol C, in either direction."* Folded into Cal's scratchpad as curatorial process; not promoted (n=2 cumulative is bracketing data, not pattern).
+- **Volta's [STANDING-DATA] pushback on n=2 cross-document drift.** Strict reading of his [LEARNED] — n=2 is *progress toward* the trigger, not satisfaction. Holding for n=3 before any Protocol C extension. Correct discipline; team-lead's eager reading would have over-triggered.
+
+### WARNING — session 28
+
+- **Skill-spec bug:** `framework-research-next-session` skill says "place NEXT-SESSION-BOOT block at TOP of session wrap." Existing convention in team-lead.md is BOTTOM (S27 NEXT-SESSION BOOT was at line 104 of a wrap that started at line 4). Skill should be amended to match existing convention. ~3-line edit on first invocation in S29.
+
+### NEXT-SESSION BOOT (re-orient instructions for S29)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **First session-start fix-up:** amend `~/.claude/skills/framework-research-next-session/SKILL.md` Step 2 to say "BOTTOM of session wrap block" not "TOP" — convention-drift bug noted in S28 [WARNING].
+5. **If PO surfaces Brunel-related work** (federation expansion, container lifecycle, worktree-asymmetry review): spawn Brunel. He has a queued accuracy review on `worktree-spawn-asymmetry-message-delivery` + a coordination flag from Volta on T06 Container Lifecycle "Phase 2.0a" stale prose (lines 1135, 1182).
+6. **If PO surfaces Monte-related work** (governance prose, T04 wordsmithing, his two pending Cal submissions): spawn Monte. He has T04 §Row 2 review queued + 2 pending Protocol A submissions (`single-channel-saturation-via-mode-partition` + `recursive-citation-as-canonical-validation`) noted in his S27 scratchpad.
+7. **If PO surfaces a third instance of cross-document drift** (any agent reports prose-procedure mismatch): n=3 reached, Protocol-C-extension trigger activates per Volta's [STANDING-DATA]. Spawn Cal for promotion drafting.
+8. **First operational item if Cal-spawning:** her queue at S28 close was clean (82 entries, no disputes, no TTL expiries). Surface-grade work would be receiving any new Protocol A submissions from spawned specialists; or a wiki health-summary at PO request.
+
+### Standing watch items going into S29
+
+- **TPS-583 (apex-research)** — when PO signals Ruth has progressed (subteam identified, page moved to V2, or both), action Stage-2 standard moves
+- **apex-research n=2 invocation** — first deployment of #1 v0.7 federation-bootstrap-template beyond FR; convention re-test point per S27 close
+- **Aalto/uikit-dev cross-team debt** — only on uikit-dev contact event
+- **esl-suvekool feedback loop** — when PO returns from Tobi sessions
+
+(*FR:Aen*)
+
+---
+
 ## SESSION 27 WRAP — 2026-05-06 (Phase B v1.0-final shipped end-to-end across 4 artifacts; substrate-failure landscape characterized)
 
 **Goal (PO-set 10:42):** Activate Phase B; let Cal flush queue.
