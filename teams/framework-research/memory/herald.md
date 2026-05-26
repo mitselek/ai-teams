@@ -199,6 +199,28 @@
 
 [DEFERRED] xireactor next-session sequencing: PO brief → Finn second-pass source survey (gating-diagnostic-not-validation) → Monte §7.2 + Brunel §10 §1.2-compliance → Herald v1.3 with v1.2.1 backlog folded.
 
+## 2026-05-26 (session #35 — Cloudflare pilot comms protocol design)
+
+[CHECKPOINT] **Task #10 single-contribution session.** Delivered comms-protocol design draft for the PO-directed Cloudflare-managed-agents pilot (2-3 solo CF Claude agents talking to each other). Routed via SendMessage to Aen for synthesis + Write to `designs/new/cloudflare-pilot/comms.md` per brief (harness-blocks direct Write of designs files; Aen executes from main session). Independent draft per no-cross-DM directive (Brunel + Volta producing parallel briefs from substrate-inventory + lifecycle angles).
+
+[DECISION] **Durable Object as per-recipient mailbox primitive** for the minimal 2-agent A↔B experiment. Only CF primitive with strong-consistency + per-instance addressable identity + persistent storage in a single object. Maps onto FR's `inbox-file-write-as-wake-mechanism` + `members[]` ACL composition without splitting wake-and-ACL across two primitives. Workers KV ruled out (eventual consistency breaks read-after-write); R2-as-mailbox ruled out (no atomic-append, fcntl-flock substrate property has no R2 analog); Queues retained for M2/M3 scale-out broadcast (1:N fan-out) but not for 1:1 mailbox.
+
+[DECISION] **`idFromName(<agent-name>)` for identity addressing + KV-backed roster as `members[]` analog.** DO name as primary identity primitive — deterministic name→ID resolution, semantically equivalent to FR's name-based SendMessage lookup. KV roster is the authoritative "is this a valid teammate" gate (`inbox-slot-vs-members-validation-asymmetry.md` analog). Same shape, different substrate primitive.
+
+[DECISION] **Retain FR's existing SendMessage envelope shape; do NOT adopt CF-native zod-typed tool-call envelope.** Three reasons: (i) per §S2 of docs/findings.md, envelope IS framework-state, not substrate-state — re-shaping would cede framework-layer ground FR explicitly reserves; (ii) transferability beats CF-native fit at pilot stage — the experiment measures substrate, not envelope; (iii) typed-contract discipline (`protocol-shapes-are-typed-contracts.md`) — inventing a new shape creates a cross-substrate translation problem. Zod-validation at DO entry is additive (wire-format enforcer), not substitutive.
+
+[DECISION] **`roster-DO` (single canonical registry) + Queue broadcast on join/leave for discovery.** Strong-consistency roster source-of-truth + push-based change notification (no polling). Compared to FR's manual config.json + harness reload: substrate-automation of what FR currently handles procedurally. Bottleneck-alignment caveat: 3-agent pilot likely insufficient n to demonstrate value; bottleneck only materializes at ~10+ agents with churn.
+
+[LEARNED] **Sub-shape E materializes at the comms-protocol level (§S5 of findings.md confirmed at the comms layer).** The 5 dimensions (identity / transport / envelope / discovery / persistence) are invariant across FR-current and CF-native; substrate primitives differ; ownership locus shifts per §S2 boundary. Comparison-to-FR-existing table in the design draft makes this mechanically visible. **Adds n=3 confirmation to Sub-shape E (n=1 Docker-on-RC + n=2 CF-managed substrate-class + n=3 CF-managed comms-layer — same finding at sub-layer granularity).**
+
+[PATTERN] **Q2 (distinct-session-termination state survival) is the primary pilot probe in 2-3 passes.** Probe design: agent A sends to B's DO mailbox → terminate B's session entirely → spawn B-prime with same `idFromName("agent-b")` → does B-prime see the message? If yes, DO-as-mailbox validated; if no, falls back to R2-with-ETag-versioning (R2 storage durability more conservatively documented). **Comms primitive choice is conditional on Q2 resolution — explicit fallback path in design.**
+
+[GOTCHA] **CF account specifics (DO availability, Queues availability, pricing) are Brunel's parallel brief, not mine.** Flagged as BO1/BO2/BO3 in Open Questions section — blocking on Brunel before pilot can execute, not blocking on the design pass.
+
+[LEARNED] **FO2 cross-link to ghost-member-pattern is the most-promising-cross-substrate finding seed.** If a CF-pilot agent is representable as an FR ghost-member (likely yes — ghost-member abstraction designed substrate-agnostic), FR↔CF-pilot interop is structurally supported. **The pilot is the existence proof for cross-substrate ghost-member representability** if execution validates it. Daemon-shape needs explicit thought — what's the analog of ghost-bridge's SSH layer when one side is CF-substrate? Likely Worker route as the daemon-analog. Filed as FO2 for future pickup.
+
+[DEFERRED] If pilot ships and Q2 resolves positive, the comms-layer finding becomes Sub-shape E n=3 evidence for `three-layer-substrate-truth-discipline.md` confidence-promotion medium-high → high. Watch posture for next session.
+
 ## 2026-04-24 (session #60 — agent-spawn-protocol)
 
 [CHECKPOINT] Shipped `docs/agent-spawn-protocol.md` v2.0.0 — retired tmux-pane spawn as default; standardized on Agent-tool persistent spawn with `team_name+name` parameters as discriminator. Six rules preserved verbatim from apex-research v1.0.0.

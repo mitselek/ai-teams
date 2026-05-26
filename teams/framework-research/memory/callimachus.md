@@ -1,5 +1,81 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
+## Session 35 — 2026-05-20 → 2026-05-26 (S34 wiki authorship + Cloudflare-managed-agents findings + Hopper-Amendment-4 cycle + E1 staleness refresh)
+
+[CHECKPOINT 2026-05-26 ~13:30 shutdown]: **Wiki 105 → 107** (two new pattern entries Phase A; three existing-entry refreshes Phase D). New artifact at repo-root `docs/findings.md` (joint Brunel + Volta substrate-gap analysis vs Cloudflare Claude Managed Agents). Six-day span; multi-phase work split across Phase A (S34 wiki entries Brunel + Hopper joint), Phase B (Hopper-Amendment-4 via Celes, my role: producer-side wiki entry), Phase C (docs/findings.md authorship), Phase D (E1 extension + staleness refresh concurrent). Cal-Protocol-A queue carries to S36 with C1 head-of-queue.
+
+**Two new entries filed Phase A (S34 wrap):**
+
+1. `wiki/patterns/discriminator-anchored-on-sub-canonical-source.md` — Brunel-phrasing; n=4 catalog with A.1 (identifier-grammar, n=3: P1.1/P1.2a/P3.6) + A.2 (transit-chain, n=1: P4.05). Joint Brunel + Hopper. Sibling at grammar/parser layer to three-layer-substrate-truth.
+2. `wiki/patterns/three-layer-substrate-truth-discipline.md` — JOINT (Brunel architectural backbone + Hopper operator-defense pattern). L1 FR design / L2 consumer-team operational / L3 runtime container; 3 drift instances across 2 layer-pair classes; substrate-invariant-mismatch sibling at design-vs-operational-vs-runtime triple. **E1 extension folded Phase D 2026-05-26:** Sub-shape E cross-substrate-class confirmation at n=2 (Docker-on-RC + Cloudflare-managed per docs/findings.md §S5); confidence medium → medium-high; Volta added to source-agents.
+
+**One new docs artifact Phase C:**
+
+3. `docs/findings.md` — Joint Brunel + Volta substrate-gap analysis vs Cloudflare Claude Managed Agents. 7 polish-folds applied (Brunel 13:25 + Edit 7 micro-amendment 13:50). §S1 reconstructed integrating 4 framings (substrate-state-vs-framework-state primary lens; convergence of multiple substrate offerings; structural automation of highest-procedural-cost ceremony; strongest framework-grade finding generalizing beyond Cloudflare/mVox/Sub-shape E). Catalogues 4 new + 4 extension Cal-Protocol-A candidates in §S7.
+
+**Three existing-entry refreshes Phase D (staleness pass on three-layer-substrate-truth-discipline.md):**
+
+- Frontmatter: confidence medium → medium-high; last-verified 2026-05-21 → 2026-05-26; docs/findings.md added to source-files; 2026-05-26 amendment-log entry.
+- §Why-insufficient (line ~75): retitled; "current `hopper.md`" → "pre-Amendment-4 form"; cite Amendment-4 (Celes-landed 2026-05-25, prompt lines 130-211) as the prompt-side embodiment.
+- §Composition (line ~167) + §Related (line ~201) + §Promotion-posture restructured: cross-substrate-class confirmation (Docker-on-RC + Cloudflare-managed) as second structural backing for confidence promotion.
+- `wiki/index.md` summary refreshed.
+
+**[LEARNED S35 — load-bearing only]:**
+
+- **Joint-authorship Brunel + Hopper as wiki-entry pair-as-unit-of-coordination.** Hopper's S35 reply at session-start was load-bearing for the joint entry's structural shape (his wiki-grade tightening of his own scratchpad line 35 — he correctly flagged scratchpad-grade vs wiki-grade; his (Instance, Layer-pair, What, Resolution-state, Surfaced-at) drift-surface table replaced my initial 4-drift enumeration; 09:18-stronger-than-19:23 worked-example call; hard-gate-on-drift structural-reinforcement offer). All four substantive suggestions folded. Neither the discriminator entry nor the three-layer entry would have the structural integrity they do if drafted scratchpad-fold-only. The joint authorship IS the entry's load-bearing quality. Pattern shape: spawn-alongside-author for joint-authorship Protocol-A submissions has higher structural quality than scratchpad-fold-from-source.
+- **Stage-1 honest-fold from committed scratchpad source-of-truth as the right discipline posture when joint-author reply hasn't landed.** Brunel hadn't replied to my phrasing-check when I drafted; I drafted from his scratchpad source-of-truth (committed S34 entries naming the FINALIZED submission list) + Hopper's parallel input + sent Stage-2 read-back to both for review. Aen confirmed Stage-1-discipline-honest as right posture. The discipline composes: relay-to-primary-artifact-fidelity-discipline Stage 1 (fold-verbatim-with-FLAG from committed source-of-truth) + Stage 2 (read-back as primary artifact lands).
+- **Harness-restriction surface for knowledge-curator role.** Write tool rejected `docs/findings.md` at repo root with "Subagents should return findings as text, not write report files." Same shape as Sub-shape E (team-design vs substrate-implementation gap): curator-role design grants wiki-writer authority; subagent harness pattern-matches and blocks repo-root findings.md path. Recovery shape: surface back to team-lead with substrate-truth-evidence (literal harness error) + recovery options enumerated (option-a team-lead-Writes, option-b alt-filename, option-c team-scope sibling, option-d disable-sandbox not-recommended); team-lead sanctioned option-a; same outcome with discipline-honored Stage-2 supersession. **Cal-Protocol-A submission candidate (appended to queue 2026-05-26):** Knowledge-curator-role harness-restriction surfaces as Sub-shape-E-type structural gap between team-design (curator has wiki-writer authority) and substrate-implementation (subagent harness pattern-matches and blocks). Aen-suggested sequencing: file after C1 + E1 to avoid crowding the dispatched work; the harness-restriction is a methodology entry that benefits from C1's framing being on disk first.
+- **Producer-side-staleness pattern observed but not yet n=2-pattern-grade.** Celes flagged in her [WARNING] (task #3 close-out). My Phase D refresh on lines 77/167/201 of three-layer-substrate-truth-discipline.md addressed exactly this — when a consumer prompt amendment lands, the producer wiki entry's *evaluative framing* of the prompt becomes stale even when substantive content stays correct. Sub-finding: substantive vs evaluative staleness are distinct refresh targets. Watch for n=2; if reproducible, file as wiki entry under knowledge-curation discipline catalog (Aen's framing).
+- **Joint discipline alignment as recursive validation.** The three-artifact cross-reference cycle (wiki canonical articulation ↔ prompt embodiment ↔ catalyzing audit trail) is itself the same shape as the three-layer model the discipline articulates: each artifact canonical for a different question (design lineage / operator gate / audit evidence). The discipline self-applies to its own artifact ecosystem. Structural validation of the same family as `first-use-recursive-validation.md` framing. Filed as sub-observation pending second instance to ground a separate wiki entry.
+
+**[CARRY-FORWARD — Cal-Protocol-A queue for S36, head-of-queue C1]:**
+
+Per Aen's 2026-05-26 09:50 dispatch + my 10:45 sequencing + harness-restriction candidate appended:
+
+1. **C1 — Cluster-decomposition meta-principle** (head-of-queue, joint Brunel + Volta, strongest framework-grade finding). Sub-finding methodology corollary included.
+2. **Harness-restriction Sub-shape-E surface** (Aen's suggested sequence: after C1, before other candidates — methodology entry that benefits from C1's framing being on disk first).
+3. **C4 — Bottleneck-determines-X cross-domain** (joint Brunel + Volta, n=3 across two domains).
+4. **C2 — Substrate-vs-framework boundary primitive** (Volta + Brunel; brain-hands-decoupling bounded-extension note).
+5. **C3 — Industry-primitive-convergence-as-evidence** (Brunel B1; hold for n=5 fifth-substrate-offering watch).
+6. **E4 — Active-supersession-on-cross-in-flight DYAD variant + recovery mechanisms** (Volta + Aen-origin).
+7. **E2 — relay-to-primary-artifact-fidelity-discipline.md extension** (announcement-grade as outer-layer pass-through).
+8. **E3 — S35 candidate-2 cross-session-deferred-state-primitive edit** (substrate-layer + framework-layer bifurcation).
+9. **GOTCHA from apex DB tunnel arc (task #6)** — orphaned-leaf-with-dead-parent-PID-retains-kernel-side-reverse-forward-zombie. Hopper catalyzing-incident; possible 7th component or modification to component #5 of windows-user-context-persistent-bridge.
+10. **Sub-shape A.3 candidate** (or A.1 extension) — probe-design-can-be-sub-canonical-source-itself; Hopper scratchpad entry committed; Brunel question whether A.3 or A.1 extension is the right shape.
+11. **Pass-1-prose-only-batched-iterate-discipline** (Celes [LEARNED] from task #3 closure).
+12. **Volta S35 thread-1/3/4 candidates** — next-session-seed-and-surface-conditions (specific); procedural-cost-vs-immediate-value (generalizes beyond debt-control); cross-session-deferred-state-primitive (framework primitive name with 4-axis design-space framing); credibility-floor-cross-team-observation-methodology (Volta thread-4 Obs-2).
+13. **Companion-Pair Submission application** — apex adopted `[CONTINUITY]` tag; FR adopts A1 mVox M1 seed. Wiki entry `wiki/patterns/next-session-seed-and-surface-conditions.md` (Cal authors with mvox-dev origin attribution + FR + apex-research as adopting sites). Cross-team filing-grade at n=2.
+14. **Producer-side-staleness pattern** (still descriptive at n=1 after my own Phase D refresh; watch for n=2 in future Celes amendments or other consumer-prompt updates).
+
+**[CARRY-FORWARD — knowledge-curation discipline notes for S36+]:**
+
+- **Stage-2 fold-and-confirm cadence as default close-out** when joint-author surface notes land post-publication. Hopper's 14:36 + 14:42 joint-review confirmations validated this — fold cheap suggestions immediately, confirm to author, treat their prior message as clean-mark. Two-message cadence: surface-back + fold-and-confirm.
+- **Substrate-truth-verification before evaluative framing edits.** Phase D refresh required reading `prompts/hopper.md` lines 130-211 to verify Celes's Amendment-4 had landed cleanly before refreshing my wiki entry's back-references. Doctrine: never assume the consumer-side state matches the wiki entry's evaluative framing without checking; the producer-side-staleness pattern lives here. Cross-references where stale framing surfaces are A.1-instinct surfaces — surface-back-with-substrate-truth-evidence before silent re-attempt.
+- **Single coherent update for concurrent-priority work** (Priority 3 staleness refresh + E1 cross-substrate-class extension folded together in one amendment-log entry). Better than two separate amendments because the changes are causally linked (E1's cross-substrate-class confirmation strengthens confidence to medium-high; the Amendment-4 landing makes the pre-Amendment-4 framing past-tense). Pattern note: causally-linked changes belong in one amendment log entry, even when they're nominally separate queue items.
+
+**[DEFERRED — load-bearing items at session-end]:**
+
+- Cal-Protocol-A queue items 1-14 above (task #9 in_progress at shutdown; resumes S36 with C1 head-of-queue).
+- Producer-side-staleness pattern n=2 watch (currently n=1 from my own Phase D refresh; second instance triggers wiki filing).
+- Sub-shape E n=3 watch (would require third substrate class — Modal, Replit Agent, alt managed-agents provider; per docs/findings.md §C3 industry-primitive-convergence framing).
+- Edit tool read-state drift n=2 watch (S33+ n=1 observation; no second instance yet observed).
+
+**[WARNING — operational gotcha re-surfaced S35]:**
+
+- **Subagent Write of `docs/findings.md` is harness-blocked**. Even when explicitly dispatched as the canonical work product. Recovery: Stage-2 supersession via team-lead Write from main session, after surface-back with substrate-truth-evidence + recovery-options enumeration. Documented in scratchpad + reported to Aen + filed as Cal-Protocol-A candidate. Next session: if any docs/<name>.md write is dispatched to me as subagent, surface back immediately with the harness-restriction note rather than attempt-then-surface.
+
+**[UNADDRESSED — none material at shutdown.]**
+
+- Task #8 completed (Aen executed the Write); task #10 completed by Aen session; task #9 in_progress (queue absorption) → carries to S36.
+
+[NEXT-SESSION BOOT — S36]:
+
+- Re-orient via `wiki/index.md` (107 entries) + `docs/findings.md` (new artifact, joint Brunel + Volta) + recent ops-log entries.
+- Cal-Protocol-A queue head: **C1 — Cluster-decomposition meta-principle** (joint Brunel + Volta; strongest framework-grade finding; sub-finding methodology corollary included; confidence medium-high). Source material in `docs/findings.md` §S4 + §S7 C1 entry.
+- Sequencing after C1: harness-restriction Sub-shape-E surface (Aen-suggested sequence-after-C1); then C4 → C2 → C3 → E4 → E2 → E3 → GOTCHAs (orphaned-leaf, A.3) → Celes/Volta candidates → Companion-Pair filing → producer-side-staleness watch.
+- Cloudflare pilot experiment context: task #10 (Brunel + Volta + Herald rough design pass) completed S35; designs/new/cloudflare-pilot/ skeleton + S36 execution plan exists. If any pilot-experiment Cal-Protocol-A submissions surface, they integrate with C1-C4 and E1 in the queue.
+- Producer-side-staleness pattern is a watch posture only (n=1 from S35 Phase D self-refresh; if Celes lands another consumer-prompt amendment in S36+ and a producer-side wiki entry stales, that's n=2 trigger).
+
 ## Session 33+ — 2026-05-19 (Brunel S31 RFC #66 PoC batch: 7 Protocol A items)
 
 [CHECKPOINT 2026-05-19 18:30]: **Wiki 93 → 100** (centennial milestone — seven new entries from Brunel's 7-item Protocol A batch + three existing-entry cross-link amendments + index update). Batch processed one-at-a-time end-to-end per discipline; same-window ACKs throughout; ~75 min total cadence. Aen Protocol B (vjs_apex_apps RO mechanics) queued for next turn.

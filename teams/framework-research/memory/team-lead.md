@@ -1,5 +1,120 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+### [NEXT SESSION] 2026-05-26 — session-35 → session-36
+
+**Bootstrap M1 seed** — first instance of mVox-M1-pattern under FR-A1 adoption (PO ratified 2026-05-22). Bound to 5 bullets per discipline. Downgrade to `[PROCESSED YYYY-MM-DD]` on first S36 read.
+
+- **State of play:** S35 closed 2026-05-26 (six-day session 2026-05-21 → 2026-05-26). Cloudflare Round 0 substrate validated end-to-end on EVR account — `fr-cma-pilot` Worker live at `https://fr-cma-pilot.evree.workers.dev/`, all 4 secrets landed, Anthropic Self-managed env `env_01PpqWL9BfKZYD7SKPUEryRu` configured, dashboard shows "ready for sandbox" state. Plus: docs/findings.md filed (task #7); 2 Phase-A wiki entries + Hopper-Amendment-4 prompt landed; Cal-Protocol-A queue ~10 items remaining.
+- **Open dispatches/dependencies:** Cal task #9 in_progress (Protocol A queue absorption ongoing; carries to S36 — Priority 1+3+E1 landed, remaining queue is C1+C4+C2+C3+E2/E3/E4 + harness-restriction Sub-shape-E entry + orphan-leaf-detector for windows-bridge pattern + Sub-shape A.3 probe-design + Pass-1-prose-only-batched-iterate + mVox-thread-1/3/4 + Companion-Pair filing for [CONTINUITY]/A1).
+- **Expected first action S36:** PO direction. **Most likely:** continue Cloudflare pilot Round 1 — address EVR Cloudflare Access wall on `/webhooks` (path-bypass policy) → create first Isolate-backed sandbox via dashboard → trigger session via Anthropic platform → observe end-to-end webhook → sandbox → response flow. **If different surface:** see conditional NEXT-SESSION BOOT (#5 onward).
+- **PO-pending decisions:** (a) Cloudflare `/webhooks` Access bypass approach — path-rule vs scope-disable; (b) Brunel-side parallel amendment to `prompts/brunel.md` §Diagnostic Discipline (Layer-1-only gap, same shape as Hopper-Amendment-4) — schedule for which session; (c) Hopper-Amendment-5 candidate (Layer-0 library-first discipline) — schedule; (d) "PO" → "Mihkel/you" naming convention question (PO surfaced 2026-05-22; not yet resolved beyond conversation).
+- **Concrete pointers:**
+  - This repo: `docs/findings.md` (cross-cutting task #7 finding — substrate gap analysis); `designs/new/cloudflare-pilot/` (README + 3 angle briefs; Round 0 spec executed, Round 1 spec ready); `teams/framework-research/wiki/patterns/discriminator-anchored-on-sub-canonical-source.md` + `three-layer-substrate-truth-discipline.md` (Phase A entries + E1 staleness refresh).
+  - External: `~/Documents/github/.mmp/claude-managed-agents/` — cloned cloudflare template, deployed as `fr-cma-pilot` Worker on EVR account `8f150f98013eec8cae0a9db20a010c49`. wrangler.jsonc has experimental naming. 4 secrets uploaded.
+  - All 6 agents (Cal, Brunel, Hopper, Celes, Volta, Herald) idle pre-S35 shutdown; will need fresh spawn per S36 PO direction.
+
+---
+
+## SESSION 35 WRAP — 2026-05-21 → 2026-05-26 (Six-day session; 10 tasks closed; Cloudflare research-and-execution arc landed in-session; A1 NEXT SESSION seed bootstrap above is part of this session's lasting structural artifact)
+
+**Spans:** 2026-05-21 09:33 → 2026-05-26 ~13:30. Six calendar days. Longest session in FR history by wide margin.
+
+**Outcome:** Substantial cross-track progress on (a) S34 carry-forward Cal-Protocol-A submissions (Phase A complete; Phase B Hopper-Amendment-4 landed); (b) mVox-dev investigation + research-perspective companion (catalyzed PO dual-perspective discipline correction); (c) **Cloudflare Claude Managed Agents pilot — designed AND Round 0 substrate validated end-to-end on EVR account**, dashboard live, ready for Round 1 sandbox creation; (d) apex DB tunnel operational incident resolved via Aen-direct Path B execution (PO authorization extension); (e) A1 mVox-M1-seed adoption (this session's seed above is the first instance — discipline self-application).
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `wiki/patterns/discriminator-anchored-on-sub-canonical-source.md` | NEW | Cal (Brunel + Hopper joint source) | Phase A task #1 |
+| `wiki/patterns/three-layer-substrate-truth-discipline.md` | NEW + E1 staleness refresh | Cal (Brunel + Hopper joint source) | Phase A task #2 + Cal Priority 3 (S35 docs/findings.md fold) |
+| `prompts/hopper.md` lines 130-211 (Hopper-Amendment-4) | NEW | Celes-drafted + Hopper author-of-record + Brunel architectural co-author | Phase B task #3 — three-layer Diagnostic Discipline section |
+| `docs/findings.md` | NEW (cross-cutting) | Brunel + Volta joint (Cal filed) | Task #7 — substrate gap analysis vs Cloudflare; FR-as-multi-agent-coordination-layer-above-single-agent-substrates positioning + bottleneck-alignment n=3 + cluster-decomposition meta-principle (strongest finding) |
+| `designs/new/cloudflare-pilot/` (README + substrate.md + lifecycle.md + comms.md) | NEW | Aen-synthesis of Brunel + Volta + Herald briefs | Task #10 — pilot experiment design |
+| `docs/operations-log-2026-05.md` (entries #7, #8, #9) | +204 lines | Hopper | Task #6 apex DB tunnel diagnostic + verification |
+| Apex DB tunnels recovered via Path B | Operator-side action | Aen (PO-authorized direct execution) | Killed Windows-side orphan tunnel tree + restarted Task Scheduler; substrate-truth-anchored discovery: TNS-bytes probe was flawed fingerprint; substrate-probe-design itself can be sub-canonical source |
+| `auto-memory/feedback_dual_perspective_remote_team_observation.md` | NEW | Aen (PO 2026-05-22 correction) | We-as-target AND we-as-researchers discipline; saved durably |
+| Cloudflare `fr-cma-pilot` Worker deployment | Operational substrate on EVR | Aen direct | KV (2) + D1 + R2 + 4 secrets + Anthropic Self-managed env wired |
+| Cross-team consultation with Schliemann (apex-research) | Cross-team comms | Aen + Volta findings relayed | Apex adopted [CONTINUITY] tag (2 design hooks Aen-articulated); FR adopted M1 seed (this artifact instantiates) — decomposition pattern n=2 cross-team |
+
+10 tasks closed (#1-#8, #10); 1 in_progress (#9 Cal queue absorption, carries to S36).
+
+### Decisions (PO-ratified)
+
+[DECISION — S35] **A1 (mVox M1 NEXT SESSION seed) adopted for FR.** PO ratified 2026-05-22 ~13:15 after Volta task #4 investigation. Evidence-first approach: A1 only (not A2/A3); audit at S40-42 per Volta thread-2 procedural-vs-structural framing. **This session's [NEXT SESSION] seed (above the wrap) is the bootstrap-write — discipline self-applies from session-1.**
+
+[DECISION — S35] **Cloudflare pilot proceeds on EVR account with experimental `fr-cma-pilot` naming.** PO ratified 2026-05-26 after Workers-Paid tier check on EVR + individual-account-Probably-free inference. Naming discipline keeps experimental artifacts visually distinct from production (`conversations`, `vestlused`, `apex-research`).
+
+[DECISION — S35] **Round 0 (substrate smoke test) is the closure point this session.** Round 1+ (sandbox creation + actual session-running) defers to S36+ in fresh-session form. Multi-session experiment per PO 2026-05-26 AskUserQuestion answer.
+
+[DECISION — S35] **Anthropic OAuth token (subscription-based, sk-ant-oat...) used as ANTHROPIC_API_KEY** for pilot Round 0 per PO direction "use same key we are using right here." Three caveats noted (token expiration, header-format compatibility, audit attribution); tolerable for experimental pilot, would matter for production.
+
+[DECISION — S35] **Aen-direct execution sanctioned by PO for substrate operations** that Hopper couldn't reach via SSH paths. Two instances: (a) apex DB tunnel Windows-side teardown + restart (Path B); (b) Cloudflare pilot deployment + secrets-upload. Coordinator-only restriction overridden for operational obstacles per explicit PO direction "perform all actions yourself, dont depend on me."
+
+[DECISION — S35] **Dual-perspective discipline enshrined via feedback auto-memory.** PO 2026-05-22 correction: when assessing remote-team practices (or any cross-team observation), apply BOTH we-as-target (adoption decision) AND we-as-researchers (framework finding) explicitly + foregrounded. Saved as `feedback_dual_perspective_remote_team_observation.md`. Applied retroactively to Volta thread-5 research-perspective companion (task #5).
+
+### Substantive learnings (Cal-grade candidates)
+
+[LEARNED — promotion-grade, framework] **Cluster-decomposition meta-principle** (docs/findings.md §S4 — strongest single finding from task #7). Clusters decompose along their coupling-dimension; coupling-dimension is the load-bearing property to identify when observing any cluster. n=3 origin observations (mVox M1-M5 team-property coupling / Cloudflare 7-mechanism cluster team-property coupling / Sub-shape E 3 layers ownership-locus coupling). Methodology corollary: decompositions invisible at n=1, emerge at n=2 with second instance providing variation along the coupling-dimension. Cal-Protocol-A queue item C1 — highest sequencing priority.
+
+[LEARNED — promotion-grade, framework] **Bottleneck-determines-adoption is cross-domain.** Volta thread-3 generalizes from discipline-domain (S35 mVox M1+M3 vs FR vs apex bottleneck-shapes) to substrate-domain (Cloudflare adoption per FR-shipped-team bottleneck). n=3 corroboration across two domains. Two-condition rule: bottleneck matches substrate strength AND workload fits substrate constraints. Cal-Protocol-A queue item C4.
+
+[LEARNED — promotion-grade, framework] **Sub-shape E substrate-class-invariant at n=2** (docs/findings.md §S5). Three-layer substrate-truth model (S34 Docker-on-RC n=1) now confirmed at n=2 under Cloudflare-managed substrate. Drift surfaces redistribute predictably when ownership locus shifts; surfaces themselves persist. Wiki confidence promoted medium → medium-high. Independent vendor corroboration via Cloudflare's own gotchas section in `connecting-to-private-services.md` (4 distinct drift instances vendor-documented). Cal-Protocol-A queue item E1.
+
+[LEARNED — promotion-grade, framework] **Substrate-vs-framework boundary primitive.** docs/findings.md §S1 + §S2 — Cloudflare's brain-hands decoupling IS the substrate primitive; FR's multi-agent coordination is the framework layer above it. "We stack, not compete." Bounded extension: "brain-hands decoupling" (Cloudflare vocabulary) and substrate-vs-framework-boundary (FR vocabulary) are the same boundary named from two sides. Cal-Protocol-A queue item C2.
+
+[LEARNED — process, promotion-grade] **Dual-perspective discipline** (PO 2026-05-22 correction). Cross-team observation requires we-as-target AND we-as-researchers framings explicit + foregrounded — not woven in. Saved to auto-memory + applied to Volta task #5 (Aen re-dispatched after correction). Generalizable beyond cross-team contexts: applies whenever FR observes any external pattern (substrate, vendor, sibling team, framework primitive).
+
+[LEARNED — promotion-grade, process] **Dyad-cross-pattern has TWO failure modes** (Volta phrasing at task #7 polish-pass): (a) drift-loop — genuine miscommunication, content diverges, reconciliation cost grows; (b) affirmation-loop — content converged early, subsequent passes only re-affirm closure without adding content. Discriminator: substantive-content-added vs only-affirmation. Recovery mechanisms: team-lead intervention at ~5+ passes (Aen 13:14 deliver-NOW); dyad-side fast-forward maps at ~3+ passes (Volta 17:25 consolidates state in single read). Both empirically demonstrated in task #7 polish-pass execution. Cal-Protocol-A queue item E4.
+
+[LEARNED — process] **Lifecycle-phase-invariance corollary.** Volta §VL4 in cloudflare-pilot/lifecycle.md: startup-side bifurcation symmetric with shutdown-side bifurcation (docs/findings.md §V3). Substrate-vs-framework boundary is operationally invariant across lifecycle phase (startup + runtime + shutdown all bifurcate the same way). Round 1 pilot will exhibit all three phases under CF substrate — empirical confirmation by construction.
+
+[LEARNED — promotion-grade, process] **Credibility-floor preamble for cross-team observation** (Volta thread-4 obs-2, materialized in docs/findings.md Preamble). Four load-bearing-implicit Cloudflare claims explicitly enumerated; downstream conclusions bounded against them. Independent vendor's own gotchas section corroborates. Cal-Protocol-A queue item — generalizes beyond Cloudflare context to all announcement-grade source interpretation.
+
+[LEARNED — promotion-grade, substrate] **Substrate-probe-design CAN be sub-canonical source itself.** Aen-surfaced (apex DB tunnel post-restart): TNS-bytes probe was anchored on assumed Oracle protocol behavior (responds to any input), but Oracle TNS doesn't respond to malformed input. Extends discriminator-anchored-on-sub-canonical-source.md from "discriminator anchors on inferred-grammar" to "probe semantics anchor on assumed-protocol-behavior" — same defect class. Hopper folded into her scratchpad. Cal-Protocol-A queue item (potentially A.3 sub-shape; Brunel-question on naming).
+
+[LEARNED — process] **Library-first-before-investigating** is a Tier R primitive that precedes substrate probes (Layer-0 before Layer 1/2/3). Aen-surfaced during apex DB tunnel arc — should have queried wiki BEFORE dispatching Hopper to substrate-probe. Carry-forward as Hopper-Amendment-5 candidate; not surfaced this session per batched-iterate compact with Celes.
+
+[LEARNED — substrate, Cloudflare integration] **Anthropic supports TWO self-hosted patterns for Claude Managed Agents.** Console default (low-code flow) is CLI-polling via `ant` CLI; CF template uses webhook-driven. Different positions on substrate-vs-framework boundary, both available from same platform. Worth Cal-Protocol-A note as cross-pattern observation.
+
+[LEARNED — substrate, Cloudflare integration] **EVR Cloudflare Access org-wide policy auto-secures the deployed Worker.** README §8 warned default state is insecure; EVR's policy makes it secure-by-default. But blocks Anthropic webhook delivery on `/webhooks` until path-bypass added. Worth Cal note as substrate-environment-defaults-matter pattern.
+
+[LEARNED — process] **Harness-restriction blocks subagent from writing report-pattern files.** Cal (subagent) couldn't write `docs/findings.md` — error `"Subagents should return findings as text, not write report files."` Workaround: Cal ships content via SendMessage; Aen writes from main session. Sub-shape-E-type structural gap between team-design (Cal has wiki writer authority by convention) and substrate-implementation (subagent harness pattern-matches and blocks). Cal-Protocol-A queue item.
+
+### Standing watch items going into session 36
+
+- **Cloudflare pilot Round 1** — substrate ready; needs `/webhooks` Access bypass + first sandbox creation + trigger session via Anthropic. Round 1 spec at `designs/new/cloudflare-pilot/README.md`. **Most likely first dispatch surface for S36.**
+- **Cal-Protocol-A queue ~10 items** — Cal in_progress on task #9. After Phase-A (Priority 1+3+E1) landed; remaining: C1+C4+C2+C3+E2/E3/E4 + harness-restriction Sub-shape-E + orphan-leaf-detector for windows-bridge + Sub-shape A.3 probe-design + Pass-1-prose-only-batched-iterate + mVox-thread-1/3/4 + Companion-Pair filing for [CONTINUITY]/A1. Cal sequences per bandwidth.
+- **Brunel-side parallel amendment to `prompts/brunel.md`** §Diagnostic Discipline (Layer-1-only gap; same shape as Hopper-Amendment-4). Celes-routed when scheduled.
+- **Hopper-Amendment-5 candidate** (Layer-0 library-first discipline). Hopper batched-iterate compact with Celes: deferred to future amendment-pass.
+- **Apex-research bidirectional cite-back** — if Eratosthenes files apex-side wiki entry for [CONTINUITY] adoption or related cross-pollination, Cal handles via Companion-Pair protocol.
+- **A1 evidence-cycle audit at S40-42** — measure whether the M1 seed pattern actually reduces team-lead reorientation tax. If yes, A2/A3 expand. If no, learn what shape didn't fit.
+- **Manager-team / PO-team architecture** (Monte domain; carried since 2026-05-20) — PO floated; not actioned. Surface if PO returns to it.
+- **Aen amendment Part C (relay-visibility rule)** — HELD at `designs/deployed/operator-role/prompts/aeneas-amendment.md`. PO may revisit.
+- **mVox-dev session 8 carry-forward** (Palestrina 3 deferred items: path convention, CLAUDE.md drift, polyphony-isms). Dormant unless PO surfaces.
+- **Volta evaluates mVox-dev startup procedure** — partially-done via task #4; could revisit for additional comparison if PO surfaces.
+- **TPS-583 (apex-research)** — Stage-2 standard moves when PO signals Ruth progressed. Dormant.
+- **"PO" → "Mihkel/you" naming convention question** (PO surfaced 2026-05-22 13:15 ish). Not resolved beyond conversation; common-prompt + agent prompts still use "PO". PO may direct a renaming pass.
+
+### NEXT-SESSION BOOT (re-orient instructions for S36)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — that's the 5-bullet reorientation seed per A1 adoption. Read it FIRST, then downgrade the tag to `[PROCESSED 2026-05-XX]` once processed.
+3. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **If PO surfaces Cloudflare pilot Round 1 (MOST LIKELY first ask):** read `designs/new/cloudflare-pilot/README.md` Round 1 spec + sub-briefs. Spawn Brunel + Volta + Herald for the design-side; possibly Hopper for substrate-operational verification. First operational step: address EVR Cloudflare Access wall on `/webhooks` — needs PO dashboard action OR sanction for me to add path-bypass via `wrangler` if API allows. Then PO creates first Isolate-backed sandbox in `https://fr-cma-pilot.evree.workers.dev/` dashboard. Then trigger session via Anthropic platform → observe webhook delivery → sandbox creation in CF → response.
+6. **If PO surfaces Cal-Protocol-A queue continuation:** spawn Cal. Her task #9 stays in_progress; she sequences per bandwidth. Top of queue: C1 cluster-decomposition (strongest), then E1 amendments (already partially done — Sub-shape E n=2 + staleness refresh), then C4 bottleneck-determines-X cross-domain, then C2 substrate-vs-framework boundary primitive. ~10 items total in queue.
+7. **If PO surfaces Brunel-side parallel amendment** to `prompts/brunel.md` (Layer-1-only gap same as Hopper-Amendment-4): spawn Celes + Brunel (as author-of-record) + Hopper (cross-reviewer for symmetry). Same joint-review pattern as task #3.
+8. **If PO surfaces Hopper-Amendment-5 candidate** (Layer-0 library-first discipline): spawn Celes + Hopper + Brunel. Hopper has the candidate prose in her scratchpad; honor batched-iterate compact (Layer-0 sub-pattern is one-amendment-cycle separate from Amendment-4).
+9. **If PO surfaces "PO" → "Mihkel/you" naming convention question:** this affects common-prompt + all agent prompts + roster. Coordinate Celes (prompt-side curation) + Cal (wiki cross-references) for the rename pass.
+10. **If PO surfaces A1 evidence-cycle audit** (planned S40-42): measure whether M1 seed reduced team-lead reorientation tax this session. Compare S36 startup-time to S34/S35 startup-times (subjective; PO will say). If subjective improvement is real, A2/A3 expand; if not, learn what shape didn't fit.
+11. **If PO surfaces apex-research cross-team work** (bidirectional cite-back, [CONTINUITY] adoption follow-up, Companion-Pair filing for FR-M1 + apex-M3): spawn Cal for Companion-Pair Submission protocol filing.
+12. **First operational item if Cal-spawning at S36 start:** route any pending Protocol A submissions from S35 carry-forward queue. Cal had ~10 items queued at S35 close. Surface-grade work present regardless of PO direction.
+13. **Apex DB tunnels** — operational substrate verified stable at S35 close (third-generation inodes confirmed evolving normally per Hopper task #6). No watch action needed unless PO reports apex team re-flags.
+
+(*FR:Aen*)
+
+---
+
 ## SESSION 34 WRAP — 2026-05-20 → 2026-05-21 (Hopper's first dispatch — apex-research authorized_keys multi-key persistence; original PO ask ACHIEVED; degraded-substrate diagnostic prevented multi-system credential cascade; Sub-shape A-E pattern catalog + 3-layer substrate-truth discipline crystallized)
 
 **Spans:** Multi-day session 2026-05-20 → 2026-05-21 (apex team's voluntary maintenance window enabled the recreate). Single dispatch arc, but the diagnostic depth made it the richest dispatch in FR history.

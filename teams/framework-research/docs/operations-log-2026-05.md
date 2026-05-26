@@ -439,3 +439,207 @@ The full surface-back chain through this dispatch is a textbook example of the h
 **Four Sub-shape A instances in the full dispatch arc** (P1.1 michelek-regex, P1.2a label-key typo, P3.6-amendment-1 character-class, P4.05-first-attempt awk runaway-string): cataloging confirmed for session-end Cal-Protocol-A submission. The shape is hardening; substrate-truth-anchored discriminators/literals reliably outperform inferred/template-anchored ones.
 
 (*FR:Hopper*)
+
+---
+
+## 2026-05-25T10:24+03:00 — apex DEV db tunnels diagnostic (Tier R-only, Hopper-scope-exit)
+
+**timestamp** — 2026-05-25T10:24+03:00 (dispatch landed via Aen task #6) → 2026-05-25T10:27+03:00 (hard-gate-trip surface-back, L3-UP vs dispatch-DOWN) → 2026-05-25T10:32+03:00 (consolidated Tier R findings + three unblock-asks) → 2026-05-25T10:35+03:00 (Aen acked, HOLD posture, routing (A) ask through PO) → 2026-05-25T10:36+03:00 (PO sharpened symptom verbatim: "localhost:11521 connection refused") → 2026-05-25T10:40+03:00 (Aen sharpened probe-suite P2a-2d, sequential single-probes per Windows-substrate friction discipline) → 2026-05-25T10:39+03:00 (P2a-2d complete, substrate-shape revised, Hopper-scope-exit recommendation surfaced) → close-out written 2026-05-25T10:42+03:00 (this entry).
+
+**tasker** — Aen (operational urgency path; PO surfaced the apex team complaint to Aen, who dispatched to Hopper as task #6). PO direction relayed through Aen at 10:36 sharpening the symptom-text. No Brunel involvement this arc; pure Hopper diagnostic.
+
+**dispatch summary** — Apex team reported DEV db tunnels (11521 VJSDBTEST, 11522 VJSDBTEST2) DOWN as of 2026-05-25; baseline metrics 2026-05-21 09:33 showed UP-with-high-churn (54 ssh restarts/24h + 17 wrapper-loop respawns lifetime). Hopper diagnosed Tier R first per discipline; surfaced hard-gate trip (L3 sockets BOUND, dispatch said DOWN); after sharpened probe-suite, surfaced revised substrate-truth (host AND container both have own tunnels, both protocol-functionally-dead with stale-listener-with-dead-upstream fingerprint); recommended Hopper-scope-exit on three independent grounds (substrate-of-truth in apex team's workspace OUT-OF-SCOPE; failing locus is THIRD context not probed; recovery action is apex-team-domain not FR-shipped).
+
+**tier classification + sanction status** — by probe:
+
+- **P0** = Tier R (connectivity viability check) — default-permitted. PASS at 10:26:56: host paarisprogemis-fyysiline up 67 days, load 1.73-1.90, ssh-as-dev viable.
+- **P1** = Tier R (L3 listen-socket check, host-side) — default-permitted. **HARD-GATE TRIP at 10:27**: `ss -tln | grep :1152[12]` returned 4 LISTEN entries (127.0.0.1 + IPv6 [::1] on both 11521 and 11522). Dispatch said DOWN; substrate said UP at L3 socket-state. Surfaced per discipline; do not silent-broaden.
+- **P2-P4** (host-side TCP+protocol probes) = Tier R (default-permitted, continued under Aen 10:32 (b)-sanction crossing in-flight with surface-back):
+  - P2: `echo > /dev/tcp/127.0.0.1/11521` exit 0 — TCP handshake OK
+  - P3: same for 11522 exit 0 — TCP handshake OK
+  - P4: `exec 3<>/dev/tcp/127.0.0.1/11521; printf x >&3; head -c 64 <&3 | od -c` returned 0 bytes within 4s timeout — **stale-listener-with-dead-upstream signature** captured
+- **P5-P13** (substrate-discovery probes, host-side) = Tier R (default-permitted): pgrep/who/ps/systemctl/docker/tmux/sudo-check — all returned no-actionable-substrate-truth (process-owner invisible without sudo; no systemd/cron/docker port; tmux-socket-visibility-under-ssh dead-end).
+- **P2a** = Tier R (host-side `nc -zv` re-confirm) — default-permitted under Aen 10:40 sharpened sanction. PASS: both 11521 + 11522 report `open`.
+- **P2b** = Tier R (container-side TCP probe via container-user SSH on port 2222) — default-permitted. **UNEXPECTED PASS**: `/dev/tcp/127.0.0.1/11521` and :11522 from inside container both return exit 0. **Substrate-shape 2 (container-can't-reach-host) REFUTED** — container has its OWN listeners.
+- **P2b-extended** = Tier R (container-side protocol-handshake) — default-permitted. **SAME stale-listener fingerprint**: exit 124 timeout, 0 bytes in 4s for both ports.
+- **P2c** = Tier R (container-side `/proc/net/tcp` direct read, no ss/netstat/lsof in container) — default-permitted. **SUBSTRATE-TRUTH CAPTURED**: container has inodes 674958957 (127.0.0.1:11521) + 674958961 (127.0.0.1:11522) in LISTEN state (0A) owned by uid=1000 (ai-teams). Each environment runs its OWN SSH tunnels; container's are separate from host's.
+- **P2d** = Tier R (container filesystem search for 11521/VJSDBTEST config). **SCOPE BOUNDARY HIT**: matching files live in `/home/ai-teams/workspace/teams/apex-research/{memory,inboxes,wiki}/` — apex team's own workspace, OUTSIDE Hopper's MAY-READ scope. Did NOT read those files; surfaced the gap to Aen.
+
+**No Tier M / Tier D in this arc.** No FR-shipped substrate mutated. All probes were Tier R default-permitted or default-permitted under sharpened Aen sanction. The diagnostic exited Hopper-scope before any recovery proposal was committed.
+
+**deployed-artifacts-read declaration** — per the Hopper-Amendment-4 three-layer discipline I co-authored (currently in joint-review with Celes + Brunel):
+
+- **Layer 1 (FR design-as-shipped):** **ABSENT** for this substrate. Read `designs/deployed/apex-research/container/docker-compose.yml` (lines 1-89) + glob-walked the entire `designs/deployed/apex-research/**` tree — no `tunnel`/`wrapper`/`db`/`oracle`/`VJSDBTEST`/`11521`/`11522` artifacts. FR-design covers the apex-research CONTAINER substrate, not the DEV db tunnel substrate. Per §Graceful Degradation case 1, surfaced gap to Aen at 10:24; Aen confirmed (b)-proceed-with-Layer-1-absent at 10:32.
+- **Layer 2 (consumer-team operational on substrate host):** **PARTIALLY UNREACHABLE / OUT-OF-SCOPE**. Probed standard locations (host /home/dev/bin/ EMPTY; systemctl user+system NO MATCHES; docker ps NO 11521/11522 PUBLISHED; ps -eo NO TUNNEL/WRAPPER VISIBLE TO dev USER; sudo NOT PASSWORD-LESS). Substrate-truth source IS in apex team's workspace (`/home/ai-teams/workspace/teams/apex-research/memory/hammurabi.md`, `inboxes/team-lead.json`, `wiki/decisions/`, `wiki/patterns/`) — NOT READ per Hopper's §Scope Restrictions (another team's substrate not in MAY-READ list). Surfaced the scope-boundary to Aen at 10:39 as part of scope-exit recommendation.
+- **Layer 3 (running container Config.Env / runtime state):** OBSERVED across host AND container. Host: ss output shows both ports LISTENING on 127.0.0.1 + [::1]. Container: /proc/net/tcp shows both ports LISTENING on 127.0.0.1 owned by uid=1000. Both contexts produce SAME stale-listener fingerprint at protocol-handshake (4s timeout, 0 bytes returned). L3 evidence is conclusive: tunnels are TCP-functionally-alive + protocol-functionally-dead in BOTH host and apex-research-container substrates.
+- **Audit-trail artifacts (this repo):** `teams/framework-research/docs/operations-log-2026-05.md` (this entry; 7th chronological entry for the month), `teams/framework-research/memory/hopper.md` (updated mid-arc with `[DISPATCH]` task #6 in-flight + `[GOTCHA]` stale-listener-fingerprint + `[LEARNED]` L2-unreachable-as-graceful-degradation-case-2-outcome).
+
+**commands executed** — verbatim, all Tier R via base64-transit-not-needed (single-token ssh commands; sequential single-probes per Windows-substrate friction discipline):
+
+- P0: `ssh -T -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=10 dev@100.96.54.170 'date; hostname; uptime'`
+- P1: `ssh -T ... dev@... "ss -tlnp 2>/dev/null | grep -E ':(1152[12])\b' || echo 'NO_LISTEN_ON_11521_11522'"`
+- P2/P3: `ssh -T ... dev@... "timeout 3 bash -c 'echo > /dev/tcp/127.0.0.1/11521' && echo PORT_11521_CONNECTABLE ..."` (separate invocations for 11521 and 11522)
+- P4: `ssh -T ... dev@... "timeout 4 bash -c 'exec 3<>/dev/tcp/127.0.0.1/11521; printf \"x\" >&3; head -c 64 <&3 | od -c'"`
+- P5: `ssh -T ... dev@... "pgrep -af 'ssh.*1152' 2>&1; echo '---PGREP_EXIT:'$?'---'"`
+- P6: `ssh -T ... dev@... "ss -tlnp 2>&1 | grep -E ':(1152[12])\b'"`
+- P7-P11: combined inventory probes for /home/dev/bin, systemctl --user/system, docker ps, who, ps -eo user,pid,etime,cmd (sequential single-probes).
+- P12: `ssh -T ... dev@... "sudo -n true 2>&1"` (negative result: password required)
+- P13: `ssh -T ... dev@... "tmux list-sessions 2>/dev/null; ... for s in \$(tmux list-sessions -F '#{session_name}' 2>/dev/null); do echo \"== \$s ==\"; tmux list-windows -t \"\$s\" -F '  #{window_index}: #{window_name}' 2>/dev/null; done"` — visibility dead-end under ssh-without-PAM-session.
+- P2a: `ssh -T ... dev@... "nc -zv 127.0.0.1 11521 2>&1; echo '---'; nc -zv 127.0.0.1 11522 2>&1"`
+- P2b: `ssh -i ~/.ssh/id_ed25519_apex -p 2222 ai-teams@100.96.54.170 "timeout 3 bash -c 'echo > /dev/tcp/127.0.0.1/11521' 2>&1; echo P11521_EXIT=$?; ..."` (container-user SSH per ~/bin/rc-deployments.json entry num:"2")
+- P2b-extended: same shape with `exec 3<>/dev/tcp/127.0.0.1/11521; printf x >&3; head -c 64 <&3 | od -c` for protocol probe
+- P2c: `ssh -i ~/.ssh/id_ed25519_apex -p 2222 ai-teams@... "head -20 /proc/net/tcp; awk 'NR>1 && \$4==\"0A\" { print \$2 }' /proc/net/tcp"`
+- P2d: `ssh -i ~/.ssh/id_ed25519_apex -p 2222 ai-teams@... "grep -rlE '11521|VJSDBTEST' /home/ai-teams/workspace/ /home/ai-teams/.config/ /home/ai-teams/bin 2>/dev/null | head -10"` — surfaced file list; did NOT read the contents (out-of-scope).
+
+**outputs** — relevant excerpts (full execution detail in the surface-back chain to Aen at 10:27, 10:32, 10:39):
+
+- **Host L3 listen sockets** (P1, P2, P3): both 11521 and 11522 bound on 127.0.0.1 + IPv6 [::1]; TCP-connect-via-/dev/tcp returns exit 0.
+- **Host protocol stale-listener fingerprint** (P4): `timeout 4 ... printf x >&3; head -c 64 <&3 | od -c` returns empty output, exit 0 (head's 4-byte default for `-c 64` partial-fill with EOF on timeout; substrate gave us NO data within 4s).
+- **No host-side wrapper-script visible to dev** (P5, P7-P11): /home/dev/bin/ has zero non-dotfile contents; no systemctl unit matching tunnel/db/wrapper/vjs/sql/oracle/apex/1152; docker ps shows 8 containers but none publish 11521/11522 to host; ps -eo for users michelek|root|apex × tunnel-related cmd patterns returns no match; sudo not password-less for dev.
+- **Container L3 listen sockets** (P2c): `/proc/net/tcp` lines 4-5 show `0100007F:2D02` and `0100007F:2D01` both in state 0A (LISTEN), uid 1000 (ai-teams), inodes 674958961 and 674958957. Container has its own tunnels.
+- **Container protocol stale-listener fingerprint** (P2b-extended): exit 124 (timeout) for both ports; SAME zero-bytes-in-4s shape as host-side.
+- **Apex-team workspace files mentioning 11521/VJSDBTEST** (P2d, FILE LIST ONLY, contents NOT READ per scope): `hammurabi.md`, `inboxes/team-lead.json`, `wiki/decisions/transition-detected-audit-stamping-adr-0014-gap-6.md`, `wiki/patterns/yleandmised-muutja-state-transition-audit.md`, `wiki/patterns/apex-page-item-v-idiom-in-plsql.md`, `wiki/patterns/vjs-oracle-designer-cg-scaffolding.md`, and others.
+
+**outcome** — **success (diagnostic) + scope-exit-recommended (recovery)**. Tier R substrate-truth captured at all three layers in both host AND container contexts; stale-listener-with-dead-upstream fingerprint reproduced in both contexts; no FR-shipped substrate mutated; substrate-shape-1 (stale-listener) revived; substrate-shape-2 (bridge-network-isolation) REFUTED.
+
+**Hopper-scope-exit recommendation surfaced on three independent grounds:**
+
+1. **Substrate-of-truth lives in apex team's workspace** (their hammurabi/wiki/inbox files), which is OUTSIDE Hopper's MAY-READ scope per §Scope Restrictions. Reading their substrate to find the wrapper-loop launcher is a scope violation.
+2. **The actual failing context (PO's "localhost:11521 connection refused" verbatim quote) is a THIRD locus** — neither host nor apex-research-container produces ECONNREFUSED; they both produce TCP-OK + protocol-hang. Failing locus not yet identified; cannot probe without PO surfacing where he ran the test.
+3. **Recovery action is fundamentally apex-team-domain** — modifying their tunnel wrapper-loop, modifying binding shape, restarting their SSH-tunnel infrastructure is apex's operational substrate, not FR-shipped. Hopper's MAY-DO is "operational against FR-shipped substrates"; apex's intra-substrate tunnels are not FR-shipped.
+
+**Recommended next actions** (surfaced to Aen at 10:39; awaiting routing decision):
+- **Escalate to apex-lead-ghost (Schliemann) via PO** for apex-side action with these diagnostic findings citable verbatim.
+- OR **expand Hopper scope** with explicit cross-team sanction to read apex's workspace.
+- OR **task Brunel diagnostic-side** for cross-team substrate analysis (his design-side scope when sanctioned).
+
+**Generalizable patterns surfaced (added to scratchpad):**
+- `[GOTCHA — substrate, apex-host]` **Stale-listener-with-dead-upstream fingerprint** — ss/`/proc/net/tcp` shows LISTEN; `/dev/tcp` TCP-connect succeeds; first-byte-write returns 0 bytes within timeout. Distinguishes from "missing listener" and "live listener serving."
+- `[LEARNED — discipline, substrate-scope-bound]` **L2 unreachable as legitimate §Graceful Degradation case 2 outcome** — when multiple substrate-discovery vectors return empty/null/access-denied AND the substrate-of-truth lives outside Hopper's MAY-READ scope, the responsible posture is declare-L2-unreachable-and-surface-to-tasker, NOT escalate probe-shapes recursively.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-05-25T11:25+03:00 — Correction entry — references 2026-05-25T10:24+03:00 (task #6 dispatch)
+
+**timestamp** — 2026-05-25T11:25+03:00 (correction-entry written).
+
+**tasker** — Aen (substrate-map correction landed at 11:05 via wiki-query; interpretation-refinement landed at 11:18).
+
+**dispatch summary** — Correction to two interpretations in the 2026-05-25T10:24+03:00 task #6 entry above. **The entry above (10:24) stands as written for the audit trail per append-only ops-log discipline; this entry supersedes specific interpretive claims, NOT the probe outputs.**
+
+**Correction 1 — "host AND container both have own listeners" was incorrect.**
+
+The 10:24 entry's `outcome` section and the `Layer 3` bullet of its `deployed-artifacts-read declaration` describe the substrate as "host and container both have own SSH tunnels on 11521/11522, both stale" and "host AND host-networked-container... same wrapper-loop owns both." **The corrected interpretation:** there is ONE set of listeners — RC host's loopback. The apex-research container is **host-networked** (compose-yml `network_mode: host`, per Brunel S34 scratchpad and `wiki/references/rc-host-db-tunnel-architecture.md` filed 2026-04-24). Host-networked containers share the host's network namespace; `/proc/net/tcp` inside the container reflects the host's network state, not the container's own.
+
+Substrate-truth-verification this entry executed (Tier R, single probe, no further sanction needed per default-permitted scope):
+
+```
+$ ssh -T dev@RC "awk 'NR>1 && (\$2 ~ /:2D01\$/ || \$2 ~ /:2D02\$/) && \$4==\"0A\" { print \$2 \" inode=\" \$10 \" uid=\" \$8 }' /proc/net/tcp"
+0100007F:2D02 inode=674958961 uid=1000
+0100007F:2D01 inode=674958957 uid=1000
+```
+
+**Host's inodes 674958961 and 674958957 are byte-identical to container's** (P2c reading from container's `/proc/net/tcp` at 10:39 captured these exact inodes). Same kernel-side inodes; same uid=1000 (kernel-numeric; host's `dev` user shares uid 1000 with container's `ai-teams` user — name-aliasing-only, single underlying identity to the kernel). **One listener observed from two vantage points in the same shared netns. NOT two parallel substrates.**
+
+The "same wrapper-loop owns both" intuition in the 10:24 entry is correct (single owner) but the structural framing ("both contexts have their own tunnels") is wrong. Cleaner substrate-truth: single set of listeners in shared netns, observed from host SSH and container SSH, both showing the same kernel inode IDs.
+
+**Correction 2 — "substrate-of-truth is in apex team's workspace" was incorrect.**
+
+The 10:24 entry's `outputs` section listed apex team's workspace files (`hammurabi.md`, `inboxes/team-lead.json`, `wiki/decisions/...`, `wiki/patterns/...`) as containing the substrate-of-truth for the tunnel wrapper-loop. **The corrected interpretation:** those files are agents documenting the database they USE; they do not OWN the tunnel substrate. The wrapper-loop substrate-of-truth is on **PO's Windows workstation** — script at `apex-migration-research/.claude/bin/open-db-tunnels.sh` (cross-repo, on PO's Windows filesystem, NOT inside this repo or apex team's container), persisted via Windows Task Scheduler task `ApexResearch-DBTunnels` in PO's user-context. Source-of-truth: `wiki/patterns/windows-user-context-persistent-bridge.md` (filed 2026-04-28, expanded 2026-04-29 with 2 refinements; 6-component persistent-bridge pattern: autossh + supervisor-of-supervisor + wscript launcher + dual triggers + IgnoreNew + stale-process cleanup).
+
+**MAY-READ scope was NOT the actual blocker** for the apex-workspace files surfaced at P2d. The actual blocker is structural: the wrapper-loop runs in PO's Windows user-context, unreachable from any Hopper SSH access path (host-user-SSH `dev@RC`, container-user-SSH `ai-teams@RC:2222`). Scope-exit still holds, just with cleaner reasoning.
+
+**Correction 3 — recovery routing.**
+
+The 10:24 entry's `Recommended next actions` proposed "(1) Escalate to apex-lead-ghost (Schliemann) via PO." Per Aen 11:18: **wrong routing.** Schliemann's team doesn't own the wrapper-loop; PO does. Routing through apex would just bounce back. Per the corrected substrate-map: **recovery action is PO restarting `ApexResearch-DBTunnels` Task Scheduler task** (or killing stale Windows-side `ssh.exe` / `autossh.exe` processes and re-triggering). PO is handling Windows-side recovery directly. Hopper's only operational action remaining is the single TNS-bytes verification probe post-restart (per Aen 11:05 dispatch text).
+
+**tier classification + sanction status** — Tier R only:
+
+- 11:25 verification probe (host inode + uid extraction via `awk` on `/proc/net/tcp`): Tier R default-permitted, single sequential probe per Windows-substrate friction discipline. PASS at 11:25: inodes byte-identical to container's P2c output from 10:39. Corrected interpretation substrate-truth-anchored.
+
+**deployed-artifacts-read declaration** — corrections fold per Hopper-Amendment-4 candidate (three-layer):
+
+- **Layer 0 (documented-knowledge probe) — NEW DISCIPLINE GAP SURFACED:** `wiki/references/rc-host-db-tunnel-architecture.md` (filed 2026-04-24, status active) and `wiki/patterns/windows-user-context-persistent-bridge.md` (filed 2026-04-28, amended 2026-04-29, status active) **both contained the complete substrate map for this incident.** Library-query at dispatch-receipt-time would have collapsed the diagnostic surface entirely — avoiding P5-P13 + sudo-escalation ask + the host-vs-container-as-two-substrates wrong-interpretation. This is the catalyzing-incident for the Layer-0-library-first discipline now captured in scratchpad as `[LEARNED — discipline, library-first]`; candidate sub-pattern for Hopper-Amendment-4 (Phase B mid-flight; not surfacing to Celes until post-verification per discipline-batched-iterate).
+- **Layer 1 (FR design-as-shipped):** ABSENT for DEV db tunnel substrate (correct as stated in 10:24 entry). Reaffirmed.
+- **Layer 2 (consumer-team operational on substrate host):** **CORRECTED INTERPRETATION** — the wrapper-loop substrate-of-truth is on **PO's Windows workstation**, NOT in apex team's workspace. The apex workspace files surfaced at P2d are agents-using-the-database references, not the tunnel-wrapper-loop owner.
+- **Layer 3 (running container Config.Env / runtime state):** **CORRECTED INTERPRETATION** — single set of listeners in shared netns (apex-research container is host-networked, `network_mode: host`), observed from host SSH and container SSH via byte-identical kernel inodes 674958961 / 674958957. NOT two parallel substrates. Same stale-listener-with-dead-upstream fingerprint (TCP-accept-OK + 0-bytes-on-first-byte-write + 4s-timeout); same owning process (Windows-side reverse-SSH that has gone stale).
+- **Audit-trail artifacts (this repo):** `teams/framework-research/docs/operations-log-2026-05.md` (entry 7 at 10:24 + this correction entry 8 at 11:25), `teams/framework-research/memory/hopper.md` (updated at 11:12 with [GOTCHA] host-networked refresh + [GOTCHA] stale-RC-listener-Windows-side-process-death + [LEARNED] Layer-0 library-first).
+
+**commands executed** — verbatim, single probe:
+
+- `ssh -T -o StrictHostKeyChecking=accept-new -o BatchMode=yes dev@100.96.54.170 "awk 'NR>1 && (\$2 ~ /:2D01\$/ || \$2 ~ /:2D02\$/) && \$4==\"0A\" { print \$2 \" inode=\" \$10 \" uid=\" \$8 }' /proc/net/tcp"`
+
+**outputs** — verbatim:
+
+```
+0100007F:2D02 inode=674958961 uid=1000
+0100007F:2D01 inode=674958957 uid=1000
+```
+
+Host inodes match container's P2c reading byte-perfect → shared-netns confirmed via primary-artifact substrate-truth.
+
+**outcome** — **success (correction)**. Three interpretations in the 10:24 entry corrected with substrate-truth-anchored evidence + wiki-source-citation. Append-only ops-log discipline preserved — 10:24 entry untouched as historical audit record; this entry supersedes specific interpretive claims and serves as the audit-detectable correction. Hopper-scope-exit conclusion CONFIRMED unchanged: PO-Windows-side recovery is outside Hopper's SSH access path; no Tier M/D from this role. Next operational action: single TNS-bytes verification probe after PO signals Windows-side restart complete.
+
+**Generalizable pattern reinforced:**
+- `[LEARNED — discipline, library-first / Layer-0]` Now the load-bearing observation from this dispatch arc. The wrong-interpretation surfaced in entry 10:24 traces back to single root cause: probing-without-library-query-first. Once library was queried (Aen 11:05), the substrate-map snapped into focus and the wrong-interpretation was diagnosable. Layer-0 discipline value: demonstrated via in-vivo catalyzing-incident at n=1.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-05-25T13:39+03:00 — task #6 close-out (PASS-via-out-of-band recovery)
+
+**timestamp** — 2026-05-25T13:38+03:00 (Aen close-out signal landed) → 2026-05-25T13:39+03:00 (Hopper final substrate-verification probe + this entry written).
+
+**tasker** — Aen (task close-out signal); PO-authorized Aen to execute Windows-side recovery directly under coordinator-tool-override for this specific operational case.
+
+**dispatch summary** — Task #6 (apex DEV db tunnels DOWN) closed by Aen via Path B execution: Windows-side full reset with orphan tree kill. **Hopper-role-of-record in this entry: final substrate-truth verification + capture of carry-forwards Aen surfaced + ops-log close-out.** No Tier M/D executed by Hopper this arc (Hopper-scope-exit recommendation in #7 + #8 stood; Aen+PO took the Windows-side action).
+
+**tier classification + sanction status** — Tier R only this entry:
+
+- **P_F1 (final substrate-truth verification, 13:39):** re-read host `/proc/net/tcp` for 11521/11522 listener inodes to confirm substrate-fresh post-recovery. Default-permitted Tier R, no per-task sanction required. PASS at 13:39.
+
+**deployed-artifacts-read declaration** — per Hopper-Amendment-4 three-layer discipline (NOW CANONICAL per `prompts/hopper.md` lines 130-211 landed by Celes 14:50 same day; second in-vivo demonstration of the discipline within hours of the section landing):
+
+- **Layer 0 (documented-knowledge probe):** the discipline-gap that catalyzed the rest of this arc. Wiki entries `wiki/references/rc-host-db-tunnel-architecture.md` + `wiki/patterns/windows-user-context-persistent-bridge.md` contained the complete substrate map; should have been queried at dispatch-receipt-time. Per `[LEARNED — discipline, library-first]` in scratchpad, candidate for next Hopper-Amendment-5 (Layer 0 prepended).
+- **Layer 1 (FR design-as-shipped):** ABSENT for DEV db tunnel substrate (reaffirmed; same as #7 entry). Per §Graceful Degradation case 1 + Layer-2+3 fallback note (line 190 of new prompt section): proceed with tasker confirmation, Layer 1 absence not blocking when Layer 2 + Layer 3 are reachable + substrate-truth-verifiable.
+- **Layer 2 (consumer-team operational on substrate host):** **REACHABLE via Aen-routing-from-PO with the wiki-loaded substrate map.** Substrate-of-truth: PO's Windows workstation; `apex-migration-research/.claude/bin/open-db-tunnels.sh`; Task Scheduler task `ApexResearch-DBTunnels`; 6-component (now 7-component candidate) persistent-bridge pattern. Read via wiki-Layer-0, not direct-probe.
+- **Layer 3 (running container Config.Env / runtime state):** REACHABLE + VERIFIED. Final probe 13:39:
+
+```
+$ ssh -T dev@100.96.54.170 "awk 'NR>1 && (\$2 ~ /:2D01\$/ || \$2 ~ /:2D02\$/) && \$4==\"0A\" { print \$2 \" inode=\" \$10 \" uid=\" \$8 }' /proc/net/tcp"
+0100007F:2D02 inode=677674111 uid=1000
+0100007F:2D01 inode=677674107 uid=1000
+```
+
+Third-generation inodes confirmed: morning 674958961/57 (zombie) → Aen post-restart 675595325/21 (Path B fresh) → 13:39 final 677674111/107 (substrate continues evolving normally post-Path-B; not zombie-stuck). Substrate-fresh independently verified.
+
+- **Audit-trail artifacts (this repo):** ops-log entries #7 (10:24 initial findings + Hopper-scope-exit) + #8 (11:25 correction entry, shared-netns interpretation refined) + this #9 close-out; hopper.md scratchpad updated through 13:39 with revised gotchas + new probe-design-as-sub-canonical-source A.3-candidate observation.
+
+**commands executed** — single Tier R probe, verbatim:
+
+- P_F1: `ssh -T -o StrictHostKeyChecking=accept-new -o BatchMode=yes dev@100.96.54.170 "awk 'NR>1 && (\$2 ~ /:2D01\$/ || \$2 ~ /:2D02\$/) && \$4==\"0A\" { print \$2 \" inode=\" \$10 \" uid=\" \$8 }' /proc/net/tcp"`
+
+**outputs** — verbatim:
+```
+0100007F:2D02 inode=677674111 uid=1000
+0100007F:2D01 inode=677674107 uid=1000
+```
+
+Distinct from both morning generation (674958961/57) AND Aen's post-restart generation (675595325/21). Substrate evolves in normal supervisor-restart cycles post-Path-B; not zombie-frozen.
+
+**outcome** — **success (out-of-band recovery + final verification + close-out)**. Task #6 closed. Original goal (diagnose apex DEV db tunnels DOWN) achieved through joint Hopper-diagnostic + Aen-Path-B-execution. Apex's actual workflow re-test is bounded by apex team's own client-protocol-test (sqlplus / Oracle SDK / whatever produced the original "connection refused" report); PO will surface if apex re-reports failures. Hopper-role-of-record on task #6 closed.
+
+**Generalizable patterns + carry-forwards (committed to scratchpad):**
+
+- `[GOTCHA — apex-host, REVISED 13:38]` Stale-listener "fingerprint" was sub-canonical-source-anchored — Oracle TNS protocol is silent-on-garbage-by-design; the probe could not disambiguate live-vs-dead. Substrate-truth-anchored disambiguation requires independent dimensions (inode-delta, DNS/TCP-reachability of upstream, process-tree integrity). My morning P4 interpretation was over-confident from a probe-shape that didn't actually disambiguate. Probe-validity is protocol-dependent.
+
+- `[LEARNED — sub-shape A.3 candidate]` **Probe-design CAN be a sub-canonical-source itself** — extending the discriminator-anchored-on-sub-canonical-source pattern (`wiki/patterns/discriminator-anchored-on-sub-canonical-source.md`) to probe-design. Aen 13:38: TNS-bytes probe was a sub-canonical proxy for "Oracle TNS protocol works" anchored on the assumption that Oracle responds to any input. Substrate-truth (Oracle's silent-on-garbage protocol behavior) was the canonical source; probe fingerprint was outer-layer pass-through. Whether this is A.3 or already covered by A.1's identifier-grammar-mismatch framing is a question for Brunel when Cal-Protocol-A queue reopens — the analogue holds either way: probe semantics anchored on assumed-protocol-behavior is the same defect class as regex anchored on assumed-identifier-grammar. Catalog-extension question; not a behavior-change for Hopper-discipline.
+
+- `[GOTCHA — apex-research, REVISED 13:38]` Orphan-tree pathology in autossh-wrapper supervised by Task Scheduler — wscript → bash supervisor → bash worker → 3-deep autossh self-fork → ssh.exe; orphaned leaf with dead-parent-PID retains kernel-side reverse-forward as zombie even when supervisor died. The 6-component persistent-bridge pattern's component #5 stale-process cleanup operates at supervisor-level, NOT orphaned-leaf-cross-tree-walk. **Path B recovery validated:** `schtasks /End` → process-tree query → `Stop-Process -Force` cascade on orphan PIDs → verify RC-side socket release → `schtasks /Run` for fresh tree. **Cal-Protocol-A submission candidate** (n=1 catalyzing-incident materialized): 7th component "orphaned-leaf detector with dead-parent-PID" OR refinement to component #5 cross-tree-walk. Aen queued for Cal post-Phase-B spawn.
+
+- `[LEARNED — discipline, library-first / Layer-0]` Reaffirmed as the load-bearing observation from this dispatch arc. **Candidate Hopper-Amendment-5** (Layer 0 prepended to the three-layer discipline that just landed in Amendment-4). Per the batched-iterate compact with Celes from 14:47 yesterday, deferred to next amendment-pass since task #6 catalyzing-incident is now materialized + Amendment-4 has just settled. Not surfacing to Celes now — letting Amendment-4 stabilize for a session or two before proposing the Layer-0 extension; n=1 catalyzing-incident is sufficient for the next round.
+
+(*FR:Hopper*)
