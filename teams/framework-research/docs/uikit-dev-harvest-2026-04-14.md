@@ -41,6 +41,7 @@
 ### A4. `e4a5c86 refactor(team): consolidate memory into wiki knowledge base` → **diverge intentionally (architectural divergence — needs explicit decision)**
 
 **What changed:** 25 scattered memory files → 1 `feedback.md` + 12 wiki pages. Specifically:
+
 - **10 `feedback_*.md` files** (branch-naming, delegate-everything, figma-approach, etc.) → merged into ONE `memory/feedback.md` (27 lines, 4 sections, `tags: [feedback, rules]` frontmatter).
 - **11 `project_*.md` files** (figma-extractors, figma-pipeline, design-tokens-issue67, etc.) → moved to `wiki/figma-pipeline.md`, `wiki/design-tokens.md`, `wiki/comparison-scripts.md`, `wiki/variable-collection.md`, etc.
 - **1 `reference_figma_pat_scopes.md`** → `wiki/figma-api-scopes.md`.
@@ -53,6 +54,7 @@ The new `memory/MEMORY.md` is 17 lines, pointing to `feedback.md` (auto-loaded b
 **Framework-research posture:** Our memory is **different in shape**. FR's `memory/` holds per-agent scratchpads only (no `feedback_*.md`, no `project_*.md`, no `user_*.md`, no `reference_*.md`). Our wiki is subdir-taxonomy (`patterns/`, `gotchas/`, `decisions/`, `contracts/`, `findings/`, `observations/`, `process/`, `archive/`) curated by Cal. **uikit-dev's wiki is flat** — 12 pages at one level, project-centric (figma-pipeline, design-tokens, environment, people, backlog, etc.), written by any agent, not curated by a librarian role.
 
 **Disposition:** `diverge intentionally` — the two wiki shapes solve different problems:
+
 - **uikit-dev's flat wiki** = project knowledge base. Frames: "what do I need to know to work on this codebase." Stakeholder: any agent. Entries are project-domain (figma, design-tokens, environment gotchas). Write access is distributed.
 - **FR's Cal-curated taxonomic wiki** = meta-process knowledge base. Frames: "what do we know about running teams." Stakeholder: any team. Entries are process-domain (patterns, contracts, decisions, gotchas). Write access is centralized through Protocol A.
 
@@ -125,6 +127,7 @@ These are **not convergent** — they serve different purposes. But Section B4 b
 **Is uikit-dev's pattern the simpler answer to what Volta is solving?** **Partly yes, partly no — they're solving two different sub-problems.**
 
 Volta's v0.3 addresses FIVE pieces of ephemeral state:
+
 1. Agent scratchpads (`memory/<name>.md`)
 2. Inbox files (`inboxes/<name>.json`)
 3. Team config (`config.json`)
@@ -132,6 +135,7 @@ Volta's v0.3 addresses FIVE pieces of ephemeral state:
 5. Per-user auto-memory from `~/.claude/projects/<slug>/memory/` — **the leak hazard Cal filed**
 
 uikit-dev's approach:
+
 - **Scratchpads:** solved by "commit them directly to `memory/<name>.md` in the repo" — agents write to the repo path as SoT (e543109). This IS simpler than Volta's restore-project-state.sh merge-semantic approach for the scratchpad subset. **But** FR already does this too — our `memory/` scratchpads are already committed to the repo. The innovation here is the EXPLICIT common-prompt edit that says "committed to git" + the write-test verification (42df893), not the pattern itself.
 - **Inboxes:** solved by persist-inboxes.sh + restore-inboxes.sh (pruning to 100 on persist, filtering shutdown messages on restore). FR has equivalent scripts — A6 cross-pollination.
 - **Config / session / tasks:** solved by **ad-hoc pre-maintenance snapshot directory** (`ephemeral-snapshot-2026-04-14/` committed to repo). This is NOT a script. It's a **one-shot manual operation** that preserves a specific moment's state. The MANIFEST.md names what's in it and what's NOT.
@@ -181,6 +185,7 @@ So the simplest answer to "is uikit-dev's pattern the simpler answer to what Vol
 - 1 `reference_*.md` + 2 `user_*.md` → moved to `wiki/figma-api-scopes.md` and `wiki/people.md`. Also read-on-demand.
 
 **Net effect:** uikit-dev's `memory/` now holds exactly TWO content classes:
+
 1. **Behavioral rules** (auto-loaded) — `feedback.md` + MEMORY.md index
 2. **Per-agent scratchpads** (auto-loaded per agent)
 
@@ -193,6 +198,7 @@ Everything else — "things we learned about this codebase" — is wiki. One-dir
 ### B5. `f1c6971 align with framework-research pattern` — what did they align?
 
 Five specific alignments:
+
 1. **Pruning to last 100 on persist** — their old persist-inboxes.sh was raw-copy; ours pruned; theirs now prunes.
 2. **Shutdown-message filtering on restore** — same direction.
 3. **`SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"`** — they adopted our path-resolution idiom.
@@ -219,6 +225,7 @@ The only things they DIDN'T take (beyond the post-alignment improvements): our r
 **Yes, and it's directly connected to Cal's pane-labels gotcha — but the relationship is "root cause uncovered," not "second instance."**
 
 Look at what b47544b renamed:
+
 - `roster.json` member names: `team-lead` → `aalto`, `component-dev-1` → `eames`, `component-dev-2` → `rams`, `qa-a11y` → `braille`, `docs-gallery` → `tschichold`
 - Inbox files: `team-lead.json` → `aalto.json`, etc. (both runtime and backup)
 - Prompt files: `team-lead.md` → `aalto.md`, etc.

@@ -1,17 +1,115 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-05-26 — session-35 → session-36
+### [NEXT SESSION] 2026-05-26 — session-36 → session-37
 
-**Bootstrap M1 seed** — first instance of mVox-M1-pattern under FR-A1 adoption (PO ratified 2026-05-22). Bound to 5 bullets per discipline. Downgrade to `[PROCESSED YYYY-MM-DD]` on first S36 read.
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S37 read):**
 
-- **State of play:** S35 closed 2026-05-26 (six-day session 2026-05-21 → 2026-05-26). Cloudflare Round 0 substrate validated end-to-end on EVR account — `fr-cma-pilot` Worker live at `https://fr-cma-pilot.evree.workers.dev/`, all 4 secrets landed, Anthropic Self-managed env `env_01PpqWL9BfKZYD7SKPUEryRu` configured, dashboard shows "ready for sandbox" state. Plus: docs/findings.md filed (task #7); 2 Phase-A wiki entries + Hopper-Amendment-4 prompt landed; Cal-Protocol-A queue ~10 items remaining.
-- **Open dispatches/dependencies:** Cal task #9 in_progress (Protocol A queue absorption ongoing; carries to S36 — Priority 1+3+E1 landed, remaining queue is C1+C4+C2+C3+E2/E3/E4 + harness-restriction Sub-shape-E entry + orphan-leaf-detector for windows-bridge pattern + Sub-shape A.3 probe-design + Pass-1-prose-only-batched-iterate + mVox-thread-1/3/4 + Companion-Pair filing for [CONTINUITY]/A1).
-- **Expected first action S36:** PO direction. **Most likely:** continue Cloudflare pilot Round 1 — address EVR Cloudflare Access wall on `/webhooks` (path-bypass policy) → create first Isolate-backed sandbox via dashboard → trigger session via Anthropic platform → observe end-to-end webhook → sandbox → response flow. **If different surface:** see conditional NEXT-SESSION BOOT (#5 onward).
-- **PO-pending decisions:** (a) Cloudflare `/webhooks` Access bypass approach — path-rule vs scope-disable; (b) Brunel-side parallel amendment to `prompts/brunel.md` §Diagnostic Discipline (Layer-1-only gap, same shape as Hopper-Amendment-4) — schedule for which session; (c) Hopper-Amendment-5 candidate (Layer-0 library-first discipline) — schedule; (d) "PO" → "Mihkel/you" naming convention question (PO surfaced 2026-05-22; not yet resolved beyond conversation).
-- **Concrete pointers:**
-  - This repo: `docs/findings.md` (cross-cutting task #7 finding — substrate gap analysis); `designs/new/cloudflare-pilot/` (README + 3 angle briefs; Round 0 spec executed, Round 1 spec ready); `teams/framework-research/wiki/patterns/discriminator-anchored-on-sub-canonical-source.md` + `three-layer-substrate-truth-discipline.md` (Phase A entries + E1 staleness refresh).
-  - External: `~/Documents/github/.mmp/claude-managed-agents/` — cloned cloudflare template, deployed as `fr-cma-pilot` Worker on EVR account `8f150f98013eec8cae0a9db20a010c49`. wrangler.jsonc has experimental naming. 4 secrets uploaded.
-  - All 6 agents (Cal, Brunel, Hopper, Celes, Volta, Herald) idle pre-S35 shutdown; will need fresh spawn per S36 PO direction.
+- **State of play:** S36 closed 2026-05-26 (one-day session 2026-05-26; ~2.5hr active). **Round-1 op-step-1 (path-rule bypass on `/webhooks`) EXECUTION-READY but TOKEN-PENDING.** Hopper 4-deliverable prep package locked; PO 14:40 sanction verbatim valid for 14:34-with-`destinations[]` shape (Brunel canonical-CF-API cross-read at 14:42 disconfirmed an intermediate 14:37 "policy-on-existing-app" framing that would have over-broadened auth; 14:43 re-sanction-against-wrong-correction moot). Substantial wiki + design output: 8 Cal entries shipped (Wiki 107→114) + 2 amendments + comms.md v1.0→v1.4 (~580 lines) + lifecycle.md amended (~95 lines) + 4 Finn research docs + status report at `docs/cf-pilot-status-and-s37-plan-2026-05-26.md`.
+- **Open dispatches/dependencies:** Hopper task #1 in_progress (bypass execution-ready; awaits CF API token + Tier-R surface-back gate clearance from PO via Aen). Cal task #5 in_progress (8 entries shipped this session; ~7 candidates fully framed in scratchpad for S37 — Edit-tool-trap promotion-grade joint Cal+Finn / C2 substrate-vs-framework primitive / S6 drafting-vs-read-back narrowing / Stage-2-feedback typology Cal+Volta / cadence-crossing E4 Aen+Herald-n=6 / routing-by-action pattern+failure-mode pair / asymmetric-cross-3-vector Cal+Aen). Task #11 functionally resolved by Finn W4 brief (Hopper flips status on absorb).
+- **Expected first action S37:** PO direction. **Most likely:** Token delivery → spawn Hopper → Path D execution (pre-flight verify → Tier-R L3 batch → STOP at surface-back gate → PO clearance via me → Tier-D bypass POST → 30-60s propagation → 3-probe verification → ops-log entry). ~5-10 min. Round-1 op-step-1 closes. If PO bandwidth allows: op-step-2 credential-shape decision + op-step-3 Pilot-A dashboard creation follow.
+- **PO-pending decisions:** (a) **CF API Token** (5 scopes, EVR-bound, 24h TTL — task #1 blocker); (b) Anthropic credential shape (task #10 — single-OAuth-token vs three-credential split per CMA reference impl; `sessions.create` scope now load-bearing post-W4); (c) Pilot-A creation via CF dashboard (op-step-3 PO 5-click); (d) Anthropic session trigger (op-step-5 PO action); (e) S35-carry-forward standing watch — Brunel-Amendment parallel-to-Hopper-4 / Hopper-Amendment-5 (Layer-0 library-first; n=3 in-session today) / "PO"→"Mihkel/you" naming convention.
+- **Concrete pointers:** Status report at `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` is THE canonical S37 brief — read it before responding to any CF-pilot PO ask. Hopper 4-deliverable prep in his scratchpad. Cal-queue carry-forward fully framed in her scratchpad (5 Stage-2-feedback typology shapes this session; cross-role topology n=3 trigger met). Wiki 107→114 — see `teams/framework-research/wiki/index.md` for entries shipped this session. comms.md at v1.4 on disk. lifecycle.md amended. 4 Finn docs at `teams/framework-research/docs/{webhook-sandbox-research,herald-g2-cross-agent-comms-brief,wake-mechanism-w4-finding,round-1-anthropic-platform-checklist}-2026-05-26.md`. All 9 agents idle at S36 shutdown; fresh spawn per S37 PO direction.
+
+---
+
+## SESSION 36 WRAP — 2026-05-26 (One-day session ~2.5hr active; Round-1 op-step-1 prep complete + token-pending; 8 Cal entries shipped Wiki 107→114; comms.md v1.0→v1.4 wire-ready; 5 substrate-truth-evidence catches reshape Round-1 design)
+
+**Spans:** 2026-05-26 ~10:55 (fresh team spawn) → ~13:24 (PO session-end signal). One day; ~2.5 hours active work; bandwidth-positive throughout.
+
+**Outcome:** Round-1 op-step-1 EXECUTION-READY but token-pending. Hopper 4-deliverable prep complete with Tier-D sanction verbatim valid. Cal-side: 8 entries shipped + 2 amendments; substrate-design-truth-evidence cluster (2.5 + Recursive-Narrowing + 2.7 + Layer-0-library-first-recurrence) fully filed at four distinct coupling-dimensions. Herald comms.md v1.0→v1.4 wire-ready with AgentMailbox-as-separate-DO-class + ctx.waitUntil + Path-(a)-RPC + W4 connectivity-direction correction. Volta lifecycle.md amendments §VL3.1+§VL4.1+§VL5.1+PT4. Five substrate-truth-evidence catches reshape Round 1: (1) CF Access bypass canonical = NEW Access App with destinations[]; (2) Anthropic outbound-only connectivity; (3) wake = sessions.create() from mailbox handler; (4) three-layer identity chain (DO ID per-session not per-agent; AgentMailbox separate class); (5) secrets = egress-policy-header-injection-from-KV.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `wiki/patterns/cluster-decomposition-meta-principle.md` (C1) | NEW | Cal (joint [brunel, volta]) | Meta-principle; n=3 coupling-dimensions × 3 domains |
+| `wiki/gotchas/subagent-harness-blocks-curator-role-repo-write.md` | NEW | Cal solo | S35 carry-over filing |
+| `wiki/patterns/bottleneck-determines-adoption.md` (C4) | NEW | Cal (joint [brunel, volta]) | n=3 across 2 domains; bidirectional YES+NO match; C1↔C4 methodology pair |
+| `wiki/patterns/sub-shape-e-at-design-domain.md` (2.5) | NEW | Cal (joint [volta, herald, brunel, hopper]) | 4 sub-instances cross-author cross-document axis; full Stage 2 absorbed (4/4 direct-DM) |
+| `wiki/patterns/three-layer-substrate-truth-discipline.md` | M (2.6 amendment) | Cal | n-count 3→6; design-domain sub-section; cross-link to 2.5 |
+| `wiki/patterns/cluster-decomposition-meta-principle.md` | M (cross-link) | Cal | C1↔C4 methodology-corollary cross-link |
+| `wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md` | NEW | Cal (joint [herald, brunel, finn]) | Within-author n=5 + cross-author n=4; sufficient × necessary logical decomposition |
+| `wiki/patterns/three-role-discipline-stacking-within-dispatch-arc.md` (2.7) | NEW | Cal (joint [hopper, brunel, aen]) | Operator+designer+coordinator vantages; layer × role family-completion |
+| `wiki/patterns/layer-0-library-first-recurrence.md` | NEW | Cal (joint [hopper, brunel, finn]) | 3-instance in-session catalog (S35 task #6 + S36 bypass-arc + S36 W4 skill-load) |
+| `designs/new/cloudflare-pilot/comms.md` v1.0→v1.4 | M (+468 lines) | Herald (co-source [brunel, finn]) | AgentMailbox-as-separate-DO-class + waitUntil + RPC + W4; wire-ready |
+| `designs/new/cloudflare-pilot/lifecycle.md` | M (+106 lines) | Volta | §VL3.1 R2 bucket layout + §VL4.1 respawn variant + §VL5.1 bootstrap + PT4 always-2xx |
+| `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` | NEW | Aen | Comprehensive PO-facing status report + S37 plan |
+| `docs/webhook-sandbox-research-2026-05-26.md` | NEW | Finn | Task #6; ~600 lines; comprehensive surface map |
+| `docs/herald-g2-cross-agent-comms-brief-2026-05-26.md` | NEW | Finn | G2 brief; ~330 lines; six-step cross-agent path |
+| `docs/wake-mechanism-w4-finding-2026-05-26.md` | NEW | Finn | W4 brief; ~120 lines; resolves task #11 |
+| `docs/round-1-anthropic-platform-checklist-2026-05-26.md` | NEW | Finn | Surface-1 checklist; ~210 lines; 6 sections |
+| 6 scratchpads updated | M | brunel, callimachus, finn, hopper, team-lead, volta | + 1 untracked `docs/uikit-dev-harvest-2026-04-14.md` carry-forward |
+
+### Decisions (PO-ratified)
+
+[DECISION — S36] **Path 1 Isolate-only Round 1 ratified** (14:36). MicroVM defers to Round 2. Substrate-class held CONSTANT per substrate.md experimental-isolation discipline at Isolate class. Brunel-recommended. Already-deployed substrate exec-ready; no Docker / no v2 migration / no Workers Builds.
+
+[DECISION — S36] **EVR Access bypass approach = path-rule on `/webhooks`** (14:00). Minimum-scope exception; rest of Worker remains Access-gated.
+
+[DECISION — S36] **Hopper sanctioned to execute bypass + acquire CF auth** (14:36). Hopper becomes CF substrate operator; extends S35 Aen-direct precedent.
+
+[DECISION — S36] **CF API Token provisioning committed but PENDING DELIVERY** (14:40 committed). 5 scopes (Workers Scripts Read, Access Apps and Policies Edit, KV Read, D1 Read, R2 Read), EVR-account-bounded, 24h TTL. **Sole Round-1 op-step-1 blocker.**
+
+[DECISION — S36] **Tier-D sanction "Approve as drafted"** on Hopper Deliverable 2 (14:40 verbatim). Bypass command: NEW Access App with `destinations:[{type:"public", uri:"fr-cma-pilot.evree.workers.dev/webhooks"}]` + inline bypass policy. Brunel canonical-CF-API cross-read at 14:42 confirmed this shape is API-canonical (CF Access Policies API has no path-scope fields; path-scope lives on Application's destinations[]). 14:43 re-sanction against wrong-correction (policy-on-existing-app) moot/revoked per substrate-truth.
+
+[DECISION — S36] **Pilot-A creation path = PO via CF dashboard** (14:43). Not service token. Path post-bypass: Agents → New Agent → Backend: Isolate → name: `pilot-a` → model: `claude-sonnet-4-6` → tools: [].
+
+[DECISION — S36] **Finn-Q1 credential shape DEFERRED to S37** (14:43). Tracked as task #10. Load-bearing post-W4 (sessions.create scope on mailbox-handler credential is now required).
+
+### Substantive learnings (Cal-grade or promotion-grade)
+
+[LEARNED — substrate, promotion-grade] **CF Access bypass canonical pattern** (Brunel substrate-truth-evidence catch). Template docs phrasing ("Add Bypass policy under same application") is dashboard-UX-focused; CF API ref documents path-scope on `destinations[]` of Access Application, not on policies. Policy-on-existing-app would over-broaden auth across App's full destinations. **Layer-0 library-first must recursively descend through doc-provenance layers when consumer-team docs framing is mechanism-ambiguous.** Joint Brunel+Hopper Cal candidacy (filed as Layer-0-library-first-recurrence).
+
+[LEARNED — substrate, promotion-grade] **Anthropic Managed Agents connectivity is outbound-only** (Finn `claude-api` skill catch). Worker long-polls Anthropic; Anthropic never dials our network. Reshapes wake-mechanism design from inverted-trigger framing to **`client.beta.sessions.create()` from mailbox handler** post-write + long-poll worker pickup. Resolves task #11.
+
+[LEARNED — substrate, promotion-grade] **Identity is three-layer chain**: agent-name → agent_id → session_id → DO ID. DO ID is per-session not per-agent. **AgentMailbox must be separate DO class** (per-agent durable via `idFromName(agent_id)`) distinct from existing Sandbox/IsolateRunner classes (per-session ephemeral).
+
+[LEARNED — substrate, promotion-grade] **Secrets injection mechanism**: egress-policy header-injection from KV `SECRETS` namespace, NOT secret_bindings[] on sandbox. Round 1 needs zero agent-side secrets; 4 Worker-level secrets are control-plane.
+
+[LEARNED — process, promotion-grade] **Recursive-narrowing substrate-truth-evidence discipline** (Cal entry; joint Herald+Brunel+Finn): each substrate-truth pass on a single document catches blind-spots at progressively deeper architectural layers. Within-author n=5 on comms.md trajectory (v1.0→v1.4) + cross-author n=4 catalog. **Each pass narrows but doesn't eliminate — asymptotic, not terminal.** Architectural-depth as second axis (Brunel sharpening): rows 1-4 substrate-primitive-shape catches; row 5 connectivity-direction-model catch — qualitatively deeper layer.
+
+[LEARNED — process, promotion-grade] **Expertise-routing as constitutive of recursive-narrowing**: discipline = iteration-tightens-framing × reviewer-substrate-knowledge-matches-current-layer. Each catcher in v1.0→v1.4 chain had substrate-expertise matched to version's depth (Herald protocol-shape / Brunel identity+DO-semantics / Brunel waitUntil / Finn RPC-vs-HTTP / Finn skill-load Anthropic-canonical). Cross-team test of pattern is whether expertise-routing happens naturally OR requires conscious management.
+
+[LEARNED — process, promotion-grade] **Three-role discipline-stacking across dispatch arcs** (Cal entry; joint Hopper+Brunel+Aen): operator hard-gate + designer substrate-truth-cross-read + coordinator relay-fidelity-correction catches what each role alone misses. n=3 instances S34/S35/S36. Family-completion claim: layer-decomposition × role-decomposition = full operational shape of substrate-truth-evidence discipline.
+
+[LEARNED — process] **Stage-2-feedback typology has 5 empirical shapes this session**: Shape-A pure-renaming + Shape-B forward-claim-extension + Shape-C mechanism-sharpening-within-claim-base + Shape-D factual-correction-on-inferred-content (FLAG-invited) + Shape-E axis-distinction-discipline-check. Author-stylistic-tendency hypothesis: Brunel→Shape-B; Volta→Shape-A+C. Cal+Volta cross-role topology n=2 trigger for typology entry candidate. n=2 of S6-narrowing observation now n=5 cumulative confirmation (C4+2.5+2.6+RN+2.7+Layer-0 all drafted clean Stage 1 solo-author despite joint-source).
+
+[LEARNED — process] **Asymmetric-cross-in-flight is routing-mode-dependent** (Cal+Aen co-articulated). Empirically confirmed n=4: ALL 4 author 2.5 Stage 2 replies arrived via direct-DM channel; ZERO via Aen-coordinator-routed burst. 3-vector framework (i Aen→others / ii Aen←others / iii Cal↔peers). Hypothesis: routing-mode (direct DM vs coordinator-relay) is latency-determining property. Wiki-process candidate joint-authorship-topology-broadening promotes from watch-grade to candidate.
+
+[LEARNED — process] **Cadence-cross density during bandwidth-positive sessions**: Cal-Aen n=10+, Herald-Aen n=6, Finn-Aen-Cal triangle n=1. Pattern structural at sub-100-second crossing window. E4 entry promotion-grade-at-first-filing per evidence density.
+
+### Standing watch items going into session 37
+
+- **CF API Token delivery** (the only Round-1 op-step-1 blocker)
+- **Anthropic credential shape decision** (task #10; Finn brief enumerates options; sessions.create scope is the load-bearing requirement)
+- **Pilot-A creation via CF dashboard** (PO 5-click action post-bypass; status report has the exact path)
+- **Cal-queue carry-forward** — ~7 fully-framed candidates: Edit-tool-trap (promotion-grade Cal+Finn; Finn mechanism correction folded — Write invalidates Read-state, deterministic not statistical); C2 substrate-vs-framework boundary primitive (Volta-axes-enumeration ready: lifecycle-phase + failure-semantics + Brunel substrate-class-fit); S6 drafting-vs-read-back-phase yield narrowing (n=5 cumulative confirmation); Stage-2-feedback typology entry (Cal+Volta 5-shapes-this-session); cadence-crossing E4 (Aen+Herald n=6 + asymmetric-cross 3-vector sub-section Cal+Aen); routing-by-action pattern+failure-mode paired (Herald-origin); Stage-0-contribution-from-filer (sketch-grade; n=1 in-vivo)
+- **Cal Stage 2 absorption still in-flight async**: Recursive-Narrowing (Herald-acked; Brunel + Finn pending direct-DM); 2.7 (Hopper-acked; Brunel pending); Layer-0-library-first-recurrence (Hopper + Brunel + Finn all pending) — natural resolution as direct-DMs arrive next session
+- **Brunel substrate.md amendment** queued post-Round-1: §2 Isolate-pivot, §3 egress-policy schema, §4 layered-chain rewrite, §5 Q3/Q4/Q5 answered
+- **Herald axis-distinction sharpening to Brunel** in-flight (recursion-locus hypothesis; Brunel will respond direct)
+- **S35-carry-forward standing watch (unchanged):** Brunel-Amendment parallel-to-Hopper-4 (Layer-1-only Diagnostic Discipline gap); Hopper-Amendment-5 candidate (Layer-0 library-first; n=3 in-session today strengthens to n=2 across sessions); "PO" → "Mihkel/you" naming convention
+- **Aen amendment Part C (relay-visibility rule)** — HELD at `designs/deployed/operator-role/prompts/aeneas-amendment.md`; potentially revisited per session
+- **TPS-583 (apex-research)** — Stage-2 standard moves when PO signals; dormant
+- **mVox-dev session 8+ carry-forward** (Palestrina 3 deferred items) — dormant
+- **Manager-team / PO-team architecture** (Monte domain) — dormant; PO floated 2026-05-20, not actioned
+
+### NEXT-SESSION BOOT (re-orient instructions for S37)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — that's the 5-bullet reorientation seed per A1 adoption. Read it FIRST, then downgrade the tag to `[PROCESSED YYYY-MM-DD]` once processed.
+3. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **READ THE STATUS REPORT FIRST IF PO ASKS ABOUT CF PILOT:** `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` is THE canonical S37 brief — has everything: S35 substrate state + S36 decisions + token specification + S37 critical-path sequence + risk register. Don't re-derive context that's already in this doc.
+6. **If PO delivers CF API token (MOST LIKELY first ask):** spawn Hopper. His 4-deliverable prep is in his scratchpad; execution path locked at Path D — pre-flight verify → Tier-R L3 batch → STOP at surface-back gate → PO clearance via me → Tier-D bypass POST per 14:34-with-destinations[] shape (PO 14:40 sanction valid; 14:43 re-sanction moot per substrate-truth) → 30-60s propagation → 3-probe verification → ops-log entry. ~5-10 min total. Verbatim sanction quote: "**PO 2026-05-26 14:40 — 'Approve as drafted'** against Hopper's Deliverable 2 curl POST to `https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/access/apps`..." (full quote in cf-pilot-status-and-s37-plan §2.4 Deliverable 2 + Hopper scratchpad).
+7. **If PO surfaces credential shape decision (task #10):** Finn brief at `docs/webhook-sandbox-research-2026-05-26.md` §2 has three failure modes documented. Single-OAuth vs three-credential split (WEBHOOK_SECRET + ANTHROPIC_ENVIRONMENT_KEY + ANTHROPIC_API_KEY) per CMA reference impl. Affects which credential mailbox-handler uses for `client.beta.sessions.create()`.
+8. **If PO surfaces Pilot-A creation:** dashboard click-path is Agents → New Agent → Backend: Isolate → name: `pilot-a` → model: `claude-sonnet-4-6` → tools: `[]`. Hopper verifies via `wrangler d1 execute fr-cma-pilot-db --remote --command "SELECT agent_id, backend, created_at FROM agent_backends ORDER BY created_at DESC LIMIT 5"` post-creation.
+9. **If PO surfaces Cal-queue continuation:** spawn Cal. ~7 entry candidates fully framed in her scratchpad. Edit-tool-trap (joint Cal+Finn; promotion-grade at first-filing per Finn mechanism correction — Write invalidates Read-state deterministic, not statistical) is the natural first entry. Then C2 substrate-vs-framework boundary primitive (joint with Volta; her axes-of-bifurcation enumeration ready). Pre-specified §1-§6 frames locked for all candidates. Also: Stage 2 absorption still in-flight on Recursive-Narrowing + 2.7 + Layer-0 — natural resolution as direct-DMs arrive.
+10. **If PO surfaces Herald v1.4 close-out / Brunel substrate.md amendment / S35-carry-forward standing watch items (Brunel-Amendment / Hopper-Amendment-5 / naming convention):** spawn relevant agent. S35-carry-forward items unchanged from S35 standing watch.
+11. **If PO surfaces apex-research cross-team work** (bidirectional cite-back, [CONTINUITY] adoption follow-up): spawn Cal for Companion-Pair Submission protocol filing.
+12. **Cross-in-flight pattern awareness for me as team-lead:** asymmetric-cross is empirically confirmed routing-mode-dependent — Aen-coordinator-routed messages have structurally-elevated arrival latency vs direct-DM. When routing Stage 2 surfaces, recommend agents use direct-DM rather than team-lead-relay; reserve team-lead-routing for genuinely needs-coordination cases.
+13. **Brevity discipline acknowledged:** consolidation-phase ratifications can be brief acks; substantive co-articulation warrants full contribution. Both compose. Document this distinction in scratchpad as discipline norm.
+
+(*FR:Aen*)
 
 ---
 

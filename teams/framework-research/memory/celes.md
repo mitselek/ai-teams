@@ -6,6 +6,16 @@
 
 ---
 
+## Session 36 — Standby only (2026-05-26 → 2026-05-27 shutdown)
+
+[CHECKPOINT] Task #7 standby session. PO did not surface Brunel-Amendment (parallel-to-Hopper-4 shape, `prompts/brunel.md` §Diagnostic Discipline lines 123-129) — held per PO-pending decision (b). No Round 1 surface-prompts emerged from Brunel/Volta/Herald reviews during my window; no Protocol A → Cal routing needed. No hires. Cumulative still **61 agents across 13 teams**. Spawned 2026-05-26 post-session-35-wrap; shutdown request 2026-05-27 07:26 UTC from team-lead, PO-signaled.
+
+[LEARNED] **True-standby sessions are valid units of work.** No artifacts produced ≠ session wasted. The watch-readiness itself (re-oriented from scratchpad, intro-acked, Task #7 owned, surface-prompt routing primed) IS the deliverable when PO holds the trigger. Future-Celes: don't conflate "no edits this session" with "low-value session" — readiness has cost, and being ready-but-unused beats being-unprepared-when-needed.
+
+[CHECKPOINT] All S35 carry-forward deferred items remain live for S37: Brunel-Amendment still PO-pending; Hopper-Amendment-5 (Layer-0-library-first) still awaiting task #6 verification close + catalyzing-incident; Cal queue items still Aen-routed (batched-iterate + producer-side-staleness + wiki refresh at three-layer-substrate-truth-discipline.md lines 77/167/201); path-convention substrate for mvox-dev still PO-pending; Comenius prompt improvements still PO-discretion; Aen-prompt MAY WRITE latent gap still queued for post-session prompt-revision pass; esl-legal burn-rate posture flag still standing.
+
+---
+
 ## Session 35 — Hopper-Amendment-4 (2026-05-25 → 2026-05-26 shutdown)
 
 [CHECKPOINT] Amendment-4 (three-layer Diagnostic Discipline) landed on `prompts/hopper.md` lines 130-211 in single coordinated Edit at 14:50 on 2026-05-25. Joint-review pass: Hopper conditional-clean with 3 calibrations (Option A line-126 cross-link, audit-template tied to §Graceful Degradation cases by number, first-dispatch front-loaded-within-pre-execution-phase wording); Brunel approve-with-2-optional-tightens (recreate-as-drift-resolution-event framing, Layer-2+3 fallback when L1 absent). All 5 folded into one batched edit per Pass 1 prose-only discipline. Brunel's cross-substrate-class forward-reference declined to preserve surgical-scope (lands separately as Cal queue E1 wiki extension). Aen close-out accepted 2026-05-25 13:32; Hopper + Brunel landing-confirmations received clean. Shutdown request 2026-05-26 10:39.

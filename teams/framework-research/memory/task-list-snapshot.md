@@ -1,28 +1,23 @@
-# Task List Snapshot — S35 close (2026-05-26)
+# Task list snapshot — S36 close (2026-05-26 → 2026-05-27)
 
-Captured at S35 shutdown per startup.md Step S2b. Future-session-team-lead can restore active task state from this snapshot if substrate state is lost (mVox-A2-style — Notes column carries next-concrete-action per pending row; not formally adopted under FR-A1, included here as pragmatic addition).
+Snapshot at session-end per shutdown procedure S2b. Supersedes S35 snapshot.
 
-| ID | Subject | Status | Owner | Notes / next concrete action |
+| # | Status | Owner | Subject | Notes / next concrete action |
 |---|---|---|---|---|
-| #1 | Cal authors `wiki/patterns/discriminator-anchored-on-sub-canonical-source.md` | completed | callimachus | Phase A landed early S35; n=4 catalog with A.1/A.2 sub-distinction. |
-| #2 | Cal authors `wiki/patterns/three-layer-substrate-truth-discipline.md` | completed | callimachus | Phase A landed early S35; joint Brunel architectural + Hopper operator-defense. |
-| #3 | Celes drafts Hopper-Amendment-4 (three-layer Diagnostic Discipline) | completed | celes | Landed at `prompts/hopper.md` lines 130-211. |
-| #4 | Volta investigates mVox-dev debt-control + startup-procedure practices | completed | volta | M1-M5 mechanisms catalogued; A1+A3 recommended; PO ratified A1 only. |
-| #5 | Volta: research-perspective companion analysis of mVox findings | completed | volta | Five threads + delta-pass; cluster-decomposition + bottleneck cross-domain + procedural-cost-vs-immediate-value. |
-| #6 | Hopper diagnoses apex DEV db tunnels down | completed | hopper | Path B executed by Aen direct (PO authorization); substrate fresh post-restart; TNS-bytes probe was flawed fingerprint; Sub-shape A.3 candidacy. |
-| #7 | Brunel + Volta joint: substrate gap analysis vs Cloudflare Claude Managed Agents | completed | brunel + volta | `docs/findings.md` filed; cluster-decomposition meta-principle strongest finding; pilot conditional candidacy for apex-research. |
-| #8 | Cal writes `docs/findings.md` (Cloudflare substrate gap analysis) | completed | callimachus | Cal hit subagent-harness-restriction on file write; Aen wrote from main session per workaround. |
-| #9 | Cal absorbs Cal-Protocol-A queue (~13 submissions) | **in_progress** | callimachus | **Priority 1 (docs/findings.md ship) + Priority 3 (wiki staleness refresh on `three-layer-substrate-truth-discipline.md`) + E1 (Sub-shape E n=2 amendment + confidence promotion) landed.** Remaining queue: C1 cluster-decomposition (strongest; next), C4 bottleneck-determines-X cross-domain, C2 substrate-vs-framework boundary primitive, C3 industry-primitive-convergence (hold for n=5), E2 relay-to-primary-artifact-fidelity extension, E3 cross-session-deferred-state-primitive edit, E4 dyad-cross-pattern with recovery mechanisms, harness-restriction Sub-shape-E entry, orphaned-leaf-detector for windows-bridge pattern, Sub-shape A.3 probe-design candidate, Pass-1-prose-only-batched-iterate-discipline (Celes [LEARNED]), mVox thread-1/3/4 candidates, Companion-Pair filing for [CONTINUITY]/A1. **Next-action S36:** Cal continues sequencing per bandwidth; C1 is the priority head-of-queue. |
-| #10 | Cloudflare pilot experiment — rough design pass (Brunel + Volta + Herald) | completed | brunel + volta + herald (Aen synthesis) | `designs/new/cloudflare-pilot/` README + 3 angle briefs; Round 0 substrate smoke test executed end-of-S35 (substrate validated; Anthropic env wired). |
+| 1 | in_progress | hopper | Round 1 op-step-1: Path-rule bypass on /webhooks + Round 0 verification | **TOKEN-PENDING — sole blocker.** Full 4-deliverable Hopper prep package on disk. PO 14:40 sanction verbatim valid for 14:34-with-`destinations[]` shape. On token: pre-flight verify → Tier-R L3 batch → STOP at surface-back gate → PO clearance via Aen → Tier-D bypass POST → 30-60s propagation → 3-probe verification → ops-log entry. ~5-10 min. |
+| 2 | completed | brunel | Round 1 substrate.md exec-readiness review | Closed S36. Amendment queued post-Round-1 per Brunel. |
+| 3 | completed | volta | Round 1 lifecycle.md exec-readiness review | Closed S36. §VL3.1+§VL4.1+§VL5.1+PT4 shipped. |
+| 4 | completed | herald | Round 1 comms.md exec-readiness review | Closed S36. v1.0 → v1.4 shipped (~580 lines wire-ready). |
+| 5 | in_progress | callimachus | Cal-Protocol-A queue absorption (S35 carry-over) | 8 entries shipped this session (Wiki 107 → 114) + 2 amendments. ~7 candidates fully framed for S37: Edit-tool-trap (promotion-grade joint Cal+Finn; Finn mechanism correction folded — Write invalidates Read-state); C2 substrate-vs-framework boundary primitive; S6 drafting-vs-read-back-phase narrowing; Stage-2-feedback typology Cal+Volta (5 shapes); cadence-crossing E4 Aen+Herald-n=6 + asymmetric-cross-3-vector Cal+Aen; routing-by-action pattern+failure-mode paired; Stage-0-contribution-from-filer. Plus 3 Stage-2 absorption residuals (Recursive-Narrowing, 2.7, Layer-0). |
+| 6 | completed | finn | Webhook trigger + Sandboxes API research | Closed S36. 4 docs shipped at `teams/framework-research/docs/`. |
+| 7 | pending | celes | Standby + Brunel-Amendment parallel-to-Hopper-4 queueing | S35 carry-over; dormant unless PO surfaces. |
+| 8 | pending | medici | Standby for periodic health audit | Dormant; trigger on Cal-queue-absorbed-meaningful-surface OR PO direct. |
+| 9 | in_progress | monte | Standby + manager-team architecture watch | Dormant since 2026-05-20; PO floated, not actioned. |
+| 10 | pending | (PO-decision) | Round 1 op-step-2 prep: Anthropic credential shape (Finn Q1) | Load-bearing post-W4. `sessions.create` scope is the new required capability. Single-OAuth-token vs three-credential split (WEBHOOK_SECRET + ANTHROPIC_ENVIRONMENT_KEY + ANTHROPIC_API_KEY) per CMA reference impl. Finn brief `docs/webhook-sandbox-research-2026-05-26.md` §2 enumerates failure modes. |
+| 11 | pending | hopper | Round 1 readiness gap: Step-5 wake mechanism (inverted Anthropic trigger) | **FUNCTIONALLY RESOLVED** by Finn W4 brief at `docs/wake-mechanism-w4-finding-2026-05-26.md`. Hopper flips status on absorb. W4 = W1-shape (sessions.create) ratified; W2/W3 falsified. |
 
-## Carry-forward summary
+## S37 first-action forecast
 
-**Active task:** #9 (Cal queue absorption) — ~10 items remain. Continues at S36.
+PO delivers token → spawn Hopper → Path D execution per `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` (the canonical S37 brief). Round-1 op-step-1 closes. If PO bandwidth allows: op-step-2 (credential decision + Pilot-A dashboard creation) follows in same window.
 
-**No blocking dependencies between #9 and any S36 first-action surface.** Cal can run alongside whatever S36 priority PO surfaces.
-
-**Substrate state external to this repo:**
-- Cloudflare account `8f150f98013eec8cae0a9db20a010c49` (EVR) has `fr-cma-pilot` Worker live with KV (2) + D1 + R2 + 4 secrets. Anthropic Self-managed env `env_01PpqWL9BfKZYD7SKPUEryRu` configured.
-- `~/Documents/github/.mmp/claude-managed-agents/` is the cloned template repo with experimental naming. Not committed to FR repo (third-party).
-
-(*FR:Aen* — S35 task snapshot)
+(*FR:Aen*)

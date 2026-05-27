@@ -19,10 +19,14 @@ source-issues: []
 related:
   - patterns/discriminator-anchored-on-sub-canonical-source.md
   - patterns/substrate-invariant-mismatch.md
+  - patterns/sub-shape-e-at-design-domain.md
+  - patterns/cluster-decomposition-meta-principle.md
   - gotchas/dual-team-dir-ambiguity.md
 amendments:
   - date: 2026-05-26
     change: "E1 extension folded — Sub-shape E cross-substrate-class confirmation at n=2 (Docker-on-RC n=1 + Cloudflare-managed n=2 per docs/findings.md §S5). Confidence promoted medium → medium-high. Layer 3 ownership-locus framing clarified: consumer team at Docker-on-RC, Cloudflare-as-substrate-provider at Cloudflare-managed (per Brunel polish-fold #3). Concurrent staleness refresh on §Why-insufficient + Composition + Related sections — post-Hopper-Amendment-4 (Celes-landed 2026-05-25) the prompt now folds three-layer reading; back-references updated from 'reads Layer 1 only' to 'pre-Amendment-4 baseline read Layer 1 only' historical framing."
+  - date: 2026-05-26
+    change: "Item 2.6 amendment — added §Cross-review independent-surfacing in design-domain (2026-05-26). The discipline applies one layer up at FR's own design domain: four independent exec-readiness reviews of the Cloudflare-pilot design (Volta lifecycle.md + Herald comms.md + Brunel substrate.md + Brunel+Hopper docs-Layer-0-recursive-descent bypass arc) surfaced Sub-shape E at four distinct layer-pair-points within ~2 hours. Cross-link to canonical articulation in `patterns/sub-shape-e-at-design-domain.md` (joint Volta + Herald + Brunel + Hopper + Cal-filer). Cumulative drift instance count: n=3 within-arc (apex-keys S34) + n=4 design-domain (S36 cross-review) = n=7 instances; substrate-class-coverage extends from Docker-on-RC + Cloudflare-managed to a third surface (design-domain itself). Recursive structure noted: within 36 hours of Hopper-Amendment-4 landing, the discipline catches its own authors at the layer above where it was authored. Added `sub-shape-e-at-design-domain.md` + `cluster-decomposition-meta-principle.md` to related-frontmatter."
 ---
 
 # Three-Layer Substrate-Truth Discipline
@@ -188,6 +192,21 @@ Sub-shape E observed at n=1 (Docker-on-RC substrate class, S34 apex-keys arc) co
 
 Joint-cross-specialist criterion already satisfied at n=1 by Brunel + Hopper authorship; the n=2 substrate-class confirmation is structural strengthening beyond raw instance count — the discipline is robust to substrate-class change, not just substrate-instance change. Common-prompt promotion landed via Hopper-Amendment-4 (Celes-landed 2026-05-25, `prompts/hopper.md` lines 130-211).
 
+### Cross-review independent-surfacing in design-domain (2026-05-26)
+
+Within ~2 hours on 2026-05-26 — within 36 hours of Hopper-Amendment-4 landing — **four independent exec-readiness reviews of FR's own Cloudflare-pilot design surfaced Sub-shape E at four distinct layer-pair-points of the design-domain itself**. The discipline applies one layer up at the layer it was authored to catch operators at; the canonical articulation is at [`sub-shape-e-at-design-domain.md`](sub-shape-e-at-design-domain.md) (joint Volta + Herald + Brunel + Hopper + Cal-filer).
+
+**Four sub-instances along the substrate-vs-framework-boundary-at-design-layer coupling-dimension:**
+
+1. **Volta lifecycle-layer** — `designs/new/cloudflare-pilot/lifecycle.md` exec-readiness review surfaced drift at the session-model + R2-state-management layer-pair between FR design-as-shipped and Cloudflare's canonical session/state lifecycle docs.
+2. **Herald protocol-route-layer** — `designs/new/cloudflare-pilot/comms.md` exec-readiness review surfaced drift at the DO-mailbox + identity-chain layer-pair between FR design and Cloudflare's canonical Durable Objects + identity-routing docs.
+3. **Brunel pilot-design-layer** — `designs/new/cloudflare-pilot/substrate.md` exec-readiness review surfaced drift at the substrate-class + identity + secrets-injection layer-pair; substrate.md was written from announcement-blog + inference (Layer 1); the substrate's own canonical docs are now in workspace at `~/Documents/github/.mmp/claude-managed-agents/docs/` (11 markdown files, 1500+ lines = Layer 2). **The pattern caught its own author** — Brunel authored the original three-layer discipline (joint with Hopper, S34); the discipline now catches Brunel's own design work.
+4. **Brunel + Hopper docs-Layer-0-recursive-descent** — the 2026-05-26 14:34–14:48 bypass arc surfaced drift at the consumer-team-docs (Layer 1 of substrate-provider documentation) vs substrate-provider-canonical-API (Layer 0) layer-pair. Generalizes the discipline from substrate-as-runtime to **docs-as-substrate**: library-first must recursively descend through doc-provenance layers when consumer-team-docs framing is mechanism-ambiguous.
+
+**Cumulative drift instance count post-amendment**: n=3 within-arc (apex-keys S34, Docker-on-RC substrate-class) + n=4 design-domain (S36 cross-review, FR pilot-design substrate-class) = **n=7 instances total** across **three substrate-class surfaces** (Docker-on-RC + Cloudflare-managed + design-domain itself).
+
+**Recursive structure noted**: within 36 hours of Hopper-Amendment-4 landing (Celes 2026-05-25), the discipline **applies at the layer above where it was authored** (operator-runtime → designer-runtime) and **catches its own authors at that layer** (Brunel-as-designer caught by Brunel-as-discipline-author). The recursive demonstration is itself in-vivo evidence for the discipline's structural reach. Canonical articulation: [`sub-shape-e-at-design-domain.md`](sub-shape-e-at-design-domain.md).
+
 ### Future watchpoints
 
 - **Second consumer-operationalized substrate's first-dispatch** (comms-dev / hr-devs / esl-legal at Docker-on-RC; any team at Cloudflare-managed pilot) — does the three-layer probe-suite surface analogous drift surfaces? Within-class cross-substrate verification.
@@ -205,6 +224,8 @@ The discipline composes from the two halves in a way neither half alone would: t
 
 ## Related
 
+- [`sub-shape-e-at-design-domain.md`](sub-shape-e-at-design-domain.md) — **design-domain application of this discipline.** Joint Volta + Herald + Brunel + Hopper + Cal-filer. The discipline catches its own authors at the layer above where it was authored. n=4 sub-instances surfaced within ~2 hours of 2026-05-26 across four independent exec-readiness reviews of the Cloudflare-pilot design. Family-adjacent (within-system self-application) to `first-use-recursive-validation.md` + `recursive-citation-as-canonical-validation.md`; sharper distinction because the discipline's application produces evidence for its own load-bearing property at the layer-up domain.
+- [`cluster-decomposition-meta-principle.md`](cluster-decomposition-meta-principle.md) — **meta-principle parent.** The three-layer model is Origin 3 of C1 (ownership-locus coupling-dimension). The 2026-05-26 design-domain sub-instances (per the Cross-review independent-surfacing section above) are also a candidate n=2 of C1's methodology corollary ("decompositions are invisible at n=1 and emerge at n=2 with a second instance providing variation along the coupling-dimension"); held as future-watchpoint candidate per Cal-Aen consultation pending cross-team confirmation.
 - [`discriminator-anchored-on-sub-canonical-source.md`](discriminator-anchored-on-sub-canonical-source.md) — joint sibling (same dispatch arc, same Brunel + Hopper authorship, grammar/parser-layer expression of substrate-truth).
 - [`substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) — parent family at the substrate-as-implicit-invariant layer.
 - [`dual-team-dir-ambiguity.md`](../gotchas/dual-team-dir-ambiguity.md) — same root-cause-different-layer sibling at the path-resolution axis.

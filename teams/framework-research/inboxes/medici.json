@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779866819462@medici\",\"from\":\"team-lead\",\"reason\":\"S36 session-end signal from PO\",\"timestamp\":\"2026-05-27T07:26:59.462Z\"}",
+    "timestamp": "2026-05-27T07:26:59.462Z",
+    "type": "message",
+    "read": true
+  }
+]

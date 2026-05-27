@@ -1,5 +1,11 @@
 # Medici — Knowledge Health Checker Scratchpad
 
+## [CHECKPOINT] 2026-05-27 session 36 — Standby, no audit triggered
+
+Task #8 standby. Reorientation only: read prior scratchpad + wiki index head + sent intro to team-lead. Trigger condition (Cal queue absorption producing meaningful new surface, OR PO explicit surface) did not arrive during session. No audit work, no commits. Shutdown at S36 close.
+
+Carry-forward into next-audit session: wiki was 100+ entries at S33+ close; S35 added Phase-A landings (discriminator-anchored-on-sub-canonical-source + three-layer-substrate-truth-discipline per team-lead's S36 brief). On next audit, scan for staleness candidates among S33+→S36 absorptions specifically — that's the window I haven't yet swept.
+
 ## [CHECKPOINT] 2026-05-20 session 33+ — Cross-team mvox-dev audit + memory cleanup
 
 External audit on `mvox-dev` team (cloned/refactored from polyphony-dev into new repo `mvox_v4e_web` at `~/Documents/github/.mmp/mvox_v4e_web/`). 14 findings; report at `teams/mvox-dev/docs/health-report-mvox-dev-2026-05-20.md` (218 lines, 9 sections). Overall verdict GREEN — refactor materially complete, stack table ↔ architecture-decisions ↔ Bentham's RED triggers all aligned, no polyphony-isms leaked into common-prompt.

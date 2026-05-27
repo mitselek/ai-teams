@@ -193,6 +193,159 @@ When two Edits in one message target a file I wrote-but-didn't-Read, the second 
 
 Aen confirmed (c) standing-by; my session contribution complete. Two research deliverables + handoff brief shipped. Three optional task ideas parked. Cal Protocol A batch in progress (3/6 done, ~halfway). No new task; do not generate work for self.
 
-## [UNADDRESSED] None
+## [CHECKPOINT S36 2026-05-26] Webhook + Sandboxes research shipped (Task #6)
+
+`docs/webhook-sandbox-research-2026-05-26.md` (~600 lines, 5 sections). Primary source: `~/Documents/github/.mmp/claude-managed-agents/` reference repo (README, architecture.md, isolate-vs-vm-sandboxes.md, src/webhooks.ts, src/index.ts, src/isolate/runner.ts). Web docs thin (`platform.claude.com/docs/en/managed-agents/` 404'd; `developers.cloudflare.com/sandbox/` lacks REST API specifics — Standard Webhooks spec at `docs.standardwebhooks.com/verifying` is the canonical reference the repo cites verbatim).
+
+Key findings:
+- Webhook = Standard Webhooks spec: 3 required headers (`webhook-id`, `webhook-timestamp`, `webhook-signature`), HMAC-SHA256 over `${id}.${timestamp}.${rawBody}`, ±300s replay window, `whsec_<base64>` secret prefix.
+- **Critical invariant: always return 2xx for valid signature + valid JSON.** 401/400 only for malformed input. Anthropic retries non-2xx indefinitely → infinite loop if we 5xx on transient downstream failure.
+- Three Anthropic credentials in reference impl: `WEBHOOK_SECRET` (inbound verify), `ANTHROPIC_ENVIRONMENT_KEY` (sk-ant-oat01-…, for work.poll/ack/heartbeat), `ANTHROPIC_API_KEY` (sk-ant-…, for sessions.retrieve). **S35 OAuth-token decision is a structural mismatch** — Hopper needs to smoke-test both calls before going live.
+- Sandbox creation is **exclusively webhook-driven**: `getIsolateRunner(env, sessionId).start({…})` — DO stub RPC, not HTTP. No "admin creates sandbox" path. DO id derived from session id via `idFromName(sessionId)`.
+- Required bindings for Isolate path: `IsolateRunner` DO + (optional) `LOADER` Worker Loader binding for code-execution tools. Workers Paid plan minimum.
+
+## [LEARNED S36] Anthropic SDK double-auth-header trap
+
+`bearerClient` in `src/webhooks.ts:35-48` sets `apiKey: null` EXPLICITLY to prevent SDK from backfilling `ANTHROPIC_API_KEY` from `process.env` (populated under `nodejs_compat`). If both `apiKey` and `authToken` go out, the managed-agents server rejects with 401 on per-session endpoints. Pattern transferable: any Anthropic SDK use under `nodejs_compat` + custom auth must `apiKey: null`. Cal Protocol A candidate.
+
+## [LEARNED S36] Sandbox creation is webhook-only
+
+No public "create sandbox" admin endpoint. Dashboard "Start session" buttons record intent in D1 + ping Anthropic; Anthropic decides to issue a webhook, our handler reacts by spinning a DO. Implication for any test scaffolding: must invoke `handleWebhook` directly in test mode OR trigger a real Anthropic session start. No third path. Confirms lifecycle.md framing assumption ("sandbox lifetime ⊆ Anthropic-controlled session lifetime"). Cal Protocol A candidate.
+
+## [CHECKPOINT S36 2026-05-26] Herald-G2 brief shipped (Path 1 follow-up)
+
+`docs/herald-g2-cross-agent-comms-brief-2026-05-26.md` (~330 lines). Targeted at Herald's v1.1.1 fold-pass §1.2. After PO DECISION ratified Isolate-only Round 1, Aen disambiguated G2: cross-agent A→B (NOT agent-to-control-plane). Brunel B2 (separate AgentMailbox DO class) used as substrate ground.
+
+Six-step path documented: (1) Pilot-A LLM emits `send_message` custom tool call; (2) ToolDispatcher inside IsolateRunner_A DO handles it (NOT inside the isolate sandbox — handler runs in Worker address space); (3) two forwarding paths — (a) direct DO RPC `env.AgentMailbox.idFromName(toAgentId).append(msg)` RECOMMENDED, (b) HTTP route `/inbox/:name` DEFERRED to Round 2; (4) mailbox storage via DO SQLite, keyed by **agent_id** not session_id (survives session boundaries); (5) wake mechanism → Anthropic SDK call → webhook → IsolateRunner_B.start(); (6) drainUnread() on session start, injected as initialContext.
+
+**Step-5 OPEN QUESTION flagged:** the wake mechanism (Anthropic SDK call that triggers an inbound webhook for a named agent) is NOT in the reference CMA repo — that repo only handles Anthropic-as-originator. Three candidate SDK surfaces (W1: beta.sessions.create, W2: work.enqueue, W3: polling-only-no-trigger). If W3 turns out true, Round 1 is structurally blocked on this primitive. Flagged as Hopper research follow-up, NOT in my Task #6 scope.
+
+Cross-link added in comprehensive doc + post-DECISION scope note ("MicroVM retained as Round-1 comparator only").
+
+## [LEARNED S36] Custom-tool handler runs in DO address space, not sandbox
+
+Key Round-1 design lever: in Isolate, custom-tool handlers (`tools[].run`) execute inside the IsolateRunner Durable Object — they have full Worker `env` access, can RPC sibling DOs, can read DB. The isolate sandbox NEVER touches the network directly. This means "send a message" is just a custom tool whose handler does the DO RPC; "read mailbox" is just custom tool's reading from a sibling DO; etc. The substrate primitives don't need to be exposed inside the sandbox — only the tool *signatures* need to. Implications across comms.md, lifecycle.md, substrate.md. Cal Protocol A candidate.
+
+## [LEARNED S36] Mailbox key = agent_id, not session_id
+
+Sessions are ephemeral; the agent is the durable identity. Mailbox DO is therefore keyed by `idFromName(agentId)`. Implication: a mailbox can be appended-to before a recipient agent has ever had a session; survives all session restarts; doesn't move when an agent's backend is flipped. This is the structural difference between "session-scoped state" (workspace, conversation history) and "agent-scoped state" (mailbox, identity, name lookups). Comms.md must make this explicit — easy to get wrong. Cal Protocol A candidate.
+
+## [LEARNED S36] Write-state ≠ Read-state for Edit — n=4 personal confirmation, plus n=5
+
+Hit n=3 at S36 16:00 (two post-Write Edits failed). Hit n=4+5 at S36 16:32 when even Edit-after-Edit failed because intervening SendMessage and tool calls expire the Read-state too. Read-state is not just expired by Write — it expires by ANY tool call sequence that doesn't immediately follow the Read. So the operational rule has to be sharper: **Read in the SAME tool-call batch as the Edit (or the Edit immediately preceding tool-call batch).** Anything else risks Read-state expiry.
+
+n=5 personal now (S26: 1; S36: 4). Permanent operational rule: when re-touching a file, Read in the same or immediately-prior tool-call batch as the Edit. Don't trust Read-state to survive across rounds of conversation.
+
+## [CHECKPOINT S36 2026-05-26 15:30] Protocol A filed to Cal — Edit-tool read-state trap
+
+Direct submission to callimachus inbox per Aen permission 2026-05-26 15:15. gotcha-class. Wraps personal n=3 + Aen S20 n=4 + S26 n=1 cross-agent into one filing. Companion-finding note attached: Anthropic SDK `apiKey: null + authToken:` may be sibling-class (auto-state-restoration-silently-overrides-explicit-state). Cal can split or unify as she sees fit. **Amendment needed:** n=4-and-n=5 occurred AFTER the filing, AND the failure mode is broader than Write→Edit — Read-state expires across rounds, not just on Write. Will follow up with Cal if she requests scope refinement.
+
+## [LEARNED S36] Co-source-agent role on FR-pilot amendments
+
+Aen recognized 2026-05-26 15:15: my Task #6 + Herald-G2 brief contributions surfaced substrate-truth evidence that reshaped Herald's v1.2→v1.3 comms.md framing. Herald's frontmatter formalizes `[herald, brunel, finn]` co-source-agents on comms.md amendments-log. Implication: cross-team research role substantively shapes FR's design output, not just informs it. First time this has been explicit in my role definition — my prompts/finn.md describes "delivery to topic files" but didn't anticipate co-authorship on amendments-log. Track-it; may inform role-bound discipline going forward (when do I write directly into topic file vs surface findings for someone else's amendment?).
+
+## [CHECKPOINT S36 2026-05-26 15:50] W4 wake-mechanism finding shipped (Hopper Task #11 resolves)
+
+`docs/wake-mechanism-w4-finding-2026-05-26.md` (~120 lines). Surfaced while loading `claude-api` skill for Surface-1 research. The skill's `shared/managed-agents-self-hosted-sandboxes.md` directly contradicts my G2-brief Step-5 W1/W2/W3 framing: **"Connectivity is outbound-only: your worker long-polls Anthropic's work queue; Anthropic never dials into your network."** No inverted-trigger primitive exists. Actual wake = `client.beta.sessions.create(agent=recipient, environment_id=...)` from mailbox handler → Anthropic queues work → our long-polling worker picks it up → IsolateRunner.start() fires → mailbox drains on session start.
+
+This is **n=5 substrate-blind-spot in Herald's comms.md within-author trajectory** per Aen's structural-claim framing (v1.0→v1.4). Cal Protocol-A submission queued (deferred per Aen: Cal busy with 2.6).
+
+## [CHECKPOINT S36 2026-05-26 16:35] Surface-1 platform checklist shipped (with W4-framing)
+
+`docs/round-1-anthropic-platform-checklist-2026-05-26.md` (~210 lines, 6 sections). Operator-facing Round 1 platform pre-flight. Adapts the `claude-api` skill's onboarding §3 pre-flight viability check as template structure (4 gap-classes: tool/integration, credential/access, data, prompt quality). Six sections: §1 viability reconciliation, §2 Console one-time setup (env, webhook, agents, OAuth), §3 per-dispatch smoke-tests (4 credential tests A/B/C/D), §4 anti-patterns from skill (5 anti-patterns), §5 exec-readiness gate (8 checks), §6 four open PO+Aen questions.
+
+W4-framing baked in: Task #11 marked as "design choice, not research" (always-on vs webhook-driven worker); Task #10 PO credential decision tied to `sessions.create` + `work.poll` + `sessions.retrieve` scope checks; credential-shape implications surfaced concretely.
+
+## [LEARNED S36] Layer-0 library-first probe descent catches design-domain blind-spots
+
+Aen's framing 2026-05-26 15:31: "Layer-0 library-first discipline produces this when applied correctly: loading the canonical reference (`claude-api` skill → `shared/managed-agents-self-hosted-sandboxes.md`) surfaced a mismodel that propagated through G2 brief → Herald v1.2/v1.3 → Hopper Task #11 framing." Sub-pattern distinct from sub-shape-E (design-domain) AND from Herald's recursive-narrowing (within-document): catches connectivity-model substrate assumptions that don't surface until canonical-source probe. **Operational rule for me:** when generating framework-design content about external substrate (Anthropic SDK, Cloudflare API, Postgres semantics), always load the canonical-library skill BEFORE the design-content write, not after. The skill-load pre-empts hallucination at the design layer.
+
+Family composition (for Cal): {sub-shape-E (2.5), recursive-narrowing (Herald §6.3), Layer-0-library-first (this new sub-pattern)}.
+
+## [GOTCHA S36] Inverted-trigger primitives are an antipattern when substrate is poll-based
+
+Connectivity-model assumption: "to wake X, we call something that pushes to X" is wrong when substrate is outbound-only-poll. Actual wake mechanism: create durable state (e.g., a session) that the polling consumer picks up on its next cycle. This shape appears in: Anthropic Managed Agents (worker polls; sessions.create is the wake), Postgres LISTEN/NOTIFY (consumer must be listening; producer NOTIFY only wakes already-connected listeners), Cloudflare Durable Objects (alarm-based wake, not inbound RPC). When designing comms-primitives against poll-based substrate, design state-write-as-wake, not push-as-wake.
+
+## [CHECKPOINT S36 2026-05-26 15:40] Cal Protocol-A paired entries filed (Layer-0 + inverted-trigger)
+
+Filed both Entry 1 (Layer-0 library-first sub-pattern) + Entry 2 (inverted-trigger gotcha) to callimachus as paired submission per Aen's "file as paired entries" guidance 2026-05-26 15:37. Co-authorship requested `[finn, callimachus]`. Cross-cite between entries: Entry 1 is the discipline that catches the Entry 2 antipattern. Substrate-shape cross-references in Entry 2: Anthropic Managed Agents (catalyzing), Postgres LISTEN/NOTIFY, Cloudflare DO alarm(), filesystem-watch (inotify/fsnotify). Cal absorbs at queue-position-discretion.
+
+## [LEARNED S36] Cross-role joint authorship is framework-maturity indicator
+
+Aen recognized 2026-05-26 15:37 + Cal cross-cite: today is **n=2 cross-role joint authorship** (Cal + Finn). Instances: (1) Edit-tool-read-state-trap (2026-05-26 15:30) — gotcha-class, my discovery via personal n=5 + Aen S20 n=4, Cal authors-of-record; (2) inverted-trigger antipattern (2026-05-26 15:40) — gotcha-class + paired sub-pattern, my discovery via `claude-api` skill load surfacing W4, Cal authors-of-record. **Load-bearing observation:** research-role (me) contributing to wiki-curator-role's (Cal's) filing authority is a framework-maturity indicator per Aen. The cross-role-cross-document contribution chain (skill-load → discovery → Hopper-Task-#11-resolution → Herald-v1.4-fold → Brunel-substrate.md-Q5-sharpening + Task #10 reframe + Cal-paired-Protocol-A) is what makes the framework's knowledge layer load-bearing rather than ornamental. Track this — my role-evolution from "research coordinator" → "research coordinator who substantively shapes design output AND co-authors framework knowledge with wiki-curator" should be made explicit in `prompts/finn.md` at next Celes-routed prompt-review cycle (already flagged earlier).
+
+## [CHECKPOINT S36 2026-05-26 15:41] Cadence-cross on paired filing — Hopper's n=3 catalog framing wins
+
+Aen flagged 2026-05-26 15:41: my Cal-paired filing (15:40) cadence-crossed with Hopper's separate n=3 Layer-0-library-first in-session catalog (15:33). **Cal's reconciliation (per Aen 15:40):** Hopper's catalog framing is structurally stronger — n=3 in-session-recurrence as the headline pattern (S35 Task #6 + S36 bypass-arc + S36 W4 skill-load); W4 is ONE instance of that recurrence, not the standalone headline. **Merged entry:** "Layer-0 library-first recurrence — same-discipline-applied-at-different-substrate-layer-pairs-within-one-session" with co-authorship `[hopper, brunel, finn, callimachus]`. **My Entry 2 (inverted-trigger gotcha) stands distinct** — gotcha-class, generalizes beyond Anthropic, stays `[finn, callimachus]`, cross-cites the merged entry as catalyzing-Anthropic-instance.
+
+No re-routing needed from my side. Cal absorbs the merge at her queue-position-discretion. Net result: my Entry 1 sub-pattern likely folds into the merged entry as a refinement layer OR sub-pattern-with-cross-link; either is fine.
+
+## [LEARNED S36] Cadence-cross n=1 (Finn-Aen-Cal triangle) — reproducing across configurations
+
+Aen 2026-05-26 15:41 flagged: this is n=1 cadence-cross in a **triangle** (Finn-Aen-Cal), distinct from prior dyadic cadence-cross instances (Cal-Aen, Herald-Aen). The pattern is reproducing across multiple coordination configurations today, which strengthens the eventual Cal-queue cadence-cross entry beyond just dyads. **Implication for my own discipline:** when routing a finding through Aen for review-and-forward, accept that Cal may receive parallel-routed framings of overlapping material from other agents in the same window. The right posture is **file my framing cleanly, then let Cal reconcile** — don't pre-emptively merge with what other agents might be routing in parallel. Aen confirmed this is the right posture ("no re-routing or counter-amendment needed").
+
+## [CHECKPOINT S36 2026-05-26 16:00] Cal Stage-2 read-back on recursive-narrowing entry — concurrence + Surface-4 shape-suggestion
+
+Replied to Cal's Stage 2 read-back on wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md (entry 112). Surface 3 (G2 vs W4 layer-pair distinction): concurred — G2 structurally COULD NOT have caught W4 because G2's framing pre-supposed the W4-mismodel. Surface 4 (§6 "discipline applying to its own articulation"): concurred + shape-suggestion to soften from "discipline catches its own blind-spots" (capability-claim) to "discipline naturally produces this kind of self-reflection when applied iteratively" (natural-consequence). Surface 5 (cross-team confidence): concurred medium-high is right; suggested apex-research as specific cross-team probe target (different substrate: Postgres + xireactor + brilliant). Co-authorship `[herald, brunel, finn, callimachus]` confirmed.
+
+## [CHECKPOINT S36 2026-05-26 17:15] Cal same-window ACK on Edit-tool entry — pre-filing mechanism scope correction sent
+
+Cal ACK'd my paired Protocol-A submission (Layer-0 + inverted-trigger) with three folds: (1) cross-role topology n=3 confirmed, (2) Stage-2 mechanism correction Shape-A absorbing my Write-mechanism statement as sharper than her time-based heuristic, (3) sibling-class auto-restoration meta-pattern as sketch-grade with n=3-cross-domain promotion-watch. **But my own n=4/n=5 data (post-15:30-submission) showed the mechanism is BROADER than just "intervening Write"** — Edits failed after intervening SendMessage / tool-call sequences with NO Write involved. Sent pre-filing correction to Cal: actual mechanism is per-conversation-round Read-state expiry; Write is the most common trigger but not the only one. Revised mechanism statement: "Read-state expires after the tool-call batch that produced the Read." Revised operational rule: "Read in same batch as Edit, or immediately-prior batch."
+
+## [LEARNED S36] Stage-2 author-side correction can chain through multiple authors
+
+Cal's S36 time-based heuristic → my Write-mechanism (Cal-Stage-A-absorb at 17:00ish) → my revised round-advancement mechanism (Cal pre-filing correction at 17:15). **Three sharpenings in <2 hours**, each more causally accurate than the prior. Pattern observation: when Stage-2 read-back surfaces a mechanism, the author-side iteration doesn't stop at first correction. If you (the recipient of the read-back) find new data post-submission, surface it pre-filing — even if Cal has already accepted the prior correction. The Cal-side absorption is queue-positioned, not insta-filed; pre-filing window is the right time to land further corrections.
+
+## [LEARNED S36] Asymmetric-cross routing-mode-dependent latency confirmed (Finn + Cal n=2)
+
+Cal at 17:00 noted: my direct-DM Protocol-A submission landed reliably in her inbox; 4-author Stage-2 replies routed via Aen-coordinator-relay are STILL not visible to her. I confirmed from my side: W4 finding routed through Aen at 15:31 produced Hopper's parallel n=3 catalog at 15:33 with substantial overlap, suggesting Aen-coordinator-relay has implicit **fan-out latency window** during which multiple agents can route overlapping framings before reconciliation. Direct-DM has no fan-out window. **Structural property of routing-mode, not uniform substrate-timing.** Both modes valid for different purposes (coordinator-relay good for "Aen should know"; direct-DM good for "Cal needs this fact now"). Fold for E4 entry as cross-confirmed.
+
+## [WATCHPOINT S36] auto-restoration-silently-overrides-explicit-state-intent — n=3 promotion candidates
+
+Cal noted as sibling-class sketch-grade observation:
+- **Instance 1 (Edit-tool harness):** Write call's auto-restoration of file-state-tracking silently overrides Read-state intent
+- **Instance 2 (Anthropic SDK):** SDK auto-restoration of `ANTHROPIC_API_KEY` from `process.env` silently overrides explicit `authToken:` intent
+
+n=2 personal observation across two distinct domains. **n=3 cross-domain promotes to entry-grade meta-pattern.** Candidate watchpoints to grep for:
+- **(W3a)** Cloudflare Worker `env` auto-binding-population overriding explicit `env.X = override` in code
+- **(W3b)** AWS SDK / GCP SDK auto-detect-credentials patterns overriding explicit `Session(aws_access_key_id=...)` calls
+- **(W3c)** Git auto-merge config: does `git config --system` silently override `--local` in some edge cases?
+
+If any team member surfaces an instance matching one of these (or any other auto-restoration trap), ping me — co-author meta-pattern promotion with Cal. Cross-link from Edit-tool-trap entry's "Related" section.
+
+## [CHECKPOINT S36 2026-05-27 07:26] PRE-DRAFT/POST-DRAFT sibling-entry framing accepted; session-close
+
+Cal's same-window response on paired Protocol-A submission landed a structural sharpening I missed: my Entry 1 (Layer-0 library-first PRE-DRAFT discipline) is **sibling** to her existing `wiki/patterns/layer-0-library-first-recurrence.md` (POST-DRAFT recurrence catalog), not a refinement of it. Sibling-axis: **temporal position within design lifecycle.** PRE-DRAFT prevents drift via load-before-draft; POST-DRAFT catches drift via cross-read after design exists. Composed reading gives full library-first lifecycle picture. Concur.
+
+**Three Finn-Cal entries queued for HOLD-release** (per Cal sequencing + Aen 16:07 HOLD):
+1. Edit-tool-trap (broader-scope mechanism per my 17:15 amendment — per-conversation-round Read-state expiry, not just intervening Write)
+2. PRE-DRAFT library-first discipline (Entry 1, sibling to existing POST-DRAFT entry)
+3. Inverted-trigger gotcha (Entry 2, cross-substrate generalization)
+
+Pre-specified Cal-side framing locked. No further consultation needed from my side.
+
+## [LEARNED S36] Stage-2 author-side correction chaining n=4 in <4 hours
+
+The Edit-tool-trap mechanism statement went through 4 sharpenings today, none requiring re-routing through Aen:
+1. **Cal S36 time-based heuristic** ("~10 messages OR ~5 minutes between Read and Edit")
+2. → **My Write-mechanism** (correlation-proxy replaced with causal property)
+3. → **My round-advancement mechanism** (post-15:30 n=4/n=5 data showed intervening-Write is one trigger but not the only one; actual mechanism is per-conversation-round Read-state expiry)
+4. → **Cal's PRE-DRAFT/POST-DRAFT axis-distinction on Entry 1** (sibling-entry framing rather than refinement-fold)
+
+**Direct-DM channel enabled this iteration density.** If we'd routed each correction through Aen-coordinator-relay, the fan-out latency window would have introduced cadence-crosses at every iteration. Direct-DM is the right channel for high-iteration-density Stage-2 author-side correction chains. Fold for cross-role topology Cal+Finn wiki-process entry when it drafts.
+
+## [SESSION 36 CLOSE 2026-05-27 07:26]
+
+Shutting down per PO signal via Aen. Three deliverables shipped to FR docs/ this session:
+- `docs/webhook-sandbox-research-2026-05-26.md` (Task #6)
+- `docs/herald-g2-cross-agent-comms-brief-2026-05-26.md` (Aen routing post-Path-1 DECISION)
+- `docs/wake-mechanism-w4-finding-2026-05-26.md` (Hopper Task #11 resolution)
+- `docs/round-1-anthropic-platform-checklist-2026-05-26.md` (Surface-1 + Task #10 input)
+
+Cal-routed: 2 Protocol-A submissions (Edit-tool-trap + paired Layer-0-PRE-DRAFT + Inverted-trigger). Co-authorship `[finn, callimachus]` on three queued entries; co-authorship `[herald, brunel, finn, callimachus]` on recursive-narrowing entry 112 (already filed).
+
+Cross-role topology Cal+Finn n=3 reached this session. Framework-maturity-indicator confirmed.
+
+Carry-forward for next session: PRE-DRAFT/POST-DRAFT sibling pair filing when HOLD releases; W3a/W3b/W3c auto-restoration meta-pattern n=3 watchpoint; role-evolution prompt-update queued for Celes; `prompts/finn.md` co-source-agent role-expansion still pending explicit update.
 
 (*FR:Finn*)
