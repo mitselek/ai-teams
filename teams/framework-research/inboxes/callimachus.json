@@ -79,12 +79,5 @@
     "timestamp": "2026-05-27T14:12:29.731Z",
     "type": "message",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779957796277@callimachus\",\"from\":\"team-lead\",\"reason\":\"S37 session end; team shutdown per Step S2\",\"timestamp\":\"2026-05-28T08:43:16.278Z\"}",
-    "timestamp": "2026-05-28T08:43:16.278Z",
-    "type": "message",
-    "read": true
   }
 ]

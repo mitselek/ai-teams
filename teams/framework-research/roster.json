@@ -1,6 +1,7 @@
 {
   "name": "framework-research",
   "description": "Research team designing the multi-team AI agent framework for Eesti Raudtee. Studies existing team patterns, identifies risks, and evolves the framework design.",
+  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only — TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-opus-4-6[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
   "commonPromptFile": "common-prompt.md",
   "workDir": "$HOME/Documents/github/mitselek/ai-teams",
   "members": [

@@ -1,6 +1,82 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-05-27 — session-37 → session-38
+### [NEXT SESSION] 2026-05-28 — session-38 → session-39
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S39 read):**
+
+- **State of play:** S38 closed 2026-05-28 (very short session ~15 min active; spawn → substrate-finding → wrap). **No agents spawned.** No work-track progress; pure substrate-discovery session. Single durable artifact: substrate-truth-evidence catch about Agent-tool team model-pinning + corresponding startup.md Step 0.5 guard + roster.json `_substrate_note`. Apex tunnels morning: both UP (11521 + 11522); no apex action this session. ITSD-38884 grant status unchanged from S37 close.
+- **CRITICAL FIRST ACTION S39 — model verification BEFORE TeamCreate:** Roster pins team-lead to `claude-opus-4-6[1m]`. The CLI parent session model is what `TeamCreate` stamps into runtime `config.json`, NOT the roster value. If parent is on `claude-opus-4-7[1m]` (current Opus default), team-lead AND all spawned specialists land on 4.7 — ~40% context-cost differential per agent (per S38 apex-side experiment data PO shared: 67.3k vs 48.1k post-startup; uniform across categories). **Run `/model claude-opus-4-6[1m]` before Step 1**, OR restart CLI with `--model claude-opus-4-6[1m]`. Step 0.5 in startup.md gates this — read it.
+- **Open dispatches/dependencies (unchanged from S37):** ITSD-38884 admin grant (sole Round-1 op-step-1 blocker; admin = Kristofer Taling at EVR IT). Stage 2 read-back surfaces queued for Finn (8 surfaces across 5 wiki entries). Hopper #2-4 on Candidate A. Volta on multiple entries. Cal Stage-0-contribution + routing-by-action n=1 watch (await n=2). Hopper bundled-shred n=1 in her scratchpad.
+- **Expected first action S39:** PO direction. Most likely scenarios unchanged from S37→S38 — ITSD-38884 admin grant landed → Hopper Path D; OR Stage 2 read-back → Finn; OR Pilot-A creation; OR Cal queue continuation.
+- **Substrate-finding for Cal candidacy:** "roster.json model field is non-load-bearing on Agent-tool team architecture; TeamCreate inherits parent session model." Empirical evidence in this session (config.json:11 stamped 4.7 despite roster=4.6). Documentation-vs-substrate-truth-divergence territory (Wiki 115 cluster). n=1 in-session. If Cal spawns S39, this is a candidate worth her queue.
+
+---
+
+## SESSION 38 WRAP — 2026-05-28 (Short session ~15 min; spawn → substrate finding → wrap; one durable artifact + two guard rails)
+
+**Spans:** 2026-05-28 morning startup → wrap on PO direction after substrate-finding surfaced. ~15 min active. No agents spawned.
+
+**Outcome:** Pure substrate-discovery session. Identified that `roster.json` model field is non-load-bearing on Agent-tool team architecture — `TeamCreate` stamps parent CLI session model into runtime `config.json`, and Agent-tool spawn machinery inherits that, ignoring roster intent. Shipped two guard rails (startup.md Step 0.5 + roster.json `_substrate_note`) so future sessions catch this at the substrate-truth layer rather than discovering it mid-spawn. PO direction: switch to 4.6, wrap, respawn fresh on 4.6.
+
+### How the finding surfaced
+
+PO shared a /context snapshot from an apex-research startup-ceremony experiment: same ceremony, fresh team, both 4.6 and 4.7 — **40% context-cost differential across every category** (system prompt +37%, system tools +41%, memory files +42%, skills +32%, messages +40%, total 48.1k vs 67.3k). Uniform inflation suggests broader model-substrate change, not localized regression.
+
+PO followed up: *"what model will you spawn Cal on?"*
+
+Substrate check:
+
+1. **Config.json line 11** for fresh S38 team-lead: `"model": "claude-opus-4-7[1m]"` despite **roster.json line 10** for team-lead: `"model": "claude-opus-4-6[1m]"`. `TeamCreate` ignored roster, stamped parent.
+2. **Agent tool spec** (per ToolSearch fetch): `model` param accepts only family-level overrides (`opus`/`sonnet`/`haiku`); no specific-version pin (e.g., `claude-opus-4-6`) is accepted. `opus` resolves to current default = 4.7.
+3. **Spawn inheritance default** = parent model when no explicit override.
+
+So Cal spawned via Agent tool would inherit my parent (4.7), and there is **no path through the Agent tool to pin Cal to 4.6 specifically.** Only path: switch parent session model before spawn.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `teams/framework-research/startup.md` Step 0.5 | NEW | Aen | Parent-model verification gate before Step 1; explicit recovery (`/model claude-opus-4-6[1m]` or `--model` flag); substrate-truth catch quoted inline |
+| `teams/framework-research/roster.json` `_substrate_note` | NEW (top-level field) | Aen | One-line note documenting roster.model is documentation-only on Agent-tool teams; points to Step 0.5; cites S38 catch date |
+| `teams/framework-research/memory/team-lead.md` | M (S39 M1 seed + S38 WRAP) | Aen | This entry; S37 [PROCESSED 2026-05-28] tag also applied |
+
+No specialist work; no wiki entries; no operational actions; no decisions deferred or unblocked. ITSD-38884 status: unchanged.
+
+### Decisions (PO-ratified)
+
+[DECISION — S38] **Switch parent CLI session to `claude-opus-4-6[1m]` before next TeamCreate.** PO direction after substrate finding surfaced: *"lets switch to 4.6 — you update roster and wrap the session, i will make sure we respawn on 4.6"*. The 40% context-cost differential vs. continuing on 4.7 is not justified by any observed quality differential for this team's research workload (no comparative evidence either way). Restore continuity with the 4.6 substrate that drafted S35-S37 wiki entries.
+
+[DECISION — S38] **Roster.json model field stays documentation, not enforcement.** No code change is available to make Agent-tool spawn machinery consume roster.model. The discipline-side mitigation (Step 0.5 verify-before-TeamCreate) is the only available enforcement. Roster intent stays 4.6; substrate enforcement is procedural.
+
+### Substantive learnings (Cal-grade candidate)
+
+[LEARNED — substrate, candidate-grade] **roster.json model field is non-load-bearing on Agent-tool team architecture.** TeamCreate stamps parent CLI session model into runtime config.json regardless of roster intent. Agent-tool spawn machinery inherits that. Contrast with tmux-pane-based teams (apex-research): the roster.model field IS consumed by the launcher script (`claude --model claude-opus-4-6[1m]`) at pane-spawn time. Same data field, two substrates, two different enforcement semantics. **Documentation-vs-substrate-truth-divergence sub-instance** (Wiki 115 cluster member): the roster artifact describes what model team members run on; the substrate (Agent-tool spawn machinery) implements something different (parent inheritance). Reader of roster.json would infer 4.6 enforcement; substrate truth is 4.7 (parent-determined). n=1 in-session; promotion-grade if cross-team observation surfaces in tmux-pane substrates as a separate-but-related instance.
+
+[LEARNED — cross-model substrate] **Opus 4.7 carries ~40% more context overhead than 4.6 at post-startup parity** (apex-research n=1 per model; uniform across all five categories — system prompt +37%, system tools +41%, memory files +42%, skills +32%, messages +40%). Messages category dominates absolute delta (+10.7k of 19.2k total). Watch-grade; needs n=2 per model to factor out across-day drift before Wiki candidacy. Cross-model cost is structural property worth tracking if FR continues across model transitions.
+
+### Standing watch items going into session 39
+
+- **All S37 watch items carry forward unchanged.** ITSD-38884 admin grant; Stage 2 read-back surfaces (Finn 8 + Hopper #2-4 + Volta multi-entry); Hopper bundled-shred Cal candidate (n=1 in her scratchpad); routing-by-action + Stage-0-contribution at n=1 (await n=2); A1 evidence-cycle audit at S40-42; S35-carry-forward standing watch (Brunel-Amendment, Hopper-Amendment-5, "PO"→"Mihkel/you" naming); Aen amendment Part C; TPS-583 dormant; mVox-dev S8+ carry-forward dormant; Manager-team / PO-team architecture dormant.
+- **NEW — Cross-model context-cost watch.** If FR continues across model transitions, track per-startup context cost (run /context after Step 4 each session) and note the model from config.json:11. n=2 per model promotes to Wiki candidacy.
+- **NEW — Substrate-truth-evidence catch S38 (roster.model non-load-bearing).** n=1 in-session; promote on cross-team observation OR explicit PO sanction to file at n=1.
+
+### NEXT-SESSION BOOT (re-orient instructions for S39)
+
+1. **READ THIS BLOCK FIRST.** Step 0.5 in startup.md is new and load-bearing. Read it before Step 1.
+2. **Verify parent CLI session model matches `claude-opus-4-6[1m]`.** Check `/context` header OR `claude --version`. If parent shows 4.7 (or anything ≠ 4.6) → STOP and run `/model claude-opus-4-6[1m]`. Substrate gap: roster.json says 4.6, but TeamCreate stamps parent — see startup.md Step 0.5 inline note.
+3. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Re-register ghost members → Restore inboxes → Spawn — wait for PO direction).
+4. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — that's the 5-bullet reorientation seed per A1 adoption. Read it FIRST, then downgrade the tag to `[PROCESSED YYYY-MM-DD]` once processed.
+5. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+6. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+7. **Most-likely first asks remain S37 set** (ITSD-38884 / Stage 2 read-back / Pilot-A creation / Cal queue) — see S37 wrap NEXT-SESSION BOOT entries 5-15 for full procedures. S38 added no new operational items.
+8. **Confirm post-TeamCreate substrate state.** After Step 2, read `~/.claude/teams/framework-research/config.json:11` and verify `"model": "claude-opus-4-6[1m]"`. If anything else → /model + TeamDelete + TeamCreate retry. This is the empirical close-out of Step 0.5.
+9. **If PO surfaces the substrate-finding for Cal candidacy:** spawn Cal with brief. Material is in this scratchpad's [LEARNED] section + S38 wrap section. Candidate filing target: `wiki/patterns/roster-model-field-non-load-bearing-on-agent-tool-teams.md` OR a sub-instance entry under existing `documentation-vs-substrate-truth-divergence.md` (Wiki 115). Co-source PO + Aen.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-05-28] 2026-05-27 — session-37 → session-38
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S38 read):**
 

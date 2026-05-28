@@ -55,6 +55,19 @@ After these 5 reads, you know everything you need to execute the startup protoco
 
 Field test (2026-03-13) showed the team-lead scrambled the phase order AND mislabeled phases (called Create "Phase 1: Sync"). The checklist format below prevents this — follow it mechanically.
 
+### Step 0.5: Verify parent CLI session model matches roster team-lead model
+
+Before `TeamCreate`, verify the parent CLI session is running on the model the roster pins team-lead to. On Agent-tool team architecture, `roster.json`'s `model` field is **documentation-only** — `TeamCreate` stamps the *parent session model* into runtime `config.json` regardless of roster intent, and all subsequently-spawned specialists inherit it (Agent tool's `model` param accepts only family-level overrides `opus`/`sonnet`/`haiku`, which resolve to the current default version, not a specific pin like `claude-opus-4-6[1m]`).
+
+```
+Roster says:  claude-opus-4-6[1m]   (team-lead intent)
+Parent says:  ???                   (run `claude --version` or check /context header for active model)
+```
+
+**If parent model ≠ roster team-lead.model:** STOP. Switch parent via `/model claude-opus-4-6[1m]` (or restart CLI with `--model claude-opus-4-6[1m]`) before proceeding. Substrate-truth catch from S38 (2026-05-28): parent on 4.7 stamped `"model": "claude-opus-4-7[1m]"` into config.json despite roster saying 4.6. All specialists would inherit 4.7 — ~40% context-cost differential per agent vs. the 4.6 baseline historic to S35-S37.
+
+**Verify:** Parent model string matches roster `members[0].model`. If matched → proceed to Step 1.
+
 ### Step 1: Sync
 
 ```bash

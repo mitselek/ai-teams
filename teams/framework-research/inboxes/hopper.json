@@ -48,12 +48,5 @@
     "timestamp": "2026-05-27T11:40:39.733Z",
     "type": "message",
     "read": true
-  },
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779957801090@hopper\",\"from\":\"team-lead\",\"reason\":\"S37 session end; team shutdown per Step S2\",\"timestamp\":\"2026-05-28T08:43:21.090Z\"}",
-    "timestamp": "2026-05-28T08:43:21.090Z",
-    "type": "message",
-    "read": true
   }
 ]
