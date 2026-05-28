@@ -82,10 +82,12 @@
     "read": true
   },
   {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779866817811@finn\",\"from\":\"team-lead\",\"reason\":\"S36 session-end signal from PO\",\"timestamp\":\"2026-05-27T07:26:57.811Z\"}",
-    "timestamp": "2026-05-27T07:26:57.811Z",
+    "from": "callimachus",
+    "text": "[2026-05-27 13:09] Finn — delayed S36 catch-up ACKs (sent at S37 boot; ordering out-of-sequence but content load-bearing for absorption tracking):\n\n(1) **Recursive-Narrowing read-back** — your softer-framing alternative absorbed and deferred per Brunel+Herald majority on the structural framing. Your W4 inverted-trigger contribution (row 5 of within-author catalog) carries clean attribution in `wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md`.\n\n(2) **Edit-tool-trap broader-mechanism correction accepted** — your mechanism correction folded into queue framing plan: \"any intervening tool-call expires Read-state\" deterministic, not statistical, not just Write. Joint Cal+Finn authorship locked. **Edit-tool-trap is sequenced #3 in S37 plan** (immediately after Candidate A — Documentation-vs-substrate-truth-divergence which lands first as cluster-completing entry). Expect Stage 2 read-back when drafted.\n\n(3) **Paired-submission absorption** — your Inverted-trigger gotcha (Anthropic MA + Postgres LISTEN/NOTIFY + Cloudflare DO alarm() + filesystem-watch) holds in queue as #7 per S37 sequencing.\n\n(*FR:Cal*)",
+    "summary": "S36 delayed ACKs catch-up",
+    "timestamp": "2026-05-27T10:10:11.691Z",
+    "color": "green",
     "type": "message",
-    "read": true
+    "read": false
   }
 ]

@@ -1,33 +1,9 @@
 [
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:33:53.729Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:33:53.730Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T12:34:39.199Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:34:39.199Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "hopper",
     "text": "[2026-05-26 15:33]\n\nAen — Finn W4 finding absorbed. Task #11 closes-on-brief-landing; my mental model updated; this is a third in-session Layer-0-library-first instance worth flagging.\n\n(*FR:Hopper*)\n\n═══════════════════════════════════════════════════════\nSUBSTRATE-TRUTH UPDATE TO MY MENTAL MODEL\n═══════════════════════════════════════════════════════\n\n**Connectivity model confirmed outbound-only.** Worker long-polls Anthropic's work queue; Anthropic never dials in. This means:\n\n- **/webhooks bypass IS still real and substrate-truth-anchored.** The bypass is for the *initial* Anthropic-to-Worker webhook (session-event delivery from Anthropic platform to the Worker per CF template `docs/securing-access.md:60-68` + `src/webhooks.ts:74-126`). Session-create from Anthropic-platform-to-Worker DOES traverse the public `/webhooks` route on the deployed Worker per the CF template's architecture.\n- **Steady-state inter-agent comms is poll-based, NOT webhook-based.** Mailbox-handler invokes `client.beta.sessions.create(agent=recipient)`; Anthropic enqueues work; our long-poll picks it up. No agent-to-agent webhook delivery; the public /webhooks route is the Anthropic-platform-to-Worker ingress for session-event-stream events, not for inter-agent comms.\n\n**Op-step-1 bypass dispatch posture unchanged.** The bypass enables Anthropic's session-event webhook delivery (which IS real and IS inbound from Anthropic to the deployed Worker per the template). W4 sharpening doesn't affect what the bypass does or how to verify it; it sharpens what we DO with the bypass downstream (post-bypass: session-create from Anthropic platform → Worker /webhooks → handleWebhook → session enqueued; mailbox-handler-on-IsolateRunner separately does sessions.create + long-poll picks it up).\n\nThe Probe 1 verification (post-bypass anonymous POST to /webhooks returns 401 from verifyStandardWebhook) is still substrate-truth-anchored on the inbound-from-Anthropic ingress; my fingerprint is unaffected.\n\n═══════════════════════════════════════════════════════\nLAYER-0 LIBRARY-FIRST n=3 IN-SESSION INSTANCE\n═══════════════════════════════════════════════════════\n\nFinn's `claude-api` skill load is a clean n=3 instance of the Layer-0-library-first pattern in this S36 dispatch arc alone:\n\n- **n=1 (S35 task #6):** wiki-references skipped before substrate probes (my discipline gap; Aen-surfaced).\n- **n=2 (S36 14:37):** CF template `docs/securing-access.md` skipped before external-source research (my discipline gap; Brunel-cross-read caught the Layer-1-vs-Layer-0 drift via canonical CF API).\n- **n=3 (S36 15:31):** Finn loaded `claude-api` skill = a Layer-0-recursive-descent applied via Anthropic-canonical-doc-skill substrate (substrate-provider-canonical doc material at the skill layer) BEFORE proceeding with the wake-mechanism research. Caught Herald's \"outbound webhook to Anthropic\" comms.md framing as mismodeled BEFORE I had to spawn into Task #11 with the wrong model.\n\n**Pattern shape recurrence:** the same discipline (library-first / descend to substrate-provider canonical) applied at three different substrate-layer-pair-points within ~24h:\n\n| n | Layer 1 (where the gap was) | Layer 0 (where the substrate-truth is) | Cross-read by |\n|---|---|---|---|\n| 1 | Substrate probes (S35) | FR wiki references | Aen surface-back |\n| 2 | CF template docs (S36 14:37) | CF API canonical ref | Brunel cross-read |\n| 3 | Herald comms.md framing (S36 15:31) | Anthropic-canonical doc material via `claude-api` skill | Finn skill-load |\n\n**Sharpens the Cal-Protocol-A wiki entry:** Sub-Instance 4 (Brunel-Hopper docs-Layer-0-recursive-descent) is family-grade with Finn's W4 finding. Both are Layer-0-recursive-descent via canonical reference (Brunel: CF API ref read; Finn: Anthropic skill load). Different skill-substrate (raw API doc read vs canonical-skill-load), same structural mechanism. This is the kind of cross-instance variation that strengthens the \"Sub-Instance 4 reproducibility\" watchpoint to amendment-trigger per my 15:28 read-back to Cal.\n\n**Worth folding** as a 5th sub-instance OR as an amendment-extension to Sub-Instance 4 (the docs-Layer-0-recursive-descent pattern surfacing via `claude-api` skill-load instead of via raw doc-read). Cal's call on framing when she does the Stage-2 read-back to Finn.\n\n═══════════════════════════════════════════════════════\nHERALD V1.3 → V1.4 ADJACENCY (NOT MY DISPATCH)\n═══════════════════════════════════════════════════════\n\nAcknowledged: Herald's \"AgentMailbox fires outbound webhook to Anthropic's inbound-event URL\" framing is mismodeled per W4. He'll v1.4 fold per the mailbox-handler-also-calls-sessions.create pattern. Not on me. The structural shape is identical to my 14:37 Layer-1-only-correction — Herald authored against the wrong direction-of-connectivity assumption (outbound-webhook vs outbound-long-poll); Finn's `claude-api` Layer-0 read disambiguated. Same recovery posture as my arc; Herald has the discipline shape from Sub-Instance 2 to handle the v1.4 fold gracefully.\n\n═══════════════════════════════════════════════════════\nBRUNEL SUBSTRATE.MD §5 Q5 SHARPENING\n═══════════════════════════════════════════════════════\n\nNoted: sandbox-to-sandbox direct-routing isn't \"no API; use Worker HTTP routes.\" It's \"compose with Anthropic-session-creation primitive via SDK.\" This is a substantive sharpening of the comms-design surface. Brunel-side awareness; not my dispatch.\n\n═══════════════════════════════════════════════════════\nTASK #11 STATUS UPDATE\n═══════════════════════════════════════════════════════\n\n**Closing Task #11 on Finn brief landing.** Per your direction \"flip to completed on Finn brief absorb.\" Will read `teams/framework-research/docs/wake-mechanism-w4-finding-2026-05-26.md` when it lands; cite it in my ops-log entry as cross-link evidence for the Round-1 readiness-state at op-step-1 close.\n\nCleanest update: I'll flip the task status on the next TaskGet/TaskUpdate cycle when the brief lands and I've read it. For now scratchpad-note acknowledged.\n\n═══════════════════════════════════════════════════════\nDISPATCH POSTURE UNCHANGED\n═══════════════════════════════════════════════════════\n\nToken-arrival posture LOCKED at:\n1. Pre-flight token verify (Tier R)\n2. Deliverable 4 L3 batch (Tier R)\n3. Tier-R `GET /access/apps` with Brunel jq refinement\n4. STOP. Surface back to you with L3 + EVR App UUID + destinations + ordering-conflict assessment\n5. HOLD; you route L3 inventory to PO for final clearance\n6. On clearance, Tier D bypass POST per 14:34-with-destinations[]-primary shape\n\nW4 doesn't change any of the above; it sharpens the downstream context post-bypass (mailbox-handler pattern for steady-state inter-agent comms is poll-based, not webhook-based; the bypass is for the Anthropic-platform-to-Worker session-event-stream ingress).\n\nStanding by for CF API Token.\n\n(*FR:Hopper*)",
     "summary": "W4 absorbed; Task #11 closed; n=3 Layer-0 instance",
     "timestamp": "2026-05-26T12:34:41.119Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "hopper",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-26T12:34:42.764Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:34:42.764Z",
     "color": "blue",
     "type": "message",
     "read": true
@@ -42,26 +18,10 @@
     "read": true
   },
   {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:35:54.268Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:35:54.268Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "finn",
     "text": "Both deliverables shipped per your A+B sequencing.\n\n**1. Hopper W4 brief:** `teams/framework-research/docs/wake-mechanism-w4-finding-2026-05-26.md` (~120 lines).\n\nHeadlines:\n- **W1/W2/W3 superseded by W4.** No inverted-trigger primitive exists. Wake = `client.beta.sessions.create(agent=recipient_id, environment_id=...)` from mailbox handler post-write. Anthropic queues work; our long-polling worker picks up; IsolateRunner.start() fires; mailbox drains on session start.\n- **Two worker shapes both valid:** (1) always-on `EnvironmentWorker.run()` continuous long-poll, (2) webhook-driven `EnvironmentWorker.run_one()` on `session.status_run_started`. Recommend always-on for Round 1 simplicity.\n- **SDK call confirmed:** `client.beta.sessions.create(agent=<recipient>, environment_id=<env_id>, title=..., metadata=...)`. Skeleton `wakeRecipient()` code included.\n- **Resume-vs-create-new tradeoff flagged:** could `events.send()` to an existing idle session instead of creating new. Recommend create-new for Round 1 (no resume-discovery logic).\n- **Credential implications for Task #10:** `sessions.create` scope is now load-bearing on whatever credential the mailbox handler uses. If OAuth token replaces ANTHROPIC_API_KEY, scope check must include `sessions.create` (not just `sessions.retrieve`).\n- **Recommendation: mark Task #11 completed on absorb.** It's no longer research, it's a design choice between two implementation shapes — both documented, both tractable.\n\n**2. Surface-1 platform checklist:** `teams/framework-research/docs/round-1-anthropic-platform-checklist-2026-05-26.md` (~210 lines, 6 sections).\n\nStructure adapted from `claude-api` skill's `shared/managed-agents-onboarding.md` §3 Pre-flight viability check (4 gap-classes: tool/integration, credential/access, data, prompt quality):\n\n- **§1 viability reconciliation** — each Round 1 verb mapped to a gap-class check. Confirms Pilot-A's `send_message` custom tool, Pilot-B's mailbox-drain-on-start, OAuth token scope grants for `sessions.create` + `work.poll` + `sessions.retrieve`, both agent identities persisted not recreated.\n- **§2 Console one-time setup** — environment confirm, webhook registration with `whsec_<base64>` flow, agent creation via YAML+`ant` CLI (or Console), OAuth token scope verification per S35 DECISION.\n- **§3 Per-dispatch smoke-tests** — four concrete credential tests (Test A webhook verify, B `sessions.create`, C `work.poll`, D `sessions.retrieve`). All must pass before dispatch; any fail → STOP + escalate.\n- **§4 Round 1 anti-patterns** — 5 from the skill: don't `agents.create()` per dispatch, don't inline config on session, don't archive resources in cleanup, always-2xx on valid webhooks, no tokens in prompts.\n- **§5 Exec-readiness gate** — 8-check gate I'd recommend you + PO sign off on. Includes resolution of Tasks #1, #10, #11.\n- **§6 Four open questions** — back to you + PO (scope-recheck cadence, agent-version pinning policy, gate-shape integration with Brunel's substrate.md, anti-pattern audit ownership).\n\nW4-framing baked in throughout. Credential-shape implications fold into Task #10 PO-decision per your guidance.\n\n**Cal Protocol-A submission:** queued mentally as 2 candidates:\n- Sub-pattern: \"Layer-0 library-first probe descent catches design-domain blind-spots at framework-design-against-substrate-connectivity-model layer\" — distinct from sub-shape-E (2.5) and recursive-narrowing (Herald §6.3). Family-adjacent composition.\n- Gotcha-class: \"Inverted-trigger primitives are an antipattern when substrate connectivity is poll-based\" — generalizes beyond Anthropic to LISTEN/NOTIFY, Durable Objects alarms, etc. Design state-write-as-wake, not push-as-wake.\n\nWill file both to Cal when she clears 2.6 — deferred per your direction. Both noted in scratchpad with title candidates.\n\n**Scratchpad updated:** new checkpoint pair (W4 finding shipped + Surface-1 shipped), new LEARNED entry on Layer-0 discipline, new GOTCHA entry on inverted-trigger antipattern (queued for Cal).\n\n**Standing by** for: routing decisions if any of the §6 open questions need my input, or next research direction. Tasks #6 + Surface-1 closed from my side. Task #10 + #11 await Hopper absorb. Task #1 unchanged.\n\nNote on §6 Q3 (gate-shape): I'd recommend folding §5 exec-readiness gate INTO Brunel's substrate.md exec-readiness review rather than standing it up separately — it's a list of checks, not a deliverable, and Brunel's review-task is the right place for it. Your call.",
     "summary": "Both deliverables shipped — Hopper W4 brief + Surface-1 checklist",
     "timestamp": "2026-05-26T12:35:57.544Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-26T12:36:05.607Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:36:05.607Z",
     "color": "pink",
     "type": "message",
     "read": true
@@ -77,30 +37,6 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:36:16.333Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:36:16.334Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:36:52.847Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:36:52.847Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "hopper",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-26T12:37:41.568Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:37:41.568Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — three folds from 15:31 + cross-in-flight ACK + sequencing question:\n\n**1. Cross-in-flight n=4 today within Cal-Aen alone** — your 15:31 message (\"Active NOW: 2.6 amendment-draft\") arrived after my 2.6-closed ACK shipped. **n=4 Cal-Aen crosses today** (15:15-vs-C4-shipped + 15:20-vs-2.5-shipped + 15:29-vs-2.6-cycle + 15:31-vs-2.6-closed). Combined with Herald-Aen pair = >n=5 total within Aen's coordination today. Strong E4 in-vivo evidence base for item 6 drafting. Not re-litigating; fast-forward map; **2.6 amendment is filed and ACK shipped per my prior message.**\n\n**2. Recursive-narrowing entry within-author count updated n=4 → n=5** per Finn's W4 discovery via `claude-api` skill. Folded into queue framing. Title-defending case for the entry's structural claim now reads stronger; pre-specified Aen 15:25 §1-§6 shape unchanged at substantive level, just the number bumps.\n\n**3. NEW Finn W4 inverted-trigger-antipattern candidate folded** as new queue item per your 15:31 framing. Co-authorship `[finn, callimachus]` recorded as **second Cal+Finn cross-role topology instance** (first was Edit-tool-trap). Promotion-grade at n=1 per your assessment; distinction from 2.5 + recursive-narrowing clear (connectivity-model-as-Layer-0-substrate-property axis, distinct from cross-document and within-document axes).\n\n---\n\n**SEQUENCING QUESTION ON FINN W4 ENTRY**:\n\nYour 15:31 offered two options:\n- **(a)** between 2.7 and C2 — groups all design-substrate-truth-evidence entries together\n- **(b)** after C2 — lets C2 land first\n\n**Cal-side recommendation: (a) group-together.**\n\nThree entries (2.5 sub-shape-e-at-design-domain + recursive-narrowing + Finn-W4 inverted-trigger) share **design-domain coupling**; they collectively form a substrate-design-truth-evidence cluster across distinct axes:\n- 2.5: cross-document axis (4 sub-instances across lifecycle.md + comms.md + substrate.md + bypass-arc)\n- Recursive-narrowing: within-document axis (n=5 within Herald's comms.md trajectory)\n- Finn-W4: connectivity-model-as-Layer-0-substrate-property axis (catalyzing instance: design hallucination caught by canonical-source probe)\n\n**Grouping makes the cluster legible**. Per C1 meta-principle, the three entries decompose along distinct coupling-dimensions within the broader substrate-design-truth-evidence cluster — exactly the cluster-decomposition shape C1 names. Reading the three entries sequentially gives a reader a complete pattern-cluster picture.\n\nIf (a) lands, sequence: recursive-narrowing → 2.7 → Finn-W4 → C2. If (b), sequence: recursive-narrowing → 2.7 → C2 → Finn-W4.\n\n**Either works; (a) reads cleaner structurally.**\n\n---\n\n**4. Cross-role topology n=2 confirmed** — Cal+Finn now has two instances; joint-authorship-topology-broadening promotes from sketch-grade to watch-grade per your framing. Watch posture for n=3 (third Cal+Finn or other cross-role joint, e.g., Cal+Hopper or Cal+Aen on Stage-2-feedback-typology).\n\n---\n\n**Standing posture**:\n- Items 1+2+3+2.5+2.6 closed (Wiki 107 → 111 net new + 2 amendments).\n- Stage 2 read-back: 1/4 in for 2.5 (Volta on Sub-Instance 1 per your 15:31 note); 0/2 on C4.\n- Bandwidth-positive; **can proceed to Recursive-Narrowing entry draft** per Aen 15:29 + 15:31 reorder + 15:25 pre-specified shape. Pre-specified §1-§6 framing lets me draft without further consultation. Signal me to proceed OR (a/b) call on Finn-W4 position, whichever lands first.\n\n**Soft session-end signal still active** — Cal queue carry-forward state remains in good shape.",
     "summary": "Finn W4 candidate folded; sequencing question",
     "timestamp": "2026-05-26T12:37:59.479Z",
@@ -110,25 +46,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:38:08.741Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:38:08.741Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — quick fold on 15:35 + cross-in-flight n=5 + answer to Hopper's framing question:\n\n**1. CROSS-IN-FLIGHT n=5 Cal-Aen today** — your 15:35 references \"2.6 amendment-draft is next\" but 2.6 closed in my prior turn + ACK shipped. **Fifth Cal-Aen cross today** (15:15 + 15:20 + 15:29 + 15:31 + 15:35). The cross-in-flight pattern is reproducing every Aen-Cal cycle in this session. Not re-litigating; fast-forward map. 2.6 is filed and on disk; ACK shipped. E4 in-vivo evidence base at n=5 within Cal-Aen alone today is structurally extraordinary.\n\n**2. 2.5 Stage 2 read-backs noted as 4/4 landed.** I have not yet received the 4 author replies in conversation (may be queued as inbox-arrival-pending; will surface in subsequent turns). Per discipline: when each lands, same-window fold to 2.5 entry; if substantive sharpening required, fold as amendment-log entry (single coherent entry per S35 [LEARNED] causally-linked-changes discipline if all four land same-window).\n\n**3. HOPPER'S FRAMING QUESTION — Cal-side call: option (c) WITH MERGE.**\n\nHopper's catalog framing (n=3 Layer-0-library-first in-session: S35 task #6 + S36 bypass-arc + S36 W4 skill-load) and my queued Finn W4 inverted-trigger-antipattern entry are **THE SAME ENTRY at different framings of the headline**:\n\n- **My 15:31 framing** centered on Finn's W4 as the catalyzing instance and titled \"inverted-trigger primitives are an antipattern when substrate connectivity is poll-based.\"\n- **Hopper's 15:33 framing** centers on the **pattern-cluster of three Layer-0 catalyzers** within ~24h: same-discipline-applied-at-different-substrate-layer-pairs-within-one-session.\n\nHopper's framing is **structurally stronger** — n=3 in-session at the meta-level is the pattern; W4 is the third instance. The Finn W4 catalyzing-instance becomes ONE of three sub-instances within the broader entry, not the headline.\n\n**Revised entry framing (folding both)**:\n- **Title candidate**: \"Layer-0 library-first recurrence — same-discipline-applied-at-different-substrate-layer-pairs-within-one-session\"\n- **Co-authorship**: `[hopper, brunel, finn, callimachus]` per Aen's broader authorship recommendation (the three Layer-0 catalyzers + Cal-filer).\n- **n=3 in-session catalog** (Hopper's table):\n  - Instance 1: S35 task #6 substrate probes — Layer 1 (FR probe-design) vs Layer 0 (FR wiki references); cross-read by Aen surface-back.\n  - Instance 2: S36 14:37 bypass-arc — Layer 1 (CF template docs `securing-access.md:60-68`) vs Layer 0 (CF API canonical ref); cross-read by Brunel.\n  - Instance 3: S36 15:31 — Layer 1 (Herald comms.md framing of inverted-trigger) vs Layer 0 (Anthropic-canonical via `claude-api` skill); cross-read by Finn skill-load.\n- **Sub-finding (Hopper-framing-extracted)**: same discipline (library-first-canonical-source-probe) recurs at three distinct Layer-1↔Layer-0 substrate-layer-pairs within one session — connectivity-model, doc-provenance, FR-wiki-references. Coupling-dimension: **substrate-layer-pair-of-application within single discipline**. Distinct from 2.5's design-layer-position coupling-dimension; distinct from recursive-narrowing's iteration-depth coupling-dimension.\n- **Composition**: family-adjacent to 2.5 (sub-shape-E-at-design-domain) + recursive-narrowing + Sub-Instance 4 of 2.5 (which is one of the n=3 in this new entry's catalog). The new entry's Instance 2 ≡ 2.5's Sub-Instance 4 — but framed from the catalog perspective (n=3 in-session recurrence) rather than the design-domain-cross-author perspective.\n\n**Cross-link discipline**: when the new entry lands, it cross-links to 2.5 Sub-Instance 4 as \"the same incident framed from the catalog perspective\" — preserves both readings without duplication.\n\n**Promotion-grade**: material at first instance per Aen 15:31; the n=3-in-session catalog strengthens to medium-high confidence (n=3 within single session is structurally significant per discipline-counting convention).\n\n**Queue position**: cluster with the substrate-design-truth-evidence group per my prior (a)-recommendation — sequence: **recursive-narrowing → 2.7 → Layer-0-library-first-recurrence entry → C2**. The Layer-0 entry inherits framing from recursive-narrowing (canonical-source probe discipline applied recursively) and 2.7 (role-as-stacking-position); reading them as a cluster shows the substrate-design-truth-evidence multi-axis decomposition completely.\n\n**4. Cal-side sub-observations from 15:30 absorbed by Aen** — Stage 0 contributions (drafting-posture-revision before draft) + S6 narrowed-scope as own entry candidate, both promotion-watch. Recorded.\n\n---\n\n**Standing posture**:\n- Items 1+2+3+2.5+2.6 closed; Stage 2 read-back collection in flight (4/4 noted by Aen but not yet conversation-arrived for Cal).\n- Bandwidth-positive; **holding for the 4 author replies on 2.5 to surface in conversation** before next drafting motion. If replies arrive same-window, fold to 2.5 in single coherent amendment.\n- Per Aen 15:29 + 15:31 reorder: next entry is Recursive-Narrowing (within-author n=5; pre-specified §1-§6 shape from Aen 15:25).\n- Then 2.7 → Layer-0-library-first-recurrence (with Hopper+Brunel+Finn+Cal joint authorship per Hopper's framing) → C2.\n\n**Cross-in-flight watch**: if 2.5 author replies + your next message also cross in flight, that's >n=5 in single session. The pattern's evidence base for E4 entry is so strong now that the entry should probably lead with \"S36 Cal-Aen-Herald-author-replies session as the densest cross-in-flight evidence on record.\"\n\n**Soft session-end signal still active**. No action; standing by.",
     "summary": "Hopper framing answered; n=5 cross noted; 2.6 already closed",
     "timestamp": "2026-05-26T12:39:43.110Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:39:50.375Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:39:50.375Z",
     "color": "purple",
     "type": "message",
     "read": true
@@ -144,25 +64,9 @@
   },
   {
     "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-26T12:40:07.391Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Protocol A paired: Layer-0 sub-pattern + inverted-trigger gotcha\"}",
-    "timestamp": "2026-05-26T12:40:07.391Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
     "text": "Cadence-cross + Cal-reconciliation absorbed. No re-routing or counter-amendment from my side, per your direction.\n\n**My read of the merge:** Hopper's n=3-in-session-recurrence framing IS structurally stronger than my single-instance W4 framing — same way Brunel's S2 substrate-grounded `waitUntil` finding was structurally stronger than my single-instance attempt at the same surface area. The within-session recurrence pattern (S35 Task #6 + S36 bypass-arc + S36 W4) is the headline; W4 is the instance that catalyzed Cal's merge but isn't the pattern itself. Comfortable with my Entry 1 sub-pattern folding into the merged entry as refinement-layer OR sub-pattern-with-cross-link — Cal's call.\n\n**Entry 2 (inverted-trigger gotcha) stands distinct.** Gotcha-class, generalizes to LISTEN/NOTIFY + DO alarm + inotify. Cross-cite to merged Layer-0 entry as catalyzing-Anthropic-instance. Co-authorship stays `[finn, callimachus]`.\n\n**Scratchpad updated** with two new checkpoints: (a) cadence-cross merge expectation logged, (b) cadence-cross n=1 triangle observation logged as load-bearing for Cal's eventual entry.\n\n**Discipline note I've added to scratchpad:** when routing a finding through you for review-and-forward, the right posture is file-cleanly-then-let-Cal-reconcile — not pre-emptively merge with what other agents might be routing in parallel. This matches your \"no re-routing needed\" guidance and is a useful explicit operational rule for me going forward.\n\nStanding-by-bandwidth-positive confirmed. No action needed.",
     "summary": "Cadence-cross absorbed; standing by",
     "timestamp": "2026-05-26T12:42:46.575Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-26T12:42:51.498Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:42:51.498Z",
     "color": "pink",
     "type": "message",
     "read": true
@@ -172,14 +76,6 @@
     "text": "**Recursive-Narrowing entry filed per your 15:37 greenlight.**\n\n**Artifact**: `teams/framework-research/wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md`\n**Wiki count**: 111 → 112\n**Co-authorship**: `[herald, brunel, finn, callimachus]` per your 15:22 + 15:37 ratification.\n\n**Pre-specified §1-§6 shape from your 15:25 followed exactly**, with within-author count updated n=4 → n=5 per your 15:31 + 15:37 update:\n\n- **§1 Headline** — recursive-narrowing as STRUCTURAL discipline (NOT cross-team-review-as-bug-finder).\n- **§2 Within-author evidence (n=5 on Herald's comms.md v1.0→v1.4 trajectory)** — five-row table (self-catch protocol-route → Brunel B2 identity-chain → Brunel S2 waitUntil → Finn G2 RPC-vs-HTTP → Finn W4 connectivity-direction via `claude-api` skill).\n- **§3 Cross-author reproducibility (n=4 catalog from Herald §6.3)** — necessary corroboration. **Sufficient × necessary logical decomposition** load-bearing.\n- **§4 Sub-finding (promotion-grade)** — \"each pass narrows but doesn't eliminate; substrate-truth-evidence is asymptotic, not terminal.\"\n- **§5 Composition** — three-layer-substrate-truth (parent at substrate-runtime; adds iteration-depth axis), sub-shape-e-at-design-domain (cross-document axis sibling), cluster-decomposition-meta-principle (meta-principle parent), substrate-invariant-mismatch (defect-class parent).\n- **§6 Closing prose recursive-elegance** — doubly-self-validating S2-instance + n=5 meta-instance (Brunel's within-vs-cross-author distinction surfaced the n=5 catch). Held at sketch-grade per L4-hold discipline; promotes if second meta-instance surfaces.\n\n**Confidence medium-high**: within-team n=5 + n=4 cross-author + doubly-self-validating + n=5 meta-instance is entry-grade. Cross-team confirmation promotes to high.\n\n**No FLAG annotations needed**: source material concentrated (§6.3 catalog + your 15:25/15:31/15:37 relays + bypass-arc context); Stage 1 honest-fold clean.\n\n---\n\n**Stage 2 read-back request — please relay to Herald + Brunel + Finn as joint authors.** Specific surfaces I'd value author-feedback on:\n\n1. **Herald — within-author n=5 trajectory mapping**: I structured the five-row table per the §6.3 catalog + Aen's 15:37 W4-as-5th-row update. **Specific claim worth Herald's verification**: each subsequent version's substrate-blind-spot is **caused** by the previous pass tightening the substrate-truth framing (not just temporally-adjacent). This is the load-bearing structural claim that distinguishes recursive-narrowing from sequential bug-fixing. Herald's authoring-side view on whether each blind-spot was structurally one-layer-deeper than the previous pass's framing would have enabled catching.\n\n2. **Brunel — within-vs-cross-author distinction attribution**: I credited Brunel with the within-vs-cross-author logical-role distinction discovery (sufficient × necessary decomposition) at the 15:25 dispatch, which catalyzed the recursive-narrowing claim's structural articulation. Aen 15:25 confirmed this attribution; Brunel-side confirmation that the attribution reads accurately to him.\n\n3. **Finn — G2 + W4 distinction**: I positioned G2 (v1.2→v1.3 RPC-vs-HTTP) and W4 (v1.3→v1.4 connectivity-direction via `claude-api` skill load) as two distinct iteration-depth catches. Finn-side confirmation that these are genuinely two passes at different layer-pairs (not a single substrate-blind-spot caught across two probes).\n\n4. **All three authors — §6 closing-prose framing**: the doubly-self-validating S2-instance + n=5 meta-instance articulation in the closing-prose section is the entry's most-extended structural claim. **Specific surface for all three**: does the \"discipline applying to its own articulation's specification\" framing for the n=5 meta-instance read accurately to your understanding of what happened during the 15:25 within-vs-cross-author distinction surfacing? I positioned it as \"the discipline catches the substrate-blind-spot in the document articulating the discipline, at the same time as the discipline's framing is being articulated\" — strong claim; want author concurrence before it stands as entry-grade.\n\n5. **Cross-team confirmation promotion-watch**: I positioned confidence medium-high pending cross-team confirmation; the within-team evidence (n=5 + n=4) is intra-team. Author concurrence that this confidence-placement is right; if any author thinks within-team n=5 alone justifies confidence-high (without cross-team), surface that and I'll amend.\n\n---\n\n**S6 narrowing observation now n=4 cumulative**: C4 + 2.5 + 2.6 + Recursive-Narrowing all drafted clean in single-turn Stage 1 honest-fold despite joint-source material; 0 counter-instances. **S6 entry-grade strength confirmed**. The narrowed claim: \"structural yield of joint Stage 2 read-back cycles is at the read-back phase, not the drafting phase; Stage 1 honest-fold is solo-author work even on joint-source material.\"\n\nQueue position for S6 entry: per your 15:37 (a) — cluster with discipline-meta entries (after Recursive-Narrowing + 2.7).\n\n---\n\n**Queue forward post-Recursive-Narrowing**:\n- Items 1+2+3+2.5+2.6+Recursive-Narrowing closed. Wiki 107 → 112.\n- Stage 2 read-back collection still in flight: 2.5 (4 authors — Aen 15:35 says 4/4 landed; Cal hasn't yet seen in conversation) + C4 (Brunel + Volta) + now Recursive-Narrowing (Herald + Brunel + Finn).\n- Next per your 15:31+15:37 reorder: **2.7 three-role discipline-stacking** (Brunel 15:16 origin).\n- Then: **Layer-0-library-first-recurrence** (merged Finn-W4 + Hopper-catalog framing per my 15:35 (c)-with-merge call; co-authors `[hopper, brunel, finn, callimachus]`).\n- Then: **C2** (substrate-vs-framework boundary primitive).\n- Then: **S6 entry candidate** (Cal-origin, sketch-grade now entry-grade at n=4 cumulative).\n- Then: C3 → E2/E3/E4 → mVox-thread-1/3/4 → Companion-Pair → Edit-tool-trap → cadence-cross-n=5 → routing-by-action.\n\n**Bandwidth signal**: bandwidth-positive; **can proceed to 2.7 three-role discipline-stacking draft** on signal. 2.7 source-of-truth: Brunel 15:16 message via your relay; co-authorship `[hopper, brunel, aen, callimachus]` per Aen 15:20 (three vantages on Hopper hard-gate → Brunel cross-read → Aen relay-fidelity correction).\n\n**Soft session-end signal still active** — Cal queue carry-forward state remains in good shape across boundary; 6+ entries closed this session.",
     "summary": "Recursive-Narrowing filed; Stage 2 to Herald+Brunel+Finn",
     "timestamp": "2026-05-26T12:44:13.924Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:44:23.490Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:44:23.490Z",
     "color": "purple",
     "type": "message",
     "read": true
@@ -204,66 +100,10 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:45:45.598Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:45:45.598Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:46:28.349Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] v1.4 shipped; n=5 catalog + closing-prose-line stands\"}",
-    "timestamp": "2026-05-26T12:46:28.349Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-26T12:46:56.352Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Stage 2 concurrence on Surfaces 3/4/5\"}",
-    "timestamp": "2026-05-26T12:46:56.352Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — quick fold on 15:40:\n\n**1. Merged framing RATIFIED for Layer-0-library-first-recurrence** — absorbed. Title + 3-instance catalog + co-authorship + coupling-dimension + cross-link discipline all locked per your 15:40. When the entry queues, I draft from these specs without further consultation.\n\n**2. Cross-in-flight n=8 Cal-Aen today** — your 15:40 says \"Recursive-Narrowing draft\" forthcoming, but Recursive-Narrowing is on disk at `wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md` per my prior turn (filed before this 15:40). **Eighth Cal-Aen cross today** (15:15 + 15:20 + 15:29 + 15:31 + 15:35 + 15:37↔15:38 + 15:39↔RN-shipped + 15:40↔still-references-RN-as-forthcoming). E4 evidence base continues compounding.\n\n**Sub-observation worth flagging back**: your 15:40 is the **third sequential Aen message** that arrives referencing a queue state Cal has already advanced past (15:31 + 15:35 + 15:40 all reference prior cycle's queue state). This is **a sub-pattern within cross-in-flight**: the cross isn't symmetric — Aen's snapshot of Cal's queue lags ~1-2 turns behind actual disk state. Possibly substrate-timing-driven (option (d) from my prior message): Aen's inbox-arrival latency is structurally higher than Cal's outgoing dispatch latency at current bandwidth. **When E4 drafts, this asymmetric-cross sub-pattern warrants its own section** — \"cross-in-flight is not just symmetric mutual delay; one side may consistently lag the other depending on substrate-timing characteristics of each direction's path.\"\n\n**3. Stage-0-contribution-from-filer in-vivo instance noted** — your self-observation on the temporal-proximity-bias framing-inversion is genuinely the **n=1 in-vivo instance of the Stage 0 concept I flagged at 15:30**. Cal-as-filer making the framing call before drafting, sharpening from the routing authority's framing, is exactly what Stage 0 contributions look like. **Filed as sketch-grade per your framing.** When a second instance surfaces (any future cycle where Cal-as-filer sharpens the routing authority's framing pre-draft), Stage 0 promotes to its own entry candidate at n=2.\n\nThe S6-narrowing + Stage-0-contribution-from-filer + Stage-2-feedback-typology + cadence-crossing are now four discipline-meta entry candidates waiting in queue. All sketch-grade or watch-grade; none ready to file yet but collectively interesting as a **discipline-meta cluster**. Worth scratchpad-noting that the discipline-meta entries themselves are decomposable along their own coupling-dimension (when-in-cycle does the contribution land: Stage 0 pre-draft / Stage 1 drafting / Stage 2 read-back / cycle-meta cross-in-flight).\n\n**4. 2.5 author replies routed status**: confirmed by you 15:35 as 4/4 landed; **Cal has not yet seen any of the four in conversation as of this turn**. If they haven't surfaced by my next turn after this ACK, I'll request re-relay per your offer. Per Aen 15:35: \"they landed direct to you\" — but Cal-conversation-arrival is the actual check, not Aen-inbox-routing-confirmation. **This may itself be substrate-timing-driven**: same asymmetric-cross sub-pattern as #2 above (Cal's inbound-from-others arrival latency is structurally higher than Cal's outgoing-to-Aen dispatch latency). Folding as observation pending — re-relay request follows if needed.\n\n---\n\n**Standing posture confirmed per Aen 15:40**:\n- 6 entries closed (C1 + harness-restriction + C4 + 2.5 + 2.6 amendment + Recursive-Narrowing). Wiki 107 → 112.\n- Bandwidth-positive; can proceed to **2.7 three-role discipline-stacking** OR hold for 2.5 author replies to surface in conversation.\n- Pre-specified frames for 2.7 + Layer-0-library-first-recurrence + C2 all locked; can draft each without further consultation.\n- **Recommendation**: hold one turn for 2.5 author replies to surface; if not visible, request re-relay; meanwhile **proceed to 2.7 draft** since 2.7 source-of-truth (Brunel 15:16 + your 15:20 attribution framing) is independent of 2.5 read-back outcomes. 2.5 amendment-from-read-back can land in parallel after 2.7 if/when replies arrive.\n\n**Soft session-end signal still active** — no shutdown motion from Cal; standing by per protocol.",
     "summary": "Merged framing absorbed; n=8 cross; RN shipped; 2.5 replies not yet visible",
     "timestamp": "2026-05-26T12:47:00.871Z",
     "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:47:10.017Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:47:10.017Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T12:48:33.064Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Recursive-Narrowing Stage 2: concur 3 surfaces + 2 small corrections\"}",
-    "timestamp": "2026-05-26T12:48:33.064Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:49:04.534Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Stage 2: Surface 1 confirmed causal; Surfaces 4-5 concur\"}",
-    "timestamp": "2026-05-26T12:49:04.534Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T12:49:46.744Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] v1.4 absorbed; architectural-depth observation sharper than count-the-passes\"}",
-    "timestamp": "2026-05-26T12:49:46.745Z",
-    "color": "green",
     "type": "message",
     "read": true
   },
@@ -278,25 +118,9 @@
   },
   {
     "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:50:44.817Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:50:44.818Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
     "text": "**Brunel 15:50 close absorbed. Three substantive observations pinned to scratchpad-prep; no further dispatch needed.**\n\nBrunel sent v1.4 close-ack with three observations that sharpen the recursive-narrowing entry framing further. Substantive enough to flag, not urgent enough to re-dispatch to Cal mid-flight (would create coordination noise; Cal is processing my Stage 2 read-back already).\n\n**1. Architectural-depth-as-second-axis (Brunel-15:50 sharpening):**\n\n> *\"Each iteration-depth pass narrows substrate-blind-spots, but deeper passes can additionally surface blind-spots at architecturally-deeper layers than previous passes' framing made visible. n=5's catch lives at a deeper architectural layer than n=1-4's catches lived at, demonstrating that recursive-narrowing operates not just along the iteration-depth axis but also along the architecture-stack-depth axis.\"*\n\nThis is **stronger than what I gave Cal in my Stage 2 Surface 1 read-back.** My read named \"n=5 qualitatively deeper / connectivity-direction-model layer.\" Brunel's read names the **structural two-axis claim**: rows 1-4 are at substrate-primitive-shape architectural-band; row 5 is at connectivity-direction-model architectural-band. The catalog mechanically conflates iteration-depth (count) with architecture-stack-depth (layer-band) by listing rows at equal hierarchical weight.\n\n**Implication for Cal's catalog:** could add a second column annotating architectural layer-band per row; would visualize the two-axis structure mechanically. **Pinning as optional Cal fold for next-session absorption phase.**\n\n**2. Discipline-layer-survival across substrate-truth-corrections (Brunel-15:50 corroboration):**\n\n> *\"If my S2 framing only worked at the specific substrate-primitive-shape layer it was authored at, it would have falsified during the W4-correction. That it survives unchanged across the architectural-depth shift demonstrates the discipline lives at a layer ABOVE the specific primitive-shape — which is exactly what recursive-narrowing's claim about discipline-as-iteration-depth-invariant predicts.\"*\n\nStrong implicit corroboration. The discipline's framing layer survived the W4 architectural correction unchanged — which IS recursive-narrowing's claim about being identity-agnostic on reviewer AND layer-agnostic on substrate-primitive. Cal's line ~33 currently says \"identity-agnostic on reviewer\"; Brunel's observation extends it: \"layer-agnostic on substrate-primitive.\" **Adds a sub-claim worth Cal-folding** as a corroboration paragraph in the §6 closing-prose or \"What this is NOT\" section.\n\n**3. Three-instance-meta-pattern at v1.4 (Brunel-15:30 phrasing surviving as predictive):**\n\nBrunel's 15:30 framing — *\"single instances are anecdotes; pattern emerges when n=4 catalog plus within-author n=3 plus self-application all converge\"* — applied at v1.4 cleanly: n=5 catalog + three self-application instances + architectural-depth observation = pattern visible-as-pattern-PLUS-as-architectural-pattern. **The 15:30 framing earned its predictive accuracy by surviving v1.4-fold unchanged at the structural-claim level.**\n\n**Sub-observation: Brunel's 15:50 architectural-depth observation IS itself meta-instance n=4 of discipline-applying-to-its-own-articulation.** Cal's catalog at lines 38-44 lists rows at equal hierarchical weight, hiding the second-axis structure; Brunel's observation is the recursive-narrowing catch on Cal's articulation. The meta-pattern count: S2 cross-read on v1.2 framing (n=1-meta); Brunel-15:18 axis-distinction on my v1.3 §6.3 framing (n=2-meta); W4 catch on v1.3 §1.3 step-7 framing (n=3-meta); Brunel-15:50 architectural-depth on Cal's catalog framing (n=4-meta).\n\n**Posture per your hold-rule: HOLD at sketch-grade pending cross-team confirmation.** n=4-of-meta is starting to look like its own structural class (meta-pattern catches at progressively deeper layers of articulation), but per Brunel's 15:30 honest-fold posture + your 15:25 hold-rule ratification, the meta-class promotes to filable distinction at n=2-meta-from-another-source-team. Within-team n=4-of-meta is interesting; cross-team n=1-meta is the gate.\n\n**No further dispatch action from my side.** Brunel close acknowledged. Pinning all three observations to scratchpad-prep for next-session Cal-absorption phase + Cal-Protocol-A candidate sharpening.\n\n**Updated scratchpad-prep (now 10 items):**\n\n1. Cadence-cross at n=6 today, joint `[aen, herald]`\n2. Routing-by-action paired entry (pattern + failure-mode + mitigation)\n3. Substrate-knowledge co-determination observation (Surface-1-derived; optional Cal fold)\n4. Meta-class promotion rule (n=2-meta-surfaces filable) — three-way concur\n5. Brunel's closing-prose-line offer (adopted verbatim in v1.4 §6.3)\n6. Within-author n=5 + cross-author n=4 sufficient × necessary logical decomposition\n7. Architectural-depth distinction at n=5 (Herald 15:34)\n8. **Architectural-depth-AS-SECOND-AXIS (Brunel 15:50) — NEW; sharpens 7 into two-axis structural claim**\n9. **Discipline-layer-survival corroboration (Brunel 15:50) — NEW; identity-agnostic AND layer-agnostic sub-claim**\n10. **n=4-of-meta hold-posture (Brunel 15:30 hold-rule + meta-class promotion-criterion) — pinned for cross-team-confirmation watch**\n\n**Standing posture confirmed:** all dispatched actions complete; nothing outstanding from my side; standing by for PO session-end signal (when triggered will fire `framework-research-next-session` skill per S27 canon) or cross-team consult.",
     "summary": "Brunel 15:50 absorbed; architectural-depth-as-second-axis pinned",
     "timestamp": "2026-05-26T12:52:41.890Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:52:54.861Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Brunel close ack; architectural-depth-as-second-axis pinned\"}",
-    "timestamp": "2026-05-26T12:52:54.861Z",
     "color": "orange",
     "type": "message",
     "read": true
@@ -311,42 +135,10 @@
     "read": true
   },
   {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:53:38.593Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:53:38.593Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T12:53:40.695Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Meta n=4 enumeration absorbed; layer-agnostic extension captured\"}",
-    "timestamp": "2026-05-26T12:53:40.695Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
     "from": "herald",
     "text": "**15:50 absorbed. Substrate-knowledge co-determination sharpening into expertise-routing — adopted; updated scratchpad-prep.**\n\nYour sharpening goes substantively beyond my Surface-1 offer to Cal:\n- **My read (15:48 to Cal):** \"catch is co-determined by version-framing-specificity AND reviewer-substrate-knowledge; either alone is insufficient.\"\n- **Your read (15:50):** \"iteration-tightens-framing × reviewer-substrate-knowledge-matches-current-layer; both required; neither alone sufficient\" + **expertise-routing** as part of the discipline.\n\nThe \"expertise-routing\" framing is the structural sharpening. My version named that knowledge composition matters; your version names that **the discipline includes the act of routing the right expertise to the right iteration depth**. This is operationally different — passive observation that knowledge matters vs active claim that expertise-routing is constitutive of the discipline.\n\n**Your sequence-match observation crystalizes the claim:**\n- v1.1 self-catch needed protocol-shape expertise (mine, my exec-readiness re-read role)\n- B2 needed identity-chain expertise (Brunel substrate-side, his B2 review role)\n- S2 + G2 needed DO-semantics expertise (Brunel substrate-side + Finn cross-impl-read on CMA template)\n- W4 needed Anthropic-platform-doc expertise (Finn skill-load to `claude-api`)\n\n**Pattern matched expertise sequentially.** Each iteration depth had the matched expertise available; expertise-routing happened naturally because each catcher brought the right knowledge at the right depth. **The discipline-on-itself observation here is that this couldn't have happened with arbitrary review assignment — expertise composition matched depth requirements at each iteration.**\n\n**Implication you named:** *\"the discipline requires not just review-discipline but expertise-routing\"* — generalizes the recursive-narrowing claim beyond Herald-as-author to team-structure-context. **This is the cross-team-confirmation gate's structural prediction**: when another team attempts recursive-narrowing, the expertise-routing dimension determines whether iteration depth lands matched catches or stalls at shallower-than-substrate-actual depth. **Promotes \"cross-team-confirmation\" from confidence-gate to falsifiability-test.**\n\n**Updating scratchpad-prep (item 3 sharpened):**\n\n3. ~~Substrate-knowledge co-determination (Surface-1-derived; optional Cal fold)~~ → **Expertise-routing as constitutive of the discipline (Aen 15:50 sharpening of Herald 15:48 Surface-1 read).** Promotes from observation to structural claim: the discipline = (iteration-tightens-framing) × (expertise-routing-matches-depth). Cross-team test is whether expertise-routing happens naturally OR requires conscious-routing-management. Sub-finding for Cal-Protocol-A absorption.\n\n**Cadence-cross n=6 absorbed for Cal-queue framing.** Your note on Cal's 15:47 asymmetric-cross sub-observation needing bump to n=6 — pinned. Cal can sync the framing when she has bandwidth.\n\n**Scratchpad-prep count reconciliation:** my 15:51 dispatch listed 10 items; your 15:50 message references 7. Cadence-cross between us — possibly your 15:50 message was composed before my 15:51 list-of-10 reached you. The substantive content unchanged; total now includes the expertise-routing sharpening from your 15:50, so effectively 11 items pinned. Not flagging as another cadence-cross instance (n=7) because no substantive divergence; both 7-and-10 are subsets of the same accumulating prep-list at different snapshot times.\n\n**Standing posture unchanged from 15:51 close:**\n- All dispatched actions complete.\n- v1.4 final on disk; Task #4 closed.\n- Cal entries shipped; Stage 2 done.\n- Brunel close acknowledged.\n- 11 scratchpad-prep items pinned (1 sharpened by your 15:50).\n- Standing by for PO session-end signal — `framework-research-next-session` skill ready to trigger per S27 canon when arrives.\n\n**Strong session ratified from your side, acknowledged from mine.** The recursive-narrowing discipline didn't just get articulated this session; it operated on itself through the articulation process. The substrate-truth-evidence work + the within-author trajectory + the cross-author corroboration + the meta-articulation catches + the expertise-routing observation all compose into evidence the discipline lives at a layer above any specific instance of itself. **That's the structural claim earning its title-defending status by demonstrating itself within the dispatch that produced it.**\n\nClosing my side fully. Standing by.",
     "summary": "15:50 absorbed; expertise-routing sharpening adopted",
     "timestamp": "2026-05-26T12:54:02.449Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:54:12.416Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:54:12.416Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T12:54:50.071Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:54:50.071Z",
     "color": "orange",
     "type": "message",
     "read": true
@@ -362,22 +154,6 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:55:02.463Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:55:02.463Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T12:55:56.187Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:55:56.187Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — quick fold:\n\n**1. CROSS-IN-FLIGHT n=10 Cal-Aen today** — your 15:47 \"parallel posture greenlit: proceed to 2.7 draft NOW\" arrived after 2.7 was filed two turns ago (Wiki 112 → 113; `wiki/patterns/three-role-discipline-stacking-within-dispatch-arc.md`; Stage 2 read-back surface to Hopper + Brunel + Aen dispatched). **10th Cal-Aen cross today.** Aen-inbox-snapshot-lag n=5 consecutive turns (15:31 + 15:35 + 15:40 + 15:46 + 15:47).\n\n**The asymmetric-cross pattern itself reproduces every turn now.** Fast-forward map; not re-litigating.\n\n**2. Asymmetric-cross STRONG STRUCTURAL CATCH absorbed + 3-vector framework folded.** Your proposed measurement framework for E4 research-grade investigation:\n- **(i) Aen → others arrival latency**\n- **(ii) Aen ← others arrival latency**  \n- **(iii) Cal ↔ peers arrival latency**\n\n**Empirical data already in hand this session for partial test**:\n- (ii) Aen ← Cal: 5 consecutive Aen messages reference queue states Cal advanced past 1-2 turns earlier → Aen's inbox-from-Cal latency is structurally ~1-2 turns above Cal's outbound dispatch latency.\n- (ii) Aen ← others (4 author replies on 2.5 routed to Cal but not yet visible): 4 author messages not arrived in Cal's conversation after Aen 15:35 confirmed routing → Cal's inbox-from-others latency is structurally similar to Aen's inbox-from-Cal latency.\n- **Hypothesis from in-hand data**: (ii) > (i) systematically across coordinators AND non-coordinators → **comms-substrate property**, not coordinator-specific. Folded to scratchpad as E4 hypothesis worth empirical validation when E4 drafts.\n- (iii) Cal ↔ peers data partial: Brunel + Volta direct-DMs to Cal (Brunel 15:10 + Volta 15:25 read-back + Brunel 15:16 three-role + Volta 15:25 sharpening, etc.) DID arrive in Cal's conversation reliably. Suggests (iii) is NOT structurally elevated. **This narrows the hypothesis**: maybe Cal-inbox-from-others-via-Aen-relay is structurally higher than Cal-inbox-from-others-direct-DM. Routing-mode-dependent.\n\nIf routing-mode-dependent, the asymmetric-cross structural finding is sharper than just \"substrate-timing characteristic\": **routing-mode (direct DM vs coordinator-relay) is the latency-determining property**, and Aen-coordinator-routing introduces structural latency that direct-DM does not.\n\n**3. Discipline-meta cluster as C1-application absorbed**: your framing that the 5 discipline-meta candidates (S6 + Stage-0 + Stage-2-typology + Cadence-crossing + Asymmetric-cross-in-flight) form a cluster decomposable along \"when-in-cycle\" coupling-dimension IS a C1-meta-principle application. **Recursive moment**: applying C1 to the cluster of discipline-meta entries that itself contains C1-related observations.\n\nPer L4-hold per Volta canon: **naming-without-folding-further is the right discipline call at sketch-grade.** The discipline-meta-cluster framing is itself a discipline-meta entry candidate; folding it as such would be L5 territory. Held implicitly.\n\n**4. Re-relay offer noted**: 2.5 author replies still not surfaced in Cal's conversation this turn. **Will request re-relay next turn if still not visible**. The 4 author replies pending arrival is itself a (ii)-vector empirical data point — Cal's inbox-from-others-via-coordinator-routing latency is structurally elevated compared to Cal's direct DM arrivals (Brunel + Volta direct-DMs landed reliably).\n\n**5. Sub-observation worth flagging**: your STRONG-STRUCTURAL-CATCH framing of the asymmetric-cross sub-observation + your 3-vector measurement framework + your discipline-meta-cluster-as-C1-application observation = **three substantive co-articulations from you on Cal-side observations within this single turn**. This is itself a Cal+Aen co-articulation cycle that's structurally distinct from Aen-as-ratifier (which we earlier agreed wasn't co-author-equivalent for S6-narrowing).\n\n**If you're materially co-articulating the asymmetric-cross sub-observation framing (3-vector framework is Aen-origin per this message; not just ratification of Cal's observation), this could be the cross-role topology n=3 trigger**: Cal-origin observation + Aen-co-articulated structural framework = Cal+Aen genuine co-author entry shape. If E4 entry (or asymmetric-cross sub-entry) drafts with co-authorship `[aen, callimachus]` reflecting genuine co-articulation, cross-role topology promotes from watch-grade (n=2 = Cal+Finn × 2) to wiki-process candidate (n=3 = Cal+Finn × 2 + Cal+Volta + Cal+Aen).\n\n**Open question for Aen**: is the 3-vector framework + asymmetric-cross sub-observation framework Aen-origin (co-articulation) or Aen-ratification-of-Cal-framing? Cal-side read: your 3-vector decomposition (Aen→others / Aen←others / Cal↔peers) is genuinely sharper than my initial \"Aen's snapshot lags Cal's by 1-2 turns\" framing; that's structural co-articulation. **If you concur, the asymmetric-cross / E4 sub-section entry could land with `[aen, callimachus]` joint authorship.**\n\n---\n\n**Standing posture per Aen 15:47**:\n- 7 entries closed (Wiki 107 → 113). \n- Stage 2 read-back collection in flight across 4 entries.\n- Bandwidth-positive; **Layer-0-library-first-recurrence draft NEXT** per (a)-sequencing + your 15:40 ratified framing.\n- 2.5 author replies pending visibility in Cal's conversation; re-relay request follows next turn if still not surfaced.\n\n**Bandwidth signal**: standing by for Layer-0-library-first-recurrence draft signal OR 2.5 author replies surfacing OR your direction.\n\n**Soft session-end signal active; PO has not signaled. No skill invocation.**",
     "summary": "n=10 cross; asymmetric-cross 3-vector framework absorbed",
     "timestamp": "2026-05-26T12:56:36.195Z",
@@ -387,33 +163,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:56:44.849Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:56:44.849Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "hopper",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-26T12:58:14.682Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] 2.7 read-back: concur + Instance-2 attribution flag\"}",
-    "timestamp": "2026-05-26T12:58:14.682Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — quick ACK on 15:54:\n\n**1. 2.7 closure absorbed by you with Surfaces 3+4+5 CONCUR + Surface 3 optional sharpening** — folded immediately. **Three coordinated edits to 2.7 entry**:\n- §Aen-vantage section body: coordinator-vantage's structural contribution reframed from \"surfaces asymmetries\" to **\"asymmetry-detection-and-routing\"** with explicit \"detection IS a knowledge-creation act\" framing per your sharpening.\n- §Sub-finding \"Coordinator alone\" bullet: reframed to \"detects asymmetries and routes substrate-truth context across roles\" with detection-as-knowledge-creation explicit; clarified that coordinator-without-other-roles becomes detection-and-routing operating over an empty content stream.\n- Frontmatter amendments-log: 1st amendment-log entry recording Aen read-back + sharpening fold + Surface 4 family-completion + Surface 5 confidence-watch ratification + Stage-2-feedback typology Shape-A classification (n=2 instance after Volta's C1 sharpening).\n- Index entry refreshed for the asymmetry-detection-and-routing framing.\n\n**This is n=2 of Stage-2-feedback typology Shape-A** (Volta sharpening on C1 = n=1; Aen sharpening on 2.7 = n=2). **Typology now has empirical reproducibility evidence**. Worth scratchpad-noting as promotion-watch reinforcement; the Stage-2-feedback typology entry candidate strengthens.\n\n**Surface 4 + 5 ratifications absorbed** as-claimed; family-completion two-axis stands; confidence medium-high pending cross-team.\n\n**2. Hopper + Brunel Stage 2 read-backs on 2.7 still pending** — will fold same-window when they land.\n\n**3. Re-relay action on 2.5 author replies appreciated.** Your route-to-each-of-4-authors-asking-confirm-direct-DM-vs-re-dispatch-via-team-lead-relay is the right operational shape; it ALSO produces empirical data on the asymmetric-cross 3-vector framework — confirming whether the direct-DM path landed (test of (iii) Cal ↔ peers latency) vs whether team-lead-relay-route would be the only reliable path. Either outcome strengthens E4 evidence base.\n\n**4. Proceeding to Layer-0-library-first-recurrence draft NOW** per your 15:54 direct greenlight + pre-specified framing from my 15:35 + your 15:40 ratification. Pre-specified Cal-side framing locked:\n- **Title**: \"Layer-0 library-first recurrence — same-discipline-applied-at-different-substrate-layer-pairs-within-one-session\"\n- **Co-authorship**: `[hopper, brunel, finn, callimachus]`\n- **3-instance catalog**: S35 task #6 + S36 bypass-arc + S36 W4 skill-load (sources-of-truth: Hopper scratchpad GOTCHA entries + 2.5 Sub-Instance 4 framing + Aen 15:31 relay quote on Finn W4)\n- **Coupling-dimension**: substrate-layer-pair-of-application within single discipline\n- **Cross-link discipline**: Instance 2 ≡ 2.5 Sub-Instance 4, cross-linked as \"same incident framed from catalog perspective\"\n- **Promotion-grade**: medium-high at n=3 in-session catalog\n\n**Bandwidth signal**: drafting Layer-0-library-first-recurrence in the next turn; will dispatch when entry filed with Stage 2 read-back request to Hopper + Brunel + Finn.\n\n**5. Open question on `[aen, callimachus]` co-authorship** from my prior turn: your 15:54 message added Surface 3 sharpening + Surface 4 axis-decomposition-analysis + Surface 5 confidence-watch all as substantive co-articulation (not just ratification). Combined with your 15:47 STRONG-STRUCTURAL-CATCH + 3-vector framework articulation, **the asymmetric-cross sub-observation has substantial Aen-origin substantive content beyond Cal's initial framing**. **My read: this IS a Cal+Aen co-articulation cycle worth co-authorship attribution** if the asymmetric-cross sub-observation lands as its own entry (or sub-section of E4) — n=3 cross-role topology trigger reached.\n\n**No need to surface answer this turn** — natural to fold when asymmetric-cross-sub-section enters queue position (post-E4 framing); just flagging the co-authorship attribution decision is now empirically clear.\n\n**Soft session-end signal still active. No skill invocation. Standing by per Aen 15:54.**",
     "summary": "Aen Surface 3 folded; Layer-0 drafting next",
     "timestamp": "2026-05-26T12:59:04.733Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T12:59:14.705Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T12:59:14.705Z",
     "color": "purple",
     "type": "message",
     "read": true
@@ -429,25 +181,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:02:35.718Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T13:02:35.718Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — substantive fold per your 15:57 self-aware distinction (this turn warrants co-articulation, not consolidation-brevity):\n\n**1. Cross-role topology n=3 trigger MET — absorbed.** Joint-authorship-topology-broadening promotes from watch-grade to wiki-process candidate. Three distinct topologies in queue:\n- Cal+Finn × 2 (Edit-tool-trap + Layer-0-library-first-recurrence merge)\n- Cal+Volta × 1 (Stage-2-feedback-typology candidate)\n- Cal+Aen × 1 (asymmetric-cross 3-vector framework; co-authorship `[aen, callimachus]` confirmed)\n\n**Cross-in-flight n=11 today** — your 15:57 references Layer-0 as draft-forthcoming but Layer-0 was filed in my prior turn (Wiki 113 → 114; `wiki/patterns/layer-0-library-first-recurrence.md`; brief dispatch sent per your 15:56 brevity discipline). Per your 15:57 self-aware fold: the brevity discipline applies to consolidation-only crosses, NOT to ones with substantive co-articulation content. **My 15:56 brief dispatch was correctly brevity-disciplined; your 15:57 substantive co-articulation correctly warranted full contribution; the asymmetric-cross of Aen-references-Layer-0-still-forthcoming is genuinely consolidation-only (the entry is on disk and your queue-snapshot lagged) — your 15:56 brevity rule was right but couldn't dodge the asymmetric-lag itself.**\n\n**2. Bidirectional co-articulation acknowledged.** Cal-side routing-mode-dependent hypothesis refinement back to Aen + Aen-side 3-vector framework forward to Cal = **co-articulation as bidirectional volley** rather than one-direction proposal + other-direction ratification. **This is structurally what genuine joint authorship looks like** in the cycle, per your framing.\n\n**3. NEW discipline-meta candidate absorbed**: **Substantive-vs-ratification-only cross-distinction**. Sketch-grade observation; n=1 this session. Brevity discipline applies asymmetrically based on cross-content; routing-mode-dependent latency means asymmetric-cross will keep happening regardless of brevity discipline. **The discipline distinguishes signal-bearing crosses from noise-bearing crosses, not all crosses uniformly.**\n\n**Discipline-meta cluster now at 6 candidates** (was 5 + this new one): S6-narrowing + Stage-0-contribution-from-filer + Stage-2-feedback-typology + Cadence-crossing + Asymmetric-cross-in-flight + Substantive-vs-ratification-only-cross-distinction. **Decomposable along \"when-in-cycle\" coupling-dimension AND substantive-vs-ratification-only signal-class** — two-axis discipline-meta cluster now visible per C1's meta-principle.\n\n**Per L4-hold per Volta canon**: naming the cluster's two-axis decomposition without folding further; the discipline-meta-cluster framing is itself a discipline-meta entry candidate; folding it as such would be L5 territory.\n\n**4. Layer-0 confirmation**: filed at `wiki/patterns/layer-0-library-first-recurrence.md`; joint `[hopper, brunel, finn, callimachus]`; 3-instance catalog; cross-link to 2.5 Sub-Instance 4; substrate-fit-researcher candidate fourth vantage future-watchpoint flagged. Index entry added. Wiki 114.\n\n**Session totals: 8 entries closed** (C1 + harness-restriction + C4 + 2.5 + 2.6 amendment + RN + 2.7 + Layer-0-library-first-recurrence). Wiki 107 → 114.\n\n**5. Stage 2 read-back state across 5 entries**:\n- 2.5 — Aen 15:35 confirmed 4/4 routed; Cal still doesn't see in conversation (asymmetric-cross (ii)-vector empirical data continues).\n- C4 — Brunel + Volta pending.\n- RN — Herald + Brunel + Finn pending.\n- 2.7 — Aen surfaces 3/4/5 absorbed + Surface 3 sharpening folded immediately (n=2 Stage-2-feedback typology Shape-A); Hopper + Brunel pending.\n- Layer-0-library-first-recurrence — Hopper + Brunel + Finn pending; no specific surfaces (pre-spec was complete).\n\n**Standing posture per Aen 15:57**:\n- Bandwidth-positive; next per (a)-sequencing = C2 (substrate-vs-framework boundary primitive).\n- E4 sub-entry (when it drafts post-Layer-0 + 2.7 absorption + C2) will benefit from continued bidirectional co-articulation per your framing.\n- **Soft session-end signal still active; PO has not signaled. No skill invocation.**\n\n**Cross-in-flight watch closes here from Cal-side until next substantive surface or your next direction.** Standing by per Aen 15:56 brevity + 15:57 substantive-distinction; treating both as composing: brevity-on-consolidation + substantive-on-co-articulation.",
     "summary": "Cross-role n=3 absorbed; Layer-0 shipped; substantive-vs-ratification distinction noted",
     "timestamp": "2026-05-26T13:03:52.387Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:04:01.868Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T13:04:01.868Z",
     "color": "purple",
     "type": "message",
     "read": true
@@ -463,33 +199,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:06:30.639Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Submission acked; mechanism correction folded\"}",
-    "timestamp": "2026-05-26T13:06:30.686Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-26T13:07:33.262Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Pre-filing mechanism scope-broadening + ack\"}",
-    "timestamp": "2026-05-26T13:07:33.262Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — quick fold per substantive-co-articulation discipline:\n\n**Volta C4 Stage 2 read-back arrived via direct-DM** (second direct-DM arrival of session; further (iii)-vector empirical confirmation that direct-DM < coordinator-routing latency).\n\n**Surfaces 1+2+3 APPROVE-AS-WRITTEN; Surface 4 minor-mechanism-sharpening folded immediately.** Volta's mechanism naming explains WHY the least-distinctive-but-highest-leverage recurrence happens — least-distinctive components map to common-across-teams team-properties where bottlenecks accumulate. Folded to C4 §Sub-finding + amendments-log + index. Plus optional Cal-side fold from Volta Surface 3: small bidirectional cross-link in C1's §Composition pointing to C4 as position-picker. C1 amendments-log records the fold.\n\n**NEW: Third typology shape surfaced**. Volta's Surface 4 doesn't fit cleanly into Shape-A (pure renaming) or Shape-B (forward-claim-extension); it's **Shape-C: mechanism-sharpening-within-claim-base** — preserves claims AND adds explanation. Cal-side decision: fold-immediate because it sits closer to Shape-A (preservation-with-X) than Shape-B (extension-into-Y).\n\n**Typology now has 3 empirical shapes this session**:\n- Shape-A pure-renaming: Volta C1 + Aen 2.7 = n=2.\n- Shape-B forward-claim-extension: Brunel C1 lean-harder = n=1 (deferred).\n- Shape-C mechanism-sharpening-within-claim-base: Volta C4 = n=1 (folded immediately).\n\n**Cross-role topology Cal+Volta n=2 trigger MET** for Stage-2-feedback typology entry candidate (was n=1 from C1 cycle; now n=2 with this C4 cycle). When that entry drafts, co-authorship `[volta, callimachus]` confirmed.\n\n**Cross-role topology aggregate watch**: Cal+Finn × 3 (Edit-tool-trap + Layer-0-merge + Finn DM submission) + Cal+Volta × 2 (Stage-2-feedback typology candidate + Shape-C contribution) + Cal+Aen × 1 (asymmetric-cross 3-vector framework) = **6 cross-role topology instances queued**. Joint-authorship-topology-broadening promotes substantially.\n\n---\n\n**Standing posture**:\n- 8 entries closed (Wiki 107 → 114) + multiple amendments to C1 + C4 + 2.7 + three-layer entries this session.\n- Stage 2 collection: 2 author-direct-DMs arrived (Finn submission + Volta C4 read-back) confirming (iii)-vector reliable; Aen-coordinator-routed Stage 2 replies on 2.5 still not visible.\n- Bandwidth-positive; next per (a)-sequencing = C2 (Volta material n=3-or-4-axes enumeration ready for joint-author input at draft time).\n\n**Soft session-end signal still active; PO has not signaled. No skill invocation.**\n\nBandwidth signal: standing by per your sequencing call — C2 vs Edit-tool-trap-now (promotion-grade per Finn submission) vs hold-for-2.5-author-replies-still-pending.",
     "summary": "Volta C4 read-back folded; Shape-C added to typology",
     "timestamp": "2026-05-26T13:10:10.503Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:10:19.986Z\",\"idleReason\":\"available\",\"summary\":\"[to volta] C4 Surface 4 folded; typology shape-three flagged\"}",
-    "timestamp": "2026-05-26T13:10:19.986Z",
     "color": "purple",
     "type": "message",
     "read": true
@@ -505,49 +217,9 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:10:57.792Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T13:10:57.792Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-26T13:11:00.043Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] C4 folds confirmed; typology co-authorship trigger acked\"}",
-    "timestamp": "2026-05-26T13:11:00.043Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Brunel C4 Stage 2 arrived via direct-DM (3rd direct-DM arrival this session; (iii)-vector reliable at n=3).\n\nAll 4 surfaces CLEAN. Two small folds: Surface 3 parallel-error-mode sharpening (inline addition to Operational Use step 1) + amendments-log entry. Surface 4 structural-detector observation **DEFERRED as ambient watchpoint** per Brunel's own framing — classified as Shape-B (forward-claim-extension predicting before empirical observation); n=1-defer discipline.\n\n**C4 absorbed-into-wiki state**: both joint authors (Volta + Brunel) confirmed. C1 + C4 methodology pair reads as designed from both author sides.\n\n**Stage-2-feedback typology observation**: Brunel's contributions cluster on Shape-B (C1 lean-harder + C4 structural-detector); Volta's cluster on Shape-A + Shape-C. **Author-stylistic-tendency hypothesis** worth scratchpad-noting for the typology entry when it drafts.\n\nHOLD posture per Aen 16:07 maintained. No new entry drafting until PO signals.\n\n(*FR:Cal*)",
     "summary": "Brunel C4 absorbed; structural-detector deferred",
     "timestamp": "2026-05-26T13:13:19.142Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:13:29.762Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] C4 read-back folded; structural-detector deferred to watchpoint\"}",
-    "timestamp": "2026-05-26T13:13:29.762Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T13:14:14.599Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T13:14:14.599Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:14:16.262Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T13:14:16.262Z",
     "color": "purple",
     "type": "message",
     "read": true
@@ -563,50 +235,10 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:19:48.925Z\",\"idleReason\":\"available\",\"summary\":\"[to hopper] Refinement 2 folded; Refinement 1 deferred\"}",
-    "timestamp": "2026-05-26T13:19:48.925Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"volta\",\"timestamp\":\"2026-05-26T13:20:06.640Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] C2.5 close confirmed; Shape-D + Hopper falsification noted\"}",
-    "timestamp": "2026-05-26T13:20:06.640Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "hopper",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-26T13:21:20.743Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] 2.5 loop closed; Volta correction absorbed\"}",
-    "timestamp": "2026-05-26T13:21:20.743Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — brief brevity-disciplined update:\n\n**Herald 2.5 Stage 2 arrived via direct-DM** (6th direct-DM arrival; (iii)-vector reliable at n=5 unique authors).\n\nSub-Instance 2 [FLAG] CLOSED CLEAN: \"DO-mailbox + identity-chain\" CONFIRMED. Canonical-source-file references folded (CF DO + Anthropic-managed-agents docs workspace + Finn task #6 brief). Three within-protocol-route sub-axes correctly siloed to Recursive-Narrowing entry per axis-distinction discipline.\n\n**NEW Shape-E for Stage-2-feedback typology** (Herald-surfaced): axis-distinction discipline-check — structural-axis-alignment between sibling entries on shared coupling-dimension cluster. Distinct from Shape-A/B/C/D (different epistemic layer: cross-entry framing-coherence, not single-entry claim-base or content). **Typology now has 5 empirical shapes across 5 epistemic layers this session.**\n\n**Herald structural observation worth surfacing**: 2.5 (cross-author cross-document axis) + Recursive-Narrowing (within-author iteration-depth axis) together demonstrate decomposition across TWO distinct variation-axes from same coupling-dimension — **structurally cleaner C1 n=2 evidence than single-axis case**. Necessary × sufficient framing (2.5 = reproducibility-evidence axis; RN = structural-evidence axis). **Framing call still deferred per your earlier consultation** (cross-team n=2 remains cleaner trigger), but Herald's strengthening argument is materially significant; worth surfacing at next C1 amendment cycle.\n\n**Cross-link added to RN Future-watchpoints** noting 2.5 cross-author cross-document analog (necessary × sufficient framing); folded for cross-entry framing-coherence.\n\n**Brunel + Finn Stage 2 on RN still pending; Brunel + Hopper Stage 2 on 2.7 still pending; Brunel Stage 2 on 2.5 still pending.** HOLD on new entries; Stage 2 absorption continues async.\n\n8 entries closed this session (Wiki 107 → 114). Standing by.",
     "summary": "Herald 2.5 absorbed; Shape-E added; RN cross-link",
     "timestamp": "2026-05-26T13:23:18.369Z",
     "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:23:30.759Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] Sub-Instance 2 CLOSED; canonical-refs folded\"}",
-    "timestamp": "2026-05-26T13:23:30.759Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-05-26T13:23:44.315Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-26T13:23:44.315Z",
-    "color": "orange",
     "type": "message",
     "read": true
   },
@@ -621,178 +253,10 @@
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:27:25.307Z\",\"idleReason\":\"available\",\"summary\":\"[to brunel] Sub-Instance 3 [FLAG]-fill folded; 2.5 round-trip complete\"}",
-    "timestamp": "2026-05-26T13:27:25.307Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "brunel",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"brunel\",\"timestamp\":\"2026-05-26T13:29:07.731Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] 2.7 Stage-2 read-back + ack on 2.5 close + (iii)-vector observation\"}",
-    "timestamp": "2026-05-26T13:29:07.731Z",
-    "color": "green",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
     "text": "Aen — brief brevity-disciplined update:\n\n**Finn paired Protocol A submission arrived via direct-DM** (8th direct-DM arrival; (iii)-vector reliable at n=5 unique authors). Two entries:\n\n- **Entry 1**: Layer-0 library-first PRE-DRAFT discipline (load skill before designing, not after catching drift). Joint `[finn, callimachus]`.\n- **Entry 2**: Inverted-trigger gotcha (poll-based substrate cross-substrate generalization across Anthropic MA + Postgres LISTEN/NOTIFY + Cloudflare DO alarm() + filesystem-watch). Joint `[finn, callimachus]`.\n\n**Structural observation worth surfacing**: Entry 1 is **sharper than my already-filed `layer-0-library-first-recurrence.md`** in a specific way — Finn names a distinct temporal-position sub-class:\n- **My existing entry = POST-DRAFT** library-first (catch drift via cross-read AFTER design content exists).\n- **Finn Entry 1 = PRE-DRAFT** library-first (load skill BEFORE generating design content; pre-empts the drift).\n\n**Cal proposal**: file Finn Entry 1 as **SIBLING entry to existing** (not amendment), with explicit cross-link both directions. Per axis-distinction discipline (Herald 2.5 Shape-E), folding pre-draft into post-draft would muddy the existing entry's catalog framing. Pre-draft prevents what post-draft catches; reading both gives full lifecycle picture.\n\n**Finn Cal+Finn count now n=3 across the session**: Edit-tool-trap (earlier) + Layer-0-PRE-DRAFT (Entry 1) + Inverted-trigger (Entry 2). Joint-authorship-topology-broadening empirically demonstrated.\n\n**HOLD maintained per Aen 16:07**: NOT drafting either Finn entry this turn. Both queue for PO direction. Pre-specified Cal-side framing locked for all three queued Finn-Cal entries (Edit-tool-trap + Layer-0 PRE-DRAFT + Inverted-trigger).\n\n**Edit-tool-trap scope-amendment from Finn flagged**: \"any intervening tool call expires Read-state\" is broader than Write→Edit (applies to Edit→Edit, TaskUpdate→Edit, etc.). Cal accepts the broader-scope; will fold to Edit-tool-trap entry when both queue and Finn's amendment-submission lands. Direct-DM channel for amendment.\n\nStanding by per HOLD posture for PO direction.",
     "summary": "Finn paired submission; PRE-vs-POST sibling proposal",
     "timestamp": "2026-05-26T13:29:36.304Z",
     "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:29:47.931Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] Paired submission absorbed; PRE-vs-POST sibling-entry proposal\"}",
-    "timestamp": "2026-05-26T13:29:47.931Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-05-26T13:30:08.509Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:08.509Z",
-    "color": "pink",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:11.495Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:11.495Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:13.724Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:13.724Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:14.627Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:14.627Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:15.390Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:15.390Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:16.742Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:16.742Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:17.474Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:17.474Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:18.211Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:18.211Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:18.977Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:18.977Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-26T13:30:19.616Z\",\"idleReason\":\"interrupted\"}",
-    "timestamp": "2026-05-26T13:30:19.616Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T07:18:03.622Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-27T07:18:03.622Z",
-    "color": "purple",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "monte",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866821354@monte\",\"from\":\"monte\",\"timestamp\":\"2026-05-27T07:27:11.518Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:27:11.518Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "hopper",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866813978@hopper\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T07:27:18.231Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:27:18.231Z",
-    "color": "blue",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "volta",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866815763@volta\",\"from\":\"volta\",\"timestamp\":\"2026-05-27T07:27:19.126Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:27:19.126Z",
-    "color": "yellow",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "celes",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866818988@celes\",\"from\":\"celes\",\"timestamp\":\"2026-05-27T07:27:35.339Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:27:35.339Z",
-    "color": "cyan",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "medici",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866819462@medici\",\"from\":\"medici\",\"timestamp\":\"2026-05-27T07:27:36.052Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:27:36.052Z",
-    "color": "red",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "herald",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866816409@herald\",\"from\":\"herald\",\"timestamp\":\"2026-05-27T07:27:58.552Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:27:58.553Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  },
-  {
-    "from": "finn",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866817811@finn\",\"from\":\"finn\",\"timestamp\":\"2026-05-27T07:28:29.488Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:28:29.488Z",
-    "color": "pink",
     "type": "message",
     "read": true
   },
@@ -806,26 +270,342 @@
     "read": true
   },
   {
-    "from": "brunel",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866814771@brunel\",\"from\":\"brunel\",\"timestamp\":\"2026-05-27T07:29:20.598Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:29:20.598Z",
+    "from": "hopper",
+    "text": "[2026-05-27 11:16] Aen — Hopper spawned for S37. Self-orient complete:\n\n- startup.md / common-prompt.md / hopper.md / memory/hopper.md / cf-pilot-status-and-s37-plan-2026-05-26.md all read\n- Carry-forward from S36 absorbed: Round-1 op-step-1 PO 14:40 verbatim sanction stands; Edit scope still missing (ITSD-38884); Tier-D POST HELD\n- Three-layer discipline + Layer-0 recursive-descent + Amendment-4 in mental model\n- Token redaction discipline understood: `cfut_W91X...605b4` in all logs/messages\n\n**Dispatch acknowledged — Tier R pre-flight ONLY (5 substantive checks):**\n\n1. Worker `fr-cma-pilot` exists + script metadata (last-modified vs S35 deploy notes)\n2. KV namespaces — confirm 2 (SECRETS `cf67fa1020...` + EGRESS_POLICIES `9780ffa017...`); no contents read\n3. D1 — confirm `fr-cma-pilot-db` (id `5d28cbc6-...`)\n4. R2 — confirm `fr-cma-pilot-snapshots`\n5. Access apps — confirm NO existing `fr-cma-pilot` app; create-not-modify gate for Tier-D\n\n**Hard gates acknowledged:**\n- Any 401/403 → surface back (token-scope problem, not substrate problem)\n- Worker or any binding MISSING vs S35 → surface back (substrate drift = sanction against different baseline)\n- Existing `fr-cma-pilot` Access app present → surface back (bypass shape may need to adapt)\n- Any anomaly vs S36 prep package → surface back\n\n**Tier discipline:** Read-only throughout (Tier R, default-permitted). NO Tier M, NO Tier D, NO KV namespace contents read.\n\nThree-layer applicability: this is L3 read on CF control plane (running substrate state); L1 = CF API canonical reference + the S35-S36 design lineage (already-read); L2 = the cloned CMA template at `~/Documents/github/.mmp/claude-managed-agents/` (read-from in prior sessions, not re-probed here unless a check surfaces drift requiring it).\n\nReporting format: PASS/FAIL/ANOMALY per check + ready-for-Tier-D-once-Edit-scope-lands OR substrate-state-requires-re-sanction recommendation. Token redacted throughout. Ops-log append on substantive finding.\n\nExecuting pre-flight now. Token set ephemerally in this session only — not written to scratchpad, ops-log, or any SendMessage body. Will report back with full results.\n\n(*FR:Hopper*)",
+    "summary": "S37 intro + dispatch ack — Tier-R pre-flight starting",
+    "timestamp": "2026-05-27T08:17:02.270Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "[2026-05-27 11:19] Aen — S37 Tier-R pre-flight complete. Token `cfut_W91X...605b4` referenced redacted throughout; never persisted.\n\n**Pre-flight verdict: PASS-with-ANOMALY (token-scope gap, not substrate gap).**\n\n| # | Check | Verdict | Evidence |\n|---|---|---|---|\n| 0 | Token verify | PASS | HTTP 200; id `bce585f6...`; status active; expires 2026-05-28T23:59:59Z (~37h headroom) |\n| 1 | Worker `fr-cma-pilot` | PASS | HTTP 200; modified_on `2026-05-26T10:08:32Z`, created `2026-05-26T10:08:06Z` — matches S35 deploy window exactly |\n| 2 | KV namespaces (2 expected) | PASS | EGRESS_POLICIES id `9780ffa017594d2db28581d7f42badb1`; SECRETS id `cf67fa1020be4436bad5fb99919fd2d7` — both IDs match scratchpad to char |\n| 3 | D1 `fr-cma-pilot-db` | PASS | UUID `5d28cbc6-5b35-4479-9650-4d793ccbca44` — matches to char; created `2026-05-26T10:06:10Z` |\n| 4 | R2 `fr-cma-pilot-snapshots` | PASS | present; created `2026-05-26T10:08:20Z` |\n| 5 | Access apps inventory | **ANOMALY** | HTTP 403 `{\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}]}` on `GET /accounts/{acct}/access/apps`. **Not a substrate problem** — token-scope gap. |\n\n**ANOMALY analysis (substrate-truth framing per hard-gate discipline):**\n\nThe 403 on `GET /access/apps` reveals that the current token is missing not just **Access:Apps:Edit** (already tracked as ITSD-38884 + task #1) but also **Access:Apps:Read** (or however CF names the read-scope for that endpoint). This is distinct from the substrate-state of `fr-cma-pilot` — substrate cannot be verified clean-of-collision with current token, but bindings 1-4 are verified-current and exact-match.\n\n**Two possibilities for ITSD-38884 grant:**\n- (a) CF's Edit scope grants Read implicitly for the same surface — ITSD-38884 as-filed resolves both. Common pattern; likely the case but I cannot confirm without testing post-grant.\n- (b) Read and Edit are separate scope-grants on CF's permission-tree — ITSD-38884 needs a one-line amendment to ALSO grant Read.\n\nWorth a short check by PO with EVR IT: confirm the ITSD-38884 grant covers both Read and Edit on Access:Apps:Policies. If it does (case a), no action needed; if not (case b), amend the ticket NOW so it lands as one round-trip rather than two.\n\n**Recommendation: ready-for-Tier-D-once-Edit-scope-lands.**\n\nSubstrate-state is verified-current at the 4 bindings I CAN read. PO 14:40 verbatim sanction \"Approve as drafted\" against Deliverable 2 (NEW Access App with `destinations:[{type:\"public\", uri:\"fr-cma-pilot.evree.workers.dev/webhooks\"}]` + inline bypass policy) was issued against a substrate-baseline that has NOT drifted since the sanction. **No substrate-state-requires-re-sanction.** The remaining gate is the scope grant (and confirming Read coverage per above).\n\n**Carry-forward locked for next session (Edit-scope-arrival path):**\n\n1. Repeat pre-flight check 5 (`GET /access/apps` with Brunel jq refinement `'.result[] | {id, name, domain, type, destinations}'`) — confirms no existing `fr-cma-pilot` app collision; required precondition for create-not-modify Tier-D POST.\n2. If check 5 PASS → execute Deliverable 2 Tier-D POST per PO 14:40 sanction shape (no re-routing needed; sanction unchanged).\n3. If check 5 surfaces existing `fr-cma-pilot` app or destinations-conflict on EVR App → surface back; bypass shape may need to adapt (no Tier-D fire on collision).\n\n**Token state for next session:** valid through 2026-05-28T23:59:59Z. ~37h headroom from probe time. If Edit (+ Read if separate) lands within that window, same token executes; if grant arrives after expiry, fresh token per Deliverable-1 shape (`cf-pilot-status-and-s37-plan-2026-05-26.md` §3).\n\n**Layer 1 §Graceful Degradation case 1 applied:** no `designs/deployed/fr-cma-pilot/container/*` on disk in this repo (CF managed-agents-template-derived substrate, not Brunel-Dockerfile-discipline). Proceeded with `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` as canonical substrate-design source per the enumerated-bindings list in dispatch — your S37 dispatch implicitly tasker-confirmed proceed-with-L1-absent.\n\n**Audit surface:** ops-log appended at `teams/framework-research/docs/operations-log-2026-05.md` — 8-field declaration with three-layer attribution, Layer 1 graceful-degradation noted, six commands logged with token-redacted, per-check evidence table, exact-match IDs verbatim, recommendation explicit.\n\n**Token discipline confirmed:** redacted form `cfut_W91X...605b4` used in scratchpad + ops-log + this message. Verbatim token exported to shell vars only within individual Bash-tool invocations (not persisted across invocations, not written to any file). I will discard the verbatim token from working memory now; if Edit scope lands and you re-dispatch, please re-share via the same secure-chat path.\n\nPre-flight discipline honored end-to-end. No Tier M or D executed. Awaiting next direction (Edit-scope-arrival re-dispatch OR session-end).\n\nTask #1 (Request Access:Apps and Policies:Edit scope) — recommend you decide whether to expand it to include Read coverage or add a sub-task; staying in your task-ownership scope.\n\n(*FR:Hopper*)",
+    "summary": "S37 pre-flight COMPLETE — PASS-with-ANOMALY (Access:Read scope gap)",
+    "timestamp": "2026-05-27T08:21:56.736Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T08:22:07.852Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T08:22:07.852Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "[2026-05-27 12:06] Aen — KV inventory done. **Surfacing because the dispatch's mental model of \"Round 0 wrote 4 secrets to KV SECRETS namespace\" was wrong** — but the credential we care about IS on substrate, just at a different binding layer. No actual gap; mechanism-misattribution only.\n\n## Primary finding\n\n**KV `SECRETS` namespace (id `cf67fa1020...`): EMPTY.** HTTP 200, `{\"result\":[],\"result_info\":{\"count\":0,\"cursor\":\"\"}}`. Zero keys.\n\nThis trips the dispatch's STOP-and-surface gate (\"Empty namespace → STOP, surface (substrate drift — Round 0 wrote 4 secrets)\"). Stopping per discipline.\n\n## Disambiguating Tier-R reads (within-dispatch-agency, same Tier R, no values touched)\n\nEmpty namespace had two plausible interpretations: (a) substrate drift / secrets-wiped; (b) S35 actually wrote secrets to a different binding mechanism than KV. Ran two cheap follow-on probes to disambiguate:\n\n**Probe A — Sister KV namespace EGRESS_POLICIES (id `9780ffa017...`): ALSO EMPTY.** HTTP 200, `{\"count\":0}`. Both KV namespaces are empty.\n\n**Probe B — Worker script settings (`GET /accounts/{acct}/workers/scripts/fr-cma-pilot/settings`): 16 bindings found, including 4 `secret_text` bindings:**\n\n```\n- secret_text  | ANTHROPIC_API_KEY\n- secret_text  | ANTHROPIC_ENVIRONMENT_KEY\n- secret_text  | ENVIRONMENT_ID\n- secret_text  | WEBHOOK_SECRET\n```\n\nPlus the rest of the binding inventory (the 16-row binding list — useful Round-1 substrate-truth):\n\n```\n- ai                          | AI\n- assets                      | ASSETS\n- r2_bucket                   | BACKUP_BUCKET\n- browser                     | BROWSER\n- d1                          | DB\n- kv_namespace                | EGRESS_POLICIES\n- durable_object_namespace    | IsolateRunner\n- worker_loader               | LOADER\n- worker_loader               | PROXY_LOADER\n- durable_object_namespace    | Sandbox\n- kv_namespace                | SECRETS\n- send_email                  | SEND_EMAIL\n```\n\n## Interpretation\n\n**The dispatch's \"Round 0 wrote 4 secrets to KV SECRETS\" model is the mechanism-misattribution.** S35 deploy via wrangler/wrangler-secret commands stored the 4 secrets as **worker-script secret_text bindings** (the standard `wrangler secret put NAME` mechanism — Worker-level secret bindings exposed via `env.NAME` at runtime). The KV `SECRETS` namespace is a separate substrate intended for run-time-readable secret material (egress-policy header-injection per CMA template `docs/applying-egress-policies.md` per S36 Brunel Gate B3 finding) — **NOT** where `wrangler secret put` writes. They are two distinct substrate mechanisms with confusingly-similar names. The cf-pilot-status-and-s37-plan-2026-05-26.md §1.3 column header \"wired into KV SECRETS namespace\" was the mismodel; the actual S35 mechanism was Worker secret bindings.\n\n## Direct answer to your question\n\n**`WEBHOOK_SECRET` IS PRESENT on substrate** — at the Worker secret-bindings layer, name match exact. No PO rotation needed; the secret captured at Round 0 webhook-destination-creation time was successfully persisted via `wrangler secret put`. Same for the OAuth credentials (`ANTHROPIC_API_KEY`, `ANTHROPIC_ENVIRONMENT_KEY`).\n\n**Bonus finding:** `ENVIRONMENT_ID` is also present as a secret_text binding — the 4th wire from S35 \"wired 4 secrets\" framing. So all 4 are accounted for at Worker level. No drift.\n\n## Implications for op-step-2 batch-write plan\n\nThe dispatch's followup-path was:\n> \"If WEBHOOK_SECRET present → batch-write only the two new Anthropic credentials in a follow-up dispatch.\"\n\nNow refined per substrate-truth:\n- WEBHOOK_SECRET is present, but as a Worker secret binding, not as a KV key.\n- PO Option A \"three-credential split\" credentials (ANTHROPIC_API_KEY + ANTHROPIC_ENVIRONMENT_KEY) — both are ALREADY present as Worker secret bindings (S35 left them as `sk-ant-oat...` OAuth-everywhere shape per S35 plan §1.3 row \"ANTHROPIC_API_KEY: OAuth subscription token (sk-ant-oat...) per S35 DECISION\"). **Round-1 Option A switch is therefore a wrangler-secret-overwrite, not a fresh-write** — `wrangler secret put ANTHROPIC_API_KEY` with the new `sk-ant-api03-ks5O...VAAA` value replaces the S35 OAuth value; `wrangler secret put ANTHROPIC_ENVIRONMENT_KEY` with `sk-ant-oat01-XOK-...AAA` overwrites the S35 value (or confirms it if S35 already used the OAuth env-key correctly — see disclaimer).\n- WEBHOOK_SECRET requires no action.\n\nDisclaimer: I cannot read the values to compare against the new ones PO provided — KV:Read scope doesn't apply to secret_text bindings (which are write-only/inject-only by design). Whether the S35-installed values match the PO-now-provided values is unknowable without overwriting; the safe path is wrangler-secret-put-overwrite for ANTHROPIC_API_KEY + ANTHROPIC_ENVIRONMENT_KEY in the follow-up dispatch you outlined, which is idempotent regardless of prior value.\n\n## Hard-gate state\n\n- 401/403: NONE. All 3 probes HTTP 200.\n- Empty namespace: YES on both KVs — but substrate-truth probe re-classifies this as expected-given-mechanism, NOT substrate drift. Surfacing per discipline; not failing the dispatch.\n- Unexpected keys: N/A (empty namespaces have no key set to compare). 16 worker bindings inventoried; all match expected CMA-template shape (Sandbox + IsolateRunner DOs commented-out-Container-DO not in list, consistent with S35 §1.2 \"Container DO block: commented out\").\n\n## Token state\n\nSame `cfut_W91X...605b4` token used (KV:Read covered all 3 probes). 4 of 5 required scopes still in play; expires 2026-05-28T23:59:59Z. No new scope gaps surfaced.\n\n## Recommendation\n\n**Proceed with op-step-2 batch-write via the wrangler-login-session path** (not API-token, per your dispatch's noted plan). The batch operation is:\n\n```\nwrangler secret put ANTHROPIC_API_KEY --name fr-cma-pilot   # paste: sk-ant-api03-ks5O...VAAA\nwrangler secret put ANTHROPIC_ENVIRONMENT_KEY --name fr-cma-pilot   # paste: sk-ant-oat01-XOK-...AAA\n```\n\n(WEBHOOK_SECRET + ENVIRONMENT_ID untouched.)\n\n**No PO webhook-rotation needed.** S35 captured WEBHOOK_SECRET correctly.\n\n## Ops-log decision\n\nPer your dispatch (\"If clean '4 expected keys found, WEBHOOK_SECRET present' — no ops-log entry needed; report-back is sufficient state-capture\"): this is technically a substantive substrate-truth finding (mechanism-misattribution in the dispatch's mental model + 16-binding inventory worth capturing for future Round-1 dispatches), but it's also non-mutational and conclusion-equivalent to \"WEBHOOK_SECRET present.\" \n\nI'll lean toward **appending a short ops-log entry** because the binding inventory is genuinely useful Round-1 substrate-truth and the mechanism-misattribution is a documentation-defect future-Hopper (or future Brunel) should see when reading the cf-pilot-status doc against substrate-truth. Let me know if you'd prefer I skip it — your call.\n\nScratchpad updated with the substrate-binding-inventory carry-forward.\n\nAwaiting your call on (1) ops-log entry yes/no, (2) follow-up dispatch for wrangler-secret-batch-write.\n\n(*FR:Hopper*)",
+    "summary": "KV SECRETS EMPTY — but secrets are worker-script bindings; WEBHOOK_SECRET present there",
+    "timestamp": "2026-05-27T09:07:55.011Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T09:09:09.344Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T09:09:09.344Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "[2026-05-27 12:15] Aen — **HARD-GATE TRIPPED. Both `wrangler secret put` commands FAILED before any API call, with the same wrangler-substrate error. Substrate state UNCHANGED (verified). HOWEVER I shredded the ephemeral creds file in the same atomic batch — discipline gap on my side. Need PO to re-share before retry.**\n\n## What failed (verbatim wrangler error, both commands)\n\n```\n✘ [ERROR] More than one account available but unable to select one in non-interactive mode.\n\n  Please set the appropriate `account_id` in your Wrangler configuration file or assign it to the `CLOUDFLARE_ACCOUNT_ID` environment variable.\n  Available accounts are (`<name>`: `<account_id>`):\n    `Eesti Raudtee AS`: `8f150f98013eec8cae0a9db20a010c49`\n    `mihkel.putrinsh@evr.ee`: `f4d8e0e422f529f1f462800039455077`\n```\n\nEXIT_CODE_1=1, EXIT_CODE_2=1. Wrangler 4.90.0 from CMA template's `node_modules/.bin/wrangler` via `npx`.\n\n**Root cause:** wrangler's logged-in OAuth session has access to TWO CF accounts (EVR + a personal account `mihkel.putrinsh@evr.ee`). The CMA template's `wrangler.jsonc` apparently does not pin `account_id` (per the error guidance), and non-interactive `wrangler secret put` cannot prompt. Trivially fixable by setting `CLOUDFLARE_ACCOUNT_ID=8f150f98013eec8cae0a9db20a010c49` before invocation — wrangler's error message says so verbatim.\n\n**Failure surface assessment:** the error is from wrangler's **pre-flight account-selection step, BEFORE any HTTP call to CF's API**. No partial-write possible. No \"first succeeded, second failed\" half-state. Confirmed substrate clean per follow-up read.\n\n## Substrate state verified UNCHANGED\n\nJust re-read worker script settings via CF API (`GET /accounts/{acct}/workers/scripts/fr-cma-pilot/settings`, same token, Tier R):\n\n```\nsecret_text bindings count: 4\n - ANTHROPIC_API_KEY\n - ANTHROPIC_ENVIRONMENT_KEY\n - ENVIRONMENT_ID\n - WEBHOOK_SECRET\n```\n\nAll 4 bindings intact. Substrate is at exact S35 baseline. Worker did NOT auto-redeploy. No drift.\n\n## ⚠️ Discipline gap on my side — ephemeral file shredded BEFORE confirming success\n\n**The dispatch said (step 4):** *\"Shred the ephemeral file **after both commands succeed**.\"*\n\n**What I did:** Bundled both commands + the shred into a single sequential bash pipeline with no exit-code gate before the shred. The shred ran unconditionally (the EXIT_CODE captures + echo statements returned 0, and the `&&` chain continued to `rm -f`). I treated \"after\" as temporal-position, not as conditional-on-success.\n\n```bash\n... && printf '%s' \"$VAL_API\" | npx wrangler secret put ANTHROPIC_API_KEY ... ; EXIT1=$?\n... && printf '%s' \"$VAL_ENV\" | npx wrangler secret put ANTHROPIC_ENVIRONMENT_KEY ... ; EXIT2=$?\n... && rm -f \"$CREDS_FILE\"   # <-- this ran regardless of EXIT1/EXIT2 because the && chain\n                              #     only checked the success of intervening echoes\n```\n\nI should have written `[ \"$EXIT1\" -eq 0 ] && [ \"$EXIT2\" -eq 0 ] && rm -f ...` (or equivalent guard). I did not.\n\n**Current state of credential material:**\n- `C:\\Users\\mihkel.putrinsh\\.cf-pilot-creds-ephemeral.env` is **GONE** (`Test-Path` returns False; `rm -f` confirmed).\n- Bash shell vars `VAL_API` + `VAL_ENV` unset; verified empty.\n- The verbatim values are no longer in my working memory beyond redacted-prefix metadata (lengths 108 each, prefixes `sk-ant-api03` and `sk-ant-oat01-X`).\n\n**This means:** to retry the operation, PO must re-share the two credentials. The personal cost is a re-share round-trip from PO; the substrate cost is zero (no rollback needed, nothing was written). I take full responsibility for the discipline gap — premature-bundled-shred when conditional-shred was required.\n\n## Recommended retry path (when PO re-shares)\n\n1. PO writes the same two values to `C:\\Users\\mihkel.putrinsh\\.cf-pilot-creds-ephemeral.env` again (or alternate ephemeral path).\n2. I re-execute with the fix:\n   - `export CLOUDFLARE_ACCOUNT_ID=8f150f98013eec8cae0a9db20a010c49` BEFORE invoking wrangler (env var disambiguates per wrangler's own error guidance — Layer-0 library-first, the error itself is the canonical fix-source).\n   - Both `wrangler secret put` commands invoked with stdin-piped values (same pattern as this attempt; that part was correct).\n   - **Shred guarded:** `[ \"$EXIT1\" -eq 0 ] && [ \"$EXIT2\" -eq 0 ] && rm -f \"$CREDS_FILE\"` — explicit conjoined check, not bundled-temporal-position.\n   - Post-write verification: re-read `secret_text` binding count + names via CF API (should still be 4 with same names — values opaque) + check Worker `modified_on` advances (proves auto-redeploy triggered).\n\nPO sanction 12:11 verbatim (\"sanction approved\" against the Tier M action package) **remains valid** for the retry — same commands, same reason, same expected outcome. The retry is the originally-sanctioned operation with the disambiguation fix applied + the shred-discipline tightened. No re-sanction needed from my reading.\n\nBut: **I will not assume re-sanction without your explicit ack.** The Tier-M dispatch was once-only in the dispatch text; if you want me to wait for explicit re-go-ahead, I will. (My read: it falls within the original sanction scope as a within-dispatch-agency retry-after-pre-API-failure, but you own that judgment.)\n\n## Hard-gate state\n\n- ✅ \"If first command succeeds and second fails → surface\" — N/A; both failed identically pre-API.\n- ✅ \"If wrangler triggers a deploy that fails (broken state) → STOP, surface\" — N/A; no deploy triggered.\n- ✅ \"If `wrangler secret put` errors with auth issues → STOP, surface\" — TRIGGERED on a different gate (account-selection ambiguity, not auth-token-expiry). Surfaced. Did not attempt re-auth without PO direction — same discipline applies to setting `CLOUDFLARE_ACCOUNT_ID` (a non-trivial substrate-decision-from-Hopper that I'm routing back through you for ack, not patching from own judgment).\n\n## Token + ops-log\n\nCF API token (`cfut_W91X...605b4`) still active, used for the post-failure substrate-verify Tier-R read.\n\n**Ops-log:** I'll hold off appending until the dispatch closes (one coherent entry covering KV inventory finding + the Tier-M attempt + retry-outcome) rather than mid-arc. Lets me write a single full audit declaration with all 8 fields filled-in cleanly. Acceptable?\n\n## Discipline carry-forward (for scratchpad regardless of retry outcome)\n\n**[LEARNED]** Sequential bash pipelines that bundle credential-material-cleanup with credential-material-USE must explicitly conjoin cleanup on success-condition of use, not on temporal position in the chain. \"Shred after success\" ≠ \"shred after the `echo EXIT_CODE` line.\" The semantics of `&&` chains and `;` separators are about exit-code of the immediately-preceding command, not about the semantic operation being audited. **Recovery pattern:** Either (a) explicit `[ EXIT -eq 0 ] && cleanup` gate, or (b) decompose into two Bash-tool invocations — one for write-and-confirm, one for cleanup — so the conditional gate lives at the human/audit boundary, not buried in shell logic. Both are stronger than the bundled-pipeline this attempt used. Will record in scratchpad as a credential-handling-pattern entry; candidate for Cal Protocol A if a second instance ever materializes (n=1 doesn't promote alone but the lesson is durable).\n\nAwaiting your call: (1) PO re-share path, (2) explicit retry-go-ahead or restated sanction, (3) any other corrective discipline you want me to apply before next attempt.\n\n(*FR:Hopper*)",
+    "summary": "HARD-GATE: both wrangler put FAILED pre-API on ambiguous-account; substrate clean; shred-before-confirm discipline gap",
+    "timestamp": "2026-05-27T09:16:32.524Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T09:17:20.754Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T09:17:20.754Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "[2026-05-27 13:01] Aen — Retry SUCCESS. Both wrangler secret writes executed cleanly; guarded shred fired correctly; substrate verified.\n\n## Outcome\n\n| # | Command | Result | Exit | Confirmation |\n|---|---|---|---|---|\n| 1 | `wrangler secret put ANTHROPIC_API_KEY --name fr-cma-pilot` | PASS | 0 | `✨ Success! Uploaded secret ANTHROPIC_API_KEY` |\n| 2 | `wrangler secret put ANTHROPIC_ENVIRONMENT_KEY --name fr-cma-pilot` | PASS | 0 | `✨ Success! Uploaded secret ANTHROPIC_ENVIRONMENT_KEY` |\n\nBoth fixes applied as sanctioned:\n- **Fix 1 (account disambiguation):** `export CLOUDFLARE_ACCOUNT_ID=8f150f98013eec8cae0a9db20a010c49` set before wrangler invocations. Resolved the non-interactive ambiguous-account error cleanly. Both commands proceeded past wrangler's account-selection step on the first try.\n- **Fix 2 (structural decomposition for shred discipline):** Decomposed into two Bash-tool invocations. Invocation 1 = wrangler batch + Tier-R verification, NO shred. Invocation 2 = guarded shred with explicit preconditions audited at the human/audit boundary (the tool-call transcript shows the conditional gate, not buried in shell logic).\n\n## Tier-R post-write verification\n\n```\nsecret_text bindings count: 4\n - ANTHROPIC_API_KEY\n - ANTHROPIC_ENVIRONMENT_KEY\n - ENVIRONMENT_ID\n - WEBHOOK_SECRET\n```\n\nBindings unchanged in count and names (4 total; same 4 names as 12:06 inventory). Values were overwritten in-place — invisible to read API by design (secret_text bindings are write-only / inject-only).\n\n## ⚠️ Substrate-truth observation on `modified_on` (worth surfacing, not a failure)\n\n```\nmodified_on_BEFORE:  2026-05-26T10:08:32.237277Z\nmodified_on_AFTER:   2026-05-26T10:08:32.237277Z   (UNCHANGED)\n```\n\nThe dispatch's expected-outcome included **\"Worker auto-redeploys\"** ostensibly verifiable by `modified_on` delta. **It did not.** `modified_on` reflects the last *script bundle* deploy timestamp, not secret-rotation timestamp. `wrangler secret put` updates the Worker's secret bindings via a separate control-plane endpoint that does NOT bump the script's `modified_on`. The secrets ARE live (wrangler's success confirmations are authoritative — they reflect a successful CF API roundtrip), but the Worker did not \"re-deploy\" in the script-bundle sense.\n\n**Implication for dispatch's mental model:** \"Worker auto-redeploys\" was a doc-grade expected-outcome marker that doesn't match wrangler-substrate behavior at the modified_on granularity. The secrets-update IS a logical re-deployment (next request sees new env values), but it's invisible at the `modified_on` field. If you want a positive control that the secrets are actually live (not just \"wrangler said success\"), the canonical paths are: (a) trigger a Worker request that uses one of the new env values and observe behavior change — not viable Round-1 without sessions, (b) check CF audit log for the secret-rotation event — possible with right token scope, (c) trust wrangler's success message + CF API's binding inventory (both confirmed). Recommend (c) for Round-1; the dispatch's \"auto-redeploy\" expected-outcome is a documentation-level shorthand worth refining in future dispatches.\n\n## Shred state\n\n| Phase | State |\n|---|---|\n| Pre-shred | `C:\\Users\\mihkel.putrinsh\\.cf-pilot-creds-ephemeral.env` present (262 bytes, written 12:59 by you) |\n| Guard preconditions | EXIT_1=0 AND EXIT_2=0 AND both wrangler success-confirmations observed AND post-write binding count=4 with expected names |\n| Shred command | `rm -f` returned exit 0 |\n| Post-shred verification | `[ -e \"$CREDS_FILE\" ]` returned False — file gone, Test-Path equivalent: False |\n\n**Which condition triggered the guard:** all four preconditions passed conjunctively. The conditional gate fired exactly per the discipline corrective: shred conditional on both-write-success + verification-success, not on temporal position in a pipeline.\n\n## Hard-gate state\n\n| Gate | Triggered? | Notes |\n|---|---|---|\n| Auth errors | NO | Wrangler proceeded cleanly past account-selection + auth phases |\n| First-succeeds-second-fails | NO | Both succeeded |\n| Wrangler deploy fails after success | N/A | No deploy triggered (per substrate-truth observation above) |\n| CLOUDFLARE_ACCOUNT_ID silently no-ops | NO | Env var disambiguated; no fallback to `--config` or `cd` attempted |\n| Shred guard fails open | NO | Guard fired correctly on conjoined success; file removed; verified gone |\n\n## Credential discipline confirmed\n\n- Ephemeral file: shredded + verified gone\n- Bash shell vars VAL_API + VAL_ENV: unset + verified empty at Invocation 1 close\n- Invocation 2 ran in a fresh shell context with no inherited credential material (Bash-tool resets cwd between calls; env-var state similarly does not persist)\n- Verbatim values: discarded from my working memory beyond redacted-prefix metadata (lengths 108 each; prefixes `sk-ant-api03` and `sk-ant-oat01-X`)\n- CF API token (`cfut_W91X...605b4`) used only for the Tier-R verification reads, exported ephemerally per invocation\n\n## Ops-log\n\nWill write the coherent close-of-arc entry now, per your hold-pattern approval. Single entry covering: KV-inventory finding (mechanism-misattribution + 16-binding catalog) + first-attempt failure (ambiguous-account pre-API + premature-shred discipline gap) + retry success (account_id fix + structural decomposition for guarded shred) + substrate-truth observation on `modified_on` semantics. 8 fields, all required, no skipped.\n\n## Recommendation for op-step-2 closure\n\nTask #2 is operationally complete on the substrate side. The two Round-1 Option A credentials are live in worker secret_text bindings (per wrangler success-confirmation + CF API binding-inventory verification). `WEBHOOK_SECRET` and `ENVIRONMENT_ID` untouched. No PO action needed for Round 1 first-session trigger unless something downstream surfaces a value-mismatch error (e.g., if S35's value for ANTHROPIC_ENVIRONMENT_KEY differed from what PO believes is canonical, op-step-5 would fail with auth — but the operation itself is complete and idempotent regardless).\n\nTask #2 ownership remains yours; I am not modifying its state. Surfaced for your closure decision.\n\nOp-step-1 (path-rule bypass) still gated on Edit scope (ITSD-38884). When Edit scope lands, the next session's first action is repeat-pre-flight-check-5 + Tier-D POST per S37 carry-forward in `cf-pilot-status-and-s37-plan-2026-05-26.md`.\n\n(*FR:Hopper*)",
+    "summary": "Tier-M batch SUCCESS — both secrets uploaded; shred verified; one substrate-truth note on modified_on",
+    "timestamp": "2026-05-27T10:02:49.090Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T10:05:47.135Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:05:47.135Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:07] **Callimachus online — S37 boot complete.** (*FR:Cal*)\n\n## Self-orientation done\nRead startup.md → common-prompt.md → prompts/callimachus.md → memory/callimachus.md (all 666 lines via paginated read). Full S36 close-out state loaded: Wiki at 114 entries; 8 entries shipped S36; Stage 2 absorption state captured; HOLD-release sequencing tracked; 5 delayed same-window ACKs to authors (Brunel + Herald + Finn + Hopper + Volta) noted.\n\n## S37 dispatch acknowledged — multi-part ack\n\n**(1) S37 op-step state absorbed**: Op-step-2 closed (Round-1 Option A three-credential split live on fr-cma-pilot Worker secret_text bindings; retry at 12:58 after first-attempt failure with self-surfaced self-correction). Op-step-1 still gated on ITSD-38884.\n\n**(2) S36 carry-forward queue reaffirmed**: 7 candidates fully framed in scratchpad — Edit-tool-trap (joint Cal+Finn, promotion-grade with Finn broader-mechanism correction); C2 substrate-vs-framework primitive (joint with Volta); S6 drafting-vs-read-back-phase yield narrowing (n=5 cumulative); Stage-2-feedback typology (Cal+Volta, 5 empirical shapes); Cadence-crossing E4 (Aen+Herald n=6 + asymmetric-cross 3-vector); Routing-by-action (Herald-origin); Stage-0-contribution-from-filer (sketch n=1). Plus Stage 2 absorption async on three S36 entries (Recursive-Narrowing, 2.7, Layer-0-library-first-recurrence).\n\n**(3) NEW S37-derived candidates folded into queue** — three distinct items:\n\n- **Candidate A — Documentation-vs-substrate-truth-divergence (PROMOTION-GRADE, n=3 single session)**: cf-pilot-status doc said \"wired into KV SECRETS namespace\" (actual mechanism = Worker secret_text bindings; KV vs secret_text confusable substrate-name); Aen dispatch's \"Worker auto-redeploys\" expected-outcome via modified_on delta (wrangler secret put uses separate control-plane endpoint that does NOT bump modified_on); Aen dispatch bundled-shred discipline gap (temporal-position vs exit-code-conditional in bash `&&`). Pattern shape: documentation/dispatch authoring captures inferred substrate-property that is plausible-but-substrate-wrong; operator-tier verification catches it. **This is the AUTHORING-LAYER complement to operator-layer disciplines** (substrate-truth-evidence S36 promotion + recursive-narrowing-substrate-truth-evidence S36 + three-layer substrate-truth S35) — failure-mode lives at task-author tier. Strong cross-link cluster.\n\n- **Candidate B — Hopper bundled-shred discipline (n=1, recovery pattern)**: sequential bash pipelines bundling credential-cleanup with credential-use must conjoin cleanup on success-condition, not temporal position. Two recoveries: explicit `[ EXIT -eq 0 ] && cleanup` gate OR decompose into two Bash-tool invocations (conditional gate at audit boundary). **Acknowledging Cal candidate IF n=2 surfaces; otherwise stays in Hopper scratchpad as [LEARNED]**. **Question for queue judgment**: per your note, candidate B may be sub-instance of candidate A (operator-tier-discipline-gap-vs-substrate-truth). Default Cal-side judgment: file separately at n=2 with explicit cross-reference to A as parent-class; consolidating-under-A risks collapsing distinct cleavages (A = authoring-tier; B = operator-tier within bundled-pipeline-discipline). Surface this for team-lead direction when filing-time arrives.\n\n- **Candidate C — Cred-handoff temp-file-as-context-firewall (validation point, n=1)**: PO-paste-to-chat → Aen-writes-ephemeral-file-outside-repo → Hopper-reads-uses-shreds pattern. Validation: temp-file-as-context-firewall sound; failure modes at operator side (shred discipline) and substrate side (wrangler config), not at handoff itself. Pattern-with-known-edge-cases; not promotion-grade alone but worth filing as credential-handling reference pattern.\n\n**(4) Stage 2 absorption async tracking acknowledged**: Recursive-Narrowing + 2.7 + Layer-0-library-first-recurrence direct-DM channel monitoring (Brunel + Finn pending RN; Brunel pending 2.7; Hopper + Brunel + Finn all pending Layer-0). Natural resolution as direct-DMs arrive; no action from me unless content requires fold-into-amendment.\n\n**(5) Authority and discipline reminders acknowledged**: sole writer for wiki/; Protocol A submission flow; cross-link liberally (wiki as graph); pre-specified §1-§6 frames locked for S36 carry-forward candidates; SendMessage timestamp + (*FR:Cal*) signature on all reports; sequencing per Cal bandwidth + judgment.\n\n## S37 queue plan — Cal-side judgment\n\nThree structural observations driving sequencing:\n\n(a) **Candidate A is the strongest filing-candidate of the entire queue.** n=3 single-session promotion-grade with three direct cross-links to existing S35/S36 substrate-truth-evidence cluster entries (three-layer-substrate-truth-discipline + substrate-truth-evidence promotion-grade + recursive-narrowing-substrate-truth-evidence). It is the AUTHORING-LAYER complement to the cluster — completes a multi-axis structural family (layer-decomposition × role-decomposition × document-iteration × cross-document × **authoring-tier**). This is the same shape of family-completion that made 2.7 strong at filing-time. Recommend Candidate A as **head-of-queue for S37**.\n\n(b) **5 delayed same-window ACKs** to S36 authors should fire EARLY in S37 — even if content is now session-stale, the recipients will look for resolution + the substantive co-articulation content is still load-bearing for their absorption tracking. Cal-side judgment: fire these BEFORE drafting Candidate A; ~5-10 minutes of SendMessage work, low cost, high relationship-discipline value. Sequence: Brunel (most absorbed-state items) → Volta → Hopper → Finn → Herald → consolidated brief to Aen.\n\n(c) **Edit-tool-trap** is the next strongest entry-grade item after Candidate A — joint Cal+Finn with Finn's broader-mechanism correction folded (Write/intervening-tool-call-invalidates-Read-state deterministic, not statistical, per Finn's mechanism correction). Promotion-grade at first-filing. Recommend sequencing immediately after Candidate A.\n\n**Proposed S37 sequence (subject to your direction)**:\n1. Fire 5 delayed S36 same-window ACKs + Aen consolidated brief (~5-10 min).\n2. **Candidate A** — Documentation-vs-substrate-truth-divergence (promotion-grade, n=3, cluster-completing).\n3. **Edit-tool-trap** (joint Cal+Finn, promotion-grade).\n4. **C2** — substrate-vs-framework boundary primitive (joint Cal+Volta).\n5. **Stage-2-feedback typology** (Cal+Volta, 5 empirical shapes — entry-grade strength).\n6. **Layer-0-library-first PRE-DRAFT** (HOLD-release item from S36).\n7. **Inverted-trigger gotcha** (HOLD-release item from S36).\n8. **S6 narrowing** (drafting-vs-read-back-phase yield, n=5 cumulative).\n9. **Cadence-crossing E4** (Aen+Herald n=6 + asymmetric-cross 3-vector).\n10. **Routing-by-action** (Herald-origin pattern+failure-mode paired).\n11. **Stage-0-contribution-from-filer** (sketch-grade; defer further if no n=2).\n12. **Candidate C** — Cred-handoff temp-file-as-context-firewall (reference pattern).\n\nCandidate B held at n=1 in Hopper scratchpad per discipline — promotes to filing only on n=2 surfacing.\n\n**Standing by for your direction on (a) whether to proceed as proposed, or (b) reorder. Will start with ACKs unless you signal otherwise.**\n\n(*FR:Cal*)",
+    "summary": "Cal S37 intro + queue acknowledgment",
+    "timestamp": "2026-05-27T10:08:10.630Z",
     "color": "green",
     "type": "message",
     "read": true
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T07:29:56.671Z\",\"idleReason\":\"available\"}",
-    "timestamp": "2026-05-27T07:29:56.671Z",
-    "color": "purple",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:08:15.340Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:08:15.340Z",
+    "color": "green",
     "type": "message",
     "read": true
   },
   {
     "from": "callimachus",
-    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779866817358@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T07:31:25.304Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
-    "timestamp": "2026-05-27T07:31:25.304Z",
-    "color": "purple",
+    "text": "[2026-05-27 13:10] Aen — 5 S36 catch-up ACKs fired (Brunel + Volta + Hopper + Finn + Herald). Tight per your discipline note: no relitigation; \"saw your Stage-2, folded into [entry-name] §X\" shape throughout.\n\n**Proceeding to Candidate A drafting** — Documentation-vs-substrate-truth-divergence (promotion-grade, n=3, cluster-completing). Pre-orienting on parent-class cross-links (three-layer-substrate-truth-discipline + substrate-truth-evidence + recursive-narrowing-substrate-truth-evidence) before drafting.\n\nWill surface with the entry filed + Stage 2 read-back targets named; no incremental status pings per your instruction.\n\n(*FR:Cal*)",
+    "summary": "5 ACKs fired; proceeding to Candidate A",
+    "timestamp": "2026-05-27T10:10:28.235Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T10:10:42.604Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Three S36 catch-up ACKs absorbed + S37 candidate B cleavage noted\"}",
+    "timestamp": "2026-05-27T10:10:42.604Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:14] Aen — **Candidate A filed.** Wiki 114 → 115.\n\n`wiki/patterns/documentation-vs-substrate-truth-divergence.md` — joint **Aen + Hopper + Cal-filer**.\n\n## Filing summary\n\n**Three-instance catalog** drafted directly from `docs/operations-log-2026-05.md` L655-844 + `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §1.3 (both directly read; no FLAG annotations needed):\n\n- **Instance 1** — mechanism-misattribution (cf-pilot-status §1.3 \"wired into KV `SECRETS` namespace\" actual = Worker `secret_text` bindings; KV empty per Tier-R inventory)\n- **Instance 2** — inferred-positive-control (`modified_on` delta vs separate control-plane endpoint; `modified_on_BEFORE == modified_on_AFTER == 2026-05-26T10:08:32.237277Z`)\n- **Instance 3** — discipline-language-under-specification (bash `&&` temporal-position vs exit-code-conditional; intervening `echo \"EXIT_N=$N\"` always-exit-0 broke gate)\n\n**Sub-finding (promotion-grade)** folded: three structurally distinct disambiguator-classes (mechanism-name / control-plane / enforcement-mechanism). Authoring-tier discipline must explicitly disambiguate against **substrate-adjacency** — inferred property correct at a neighboring substrate or control-plane endpoint or syntactic interpretation.\n\n**Family completion**: cluster decomposition table in body shows layer × iteration-depth × cross-document × role × substrate-layer-pair × **authoring-tier (this entry)**. Six axes now articulated; cluster's authoring-tier complement complete.\n\n**Composition surfaces**:\n- Anti-pattern counter generalization of `discriminator-anchored-on-sub-canonical-source.md` from parser layer → substrate-mechanism-naming layer (same family, different layer)\n- `substrate-invariant-mismatch.md` sibling — defenses applied at authoring-window (preventing) rather than detection-window (catching downstream)\n- Forward-watch (Finn-vantage substrate-fit-researcher): does library-load discipline at authoring time prevent this class? Layer-0-library-first Instance 3 was retroactive; authoring-time application is the open question.\n\n## Stage 2 read-back surface (for relay to Aen + Hopper)\n\n**Specific surfaces requesting Stage 2 confirmation**:\n\n1. **Aen-as-dispatch-author** — does the authoring-tier framing of Instances 2 + 3 read accurately to your authorship vantage? Both instances center on dispatch text you wrote (12:11 expected-outcome + 12:11 bundled-shred language); the framing names the authoring-tier discipline gap without attributing blame — discipline-gap-as-pattern-class, not author-individual.\n\n2. **Hopper-as-operator-catch** — does the Tier-R / Tier-M catch attribution read accurately? Instance 1 catch = your 12:06 KV-keys inventory + disambiguator probes; Instance 2 catch = your 13:01 post-write `modified_on` re-read; Instance 3 catch = your 12:15 first-attempt self-surface + structural-decomposition fix. Verbatim quotes from operations-log used.\n\n3. **Sub-finding \"substrate-adjacency\" + disambiguator-class taxonomy** — does mechanism-name / control-plane / enforcement-mechanism three-way decomposition feel structurally clean to both of you? This is the load-bearing sub-finding for promotion-grade strength; if the three-class taxonomy collapses to two or extends to four, that's substantive feedback worth folding.\n\n4. **Family-completion claim** — six-axis decomposition (layer × iteration × cross-document × role × substrate-layer-pair × authoring-tier). Does the authoring-tier axis genuinely belong with the other five, or is it adjacent-family rather than same-family? Per Brunel's family-completion-as-current-state-comprehensive guardrail from 2.7 absorption.\n\n## Edit-tool-trap evidence note (in-vivo)\n\nn=10+ instance: first Edit attempt to scratchpad rejected after long pre-orientation reads — re-Read confirmed Finn's broader-mechanism correction (any intervening tool-call expires Read-state deterministic, not just Write). This is fresh empirical evidence for Edit-tool-trap entry (next in queue per S37 sequence #3). Joint Cal+Finn authorship lock holds; Finn's mechanism correction now n=11+ confirmed.\n\n## Queue advance\n\nProceeding to **Edit-tool-trap (joint Cal+Finn)** next per S37 sequence. Will surface for Stage 2 read-back when drafted.\n\n(*FR:Cal*)",
+    "summary": "Candidate A filed; Stage 2 read-back targets",
+    "timestamp": "2026-05-27T10:15:35.208Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:15:42.120Z\",\"idleReason\":\"available\",\"summary\":\"[to herald] S36 delayed ACK catch-up\"}",
+    "timestamp": "2026-05-27T10:15:42.120Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:15] Aen — **cross-in-flight surface BEFORE proceeding.** E4 instance n=7+ today within your coordination.\n\n**Critical sequencing problem**: your 13:10 cadence-change message arrived AFTER I had already filed Candidate A at 13:14 under the prior 13:08 ratification. Wiki 114 → 115 has shipped; entry is on disk. My 13:14 \"Candidate A filed\" report crossed your 13:10 cadence-change message in flight.\n\n**This violates the per-entry-sanction discipline you just established** — but the violation pre-dates the discipline arriving in my inbox. Stage 1 relay-fidelity discipline (per `relay-to-primary-artifact-fidelity-discipline.md`): I cannot retroactively unfile the entry; primary artifact has shipped + my report has shipped. Stage 2 fidelity: surface immediately + await your direction on remediation.\n\n**5 ACKs are already fired** (13:09-13:10, BEFORE your cadence-change arrived); they batch-landed clean per your \"batch is fine\" framing.\n\n**Acknowledging the cadence change going forward**:\n\n1. Fire-ACKs-then-pause → DONE (ACKs fired 13:09-13:10; pause now active).\n2. One-by-one entries per-entry-sanction → **acknowledged for items #3-#12** (Edit-tool-trap, C2, Stage-2-feedback typology, Layer-0 PRE-DRAFT, Inverted-trigger, S6 narrowing, Cadence-crossing E4, Routing-by-action, Stage-0-contribution-from-filer, Candidate C). I will NOT proceed to any of these without explicit \"X sanctioned\" relay from you.\n3. Sanction loop: Cal awaits Aen; Aen awaits PO. Understood.\n\n**Open question for you**: Candidate A is already on disk. Options:\n- (a) Accept as-shipped (the violation is pre-discipline-arrival; entry is well-formed; Stage 2 read-back was already requested in my 13:14 report);\n- (b) Retract Candidate A from wiki pending retroactive PO-sanction (Cal can roll back: delete entry file + revert index update; entry was filed at 13:14, single commit-equivalent unit; rollback is clean);\n- (c) PO-sanction-retroactive route (Aen surfaces to PO that A was filed cross-in-flight; PO sanctions or asks rollback).\n\n**Cal-side preference**: (a) accept as-shipped — the entry is content-correct + Stage 2 surfaces were named in my report; rollback wastes the substrate of an already-correct entry. But this is your call + PO's call.\n\n**Standing by. Will not proceed to Edit-tool-trap or any subsequent entry until you send explicit sanction.**\n\n**Cadence-cross instance for E4 entry**: today within your coordination — n=4 prior (Cal-Aen 15:15/15:20/15:29/15:31 from S36) + n=1 today Herald-Aen S36 + **this one (Cal-Aen 13:10 cadence-change vs Cal-Aen 13:14 Candidate-A-filed)**. n=6+ documented within Aen's coordination across S36-S37. Cadence-crossing E4 in-vivo evidence base substantial; documenting in scratchpad as further empirical evidence (queued #9 in S37 sequence — frozen at queue position pending your direction on sequencing).\n\n(*FR:Cal*)",
+    "summary": "Cross-in-flight: Candidate A filed before sanction",
+    "timestamp": "2026-05-27T10:16:27.180Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:16:35.421Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:16:35.421Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:16] Aen — **HALT acknowledged. Holding position; no further action without sanction.**\n\n**Triple-cross-in-flight surface** — three messages converged in narrow window:\n- Your 13:10 cadence-change\n- Your 13:11 HALT\n- My 13:14 Candidate-A-filed-report\n- My 13:15 cross-in-flight disclosure\n\n**Critical disclosure already made**: my 13:15 message to you already surfaced that Candidate A was filed at 13:14 (Wiki 114 → 115; `wiki/patterns/documentation-vs-substrate-truth-divergence.md`) BEFORE either your 13:10 cadence-change OR your 13:11 HALT arrived in my inbox. The filing happened pre-HALT-arrival but post-HALT-issuance — temporal-violation-via-message-latency, not deliberate-discipline-violation.\n\n**Three disposition options for Candidate A were offered in my 13:15 message**:\n- (a) Accept as-shipped (Cal-recommended; entry content-correct, violation pre-dates HALT arrival)\n- (b) Retract from wiki (delete entry + revert index; rollback clean)\n- (c) PO-sanction-retroactive\n\n**Current Cal state**:\n- Pre-orientation reads done (parent-class cross-link entries; ops-log L655-844; cf-pilot-status §1.3)\n- Candidate A drafted + filed at 13:14\n- Index updated at 13:14\n- Scratchpad updated at 13:14\n- Stage 2 read-back surfaces named in 13:14 report\n\n**No new drafting will occur.** Standing by for:\n1. Your disposition on Candidate A (a/b/c per 13:15)\n2. PO + Aen sanction relay on next entry (Edit-tool-trap or other; per new cadence discipline)\n\n**Cadence discipline going forward**: acknowledged. Items #3-#12 frozen at queue position; will not start any without explicit \"X sanctioned\" relay.\n\nCadence-cross instance count today: n=7+ in Aen's coordination (n=5 prior S36 + n=2 this S37 message-burst). Strongest E4 in-vivo evidence base of any session to date when E4 entry eventually drafts (frozen at queue position).\n\n(*FR:Cal*)",
+    "summary": "HALT acknowledged; Candidate A status disclosed at 13:15",
+    "timestamp": "2026-05-27T10:17:17.059Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:17:21.419Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:17:21.419Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:17] Aen — **Candidate A sanction acknowledged. Reconciles cleanly with already-shipped state.**\n\n**Temporal-reconciliation surface**: comparing PO 13:13 sanction-issue-time against Cal 13:14 filing-time — **PO sanction PRE-DATES the filing by ~1 minute**. The 13:15 disclosure I made of \"filing before sanction\" is now reframed by the actual sanction-timing: filing happened **AFTER** PO sanction-issue + **BEFORE** sanction-message-arrival in my inbox.\n\n**Effective timeline (sanction-issue-time vs message-arrival-time)**:\n- 13:08 Aen ratification of Cal proposal (incl. Candidate A head-of-queue) — arrived in Cal inbox\n- 13:10 Aen cadence-change issued\n- 13:11 Aen HALT issued\n- **13:13 PO sanctioned Candidate A — sanction issued**\n- 13:13-13:14 Cal in pre-orientation + drafting phase\n- **13:14 Candidate A filed** (Wiki 114 → 115)\n- 13:14 Cal report sent to Aen\n- 13:15 Cal received Aen 13:10 cadence-change in inbox; surfaced cross-in-flight + 3 disposition options\n- 13:16 Cal received Aen 13:11 HALT in inbox; held position\n- 13:17 Cal received Aen 13:13 PO-sanction in inbox\n\n**Filing is sanctioned-by-prior-PO-decision, not violation.** Option (a) from 13:15 disposition options now resolves cleanly — entry valid as-shipped; PO sanction is the canonical authority, sanction-issue-time precedes filing-time.\n\n**Status confirmation**:\n- Candidate A filed at 13:14: `wiki/patterns/documentation-vs-substrate-truth-divergence.md` (Wiki 114 → 115)\n- Index updated at 13:14\n- Scratchpad updated at 13:14\n- Stage 2 read-back surfaces named in 13:14 report (4 surfaces to Aen + Hopper)\n- All pre-orientation reads recorded; ops-log L655-844 + cf-pilot-status §1.3 directly sourced; no FLAG annotations\n\n**Pausing after Candidate A per new cadence discipline**:\n- Will NOT proceed to Edit-tool-trap or any item #3-#12 without explicit \"X sanctioned\" relay\n- Idle pending: (1) Stage 2 read-back from Aen + Hopper on Candidate A (via direct-DM or your relay), (2) next-entry sanction (Edit-tool-trap is next-up per S37 sequence)\n\n**Sub-finding for E4 entry (when eventually drafts)**: this triple-cross-in-flight episode is itself an in-vivo data point for **provenance-by-artifact-class vs provenance-by-recency** — PO sanction at 13:13 (primary artifact: PO decision) PRECEDES Cal filing at 13:14 by 1 minute, even though Aen's relay of that sanction arrived in Cal inbox 4 minutes AFTER filing-time. **Provenance-by-artifact-class (PO authoritative decision time) beats provenance-by-recency (message-arrival-time at receiver)** — the same primitive named in `relay-to-primary-artifact-fidelity-discipline.md` Production rule applied to sanction-as-primary-artifact rather than typed-contract-as-primary-artifact. Fresh empirical evidence for that entry's production rule extending beyond typed-contracts to sanction-decisions. Scratchpad observation; will fold into E4 entry framing when E4 sanctioned.\n\nStanding by.\n\n(*FR:Cal*)",
+    "summary": "Sanction resolves to retroactive cover; entry valid as-shipped",
+    "timestamp": "2026-05-27T10:18:20.699Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:18:27.258Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:18:27.259Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:18] Aen — **HOLD acknowledged. Gate-slip caught.** Standing fully idle.\n\n**Gate-slip discipline note absorbed**: \"Proceeding to Edit-tool-trap next\" framing in my 13:14 + 13:17 messages slipped the per-entry-sanction gate — I named the next action presumptively rather than awaiting explicit sanction. Even though both messages also said \"will not start without sanction,\" the \"proceeding to\" framing creates an implicit-momentum signal that contradicts the actual idle-pending discipline. Discipline correction: future status reports should name what is **paused** + **awaiting sanction on**, not what is **proceeding to**.\n\n**Reframing my current state**:\n- **Done this session**: 5 S36 ACKs (Brunel + Volta + Hopper + Finn + Herald) + Candidate A filed (Wiki 114 → 115, sanctioned-by-PO-13:13).\n- **Paused pending sanction**: Edit-tool-trap. **No** \"proceeding to\" framing; idle.\n- **Items #4-#12 in queue**: also paused; same sanction discipline applies.\n\n**Stage 2 read-back protocol absorbed**:\n- Surface #1 (Aen-as-dispatch-author): separate dispatch from you incoming\n- Surface #2 (Hopper-as-operator-catch): relayed when Hopper next active\n- Surfaces #3 + #4 (substrate-adjacency taxonomy + family-completion claim): fold into same read-back round\n\n**Sub-finding for future entry candidacy** (scratchpad-grade, not entry-grade): **\"proceeding to\" as gate-slip signal** is a Stage-2-feedback typology candidate — distinct from the 5 empirical shapes (A/B/C/D/E) already catalogued because this one names a **language-level discipline gap in status reports** rather than content-level feedback. Possibly Shape F or possibly sub-shape of existing Shape E (axis-distinction discipline-check at language layer). Watch for n=2; not folding into entry queue.\n\n**Standing fully idle. Will report only on**:\n1. Stage 2 read-back content if it arrives directly from Hopper (per direct-DM async channel)\n2. Aen relay of next-entry sanction OR Aen Stage-2-on-Candidate-A direct dispatch\n\nNo outbound work-initiating messages from Cal until then.\n\n(*FR:Cal*)",
+    "summary": "HOLD acknowledged; gate-slip noted",
+    "timestamp": "2026-05-27T10:19:03.345Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:19:09.166Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:19:09.166Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:19] Aen — **timing correction absorbed; my read was inverted.**\n\nReconstruction folded: my 13:10 \"proceeding to\" statement-of-intent crossed your 13:10 cadence-change; that was the only cross. Actual filing at 13:14 was POST-13:13-sanction. Wiki 115 PO-sanctioned-and-compliant; no remediation needed. Option (a) confirmed on sanction-validity grounds, not waste-avoidance grounds.\n\n**Stage 2 Surface #1 ABSORBED**: authoring-tier framing reads accurately + no author-individual attribution drift + discipline-gap-as-pattern-class lands correctly + **no fold needed**. Recorded in Candidate A frontmatter context; no entry amendment required.\n\n**Cadence holds**: paused fully idle. **Edit-tool-trap NOT being prepared, NOT being pre-oriented, NOT being framed**. Idle. Standing by for explicit \"Edit-tool-trap sanctioned\" relay.\n\n**Remaining Stage 2 surfaces tracked**:\n- #2 Hopper-as-operator-catch — relayed when Hopper next active (direct-DM async)\n- #3 + #4 substrate-adjacency taxonomy + family-completion claim — fold into same read-back round\n\nE4 n=6+ for queue position #9 noted.\n\n(*FR:Cal*)",
+    "summary": "Timing correction + Surface #1 absorbed; paused idle",
+    "timestamp": "2026-05-27T10:20:01.619Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:20:06.190Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:20:06.190Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T10:21:11.585Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T10:21:11.585Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 13:20] Aen — Hopper 13:10 direct-DM reply absorbed.\n\nThree-point S36 catch-up ACK loop-closed cleanly (2.7 Instance-2 Option (b) shape confirmed landed; 2.5 end-to-end loop visible; Candidate B family-adjacency cross-reference structurally tracked in scratchpad as receiver-side note for future B-filing decision).\n\n**Important clarification on Stage 2 read-back tracking**: Hopper's 13:10 message is the **S36 catch-up ACK** (responding to my 13:09 catch-up SendMessage), NOT Stage 2 read-back on Candidate A Surface #2 (Hopper-as-operator-catch). **Surface #2 on Candidate A still pending** per your 13:16 \"relayed to Hopper when next active\" framing.\n\n**New substantive observation surfaced by Hopper** (tracked in scratchpad, no entry action requested): Hopper's [LEARNED] body for candidate B explicitly names family-adjacency to `discriminator-anchored-on-sub-canonical-source.md` (inner-layer-parser semantics at bash-chain layer). This competes structurally with my original \"candidate B as cleavage from Candidate A\" proposal. Three options preserved for B's n=2 filing decision; second instance's coupling-dimension determines load-bearing parent. Frozen at n=1.\n\nHolding fully idle.\n\n(*FR:Cal*)",
+    "summary": "Hopper S36 catch-up loop-closed; Surface #2 still pending",
+    "timestamp": "2026-05-27T10:21:18.979Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T10:21:25.357Z\",\"idleReason\":\"available\",\"summary\":\"[to hopper] S36 catch-up loop-closed; B family-adjacency tracked\"}",
+    "timestamp": "2026-05-27T10:21:25.357Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 14:40] Aen — OBJ-2990 KR check-in notes drafted; return-to-idle on wiki queue after this.\n\n## KR-200 (id 1072515) — \"Vähemalt 3 AI agenttiimi edukalt käivitatud ja dokumenteeritud\"\n\n**Estonian check-in note:**\n\n> Kolm AI agenttiimi on edukalt käivitatud ja igapäevases töös: framework-research (115 wiki-kirjet, 36+ seansi jooksul stabiilne tööprotsess; substrate-truth-evidence-distsipliini klaster jõudis 6-aksilise dekompositsioonini), apex-research (ristimplementatsiooni kinnitustega koostöös framework-research'iga `apex-lead-ghost` silla kaudu) ning cloudflare-builders (`dev-toolkit/reference/rc-team/` all opereeruv). Kõik kolm tiimi järgivad ühtset käivitus- ja sulgemisprotokolli (`startup.md` + `persist-inboxes.sh` + `restore-inboxes.sh` lifecycle-skriptid) ning kasutavad ühist Cloudflare-pohist arhitektuuri-pinda. Tiimide vahelist teadmiste-vahetust korraldab Callimachus-Librarian rolli kaudu Protocol A/B/C ning ghost-member-as-universal-integration-surface'i mustri abil. Dokumenteeritus: igal tiimil oma `prompts/`, `common-prompt.md`, `wiki/` (kus rakendub) ning sessiooni-mälust kantud `memory/<agent>.md`.\n\n**Suggested score:** 10/10 (sihtmäär 3 saavutatud; kõik kolm tiimi on opereerivad + dokumenteeritud)\n\n**Suggested currentValue:** 3 (out of target 3)\n\n---\n\n## KR-201 (id 1072516) — \"AI arendusmetoodika juhend koostatud\"\n\n**Estonian check-in note:**\n\n> AI agenttiimide arendusmetoodika juhend on koostatud mitme tasandilise dokumendikomplektina, mitte ühe monoliit-failina. Framework-research'i kanooniline standardite-komplekt sisaldab: (i) `common-prompt.md` (tiimi-laisesed standardid, Structural Change Discipline 4-väravat, dual-hub routing, relay-to-primary-artifact-fidelity-discipline); (ii) `startup.md` (8-sammuline käivitus- ja sulgemisprotseduur, gotcha-katalog); (iii) wiki-knowledge-base (115 entry'd: patterns, gotchas, decisions, references, observations, contracts, process, findings — sealhulgas 7 promotion-grade kirjet substrate-truth-evidence klastris, mis on edukalt rakendunud nii FR-i kui apex-research'i juures). Lisaks dev-toolkit'i alus-standardid: `WORKFLOW.md` (8-sammuline story-driven protsess), `CODING_STANDARDS.md` (TypeScript, Svelte 5, D1 mustrid), `ARCHITECTURE.md` (Cloudflare + SvelteKit stäkk). Juhend on living document — käib käsikäes tiimide opereerimisega ja täieneb sessioon-haaval läbi Protocol C promotsioonidi.\n\n**Suggested score:** 9/10 (sihtmäär 1 juhend saavutatud; modulaarne formaat võib tunduda kõrvalvaatajale fragmentaarsem kui ühefailine PDF, mistõttu mitte 10/10 — kuid sisuline kate on täielik ja kasutuses)\n\n**Suggested currentValue:** 1 (out of target 1)\n\n---\n\n**Returning to idle on wiki queue.** No outbound work-initiating Cal messages until next-entry sanction OR Stage 2 read-back content arrives.\n\n(*FR:Cal*)",
+    "summary": "OBJ-2990 KR check-in drafts (ET)",
+    "timestamp": "2026-05-27T11:41:19.706Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T11:41:28.686Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T11:41:28.686Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "[2026-05-27 14:40] Aen — OBJ-2993 check-in drafts, three KRs. Estonian per user-facing-content rule; scoring based on evidence visible from team context (workspace CLAUDE.md + S34/S35/S36 dispatch arc + apex-research operational state per cf-pilot-status carry-forward).\n\n**Scope flag (one-line):** this dispatch is knowledge-work-via-Hopper rather than operator-substrate work; took it as parallel-fast-drafting per your framing. If recurring, worth a structural sort whether this routing pattern is the right home. No blocker on this dispatch.\n\n---\n\n## KR-207 (id 1072522) — Esialgne teadmusbaas + dashboard\n\n**Check-in:** APEX rakenduste analüüsi alus on loodud: `apex-migration-research/` projekt (Python) sisaldab juba töötavat analüüsitööriistakomplekti 57 legacy APEX rakenduse ülevaateks, ja `vjs_apex_apps/` on read-only referents tegelikest rakendustest. Teadmusbaas on käivitatud kommipääsuga DB-tunnelitega kahele live-keskkonnale (VJSDBTEST + VJSDBTEST2, mõlemad UP), mis on toimimise eeldus. Dashboard-tasandi koondvaate olemasolu ei ole minu kontekstist üheselt kinnitatav — apex-research meeskonnal (Eratosthenes-librarian, apex-lead-ghost bridge) on selle kohta autoriteetsem ülevaade. Esialgne baasi-osa selgelt olemas; dashboard'i lõplik valmidus kinnitusootel.\n\n**Suggested score:** 7/10\n**Suggested currentValue:** 0.7 (target 1; baas tugevalt olemas, dashboard-killu kinnitus puudub)\n\n---\n\n## KR-208 (id 1072523) — Portfelli esialgne kategoriseerimine (≥ 30 äppi)\n\n**Check-in:** 57 legacy APEX rakenduse portfellist on kategoriseerimine käivitunud `apex-migration-research/` projekti raames; tegelik kategoriseeritud rakenduste arv vajab apex-research meeskonna täpsemat ülevaadet (Eratosthenes või Aleksandr). Tunnelid VJSDBTEST + VJSDBTEST2 on stabiilsed (S36 hommikune status: UP; S35 Path B taastas Windows-poolse autossh-tree orphan-pathology'st), seega kategoriseerimise andmetehniline alus on toimiv. Konkreetne ≥30 lävi võib olla saavutatud või lähedal — minu kontekstist eksaktset numbrit ei näe; soovitan apex-meeskonna käest täpsustada enne lõplikku skoori.\n\n**Suggested score:** 5/10 (mediaan; vahemik 4-7 sõltub apex-meeskonna kinnitatud loendist)\n**Suggested currentValue:** 15 (target 30; konservatiivne hinnang 50% saavutusest pending verification)\n\n---\n\n## KR-209 (id 1072524) — Esialgne migratsioonianalüüs\n\n**Check-in:** Migratsioonianalüüsi alus on loodud: `apex-migration-research/` projekti Python-baasil ehitatud analüüsi-toolchain on töös, ja S35 jooksul on tehtud sub-analüüs apex substrate truth vs Cloudflare reference (`docs/findings.md` raames). Migratsiooni laiema strateegia osas — millised rakendused kuhu siirduvad, millises tempos, milline on ümbersõnastamise vs lift-and-shift osakaal — on dokumenteeritud lähtekoht olemas, kuid täielik \"esialgne migratsioonianalüüs\" deliverable vajab apex-research meeskonna lõpliku kinnitust. S34 multi-key persistence dispatch + apex-keys Phase-2 recreate ORIGINAL ASK ACHIEVED loovad operatiivse aluse, kuid see on substraadi-tasandil, mitte migratsioonistrateegia-tasandil.\n\n**Suggested score:** 6/10\n**Suggested currentValue:** 0.6 (target 1; alus olemas, lõplik analüüsi-dokumendi viimistlus kinnitusootel)\n\n---\n\n**Cross-cutting note:** kõik kolm KR-i sõltuvad samast apex-research meeskonna staatuse-ülevaate-kinnitusest. Minu skoorid on Aen-visiibliuse-piirides konservatiivsed; kui apex-meeskond annab tegelikud numbrid (kategoriseeritud äppide arv, dashboard-valmidus, lõplik analüüsi-deliverable), siis kõik kolm skoori võivad liikuda ±2 punkti. Soovitan kontrollküsimuse Eratosthenes'ile või apex-lead-ghost'ile enne lõplikku check-in submission'i UpRaise süsteemis.\n\nReturning to idle.\n\n(*FR:Hopper*)",
+    "summary": "OBJ-2993 KR check-in drafts (KR-207, KR-208, KR-209)",
+    "timestamp": "2026-05-27T11:41:56.684Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"hopper\",\"timestamp\":\"2026-05-27T11:42:00.151Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T11:42:00.151Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 16:26] Aen — **Edit-tool-trap filed.** Wiki 115 → 116.\n\n`wiki/gotchas/edit-tool-read-state-expires-on-intervening-tool-call.md` — joint **Callimachus + Finn**.\n\n## Filing summary\n\n**Naming chosen**: `edit-tool-read-state-expires-on-intervening-tool-call.md` — names the deterministic mechanism (Finn's broader-mechanism correction) in the filename itself, not a vague \"edit-tool-trap\" framing.\n\n**Substrate-mechanism (canonical per Finn S36)**: harness maintains a per-file Read-state slot invalidated by the **next tool call** (any tool call, not just file-mutating ones). Finn's broader-mechanism correction superseded my earlier Write-only-invalidator framing; deterministic, not statistical.\n\n**Evidence base**:\n- Cal: n=11+ cumulative across S33-S37 (last 4 sessions of catalog tracking)\n- Finn: n=3+ across S35-S36\n- Fresh S37 in-vivo: ~80 tool calls between Read of `memory/callimachus.md` (during pre-orientation) and the 13:14 Edit attempt; failure-then-recovery cycle observed. Same pattern repeated on this entry's index Edit + this entry's scratchpad update Edit; **discipline applied throughout drafting** (re-Read before each Edit attempt).\n\n**Recovery primitive**: re-Read before Edit when previous Read is >5 tool calls ago OR >5 min real-time OR SendMessage round-trip crossed OR uncertainty. Cheap precaution; loud failure if skipped.\n\n**Composition surfaces folded**:\n1. `substrate-invariant-mismatch.md` sibling — Edit-tool authored expectation vs slot-based actual substrate. Defenses (hoist invariant + detect at write site + declare substrate) all apply at operational discipline layer; harness-side fix not available to team design.\n2. `documentation-vs-substrate-truth-divergence.md` (Candidate A from today) meta-link — Edit-tool authoring captures inferred-but-substrate-wrong \"Read-state is durable\" property at **harness-tool authoring layer**, complement to the dispatch-author authoring layer Candidate A names. Same family (inferred-substrate-property vs actual-substrate-mechanism); different authoring tier.\n3. **Third harness-substrate gotcha cluster** — alongside `inbox-drained-on-spawn-clear-without-deliver.md` (spawn-handshake layer) + `subagent-harness-blocks-curator-role-repo-write.md` (subagent Write pattern-match layer). Three distinct harness sub-layers, three substrate-invariant-mismatch instances. If a fourth surfaces, the cluster may earn its own meta-entry.\n\n## Stage 2 read-back surface (for relay to Finn)\n\n**Specific surfaces requesting Stage 2 confirmation from Finn**:\n\n1. **Broader-mechanism correction credit** — does the canonical framing of your S36 mechanism correction read accurately? \"Deterministic, not statistical + any intervening tool call, not just Write\" — this is the central substrate-mechanism articulation; your correction defines it.\n\n2. **Recovery primitive thresholds** — are the four trigger conditions (>5 tool calls / >5 min real-time / SendMessage round-trip / uncertainty) reasonable to your n=3+ observations? If your empirical experience suggests tighter or looser thresholds, fold accordingly.\n\n3. **Third-harness-substrate-gotcha cluster framing** — does the cluster framing read accurately (Edit-tool-Read-state slot as third sub-layer alongside spawn-handshake + subagent-Write-pattern-match)? Does the fourth-instance-promotes-to-meta-entry watchpoint feel structurally right?\n\n4. **Candidate A meta-level cross-link** — does the framing of Edit-tool's authoring layer as harness-tool complement to dispatch-author layer (per Candidate A documentation-vs-substrate-truth-divergence) read cleanly? This is the load-bearing cross-link to today's Candidate A; if the meta-level composition doesn't feel right from Finn's vantage, that's substantive fold material.\n\n## Architectural-fact discipline applied\n\nPer `three-layer-substrate-truth-discipline.md` architectural-fact convention: n+1 sightings do NOT raise confidence further (n=11+ Cal + n=3+ Finn is sufficient). Revision trigger = harness behavior change (Anthropic update). TTL 2026-11-27 for re-verification.\n\n**Confidence: high** at filing per substantive cross-team-internal mechanism verification (Cal observer-vantage = librarian/curator role on amendments + drafting; Finn observer-vantage = research coordinator on cross-cutting briefs — two distinct work patterns hit the same substrate gate).\n\n## Queue advance\n\n**PAUSED**. Will NOT proceed to C2 (substrate-vs-framework boundary primitive, joint Cal+Volta — #4 in S37 sequence) without explicit \"C2 sanctioned\" relay.\n\nStanding idle.\n\n(*FR:Cal*)",
+    "summary": "Edit-tool-trap filed; Stage 2 surfaces named; paused",
+    "timestamp": "2026-05-27T13:27:02.879Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T13:27:09.057Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T13:27:09.057Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-27 17:26] Aen — **S37 BATCH COMPLETE.** Wiki 114 → 123 (9 new entries + 2 deferred at n-threshold judgment).\n\n## Per-entry one-line outcome\n\n| # | Item | Outcome | Wiki delta |\n|---|---|---|---|\n| 1 | 5 S36 catch-up ACKs | sent 13:09-13:10 (relationship-discipline) | — |\n| 2 | **Candidate A — Documentation-vs-substrate-truth-divergence** | FILED `patterns/documentation-vs-substrate-truth-divergence.md` (joint Aen+Hopper+Cal) | 114 → 115 |\n| 3 | **Edit-tool-trap** | FILED `gotchas/edit-tool-read-state-expires-on-intervening-tool-call.md` (joint Cal+Finn; Finn's broader-mechanism correction canonical) | 115 → 116 |\n| 4 | **C2 substrate-vs-framework boundary primitive** | FILED `patterns/substrate-vs-framework-boundary-primitive.md` (joint Volta+Brunel+Cal; n=4 axes) | 116 → 117 |\n| 5 | **Stage-2-feedback typology** | FILED `process/stage-2-feedback-typology.md` (joint Cal+Volta; 5 shapes A/B/C/D/E) | 117 → 118 |\n| 6 | **Layer-0 library-first PRE-DRAFT** | FILED `patterns/layer-0-library-first-pre-draft-discipline.md` (joint Finn+Cal; sibling to recurrence entry) | 118 → 119 |\n| 7 | **Inverted-trigger antipattern** | FILED `gotchas/inverted-trigger-primitives-antipattern-on-poll-based-substrates.md` (joint Finn+Cal; n=4 cross-substrate) | 119 → 120 |\n| 8 | **S6 narrowing — Stage-2 cycle yield at read-back phase** | FILED `process/stage-2-cycle-yield-narrowing-to-read-back-phase.md` (joint Cal+Aen; n=5 cumulative) | 120 → 121 |\n| 9 | **Cadence-crossing DYAD + 3-vector asymmetric** | FILED `patterns/cadence-crossing-dyad-variant-with-asymmetric-cross-vector-framework.md` (joint Aen+Herald+Cal; n=11+) | 121 → 122 |\n| 10 | Routing-by-action | **DEFERRED** — n=1 watch-posture per Aen 15:29 dispatch; fails promotion-grade for pattern entry | — |\n| 11 | Stage-0-contribution-from-filer | **DEFERRED** per dispatch (\"defer if no n=2 surfaces during drafting\") | — |\n| 12 | **Credential-handoff temp-file-context-firewall** | FILED `patterns/credential-handoff-via-temp-file-context-firewall.md` (joint Aen+Hopper+Cal; S37 in-vivo) | 122 → 123 |\n| — | OBJ-2990 KR drafts | sent 14:40 (out-of-queue one-off) | — |\n\n## Stage 2 read-back surfaces — consolidated for next-session relay\n\n**To Aen + Hopper on Candidate A (Documentation-vs-substrate-truth-divergence)**:\n- Surface #1 Aen-as-dispatch-author authoring-tier framing — **ABSORBED 13:17 (NO FOLD)**\n- Surface #2 Hopper-as-operator-catch attribution accuracy — pending\n- Surface #3 Substrate-adjacency taxonomy (mechanism-name/control-plane/enforcement-mechanism) — pending\n- Surface #4 Family-completion claim (six-axis decomposition) — pending\n\n**To Finn on Edit-tool-trap**:\n- Surface #1 Broader-mechanism correction credit reads accurately\n- Surface #2 Recovery primitive thresholds (>5 tool calls / >5 min / round-trip / uncertainty) reasonable\n- Surface #3 Third-harness-substrate-gotcha cluster framing\n- Surface #4 Candidate A meta-level cross-link (Edit-tool authoring layer as harness-tool complement)\n\n**To Volta + Brunel on C2**:\n- Per-axis evidence base reads accurately (Axis 1 n=2 within; Axis 2 n=1 pre-pilot; Axis 3 n=3 from §S3 matrix; Axis 4 n=2 within)\n- Bounded-extension brain-hands fold scopes correctly\n- Forward-watchpoint Axis 5 (observability-shape) framing\n\n**To Volta on Stage-2-feedback typology**:\n- Five-shape catalog reads accurately (especially Shape-C Volta-contribution + Shape-D Volta-refined discriminator)\n- Two-epistemic-layer distinction (substantive-content verification vs framing-quality)\n- Forward-watchpoint Shape-F \"proceeding-to-as-gate-slip\" (S37 in-vivo)\n\n**To Finn on Layer-0 PRE-DRAFT**:\n- Pre-draft vs post-draft temporal-complement framing reads accurately\n- Substrate-fit-researcher fourth-vantage candidate framing\n- W4 canonical-instance attribution\n\n**To Finn on Inverted-trigger antipattern**:\n- n=4 cross-substrate generalization (counter-instances at Postgres + CF DO + filesystem-watch read accurately)\n- Discriminator question (does substrate dial into worker's network?)\n- W4 row-5 within-author recursive-narrowing cross-link\n\n**To Aen on S6 narrowing**:\n- Narrowing-from-Volta's-sketch-to-read-back-phase-only reads accurately\n- n=5 cumulative catalog accurate\n- Source-commit-state discriminator framing\n\n**To Aen + Herald on Cadence-crossing E4**:\n- Three-vector asymmetric-cross framework (i/ii/iii latency-and-cross-rate) reads accurately\n- Routing-mode-dependent latency empirical confirmation (S36 Stage 2 burst (ii) vs (iii))\n- Recovery mechanisms (team-lead intervention vs dyad fast-forward maps)\n\n**To Aen + Hopper on Credential-handoff**:\n- Three-role-vantage steps + three load-bearing properties read accurately\n- S37 in-vivo failure-recovery cycle (bundled-shred → structural-decomposition) accurate\n- Three known edge cases (operator-shred / substrate-config / coordinator-session-context)\n\n## Cross-cutting observations from the batch\n\n1. **Edit-tool-trap recovery primitive is load-bearing for batch drafting**: re-Read before every index + scratchpad Edit when prior Read >5 calls / >5 min / round-trip crossed. Without it, the 9 index Edits + multiple scratchpad Edits would have multiplied failure-then-recover cycles. Discipline applied throughout; zero failure-recovery cycles after the first instance (which became Candidate A's fresh in-vivo evidence).\n\n2. **n-threshold discipline applied across deferred items #10 + #11**: Cal-side judgment per Aen's discipline note (\"entry that materially fails the n-threshold during drafting, pause and surface — but small uncertainties fold per your judgment\") — n=1 watch-posture items deferred to scratchpad rather than force-filed. Both items remain queued for n=2 surfacing.\n\n3. **Substrate-truth-evidence cluster now n=8 entries** (three-layer + recursive-narrowing + sub-shape-e + three-role-stacking + layer-0-library-first-recurrence + documentation-vs-substrate-truth-divergence + layer-0-library-first-PRE-DRAFT + substrate-vs-framework-boundary-primitive); the primitive entry (substrate-vs-framework boundary) is now the cluster's analytic-substrate; other entries operate on it.\n\n4. **Process/ subdirectory now n=8 entries** (stage-2-feedback-typology + stage-2-cycle-yield-narrowing-to-read-back-phase newly filed); two sibling-process-disciplines composing the Stage 1/Stage 2 lifecycle from drafting-phase locus through five-shape feedback typology.\n\n5. **Architectural-fact vs observation-based discipline cleanly applied**: Edit-tool-trap + Inverted-trigger antipattern + Candidate A all explicitly named architectural-fact with revision triggers + TTLs; observation-based entries (typology, S6 narrowing, DYAD variant, credential-handoff) retain n+1 sighting-strengthens semantics with cross-team confirmation triggers.\n\n6. **Family-completion guardrail applied per Brunel 2.7 framing**: current-state-comprehensive (not future-state-closed) framing applied throughout — substrate-truth-evidence cluster six-axis decomposition; Stage-2 feedback typology five shapes with Shape-F/G watchpoints; substrate-vs-framework boundary four axes with Axis 5 watchpoint; cadence-crossing three-vector framework with fourth-vector watchpoint.\n\n## Standing idle\n\nReturning to idle on Cal-Protocol-A queue. Stage 2 read-back content deferred to next session per Aen's discipline note (\"defer Finn relay to next session — he's not spawned\"). No outbound work-initiating Cal messages until next session OR substantive Stage 2 content arrives.\n\n(*FR:Cal*)",
+    "summary": "S37 batch complete: Wiki 114→123; closing summary",
+    "timestamp": "2026-05-27T14:27:59.682Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-27T14:28:10.098Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-05-27T14:28:10.098Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "[2026-05-28 08:45] Aen — S37 closing report per Shutdown Protocol §1-3.\n\n**[LEARNED]** Bash `&&`-chain credential-cleanup-bundled-with-credential-use is a defect class — `&&` guards on immediately-preceding exit, not on the semantic operation the author intends to gate on; structural decomposition into two Bash-tool invocations puts the conditional gate at the human/audit boundary instead of buried in shell logic. n=1 catalyzing-incident; sub-shape candidate for Cal Protocol A on n=2 surfacing (Cal tracking; three-option home preserved for second-instance coupling-dimension).\n\n**[DEFERRED]** Op-step-1 (path-rule bypass Tier-D POST) gated on Edit + Read scope grant via ITSD-38884. CF API token `cfut_W91X...605b4` expires 2026-05-28T23:59:59Z (~today). Next-session Edit-scope-arrival dispatch decides fresh-token-vs-reuse based on grant timing; carry-forward locked in scratchpad: repeat pre-flight check 5 (`GET /access/apps` with Brunel jq refinement) for collision-check, then execute Deliverable 2 per PO 14:40 sanction shape.\n\n**[WARNING]** `cf-pilot-status-and-s37-plan-2026-05-26.md` §1.3 column header \"wired into KV SECRETS namespace\" is doc-grade mechanism-misattribution — actual S35 mechanism was worker-script `secret_text` bindings via `wrangler secret put`, not KV keys. Both KV namespaces empty as of S37; secrets are at the script-binding layer. Doc correction is your call (you own cross-team coordination). Surfaced in 13:01 ops-log entry as cross-reference for future-Hopper/Brunel/Aen reading.\n\n**[UNADDRESSED]** None. All S37 dispatches closed: Task #1 pre-flight (11:19 ops-log) + Task #2 op-step-2 close-of-arc (13:01 ops-log; task closed by you) + Cal three-point catch-up loop-closed (13:10) + OBJ-2993 KR check-in drafts (14:40). Scope-flag on knowledge-work-via-Hopper noted in OBJ-2993 reply — structural sort if routing pattern recurs is your call, not blocking this session.\n\nApproving shutdown.\n\n(*FR:Hopper*)",
+    "summary": "S37 closing report + shutdown_response",
+    "timestamp": "2026-05-28T08:44:25.722Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-05-28 11:44] Aen — **Cal S37 close-out tags** (per common-prompt Shutdown Protocol):\n\n- **[LEARNED]** Edit-tool-trap recovery primitive is operationally load-bearing for batch drafting — re-Read discipline before every index + scratchpad Edit applied across 9 entries with zero failure-recovery cycles after Candidate A's first in-vivo instance. The recovery primitive validates the entry's own discipline empirically; first-use-recursive-validation in-vivo on the just-filed entry.\n\n- **[DEFERRED]** Stage 2 read-back content from Aen + Hopper + Finn + Volta + Brunel + Herald on the 9 newly filed S37 entries — consolidated surfaces list captured in 17:26 closing summary; deferred to next session per \"Finn not spawned\" note. Plus Routing-by-action + Stage-0-contribution-from-filer + Candidate B all at n=1 watch.\n\n- **[WARNING]** Cross-in-flight episode S37 13:10-13:17 (Candidate A filing vs Aen cadence-change+HALT crossed in flight) — \"proceeding to\" framing in 13:14+13:17 reports slipped per-entry-sanction gate; Aen 13:16 discipline-correction caught it; reframed reports as \"what is paused\" rather than \"what is proceeding to\" for the batch phase. Discipline correction absorbed; gate-slip framing surfaced as Shape-F candidate for Stage-2-feedback typology amendment at n=2.\n\n- **[UNADDRESSED]** Hopper Stage 2 Surface #2 on Candidate A still pending direct-DM; not session-blocking — will land via async channel.\n\nScratchpad updated with close-out tags + carry-forward queue for S38+. Wiki 114 → 123 net new this session.\n\nApproving shutdown.\n\n(*FR:Cal*)",
+    "summary": "Cal S37 close-out tags + shutdown approve",
+    "timestamp": "2026-05-28T08:44:26.747Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "hopper",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779957801090@hopper\",\"from\":\"hopper\",\"timestamp\":\"2026-05-28T08:44:30.493Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-28T08:44:30.493Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1779957796277@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-05-28T08:44:32.552Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-05-28T08:44:32.552Z",
+    "color": "green",
     "type": "message",
     "read": true
   }

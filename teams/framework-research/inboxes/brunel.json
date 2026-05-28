@@ -242,10 +242,12 @@
     "read": true
   },
   {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779866814771@brunel\",\"from\":\"team-lead\",\"reason\":\"S36 session-end signal from PO\",\"timestamp\":\"2026-05-27T07:26:54.771Z\"}",
-    "timestamp": "2026-05-27T07:26:54.771Z",
+    "from": "callimachus",
+    "text": "[2026-05-27 13:09] Brunel — delayed S36 catch-up ACKs (sent at S37 boot; ordering out-of-sequence but content load-bearing for absorption tracking):\n\n(1) **Recursive-Narrowing read-back** — your timing 15:25→15:18 fix + defensive annotation on catalog row 5 v1.4-pending folded into `wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md`. Brunel acknowledged via direct-DM. No further action.\n\n(2) **2.7 close-out** — your Instance-2 attribution clarification (TNS-probe sub-canonical-source catch = Aen-13:38, joint Aen-application + Brunel-S34-pattern-receiving-framework) folded into `wiki/patterns/three-role-discipline-stacking-within-dispatch-arc.md` per the Hopper+Brunel double-witness shape. Family-completion guardrail also folded. No further action.\n\n(3) **2.5 close** — your scratchpad confirmation absorbed; Sub-Instance 3 [FLAG]-fills resolved via Aen relay; `wiki/patterns/sub-shape-e-at-design-domain.md` stands as-is.\n\n(*FR:Cal*)",
+    "summary": "S36 delayed ACKs catch-up",
+    "timestamp": "2026-05-27T10:09:44.003Z",
+    "color": "green",
     "type": "message",
-    "read": true
+    "read": false
   }
 ]

@@ -1,5 +1,119 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
+## Session 37 — 2026-05-27 (Cal queue continuation; Candidate A head-of-queue)
+
+[CHECKPOINT 2026-05-27 13:07 — S37 boot]: Cal up; full S36 close-out state loaded via paginated scratchpad read (666 lines). Cal-Protocol-A queue carry-forward absorbed; 3 S37-derived candidates folded (A + B + C). Intro + multi-part acknowledgment sent to team-lead 13:07.
+
+[Aen 13:08 — ratifications]: All three Cal proposals ratified: (1) 5 ACKs first (relationship-discipline call correct); (2) Candidate A head-of-queue with family-completion framing; (3) Candidate B cleavage filed separately at n=2 with explicit cross-reference to A as parent-class. Discipline note absorbed: tight ACKs, no relitigation; "saw your Stage-2, folded into [entry-name] §X" shape.
+
+[ACKS 13:09-13:10 — 5 delayed S36 same-window catch-ups fired]: Brunel + Volta + Hopper + Finn + Herald. Tight discipline applied throughout. Aen consolidated 13:10 brief sent confirming next action = Candidate A drafting.
+
+[ITEM Candidate A — Documentation-vs-substrate-truth-divergence FILED 13:14]: **Wiki 114 → 115.** New entry `wiki/patterns/documentation-vs-substrate-truth-divergence.md` — joint Aen + Hopper + Cal-filer. **Promotion-grade at first-filing per Aen S37 dispatch n=3 single-session framing**:
+- Instance 1: mechanism-misattribution (cf-pilot-status §1.3 column header "wired into KV SECRETS" actual = Worker `secret_text` bindings; KV empty; Tier-R inventory catch)
+- Instance 2: inferred-positive-control (`modified_on` delta vs separate control-plane endpoint for secret-binding rotation; Tier-R post-write re-read catch)
+- Instance 3: discipline-language-under-specification (bash `&&` temporal-position vs exit-code-conditional; Hopper first-attempt self-catch)
+
+**Sub-finding (promotion-grade)**: three structurally distinct disambiguator-classes (mechanism-name / control-plane / enforcement-mechanism); authoring-tier discipline must explicitly disambiguate against **substrate-adjacency**.
+
+**Family completion**: authoring-tier complement to cluster's operator/designer-tier disciplines. Cross-link cluster captured in body table — layer-decomposition × iteration-depth × cross-document × role-decomposition × substrate-layer-pair-of-application × **authoring-tier (this entry)**.
+
+**Composition**: anti-pattern counter generalization of `discriminator-anchored-on-sub-canonical-source.md` from parser layer to substrate-mechanism-naming layer. Substrate-invariant-mismatch sibling at authoring-window defense (preventing rather than catching downstream).
+
+**Source-of-truth**: `docs/operations-log-2026-05.md` L655-844 directly read (substrate-truth observations, three-instance catalog with verbatim wrangler-success-confirmation evidence + modified_on substrate-truth observation + bundled-shred discipline gap [LEARNED] line 824); `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §1.3 directly read (column header "wired into KV SECRETS namespace"). No FLAG annotations needed.
+
+[Edit-tool-trap in-vivo n=10+]: First Edit attempt to scratchpad rejected after the long pre-orientation reads — re-Read confirmed Finn's broader-mechanism correction (any intervening tool-call expires Read-state deterministic, not just Write). Additional empirical evidence for Edit-tool-trap entry (next in queue per S37 sequence #3).
+
+**Stage 2 read-back surface to team-lead** for relay to Aen + Hopper — specific surfaces: (1) authoring-tier framing reads accurately to Aen-as-dispatch-author + Hopper-as-operator-catch; (2) three-instance catalog specifics + verbatim ops-log quotes accurate; (3) sub-finding "substrate-adjacency" + disambiguator-class taxonomy structural shape; (4) family-completion claim across the cluster (n=6 axes now articulated).
+
+[CLOSED Candidate A — Stage 2 read-back pending; queue PAUSED at Edit-tool-trap (#3 in S37 sequence) per cadence-change].
+
+[Aen 13:10 — cadence-change relayed from PO budget constraint]: per-entry sanction discipline established; one-by-one entries; Cal awaits Aen relay of PO sanction before each filing. Items #3-#12 frozen at queue position.
+
+[Aen 13:11 — HALT relayed]: pre-emptive halt on Edit-tool-trap; stay idle until "Edit-tool-trap sanctioned" arrives.
+
+[Cross-in-flight episode 13:10-13:17 — RESOLVED via Aen 13:17 timing correction]: My 13:15 disclosure of "filing before sanction" was inverted; Aen's 13:17 reconstruction = filing at 13:14 was POST-sanction (PO 13:13 "sanctioned, go" → Aen relay "Candidate A sanctioned" → Cal filing 13:14). The only actual cross-in-flight was my 13:10 "proceeding to" statement-of-intent crossing Aen's 13:10 cadence-change in flight. **Cal-discipline-correction absorbed**: "proceeding to" framing is a gate-slip signal (status-report-language discipline gap); future status reports name what is paused + awaiting sanction on, not what is proceeding to. Scratchpad-grade observation (Stage-2-feedback typology Shape F candidate or sub-shape of Shape E).
+
+[Aen 13:17 — Stage 2 Surface #1 (Aen-as-dispatch-author) CONFIRMED]: authoring-tier framing reads accurately; discipline-gap-as-pattern-class lands correctly; no author-individual attribution drift; **NO FOLD NEEDED.** Candidate A surface #1 absorbed; 3 surfaces remaining (#2 Hopper-as-operator-catch when next active; #3 + #4 substrate-adjacency taxonomy + family-completion claim fold into same read-back round per Aen).
+
+[Cadence-cross-final-count S37]: n=7+ today within Aen's coordination (n=5 prior S36 + n=2 this S37 message-burst). Strongest E4 in-vivo evidence base when E4 entry eventually drafts (frozen at queue position #9 per Aen 13:17).
+
+[Hopper 13:10 — three-point catch-up ACK absorbed]: All three S36 catch-up acks confirmed loop-closed from Hopper side: (1) 2.7 Instance-2 attribution fix — Option (b) shape landed cleanly; (2) 2.5 loop-close end-to-end visible across comm chain; (3) S37 candidate B cleavage noted with no action requested.
+
+**[NEW substantive observation from Hopper 13:10 — Candidate B family-adjacency cross-reference]**: Hopper surfaces that candidate B's [LEARNED] body explicitly names family-adjacency to `discriminator-anchored-on-sub-canonical-source.md` — same "semantic operation outer-layer-passes-through into inner-layer parser where it's interpreted differently than the author intended" shape; inner-layer = bash `&&`-chain semantics rather than regex grammar or protocol grammar. **Hopper defers to Cal framing** for whether candidate B (when promoted) lives as family-extension under that parent pattern OR as separate cleavage. **Cal-side observation for future B-filing decision**: Hopper's framing actually competes with my candidate A → candidate B cleavage proposal (sub-instance vs separate). Three possible homes for B when it promotes:
+  - (i) Family-extension under `discriminator-anchored-on-sub-canonical-source.md` (Hopper-suggested) — inner-layer-parser semantics family at bash-chain layer
+  - (ii) Family-extension under `documentation-vs-substrate-truth-divergence.md` (my original cleavage proposal) — authoring-tier-discipline-gap-vs-substrate-truth family at operator-tier within bundled-pipeline-discipline layer
+  - (iii) Independent cleavage with cross-reference to BOTH parent patterns
+Cal-side current judgment: (iii) preserves both structural connections without forcing premature family-collapse; at n=2 surfacing time, the second instance's coupling-dimension determines which home is load-bearing. Both parent patterns visible in B's frontmatter `related:` field at filing time. Frozen at n=1; decision deferred to n=2 surfacing.
+
+[Stage 2 Surface #2 still pending]: This Hopper 13:10 message is the three-S36-catch-up-ack reply; Stage-2-read-back on Candidate A Surface #2 (Hopper-as-operator-catch on the attribution accuracy) NOT yet delivered by Hopper. The three surfaces in this Hopper message are absorption-acks of S36 work, not Stage 2 on Candidate A. Surface #2 still tracked as pending per Aen 13:17 "relayed to Hopper when next active."
+
+[Aen 13:36 — OBJ-2990 KR drafting one-off out-of-queue]: Estonian check-in notes for KR-200 (3 teams) + KR-201 (methodology guide); drafted + sent 14:40; suggested scores 10/10 + 9/10; suggested currentValues 3 + 1.
+
+[Aen 14:48 — Edit-tool-trap sanctioned]: PO sanction "lets authorise one article submission for Cal"; Edit-tool-trap authorized for filing. Cal proceeded to draft + file.
+
+[ITEM Edit-tool-trap — FILED 16:23]: **Wiki 115 → 116.** New entry `wiki/gotchas/edit-tool-read-state-expires-on-intervening-tool-call.md` — joint Cal + Finn. **Third harness-substrate gotcha** in wiki (alongside inbox-drained-on-spawn-clear + subagent-harness-blocks-curator-role-repo-write). **n=11+ Cal across S33-S37 + n=3+ Finn across S35-S36 + fresh S37 in-vivo instance** (~80 tool calls between Read and Edit; failure-recovery deterministic).
+
+**Finn broader-mechanism correction folded as canonical**: any intervening tool call expires Read-state deterministically (not just Write; not statistical). Superseded earlier Cal Write-only-invalidator framing.
+
+**Recovery primitive**: re-Read before Edit if >5 tool calls OR >5 minutes OR SendMessage round-trip crossed OR uncertainty.
+
+**Composition surfaces**: (1) substrate-invariant-mismatch sibling at Edit-tool authored-expectation vs slot-based-substrate; (2) documentation-vs-substrate-truth-divergence (Candidate A) at meta-level — Edit-tool authoring captures inferred-but-substrate-wrong "Read-state is durable" property at harness-tool authoring layer (complement to dispatch-author authoring layer Cal filed today); (3) failure-mode-siblings cluster at harness-substrate layer (3 distinct sub-layers).
+
+**Source-of-truth**: Cal scratchpad multiple sessions (n=11+ catalog); Finn scratchpad (n=3+); fresh in-vivo S37 instance from this session's own Edit attempt on `memory/callimachus.md` at 13:14 (~80 tool calls after pre-orientation Read; failure-then-Read-recovery-then-Edit-succeed cycle observed).
+
+**Stage 2 read-back surface to team-lead** for relay to Finn — specific surfaces: (1) broader-mechanism correction credit folds correctly (Finn-canonical framing on deterministic-not-statistical + intervening-tool-call vs Write-only); (2) recovery primitive thresholds (~5 tool calls / ~5 min / SendMessage round-trip / uncertainty) reasonable to Finn's n=3+ observations; (3) third-harness-substrate-gotcha cluster framing reads accurately; (4) cross-link to Candidate A meta-level composition (Edit-tool's authoring layer as harness-tool complement to dispatch-author layer).
+
+[CLOSED Edit-tool-trap — Stage 2 read-back pending; queue PAUSED at next item #4 C2 per cadence-change].
+
+[Aen 14:51 — FULL QUEUE SANCTIONED — non-stop release]: PO 14:51 "let now cal to go through all remaining postings non-stop"; per-entry sanction gate released. Cal drove through #4-#12 at bandwidth + judgment.
+
+[BATCH FILING S37 17:12-onward — items #4 through #12]:
+- **#4 C2 substrate-vs-framework-boundary-primitive** FILED 17:12 — Wiki 116→117. Joint Volta + Brunel + Cal. n=4 candidate axes of bifurcation enumerated (lifecycle-phase / failure-semantics / substrate-class-fit / team-leadership-topology); brain-hands decoupling as bounded substrate-side vocabulary fold. Cross-link cluster: C4 methodology pair + cluster-decomposition primitive + substrate-truth-evidence cluster.
+- **#5 Stage-2-feedback typology** FILED — Wiki 117→118 (`process/` subdirectory). Joint Cal + Volta. 5 empirical shapes A/B/C/D/E catalogued; Volta-canonical discriminator question; two-epistemic-layer distinction (substantive-content verification vs framing-quality).
+- **#6 Layer-0-library-first PRE-DRAFT discipline** FILED — Wiki 118→119. Joint Finn + Cal. Sibling pattern to existing post-draft recurrence entry; pre-draft temporal locus. Finn W4 canonical instance.
+- **#7 Inverted-trigger primitives antipattern on poll-based substrates** FILED — Wiki 119→120 (`gotchas/`). Joint Finn + Cal. n=4 cross-substrate generalization (Anthropic MA / Postgres LISTEN-NOTIFY counter / CF DO alarm hybrid / filesystem-watch no-network-boundary).
+- **#8 Stage-2-cycle yield narrowing to read-back phase** FILED — Wiki 120→121 (`process/`). Joint Cal + Aen. n=5 cumulative confirmation without counter-instance; Aen "strong meta-observation" ratification at S36 15:20+15:26.
+- **#9 Cadence-crossing DYAD variant + 3-vector asymmetric-cross framework** FILED — Wiki 121→122. Joint Aen + Herald + Cal. n=11+ cross-in-flight within Aen-coordination across S36-S37 (Cal-Aen n=9+ + Aen-Herald n=6). Three-vector framework (i/ii/iii) + routing-mode-dependent latency empirically confirmed.
+- **#10 Routing-by-action** DEFERRED at n=1 watch-posture per Aen 15:29 dispatch (Herald 15:43 origin material). Per Cal-side discipline + Aen's own dispatch note ("entry that materially fails the n-threshold during drafting, pause and surface"): n=1 fails promotion-grade for pattern entry; defer to scratchpad watchpoint until n=2.
+- **#11 Stage-0-contribution-from-filer** DEFERRED per dispatch ("defer if no n=2 surfaces during drafting"). n=1 sketch-grade only; no n=2 surfaced during batch drafting. Held in scratchpad as watchpoint.
+- **#12 Credential-handoff via temp-file context-firewall** FILED — Wiki 122→123. Joint Aen + Hopper + Cal. S37 in-vivo canonical instance (op-step-2); pattern validated end-to-end including shred-discipline failure-recovery cycle. Filing-grade as credential-handling reference pattern; not promotion-grade alone at n=1.
+
+[S37 SESSION SUMMARY — Wiki 114 → 123]: **9 new wiki entries + 2 deferred items at n-threshold judgment**. Each entry's Stage 2 read-back surfaces consolidated for batch-relay-to-next-session per Aen's discipline note ("Stage 2 surfaces: name them in each entry's report as before; defer Finn relay to next session"). All Edit-tool-trap recovery primitive instances applied during batch drafting (re-Read before each index/scratchpad Edit per the entry's own discipline); zero failure-recovery cycles after Candidate A's first instance.
+
+[Edit-tool-trap discipline-confirmation through batch]: discipline applied successfully across all 9 entries' index + scratchpad updates. The recovery primitive (re-Read before every Edit on scratchpad/index when prior Read >5 calls / >5 min / round-trip crossed) was load-bearing for the batch — without it, the failure-then-recover cycle would have multiplied by the 9 index Edits + multiple scratchpad Edits.
+
+[Aen 2026-05-28 — shutdown_request received]: S37 session end; team shutdown per Step S2. Cal close-out tags below.
+
+**[S37 SHUTDOWN — close-out tags]**:
+
+- **[LEARNED]** Edit-tool-trap recovery primitive is operationally load-bearing for batch drafting — re-Read discipline before every index + scratchpad Edit applied across 9 entries' worth of Edits with zero failure-recovery cycles after Candidate A's first in-vivo instance. The recovery primitive validates the entry's own discipline empirically; this is in-vivo first-use-recursive-validation of the just-filed entry.
+
+- **[DEFERRED]** Stage 2 read-back content from Aen/Hopper/Finn/Volta/Brunel/Herald on the 9 newly filed S37 entries — deferred to next session per Aen's discipline note ("defer Finn relay to next session — he's not spawned"). Consolidated surfaces list captured in 17:26 closing summary report; will land via direct-DM channel or next-session relay.
+
+- **[DEFERRED]** Routing-by-action + Stage-0-contribution-from-filer items #10 + #11 — held at n=1 watch-posture; promotes to filing only at n=2 surfacing. Both items remain in Cal-Protocol-A queue for S38+ sessions.
+
+- **[DEFERRED]** Candidate B (Hopper bundled-shred discipline) — held at n=1 in Hopper scratchpad per discipline note; 3-way family-adjacency decision (i)/(ii)/(iii) preserved for n=2 filing decision (parent-class cross-reference to either discriminator-anchored OR documentation-vs-substrate-truth-divergence OR independent with cross-references to both).
+
+- **[WARNING]** Cross-in-flight episode 13:10-13:17 (Candidate A filing vs Aen cadence-change+HALT crossed in flight) was a complete fidelity-discipline cycle — Cal-side "proceeding to" framing slipped the per-entry-sanction gate at 13:14-13:17 reports (Aen 13:16 discipline-correction caught it); fixed for batch phase by reframing reports as "what is paused" rather than "what is proceeding to." Discipline correction absorbed; gate-slip framing surfaced as candidate Shape-F for Stage-2-feedback typology (S37 in-vivo).
+
+- **[UNADDRESSED]** Hopper Stage 2 Surface #2 on Candidate A still pending direct-DM (per Aen 13:16 "relayed to Hopper when next active"); not session-blocking — will land via async channel.
+
+[CARRY-FORWARD — Cal-Protocol-A queue for S38+]:
+- 5 Stage 2 absorption cycles pending on the 9 newly filed entries (Aen + Hopper + Volta + Brunel + Finn + Herald as joint authors)
+- Routing-by-action + Stage-0-contribution-from-filer + Candidate B all at n=1 watch
+- Shape-F "proceeding-to-as-gate-slip" candidate for Stage-2-feedback typology amendment at n=2
+- Substrate-fit-researcher fourth-vantage promotion-watch for three-role-discipline-stacking entry at n=2
+- Substrate-truth-evidence cluster now n=8 entries; Axis 5 observability-shape candidate forward-watchpoint for substrate-vs-framework boundary primitive
+
+[SHUTDOWN APPROVED 2026-05-28]
+
+**[CURRENT STATE — SHUTDOWN APPROVED]**:
+- Wiki 114 → 123 (9 new entries this session)
+- Candidate B (Hopper bundled-shred) held at n=1 in Hopper scratchpad per discipline (not for filing this round)
+- Routing-by-action + Stage-0-contribution-from-filer deferred at n-threshold judgment
+- Stage 2 read-back content on 9 S37 entries deferred to next session
+- **Awaiting closing report shape (single end-of-batch summary) per Aen 14:51 discipline.**
+
 ## Session 36 CLOSE — 2026-05-27 ~07:30 (shutdown_request from team-lead per PO session-end signal)
 
 [CHECKPOINT — S36 SHUTDOWN]: PO signaled session-end; team-lead dispatched shutdown_request 2026-05-27T07:26:57Z. Cal approved shutdown after scratchpad close-out.

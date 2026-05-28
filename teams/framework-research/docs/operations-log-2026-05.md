@@ -643,3 +643,214 @@ Distinct from both morning generation (674958961/57) AND Aen's post-restart gene
 - `[LEARNED — discipline, library-first / Layer-0]` Reaffirmed as the load-bearing observation from this dispatch arc. **Candidate Hopper-Amendment-5** (Layer 0 prepended to the three-layer discipline that just landed in Amendment-4). Per the batched-iterate compact with Celes from 14:47 yesterday, deferred to next amendment-pass since task #6 catalyzing-incident is now materialized + Amendment-4 has just settled. Not surfacing to Celes now — letting Amendment-4 stabilize for a session or two before proposing the Layer-0 extension; n=1 catalyzing-incident is sufficient for the next round.
 
 (*FR:Hopper*)
+
+---
+
+## 2026-05-27T11:19+03:00 — fr-cma-pilot CF substrate Tier-R pre-flight (PASS-with-ANOMALY)
+
+**timestamp** — 2026-05-27T11:15+03:00 (dispatch landed via Aen) through 2026-05-27T11:19+03:00 (pre-flight batch complete).
+
+**tasker** — Aen (S37 dispatch; PO-routed via Aen per single-coordinator-hub pattern; references PO 14:40 2026-05-26 verbatim sanction "Approve as drafted" against Deliverable 2 NEW Access App POST shape, which remains HELD pending Edit scope).
+
+**dispatch summary** — Read-only pre-flight on Cloudflare pilot substrate `fr-cma-pilot.evree.workers.dev` using current CF API token (`cfut_W91X...605b4`, 4 of 5 required scopes; Access:Apps:Edit MISSING per EVR IT ticket ITSD-38884). Validate Worker + 2 KV + 1 D1 + 1 R2 + Access apps inventory against S35 deploy notes (Aen scratchpad + cf-pilot-status-and-s37-plan-2026-05-26.md). Surface back with full results so next-session Tier-D POST (when Edit scope lands) can execute against verified-current baseline without re-verification.
+
+**tier classification + sanction status** — Tier R throughout; default-permitted; no per-task sanction required. Token redacted in all outputs (form `cfut_W91X...605b4`).
+
+**deployed-artifacts-read declaration** — three-layer probe suite, per-layer attribution:
+
+- **Layer 1 (FR design-as-shipped)** — No on-disk artifacts at `designs/deployed/fr-cma-pilot/container/*` (this is a CF managed-agents-template-derived substrate, not FR-shipped via Brunel Dockerfile-discipline). §Graceful Degradation case 1 applies. Proceed-without-Layer-1-read per Aen S37 dispatch package which references the equivalent canonical sources: `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §1 (deployment substrate established) + §1.2 (bindings provisioned) + scratchpad `[DISPATCH — Task #1 S36 ...]` carry-forward. Aen tasker-confirmation implicit in the dispatch's enumerated expected-bindings list.
+- **Layer 2 (consumer-team operational copy)** — CF managed-agents template at `~/Documents/github/.mmp/claude-managed-agents/` (cloned in S35 by Aen-direct; canonical for `wrangler.jsonc` declarations + DO class definitions + worker `src/webhooks.ts` signature-check logic). Not re-probed this pre-flight (S35-S36 reads already canonical; no drift signal in dispatch). Read via prior session: `docs/securing-access.md`, `wrangler.jsonc:80-96` (Container DO commented out), `src/webhooks.ts:74-126` (Standard Webhooks signature verification).
+- **Layer 3 (running substrate state — CF control plane)** — six API reads against `https://api.cloudflare.com/client/v4/`, account `8f150f98013eec8cae0a9db20a010c49`:
+  - `/user/tokens/verify` → token id `bce585f6572a1229e9133d988379c059`, status active, not_before 2026-05-26T00:00:00Z, expires_on 2026-05-28T23:59:59Z (~37h headroom from probe time)
+  - `/accounts/{acct}/workers/scripts` (list) → `fr-cma-pilot` present, modified_on `2026-05-26T10:08:32.237277Z`, created_on `2026-05-26T10:08:06.00474Z` (S35 deploy window confirmed)
+  - `/accounts/{acct}/storage/kv/namespaces` → 2 namespaces matching S35 IDs exactly
+  - `/accounts/{acct}/d1/database` → 11 total; `fr-cma-pilot-db` UUID `5d28cbc6-5b35-4479-9650-4d793ccbca44`, created `2026-05-26T10:06:10.871Z`, version production, num_tables 0, file_size 114688
+  - `/accounts/{acct}/r2/buckets` → 9 total; `fr-cma-pilot-snapshots` present, creation_date `2026-05-26T10:08:20.747Z`
+  - `/accounts/{acct}/access/apps` → HTTP 403 Authentication error (scope-not-granted; expected given Edit-scope-missing context, but Read also absent — pre-flight surfaces this distinctly)
+- **Audit-trail artifacts (this repo)** — scratchpad `memory/hopper.md` [DISPATCH — Task #1 S36 ...] carry-forward; `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §3 (token-scope expectation) + §2.4 Deliverable 4 (L3 batch shape).
+
+**commands executed** — six `curl.exe` GET requests via Bash with ephemeral `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` shell vars:
+
+```
+curl.exe -sS "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+  -H "Authorization: Bearer <REDACTED:cfut_W91X...605b4>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/workers/scripts/fr-cma-pilot" \
+  -H "Authorization: Bearer <REDACTED>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/workers/scripts" \
+  -H "Authorization: Bearer <REDACTED>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/storage/kv/namespaces" \
+  -H "Authorization: Bearer <REDACTED>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/d1/database" \
+  -H "Authorization: Bearer <REDACTED>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/r2/buckets" \
+  -H "Authorization: Bearer <REDACTED>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/access/apps" \
+  -H "Authorization: Bearer <REDACTED>"
+```
+
+Token referenced as redacted form `cfut_W91X...605b4` throughout; never written verbatim to scratchpad, ops-log, or SendMessage body. Shell vars exported in single Bash-tool invocations only — not persisted across invocations and not written to any file.
+
+**outputs** — per-check verdict (PASS / FAIL / ANOMALY) with substrate-truth evidence:
+
+| # | Check | Verdict | Evidence (substrate-truth) |
+|---|---|---|---|
+| 0 | Token verify | PASS | HTTP 200; id `bce585f6...`; status active; expires 2026-05-28T23:59:59Z |
+| 1 | Worker `fr-cma-pilot` exists | PASS | HTTP 200; list metadata: modified_on `2026-05-26T10:08:32Z`, created_on `2026-05-26T10:08:06Z`; matches S35 deploy window |
+| 2 | KV namespaces (2 expected) | PASS | HTTP 200; `fr-cma-pilot-EGRESS_POLICIES` id `9780ffa017594d2db28581d7f42badb1`; `fr-cma-pilot-SECRETS` id `cf67fa1020be4436bad5fb99919fd2d7`; both IDs match scratchpad to char |
+| 3 | D1 `fr-cma-pilot-db` | PASS | HTTP 200; UUID `5d28cbc6-5b35-4479-9650-4d793ccbca44`; matches scratchpad to char; created `2026-05-26T10:06:10Z` |
+| 4 | R2 `fr-cma-pilot-snapshots` | PASS | HTTP 200; bucket present; created `2026-05-26T10:08:20Z` |
+| 5 | Access apps inventory | **ANOMALY — token scope** | HTTP 403; `{"errors":[{"code":10000,"message":"Authentication error"}],"success":false}`; endpoint `GET /accounts/{acct}/access/apps`. **Not a substrate problem** — substrate is presumably in expected state (no `fr-cma-pilot` Access app yet) but cannot be verified with current token. Read scope on Access also absent, not just Edit. |
+
+**outcome** — partial (substrate checks 1-4 PASS; Access-apps check 5 ANOMALY at token-scope layer, not substrate layer).
+
+**Recommendation:** **ready-for-Tier-D-once-Edit-scope-lands**, with the following caveat surfaced for PO/Aen via task #1 channel:
+
+- The Access:Apps:Edit scope grant request should be **expanded to include Access:Apps:Read** (or whatever scope name CF uses for `GET /access/apps`). Without Read, pre-flight cannot confirm the "no existing `fr-cma-pilot` Access app" precondition that the dispatched Tier-D POST shape (NEW App with `destinations: [{type:"public", uri:"fr-cma-pilot.evree.workers.dev/webhooks"}]`) assumes.
+- If CF's dashboard exposes Read-and-Edit as a single "Edit" affordance (some CF scope categories grant Read implicitly with Edit), the ITSD-38884 grant may resolve both at once. If the scopes are separate, the ticket needs a one-line amendment.
+- Substrate-state for the four bindings (Worker + KV + D1 + R2) is verified-current and matches S35 baseline exactly — the 14:40 PO Tier-D sanction is against a substrate-state that has not drifted since the sanction was issued. **No substrate-state-requires-re-sanction**; the only remaining gate is the scope grant.
+
+**Token state for next-session execution:** valid through 2026-05-28T23:59:59Z. ~37h headroom from probe time; if Edit scope grant lands within that window, the same token can execute Tier-D POST without re-issuance. If grant arrives after 2026-05-28T23:59:59Z, fresh token issuance required per Deliverable-1 shape (`docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §3).
+
+**No Tier M or D executed.** All operations Tier R; pre-flight discipline honored end-to-end. Substrate untouched.
+
+**Cross-references:**
+
+- `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §2.4 Deliverable 4 (L3 batch — this entry's checks 1-4 are subset)
+- `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §3.2 (Required scopes — 5; current token has 4; Access:Apps:Edit missing per ITSD-38884; **this entry surfaces additional gap: Access:Apps:Read also missing or not granted**)
+- `teams/framework-research/memory/hopper.md` [DISPATCH — Task #1 S36 ...] carry-forward
+- TaskList task #1 (Request Access:Apps and Policies:Edit scope from EVR CF admin) — recommend Aen review whether to expand task #1's scope or add task to track Read-scope gap distinctly
+
+(*FR:Hopper*)
+
+---
+
+## 2026-05-27T13:01+03:00 — fr-cma-pilot Round-1 op-step-2 secret-rotation (SUCCESS-via-retry; discipline-gap surfaced and corrected)
+
+**timestamp** — 2026-05-27T12:05+03:00 (dispatch arc begins: KV-keys inventory dispatch) through 2026-05-27T13:01+03:00 (Tier-M retry success + guarded shred). Three-phase arc; logged as one coherent entry per Aen 12:11 dispatch-close approval.
+
+**tasker** — Aen (single tasker across arc; PO-routed per single-coordinator-hub pattern). PO 12:11 verbatim Tier-M sanction "sanction approved" against three-component action package; PO 12:58 verbatim "1" choosing Path-1 retry path (rewrite ephemeral file + apply fixes).
+
+**dispatch summary** — Round-1 op-step-2: rotate two of four worker `secret_text` bindings to PO Option A "three-credential split" per CMA reference impl. Carried via three sub-dispatches:
+
+1. **12:05 Tier-R KV-keys inventory** (Aen dispatch) — list NAMES only in CF KV `SECRETS` namespace (id `cf67fa1020...`); confirm `WEBHOOK_SECRET` present; surface drift.
+2. **12:11 Tier-M batch attempt 1** (Aen dispatch + PO sanction) — `wrangler secret put ANTHROPIC_API_KEY` + `wrangler secret put ANTHROPIC_ENVIRONMENT_KEY` with `--name fr-cma-pilot`, values via stdin-pipe from ephemeral creds file, post-success shred. FAILED pre-API on ambiguous-account error; **operator-side discipline gap on shred bundling**.
+3. **12:58 Tier-M batch retry** (Aen re-dispatch + PO restated sanction-via-path-choice "1") — two fixes (CLOUDFLARE_ACCOUNT_ID env-var + structural decomposition for guarded shred). SUCCESS on first attempt.
+
+**tier classification + sanction status** — by sub-dispatch:
+
+- **Sub-dispatch 1** = Tier R (default-permitted; no per-task sanction). KV-keys list via `GET /accounts/{acct}/storage/kv/namespaces/{ns_id}/keys`. Plus two within-dispatch-agency Tier R disambiguator probes (sister KV + worker `/settings` endpoint) per Aen's empty-namespace hard-gate "surface, then disambiguate."
+- **Sub-dispatch 2** = Tier M (designed-recovery mutation; substrate-mechanism is `wrangler secret put` which is the canonical wrangler secret-rotation API — idempotent overwrite, atomic, substrate handles secret-binding lifecycle). PO sanction verbatim 12:11:
+  > "Commands: `wrangler secret put ANTHROPIC_API_KEY --name fr-cma-pilot` (stdin: full sk-ant-api03 value); `wrangler secret put ANTHROPIC_ENVIRONMENT_KEY --name fr-cma-pilot` (stdin: full sk-ant-oat01 value). Reason: Round-1 Option A overwrite of S35 OAuth-everywhere values per CMA reference impl. Expected outcome: both commands return success; bindings updated (no read-back possible); WEBHOOK_SECRET + ENVIRONMENT_ID untouched; Worker auto-redeploys."
+  
+  Tier-M single-line-ack-suffices threshold per hopper.md:88 satisfied; PO-direct sanction routed through Aen per single-coordinator-hub.
+- **Sub-dispatch 3** = Tier M same as sub-dispatch 2 (retry of same operation; PO 12:58 verbatim "1" chose Path 1 = "proceed with retry; I rewrite the file from my held context; you apply the fix" — within-scope retry of originally-sanctioned operation with two disciplined corrective fixes). Aen 12:58 re-dispatch text named two fixes: CLOUDFLARE_ACCOUNT_ID env-var, guarded shred. Both fixes are disciplined corrections (one Layer-0 library-first from wrangler's own error message; one operator-discipline carry-forward from sub-dispatch 2's [LEARNED]), not new substrate decisions.
+
+**deployed-artifacts-read declaration** — three-layer probe suite, per-layer attribution:
+
+- **Layer 1 (FR design-as-shipped)** — No on-disk artifacts at `designs/deployed/fr-cma-pilot/container/*` per §Graceful Degradation case 1 (carry-forward from 2026-05-27T11:19 ops-log entry's same-substrate disposition). Proceed-without-Layer-1-read; canonical substrate-design source is `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §1.3 (4 worker-level secrets enumeration). Aen tasker-confirmation implicit in dispatch's enumerated commands. **Documentation-grade finding surfaced retroactively to Layer 1 (see substrate-truth section below):** §1.3 column header "wired into KV SECRETS namespace" was a mechanism-misattribution; actual S35 mechanism was `wrangler secret put` = worker-script `secret_text` bindings.
+- **Layer 2 (consumer-team operational copy)** — CMA template at `~/Documents/github/.mmp/claude-managed-agents/`. Read this dispatch: `package.json` scripts (confirms wrangler available locally at `node_modules/.bin/wrangler` via npx); `wrangler.jsonc` indirectly via wrangler error text (confirms NO pinned `account_id` field in operational config — wrangler's ambiguous-account error names this gap explicitly). `npx wrangler --version` confirmed 4.90.0; `npx wrangler whoami` confirmed logged-in OAuth session with d1+secrets+workers write scopes (sufficient for `secret put`); `npx wrangler secret put --help` confirmed `--name` flag + stdin-piped value pattern.
+- **Layer 3 (running substrate state — CF control plane)** — multiple Tier-R reads:
+  - `GET /accounts/{acct}/storage/kv/namespaces/{cf67fa1020...}/keys` → 0 keys (KV `SECRETS` empty)
+  - `GET /accounts/{acct}/storage/kv/namespaces/{9780ffa017...}/keys` → 0 keys (KV `EGRESS_POLICIES` empty; disambiguator)
+  - `GET /accounts/{acct}/workers/scripts/fr-cma-pilot/settings` → 16 bindings inventoried (4 secret_text + 12 others)
+  - `GET /accounts/{acct}/workers/scripts` (pre-Tier-M baseline) → modified_on `2026-05-26T10:08:32.237277Z`
+  - `GET /accounts/{acct}/workers/scripts/fr-cma-pilot/settings` (post-attempt-1-failure verification) → 4 secret_text bindings intact at S35 names; substrate clean post-failure
+  - `GET /accounts/{acct}/workers/scripts` (post-Tier-M-retry-success baseline) → modified_on `2026-05-26T10:08:32.237277Z` (UNCHANGED — see substrate-truth observation below)
+  - `GET /accounts/{acct}/workers/scripts/fr-cma-pilot/settings` (post-Tier-M-retry-success verification) → 4 secret_text bindings unchanged in count + names
+- **Audit-trail artifacts (this repo)** — `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §1.3 (S35 secret enumeration; mechanism-misattribution surfaced this dispatch); scratchpad `memory/hopper.md` carry-forward across three sub-dispatches; prior ops-log entry `2026-05-27T11:19+03:00` (same substrate, same session).
+
+**commands executed** — verbatim, including substrate prefix:
+
+Sub-dispatch 1 (Tier R inventory + disambiguator):
+```
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/storage/kv/namespaces/cf67fa1020be4436bad5fb99919fd2d7/keys" \
+  -H "Authorization: Bearer <REDACTED:cfut_W91X...605b4>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/storage/kv/namespaces/9780ffa017594d2db28581d7f42badb1/keys" \
+  -H "Authorization: Bearer <REDACTED>"
+
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/8f150f98013eec8cae0a9db20a010c49/workers/scripts/fr-cma-pilot/settings" \
+  -H "Authorization: Bearer <REDACTED>"
+```
+
+Sub-dispatch 2 (Tier M attempt 1 — FAILED pre-API):
+```
+cd ~/Documents/github/.mmp/claude-managed-agents
+VAL_API=$(grep -E '^ANTHROPIC_API_KEY=' "$CREDS_FILE" | sed 's/^ANTHROPIC_API_KEY=//' | sed 's/^"//;s/"$//')
+VAL_ENV=$(grep -E '^ANTHROPIC_ENVIRONMENT_KEY=' "$CREDS_FILE" | sed 's/^ANTHROPIC_ENVIRONMENT_KEY=//' | sed 's/^"//;s/"$//')
+printf '%s' "$VAL_API" | npx wrangler secret put ANTHROPIC_API_KEY --name fr-cma-pilot
+# EXIT_1=1 — "More than one account available but unable to select one in non-interactive mode"
+printf '%s' "$VAL_ENV" | npx wrangler secret put ANTHROPIC_ENVIRONMENT_KEY --name fr-cma-pilot
+# EXIT_2=1 — same error
+unset VAL_API VAL_ENV
+rm -f "$CREDS_FILE"  # <-- DISCIPLINE GAP: ran unconditionally because && chain guarded on intervening echo, not on EXIT_N
+```
+
+Sub-dispatch 3 (Tier M retry — SUCCESS):
+```
+# Invocation 1 (write + Tier-R verify; NO shred)
+cd ~/Documents/github/.mmp/claude-managed-agents
+export CLOUDFLARE_ACCOUNT_ID=8f150f98013eec8cae0a9db20a010c49   # Fix 1: account disambiguation
+VAL_API=$(grep -E '^ANTHROPIC_API_KEY=' "$CREDS_FILE" | sed 's/^ANTHROPIC_API_KEY=//' | sed 's/^"//;s/"$//')
+VAL_ENV=$(grep -E '^ANTHROPIC_ENVIRONMENT_KEY=' "$CREDS_FILE" | sed 's/^ANTHROPIC_ENVIRONMENT_KEY=//' | sed 's/^"//;s/"$//')
+printf '%s' "$VAL_API" | npx wrangler secret put ANTHROPIC_API_KEY --name fr-cma-pilot
+# EXIT_1=0 — "✨ Success! Uploaded secret ANTHROPIC_API_KEY"
+printf '%s' "$VAL_ENV" | npx wrangler secret put ANTHROPIC_ENVIRONMENT_KEY --name fr-cma-pilot
+# EXIT_2=0 — "✨ Success! Uploaded secret ANTHROPIC_ENVIRONMENT_KEY"
+unset VAL_API VAL_ENV
+curl.exe -sS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/fr-cma-pilot/settings" -H "Authorization: Bearer <REDACTED>"
+# 4 secret_text bindings confirmed: ANTHROPIC_API_KEY, ANTHROPIC_ENVIRONMENT_KEY, ENVIRONMENT_ID, WEBHOOK_SECRET
+
+# Invocation 2 (guarded shred — Fix 2: cleanup at audit boundary, not buried in shell)
+# Preconditions from Invocation 1 transcript: EXIT_1=0, EXIT_2=0, both wrangler "✨ Success!" lines, binding count=4 verified
+rm -f "$CREDS_FILE"
+# rm exit 0; [ ! -e "$CREDS_FILE" ] → True (file gone)
+```
+
+Token referenced as redacted form `cfut_W91X...605b4` throughout; never written verbatim. Verbatim credential values (lengths 108, prefixes `sk-ant-api03` and `sk-ant-oat01-X`) never persisted to scratchpad, ops-log, or SendMessage body.
+
+**outputs** — substrate-truth findings + outcome by phase:
+
+| Phase | Outcome | Substrate-truth |
+|---|---|---|
+| Sub-1: KV inventory | PASS-with-SUBSTRATE-TRUTH | KV `SECRETS` + `EGRESS_POLICIES` both EMPTY (count=0); worker script has 16 bindings including 4 `secret_text` (ANTHROPIC_API_KEY, ANTHROPIC_ENVIRONMENT_KEY, ENVIRONMENT_ID, WEBHOOK_SECRET). **Mechanism-misattribution surfaced:** S35's "4 secrets to KV SECRETS" was actually 4 worker-script `secret_text` bindings via `wrangler secret put`. cf-pilot-status §1.3 column header is wrong. |
+| Sub-2: Tier-M attempt 1 | FAILED pre-API (no substrate write) | Both `wrangler secret put` returned exit 1 with `"More than one account available but unable to select one in non-interactive mode"` — CMA template's `wrangler.jsonc` does not pin `account_id`; non-interactive shell cannot prompt. Substrate state verified UNCHANGED post-failure (4 bindings at S35 values). |
+| Sub-2 discipline gap | Self-surfaced + carried forward | Operator shredded ephemeral creds file in same atomic bash pipeline; `&&` chain guarded on intervening `echo "EXIT_N=$N"` (always exit-0) rather than on the wrangler exit codes. "Shred after success" misinterpreted as syntactic-temporal-position rather than conditional-on-success. **[LEARNED] recorded in scratchpad; sub-shape candidate for Cal Protocol A if n=2 materializes.** |
+| Sub-3: Tier-M retry | PASS | Both `wrangler secret put` returned exit 0 with `"✨ Success! Uploaded secret <NAME>"` on first attempt. Account disambiguation via `CLOUDFLARE_ACCOUNT_ID` env-var (Layer-0 library-first: wrangler's own error text was the canonical fix-source). Structural decomposition (two Bash-tool invocations: write+verify then guarded-shred) made the conditional gate visible at the human/audit boundary. |
+| Sub-3 verification | PASS | Worker `/settings` re-read: 4 `secret_text` bindings unchanged in count + names. Values opaque (secret_text bindings are write-only by design). |
+| Sub-3 shred | PASS | Guarded shred fired correctly on conjoined-success preconditions (EXIT_1=0 AND EXIT_2=0 AND wrangler-success-confirmations-observed AND binding-count-verification-passed). File removed; `[ -e "$CREDS_FILE" ]` returned False; verified gone. |
+
+**Substrate-truth observation on `modified_on` (worth surfacing; not a failure):**
+
+The dispatch's expected-outcome included "Worker auto-redeploys" ostensibly verifiable by `modified_on` field delta. Observed:
+
+```
+modified_on_BEFORE:  2026-05-26T10:08:32.237277Z
+modified_on_AFTER:   2026-05-26T10:08:32.237277Z   (UNCHANGED)
+```
+
+`modified_on` reflects script-bundle deploy timestamp, not secret-binding-rotation timestamp. `wrangler secret put` updates secret bindings via a separate control-plane endpoint that does NOT bump the script's `modified_on`. The secrets ARE live (wrangler's success confirmations are authoritative; CF API binding-inventory confirms presence), but the Worker did not "re-deploy" in the script-bundle sense. **Documentation-level expected-outcome marker** in the dispatch text doesn't match wrangler-substrate behavior at the `modified_on` granularity. Canonical positive-control paths if needed in future: (a) trigger a Worker request that uses one of the new env values — not viable Round-1 without sessions; (b) CF audit-log secret-rotation event (right token scope required); (c) trust wrangler's success message + CF API binding inventory (both confirmed). For Round-1 this dispatch, (c) is sufficient.
+
+**outcome** — SUCCESS (via retry).
+
+- Substrate operation complete: 2 of 4 worker `secret_text` bindings rotated to Option A values (`ANTHROPIC_API_KEY` to fresh `sk-ant-api03-...` regular API key; `ANTHROPIC_ENVIRONMENT_KEY` to fresh `sk-ant-oat01-...` OAuth env key). Other 2 (`WEBHOOK_SECRET`, `ENVIRONMENT_ID`) untouched per dispatch scope.
+- Credential discipline: ephemeral file shredded + verified gone; shell vars unset; verbatim values discarded; CF API token used Tier-R only, redacted throughout.
+- Discipline self-correction: shred-bundled-with-write [LEARNED] recorded in scratchpad with recovery primitives (explicit conjoined check OR structural-decomposition into two Bash-tool invocations); retry applied structural decomposition; gate fired correctly.
+- Documentation surface: cf-pilot-status §1.3 mechanism-misattribution surfaced for future-Hopper/Brunel/Aen documentation correction (not corrected in this entry; ops-log is append-only; Aen owns whether the §1.3 doc gets amended).
+
+**No Tier D executed.** Op-step-1 (path-rule bypass) remains held pending Edit scope grant (ITSD-38884).
+
+**Cross-references:**
+
+- `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §1.3 (S35 4-secret enumeration; mechanism-misattribution surfaced)
+- `teams/framework-research/docs/operations-log-2026-05.md` 2026-05-27T11:19+03:00 entry (preceding pre-flight against same substrate; same session)
+- `teams/framework-research/memory/hopper.md` [DISPATCH — Task #2 S37 op-step-2 prep/Tier-M/retry] entries + [LEARNED — discipline, credential-cleanup-bundled-with-credential-use] entry
+- TaskList task #2 (Provision three Anthropic credentials per reference-impl split) — operationally complete on substrate-side post sub-dispatch 3; task ownership remains with Aen for closure decision
+
+(*FR:Hopper*)

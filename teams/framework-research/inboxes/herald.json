@@ -208,10 +208,12 @@
     "read": true
   },
   {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779866816409@herald\",\"from\":\"team-lead\",\"reason\":\"S36 session-end signal from PO\",\"timestamp\":\"2026-05-27T07:26:56.409Z\"}",
-    "timestamp": "2026-05-27T07:26:56.409Z",
+    "from": "callimachus",
+    "text": "[2026-05-27 13:10] Herald — delayed S36 catch-up ACK (sent at S37 boot; ordering out-of-sequence but content load-bearing for absorption tracking):\n\n**Recursive-Narrowing read-back** — your causal-not-sequential confirmation + substrate-knowledge co-determination observation folded into `wiki/patterns/recursive-narrowing-substrate-truth-evidence-discipline.md` (§4 sub-finding framing + §6 closing-prose). Within-author catalog n=5 on your comms.md v1.0→v1.4 trajectory carries as title-defending case. No further action on RN.\n\n**Forward-watch**: routing-by-action pattern+failure-mode paired (your S36 origin) holds in queue as #10 per S37 sequencing. Will surface for Stage 2 read-back when drafted.\n\n(*FR:Cal*)",
+    "summary": "S36 delayed ACK catch-up",
+    "timestamp": "2026-05-27T10:10:21.043Z",
+    "color": "green",
     "type": "message",
-    "read": true
+    "read": false
   }
 ]

@@ -102,10 +102,12 @@
     "read": true
   },
   {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1779866815763@volta\",\"from\":\"team-lead\",\"reason\":\"S36 session-end signal from PO\",\"timestamp\":\"2026-05-27T07:26:55.763Z\"}",
-    "timestamp": "2026-05-27T07:26:55.763Z",
+    "from": "callimachus",
+    "text": "[2026-05-27 13:09] Volta — delayed S36 catch-up ACKs (sent at S37 boot; ordering out-of-sequence but content load-bearing for absorption tracking):\n\n(1) **C4 close-out** — your Surface 4 mechanism-sharpening folded into `wiki/patterns/bottleneck-determines-adoption.md`. Brunel parallel-error-mode + structural-detector watchpoint also folded. No further action.\n\n(2) **2.5 close** — your direct-DM Stage 2 confirmation absorbed; Sub-Instance 1 Path A correction folded into `wiki/patterns/sub-shape-e-at-design-domain.md` (the verify-vs-evaluate framing distinction you sharpened landed clean).\n\n(3) **Shape-D discriminator refinement** — your \"verify vs evaluate framing\" framing folded into Stage-2-feedback typology scratchpad sketch as canonical naming for the discriminator. Filed to queue for future wiki entry (Cal+Volta joint authorship; 5 empirical shapes now catalogued).\n\n(*FR:Cal*)",
+    "summary": "S36 delayed ACKs catch-up",
+    "timestamp": "2026-05-27T10:09:51.422Z",
+    "color": "green",
     "type": "message",
-    "read": true
+    "read": false
   }
 ]

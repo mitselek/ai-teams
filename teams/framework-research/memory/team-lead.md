@@ -1,14 +1,102 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-05-26 — session-36 → session-37
+### [NEXT SESSION] 2026-05-27 — session-37 → session-38
 
-**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S37 read):**
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S38 read):**
 
-- **State of play:** S36 closed 2026-05-26 (one-day session 2026-05-26; ~2.5hr active). **Round-1 op-step-1 (path-rule bypass on `/webhooks`) EXECUTION-READY but TOKEN-PENDING.** Hopper 4-deliverable prep package locked; PO 14:40 sanction verbatim valid for 14:34-with-`destinations[]` shape (Brunel canonical-CF-API cross-read at 14:42 disconfirmed an intermediate 14:37 "policy-on-existing-app" framing that would have over-broadened auth; 14:43 re-sanction-against-wrong-correction moot). Substantial wiki + design output: 8 Cal entries shipped (Wiki 107→114) + 2 amendments + comms.md v1.0→v1.4 (~580 lines) + lifecycle.md amended (~95 lines) + 4 Finn research docs + status report at `docs/cf-pilot-status-and-s37-plan-2026-05-26.md`.
-- **Open dispatches/dependencies:** Hopper task #1 in_progress (bypass execution-ready; awaits CF API token + Tier-R surface-back gate clearance from PO via Aen). Cal task #5 in_progress (8 entries shipped this session; ~7 candidates fully framed in scratchpad for S37 — Edit-tool-trap promotion-grade joint Cal+Finn / C2 substrate-vs-framework primitive / S6 drafting-vs-read-back narrowing / Stage-2-feedback typology Cal+Volta / cadence-crossing E4 Aen+Herald-n=6 / routing-by-action pattern+failure-mode pair / asymmetric-cross-3-vector Cal+Aen). Task #11 functionally resolved by Finn W4 brief (Hopper flips status on absorb).
-- **Expected first action S37:** PO direction. **Most likely:** Token delivery → spawn Hopper → Path D execution (pre-flight verify → Tier-R L3 batch → STOP at surface-back gate → PO clearance via me → Tier-D bypass POST → 30-60s propagation → 3-probe verification → ops-log entry). ~5-10 min. Round-1 op-step-1 closes. If PO bandwidth allows: op-step-2 credential-shape decision + op-step-3 Pilot-A dashboard creation follow.
-- **PO-pending decisions:** (a) **CF API Token** (5 scopes, EVR-bound, 24h TTL — task #1 blocker); (b) Anthropic credential shape (task #10 — single-OAuth-token vs three-credential split per CMA reference impl; `sessions.create` scope now load-bearing post-W4); (c) Pilot-A creation via CF dashboard (op-step-3 PO 5-click); (d) Anthropic session trigger (op-step-5 PO action); (e) S35-carry-forward standing watch — Brunel-Amendment parallel-to-Hopper-4 / Hopper-Amendment-5 (Layer-0 library-first; n=3 in-session today) / "PO"→"Mihkel/you" naming convention.
-- **Concrete pointers:** Status report at `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` is THE canonical S37 brief — read it before responding to any CF-pilot PO ask. Hopper 4-deliverable prep in his scratchpad. Cal-queue carry-forward fully framed in her scratchpad (5 Stage-2-feedback typology shapes this session; cross-role topology n=3 trigger met). Wiki 107→114 — see `teams/framework-research/wiki/index.md` for entries shipped this session. comms.md at v1.4 on disk. lifecycle.md amended. 4 Finn docs at `teams/framework-research/docs/{webhook-sandbox-research,herald-g2-cross-agent-comms-brief,wake-mechanism-w4-finding,round-1-anthropic-platform-checklist}-2026-05-26.md`. All 9 agents idle at S36 shutdown; fresh spawn per S37 PO direction.
+- **State of play:** S37 closed 2026-05-27 (one-day session ~5hr active; ~10:55-17:30). **Op-step-2 SUBSTRATE-COMPLETE** — three Anthropic credentials per CMA reference-impl shape now live on `fr-cma-pilot` Worker secret_text bindings (OAuth-everywhere shortcut from S35 overwritten). **Op-step-1 STILL gated on ITSD-38884** (EVR IT ticket; admin grant pending on Access:Apps and Policies — Read + Edit). Substantial wiki output: 9 Cal entries shipped Wiki 114→123 + 4 substrate-truth catches reshape authoring discipline + Upraise-OKR skill extended (`--action checkin` + utf-8 fix + KR field extraction) + 8 OKR check-ins fired across OBJ-2989/2990/2993.
+- **Open dispatches/dependencies:** ITSD-38884 admin grant (sole Round-1 op-step-1 blocker; admin = Kristofer Taling at EVR IT). Stage 2 read-back surfaces queued for Finn (8 surfaces across 5 wiki entries: Edit-tool-trap ×4 + Layer-0 PRE-DRAFT ×3 + Inverted-trigger ×3 + Cadence-crossing ×3 + Stage-2-feedback typology ×3) + Aen/Hopper on Candidate A surfaces #2-4 + Volta on multiple entries. Routing-by-action + Stage-0-contribution at n=1 watch (deferred this batch; await n=2). Hopper bundled-shred Cal candidate held at n=1 in her scratchpad.
+- **Expected first action S38:** PO direction. **Most likely:** ITSD-38884 admin grant landed → spawn Hopper → Path D execution (pre-flight check 5 first per Edit-scope-arrival path she defined; then Tier-D bypass POST per 14:34-with-`destinations[]` shape; PO 12:11 sanction verbatim valid). ~5-10 min total. Admin response time unknown — could be hours, days, or longer.
+- **PO-pending decisions:** (a) ITSD-38884 admin grant on Access:Read+Edit (only Round-1 op-step-1 blocker); (b) Pilot-A creation via CF dashboard (op-step-3 PO 5-click; click-path: Agents → New Agent → Backend: Isolate → name `pilot-a` → model `claude-sonnet-4-6` → tools []); (c) Anthropic session trigger (op-step-5 PO action); (d) Stage 2 read-back disposition (Finn relay timing — 8 surfaces consolidated).
+- **Concrete pointers:** Status report at `teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md` is still THE canonical CF pilot brief for op-step-1+ context. ITSD-38884 at `https://eestiraudtee.atlassian.net/browse/ITSD-38884`. Wiki 114→123 — see `wiki/index.md`; substrate-truth-evidence cluster now n=8 entries. Upraise-OKR skill at `~/.claude/skills/upraise-okr/scripts/upraise-api.py` now has `--action checkin` + utf-8 stdin/stdout fix + KR field extraction (children-array shape; KR title at `kr.title` not `kr.objective.title`). Cred-handoff temp-file-as-context-firewall pattern validated in-vivo (Wiki 123). All 9 agents idle at S37 shutdown.
+
+---
+
+## SESSION 37 WRAP — 2026-05-27 (One-day session ~5hr active; Op-step-2 substrate-complete; Wiki 114→123 9 entries; 4 substrate-truth catches reshape authoring discipline; 8 OKR check-ins fired across 3 OBJs; Upraise-OKR skill extended)
+
+**Spans:** 2026-05-27 ~10:55 (fresh team spawn) → ~17:30 (PO session-end signal). One day; ~5 hours active work; bandwidth-positive throughout though contextToken 15-min TTL friction (n=4+ token-expired errors during OKR work).
+
+**Outcome:** Op-step-2 substrate-complete (Round-1 Option A three-credential split per CMA reference impl now live on Worker secret_text bindings). Op-step-1 still gated on ITSD-38884 admin grant. Cal-side: 9 entries shipped (Wiki 114→123) + 4 substrate-truth catches authoring-layer (Candidate A documentation-vs-substrate-truth-divergence promotion-grade with n=3 single-session evidence; Edit-tool-trap deterministic mechanism naming; modified_on doesn't bump on secret rotation; bundled-shred temporal vs conditional gap). OKR-side: 8 KR check-ins fired across OBJ-2989/2990/2993 with proper Estonian Cal+Hopper drafts. Skill-side: Upraise-OKR script extended with checkin action + utf-8 fix + KR extraction; ITSD-38884 ticket body amended (Read+Edit scopes via Atlassian MCP edit).
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `wiki/patterns/documentation-vs-substrate-truth-divergence.md` (Wiki 115) | NEW | Cal (joint Aen+Hopper+Cal-filer) | Promotion-grade, n=3 single-session, AUTHORING-LAYER complement to operator-layer cluster |
+| `wiki/gotchas/edit-tool-read-state-expires-on-intervening-tool-call.md` (Wiki 116) | NEW | Cal (joint Cal+Finn) | Finn broader-mechanism correction canonical; n=11+ Cal + n=3+ Finn; recovery primitive with 4 thresholds |
+| `wiki/patterns/substrate-vs-framework-boundary-primitive.md` (Wiki 117) | NEW | Cal (joint Volta+Brunel+Cal) | C2 cluster-primitive; 4 axes; brain-hands bounded extension |
+| `wiki/process/stage-2-feedback-typology.md` (Wiki 118) | NEW | Cal (joint Cal+Volta) | 5 shapes A/B/C/D/E; two-epistemic-layer distinction |
+| `wiki/patterns/layer-0-library-first-pre-draft-discipline.md` (Wiki 119) | NEW | Cal (joint Finn+Cal) | Pre-draft vs post-draft temporal complement to recurrence entry |
+| `wiki/gotchas/inverted-trigger-primitives-antipattern-on-poll-based-substrates.md` (Wiki 120) | NEW | Cal (joint Finn+Cal) | n=4 cross-substrate; "does substrate dial into worker?" discriminator |
+| `wiki/process/stage-2-cycle-yield-narrowing-to-read-back-phase.md` (Wiki 121) | NEW | Cal (joint Cal+Aen) | n=5 cumulative confirmation; source-commit-state discriminator |
+| `wiki/patterns/cadence-crossing-dyad-variant-with-asymmetric-cross-vector-framework.md` (Wiki 122) | NEW | Cal (joint Aen+Herald+Cal) | n=11+ today; 3-vector asymmetric-cross framework with latency-and-cross-rate per vector |
+| `wiki/patterns/credential-handoff-via-temp-file-context-firewall.md` (Wiki 123) | NEW | Cal (joint Aen+Hopper+Cal) | S37 in-vivo validation; failure-recovery cycle catalogued |
+| Op-step-2 substrate executed — 2× wrangler secret put on fr-cma-pilot | Operator action | Hopper (PO 12:11 sanction; 12:58 retry with `CLOUDFLARE_ACCOUNT_ID` disambiguation + guarded shred fixes) | Both bindings updated; WEBHOOK_SECRET + ENVIRONMENT_ID untouched; substrate-truth catch: modified_on does NOT bump on secret rotation |
+| 8 OKR check-ins fired (OBJ-2989 ×3 + OBJ-2990 ×2 + OBJ-2993 ×3) | Operator action | Aen-direct via upraise-api.py with Cal+Hopper drafts | OBJ-2991/2992 left unfired ("nothing yet" per PO) |
+| `upraise-api.py` skill script extended | M | Aen | Added `--action checkin`, subprocess `encoding="utf-8"`, KR field extraction (children-array with `kr.title` at top level not `kr.objective.title`); also fixed appVersion 4.7.0→4.11.0 |
+| ITSD-38884 (EVR IT ticket) body amended | M | Aen via Atlassian MCP editJiraIssue | Original single-scope (Edit) → dual-scope (Read + Edit) after Hopper pre-flight surfaced 403 on `GET /access/apps` |
+| `docs/operations-log-2026-05.md` | M (+211 lines) | Hopper | Two ops-log entries covering KV inventory + S37 Tier-M arc + retry-after-failure |
+| Scratchpads | M | callimachus +89 lines; hopper +6 lines | S37 carry-forward; Hopper bundled-shred [LEARNED] at n=1 |
+| Misc | + | — | Cal queue drained to 2-item watch (routing-by-action + Stage-0-contribution at n=1 await n=2) |
+
+### Decisions (PO-ratified)
+
+[DECISION — S37] **Option A three-credential split per CMA reference impl ratified** for Round 1 (12:11). PO sanction verbatim: "sanction approved" against `wrangler secret put ANTHROPIC_API_KEY/ENVIRONMENT_KEY` with new sk-ant-api03 + sk-ant-oat01 values. Retry sanctioned in-scope at 12:58 with two fixes (CLOUDFLARE_ACCOUNT_ID env disambiguation + guarded conditional shred). Overrides S35 OAuth-everywhere shortcut.
+
+[DECISION — S37] **Per-entry sanction cadence for Cal wiki entries** (13:10) due to PO budget signal. Released at 14:51 ("let now cal to go through all remaining postings non-stop") allowing batch-fire of items #4-#12.
+
+[DECISION — S37] **Cred-handoff temp-file-as-context-firewall is the validated pattern** for credential plumbing in this team. Wiki 123 entry codifies it; failure modes (operator shred discipline; substrate config; coordinator-session-context) enumerated.
+
+[DECISION — S37] **OBJ-2991/2992 (VJS2) deferred** per "nothing yet" — no FR team evidence base; punch-in deferred until concrete progress.
+
+### Substantive learnings (Cal-grade or promotion-grade)
+
+[LEARNED — process, promotion-grade] **Documentation-vs-substrate-truth-divergence** (Candidate A, Wiki 115): authoring-tier discipline gap where documentation/dispatch captures inferred substrate-property that is plausible-but-substrate-wrong. n=3 single-session evidence: (1) cf-pilot-status doc said "wired into KV SECRETS namespace" → actual mechanism Worker secret_text bindings; (2) Aen dispatch's "Worker auto-redeploys via modified_on" → wrangler secret put uses separate control-plane endpoint that doesn't bump script `modified_on`; (3) Aen bundled-shred dispatch language → temporal-position vs exit-code-conditional gap. **AUTHORING-LAYER complement to existing operator-layer substrate-truth cluster** (three-layer + recursive-narrowing + sub-shape-E + three-role-stacking + layer-0-library-first-recurrence + this entry + layer-0-PRE-DRAFT + substrate-vs-framework-boundary = n=8 cluster entries).
+
+[LEARNED — process, promotion-grade] **Edit-tool-trap deterministic mechanism** (Wiki 116): harness maintains per-file Read-state slot invalidated by next tool call (any tool call, not just file-mutating ones). Recovery primitive: re-Read before Edit when prior Read >5 tool calls / >5 min real-time / SendMessage round-trip crossed / uncertainty. Applied throughout Cal's batch drafting; zero failure-recovery cycles after first instance (which became Candidate A evidence).
+
+[LEARNED — process] **Cred-handoff temp-file pattern validated in-vivo**: PO pastes credential → Aen writes ephemeral file outside repo → Hopper reads + uses + shreds (guarded conditional). Failure modes: (a) operator shred discipline (must conjoin on exit codes not temporal position); (b) substrate config (e.g., wrangler account ambiguity); (c) coordinator session-context (credentials live in Aen context unless explicitly discarded). All three encountered S37; all three recoverable with proven patterns.
+
+[LEARNED — substrate] **modified_on field reflects last script bundle deploy timestamp, not secret-rotation timestamp.** `wrangler secret put` updates Worker secret bindings via separate control-plane endpoint that does NOT bump `modified_on`. Positive control for "secret is live" is wrangler success output + CF API binding inventory, not `modified_on` delta.
+
+[LEARNED — substrate] **KV namespaces and Worker secret_text bindings are distinct substrate mechanisms with confusingly-similar names.** Round 0 deploy via `wrangler secret put` stored 4 secrets as Worker secret_text bindings; KV `SECRETS` namespace is a separate substrate for runtime-readable secret material (egress-policy header-injection per Brunel S36 Gate B3 finding). cf-pilot-status doc had mechanism-misattributed this; corrected post-Cal-A.
+
+[LEARNED — process] **contextToken 15-min TTL × chat-turn-eating-time pattern**: Forge JWT contextToken expires in 15 min from iat; multi-turn chat conversations routinely burn this window before write completes. n=4+ token-expired errors during S37 OKR work. Workaround: keep Python wrapper script pre-prepared; only token-paste turnaround is variable; fire IMMEDIATELY on receipt of fresh token. Skill-grade pattern; possibly Wiki-grade if n=2 across sessions (currently n=1 cumulative within this skill domain).
+
+### Standing watch items going into session 38
+
+- **ITSD-38884 admin grant** (sole Round-1 op-step-1 blocker; EVR IT processing)
+- **Stage 2 read-back surfaces from S37 entries** — 8 surfaces total awaiting Finn relay; plus Hopper #2-4 on Candidate A; plus Volta on C2/typology/Layer-0/etc.
+- **Hopper bundled-shred Cal candidate** held at n=1 in Hopper scratchpad; promotes to filing if n=2 surfaces
+- **Routing-by-action + Stage-0-contribution-from-filer** deferred from S37 batch; n=1 watch posture; await n=2
+- **Cal Stage 2 absorption async on prior S36 entries** (Recursive-Narrowing, 2.7, Layer-0-library-first-recurrence) — natural resolution as Finn/Brunel direct-DMs arrive
+- **A1 evidence-cycle audit at S40-42** (originally S35 plan; ~3-5 sessions out)
+- **S35-carry-forward standing watch (unchanged)**: Brunel-Amendment parallel-to-Hopper-4 (Layer-1-only Diagnostic Discipline gap); Hopper-Amendment-5 candidate (Layer-0 library-first n=3 in-session today S37 strengthens); "PO" → "Mihkel/you" naming convention
+- **Aen amendment Part C (relay-visibility rule)** — HELD at `designs/deployed/operator-role/prompts/aeneas-amendment.md`
+- **TPS-583 (apex-research)** — Stage-2 standard moves when PO signals; dormant
+- **mVox-dev session 8+ carry-forward** (Palestrina 3 deferred items) — dormant
+- **Manager-team / PO-team architecture** (Monte domain) — dormant; PO floated 2026-05-20
+
+### NEXT-SESSION BOOT (re-orient instructions for S38)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — that's the 5-bullet reorientation seed per A1 adoption. Read it FIRST, then downgrade the tag to `[PROCESSED YYYY-MM-DD]` once processed.
+3. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **If PO surfaces ITSD-38884 admin grant landed (MOST LIKELY first ask if grant arrives):** spawn Hopper. Her S37 pre-flight identified the Edit-scope-arrival path: repeat check 5 (`GET /access/apps` with Brunel jq refinement `'.result[] | {id, name, domain, type, destinations}'`) to confirm no existing `fr-cma-pilot` Access app collision; if clean → execute Deliverable 2 Tier-D POST per PO 12:11 sanction shape (`NEW Access App with destinations:[{type:"public", uri:"fr-cma-pilot.evree.workers.dev/webhooks"}]` + inline bypass policy). ~5-10 min total. Verbatim sanction quote in `docs/cf-pilot-status-and-s37-plan-2026-05-26.md` §2.4.
+6. **If PO surfaces Pilot-A creation (op-step-3):** PO 5-click in CF dashboard: Agents → New Agent → Backend: Isolate → name `pilot-a` → model `claude-sonnet-4-6` → tools `[]`. Hopper verifies post-creation via `wrangler d1 execute fr-cma-pilot-db --remote --command "SELECT agent_id, backend, created_at FROM agent_backends ORDER BY created_at DESC LIMIT 5"`.
+7. **If PO surfaces Anthropic session trigger (op-step-5):** PO action; observe webhook delivery → sandbox creation in CF → response.
+8. **If PO surfaces Stage 2 read-back continuation:** spawn Finn for absorption on 8 surfaces (Edit-tool-trap ×4 / Layer-0 PRE-DRAFT ×3 / Inverted-trigger ×3 / Cadence-crossing ×3 / Stage-2-feedback typology ×3 — Finn-side and Volta-side overlap). Surfaces named in respective wiki entries' filing reports.
+9. **If PO surfaces Cal queue continuation:** Cal queue is largely drained post-S37. Only routing-by-action + Stage-0-contribution at n=1 watch; await n=2 OR explicit PO direction to file at n=1.
+10. **If PO surfaces routing-by-action or Stage-0-contribution promotion at n=1:** spawn Cal with explicit "file at n=1" sanction; otherwise defer per Cal's discipline.
+11. **If PO surfaces credential-handoff pattern application** (any new credential into team substrate): Wiki 123 `credential-handoff-via-temp-file-context-firewall.md` documents the validated pattern; Aen writes ephemeral file outside repo (`~/.cf-pilot-creds-ephemeral.env` or similar); Hopper reads-uses-shreds with `[ "$EXIT" -eq 0 ] && rm -f` conditional gate OR decompose into two Bash-tool invocations.
+12. **If PO surfaces apex-research cross-team work** (bidirectional cite-back, [CONTINUITY] adoption follow-up): spawn Cal for Companion-Pair Submission protocol filing.
+13. **If PO surfaces Hopper-Amendment-5** (Layer-0 library-first discipline; n=3 strengthens with S37 in-session evidence): spawn Celes + Hopper + Brunel per S35 amendment-cycle pattern.
+14. **If PO surfaces apex DB tunnel issues:** check `docs/operations-log-2026-05.md` for latest tunnel status; spawn Hopper for substrate diagnosis if tunnels degraded.
+15. **Edit-tool-trap recovery primitive** (Wiki 116) applies to all agents doing scratchpad/index Edits during long-running batches; pre-load in spawn briefs if expecting >5 sequential Edits.
+16. **contextToken 15-min friction note:** if S38 surfaces OKR or other Forge-app work requiring contextTokens, use Python wrapper script pattern (pre-written script + fast token-paste turnaround); each interim chat turn burns ~30s-2min of token life.
+
+(*FR:Aen*)
 
 ---
 
