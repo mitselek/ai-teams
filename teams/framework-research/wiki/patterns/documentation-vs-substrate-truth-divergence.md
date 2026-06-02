@@ -5,7 +5,7 @@ source-agents:
   - callimachus
 discovered: 2026-05-27
 filed-by: librarian
-last-verified: 2026-05-27
+last-verified: 2026-06-02
 status: active
 confidence: medium-high
 source-files:
@@ -13,6 +13,7 @@ source-files:
   - teams/framework-research/docs/cf-pilot-status-and-s37-plan-2026-05-26.md
   - teams/framework-research/memory/hopper.md
   - teams/framework-research/memory/callimachus.md
+  - teams/framework-research/roster.json
 source-commits: []
 source-issues: []
 related:
@@ -24,7 +25,10 @@ related:
   - patterns/discriminator-anchored-on-sub-canonical-source.md
   - patterns/substrate-invariant-mismatch.md
   - patterns/relay-to-primary-artifact-fidelity-discipline.md
-amendments: []
+  - patterns/substrate-vs-framework-boundary-primitive.md
+amendments:
+  - date: 2026-06-02
+    description: "Instance 4 added (roster.model non-load-bearing on Agent-tool teams); first cross-domain instance beyond cloudflare-pilot; n=3→n=4; fourth disambiguator-class (architecture-enforcement-mechanism). Source co-authors Aen + PO (S38 discovery); cross-substrate contrast with tmux-pane teams."
 ---
 
 # Documentation-vs-Substrate-Truth Divergence at the Authoring Tier
@@ -43,9 +47,9 @@ Three load-bearing properties:
 2. **Plausible-but-substrate-wrong** — the inferred property is the kind of statement that *could* be correct on some substrate, or on the substrate at a different control-plane endpoint, or on a confusably-similar substrate-mechanism. Plausibility is what gets it past the authoring review; substrate-truth is what catches it at execution.
 3. **Caught at operator-tier verification** — the canonical detection site is operator-tier substrate-probe (Tier-R inventory, Tier-M post-write verification, `modified_on` delta check, canonical-source library probe). Once surfaced, correction is local to the artifact; the authoring-tier discipline gap is the residue worth naming.
 
-## Three Instances From S37 (2026-05-27)
+## Instances 1-3: S37 (2026-05-27) — Cloudflare-Pilot Domain
 
-All three surfaced within one operator dispatch arc (op-step-2: Round-1 credential split on Worker `secret_text` bindings) in single session, all in the cloudflare-pilot domain.
+Instances 1-3 surfaced within one operator dispatch arc (op-step-2: Round-1 credential split on Worker `secret_text` bindings) in single session, all in the cloudflare-pilot domain.
 
 ### Instance 1 — Mechanism-misattribution: KV `SECRETS` vs Worker `secret_text` bindings
 
@@ -80,27 +84,50 @@ All three surfaced within one operator dispatch arc (op-step-2: Round-1 credenti
 | Verbatim ops-log finding | "Operator shredded ephemeral creds file in same atomic bash pipeline; `&&` chain guarded on intervening `echo \"EXIT_N=$N\"` (always exit-0) rather than on the wrangler exit codes. 'Shred after success' misinterpreted as syntactic-temporal-position rather than conditional-on-success." (operations-log-2026-05.md L824) |
 | Disambiguator | The discipline language ("after both succeed") is correct in intent but under-specified in *which substrate-mechanism* enforces "after"; bash-syntactic-temporal `&&` is not equivalent to conditional-on-exit-code-zero when an intervening statement returns 0 |
 
+## Instance 4: S38 (2026-05-28) — Agent-Tool Team Architecture Domain
+
+First instance beyond cloudflare-pilot domain. Surfaces the same authoring-tier divergence pattern at the **team-infrastructure configuration layer** rather than the operator-dispatch layer.
+
+### Instance 4 — Architecture-enforcement-mechanism: roster.json `model` field non-load-bearing on Agent-tool teams
+
+| Aspect | Value |
+|---|---|
+| Artifact | `teams/framework-research/roster.json` line 10 — `"model": "claude-opus-4-6[1m]"` for all team members |
+| Inferred substrate-property | Team members run on the model specified in roster.json (`claude-opus-4-6[1m]`); roster.json `model` field controls which model agents use at runtime |
+| Substrate-truth | On Agent-tool team architecture, `TeamCreate` stamps the **parent CLI session's model** into runtime `config.json` regardless of roster.json intent. The Agent tool's spawn `model` parameter accepts only **family-level overrides** (`opus`/`sonnet`/`haiku`), not specific version pins. If the parent CLI runs on `claude-opus-4-7[1m]`, all spawned agents land on 4.7 despite roster.json specifying 4.6 |
+| Catch site | S38 session boot — config.json line 11 showed `"model": "claude-opus-4-7[1m]"` despite roster.json line 10 saying `"model": "claude-opus-4-6[1m]"`. Agent tool spec (ToolSearch fetch): `model` param accepts only `opus`/`sonnet`/`haiku` |
+| Evidence | Config.json line 11 = `"model": "claude-opus-4-7[1m]"` for fresh S38 team. Roster.json line 10 = `"model": "claude-opus-4-6[1m]"`. Spawn inheritance default = parent model when no explicit family-level override |
+| Disambiguator | **Two team-architecture substrates, same data field, two enforcement semantics.** On **tmux-pane-based teams** (e.g., apex-research), launcher scripts consume roster.json `model` field directly via `claude --model claude-opus-4-6[1m]` at spawn time — the field IS load-bearing. On **Agent-tool teams** (e.g., framework-research), the field is **non-load-bearing** — parent CLI model propagates via TeamCreate regardless. A reader of roster.json infers model-enforcement; substrate-truth is parent-determined. The authoring of roster.json with specific version pins captures a plausible-but-substrate-wrong property: the configuration *looks* like it controls model selection, but the enforcement mechanism on Agent-tool architecture ignores it |
+
+**Cross-substrate contrast is the structural contribution:** the same data field (`model` in roster.json) is load-bearing on one team-architecture substrate (tmux-pane) and non-load-bearing on another (Agent-tool). This is the pattern's substrate-adjacency shape at the architecture-enforcement layer — the inferred property ("this field controls model selection") is correct on an adjacent substrate, wrong on the actual deployment substrate.
+
+**Mitigation shipped S38:** startup.md Step 0.5 procedural gate (verify parent model matches roster intent before TeamCreate) + roster.json `_substrate_note` top-level field documenting the gap. Mitigation is operational-procedural, not substrate-fix — the gap persists until Anthropic adds version-pin support to the Agent tool's `model` parameter.
+
+**Cost context (PO-sourced S38):** 40% context-cost differential between 4.6 and 4.7 from apex-research experiment; the non-load-bearing field has material cost implications when the parent CLI silently runs a different model than intended.
+
 ## Cross-Instance Pattern
 
-All three share the same authoring-tier shape:
+All four share the same authoring-tier shape:
 
-| Instance | Inferred substrate-property | Actual substrate-mechanism | Caught at |
-|---|---|---|---|
-| 1 | KV `SECRETS` is where the four secrets live | Worker `secret_text` bindings | Tier-R KV-keys inventory |
-| 2 | `modified_on` delta is the auto-redeploy positive-control | Separate secret-binding control-plane endpoint | Tier-R post-write `modified_on` re-read |
-| 3 | Bash `&&` chain enforces "after both succeed" | Intervening `echo` lets chain continue regardless | Tier-M first-attempt-failure observation |
+| Instance | Inferred substrate-property | Actual substrate-mechanism | Caught at | Domain |
+|---|---|---|---|---|
+| 1 | KV `SECRETS` is where the four secrets live | Worker `secret_text` bindings | Tier-R KV-keys inventory | cloudflare-pilot |
+| 2 | `modified_on` delta is the auto-redeploy positive-control | Separate secret-binding control-plane endpoint | Tier-R post-write `modified_on` re-read | cloudflare-pilot |
+| 3 | Bash `&&` chain enforces "after both succeed" | Intervening `echo` lets chain continue regardless | Tier-M first-attempt-failure observation | cloudflare-pilot |
+| 4 | roster.json `model` field controls agent model selection | Parent CLI model propagates via TeamCreate; Agent tool accepts only family-level overrides | S38 boot config.json vs roster.json comparison | agent-tool-architecture |
 
-In each case, the authoring artifact captured an inferred substrate-property that is plausible-but-substrate-wrong; the operator's Tier-R or Tier-M verification surfaced the divergence; correction was local to the artifact, but the discipline gap is in the authoring practice — **relying on inferred properties without substrate-truth grounding at authoring time**.
+In each case, the authoring artifact captured an inferred substrate-property that is plausible-but-substrate-wrong; verification surfaced the divergence; correction was local to the artifact, but the discipline gap is in the authoring practice — **relying on inferred properties without substrate-truth grounding at authoring time**. Instance 4 extends this from operator-dispatch artifacts to **team-infrastructure configuration artifacts** and from cloudflare-pilot to **agent-tool team architecture** — the first cross-domain instance, confirming the pattern is not domain-specific.
 
 ## Sub-Finding (Promotion-Grade): Disambiguator-Class is Substrate-Adjacency
 
-The three instances differ in *what kind* of substrate-property was inferred wrongly, and the disambiguator pattern across them suggests a structural categorization:
+The four instances differ in *what kind* of substrate-property was inferred wrongly, and the disambiguator pattern across them suggests a structural categorization:
 
 - **Instance 1 = mechanism-name disambiguator** (two substrate-mechanisms with confusably-similar names; the author selected one based on name without verifying the actual operational mechanism)
 - **Instance 2 = control-plane disambiguator** (one substrate-operation reads as if it bumps a particular field; the actual mechanism operates on a different endpoint with different side effects)
 - **Instance 3 = enforcement-mechanism disambiguator** (a discipline phrase ("after success") under-specifies which substrate-mechanism enforces the temporal relation)
+- **Instance 4 = architecture-enforcement-mechanism disambiguator** (a configuration field that is load-bearing on one team-architecture substrate but non-load-bearing on another; the field's authoring infers enforcement from the adjacent substrate's semantics)
 
-Each instance failed by **substrate-adjacency**: the inferred property was correct at a neighboring substrate or at a neighboring control-plane endpoint or at a neighboring syntactic interpretation. Authoring-tier discipline must therefore explicitly disambiguate against substrate-adjacency: when writing an inferred property, name the substrate-mechanism precisely and verify the disambiguator against canonical substrate-truth before shipping the artifact.
+Each instance failed by **substrate-adjacency**: the inferred property was correct at a neighboring substrate or at a neighboring control-plane endpoint or at a neighboring syntactic interpretation or at a neighboring architecture substrate. Authoring-tier discipline must therefore explicitly disambiguate against substrate-adjacency: when writing an inferred property, name the substrate-mechanism precisely and verify the disambiguator against canonical substrate-truth before shipping the artifact.
 
 ## Composition With the Substrate-Truth-Evidence Cluster
 
@@ -137,22 +164,25 @@ The authoring-tier discipline that *prevents* this class:
 
 ## Promotion-Posture
 
-**Confidence medium-high** — n=3 within a single session within a single dispatch arc; same substrate domain (cloudflare-pilot); same operator-tier catch mechanism (Tier-R / Tier-M probes); three structurally distinct disambiguator-classes (mechanism-name / control-plane / enforcement-mechanism).
+**Confidence medium-high** — n=4 across two substrate domains (cloudflare-pilot + agent-tool-architecture); four structurally distinct disambiguator-classes (mechanism-name / control-plane / enforcement-mechanism / architecture-enforcement-mechanism). Instance 4 is the first cross-domain instance, confirming the pattern is not cloudflare-pilot-specific.
 
-**Cross-team confirmation promotes to confidence-high.** Candidate cross-team sites: apex-research (when Schliemann/Aen-apex authors against unfamiliar substrate); any team adopting Cloudflare-managed-agents substrate (mechanism-name disambiguators predicted to recur given the substrate's confusably-similar mechanism-names: `secret_text` bindings vs KV `SECRETS` vs `secret_bindings` array).
+**Cross-team confirmation promotes to confidence-high.** Candidate cross-team sites: apex-research (when Schliemann/Aen-apex authors against unfamiliar substrate); any team adopting Cloudflare-managed-agents substrate (mechanism-name disambiguators predicted to recur given the substrate's confusably-similar mechanism-names); any team transitioning between tmux-pane and Agent-tool architectures (Instance 4 disambiguation surface predicted to recur).
 
 **Cross-org confirmation distinguishes EVR-discipline-culture vs org-invariant** per [`three-role-discipline-stacking-within-dispatch-arc.md`](three-role-discipline-stacking-within-dispatch-arc.md) cross-org-vs-within-org refinement.
 
-**Operational falsifiability:** the next operator-tier substrate-probe on a fresh dispatch text against a substrate-mechanism the author has not personally verified is the next data point. If the dispatch lands clean against substrate-truth, that is positive evidence the authoring-tier discipline is being applied implicitly. If a fourth divergence surfaces, the entry advances toward common-prompt promotion (Protocol C).
+**Operational falsifiability:** the next substrate-probe on a fresh artifact against a substrate-mechanism the author has not personally verified is the next data point. Instance 4 demonstrates that the pattern extends beyond operator-dispatch artifacts to configuration artifacts — future falsifiability applies across both artifact classes.
 
-**Watchpoint candidate**: substrate-fit-researcher (Finn-vantage) acting at authoring time — does library-load discipline at authoring time catch this class before shipping? [`layer-0-library-first-recurrence.md`](layer-0-library-first-recurrence.md) Instance 3 (Finn W4 catch) operated against an already-shipped artifact (Herald v1.3); Instance 3 there was retroactive. Forward-watch: does the same discipline applied at authoring time prevent the same class of authoring-tier failure?
+**Watchpoint candidates**:
+- Substrate-fit-researcher (Finn-vantage) acting at authoring time — does library-load discipline at authoring time catch this class before shipping? [`layer-0-library-first-recurrence.md`](layer-0-library-first-recurrence.md) Instance 3 (Finn W4 catch) operated against an already-shipped artifact (Herald v1.3); Instance 3 there was retroactive. Forward-watch: does the same discipline applied at authoring time prevent the same class of authoring-tier failure?
+- Instance 4 cross-architecture-substrate extension — does the pattern recur for other configuration fields that have different enforcement semantics across team-architecture substrates? Candidate: `agentType` field in roster.json (does Agent-tool architecture honor it vs tmux-pane launcher?). If yes, strengthens Instance 4's architecture-enforcement-mechanism disambiguator-class.
 
 ## What This Is NOT
 
 - **Not "documentation gets stale"** — the divergence is at authoring time, not via stale-after-edit. The artifact was substrate-wrong when it was written, not because the substrate later drifted.
 - **Not "the operator's read was wrong"** — the operator's substrate-truth-anchored verification was the catch site. The defect is in the artifact.
-- **Not a single substrate-layer phenomenon** — the three instances span design-doc text (Instance 1), dispatch sanction text (Instance 2), and discipline-phrase language (Instance 3). Authoring-tier failure-modes are substrate-layer-invariant within the substrate-mechanism-precise-naming discipline.
+- **Not a single substrate-layer phenomenon** — the four instances span design-doc text (Instance 1), dispatch sanction text (Instance 2), discipline-phrase language (Instance 3), and team-infrastructure configuration (Instance 4). Authoring-tier failure-modes are substrate-layer-invariant within the substrate-mechanism-precise-naming discipline.
 - **Not redundant with `discriminator-anchored-on-sub-canonical-source.md`** — that entry catches discriminators (parser / transit-chain artifacts) anchored on sub-canonical sources at the runtime-mechanism layer. This entry catches authoring-tier inferences at the substrate-mechanism-naming layer. Same family (sub-canonical anchoring); different layer (parser vs authoring).
-- **Not solely cloudflare-pilot domain** — the three instances all occurred in cloudflare-pilot due to single-session sampling. The pattern shape is substrate-domain-invariant; cross-team confirmation expected to surface in any team's dispatch-authoring practice against an unfamiliar substrate.
+- **Not solely cloudflare-pilot domain** — Instances 1-3 all occurred in cloudflare-pilot; Instance 4 (S38) is the first cross-domain instance in agent-tool team architecture, confirming that the pattern shape is substrate-domain-invariant.
+- **Not "config field is broken"** — Instance 4's roster.json `model` field works correctly on tmux-pane teams. The failure is that the authoring inferred enforcement from the adjacent substrate's semantics without verifying enforcement on the actual deployment substrate (Agent-tool architecture).
 
 (*FR:Callimachus*)

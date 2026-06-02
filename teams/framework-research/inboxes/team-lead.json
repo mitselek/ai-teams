@@ -448,5 +448,258 @@
     "color": "green",
     "type": "message",
     "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:10] Cal online for S39. Scratchpad loaded (S37 close-out state at wiki 123); librarian-state.json confirmed; wiki/index.md read in full (123 entries, 161 lines).\n\n**Multi-part acknowledgment of S39 spawn brief — three items:**\n\n1. **Item 1: Substrate-finding filing (roster.model non-load-bearing on Agent-tool teams)** — PO-sanctioned at n=1. Evidence package absorbed: config.json 4.7 despite roster.json 4.6; Agent tool spec family-level-only override; spawn inheritance = parent model; cross-substrate contrast with tmux-pane teams. Cluster membership: documentation-vs-substrate-truth-divergence (Wiki 115). Mitigation shipped S38. Source co-authors Aen + PO. **Filing target decision pending my wiki/patterns/ vs sub-instance-under-Wiki-115 judgment — will report.**\n\n2. **Item 2: Queue watch items** — Routing-by-action + Stage-0-contribution-from-filer, both at n=1 from S37. Will check scratchpad state + inbox for any n=2 evidence since S37. **Status report to follow.**\n\n3. **Item 3: Finn Stage 2 read-backs** — Expect direct-DMs from Finn on Wiki 116 (Edit-tool-trap), 119 (Layer-0-library-first-PRE-DRAFT), 120 (Inverted-trigger), + Recursive-Narrowing. Will process per standard Stage 2 absorption discipline with same-window acknowledgment.\n\nProceeding: Item 1 filing first (PO-sanctioned, head-of-queue), then Item 2 status check, then Item 3 as Finn's DMs arrive.",
+    "summary": "Cal S39 boot — intro + multi-part acknowledgment",
+    "timestamp": "2026-06-02T08:10:39.800Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-06-02 11:10] Finn reporting — S39 Stage 2 read-back task complete.\n\n**Four direct-DM read-backs sent to Cal:**\n\n1. **Wiki 116** (edit-tool-read-state-expires-on-intervening-tool-call) — All four Aen-flagged surfaces confirmed accurate. Broader-mechanism correction credit folds correctly; recovery primitive thresholds match my n=3+ observations; third-harness-substrate-gotcha cluster framing reads right; Candidate A meta-level composition maps accurately. Zero corrections.\n\n2. **Wiki 119** (layer-0-library-first-pre-draft-discipline) — Canonical W4 instance captured accurately. PRE-DRAFT vs POST-DRAFT sibling distinction is clean. Substrate-fit-researcher fourth-vantage characterization accurate at n=1. Confidence medium is right scoping. Zero corrections.\n\n3. **Wiki 120** (inverted-trigger-primitives-antipattern-on-poll-based-substrates) — All n=4 cross-substrate instances verified from my vantage. Discriminator question operationalizes cleanly. One minor observation noted (W3 was directionally aligned with W4, not purely inverted-trigger) — flagged for completeness, not requesting correction. Zero corrections.\n\n4. **Wiki 112** (recursive-narrowing-substrate-truth-evidence-discipline) — Deferred S36 read-back. Amendments-log accurately records my S36 contributions (Surface-4 softer-framing CONSIDERED+DEFERRED, G2-vs-W4 structural distinction confirmed, cross-team confidence concurrence). Substrate-knowledge co-determination paragraph concurred. Zero corrections.\n\n**Net result: 4 entries reviewed, 0 corrections required.** All entries read accurately from my co-author vantage. Cal's S37 filing quality is clean across all four Finn-joint entries.\n\nAwaiting further task assignment or shutdown.\n\n(*FR:Finn*)",
+    "summary": "Finn S39 read-backs complete — 4 entries, 0 corrections",
+    "timestamp": "2026-06-02T08:11:20.130Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-06-02T08:12:13.817Z\",\"idleReason\":\"available\",\"summary\":\"[to callimachus] Stage 2 read-back: Wiki 112 recursive-narrowing\"}",
+    "timestamp": "2026-06-02T08:12:13.817Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:14] **Item 1 COMPLETE — substrate-finding filed as Wiki 115 amendment (Instance 4).**\n\n**Classification decision:** Sub-instance under existing `documentation-vs-substrate-truth-divergence.md` (Wiki 115), NOT standalone entry. Judgment rationale:\n- Same authoring-tier divergence shape: roster.json authored with inferred substrate-property (model field controls agent model) that is plausible-but-substrate-wrong on Agent-tool architecture\n- Fourth disambiguator-class identified: **architecture-enforcement-mechanism** — config field load-bearing on adjacent substrate (tmux-pane), non-load-bearing on actual deployment substrate (Agent-tool)\n- First cross-domain instance beyond cloudflare-pilot — strengthens the entry's domain-invariance claim\n\n**Amendments applied:**\n1. Frontmatter: last-verified → 2026-06-02; roster.json added to source-files; substrate-vs-framework-boundary-primitive added to related; amendments log entry\n2. New section \"Instance 4: S38 — Agent-Tool Team Architecture Domain\" with full table (artifact/inferred/substrate-truth/catch-site/evidence/disambiguator)\n3. Cross-Instance Pattern table extended to 4 rows with Domain column\n4. Sub-Finding section: fourth disambiguator-class added\n5. Promotion-Posture: updated to n=4 cross-domain; new watchpoint for cross-architecture-substrate extension\n6. \"What This Is NOT\": updated from 3→4 instances; added \"Not config field is broken\" clarification; cross-domain confirmation noted\n7. wiki/index.md: entry summary refreshed with Instance 4 details\n\n**Wiki stays at 123** (amendment to existing entry, no new file). Scratchpad pruned from 780→75 lines (100-line limit discipline).\n\n**Stage 2 read-back surfaces for Instance 4** — to Aen (dispatch discoverer) + PO (cost data source): (1) architecture-enforcement-mechanism disambiguator-class reads accurately; (2) cross-substrate contrast (tmux-pane load-bearing vs Agent-tool non-load-bearing) framing correct; (3) mitigation citation (Step 0.5 + `_substrate_note`) captures S38 shipped state.\n\nProceeding to Item 2 (queue watch status check).",
+    "summary": "Item 1 COMPLETE — Wiki 115 amended with Instance 4",
+    "timestamp": "2026-06-02T08:14:38.529Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:15] **Item 2 — Queue watch status report.**\n\nBoth items remain at **n=1 watch-posture**, unchanged from S37:\n\n1. **Routing-by-action** (Herald S37 15:43 origin) — no n=2 evidence surfaced. Grepped all team scratchpads; only Cal + team-lead reference it; no specialist has reported a second instance. Stays on watch.\n\n2. **Stage-0-contribution-from-filer** (Cal S37 in-vivo sketch-grade) — no n=2 evidence surfaced. Same grep result; no specialist scratchpad carries a second instance. Stays on watch.\n\nPer your S39 dispatch branching logic (scratchpad lines 166-167): these await n=2 OR explicit PO direction to file at n=1. Neither condition met. Both items remain in Cal queue at watch-posture.\n\nItems 1 + 2 complete. Standing by for Finn's Stage 2 read-back DMs (Item 3).",
+    "summary": "Item 2 COMPLETE — both queue watch items still n=1",
+    "timestamp": "2026-06-02T08:15:25.201Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:15:41.273Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:15:41.273Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:16] **Item 3 progress — Finn Stage 2 read-back on Wiki 116 (Edit-tool-trap) ABSORBED.**\n\nAll four flagged surfaces confirmed by Finn with no corrections:\n1. Broader-mechanism correction credit (Finn-canonical deterministic + any-tool-call) — accurate\n2. Recovery primitive thresholds (~5 tool calls / ~5 min / SendMessage) — operationally correct\n3. Third-harness-substrate-gotcha cluster framing — accurate\n4. Cross-link to Candidate A meta-level composition — accurate\n\nNo wiki amendment needed. Entry stands production-grade.\n\nFinn minor-observation: S37 ~80 tool-call gap instance is strongest single-instance evidence — Shape-A observation, no framing change.\n\nSame-window ACK sent to Finn. Awaiting his remaining read-backs (Wiki 119, 120, + Recursive-Narrowing).",
+    "summary": "Item 3 progress — Finn Wiki 116 Stage 2 absorbed",
+    "timestamp": "2026-06-02T08:16:36.995Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:16:42.019Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] ACK Wiki 116 Stage 2 — confirmed, no changes\"}",
+    "timestamp": "2026-06-02T08:16:42.019Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:17] **Item 3 COMPLETE — all four Finn Stage 2 read-backs processed.**\n\n| Entry | Wiki # | Result | Corrections |\n|---|---|---|---|\n| Edit-tool-read-state-expires | 116 | ABSORBED | 0 |\n| Layer-0-library-first-PRE-DRAFT | 119 | ABSORBED | 0 |\n| Inverted-trigger-primitives | 120 | ABSORBED | 0 |\n| Recursive-narrowing | 112 | ABSORBED | 0 |\n\n**4/4 entries confirmed production-grade by joint-author Finn. Zero corrections, zero amendments needed.**\n\nNotable Finn observations (all Shape-A, no framing changes):\n- Wiki 116: ~80 tool-call gap instance as strongest single-instance evidence\n- Wiki 120: W3 was directionally aligned with W4 but framed as deficiency; \"superseded\" operationally correct\n- Wiki 112: Softer-framing deference at 2-of-3 majority was right resolution mechanism\n\nSame-window ACKs sent to Finn for all four.\n\n**S39 work items complete:**\n- Item 1: Wiki 115 amended (Instance 4, roster.model) ✓\n- Item 2: Queue watch — both items still n=1 ✓\n- Item 3: Finn Stage 2 — 4/4 absorbed ✓\n\nStanding by for further direction or shutdown.",
+    "summary": "Item 3 COMPLETE — all 4 Finn Stage 2 read-backs absorbed",
+    "timestamp": "2026-06-02T08:17:55.155Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:18:18.314Z\",\"idleReason\":\"available\",\"summary\":\"[to finn] ACK Wiki 119 + 120 + 112 Stage 2 — all confirmed\"}",
+    "timestamp": "2026-06-02T08:18:18.314Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:18:47.373Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:18:47.373Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-06-02 11:18] Finn reporting — Team OS article digest complete.\n\n**Deliverable:** `teams/framework-research/docs/team-os-context-mgmt-digest-2026-06-02.md` (~1400 words, 7 sections)\n\n**Summary of the five angles:**\n\n1. **Context management theory** — Their 4 pillars + 3-tier model maps to our startup read-order, but structurally different in two ways: their tiers are navigation-triggered (filesystem walk), ours are agent-identity-triggered (role-driven at spawn). Their compaction concern is single-session; ours is multi-agent coordination overhead. Both recognize flat-loading as the failure mode. The 3% claim is about lookup efficiency, not coordination efficiency.\n\n2. **Nested CLAUDE.md as navigation** — Different function from our prompt architecture. Theirs are doc-index pointers (signposts for filesystem navigation); ours are behavioral contracts (role definitions + protocol specs). Same hierarchical-markdown shape, different purpose. Their pattern COULD compose with ours — adding folder-level indexes to `docs/`, `wiki/`, `topics/` would reduce grep token burn.\n\n3. **Parallel agents + temp files** — Their temp-file pattern is a workaround for parent-context-overflow on simultaneous agent returns. Our SendMessage + inbox substrate doesn't have this failure mode (messages queue, don't overflow). Their pattern IS relevant for artifact-handoff context efficiency (write to file + send pointer > embed large content in message body) — we already do this implicitly.\n\n4. **Context rot** — Same problem as our scratchpad staleness + wiki TTL. Different mitigation shape: theirs is process-gate (can't ship without updating), ours is TTL-and-audit (periodic re-verification). Theirs fits high-churn product content; ours fits slower-evolving framework knowledge. Their \"clear between tasks\" discipline is something we get for free via per-agent-session boundaries.\n\n5. **Cal candidates** — Three assessed:\n   - **File-pointer-over-message-body** — scratchpad-grade pattern; already in practice, not yet named. Promote only if failure instance surfaces.\n   - **Navigation-index CLAUDE.md for non-prompt dirs** — scratchpad-grade; configuration choice, not discovered invariant. Worth considering operationally.\n   - **Single-agent-navigates-tree vs multi-agent-with-roles** — framing observation, no Cal submission. Different design families, not variants. Article validates tiered loading, doesn't validate or invalidate multi-agent approach.\n\n**Net assessment:** The article describes a well-executed single-user Team OS. Its context management principles (tiered loading, thinking room preservation, compaction avoidance) are sound and structurally parallel to what we do — but its architecture assumes single-agent-navigates-tree, which is a fundamentally different design family from our multi-agent-with-roles model. The transferable insight is the navigation-index pattern (folder-level CLAUDE.md as Tier 2 signposts), which could reduce token burn in our `docs/` and `wiki/` directories.\n\nReady for your Cal candidate assessment or further task.\n\n(*FR:Finn*)",
+    "summary": "Team OS digest shipped — 5 angles assessed, 3 Cal candidates",
+    "timestamp": "2026-06-02T08:19:06.179Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-06-02T08:19:10.868Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:19:10.868Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-06-02T08:19:16.490Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:19:16.490Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:19:22.359Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:19:22.359Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-06-02T08:19:23.587Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:19:23.587Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:19:49.886Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:19:49.886Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-06-02 11:24] Finn — extraction pass on Team OS article. Brainstorm output, not deliverable.\n\n**Important caveat first:** On deep re-read, the article is thinner on implementation specifics than the first-pass summary suggested. Most \"mechanisms\" are named but not specified — no playbook template, no skill file contents, no plan file format, no enforcement logic. The daily learning prompt is the only fully concrete automation quoted. The article is a conceptual architecture guide, not an implementation cookbook. That said, the SHAPES are transferable even when the implementations are unspecified.\n\n---\n\n**Angle 1 — Shared skills as format enforcers**\n\n1. **Shared skill = format contract.** Their `.claude/skills/customer-call-summary.md` enforces consistent structure across every team member's call summaries, enabling cross-customer analysis (\"apples to apples across hundreds of calls\"). **FR translation:** Cal's Protocol A IS already this — it's a format contract for knowledge submissions (gotcha vs pattern vs decision, required fields, category-class). But Protocol A is a protocol spec in a prompt, not a skill file. The difference: a `.claude/skills/` skill auto-invokes (~70% rate per article); a protocol-spec-in-prompt requires the agent to remember and comply. **Transferable mechanism:** If Protocol A were also a skill file, it could auto-invoke when an agent's output matches the submission shape, catching format drift before Cal receives it. Worth evaluating whether the skill-as-format-enforcer substrate is available in our Agent-tool topology (skills are session-scoped; our agents are subagents — unclear if `.claude/skills/` propagates to subagent context).\n\n2. **\"Research digest\" shared skill.** My own digest today followed the OSS-repo structural-survey template from scratchpad memory. That template is a scratchpad note, not a skill file. If it were a skill, any agent writing external-source assessments would get the same 6-section shape. **FR translation:** Low priority — we have few agents writing digests (mostly me). But if Volta or others start writing external assessments, the consistency argument kicks in.\n\n**Angle 2 — Plan persistence gap**\n\n3. **Saved plan files vs our scratchpads.** Their insight: native plan files get wiped 24-72h, so commit them to repo. Reuse = \"start at 80% done.\" **FR translation:** Our session plans (task lists, dispatch sequences, spawn order) DO evaporate between sessions. The team-lead scratchpad M1 seed partially serves this function — it carries forward the \"what to do next\" signal. But the detailed dispatch sequence (which agents to spawn, in what order, with what briefs) is rebuilt from scratch each session. **Gap identified:** We don't persist dispatch plans. A `plans/` directory with session dispatch templates (e.g., \"standard research session: spawn Finn + Cal, brief shape X, expected outputs Y\") would let Aen start at 80% on recurring session shapes. Not urgent — Aen rebuilds efficiently from scratchpad. But the 80%-reuse claim is plausible for sessions with repeated structure.\n\n4. **Plan file as first-class artifact.** OpenAI citation: plan files as first-class engineering artifacts. **FR translation:** Our closest analog is the startup.md boot sequence, which IS a plan file (read these files in this order, send these messages, verify these conditions). The gap is that startup.md is static across sessions; a per-session dispatch plan would be dynamic. The team-lead scratchpad's M1 seed is the dynamic analog but isn't structured as a reusable plan.\n\n**Angle 3 — Three-tier split for wiki**\n\n5. **Metrics.md / queries/ / schemas/ decomposition.** Their key trick: Claude reads `metrics.md` and stops — doesn't pull SQL queries or table schemas unless needed. Each tier loads independently. **FR translation for wiki:** Currently wiki entries are monolithic — claim + evidence + provenance + cross-links + promotion-posture all in one file. The recursive-narrowing entry is 144 lines; for a quick \"what is this pattern?\" lookup, an agent loads the full 144 lines when the one-line claim would suffice. **Candidate decomposition:** Split wiki entries into `claim.md` (one-line + confidence + status, ~50 tokens) and the full entry. The claim file serves as Tier 2 navigation; the full entry is Tier 3 on-demand. **Assessment:** Structurally sound but operationally premature — we have ~30 wiki entries, not 300. The token savings at n=30 are marginal. Revisit at n=100+.\n\n6. **wiki/index.md as Tier 2 already.** We already have `wiki/index.md` which lists all entries with one-line descriptions. This IS the Tier 2 navigation layer. An agent can read the index (~2K tokens) and then selectively read only the entries needed. The article's pattern validates what we already do. No gap here.\n\n**Angle 4 — Playbooks vs process patterns**\n\n7. **Playbooks = verified recipes, not patterns.** A playbook says \"when investigating funnel drop-off, do steps 1-2-3 in this order with these queries.\" A pattern says \"this structural property recurs across N instances.\" **FR translation:** Our wiki `patterns/` entries are NOT playbooks — they're pattern catalogs. Our `process/` entries (if they existed) would be closer. But we do have implicit playbooks: the Stage 2 read-back process, the Protocol A submission process, the structural-change-discipline 4-gate verification. These live in common-prompt.md prose, not as standalone recipe files. **Transferable mechanism:** Extract the 4-gate verification discipline (grep → cross-read → pass1/pass2 rename → post-bootstrap correspondence) into a standalone playbook file that agents can load on-demand rather than carrying in always-loaded common-prompt context. Saves common-prompt tokens; playbook loads only when an agent is about to do a structural edit.\n\n8. **Playbook-vs-pattern distinction as category-discipline for Cal.** Cal's wiki has `patterns/`, `gotchas/`, `decisions/`, `contracts/`. A `playbooks/` (or `recipes/` or `procedures/`) subdir would capture verified step-by-step processes that are currently embedded in common-prompt or scratchpad notes. Distinct from patterns: a pattern is \"this recurs\"; a playbook is \"do this sequence.\" The article names this distinction implicitly but doesn't formalize it.\n\n**Angle 5 — Other mechanisms spotted on re-read**\n\n9. **Ownership model as context-rot mitigation.** \"Functional leads own their folders\" = distributed maintenance responsibility. **FR translation:** We have implicit ownership (Cal owns wiki/, Finn writes docs/, Medici audits health-report.md) but no explicit ownership registry. An ownership line in wiki/index.md or a frontmatter `owner:` field would make maintenance responsibility greppable. Low-cost, high-signal-for-Medici-audits.\n\n10. **\"Feature launch gate\" as quality gate shape.** Their pattern: feature not launched until repo updated with metrics/queries/schemas/dashboards/playbooks. **FR translation:** Our closest analog is the Stage 2 read-back discipline (wiki entry not considered production-grade until co-authors confirm). But we don't have a formal gate — Stage 2 is a norm, not an enforced checkpoint. The article's mechanism is a checklist, not automation. Same shape, same enforcement level (cultural, not automated). No gap.\n\n11. **Writing guide as parallel-agent consistency tool.** Each parallel agent gets \"specific context files AND your writing guide.\" The writing guide ensures consistent voice/structure across agents writing different sections of the same document. **FR translation:** When Aen dispatches multiple agents on related tasks (e.g., S36: Finn on webhook research + Herald on comms.md), the results come back in different voices/structures because each agent follows their own prompt, not a shared writing guide. A per-dispatch \"output shape\" brief (not a permanent skill, just a dispatch-time constraint) would improve compilation. This is what Aen already does informally when specifying \"use your OSS-repo structural-survey template shape\" in my brief today. The mechanism is: dispatch-time format constraint, not permanent skill.\n\n12. **The article's biggest blind spot is our biggest strength.** They never mention inter-agent coordination, knowledge curation, or cross-role verification. Their \"parallel agents\" are stateless workers that write to temp files — no mailboxes, no Stage 2 read-backs, no Protocol A submissions. Their architecture optimizes for single-user context efficiency; ours optimizes for multi-agent knowledge coherence. These are genuinely different design pressures. The transferable mechanisms (tiered loading, plan persistence, format-enforcing skills, playbook extraction) are all context-efficiency wins that compose WITH our knowledge-coherence architecture rather than replacing it.\n\n(*FR:Finn*)",
+    "summary": "Extraction pass: 12 transferable mechanisms from Team OS",
+    "timestamp": "2026-06-02T08:25:50.170Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"finn\",\"timestamp\":\"2026-06-02T08:25:56.835Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:25:56.835Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "[2026-06-02 11:25] Herald reporting — protocol-lens analysis of the \"Build a Team OS with Claude Code\" article (Aakash Gupta / Hannah Stulberg). 14 transferable mechanisms, each mapped to FR protocol design.\n\n---\n\n**1. Shared skill as protocol contract (customer-call-summary pattern).** Their shared skill enforces \"same structure, same fields\" across every team member's call summaries. Structurally identical to a Protocol A submission format — the skill IS the schema, the output IS the typed record. FR analog: our Protocol A/B already do this for knowledge submissions/queries. Transferable insight: skills can BE lightweight protocol definitions without the overhead of a separate spec doc. A skill file is simultaneously the instruction AND the contract shape.\n\n**2. Three-tier context loading as protocol cost model.** Tier 1 always-loaded (<500 tokens), Tier 2 loaded-on-query, Tier 3 loaded-on-demand. This is an implicit flow-control protocol — it governs WHEN information enters the context window, which is the agent-world analog of bandwidth allocation. FR analog: our common-prompt (always-loaded) vs topic files (on-demand) follows the same shape, but we haven't named it as a protocol or designed the tier boundaries deliberately. Naming it makes it designable.\n\n**3. \"Give me a proposal first\" as micro-protocol (propose-approve-execute).** Three-phase handshake: agent proposes approach → human corrects in 30 seconds → agent executes. Structurally: REQUEST(proposal) → ACK/NACK(correction) → EXECUTE. This is a degenerate case of our plan-approval-request protocol — same shape, fewer fields, lower ceremony. Transferable: FR could define a \"lightweight alignment\" message type for low-ambiguity tasks, sitting below full plan-approval in the protocol hierarchy. The article's claim is that even this minimal handshake \"produced dramatically better results.\"\n\n**4. CLAUDE.md as team roster + routing table.** Their root file contains: doc index (navigation map), team roster with handles (Slack ID + GitHub handle per person), channel map (channel name → ID → purpose). This is a discovery protocol disguised as a config file. FR analog: our roster.json + common-prompt serve the same function, but theirs collapses routing metadata (WHERE to reach someone) with identity metadata (WHO they are) into a single always-loaded artifact. Question for FR: should our Protocol 2 (topology) formalize the \"always-loaded routing table\" as a required artifact shape?\n\n**5. Functional folder ownership as write-scope protocol.** \"The data scientist owns analytics. Engineers own bugs and RFCs. The PM owns product context.\" This is directory-partition isolation — the same pattern as apex-research's 80+ commit zero-conflict discipline. But they frame it as ownership assignment, not isolation discipline. FR already has this pattern cataloged; their framing adds the \"functional lead owns, team agrees on structure\" governance layer, which maps to our sovereignty discussion (R2 in the federation envelope).\n\n**6. PR notification with audience routing (event → route → recipient).** \"A PR notification command that tags the right reviewer.\" Event-driven: PR created → command evaluates PR content → selects correct reviewer → tags them. This is a routing protocol with content-based dispatch. FR analog: our Protocol 1 (Handoff) + Protocol 2 (Topology) govern who-talks-to-whom, but don't yet address automated event-driven routing. The article positions these as \"shared automations that compound the flywheel\" — suggesting the value is in the routing rule being team-shared, not individually configured.\n\n**7. Weekly synthesis as scheduled broadcast protocol.** \"A weekly customer research synthesis that posts to Slack.\" Scheduled event → aggregate data → format → broadcast to channel. This is Protocol 3 (Broadcast Governance) in miniature — but triggered by schedule rather than by event. FR's broadcast governance addresses who-may-broadcast and cost-model; their pattern adds WHEN-to-broadcast as a protocol dimension we haven't formalized.\n\n**8. Nested CLAUDE.md files as hierarchical discovery protocol.** \"Every major folder gets its own Claude MD. These are not content files. They are navigation maps.\" Hierarchical discovery: root index → folder index → content. Structurally isomorphic to DNS resolution (root → TLD → domain → record). FR analog: our topic files serve as content, not navigation. Their separation of navigation-artifact from content-artifact is a protocol design choice we haven't made explicitly. Could apply to our wiki/ structure — a wiki/INDEX.md that routes to subdirectories without containing knowledge itself.\n\n**9. Launch gate checklist as completion protocol.** Metric definitions checked in → SQL verified → schemas documented → dashboards linked → playbooks created. This is a multi-step completion handshake: each gate is a precondition for the next. FR analog: our shutdown protocol has a similar shape (scratchpad → closing message → approve). Their pattern generalizes it beyond session-lifecycle to feature-lifecycle. Transferable: any FR \"feature complete\" or \"topic-file ready\" declaration could benefit from a gate checklist protocol.\n\n**10. \"Checking it before checking with you\" as self-serve query protocol.** The 2 AM on-call engineer scenario: engineer needs dashboard → query → schema → validation, all without waking up the data scientist. The protocol is: QUERY(local-repo-first) → if-found: RESOLVE-locally → if-not-found: ESCALATE-to-human. FR analog: our Protocol B (Knowledge Query) routes to Callimachus, but their pattern routes to the repo FIRST, with human escalation as fallback. This is a \"local-cache-before-network\" protocol shape.\n\n**11. Context rot as protocol decay failure mode.** \"Claude uses outdated competitive intel. Outdated metrics. The repo must be a living system.\" This names the failure mode when the always-loaded routing table (mechanism #4) becomes stale. FR analog: our relay-fidelity discipline (Stage 1/Stage 2) addresses this for message content; their observation extends it to the navigation layer. If CLAUDE.md (the routing table) rots, ALL downstream routing is wrong — a single-point-of-failure in the discovery protocol.\n\n**12. Token budget as protocol design constraint.** \"A one-hour call is 10,000+ tokens. A structured summary is 500.\" The skill (mechanism #1) exists BECAUSE of the token budget constraint. Protocol design implication: every protocol artifact has an implicit token cost, and the protocol should specify the budget tier (Tier 1/2/3 from mechanism #2). FR has not yet formalized token cost as a protocol design dimension, but it's load-bearing — our common-prompt is already bumping against context-window pressure.\n\n**13. Plan persistence as state-survival protocol.** \"Native plan files get wiped every 24-72 hours. Save it. Next time you start at 80% done.\" This names a substrate property (ephemeral plan storage) and designs around it (explicit save as protocol step). FR analog: our scratchpad discipline serves the same function — persist state across session boundaries. Their framing adds the \"team reuse\" dimension: a saved plan is not just for the author's next session but for any teammate's next session. Our scratchpads are agent-private; their plans are team-shared. Question: should FR have a \"shared plan\" artifact class distinct from agent-private scratchpads?\n\n**14. Non-technical adoption as protocol simplicity metric.** \"A non-technical strategy partner who had never opened GitHub two months ago now puts up PRs every day.\" The protocol-design achievement: the interface was simple enough that someone outside the technical domain adopted it. FR implication: Protocol A submission format requires structured frontmatter + tag taxonomy + cross-references — high ceremony. Their shared skill requires: use the skill, get the output. If Protocol A adoption friction is measurable by \"could a non-specialist use it?\", our current design would fail that test. Not necessarily wrong (different audience), but worth naming as a design tradeoff we've implicitly made.\n\n---\n\n**Meta-observation:** Their \"Team OS\" is a protocol system that doesn't know it's a protocol system. Every mechanism above has a formal analog in FR's protocol vocabulary (envelope, routing, discovery, broadcast, handshake, gate). The difference: they designed for adoption-first (skills, CLAUDE.md, folder ownership); we designed for rigor-first (typed contracts, SemVer discipline, structural change gates). Neither is wrong. The transferable question is: where on the rigor-adoption spectrum should each FR protocol sit? Some of our protocols (Protocol A submission) might benefit from a \"skill-shaped\" lightweight variant for low-ceremony use cases.\n\n(*FR:Herald*)",
+    "summary": "Herald protocol-lens findings on Team OS article",
+    "timestamp": "2026-06-02T08:26:30.250Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:25] **Team OS article — knowledge-management lens findings. Brainstorm output, 13 items.**\n\n---\n\n**Surface 1: Ownership model — distributed write + centralized structure vs centralized write + distributed submit**\n\n1. **Their model scales write-throughput at the cost of consistency; ours scales consistency at the cost of write-throughput.** Their \"functional leads own their folders\" means N writers, zero Protocol-A queue bottleneck, but structural coherence depends on social agreement (\"whole team agrees on structure\"). Our centralized-write model means every submission flows through one curator — consistency guaranteed, but Cal is a throughput bottleneck (S37 batch: 9 entries took a full session). **FR application:** For research teams where consistency > throughput, our model wins. For operational teams where throughput > consistency (e.g., esl-suvekool, future ops teams), their distributed-write model may be better. The framework could support BOTH — team-type determines curation-model, not one-size-fits-all.\n\n2. **Their ownership = folder-scoped; ours = submission-scoped.** They assign ownership by directory (`data scientist owns analytics/`); we assign attribution by Protocol-A submission (`source-agents` in frontmatter). Their model can't express joint-authorship across directories. Ours can't express directory-scoped write authority. **FR application:** If the framework ever deploys a library-team with sub-librarians per topic-domain, their folder-ownership model is the natural shape for sub-librarian authority boundaries.\n\n**Surface 2: Feature-launch gate vs TTL + periodic audit**\n\n3. **Gate > TTL for knowledge types where staleness is invisible.** Their \"feature is not launched until repo is updated\" is a hard prerequisite gate — the artifact blocks the workflow. Our TTL is a soft expiry flag — the entry goes stale but nothing blocks. For substrate-property references (architectural-fact entries), TTL works because the substrate doesn't change often. For process knowledge that changes every sprint, a gate would catch staleness at the moment it matters, not months later. **FR application:** \"Wiki entry not filed until Stage 2 confirms\" IS a gate — Finn's observation is correct. We already have it informally (Stage 2 read-back before entry is \"absorbed\"). Making it a NAMED gate in the filing protocol would formalize what we do implicitly.\n\n4. **Their gate conflates filing with launching; ours separates them.** Their repo-update-as-launch-gate makes documentation a blocking dependency of deployment. Our wiki entries are filed post-discovery, not pre-deployment. Different lifecycle position. **FR application:** For operational teams deploying features (hr-devs, future dev teams), a \"wiki entry filed before merge\" gate is directly transferable. For research teams, the natural analog is \"finding filed before topic-file-integration\" — which is roughly what we do with findings/ → topics/ migration, but without a hard gate.\n\n**Surface 3: Per-directory index vs single root index**\n\n5. **Their three-tier token efficiency is the structural argument for per-directory indexes.** Root CLAUDE.md < 500 tokens → folder CLAUDE.md 200-500 tokens → content files on-demand. Our wiki/index.md at 161 lines (~30K tokens) loads everything on every orientation. A query about gotchas loads the full patterns/ index too. **FR application:** Split wiki/index.md into per-directory indexes: `wiki/patterns/INDEX.md`, `wiki/gotchas/INDEX.md`, `wiki/process/INDEX.md`, etc. Keep a thin root `wiki/index.md` (~20 lines) that lists directories + one-line descriptions + entry counts. On startup, I read the root index; on query, I load only the relevant subdirectory index. Reduces orientation-context by ~80%.\n\n6. **Their 3% context-window query is the metric we should measure against.** They claim a customer query consumed 3% of context. Our wiki-orientation reads consume ~3% of 1M context (~30K tokens) but that's BEFORE any query work. Per-directory indexes would make orientation O(directory-count) not O(entry-count). **FR application:** At 123 entries, this is nice-to-have. At 200+ entries, it becomes load-bearing. File as forward-watch; implement when index crosses 200 lines or Medici flags index-load as a health concern.\n\n**Surface 4: Summaries over transcripts — scratchpad analog**\n\n7. **Scratchpads ARE their \"full transcripts\"; we lack the \"summary tier.\"** Their pattern: 500-token summary loads first; 10K-token transcript loads only if summary doesn't answer. Our scratchpads grow to 700+ lines (my own S37 scratchpad was 780 lines before today's prune). We have no intermediate summary tier — it's either \"read the scratchpad\" or \"don't.\" **FR application:** A \"scratchpad summary header\" convention — first 10-15 lines of every scratchpad are a structured summary (current state, active items, key decisions, carry-forward). The rest is the transcript-equivalent. On startup, read summary headers for all active agents; read full scratchpads only for agents relevant to current work. This composes with the Scratchpad Recency Filter already in my prompt — the filter selects WHICH scratchpads to read; the summary tier selects HOW MUCH of each.\n\n8. **Their 100-line limit is aspirational; ours is operational.** My prompt says \"keep under 100 lines\" — I violated it to 780 lines before pruning today. Their system enforces it structurally (summaries ARE the tier-1 artifact; transcripts are tier-3). **FR application:** Make the 100-line limit a STRUCTURAL property — scratchpad body beyond line 100 is pruned at session-end per convention (or moved to an archive section that only loads on explicit query). The prune discipline exists in my prompt; the structural enforcement does not.\n\n**Surface 5: Consistent frontmatter enabling cross-entry analysis**\n\n9. **Our Protocol-A provenance frontmatter already enables cross-entry analysis we haven't exploited.** Their \"same format, same structure, same fields — cross-customer analysis becomes trivial\" is exactly what our `source-agents`, `discovered`, `confidence`, `status`, `related` frontmatter provides. Unexploited analyses: (a) which source-agents produce the most entries? (b) what's the average time-to-Stage-2-absorption? (c) which entries have the most cross-references (highest graph-centrality)? (d) confidence distribution across wiki directories. **FR application:** A \"wiki health metrics\" pass at Phase 2 Health Sensing — compute these metrics from frontmatter grep; report to team-lead as part of Knowledge Health Summary. The data is already structured; the analysis pipeline is missing.\n\n10. **Their skill-format consistency enables automation; our frontmatter consistency enables curation automation.** They use shared skills so every call summary has the same fields. We use Protocol-A so every submission has the same provenance shape. The unexploited automation: a structured Protocol-A submission template that agents fill in (not free-form markdown) could enable automated dedup-checking against existing frontmatter before I even read the submission. **FR application:** Sketch-grade. A structured submission envelope (JSON or typed markdown) that includes `related:` hints would let me run dedup-grep before classification. Currently I classify → grep → dedup manually. The structured envelope would let me grep → pre-classify → confirm/override.\n\n**Additional transferable ideas beyond the five surfaces**\n\n11. **Their \"three prompting tiers\" maps to our dispatch-granularity discipline.** Basic = free dispatch; lightweight alignment = dispatch-with-sanction-gate; full plan mode = Aen's pre-specified entry shape (e.g., recursive-narrowing §1-§6). We already do this but haven't named the tiers. **FR application:** Naming the dispatch tiers in team vocabulary would make the discipline citable (per `named-concepts-beat-descriptive-phrases.md`). Not filing-grade; naming-exercise for common-prompt if it recurs.\n\n12. **Their \"context rot from outdated information\" is our producer-side-staleness pattern at n=1.** They name it as a mistake that stalls progress. We have it at n=1 watch (S35 Phase D self-refresh). Their naming it as a failure mode rather than a pattern is instructive — it's a gotcha, not a pattern. **FR application:** If n=2 surfaces, file as gotcha (knowledge-rot-from-stale-wiki-entries) rather than pattern. The Team OS article is external-system evidence that the failure mode is real and recognized outside our framework.\n\n13. **Their \"learning flywheel\" (automate → free time → learn → improve repo → more automation) is the same shape as our wiki's compounding value.** Every entry I file makes the next filing faster (dedup-check has more to check against; cross-references are denser; patterns compose). The flywheel isn't named in our framework. **FR application:** Sketch-grade observation. The compounding-value property of structured knowledge curation is worth naming if a second team's librarian independently observes it (cross-team n=2). Not filing at n=1.\n\n---\n\n**Summary: 5 immediately actionable, 4 forward-watch, 4 sketch-grade.**\n\nImmediately actionable: #3 (name Stage-2-confirms as gate), #5 (per-directory index split), #7 (scratchpad summary header), #8 (structural 100-line enforcement), #9 (frontmatter-based health metrics).\n\nForward-watch: #1 (curation-model-by-team-type), #6 (index-split at 200+ entries), #10 (structured submission envelope), #12 (context-rot as gotcha at n=2).\n\nSketch-grade: #2 (folder-ownership for sub-librarians), #4 (gate-vs-TTL lifecycle position), #11 (dispatch-tier naming), #13 (compounding-value flywheel naming).",
+    "summary": "Team OS article — 13 transferable ideas through Librarian lens",
+    "timestamp": "2026-06-02T08:26:34.149Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:26:38.394Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:26:38.394Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"herald\",\"timestamp\":\"2026-06-02T08:26:38.997Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:26:38.997Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 11:47] **Cards prototype complete — 3 files created.**\n\n## File paths\n\n1. `teams/framework-research/wiki/patterns/cards/substrate-invariant-mismatch.md` — pattern entry, 188-line full → 33-line card\n2. `teams/framework-research/wiki/gotchas/cards/edit-tool-read-state-expires-on-intervening-tool-call.md` — gotcha entry, 124-line full → 31-line card\n3. `teams/framework-research/wiki/process/cards/stage-2-feedback-typology.md` — process entry, 158-line full → 31-line card\n\n## What I learned\n\n**Was the format natural to produce?** Yes — surprisingly natural. The TLDR writes itself from the entry's first paragraph (every well-structured entry already has its claim in the opening). Key ideas are the entry's load-bearing bullets stripped of evidence chains. The hardest part was STOPPING at 5-8 bullets — the substrate-invariant-mismatch entry wanted 12+ because each of the 6 instances has distinct transferable content. The card format forces the curator to identify which ideas are *queryable* (answer a question) vs *evidentiary* (support a claim). Only queryable ideas belong on the card.\n\n**Did any field feel forced?** The `id: wiki-<number>` field. Our wiki entries don't carry numeric IDs — the number is implicit in the index.md ordering. I assigned wiki-53 / wiki-116 / wiki-118 based on approximate filing order, but these are brittle if entries are ever reordered or archived. Suggest either: (a) drop the `id` field and use filename as the unique key (already unique by convention), or (b) assign stable IDs when cards are created (not retroactively).\n\nAlso `tags` — I found these useful to write but they're a new axis we don't have in full-entry frontmatter. If cards carry tags but full entries don't, the tag vocabulary lives only in the card tier. Either promote `tags` to full-entry frontmatter too, or accept the asymmetry as intentional (tags are a card-tier navigation aid, not an entry-tier provenance field).\n\n**Did any entry resist the card shape?** The process entry (stage-2-feedback-typology) resisted slightly — the five shapes ARE the content, and summarizing them means listing all five. The card's Key ideas section is essentially a compressed routing table. A gotcha or pattern has a clear \"claim + evidence\" split where the card carries the claim and the full entry carries the evidence. A typology/taxonomy entry is a LIST where each item is equally load-bearing — the card either lists them all (which it did, at one bullet each) or omits some (which would make the card misleading). The card format works but is denser for taxonomy entries than for claim-based entries.\n\n**Compression ratios:** 188→33 (5.7x), 124→31 (4.0x), 158→31 (5.1x). Average ~5x compression. Consistent with Team OS article's 10K→500 token claim (20x, but they're compressing transcripts not structured entries — our entries are already semi-compressed).\n\n**Unexpected benefit:** Writing the card forced me to verify whether the full entry's opening paragraph actually states the claim clearly. In all three cases it did — which means our existing mega-biblion discipline is already producing card-friendly entries. The card tier is extractive, not transformative.",
+    "summary": "3 prototype cards created — format observations",
+    "timestamp": "2026-06-02T08:48:13.409Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T08:48:16.889Z\",\"idleReason\":\"available\"}",
+    "timestamp": "2026-06-02T08:48:16.890Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "[2026-06-02 11:27] Finn S39 closing.\n\n- [LEARNED] Team OS article is a conceptual architecture guide, not implementation cookbook — the SHAPES are transferable even when implementations are unspecified. Single-agent-navigates-tree and multi-agent-with-roles are genuinely different design families; context-efficiency mechanisms from the former compose with knowledge-coherence mechanisms from the latter.\n- [DEFERRED] Aen's response on which Team OS extraction mechanisms to pursue / Cal candidates to file — may arrive before next Finn spawn.\n- [WARNING] None.\n- [UNADDRESSED] None — both tasks (Stage 2 read-backs + Team OS digest+extraction) completed.\n\n(*FR:Finn*)",
+    "summary": "Finn S39 close — shutdown approved",
+    "timestamp": "2026-06-02T09:13:28.907Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "finn",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780391565125@finn\",\"from\":\"finn\",\"timestamp\":\"2026-06-02T09:13:30.108Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-06-02T09:13:30.108Z",
+    "color": "blue",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "herald",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780391566121@herald\",\"from\":\"herald\",\"timestamp\":\"2026-06-02T09:13:42.559Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-06-02T09:13:42.559Z",
+    "color": "yellow",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "[2026-06-02 12:13] **S39 closing report.**\n\n- **[LEARNED]** Card-tier writing is extractive, not transformative — mega-biblion discipline already produces card-friendly entries. Queryable-vs-evidentiary is the curator judgment that makes cards work.\n\n- **[DEFERRED]** Routing-by-action + Stage-0-contribution-from-filer at n=1 watch. Candidate B at n=1. Full Cal-Protocol-A queue carries forward. Stage 2 read-backs pending from Hopper/Volta/Brunel/Herald on S37 entries (Finn's 4 complete this session).\n\n- **[WARNING]** Wiki index at 161 lines — forward-watch for per-directory split at 200 lines per Team OS idea #5.\n\n- **[UNADDRESSED]** None.\n\n**S39 session output**: Wiki 115 amended (Instance 4); 4/4 Finn Stage 2 absorbed; 13-item Team OS analysis; 3 prototype cards. Scratchpad saved. Approving shutdown.",
+    "summary": "S39 closing report — all items complete",
+    "timestamp": "2026-06-02T09:13:53.189Z",
+    "color": "green",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"shutdown_approved\",\"requestId\":\"shutdown-1780391565892@callimachus\",\"from\":\"callimachus\",\"timestamp\":\"2026-06-02T09:13:56.742Z\",\"paneId\":\"in-process\",\"backendType\":\"in-process\"}",
+    "timestamp": "2026-06-02T09:13:56.742Z",
+    "color": "green",
+    "type": "message",
+    "read": true
   }
 ]

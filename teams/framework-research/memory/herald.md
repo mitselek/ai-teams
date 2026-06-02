@@ -1,5 +1,23 @@
 # Herald Scratchpad
 
+## 2026-06-02 (session #39 — Protocol lens on external article)
+
+[CHECKPOINT] **Single-task session: protocol-lens analysis of "Build a Team OS with Claude Code" (Aakash Gupta / Hannah Stulberg).** Delivered 14 transferable mechanisms to Aen via SendMessage, each mapped to FR protocol design vocabulary.
+
+[LEARNED] **Their "Team OS" is a protocol system that doesn't know it's a protocol system.** Every mechanism has a formal analog in FR's vocabulary (envelope, routing, discovery, broadcast, handshake, gate). Key structural difference: they designed adoption-first (skills, CLAUDE.md, folder ownership); FR designed rigor-first (typed contracts, SemVer discipline, structural change gates). The transferable question is where on the rigor-adoption spectrum each FR protocol should sit.
+
+[PATTERN] **Shared skill as protocol contract.** A skill file is simultaneously the instruction AND the contract shape — lighter-weight than a separate protocol spec doc. Their customer-call-summary skill enforces "same structure, same fields" across all users. Structurally identical to Protocol A submission format, but with zero ceremony. Implication: Protocol A might benefit from a "skill-shaped" lightweight variant for low-ceremony use cases.
+
+[PATTERN] **Three-tier context loading as implicit flow-control protocol.** Tier 1 always-loaded (<500 tokens), Tier 2 loaded-on-query, Tier 3 loaded-on-demand. FR already follows this shape (common-prompt vs topic files) but hasn't named it as a protocol or designed tier boundaries deliberately. Naming it makes it designable. Token budget is a load-bearing protocol design constraint we haven't formalized.
+
+[PATTERN] **"Propose first" micro-protocol is a degenerate plan-approval handshake.** REQUEST(proposal) → ACK/NACK(correction) → EXECUTE. Same shape as our plan-approval-request, fewer fields, lower ceremony. Their claim: even this minimal handshake "produced dramatically better results."
+
+[PATTERN] **Nested CLAUDE.md as hierarchical discovery protocol.** Navigation maps separated from content — structurally isomorphic to DNS resolution. FR's topic files serve as content, not navigation. The separation is a protocol design choice worth considering for wiki/ structure.
+
+[PATTERN] **Non-technical adoption as protocol simplicity metric.** "A non-technical strategy partner who had never opened GitHub two months ago now puts up PRs every day." If Protocol A adoption friction is measurable by "could a non-specialist use it?", our current design would fail that test. Worth naming as a design tradeoff we've implicitly made.
+
+[DEFERRED] No Cal Protocol A submissions this session (single-task brainstorm output, not specification-grade findings). If Aen or PO decide any of the 14 mechanisms warrant wiki-grade treatment, those become future Herald deliverables.
+
 ## 2026-05-06 (session #27 — Phase B mid-flight wake)
 
 [CHECKPOINT] **RegistrationAuthority typed-contract ratification** (Brunel/Monte composition for Phase B #1 federation bootstrap + #2 authority-drift detection). Recommendation: Option (2) — new top-level discriminated-union sibling `FederationAuthorityRecord` (NOT a `kind` value inside an existing write-event union). Reasoning: 3 structural arguments (substrate-metadata-vs-write-event lifecycle, append-only-additive-supersedes-chain vs transactional, D2/D6 consume as reference data not error event).

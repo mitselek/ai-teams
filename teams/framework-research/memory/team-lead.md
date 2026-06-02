@@ -1,6 +1,80 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-05-28 — session-38 → session-39
+### [PROCESSED 2026-06-02] 2026-06-02 — session-39 → session-40
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S40 read):**
+
+- **State of play:** S39 closed 2026-06-02. Three agents spawned (Finn, Cal, Herald). Wiki 115 amended (Instance 4: roster.model substrate-finding). Finn Stage 2 read-backs: 4/4 absorbed, 0 corrections. External article analysis: "Build a Team OS with Claude Code" — three-agent multi-lens extraction (39 items → 15 epic work items → 5 Tier-1 sub-issues). **Card prototype validated** — three-tier wiki context system (index/card/full) with ~5x compression. Also: Anderson security reviewer persona designed for Arhitecture review team (consultancy, delivered via gist). Queue watch: routing-by-action + Stage-0-contribution both still n=1.
+- **CRITICAL FIRST ACTION S40 — 5 Tier-1 issues from epic #67:** #68 three-tier wiki context system (prototype validated, backfill remaining ~120 entries + per-dir indexes), #69 scratchpad summary header convention, #70 Stage-2-confirms formal gate, #71 playbook extraction from common-prompt, #72 hierarchical CLAUDE.md for non-prompt dirs. PO wants a clean session dedicated to these.
+- **Open dispatches/dependencies (carried from S38):** ITSD-38884 admin grant (sole Round-1 op-step-1 blocker). Hopper Path D execution when grant lands. Pilot-A creation (PO dashboard). All unchanged — S39 was research-focused, no CF pilot work.
+- **Expected first action S40:** PO directed clean session for the 5 Tier-1 issues. Start with #68 (cards backfill — Cal) as it has the validated prototype and highest convergence. #69 (scratchpad headers) and #71 (playbook extraction) can run in parallel.
+- **Anderson persona (consultancy):** Delivered via gist (https://gist.github.com/mitselek/88e513513da09c423c1b26e3bf26eb0c). Fifth member of Arhitecture review team — security architecture & compliance lens. Ross Anderson (1956–2024). Includes `[THREAT-MODEL]` tag per Celes review. Not FR work — external consultancy.
+
+---
+
+## SESSION 39 WRAP — 2026-06-02 (Research + design session; Wiki 115 amended; Team OS article 3-agent extraction → epic #67 with 5 sub-issues; card prototype validated)
+
+**Spans:** 2026-06-02 ~11:00 → ~12:00. One session; ~1 hour active.
+
+**Outcome:** Four work streams completed: (1) consultancy — Anderson security reviewer persona for Arhitecture review team; (2) Finn Stage 2 read-backs 4/4 absorbed 0 corrections; (3) Cal filed substrate-finding as Wiki 115 Instance 4 + confirmed queue watch items at n=1; (4) Team OS article multi-lens extraction — Finn (12 mechanisms) + Cal (13 knowledge-mgmt ideas) + Herald (14 protocol observations) → synthesized to epic #67 with 15 work items across 3 tiers → 5 Tier-1 sub-issues (#68-#72). Card prototype validated on 3 entries (~5x compression). PO directed next session for the 5 Tier-1 issues.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `wiki/patterns/documentation-vs-substrate-truth-divergence.md` (Wiki 115) | M (Instance 4) | Cal | roster.model non-load-bearing; 4th disambiguator-class: architecture-enforcement-mechanism |
+| `docs/team-os-context-mgmt-digest-2026-06-02.md` | NEW | Finn | ~1400 words; 5-angle assessment of Team OS article |
+| `wiki/patterns/cards/substrate-invariant-mismatch.md` | NEW (prototype) | Cal | Card prototype: 188→33 lines (5.7x) |
+| `wiki/gotchas/cards/edit-tool-read-state-expires-on-intervening-tool-call.md` | NEW (prototype) | Cal | Card prototype: 124→31 lines (4.0x) |
+| `wiki/process/cards/stage-2-feedback-typology.md` | NEW (prototype) | Cal | Card prototype: 158→31 lines (5.1x) |
+| GitHub issue #67 | NEW | Aen | Epic: Context Management Improvements — 15 work items, 3 tiers |
+| GitHub issues #68-#72 | NEW | Aen | 5 Tier-1 sub-issues from epic #67 |
+| Gist: Anderson persona | NEW (external) | Celes | Security reviewer for Arhitecture review team; consultancy deliverable |
+
+### Decisions (PO-ratified)
+
+[DECISION — S39] **Three-tier wiki context system adopted** (index/card/full). Prototype validated on 3 entries. Cards generated at filing time by Cal. `id` field dropped (filename is key). `tags` card-tier only. Structure: `wiki/<subdir>/cards/<name>.md`.
+
+[DECISION — S39] **`[THREAT-MODEL]` tag over `[SPECULATIVE]`** for Anderson persona. Celes pushed back on "speculative" — connotes guesswork, clashes with "operationally specific" personality. `[THREAT-MODEL]` is recognized methodology term in security domain.
+
+[DECISION — S39] **Tier-1 issues filed for next clean session.** PO directed S40 dedicated to #68-#72.
+
+### Substantive learnings
+
+[LEARNED — process, promotion-grade] **"Queryable vs evidentiary" distinction in card curation.** Cal's self-reflection: card format forces curator to distinguish ideas that answer questions (queryable → card) from ideas that support claims (evidentiary → full entry only). The card tier is extractive, not transformative — existing mega-biblion discipline already produces card-friendly entries. Potential wiki-grade finding if cross-team validation surfaces.
+
+[LEARNED — framework] **Rigor-adoption spectrum as protocol design dimension.** Herald's meta-observation: Team OS is a protocol system that doesn't know it's a protocol system. They designed adoption-first; we designed rigor-first. The transferable question: where on the spectrum should each protocol sit? Some FR protocols (Protocol A) might benefit from skill-shaped lightweight variants.
+
+[LEARNED — process] **Multi-lens extraction produces higher-quality synthesis than single-agent assessment.** Finn's first-pass digest was assessment-shaped ("how does this compare"). Three-agent extraction was mechanism-shaped ("what can we steal"). The cross-agent convergences (items hit by 2+ agents independently) were the strongest signals — per-directory indexes, skill-as-format-contract, Stage-2-confirms gate all surfaced from all three lenses.
+
+### Standing watch items going into session 40
+
+- **All S38 watch items carry forward unchanged** — ITSD-38884, Stage 2 read-back surfaces (Hopper #2-4 + Volta multi-entry still pending from S37), Hopper bundled-shred at n=1, routing-by-action + Stage-0-contribution at n=1, A1 evidence-cycle audit at S40-42, S35 carry-forward standing watch, Aen amendment Part C, TPS-583 dormant, mVox-dev dormant, Manager-team dormant.
+- **NEW — Epic #67 Tier-1 execution** — 5 issues (#68-#72) targeted for S40.
+- **NEW — Card backfill scale question** — ~120 entries to backfill. Cal can batch-process but will consume significant session time. PO may want to phase (e.g., patterns/ first, then gotchas/, etc.).
+- **NEW — Anderson gist** — consultancy delivered; PO may want to commit to Arhitecture repo or leave as gist.
+
+### NEXT-SESSION BOOT (re-orient instructions for S40)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — 5-bullet reorientation per A1. Downgrade tag to `[PROCESSED YYYY-MM-DD]` once processed.
+3. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **PO directed S40 for the 5 Tier-1 issues (#68-#72).** Read each issue on GitHub before spawning. Recommended agent assignments:
+   - **#68 (three-tier wiki):** Cal — backfill cards for remaining ~120 entries + create per-dir INDEX.md files + thin root INDEX.md. Batch-processable. Largest item.
+   - **#69 (scratchpad headers):** Aen direct or Celes — define format, update common-prompt + agent prompts.
+   - **#70 (Stage-2-confirms gate):** Cal — update filing protocol, add `stage-2:` field to card frontmatter.
+   - **#71 (playbook extraction):** Aen + any agent — audit common-prompt, extract recipes to playbooks/ files.
+   - **#72 (hierarchical CLAUDE.md):** Finn — write doc-index CLAUDE.md for docs/, topics/, designs/.
+6. **If PO surfaces ITSD-38884 admin grant:** spawn Hopper, Path D execution per S37 procedures. Takes priority over epic work.
+7. **If PO surfaces Anderson persona follow-up:** gist is at https://gist.github.com/mitselek/88e513513da09c423c1b26e3bf26eb0c — commit to Arhitecture repo if PO directs.
+8. **Card backfill phasing question:** ~120 entries is a significant batch. Suggest patterns/ first (highest entry count, most queried), then gotchas/, then process/. PO may want to phase across sessions rather than one-shot.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-05-28] 2026-05-28 — session-38 → session-39
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S39 read):**
 
