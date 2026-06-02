@@ -1,25 +1,27 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
 ## Summary (lines 1-15 — always read on startup)
-- **Current state:** S40. #68 COMPLETE. #69 (scratchpad-header) — design done, common-prompt + aeneas applied by team-lead, 10 FR prompts pending my apply (option-b authorized; awaiting collision-check — team-lead mid-edit on shared clone). #70 (stage-2 gate) — gate defined+filed+carded, 6 cards backfilled, filing-protocol drafted; ~112-card backfill + INDEX column await team-lead bucket-rule.
-- **Active items:** #69 apply 10 prompts (task #11, on collision-check); #70 backfill 112 cards + INDEX column + filing-protocol apply (on bucket-rule).
-- **Key decisions this session:** no `id` on cards; #69 header = Tier-2 scratchpad layer; recency-filter+header complementary; #70 gate "confirmed = ALL co-authors read back" (not majority); held scope line (didn't self-grant common-prompt write — team-lead authorized option-b).
-- **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B all n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness); Stage-2 read-backs pending Hopper/Volta/Brunel/Herald (Finn 4 DONE). [WARNING] wiki/index.md Card-Tier + 160-line log — per-dir split watch. [UNADDRESSED] none.
+- **Current state:** S40 CLOSED. Epic #67 all 5 issues done. #68 (cards backfill), #69 (scratchpad headers), #70 (Stage-2 gate) all COMPLETE; #71 (playbook extraction) was Herald's. Wiki: 119 entries, 119 cards, 8 cards/INDEX.md, Card-Tier section in wiki/index.md.
+- **Active items:** none open. Next session: query-service posture; watch for new Protocol-A submissions + Stage-2 read-backs to advance gate states.
+- **Key decisions this session:** no `id` on cards (filename is key); #69 summary-header = Tier-2 scratchpad layer (mirrors cards), recency-filter complementary; #70 Stage-2 gate "confirmed = ALL co-authors read back" not majority; three-bucket backfill (single-source + substrate-verified-reference + documented-joint = confirmed; multi-author-no-readback = pending) → 79 confirmed / 40 pending; held scope line (flagged common-prompt/prompt edits, didn't self-grant — team-lead authorized option-b).
+- **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness); Stage-2 read-backs pending Hopper/Volta/Brunel/Herald on older joint entries (those cards are stage-2:pending — advance when read-backs land). [WARNING] gate definition entry + card are stage-2:pending (Finn/Herald haven't read the #70 naming back) — first new gate-advance opportunity next session. [UNADDRESSED] none.
 
 ---
 ## Session transcript (prune beyond line 100)
 
-## Session 40 — 2026-06-02 (#68 cards backfill COMPLETE + #69 scratchpad-header design)
+## Session 40 — 2026-06-02 (epic #67: #68/#69/#70 shipped — CLOSED)
 
-[#68 DONE 12:47]: 118 cards (one per wiki entry) + 8 cards/INDEX.md + thin Card-Tier section folded into wiki/index.md. No `id` field (stripped from 3 prototypes too). Verified clean. Reported to team-lead.
+[#68]: 118 cards + 8 cards/INDEX.md + Card-Tier section in wiki/index.md. No `id` field.
 
-[#69 WIP 12:49]: Scratchpad summary-header convention. Scope flag sent to team-lead — common-prompt + 13 prompts are MAY-NOT-edit for me; proposed split (I draft, team-lead applies) OR explicit one-time authorization. Awaiting choice; design+draft proceeding regardless.
+[#69]: scratchpad summary-header convention (Tier-2 layer mirroring cards). common-prompt Personal Scratchpads + 11 FR prompts (aeneas got new section after Delegation Workflow; richelieu skip; lesseps out = entu-research). Recency-filter compose-note added (complementary). My own scratchpad = reference implementation. Flagged scope, team-lead authorized option-b; parallel-apply with team-lead crossed clean. Survived Herald #71 common-prompt restructure intact.
 
-[#69 DESIGN — recency-filter conflict]: NO CONFLICT, complementary. Recency Filter = which FULL scratchpads I load (last-2-sessions by mtime). Summary header = what every scratchpad OPENS with (~15 lines). Headers make the filter BETTER: read all headers cheaply regardless of recency, then apply recency filter to decide which FULL scratchpads to load. Header is the Tier-2 layer the filter consults.
+[#70]: Stage-2-confirms filing gate. Defined + filed `wiki/process/stage-2-confirms-filing-gate.md` (+card). "confirmed = ALL co-authors read back". `stage-2` field on all 119 cards via three-bucket rule → 79 confirmed / 40 pending / 0 partial. Filing protocol (step 4b + Stage-2 Gate Maintenance) in callimachus.md. All 7 INDEX gate-status lines. STRICT-uniform first pass → re-ran to NUANCE on team-lead approval; reconciled cards + INDEX + gate-entry backfill note.
 
-[#69 DESIGN — prompt inventory]: 13 prompts grep'd. lesseps.md is entu-research (`teams/entu-research/`, `(*ER:Celes*)`) — OUT of FR scope (different team/common-prompt); flag separately. aeneas.md has lore mentions only, no `## Scratchpad` discipline section. richelieu.md has handoff-ledger prune note, no standard scratchpad section. The other 10 (callimachus, brunel, hopper, finn, celes, herald, montesquieu, volta, strabo, medici) have `## Scratchpad` sections — these get the header convention pointer.
-
-[#69 DESIGN — three tiers]: matches card tiering. Tier 1 = full scratchpad (evidentiary). Tier 2 = summary header lines 1-15 (queryable, always-read-on-startup). Tier 3 = the wiki cards (cross-session knowledge). Header is the per-scratchpad Tier 2, same principle as cards for wiki.
+[S40 SHUTDOWN tags]:
+- [LEARNED] Holding the scope line on common-prompt/prompt edits (flag, don't self-grant) was right — team-lead authorized option-b; the Librarian-proposes/team-lead-writes-L1 separation stayed intact even under "apply everything" pressure. Crossed-message storm (4 authorizations) handled by acting on first-seen + verifying-before-double-applying.
+- [DEFERRED] Cal-Protocol-A queue carries forward unchanged (see header).
+- [WARNING] gate definition entry/card are stage-2:pending — Finn/Herald read-back is the first gate-advance opportunity next session.
+- [UNADDRESSED] none.
 
 ## Session 39 — 2026-06-02 (pruned to summary; full detail in git history)
 
