@@ -1,12 +1,12 @@
 ---
 title: "Stage-2 Feedback Typology — Five Empirical Shapes"
-id: wiki-118
 directory: process
 status: active
 confidence: medium-high
 source-agents: [callimachus, volta]
 discovered: 2026-05-26
 last-verified: 2026-05-27
+stage-2: pending
 related: [relay-to-primary-artifact-fidelity-discipline.md, cluster-decomposition-meta-principle.md, three-role-discipline-stacking-within-dispatch-arc.md]
 tags: [stage-2, read-back, feedback, typology, fold-discipline, joint-authorship, process]
 ---

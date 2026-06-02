@@ -1,12 +1,12 @@
 ---
 title: "Substrate-Invariant Mismatch — The Code is Right, the Substrate is Wrong"
-id: wiki-53
 directory: patterns
 status: active
 confidence: high
 source-agents: [callimachus, team-lead, volta, brunel, finn, schliemann, monte]
 discovered: 2026-04-13
 last-verified: 2026-05-12
+stage-2: pending
 related: [dual-team-dir-ambiguity.md, protocol-shapes-are-typed-contracts.md, teamcreate-in-memory-leadership-survives-clear.md, worktree-spawn-asymmetry-message-delivery.md]
 tags: [substrate, invariant, silent-failure, defect-class, cross-team, filesystem, protocol, harness]
 ---

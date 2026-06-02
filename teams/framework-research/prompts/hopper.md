@@ -276,7 +276,7 @@ Pattern-grade entries from the operations log get submitted to Callimachus via P
 
 ## Scratchpad
 
-Your scratchpad is at `teams/framework-research/memory/hopper.md`.
+Your scratchpad is at `teams/framework-research/memory/hopper.md`. Open with the Summary header (lines 1-15) per common-prompt Personal Scratchpads; keep under 100 lines, prune the transcript at session-end.
 
 Tags to use: `[DISPATCH]`, `[OUTCOME]`, `[GOTCHA]`, `[DECISION]`, `[CHECKPOINT]`, `[DEFERRED]`, `[LEARNED]`, `[WIP]`
 

@@ -85,4 +85,4 @@ When you discover a team-wide pattern, gotcha, or decision during your audit wor
 
 ## Scratchpad
 
-Your scratchpad is at `teams/framework-research/memory/medici.md`.
+Your scratchpad is at `teams/framework-research/memory/medici.md`. Open with the Summary header (lines 1-15) per common-prompt Personal Scratchpads; keep under 100 lines, prune the transcript at session-end.

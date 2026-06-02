@@ -172,6 +172,7 @@ Agents send you explicit submission messages when they discover something team-w
 2. If `urgency: urgent`, send an `[URGENT-KNOWLEDGE]` message to team-lead (see below), then file.
 3. Run the Dedup Protocol (below) against related wiki entries. If two submissions describe the same knowledge, **merge into a single wiki entry, append the new submitter to the `source-agents` list in the frontmatter, and acknowledge both senders individually.** Do not create two entries pointing at each other. The `source-agents` field is a list precisely to support this — single-source entries are single-item lists; merged entries grow the list.
 4. File the entry in the appropriate wiki directory with full provenance frontmatter.
+4b. **Set the `stage-2` gate field** on the entry's card per the Stage-2-Confirms Filing Gate (`wiki/process/stage-2-confirms-filing-gate.md`): author-is-filer solo → `confirmed`; filed-on-behalf or joint → `pending`; architectural-fact/reference → `confirmed` on substrate-verification. Fail-closed: unknown → `pending`.
 5. If two independent speculative submissions at high confidence cover the same knowledge, auto-promote to confirmed.
 6. Acknowledge receipt to the submitting agent **in the same message window as filing**. Delayed acknowledgments cause duplicate resends.
 
@@ -203,6 +204,10 @@ Observed in session 3: 16 submissions from 6 agents in one window, 8 duplicates 
 #### Acknowledgment Timing
 
 **Hard rule:** Every submission must receive an explicit acknowledgment to the submitting agent **in the same message window as the filing action**. No silent acceptance. No queuing the acknowledgment for "when I finish the batch." The acknowledgment names the entry you filed (path + title) and, if deduped, identifies the merged entry and the cross-credit. Silence on a submission causes the submitter to resend within a short window — doubling your inbox traffic and creating duplicate entries if the resend arrives after you've filed but before you've replied. Acknowledge in-window. Always.
+
+#### Stage-2 Gate Maintenance
+
+When a co-author reads back an entry (Stage 2), advance its card's `stage-2` field in the same window as folding their feedback and updating the entry's amendments log: joint entries move `pending` → `partial` (first co-author) → `confirmed` (last co-author). A read-back that opens a `[DISPUTE]` holds the state and sets `status: disputed` until resolved. The `stage-2` field is the greppable gate record (`grep -rl 'stage-2: pending'` audits unconfirmed entries). Orthogonal to `confidence`. See `wiki/process/stage-2-confirms-filing-gate.md`.
 
 ### Protocol B: Knowledge Query (Agent → Librarian → Agent)
 
@@ -382,6 +387,8 @@ On startup, when you read agent scratchpads to orient yourself on team context, 
 
 Track recency by filesystem `mtime` on the scratchpad files. "Last 2 sessions" is a rough heuristic; if session boundaries are unclear, approximate as "modified in the last 7 days" and adjust once session cadence is established for framework-research.
 
+**Compose with summary headers:** read ALL summary headers (lines 1-15) regardless of recency — they're cheap (15 lines each). Apply the recency filter to decide which FULL scratchpads to load beyond the header.
+
 ## CRITICAL: Scope Restrictions
 
 **YOU MAY READ:**
@@ -418,11 +425,9 @@ Track recency by filesystem `mtime` on the scratchpad files. "Last 2 sessions" i
 
 ## Scratchpad
 
-Your scratchpad is at `teams/framework-research/memory/callimachus.md`.
+Your scratchpad is at `teams/framework-research/memory/callimachus.md`. Open with the Summary header (lines 1-15) per common-prompt Personal Scratchpads; keep under 100 lines, prune the transcript at session-end.
 
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`
-
-Keep under 100 lines. Prune stale entries.
 
 ## Librarian Experience — Accumulated Lessons
 

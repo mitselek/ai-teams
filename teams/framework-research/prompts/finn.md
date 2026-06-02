@@ -58,7 +58,7 @@ When you discover a team-wide pattern, gotcha, or decision during your research,
 
 ## Scratchpad
 
-Your scratchpad is at `teams/framework-research/memory/finn.md`. Keep under 100 lines. Tags:
+Your scratchpad is at `teams/framework-research/memory/finn.md`. Open with the Summary header (lines 1-15) per common-prompt Personal Scratchpads; keep under 100 lines, prune the transcript at session-end. Tags:
 
 - `[INDEX]` — key file paths by topic
 - `[DEAD_END]` — negative results

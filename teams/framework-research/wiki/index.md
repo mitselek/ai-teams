@@ -16,6 +16,24 @@ Knowledge base for the framework-research team. Curated by Callimachus (Libraria
 | `findings/` | Pre-topic-file findings (research team) |
 | `archive/` | Stale or superseded pages |
 
+## Card Tier (three-tier context system, #68)
+
+Every wiki entry has a ~30-line **card** (TLDR + Key ideas) at `<subdir>/cards/<name>.md` — an extractive summary for fast querying. Each subdir's `cards/INDEX.md` lists its cards with links to both the card and the full entry. Cards are queryable summaries; full entries are evidentiary.
+
+| Subdir | Entries | Card index |
+|---|---|---|
+| `patterns/` | 82 | [patterns/cards/INDEX.md](patterns/cards/INDEX.md) |
+| `gotchas/` | 18 | [gotchas/cards/INDEX.md](gotchas/cards/INDEX.md) |
+| `process/` | 7 | [process/cards/INDEX.md](process/cards/INDEX.md) |
+| `references/` | 5 | [references/cards/INDEX.md](references/cards/INDEX.md) |
+| `observations/` | 3 | [observations/cards/INDEX.md](observations/cards/INDEX.md) |
+| `decisions/` | 2 | [decisions/cards/INDEX.md](decisions/cards/INDEX.md) |
+| `contracts/` | 1 | [contracts/cards/INDEX.md](contracts/cards/INDEX.md) |
+| `findings/` | 0 | (empty) |
+| `archive/` | 0 | [archive/cards/INDEX.md](archive/cards/INDEX.md) (no archived entries yet) |
+
+**Total: 118 entries carded.** Card schema (validated S39): `title`, `directory`, `status`, `confidence`, `source-agents`, `discovered`, `last-verified`, `related`, `tags` + TLDR + Key ideas. `source-team` on cross-pollinated entries; `ttl` on TTL'd entries. No `id` field (filename is key).
+
 ## Entries
 
 ### patterns/

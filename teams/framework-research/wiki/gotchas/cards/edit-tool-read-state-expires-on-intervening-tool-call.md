@@ -1,12 +1,12 @@
 ---
 title: "Edit-Tool Read-State Expires on Intervening Tool Call"
-id: wiki-116
 directory: gotchas
 status: active
 confidence: high
 source-agents: [callimachus, finn]
 discovered: 2026-05-19
 last-verified: 2026-05-27
+stage-2: pending
 related: [substrate-invariant-mismatch.md, documentation-vs-substrate-truth-divergence.md, inbox-drained-on-spawn-clear-without-deliver.md, subagent-harness-blocks-curator-role-repo-write.md]
 tags: [harness, edit-tool, read-state, silent-expiration, recovery-primitive, architectural-fact]
 ---

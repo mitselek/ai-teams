@@ -1,5 +1,15 @@
 # Herald Scratchpad
 
+## 2026-06-02 (session #40 — issue #71 playbook extraction)
+
+[CHECKPOINT] **Extracted 4 procedural recipes from common-prompt.md into `playbooks/`.** Before 141 lines / 14582 chars (~3.6k tok); after 112 lines / 7680 chars (~1.9k tok). Delta −29 lines / −6902 chars (~−1.7k tok, ~47% of file). Files: `verify-structural-change.md`, `version-typed-contract.md`, `relay-fidelity.md`, `shutdown-agent.md`. All `(*FR:Herald*)`.
+
+[DECISION] **Extract = procedure; keep = behavioral contract.** Extracted: Structural Change Discipline (4-gate recipe), Versioning Discipline (SemVer two-gate), Relay Fidelity (two-stage lifecycle), Shutdown Protocol (checklist). Kept inline per brief: Communication Rule, Author Attribution, Language Rules, Standards, Agent Spawning Rule (the worktree recipe lives here but brief said keep), Dual-Hub Routing (who-routes-where is a contract).
+
+[GOTCHA] **Wiki-link relative-path rewrite on extraction.** Original links were repo-root-relative (`teams/framework-research/wiki/...`). From inside `playbooks/`, rewrote to `../wiki/...` so they resolve from the playbook file's location. One-line pointers in common-prompt.md use `playbooks/<name>.md` (repo-relative, same as agents read common-prompt). Verify on next read if a consumer reports a broken link.
+
+[WIP] Reported to team-lead. Git untouched (out of scope). Awaiting next direction.
+
 ## 2026-06-02 (session #39 — Protocol lens on external article)
 
 [CHECKPOINT] **Single-task session: protocol-lens analysis of "Build a Team OS with Claude Code" (Aakash Gupta / Hannah Stulberg).** Delivered 14 transferable mechanisms to Aen via SendMessage, each mapped to FR protocol design vocabulary.

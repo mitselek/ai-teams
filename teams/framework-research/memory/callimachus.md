@@ -1,35 +1,29 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
-## Session 39 — 2026-06-02 (Substrate-finding filing + queue watch + Finn Stage 2 read-backs)
+## Summary (lines 1-15 — always read on startup)
+- **Current state:** S40. #68 COMPLETE. #69 (scratchpad-header) — design done, common-prompt + aeneas applied by team-lead, 10 FR prompts pending my apply (option-b authorized; awaiting collision-check — team-lead mid-edit on shared clone). #70 (stage-2 gate) — gate defined+filed+carded, 6 cards backfilled, filing-protocol drafted; ~112-card backfill + INDEX column await team-lead bucket-rule.
+- **Active items:** #69 apply 10 prompts (task #11, on collision-check); #70 backfill 112 cards + INDEX column + filing-protocol apply (on bucket-rule).
+- **Key decisions this session:** no `id` on cards; #69 header = Tier-2 scratchpad layer; recency-filter+header complementary; #70 gate "confirmed = ALL co-authors read back" (not majority); held scope line (didn't self-grant common-prompt write — team-lead authorized option-b).
+- **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B all n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness); Stage-2 read-backs pending Hopper/Volta/Brunel/Herald (Finn 4 DONE). [WARNING] wiki/index.md Card-Tier + 160-line log — per-dir split watch. [UNADDRESSED] none.
 
-[CHECKPOINT 2026-06-02 11:10 — S39 boot]: Cal up; S37 close-out state loaded (wiki 123). Three-item spawn brief from Aen acknowledged.
+---
+## Session transcript (prune beyond line 100)
 
-[ITEM 1 — Wiki 115 amendment FILED 11:25]: **Instance 4 added to `documentation-vs-substrate-truth-divergence.md`** — roster.json `model` field non-load-bearing on Agent-tool teams. PO-sanctioned at n=1 from S38. Filed as sub-instance (amendment), NOT standalone entry. Judgment: same authoring-tier divergence shape (inferred substrate-property plausible-but-substrate-wrong); new disambiguator-class = architecture-enforcement-mechanism (config field load-bearing on adjacent substrate tmux-pane, non-load-bearing on actual Agent-tool); first cross-domain instance beyond cloudflare-pilot. n=3→n=4; index updated; wiki stays at 123 (amendment, no new file). Source co-authors Aen + PO; mitigation shipped S38 (startup.md Step 0.5 gate + `_substrate_note`).
+## Session 40 — 2026-06-02 (#68 cards backfill COMPLETE + #69 scratchpad-header design)
 
-[Item 2 — Queue watch COMPLETE 11:15]: Routing-by-action + Stage-0-contribution-from-filer — both remain at n=1 watch-posture. Grepped all team scratchpads; no n=2 evidence since S37. Await n=2 or explicit PO sanction per Aen S39 dispatch branching logic.
+[#68 DONE 12:47]: 118 cards (one per wiki entry) + 8 cards/INDEX.md + thin Card-Tier section folded into wiki/index.md. No `id` field (stripped from 3 prototypes too). Verified clean. Reported to team-lead.
 
-[Item 3 — Finn Stage 2 COMPLETE 11:17]: All 4 Finn read-backs absorbed from inbox DMs. Results:
-- Wiki 116 (Edit-tool-trap): ABSORBED, 0 corrections. Broader-mechanism credit + thresholds + cluster + Candidate-A cross-link all confirmed.
-- Wiki 119 (Layer-0 PRE-DRAFT): ABSORBED, 0 corrections. Canonical instance + sibling table + fourth-vantage + promotion-posture all confirmed.
-- Wiki 120 (Inverted-trigger): ABSORBED, 0 corrections. All 4 cross-substrate instances confirmed. W3 directional-alignment observation noted (Shape-A).
-- Wiki 112 (Recursive-narrowing): ABSORBED, 0 corrections. Amendments-log + within-author table + co-determination + meta-instance all confirmed.
-Same-window ACKs sent to Finn for all four. All entries stand production-grade from joint-author confirmation.
+[#69 WIP 12:49]: Scratchpad summary-header convention. Scope flag sent to team-lead — common-prompt + 13 prompts are MAY-NOT-edit for me; proposed split (I draft, team-lead applies) OR explicit one-time authorization. Awaiting choice; design+draft proceeding regardless.
 
-[Team OS article analysis 11:25]: 13 transferable ideas through Librarian lens sent to team-lead. 5 immediately actionable (#3 Stage-2-confirms gate, #5 per-directory index split, #7 scratchpad summary header, #8 structural 100-line enforcement, #9 frontmatter health metrics), 4 forward-watch, 4 sketch-grade.
+[#69 DESIGN — recency-filter conflict]: NO CONFLICT, complementary. Recency Filter = which FULL scratchpads I load (last-2-sessions by mtime). Summary header = what every scratchpad OPENS with (~15 lines). Headers make the filter BETTER: read all headers cheaply regardless of recency, then apply recency filter to decide which FULL scratchpads to load. Header is the Tier-2 layer the filter consults.
 
-[Cards prototype 11:47]: 3 prototype cards created — `wiki/patterns/cards/substrate-invariant-mismatch.md`, `wiki/gotchas/cards/edit-tool-read-state-expires-on-intervening-tool-call.md`, `wiki/process/cards/stage-2-feedback-typology.md`. Average ~5x compression. Key observations: format natural to produce; `id` field feels forced (entries lack numeric IDs); `tags` field useful but asymmetric with full-entry frontmatter; taxonomy entries (process/) resist card shape slightly (list-shaped content).
+[#69 DESIGN — prompt inventory]: 13 prompts grep'd. lesseps.md is entu-research (`teams/entu-research/`, `(*ER:Celes*)`) — OUT of FR scope (different team/common-prompt); flag separately. aeneas.md has lore mentions only, no `## Scratchpad` discipline section. richelieu.md has handoff-ledger prune note, no standard scratchpad section. The other 10 (callimachus, brunel, hopper, finn, celes, herald, montesquieu, volta, strabo, medici) have `## Scratchpad` sections — these get the header convention pointer.
 
-**[S39 SHUTDOWN — close-out tags]**:
+[#69 DESIGN — three tiers]: matches card tiering. Tier 1 = full scratchpad (evidentiary). Tier 2 = summary header lines 1-15 (queryable, always-read-on-startup). Tier 3 = the wiki cards (cross-session knowledge). Header is the per-scratchpad Tier 2, same principle as cards for wiki.
 
-- **[LEARNED]** Card-tier writing is extractive, not transformative — our mega-biblion discipline already produces card-friendly entries. The TLDR writes from the opening paragraph; Key ideas are load-bearing bullets stripped of evidence chains. The curator judgment is queryable-vs-evidentiary: only queryable ideas belong on the card.
+## Session 39 — 2026-06-02 (pruned to summary; full detail in git history)
 
-- **[DEFERRED]** Routing-by-action + Stage-0-contribution-from-filer remain at n=1 watch. Candidate B (Hopper bundled-shred) at n=1. Full Cal-Protocol-A queue items C3/E2/E3/GOTCHAs/A.3/Pass-1/Volta-candidates/Companion-Pair/Producer-side-staleness all carry forward unchanged.
-
-- **[DEFERRED]** Stage 2 read-back surfaces still pending from S37: Hopper on multiple entries, Volta on multiple entries, Brunel on multiple entries, Herald on multiple entries. Finn's 4 read-backs COMPLETE this session.
-
-- **[WARNING]** Wiki index at 161 lines approaching the threshold where per-directory split (Team OS article idea #5) becomes load-bearing. Forward-watch at 200 lines.
-
-- **[UNADDRESSED]** None. All three spawn-brief items + Team OS analysis + cards prototype completed.
+S39: Wiki 115 Instance-4 amendment (roster.model non-load-bearing on Agent-tool teams; authoring-tier divergence, architecture-enforcement-mechanism disambiguator-class, n=3→n=4). Finn 4 Stage-2 read-backs ABSORBED 0-corrections (Wiki 116/119/120/112). Team OS 13-idea analysis to team-lead. 3 prototype cards created (the S40 #68 backfill built on these). [LEARNED] card-tier writing is extractive not transformative; queryable-vs-evidentiary is the curator judgment.
 
 ## S37 CLOSE-OUT STATE (2026-05-28) — load-bearing carry-forward only
 
