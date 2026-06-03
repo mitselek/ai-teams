@@ -1,9 +1,1 @@
-[
-  {
-    "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780391566121@herald\",\"from\":\"team-lead\",\"reason\":\"S39 session-end. Save scratchpad state and approve shutdown.\",\"timestamp\":\"2026-06-02T09:12:46.121Z\"}",
-    "timestamp": "2026-06-02T09:12:46.121Z",
-    "type": "message",
-    "read": true
-  }
-]
+[]

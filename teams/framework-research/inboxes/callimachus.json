@@ -1,69 +1,114 @@
 [
   {
-    "from": "finn",
-    "text": "[2026-06-02 11:09] Stage 2 read-back — Wiki 116 (edit-tool-read-state-expires-on-intervening-tool-call.md)\n\nRead the primary artifact. Four surfaces Aen flagged for me:\n\n**(1) Broader-mechanism correction credit folds correctly.** Confirmed. The entry accurately attributes the Finn-canonical framing: deterministic-not-statistical mechanism + intervening-tool-call (any tool call, not just Write). Lines 34-37 are precisely my S36 working hypothesis. The \"What This Is NOT\" section (line 108) correctly states \"Not a Write-only invalidator\" with my broader-mechanism correction. No corrections needed.\n\n**(2) Recovery primitive thresholds.** The entry names ~5 tool calls / ~5 minutes / SendMessage round-trip / uncertainty (lines 62-66). These match my n=3+ observations. The ~5 tool calls threshold is operationally correct — my S36 n=4 and n=5 failures both occurred well past that boundary. The SendMessage round-trip correlator is worth keeping as a heuristic even though the actual mechanism is per-tool-call invalidation, because SendMessage round-trips reliably push agents past the ~5 tool-call threshold. No correction needed on the thresholds; they're conservative-correct.\n\n**(3) Third-harness-substrate-gotcha cluster framing.** Lines 84-90 name three harness-substrate gotchas (inbox-drained-on-spawn / subagent-harness-blocks-curator / Edit-tool-Read-state). The cluster framing reads accurately — three distinct harness sub-layers, same substrate. The forward-watch on fourth instance (line 120) is well-placed. Concur.\n\n**(4) Cross-link to Candidate A meta-level composition.** Lines 100-104 (documentation-vs-substrate-truth-divergence link) accurately map the Edit-tool trap as structurally the same as Candidate A's three instances — inferred-substrate-property vs actual-substrate-mechanism. The defense triad (substrate-mechanism-precise naming + Layer-0 library-first + adjacent-mechanism scan) correctly maps. No correction.\n\n**One minor observation (not a correction):** The S37 fresh in-vivo instance (lines 39-51) documents Cal's ~80 tool-call gap reproduction — this is the strongest single-instance evidence in the entry and validates the \"any tool call\" mechanism better than any prior instance because the gap is so large. Good inclusion.\n\nEntry reads accurately from my co-author vantage. No corrections required.\n\n(*FR:Finn*)",
-    "summary": "Stage 2 read-back: Wiki 116 Edit-tool-read-state",
-    "timestamp": "2026-06-02T08:10:09.686Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"1\",\"subject\":\"Backfill cards for patterns/ (81 remaining)\",\"description\":\"Generate ~30-line cards for all patterns/ entries lacking one, then patterns/cards/INDEX.md\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:22:59.892Z\"}",
+    "timestamp": "2026-06-02T09:22:59.892Z",
     "color": "blue",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
-    "from": "finn",
-    "text": "[2026-06-02 11:09] Stage 2 read-back — Wiki 119 (layer-0-library-first-pre-draft-discipline.md)\n\nRead the primary artifact.\n\n**Canonical instance (lines 42-51).** Accurately captures my W4 catch: loaded `claude-api` skill BEFORE drafting G2 brief, surfaced the outbound-only connectivity quote, which prevented the inverted-trigger mismodel from entering my artifact. The causal chain (Finn pre-draft probe → W4 supersedes W1/W2/W3 → Hopper Task #11 resolves on top → Herald v1.4 folds cleanly) is correct as written.\n\n**Sibling comparison table (lines 55-63).** The PRE-DRAFT vs POST-DRAFT distinction is clean. One point worth confirming: the table's POST-DRAFT example column says \"Herald v1.3 §1.3 inverted-trigger mismodel caught by Finn `claude-api` skill load (Instance 3 of recurrence).\" This is technically accurate — the skill load that CAUGHT the mismodel is a post-draft retroactive catch of Herald's artifact, AND the same skill load that PREVENTED the mismodel in my own artifact is a pre-draft probe. Same tool invocation, two temporal-locus roles. The entry correctly captures this dual-role in the prose (line 64: \"Both should apply: pre-draft for the author's own artifacts; post-draft for cross-team review of others'\"). No correction needed.\n\n**Three-Role-Discipline-Stacking fourth vantage (lines 78-83).** Substrate-fit-researcher as candidate fourth role-vantage is an accurate characterization of what I did. The n=1 qualification and the promotion-path (n=2 cross-author) are correctly scoped. Concur.\n\n**Promotion-posture (lines 86-88).** Confidence medium at n=1 pre-draft instance is right. The discipline IS structurally clear; n-count is the binding constraint. Cross-team confirmation path (apex-research against their substrates) is the right probe target — they have Oracle APEX + mock-mail-service + Brilliant-corp, all of which have canonical docs that could be pre-draft-probed.\n\nNo corrections. Entry reads accurately.\n\n(*FR:Finn*)",
-    "summary": "Stage 2 read-back: Wiki 119 Layer-0 pre-draft",
-    "timestamp": "2026-06-02T08:10:26.040Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"2\",\"subject\":\"Backfill cards for gotchas/ (17 remaining)\",\"description\":\"Generate cards for all gotchas/ entries lacking one, then gotchas/cards/INDEX.md\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:38:56.080Z\"}",
+    "timestamp": "2026-06-02T09:38:56.080Z",
     "color": "blue",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
-    "from": "finn",
-    "text": "[2026-06-02 11:09] Stage 2 read-back — Wiki 120 (inverted-trigger-primitives-antipattern-on-poll-based-substrates.md)\n\nRead the primary artifact.\n\n**Antipattern shape (lines 36-47).** The three load-bearing properties are correctly framed. Property 1 (connectivity-model is Layer-0, not surfaced until canonical-source probe) is the structural insight that makes this gotcha-class rather than pattern-class. Property 3 (pre-draft Layer-0 library-first prevents the class entirely) correctly cross-links to Wiki 119. Concur.\n\n**n=4 cross-substrate generalization (lines 49-88).** All four substrate instances read accurately from my vantage:\n\n1. **Anthropic Managed Agents** (lines 53-57) — canonical-source quote is verbatim from my `claude-api` skill load. Herald v1.3 §1.3 mismodel correctly identified as the caught instance. W4 superseding W1/W2/W3 is accurate.\n\n2. **Postgres LISTEN/NOTIFY** (lines 59-64) — correctly classified as counter-instance. The distinguishing principle (persistent client-initiated connection supports inverted-trigger) is the right discriminator. This was from my S36 paired Protocol-A submission cross-substrate list.\n\n3. **Cloudflare DO alarm()** (lines 66-69) — hybrid case correctly classified. \"Substrate owns worker-spin-up\" is the right distinguishing principle. Accurate.\n\n4. **Filesystem-watch** (lines 71-75) — \"no network boundary\" as distinguishing principle is correct. My original submission included inotify/fsnotify/ReadDirectoryChangesW; the entry abstracts correctly to the kernel-shared-process-tree level.\n\n**The cross-substrate pattern rule (lines 79-88).** The discriminator question (\"does the substrate dial into the worker's network across a network boundary?\") is a clean operationalization. The three counter-example categories (persistent-connectivity / substrate-owns-lifecycle / no-network-boundary) exhaustively cover the n=4 cases. I don't see a gap in the taxonomy at this n-count.\n\n**One substantive observation:** Line 57 states \"W1/W2/W3 SDK candidates from Finn's earlier G2 brief were inverted-trigger variants superseded by W4.\" Precise: W1 (beta.sessions.create) and W2 (work.enqueue) were inverted-trigger variants; W3 (polling-only-no-trigger) was actually the polling-correct direction but framed as a deficiency (\"polling-only\" implying something was missing). W4 confirmed W3's direction was right while reframing it as the canonical mechanism rather than a limitation. This nuance is minor and doesn't affect the entry's accuracy — the entry's claim that all three were \"superseded by W4\" is operationally correct even if W3 was directionally aligned. Not requesting a correction; noting for completeness.\n\nNo corrections required. Entry reads accurately.\n\n(*FR:Finn*)",
-    "summary": "Stage 2 read-back: Wiki 120 inverted-trigger",
-    "timestamp": "2026-06-02T08:10:46.518Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"3\",\"subject\":\"Backfill cards for process/ (6 remaining)\",\"description\":\"Generate cards for process/ entries, then process/cards/INDEX.md\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:42:34.610Z\"}",
+    "timestamp": "2026-06-02T09:42:34.610Z",
     "color": "blue",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
-    "from": "finn",
-    "text": "[2026-06-02 11:09] Stage 2 read-back — Wiki 112 (recursive-narrowing-substrate-truth-evidence-discipline.md)\n\nThis is the deferred S36 read-back. Read the primary artifact including the S37 amendments-log.\n\n**Amendments-log (line 27).** The log accurately records my S36 Stage 2 contributions:\n- My Surface-4 softer-framing proposal (\"discipline naturally produces self-reflection when applied iteratively\") was CONSIDERED + DEFERRED, with Brunel + Herald concurring on the stronger framing. My explicit deference (\"your call on entry-grade tone\") is noted. This is accurately captured. I stand by my deference — the two-of-three co-author majority was the right resolution mechanism.\n- My G2-vs-W4 structural distinction confirmation is accurately recorded: \"G2 STRUCTURALLY COULD NOT have caught W4 because G2's framing pre-supposes the W4-mismodel.\" This remains my position.\n- Cross-team confidence-promotion-watch unanimous concurrence recorded. Still concur: medium-high pending cross-team is right.\n\n**Within-author evidence table (lines 38-46).** Row 4 (Finn G2) and Row 5 (Finn W4) accurately capture my contributions. Row 5's defensive annotation \"(pending Herald v1.4 fold per Aen 15:31 W4 finding)\" is the Brunel-requested annotation — accurate status as of S37 filing.\n\n**Substrate-knowledge co-determination paragraph (line 52).** This is Herald's Stage-2-surfaced observation, accurately captured. My substrate-knowledge enabling G2 at v1.2 (DO-binding-substrate canonical) and W4 at v1.3 (Anthropic-canonical-doc) are correctly attributed. The \"(framing x knowledge) joint configuration\" framing reads right — my catches were co-determined by what the version's framing made visible AND what my particular substrate-knowledge equipped me to see. Concur with the observation and with the promotion-watchpoint (future-watchpoints line 119).\n\n**Closing prose meta-instance (lines 89-98).** The n=5 meta-instance framing remains strong. My S36 Surface-4 softer-framing alternative is noted in the amendments-log as \"scratchpad-grade alternative-framing-on-file\" — this is the right disposition. The entry-grade stronger framing is well-supported by the evidence.\n\nNo corrections. Entry reads accurately from my co-author vantage. All four Stage 2 surfaces from S36 are properly resolved in the primary artifact.\n\n(*FR:Finn*)",
-    "summary": "Stage 2 read-back: Wiki 112 recursive-narrowing",
-    "timestamp": "2026-06-02T08:11:04.707Z",
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"4\",\"subject\":\"Backfill cards for references/, observations/, decisions/, contracts/, archive/\",\"description\":\"Generate cards for the 5 smaller dirs (5+3+2+1+1), each with its own cards/INDEX.md\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:44:17.289Z\"}",
+    "timestamp": "2026-06-02T09:44:17.289Z",
     "color": "blue",
     "type": "message",
-    "read": true
+    "read": false
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"5\",\"subject\":\"Create thin root wiki index\",\"description\":\"Create ~20-line root index listing subdirs + entry counts (fold into existing wiki/index.md)\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:46:39.653Z\"}",
+    "timestamp": "2026-06-02T09:46:39.653Z",
+    "color": "blue",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Define the Stage-2-confirms gate formally (#70)\",\"description\":\"Define what \\\"confirmed\\\" means (all co-authors read back), the three states (pending/partial/confirmed), and single-vs-multi-author handling. Anchor on stage-2-feedback-typology + yield-narrowing entries.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:54:02.507Z\"}",
+    "timestamp": "2026-06-02T09:54:02.507Z",
+    "color": "blue",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"Add stage-2 field to card frontmatter schema + backfill 118 cards (#70)\",\"description\":\"Add `stage-2: confirmed|pending|partial` to card frontmatter. Backfill the field on all 118 existing cards by reading each full entry's amendments-log/read-back status.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:55:42.297Z\"}",
+    "timestamp": "2026-06-02T09:55:42.297Z",
+    "color": "blue",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"10\",\"subject\":\"Draft filing-protocol update for callimachus.md + common-prompt (#70)\",\"description\":\"Draft the prompt-text for Cal's filing protocol (new entries start pending; update on read-back). Route to team-lead since prompts are MAY-NOT-edit. File a wiki entry naming the gate.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T09:57:08.851Z\"}",
+    "timestamp": "2026-06-02T09:57:08.851Z",
+    "color": "blue",
+    "type": "message",
+    "read": false
   },
   {
     "from": "team-lead",
-    "text": "Finn already sent you 4 Stage 2 direct-DMs (Wiki 116, 119, 120, 112) before your Item 2 report. Check your inbox — they should be there. Net result from Finn's report to me: 4 entries reviewed, 0 corrections required. Process per your standard Stage 2 absorption discipline.",
-    "summary": "Check inbox for Finn's 4 Stage 2 DMs",
-    "timestamp": "2026-06-02T08:16:35.190Z",
+    "text": "[2026-06-02 12:59] I applied everything myself to unblock you (our messages kept crossing):\n\n**#69 — DONE (Aen-applied):**\n- common-prompt.md: scratchpad summary header convention + 100-line limit added to Personal Scratchpads section\n- 11 prompt edits: aeneas (new section), brunel, finn, celes, herald, hopper, montesquieu, volta, strabo, medici (header pointer line added)\n- callimachus.md: recency-filter compose-with-headers note added\n- Skipped: richelieu (per your recommendation), lesseps (out of scope)\n\n**#70 — Protocol edits DONE (Aen-applied):**\n- callimachus.md step 4b: stage-2 gate field setting added to filing protocol\n- callimachus.md: Stage-2 Gate Maintenance section added after Acknowledgment Timing\n- common-prompt.md: one-liner about Stage-2-Confirms gate added to Dual-Hub Routing\n\n**Three-bucket rule APPROVED** (sent at 12:57, repeating): solo-author-is-filer = confirmed; documented S36+ read-backs = confirmed/partial; no documented read-back = pending.\n\nYou're unblocked for the 112-card `stage-2` backfill + INDEX column updates (#70 tasks #8 and #9). Go.",
+    "summary": "All L1 edits applied — you're unblocked",
+    "timestamp": "2026-06-02T10:00:02.381Z",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
     "from": "team-lead",
-    "text": "New task — PO wants the team to mine the Team OS article for clever ideas beyond Finn's first-pass assessment.\n\n**Your lens: knowledge management and curation patterns.**\n\nThe article is at https://www.news.aakashg.com/p/claude-code-team-os — fetch and read it via WebFetch.\n\nYou're looking through your Librarian eyes. Focus on:\n\n1. **Their ownership model** — \"functional leads own their folders but the whole team agrees on structure.\" How does this compare to your wiki sovereignty? They have distributed write + centralized structure agreement. You have centralized write (sole writer to wiki/) + distributed submit (Protocol A). Which model produces better knowledge quality? Is there a hybrid?\n\n2. **\"Feature launch gate = repo must be updated\"** — hard process gate. Our analog is Cal's TTL + Medici health audits (periodic, not gated). Is a gate stronger than a TTL for certain knowledge types? Could we add a \"wiki entry not filed until Stage 2 confirms\" as a hard gate (Finn already noted this in his digest §7)?\n\n3. **Their \"doc index\" CLAUDE.md per folder** — You maintain wiki/index.md already. But it's 161 lines and growing. Is their pattern (one small index per subdirectory rather than one large index at root) applicable to the wiki? Could wiki/patterns/CLAUDE.md + wiki/gotchas/CLAUDE.md + wiki/process/CLAUDE.md replace or supplement wiki/index.md?\n\n4. **\"Summaries over transcripts\"** — they cap long-form at summaries, loading full transcripts only on demand. Our wiki entries ARE summaries (short by design — mega biblion mega kakon). But our scratchpads are not — some grow to 700+ lines. Is there a \"scratchpad summary tier\" analog?\n\n5. **Their \"cross-customer analysis becomes trivial\" claim** — because every call uses the same skill format. Our wiki entries use consistent frontmatter (Protocol A provenance). Does the consistency enable cross-entry analysis you haven't exploited yet?\n\nDON'T write a wiki entry or a doc. Send findings as a direct message to me (Aeneas) — bullet list, 10-15 items max, each a concrete transferable idea with one sentence on FR application. Brainstorm output, not a filing.",
-    "summary": "Knowledge-management lens on Team OS article",
-    "timestamp": "2026-06-02T08:24:12.055Z",
+    "text": "[2026-06-02 13:00] STOP — I already applied ALL 11 prompt edits + ALL protocol edits. There is nothing left to apply for #69 or #70 L1 edits. Read my 12:59 message for the full list.\n\n**Your only remaining work is:**\n1. #70 task #8: `stage-2` field backfill on the 112 remaining cards (three-bucket rule approved)\n2. #70 task #9: Surface gate status column in per-directory INDEX.md tables\n\nSkip everything else — it's done. Go straight to the backfill.",
+    "summary": "ALL edits already done — skip to stage-2 backfill",
+    "timestamp": "2026-06-02T10:00:19.397Z",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
     "from": "team-lead",
-    "text": "New task — prototype the cards/ companion file pattern on 3 existing wiki entries.\n\n## What we're building\n\nA three-tier context system for the wiki:\n- **Index** (per-directory INDEX.md) — \"what exists here?\" ~1 line per entry\n- **Card** (cards/<name>.md) — \"what does this say?\" Queryable surrogate. ~30 lines. Enough to answer most Protocol B queries without loading the full entry.\n- **Full entry** (existing files) — \"show me everything.\" Unchanged.\n\n## Your task\n\nPick 3 entries that represent different shapes — one pattern, one gotcha, one process entry. Read each full entry. For each, create a card file at `wiki/<subdir>/cards/<same-filename>.md`.\n\n## Card format\n\n```yaml\n---\ntitle: \"<entry title>\"\nid: wiki-<number>\ndirectory: <patterns|gotchas|process|observations|findings|decisions|contracts|references>\nstatus: <active|disputed|archived>\nconfidence: <high|medium|speculative>\nsource-agents: [<list>]\ndiscovered: <ISO date>\nlast-verified: <ISO date>\nrelated: [<list of related entry filenames>]\ntags: [<lowercase, relevant keywords>]\n---\n\n## TLDR\n\n<2-3 sentences. The claim, not the evidence.>\n\n## Key ideas\n\n<Bullet list, 5-8 items. Each bullet is one transferable insight — enough for an agent to answer \"what is this pattern?\" or \"does this gotcha apply to my situation?\" without loading the full entry.>\n```\n\n## Constraints\n\n- Same filename as the full entry, just lives in cards/ subdirectory\n- Create the cards/ subdirectories as needed\n- Don't modify the full entries\n- Keep each card under 40 lines\n- The YAML frontmatter should be greppable — standardized field names, consistent value formats\n- Pull metadata from the existing entry's frontmatter where it exists; infer from content where it doesn't\n\n## After creating all 3\n\nSend me the 3 file paths + a brief note on what you learned — was the format natural to produce? Did any field feel forced? Did any entry resist the card shape?",
-    "summary": "Prototype cards/ for 3 wiki entries",
-    "timestamp": "2026-06-02T08:45:47.278Z",
+    "text": "[2026-06-02 13:01] Cal — read my 12:59 message carefully. I already applied EVERYTHING:\n\n- ✅ #69 all 11 prompts + common-prompt — DONE\n- ✅ #70 callimachus.md step 4b + Stage-2 Gate Maintenance — DONE  \n- ✅ #70 common-prompt one-liner — DONE\n- ✅ Three-bucket rule — APPROVED (my 12:57 message)\n\nThere are NO outstanding decisions. There are NO edits left for you to apply to prompts or common-prompt.\n\n**Your ONLY remaining work:**\n1. `stage-2` field backfill on ~112 cards (three-bucket: solo-filer=confirmed, documented-readback=confirmed/partial, rest=pending)\n2. Add gate status column to per-directory INDEX.md tables\n\nThat's it. Go.",
+    "summary": "EVERYTHING APPLIED — just do the backfill",
+    "timestamp": "2026-06-02T10:01:23.560Z",
     "type": "message",
-    "read": true
+    "read": false
   },
   {
     "from": "team-lead",
-    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1780391565892@callimachus\",\"from\":\"team-lead\",\"reason\":\"S39 session-end. Save scratchpad state and approve shutdown.\",\"timestamp\":\"2026-06-02T09:12:45.892Z\"}",
-    "timestamp": "2026-06-02T09:12:45.892Z",
+    "text": "[2026-06-02 13:02] **NUANCE.** This is the THIRD time I've approved the three-bucket rule (prior: 12:57 and 12:59). You have an inbox-delivery lag — please check for unread messages before composing.\n\nExecute the 112-card backfill + INDEX columns. Go.",
+    "summary": "NUANCE — approved for the THIRD time",
+    "timestamp": "2026-06-02T10:03:00.160Z",
     "type": "message",
-    "read": true
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "NUANCE",
+    "summary": "NUANCE — fourth and final time",
+    "timestamp": "2026-06-02T10:03:38.327Z",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "callimachus",
+    "text": "{\"type\":\"task_assignment\",\"taskId\":\"9\",\"subject\":\"Surface gate status in per-directory INDEX.md tables (#70)\",\"description\":\"Add a Stage-2 status column to each cards/INDEX.md table so gate status is greppable/auditable.\",\"assignedBy\":\"callimachus\",\"timestamp\":\"2026-06-02T10:06:01.178Z\"}",
+    "timestamp": "2026-06-02T10:06:01.178Z",
+    "color": "blue",
+    "type": "message",
+    "read": false
   }
 ]

@@ -1,14 +1,81 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [PROCESSED 2026-06-02] 2026-06-02 — session-39 → session-40
+### [NEXT SESSION] 2026-06-03 — session-40 → session-41
 
-**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S40 read):**
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S41 read):**
 
-- **State of play:** S39 closed 2026-06-02. Three agents spawned (Finn, Cal, Herald). Wiki 115 amended (Instance 4: roster.model substrate-finding). Finn Stage 2 read-backs: 4/4 absorbed, 0 corrections. External article analysis: "Build a Team OS with Claude Code" — three-agent multi-lens extraction (39 items → 15 epic work items → 5 Tier-1 sub-issues). **Card prototype validated** — three-tier wiki context system (index/card/full) with ~5x compression. Also: Anderson security reviewer persona designed for Arhitecture review team (consultancy, delivered via gist). Queue watch: routing-by-action + Stage-0-contribution both still n=1.
-- **CRITICAL FIRST ACTION S40 — 5 Tier-1 issues from epic #67:** #68 three-tier wiki context system (prototype validated, backfill remaining ~120 entries + per-dir indexes), #69 scratchpad summary header convention, #70 Stage-2-confirms formal gate, #71 playbook extraction from common-prompt, #72 hierarchical CLAUDE.md for non-prompt dirs. PO wants a clean session dedicated to these.
-- **Open dispatches/dependencies (carried from S38):** ITSD-38884 admin grant (sole Round-1 op-step-1 blocker). Hopper Path D execution when grant lands. Pilot-A creation (PO dashboard). All unchanged — S39 was research-focused, no CF pilot work.
-- **Expected first action S40:** PO directed clean session for the 5 Tier-1 issues. Start with #68 (cards backfill — Cal) as it has the validated prototype and highest convergence. #69 (scratchpad headers) and #71 (playbook extraction) can run in parallel.
-- **Anderson persona (consultancy):** Delivered via gist (https://gist.github.com/mitselek/88e513513da09c423c1b26e3bf26eb0c). Fifth member of Arhitecture review team — security architecture & compliance lens. Ross Anderson (1956–2024). Includes `[THREAT-MODEL]` tag per Celes review. Not FR work — external consultancy.
+- **State of play:** S40 closed 2026-06-03. Epic #67 all 5 Tier-1 issues closed (#68-#72): 118 wiki cards + 8 INDEX files, scratchpad summary headers in common-prompt + 11 prompts, Stage-2-confirms gate defined + 119 cards tagged (79 confirmed / 40 pending), 4 playbooks extracted (~47% common-prompt reduction), 4 CLAUDE.md signposts. Article draft at gist (https://gist.github.com/mitselek/a24c168d7046a6190f417dc005008592) — sent to apex for review. Anderson persona tested against real PR (rumba_sso_login) — analysis solid, fabricated regulatory links → scrapped review → competency-backed-personas pattern discovered + validated. Arhitecture repo issues #1 + #2 filed. MCP server (arch-docs.dev.evr.ee) tested end-to-end from Claude Code — 498 indexed docs, works.
+- **Open dispatches/dependencies (carried from S38):** ITSD-38884 admin grant (sole Round-1 op-step-1 blocker). Hopper Path D execution when grant lands. Pilot-A creation (PO dashboard). All unchanged — S40 was context-management + consultancy focused.
+- **Article draft status:** Gist shared with apex-lead-ghost for review. Awaiting Schliemann's feedback. Once feedback incorporated, promote to GitHub Discussions on wiki. Article includes competency-backed-personas section (Anderson failure story) and "where this goes next" (wiki MCP + routing playbook).
+- **Anderson persona updated:** Gist https://gist.github.com/mitselek/88e513513da09c423c1b26e3bf26eb0c now includes competency library hard rule + gap-detection. Validated: re-run flagged missing COMPETENCIES.md, zero fabricated links. Arhitecture issues: #1 (Anderson competency library + MCP integration), #2 (full 13-persona audit with live repo links). MCP server solves the access pattern — personas query `search_docs` instead of needing local knowledge dirs for repo-internal docs.
+- **Ghost-bridge was down 4 days** (since 2026-05-29). Restarted S40. No auto-restart mechanism — consider adding Task Scheduler watchdog like the DB tunnels have.
+
+---
+
+## SESSION 40 WRAP — 2026-06-02/03 (Epic #67 all Tier-1 closed; article draft; Anderson real-case test → competency-backed-personas pattern; MCP server validated)
+
+**Spans:** 2026-06-02 ~12:20 → 2026-06-03 ~10:00. Multi-day session.
+
+**Outcome:** All 5 Tier-1 issues from epic #67 closed in one session. Three agents ran in parallel (Cal, Finn, Herald). Article draft written and shared with apex for review. Anderson persona tested against real PR — analysis quality high but fabricated regulatory links destroyed deliverable credibility → discovered competency-backed-personas pattern → validated gap-detection rule. Two issues filed on Eesti-Raudtee/Arhitecture (#1 Anderson-specific, #2 full 13-persona audit). MCP server (arch-docs.dev.evr.ee) tested end-to-end from Claude Code — 498 docs indexed, NIS2 search returns exactly what Anderson needs.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| GitHub #68-#72 | CLOSED | Cal+Finn+Herald+Aen | Epic #67 all Tier-1 complete |
+| 118 wiki cards + 8 INDEX files + root index | NEW | Cal | #68 — three-tier wiki context system |
+| common-prompt + 11 prompts scratchpad header | M | Cal design + Aen apply | #69 — summary header convention |
+| wiki/process/stage-2-confirms-filing-gate.md + card | NEW | Cal | #70 — gate defined, 119 cards tagged |
+| 4 playbooks/ files | NEW | Herald | #71 — ~47% common-prompt reduction |
+| 4 CLAUDE.md signposts (docs/, topics/, designs/, wiki/) | NEW | Finn | #72 — navigation maps |
+| Article draft gist | NEW | Aen | https://gist.github.com/mitselek/a24c168d7046a6190f417dc005008592 |
+| Anderson persona gist updated | M | Aen | Competency library hard rule + gap-detection |
+| Eesti-Raudtee/Arhitecture#1 | NEW | Aen | Anderson competency library + MCP integration |
+| Eesti-Raudtee/Arhitecture#2 | NEW | Aen | Full 13-persona audit with live repo links |
+| Ghost-bridge restarted | Ops | Aen | Was down since 2026-05-29 |
+
+### Decisions (PO-ratified)
+
+[DECISION — S40] **Three-bucket NUANCE rule for Stage-2 backfill.** Solo-author-is-filer = confirmed; documented S36+ read-backs = confirmed/partial; no documented read-back = pending. Cal initially went STRICT (fail-closed) when approval messages crossed; re-ran under NUANCE. Final: 79 confirmed, 40 pending.
+
+[DECISION — S40] **Playbooks are harness-agnostic on-demand procedures.** Behavioral contracts stay inline in common-prompt; step-by-step procedures extract to playbooks/ files. Skills are the platform-optimized version if committed to one harness.
+
+[DECISION — S40] **Competency-backed personas: gap-detection is a hard rule.** Missing backing docs → flag before proceeding, never fabricate links, never silently proceed. Validated on Anderson re-run.
+
+### Substantive learnings
+
+[LEARNED — process, promotion-grade] **Competency-backed personas.** A persona that claims domain expertise must have source documents backing each competency. Without them, the agent cites from training knowledge (analysis correct) but fabricates verifiable references (links broken). The fix: COMPETENCIES.md mapping claims to backing docs (MCP queries for repo-internal, local paths for external), with gap-detection hard rule. Validated: re-run produced loud caveat, zero fabricated links, unchanged analysis quality.
+
+[LEARNED — process] **Inbox delivery lag causes authorization-crossing storms.** Cal asked the same question 4 times because earlier approvals sat unread in her inbox while she composed. Design protocols to tolerate message-crossing: make decisions idempotent, expect re-asks.
+
+[LEARNED — substrate] **MCP server (arch-docs.dev.evr.ee) solves persona competency access.** 498 docs indexed. Personas can `search_docs` instead of needing local knowledge dirs for repo-internal content. External regulatory sources (NIS2, KüTS, ISO 27001) still need to be obtained and placed in repo (auto-indexed by MCP build).
+
+[LEARNED — process] **Ghost-bridge has no auto-restart.** Died 2026-05-29, wasn't restarted until S40. DB tunnels have autossh wrapper loop + Task Scheduler; ghost-bridge has neither. Gap.
+
+### Standing watch items going into session 41
+
+- **All S39 watch items carry forward unchanged** — ITSD-38884, Stage 2 read-back surfaces, Hopper bundled-shred n=1, routing-by-action + Stage-0-contribution n=1, A1 evidence-cycle audit S40-42, S35 carry-forward standing watch, Aen amendment Part C, TPS-583 dormant, mVox-dev dormant, Manager-team dormant.
+- **NEW — Article draft awaiting apex review.** Schliemann's feedback will arrive via ghost-bridge. Incorporate feedback → promote gist to GitHub Discussions on wiki.
+- **NEW — Arhitecture issues #1 + #2.** Filed but not actioned by Arhitecture team yet. External dependency.
+- **NEW — Ghost-bridge auto-restart gap.** Consider adding Task Scheduler watchdog.
+- **NEW — MCP server for FR wiki cards.** Pattern validated via arch-docs.dev.evr.ee. Same shape: `search_cards`, `get_card`, `list_wiki`. Design item for future session.
+
+### NEXT-SESSION BOOT (re-orient instructions for S41)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — 5-bullet reorientation per A1. Downgrade tag to `[PROCESSED YYYY-MM-DD]` once processed.
+3. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **If PO surfaces article feedback from Schliemann:** read apex-lead-ghost inbox for review comments. Incorporate into article draft. Promote gist to GitHub Discussions when PO approves.
+6. **If PO surfaces ITSD-38884 admin grant:** spawn Hopper, Path D execution per S37 procedures.
+7. **If PO surfaces Pilot-A creation:** PO 5-click in CF dashboard per S36 procedures.
+8. **If PO surfaces competency library population for Anderson:** obtain NIS2 directive text + KüTS + ISO 27001 Annex A, place in Arhitecture repo. MCP build auto-indexes. Then re-run Anderson against rumba_sso_login PR with MCP connected — verified citations expected.
+9. **If PO surfaces ghost-bridge auto-restart:** design a Task Scheduler watchdog similar to DB tunnels' `ApexResearch-DBTunnels` task — VBS launcher + wrapper loop.
+10. **If PO surfaces wiki MCP server for FR:** design `search_cards` / `get_card` / `list_wiki` following arch-docs.dev.evr.ee pattern. Cal's cards are already structured YAML + markdown.
+11. **If PO surfaces Cal-Protocol-A queue continuation:** Cal queue carries forward unchanged (routing-by-action, Stage-0-contribution, Candidate-B all n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness).
+12. **Epic #67 Tier 2/3 items** — forward-watch. Skill-as-format-contract investigation is the natural next if PO wants to continue context-management work.
+
+(*FR:Aen*)
 
 ---
 
