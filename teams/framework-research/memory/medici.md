@@ -1,5 +1,26 @@
 # Medici — Knowledge Health Checker Scratchpad
 
+## [CHECKPOINT] 2026-06-05 session 43 — #74 reflexive competency-gap audit (second lens)
+
+Second lens on #74 (Celes leads). Deliverable: `docs/health-report-competency-gap-2026-06-05.md` (new dated file, NOT overwriting v6 health-report.md baseline). Swept all 10 FR prompts → claim→backing table. **OUTCOME: design COMPLETE + faithful to both lenses, PO ruling pending.** Celes's doc `docs/2026-06-05-competency-gap-analysis.md` adopted my findings: three-way taxonomy (citation/substrate/posture → gate/substrate-read/audit), "two mechanisms one name" headline (credited), D3 collapsed to single-policy YAGNI (matches team-lead's read), orphan-claim nuance in §1.4. No prompt edits required (2 optional one-line mirrors G1/C2 post-ratification). My report carries a reconciliation note (my narrow "0 external-citation" yields to her broader "claim-heavy = cites OR derives-from").
+
+THREE HEADLINES (durable):
+- **0/10 FR roles carry Anderson-fabrication risk.** No FR role cites EXTERNAL authority; claims are role-posture + INTERNAL backing (wiki/topics/reference). Fabrication failure-mode transfers but surface doesn't exist on FR → drives Q3 to YAGNI.
+- **Competency-gate = TWO mechanisms wearing one name:** (1) claim→backing MAPPING generalizes to standing roles (= my audit); (2) runtime gap-REACTION loop ([GAP]-flag+Action-2) does NOT generalize — it's a citation-work feature. This is the load-bearing answer to Celes's Q1 question ("new instrument or special case of coherence audit?" → SPECIAL CASE).
+- **FR AHEAD of Arhitecture roster on synergy-wiring:** Volta⟷Brunel, Brunel⟷Hopper, Monte⟷Herald all bilaterally prompt-encoded. Brunel/Hopper independently re-derived the gap-reaction loop as substrate-truth-read discipline (three-layer-substrate-truth) — gate exists where FR needed it. Convergence.
+
+2 minor coherence gaps surfaced (LOW): G1 brunel lacks Hopper's missing-artifact surface-back; C2 work-hub (aeneas⟷all) spoke-side-only vs knowledge-hub (Cal⟷all) bilateral.
+
+[DONE — #74 RATIFIED & LANDED 2026-06-05] PO approved D1-D6. Added `[ORPHAN-CLAIM]` as 6th audit category to `prompts/medici.md` §Audit Checklist (verbatim D3/§6 text, in my MAY-WRITE scope). Scan-shape distinction recorded in the category itself: `[ORPHAN-CLAIM]` = absence-of-ANY-artifact on a claim; `[GAP]` = artifact-exists-but-thin. Baseline sweep referenced (`docs/health-report-competency-gap-2026-06-05.md`). Reported to team-lead. The `kind: external` tags on external claims (Finn's docs line etc.) are an authoring-side action (Celes/team-lead own prompt-body edits), not mine — my checklist line is the audit-side half; the tags are the grep target the authors apply. NOT done by me: I only own the checklist category. Git commit = team-lead's domain (I don't touch git).
+
+## [LEARNED] Competency-gap audit IS a profile of my existing coherence audit, not new machinery
+
+Q1's real question was whether FR needs a NEW eval instrument. Answer: no — it's a profile of my `[GAP]` (claimed-but-unbacked) × `[COHERENCE]` (asked-vs-equipped) categories, run as one pass. Reusable: when a "new audit type" is proposed, first check whether it's a cross-product of existing categories. The Section-1 claim→backing table is the cheap reusable instrument; doubles as the proactive baseline so the team can go YAGNI afterward.
+
+## [LEARNED] "Internal-assert" vs "external-citation" competency is the discriminator for gap-reaction need
+
+A role that cites external authority (Anderson/Leveson) needs a runtime gap-reaction flag. A role whose competency is posture + internal-repo backing (every FR role) needs only periodic audit. A role that consumes external/cross-team SUBSTRATE at runtime (Brunel/Hopper) needs a substrate-truth-read discipline (the gap-reaction loop re-shaped). Three classes, three different mechanisms — don't apply the citation-gate to posture roles.
+
 ## [CHECKPOINT] 2026-05-27 session 36 — Standby, no audit triggered
 
 Task #8 standby. Reorientation only: read prior scratchpad + wiki index head + sent intro to team-lead. Trigger condition (Cal queue absorption producing meaningful new surface, OR PO explicit surface) did not arrive during session. No audit work, no commits. Shutdown at S36 close.

@@ -50,6 +50,12 @@ Do any topic files contradict each other or the reference implementations?
 
 Are teammate scratchpads current and pruned?
 
+### 6. Orphan-Claim Scan (`[ORPHAN-CLAIM]`)
+
+For each capability a prompt asserts, check whether its backing is an *external body of knowledge* (a standard, a vendor's docs, a domain corpus) with **no in-repo artifact to verify against**. These are invisible to the `[CONTRADICTION]` check — there's nothing to be inconsistent with. Flag each; the prompt should carry a `kind: external` marker on that claim and a `[GAP]`-on-absence caution ("if the specific doc is unavailable, flag — never assert from training memory"). Trigger: roster change, or any new prompt.
+
+This is a different scan *shape* from `[GAP]`: `[GAP]` is artifact-vs-need (the artifact exists but is thin); `[ORPHAN-CLAIM]` is absence-of-any-artifact on a claim. Ratified in #74 (2026-06-05); the FR roster's own baseline orphan-claim sweep is `docs/health-report-competency-gap-2026-06-05.md`.
+
 ## Output Format
 
 Write report to `teams/framework-research/docs/health-report.md`:

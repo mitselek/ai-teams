@@ -1,6 +1,84 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-05 — session-42 → session-43
+### [NEXT SESSION] 2026-06-05 — session-43 → session-44
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S44 read):**
+
+- **State of play:** S43 closed 2026-06-05 (~14:22–15:03, single session, ran on Opus 4.6 per roster intent). **#74 reflexive competency gap analysis COMPLETE and RATIFIED (D1–D6 approved).** Headline framework finding: "the competency gate is two mechanisms wearing one name" — claim→backing mapping (generalizes) + runtime gap-reaction (citation-only). Three-way taxonomy (citation/substrate/posture-backed) landed in topic 10. Medici's audit found 0/10 FR roles cite external authority → whole-roster YAGNI + one `[ORPHAN-CLAIM]` scan (landed as Medici's 6th audit category in `prompts/medici.md`). No prompt edits required by the design.
+- **One deferred task (#8):** bundled post-#74 prompt-edits batch — `kind:external` tags (1b) + G1 (brunel.md missing-artifact surface-back) + C2 (aeneas.md work-hub bilateral wiring). All LOW, Celes proposes diffs / team-lead applies. One review pass.
+- **Substrate anomalies now n≥2 across S42/S43 (Cal filing candidates):** peer-DM delivery lag/stall ("disk inbox ≠ delivery truth") + task-state-loss with stale replays. Both reproduced this session.
+- **All S42 watch items carry forward unchanged** — TPS-601 (no assignee), ITSD-38884, article draft awaiting Schliemann, ghost-bridge auto-restart gap, A1 evidence-cycle audit S40-42 (DUE!), S35 standing watch, TPS-583/mVox-dev/Manager-team dormant. Arhitecture #9-#13 external. Round-3 candidate parked.
+- **#74 closed by this session** — close the GitHub issue if not yet done.
+
+---
+
+## SESSION 43 WRAP — 2026-06-05 (#74 reflexive competency gap analysis: designed, audited, ratified D1–D6; topic 10 updated; [ORPHAN-CLAIM] landed)
+
+**Spans:** 2026-06-05 ~14:22 → ~15:03. Single session, ~40 min active. Parent on Opus 4.6 (roster intent).
+
+**Outcome:** #74 executed end-to-end in one session. Celes (lead) + Medici (second lens) converged on a clean design: the guild competency gate is two separable mechanisms; FR's standing roster needs only the audit half (Medici's existing coherence pass + one new orphan-claim scan). 0/10 FR roles cite external authority → whole-roster YAGNI. Three-way taxonomy (citation/substrate/posture-backed) promoted to topic 10. One prompt edit landed (`[ORPHAN-CLAIM]` in medici.md). PO ratified D1–D6. Three LOW optional prompt edits deferred as one bundled task (#8).
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `docs/2026-06-05-competency-gap-analysis.md` | NEW | Celes | Design doc answering PO's 3 questions + D1–D6 decision list |
+| `docs/health-report-competency-gap-2026-06-05.md` | NEW | Medici | Per-prompt claim→backing audit, 10/10 backed, 4 LOW gaps |
+| `prompts/medici.md` | M | Medici | `[ORPHAN-CLAIM]` 6th audit category (§6, lines 53-57) |
+| `topics/10-guild-specialists.md` | M | Celes | Three-way taxonomy subsection + resolved "retainer QA" open question |
+| memory/celes.md | M | Celes | S43 checkpoint, carry-forward for #8 |
+| memory/medici.md | M | Medici | S43 checkpoint |
+
+### Decisions (PO-ratified)
+
+[DECISION — S43] **D1: Competency-gap detection = profile of Medici's existing audit + one orphan-claim sub-check.** "The audit is the gate." Not runtime gates in standing prompts.
+
+[DECISION — S43] **D2: No new per-agent artifact class.** Single Medici-owned baseline table. Not wiki, not competencies/ tree, not frontmatter.
+
+[DECISION — S43] **D3: Single policy — proactive ONCE (baseline audit, done), YAGNI thereafter.** 0 external-citing FR roles → proactive arm has no target. Orphan-claim scan = 1 checklist line + `kind: external` tags.
+
+[DECISION — S43] **D4: No prompt edits required.** Two LOW optional mirrors (G1/C2) offered separately.
+
+[DECISION — S43] **D5: Auditor owns the competency map (Medici, not Celes).** Closes topic-10 "marking your own homework" open question.
+
+[DECISION — S43] **D6: Standalone until ratified; promote to topic 10 post-ratification.** (Promoted this session.)
+
+### Substantive learnings
+
+[LEARNED — framework, promotion-grade] **The competency gate is two mechanisms wearing one name.** Claim→backing mapping generalizes to any roster (cheap audit). Runtime gap-reaction loop does NOT generalize beyond citation-bearing dispatch roles. Three-way taxonomy: citation-backed → runtime gate; substrate-backed → substrate-truth-read; posture-backed → periodic audit only. FR independently re-derived mechanism #2 as three-layer-substrate-truth — convergence proves taxonomy is discovered, not invented.
+
+[LEARNED — process] **Don't bucket roles on assumed properties.** Celes's first-draft 5/5 split assumed external-citation; Medici's audit showed 0/10. Wait for audit data before taxonomy.
+
+[LEARNED — process] **Orphan-claim scan is genuinely new vs coherence audit.** A claim backed by an external body-of-knowledge with no in-repo artifact has nothing to be inconsistent WITH — invisible to artifact-vs-artifact coherence. The `[ORPHAN-CLAIM]` category fills this gap.
+
+[LEARNED — substrate] **Peer-DM lag + task-state-loss both reproduced S42→S43 (n≥2).** Cal filing candidates when he next spawns.
+
+### Standing watch items going into session 44
+
+- **All S42 watch items carry forward unchanged** — TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, A1 evidence-cycle audit (DUE!), S35 standing watch, Aen amendment Part C, TPS-583/mVox-dev/Manager-team dormant.
+- **NEW — Task #8 (bundled post-#74 prompt-edits):** 1b `kind:external` tags + G1 brunel.md + C2 aeneas.md. Celes proposes, team-lead applies. One pass.
+- **NEW — Close #74 on GitHub** if not yet done.
+- **NEW — Substrate anomalies n≥2 for Cal:** peer-DM lag, task-state-loss. Sources: S42 wrap + S43 closing reports.
+- **Arhitecture #9-#13** external — unchanged.
+- **Round-3 candidate parked** — panel expansion hypothesis.
+
+### NEXT-SESSION BOOT (re-orient instructions for S44)
+
+1. Read `startup.md` first (always). Steps 1-5. **Step 0.5 model gate:** roster pins 4.6; S43 ran 4.6 — verify before TeamCreate.
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S44 read.
+3. **Pull `mitselek-ai-teams` repo.**
+4. **Don't pre-spawn any agent at session start** — wait for PO direction.
+5. **Close #74 on GitHub** if not yet done: `gh issue close 74 --repo mitselek/ai-teams`.
+6. **If PO surfaces task #8 (post-#74 prompt-edits):** spawn Celes. She has the diffs ready (1b + G1 + C2). One review pass. ~10 min.
+7. **If Cal spawns:** his queue has 2 substrate anomalies at n≥2 (peer-DM lag + task-state-loss; sources: S42 wrap, S43 closing reports, celes.md carry-forward). Plus S42 carryover (idle wake-churn, Wiki-115 v2/v3 instance).
+8. **A1 evidence-cycle audit is DUE** (S40-42 window closed) — raise with PO if not surfaced.
+9. **If PO surfaces Arhitecture #9-#13 movement / round-3 / TPS-601 / ITSD-38884 / article / ghost-bridge:** unchanged procedures per S42 boot items.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-05] 2026-06-05 — session-42 → session-43
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S43 read):**
 

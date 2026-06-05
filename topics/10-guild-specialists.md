@@ -102,10 +102,33 @@ The design wired two pairings (Beck⟷Bach, Leveson⟷Anderson). Both reproduced
 
 **Implication for the design:** the consultancy (Celes-shaped role) is a **per-setup** investment — build the retainer prompts with gates + synergy + the gap-reaction protocol once, and the pool dispatches without per-engagement re-engineering. This sharpens the "Retainer quality assurance" open question below: the high-value consultancy work is the one-time prompt engineering and the competency-backend curation, not babysitting each review.
 
+## The competency gate is two mechanisms wearing one name — three-way taxonomy (*FR:Celes*)
+
+The S43 reflexive exercise (#74) turned the competency methodology inward onto framework-research's own standing roster and produced the strongest generalization in the whole guild line of work. Full design + evidence: `teams/framework-research/docs/2026-06-05-competency-gap-analysis.md` (Celes) and `teams/framework-research/docs/health-report-competency-gap-2026-06-05.md` (Medici, the per-prompt audit).
+
+**Lead with the convergence evidence, because it shows the taxonomy is discovered, not invented:** when Medici audited FR's 10 standing prompts for the gap-reaction loop, he found FR had **already re-derived that loop for its runtime-substrate roles (Brunel, Hopper) without ever calling it a "competency gate"** — it lives as the three-layer-substrate-truth-reading discipline. The mechanism the guild design centers on appeared independently in the team that designed the guild, attached to exactly the role-class that needed it. That convergence is what tells us the distinction below is real structure, not a post-hoc carving.
+
+**The distinction:** the "competency gate" from the S41/S42 guild work is actually *two separable mechanisms*:
+
+1. **Claim→backing mapping** (the audit table) — generalizes fully to any long-lived roster; cheap; owned by a health-checker.
+2. **Runtime gap-reaction loop** (`[GAP]`-flag + file-issue) — does **not** generalize to roles that don't cite external authority; it is a feature of *citation-bearing review work*, not standing coordination/design work.
+
+This resolves into a **three-way competency taxonomy**, each kind needing a different verification mechanism:
+
+| Competency kind | Backed by | Verification mechanism | Role class |
+|---|---|---|---|
+| **Citation-backed** | An external source doc (standard, regulation) | Runtime gate — full Anderson pattern (query backend, cite real, flag+file) | Dispatch-time review personas (the guild) |
+| **Substrate-backed** | A live deployed artifact / external substrate read at runtime | Substrate-truth-reading discipline (read your own shipped artifact; surface on absence) | Operator/architect roles (Hopper/Brunel class) |
+| **Posture-backed** | Role definition + model capability, internally documented | Periodic audit only — claim→backing map, no embedded gate | Coordinator/design roles (most standing rosters) |
+
+**Implication for this design:** topic 10's competency-gate is under-specified — it should name which of the three a given role is, because **only citation-backed roles need the runtime loop** that the guild design centers on. A standing team applying the guild competency idea to itself should reach for the audit (posture) or substrate-read (substrate) mechanism, not bolt the citation-runtime-gate onto roles that have nothing external to cite. For FR specifically, 0 of 10 roles are citation-backed — so the reflexive answer was whole-roster YAGNI on the internal-knowledge axis, plus a single proactive **orphan-claim scan** (a new `[ORPHAN-CLAIM]` audit category that flags any claim naming an external body-of-knowledge with no in-repo artifact to verify against — the one case a consistency-based coherence audit can't see, because there's nothing to be inconsistent *with*).
+
+**Competency-backend-staleness, FR-native form:** the "Competency backend ownership at scale" open question below has an FR-internal analogue — FR's only drifting backing is the **frozen `reference/` snapshots** (rc-team, hr-devs), not external standards. Same staleness shape, internal surface.
+
 ## Open questions
 
 - **Competency backend ownership at scale:** who pays the cost of obtaining and indexing external source docs (EN 50716, NIS2 directive text, ISO 27001 Annex A)? The domain owner? The consultancy? The client who needs the gap closed?
-- **Retainer quality assurance:** who reviews the retainer prompts themselves? The consultancy (Celes-role) is the natural owner, but marking your own homework is a governance gap.
+- ~~**Retainer quality assurance:** who reviews the retainer prompts themselves?~~ **RESOLVED (S43, #74 D5):** the **auditor owns the competency map, not the authoring role.** Marking-your-own-homework is avoided by separation: the role-sculptor (Celes) authors prompts, but a distinct health-checker (Medici) verifies their backing. Demonstrated reflexively — Celes authored 9 of 10 FR prompts; Medici audited them, including Celes's own.
 - **Pricing / priority model:** when 3 teams want Anderson simultaneously, who queues? First-come or criticality-based?
 - **Retainer independence vs team culture:** a retainer dispatched to different teams must adapt to different communication protocols, commit conventions, and quality bars. How much adaptation is the consultancy's job vs the retainer's?
 - **Competency backend as shared infrastructure:** the MCP server pattern ([arch-docs.dev.evr.ee](https://arch-docs.dev.evr.ee)) works for one repo. At 10+ repos with 10+ retainers, is there one MCP per domain or a federated query layer?
