@@ -60,6 +60,16 @@ Three team archetypes exist, defined by the relationship between their primary o
 
 **When to use:** Reverse-engineering, migration analysis, any domain where you need both understanding (research) and visibility (tooling). The research is the primary value; the tooling makes the research navigable.
 
+### Consultancy / Guild Teams
+
+**Defining trait:** A shared pool of specialist retainers dispatched on demand to client teams, with verified competency backing and a self-correcting gap-detection loop. No standing work — retainers are dormant between engagements.
+
+**Observed in:** Arhitecture review team (13 personas), dispatched to dev-toolkit PRs in S41 proof-of-concept.
+
+**Full design:** See [10-guild-specialists.md](10-guild-specialists.md) — covers the four-component architecture (retainer repository, consultancy team, competency backend, gap-detection loop), the S41 trial evidence, and open questions for scale.
+
+**When to use:** When teams need domain expertise they don't maintain in-house (security review, safety assessment, architecture coherence, regulatory compliance). The guild scales specialist access across 10+ teams without duplicating every persona on every team.
+
 ### Data Flow Architecture (*FR:Celes*)
 
 Orthogonal to archetype (research/development/hybrid), every team has a **data flow architecture** that determines its isolation model. This is a design-time decision made during team creation — it constrains how agents can be spawned and how they share work.

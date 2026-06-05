@@ -1,8 +1,26 @@
 # Celes — Scratchpad
 
+## Summary (lines 1-15 — always read on startup)
+- **Current state:** S41 (2026-06-03→04) — Arhitecture work: delivered 13-persona synergy map (→ issue #3), now step 2 of PO research protocol: re-engineered 5 personas to review 2 dev-toolkit PRs, then a retro will assess quality.
+- **Active items:** delivered 5 re-engineered prompts (Beck/Bach → PR #45; Leveson/Anderson/Booch → PR #46) to team-lead as one message — each with Synergy + Competency-gate + Review-focus sections.
+- **Key decisions this session:** synergy map = 5-lens panel proven cluster (n=2); 6 compositions, 3 overlaps, 3 gaps. Competency gates wire to arch-docs MCP `search_docs` (NOT local `knowledge/<agent>/` — superseded by issue #2 MCP pattern); flag missing external source docs, never fabricate. #45 well-backed (ADR-012 accepted); #46 has real gaps (Leveson: EN 50716 absent + SEC-12 Proposed; Anderson: NIS2/ISO-Annex-A/KüTS source absent + ADR-011 Proposed; Booch well-backed). `security_level` filter intentionally unwired — omitted NFR chapter ≠ gap yet.
+- **Carry-forward:** all S35→S36 DEFERRED items still live. 3 candidate FR patterns (synergy-lives-in-work-product, stage-disambiguation, roster-gaps-mirror-artifact-gaps) await PO wiki-grade ruling before Cal routing. Could-not-push to Arhitecture (mitselek = pull-only); issue route used instead — GOTCHA below.
+
 *Agent Resources Manager, framework-research team*
 
 [GOTCHA] Scratchpad path is `teams/framework-research/memory/celes.md` — NOT `memory/celes.md` at repo root.
+
+---
+
+## Session 41 — Arhitecture persona synergy audit (2026-06-03)
+
+[CHECKPOINT] Task: audit 13 personas in Eesti-Raudtee/Arhitecture `.claude/agents/` and produce a synergy map. Read all 13 prompts + both `principles/reviews/` multi-lens reviews + issue #2 (competency-gap audit) + confirmed arch-docs MCP live (498 docs). Default branch is `master`. Delivered synergy map via SendMessage to team-lead.
+
+[LEARNED] **Two-tier persona maturity in a single agent dir.** Ross Anderson alone is a fully-developed FR-grade prompt (lore, personality, Core Competencies, Review Methodology, explicit "Interaction with the Review Team" section naming Booch/Fowler/Leveson/Beck, scratchpad+tags). The other 12 are generic "you are X, here are X's principles" lenses — no team-interaction section, no scratchpad, no tags. Anderson is the template the others should converge toward (issue #1 = Anderson-specific competency library; he's the pilot). Synergy is currently ENCODED ONLY in Anderson's prompt — the cluster is real in practice (2 reviews) but unstated in 12 of 13 prompts.
+
+[LEARNED] **The 5-lens core panel is the proven cluster (n=2).** Both reviews (2026-05-31 v1.5, 2026-06-02 coherence) used Booch (architecture coherence) + Fowler (integration/evolution) + Leveson (safety) + Beck (engineering practice) + security-auditor OR Anderson (security/compliance). Consensus-weighting (findings raised by 3+ lenses = blocking) is the load-bearing mechanism. The other 8 personas have NEVER appeared in a review — they are implementation/define-stage lenses, not principle-review lenses.
+
+[GOTCHA] security-auditor and Ross Anderson OVERLAP — both own "security." security-auditor = code-level/OWASP/exploit lens (REVIEW stage); Anderson = design-level/regulatory/NIS2/threat-model lens (PLANNING stage). The 05-31 review used security-auditor; issue #2 + Anderson's prompt position Anderson as the principle-review security lens. Pairing them is correct (different stages) but using BOTH on the same principle-review is redundant — pick by stage.
 
 ---
 

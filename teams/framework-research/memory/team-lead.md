@@ -1,6 +1,82 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-03 — session-40 → session-41
+### [NEXT SESSION] 2026-06-05 — session-41 → session-42
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S42 read):**
+
+- **State of play:** S41 closed 2026-06-05. Multi-day session (2026-06-03→05). Major output: guild-specialist pattern designed + validated via controlled trial. Celes audited 13 Arhitecture personas → synergy map filed ([Arhitecture #3](https://github.com/Eesti-Raudtee/Arhitecture/issues/3)). 5 personas re-engineered with competency gates + synergy wiring → reviewed [dev-toolkit PR #45](https://github.com/Eesti-Raudtee/dev-toolkit/pull/45) + [PR #46](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46) → all 5 reviews posted on PRs ([gist](https://gist.github.com/mitselek/a20d0be7ae193c8266725880005aa4a6)). 5 persona improvement issues filed ([Arhitecture #4-#8](https://github.com/Eesti-Raudtee/Arhitecture/issues/4)). New topic seeded: [10-guild-specialists.md](https://github.com/mitselek/ai-teams/blob/main/topics/10-guild-specialists.md). Container intake request filed ([TPS-601](https://eestiraudtee.atlassian.net/browse/TPS-601)). DB tunnels confirmed working but flapping (83 restarts/day). Apex card system feedback received (175 entries, filing-time > batch).
+- **Open dispatches/dependencies:** (a) Arhitecture #4-#8 (persona prompt updates — BLOCKS [#73](https://github.com/mitselek/ai-teams/issues/73) re-review experiment). (b) TPS-601 container intake (no assignee yet — org routing question). (c) ITSD-38884 admin grant unchanged. (d) Article draft awaiting Schliemann feedback (sent S40, no review back yet). (e) Ghost-bridge auto-restart gap (noted S40, not actioned).
+- **Re-review experiment ready:** [#73](https://github.com/mitselek/ai-teams/issues/73) has detailed 9-step plan. Precondition: Arhitecture #4-#8 merged. Check at session start: `gh issue list --repo Eesti-Raudtee/Arhitecture --state open --json number | jq '[.[].number] | map(select(. >= 4 and . <= 8))'` → empty = unblocked.
+- **Retro rubric unfilled:** Celes drafted the scoring template (in her S41 message). Fill after round 2 with side-by-side comparison.
+- **All S40 watch items carry forward unchanged** — ITSD-38884, Stage 2 read-back surfaces, Hopper bundled-shred n=1, routing-by-action + Stage-0-contribution n=1, A1 evidence-cycle audit S40-42, S35 carry-forward standing watch, Aen amendment Part C, TPS-583 dormant, mVox-dev dormant, Manager-team dormant.
+
+---
+
+## SESSION 41 WRAP — 2026-06-03→05 (Guild-specialist pattern designed + validated; 5 persona reviews delivered; topic 10 seeded; container intake filed; DB tunnels diagnosed)
+
+**Spans:** 2026-06-03 ~12:25 → 2026-06-05 ~09:00. Multi-day session.
+
+**Outcome:** Guild-specialist framework pattern designed end-to-end and validated via controlled trial. Celes produced synergy map for 13 Arhitecture personas, re-engineered 5 for PR review with competency gates + synergy wiring. All 5 reviews delivered on dev-toolkit PRs #45 and #46 — zero fabrications, all gaps correctly flagged, consensus findings emerged from designed pairings. Pattern abstracted to topic 10 (guild-specialists.md) as fourth team archetype. Container intake request (TPS-601) filed for apex team. DB tunnels confirmed working but flapping. Apex team card system feedback received (175 entries, real adoption data).
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| [Arhitecture #3](https://github.com/Eesti-Raudtee/Arhitecture/issues/3) (synergy map) | NEW | Celes | 13-persona audit: 6 clusters, 3 overlaps, 3 gaps |
+| 5 PR reviews on [dev-toolkit #45](https://github.com/Eesti-Raudtee/dev-toolkit/pull/45) + [#46](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46) | NEW | Beck+Bach+Booch+Leveson+Anderson | Posted as PR comments + [gist](https://gist.github.com/mitselek/a20d0be7ae193c8266725880005aa4a6) |
+| [Arhitecture #4-#8](https://github.com/Eesti-Raudtee/Arhitecture/issues/4) | NEW | Aen | Atomic persona improvement issues with gap-reaction protocol |
+| [topics/10-guild-specialists.md](https://github.com/mitselek/ai-teams/blob/main/topics/10-guild-specialists.md) | NEW | Aen | Fourth team archetype: shared expert pool with competency backend |
+| topics/01-team-taxonomy.md | M | Aen | Added Consultancy/Guild section pointing to topic 10 |
+| [mitselek/ai-teams #73](https://github.com/mitselek/ai-teams/issues/73) | NEW | Aen | Re-review experiment plan (9 steps, blocked on #4-#8) |
+| [TPS-601](https://eestiraudtee.atlassian.net/browse/TPS-601) | NEW | Aen | Apex container intake request (linked to VEO-4 + TPS-577) |
+| Retro rubric | NEW (message) | Celes | Fillable scoring template for round 1 vs round 2 comparison |
+
+### Decisions (PO-ratified)
+
+[DECISION — S41] **Guild-specialist pattern adopted as fourth team archetype.** Shared expert pool with competency backend, dispatched on demand. Seeded as topic 10. Evidence: S41 controlled trial with 5 Arhitecture personas.
+
+[DECISION — S41] **Competency gap-detection is a two-action protocol.** (1) Flag `[GAP]` in output artifact, (2) file issue at retainer repository about the missing backing. Both actions must be prompt-encoded. Added to Arhitecture #4-#8.
+
+[DECISION — S41] **Container intake filed directly rather than waiting for standard adoption.** TPS-601 forces org to react to a concrete request (VEO-4 stalled 20 days on routing question).
+
+### Substantive learnings
+
+[LEARNED — framework, promotion-grade] **Competency gates + synergy wiring produce measurably better reviews than generic single-lens prompts.** 5/5 personas flagged gaps correctly, zero fabrications, designed pairings (Beck⟷Bach, Leveson⟷Anderson) produced consensus findings neither lens would reach alone. The `security_level`/`safety_related` conflation check and the "characterization tests pin bugs" finding are the marquee evidence.
+
+[LEARNED — framework] **Synergy must be prompt-encoded, not just in the work product.** Celes's #3 headline finding: the Arhitecture team shipped coordinated multi-lens reviews while only 1 of 13 prompts (Anderson) encoded the coordination. The cluster is fragile until prompt-encoded. Round 2 will test whether prompt-encoding eliminates the need for per-engagement Celes intervention.
+
+[LEARNED — process] **Filing-time card generation >> batch backfill.** Apex team (175 entries) confirmed: batch backfill of 87 cards was expensive (~7 commits); filing-time generation is near-free. Start with filing-time from day 1.
+
+[LEARNED — substrate] **DB tunnels work end-to-end but flap heavily.** 83 SSH restarts/day (~17min MTBF). Oracle responds through tunnel (ORA-01017 = auth challenge = protocol works). Autossh + wrapper loop + Task Scheduler = persistent but unreliable for sustained work.
+
+### Standing watch items going into session 42
+
+- **All S40 watch items carry forward unchanged** — ITSD-38884, Stage 2 read-back surfaces, Hopper bundled-shred n=1, routing-by-action + Stage-0-contribution n=1, A1 evidence-cycle audit S40-42, S35 carry-forward standing watch, Aen amendment Part C, TPS-583 dormant, mVox-dev dormant, Manager-team dormant.
+- **NEW — Re-review experiment [#73](https://github.com/mitselek/ai-teams/issues/73)** blocked on Arhitecture #4-#8 (persona prompt merges). Check at session start.
+- **NEW — TPS-601 container intake** — no assignee, org routing question open. Dmitri Buloitšik's VEO-4 comment (2026-05-13) suggested ITOps. No response to PO's May 14 follow-up.
+- **NEW — Retro rubric unfilled.** Score after round 2 with side-by-side comparison.
+- **NEW — Article draft still awaiting Schliemann feedback.** Asked again S41 (low-priority). No response yet.
+- **NEW — Dev-toolkit PRs #45/#46 have "address review" commits.** Authors acted on round-1 findings. Re-review is the next action once #4-#8 land.
+
+### NEXT-SESSION BOOT (re-orient instructions for S42)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — 5-bullet reorientation per A1. Downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S42 read.
+3. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **Check re-review precondition:** `gh issue list --repo Eesti-Raudtee/Arhitecture --state open --json number | jq '[.[].number] | map(select(. >= 4 and . <= 8))'`. If empty → [#73](https://github.com/mitselek/ai-teams/issues/73) unblocks. Execute the 9-step re-review plan.
+6. **If PO surfaces TPS-601 follow-up:** check Jira for assignee/comments. The intake request forces org routing.
+7. **If PO surfaces ITSD-38884 admin grant:** spawn Hopper, Path D execution per S37 procedures.
+8. **If PO surfaces article feedback from Schliemann:** read apex-lead-ghost inbox. Incorporate into article draft.
+9. **If PO surfaces retro scoring (round 1 only):** Celes has the rubric in her S41 message. Can fill round 1 standalone, but full value is round 1 vs round 2 side-by-side.
+10. **If PO surfaces ghost-bridge auto-restart:** design Task Scheduler watchdog (noted S40, not actioned).
+11. **If PO surfaces new guild-specialist work:** topic 10 has open questions (competency backend ownership at scale, retainer quality assurance, priority model, federation).
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-03] 2026-06-03 — session-40 → session-41
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S41 read):**
 

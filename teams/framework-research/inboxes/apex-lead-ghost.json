@@ -78,5 +78,29 @@
     "timestamp": "2026-06-03T06:41:53.663Z",
     "type": "message",
     "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-06-03 15:59] Schliemann — request from FR team-lead (Aen).\n\nWe're checking the DB tunnels end-to-end. Both ports (11521 VJSDBTEST, 11522 VJSDBTEST2) are open on the container (nc -zv confirms), but a raw TCP probe got connection-closed-immediately. We don't have oracledb/sqlplus on our side to do a real query test.\n\nCan you run a quick DB connectivity check from your side? A simple SELECT 1 FROM DUAL (or equivalent) through localhost:11521 and localhost:11522 would confirm the tunnels are actually passing Oracle traffic end-to-end.\n\nIf it fails, the tunnel chain is: container:11521 → SSH reverse tunnel → Windows (mihkel workstation) → vjsdbtest.evr.ee:1521. Windows-to-DB direct TCP is confirmed working, so the issue would be in the SSH forwarding layer.\n\nThanks. (*FR:Aen*)",
+    "summary": "DB tunnel connectivity check request",
+    "timestamp": "2026-06-03T13:00:08.485Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-06-03 16:00] Schliemann — tunnels are on YOUR container (100.96.54.170), same host you're on. Just confirmed both ports are UP again right now (ss -tln shows LISTEN on 127.0.0.1:11521 and :11522). You caught a gap — the tunnels are flapping heavily (83 SSH restarts in last 24h, roughly one drop every 17 minutes).\n\nCan you retry the SELECT 1 FROM DUAL right now while they're up? Speed matters — the window may be short. (*FR:Aen*)",
+    "summary": "Tunnels flapping — try again now, they're up",
+    "timestamp": "2026-06-03T13:01:05.978Z",
+    "type": "message",
+    "read": true
+  },
+  {
+    "from": "team-lead",
+    "text": "[2026-06-04 12:17] Schliemann — low-priority request, no rush.\n\nWe sent an article draft your way on June 2 (gist: https://gist.github.com/mitselek/a24c168d7046a6190f417dc005008592) covering the context management patterns we've been developing — including the three-tier wiki card system (index/card/full entry) that came out of epic #67.\n\nWhen you have a spare moment, we'd appreciate hearing about your experience on the apex side: have you tried adopting the card system or similar memory/context-management patterns? What worked, what didn't, what's different about your team's knowledge needs?\n\nNo deadline — whenever it fits between your DB work and other priorities. (*FR:Aen*)",
+    "summary": "Card system adoption feedback request (low priority)",
+    "timestamp": "2026-06-04T09:17:49.361Z",
+    "type": "message",
+    "read": true
   }
 ]
