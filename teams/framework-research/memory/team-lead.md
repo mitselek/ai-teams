@@ -8,7 +8,7 @@
 - **One deferred task (#8):** bundled post-#74 prompt-edits batch — `kind:external` tags (1b) + G1 (brunel.md missing-artifact surface-back) + C2 (aeneas.md work-hub bilateral wiring). All LOW, Celes proposes diffs / team-lead applies. One review pass.
 - **Substrate anomalies now n≥2 across S42/S43 (Cal filing candidates):** peer-DM delivery lag/stall ("disk inbox ≠ delivery truth") + task-state-loss with stale replays. Both reproduced this session.
 - **All S42 watch items carry forward unchanged** — TPS-601 (no assignee), ITSD-38884, article draft awaiting Schliemann, ghost-bridge auto-restart gap, A1 evidence-cycle audit S40-42 (DUE!), S35 standing watch, TPS-583/mVox-dev/Manager-team dormant. Arhitecture #9-#13 external. Round-3 candidate parked.
-- **NEW — Arhitecture #1 AC4 (live MCP test) PARKED:** arch-docs MCP at `arch-docs.dev.evr.ee` returning 404 on `/mcp`. Fix MCP, then spawn Anderson against PR #46 (NFR convention, strong regulatory surface). AC3 is fully resolved (all sources catalogued/held). PR #46 still open.
+- **NEW — Arhitecture #1 AC4 (live MCP test) ready for S44:** arch-docs MCP was unreachable from personal sub (404 on `/mcp`); S44 runs on org sub where MCP is available. Spawn Anderson against PR #46 (NFR convention, strong regulatory surface). AC3 is fully resolved (all 6 sources catalogued/held per #1 comments). Anderson persona prompt fetched and verified (competency gates + MCP repoints all in place). PR #46 still open.
 
 ---
 
@@ -57,18 +57,19 @@
 
 - **All S42 watch items carry forward unchanged** — TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, A1 evidence-cycle audit (DUE!), S35 standing watch, Aen amendment Part C, TPS-583/mVox-dev/Manager-team dormant.
 - **NEW — Task #8 (bundled post-#74 prompt-edits):** 1b `kind:external` tags + G1 brunel.md + C2 aeneas.md. Celes proposes, team-lead applies. One pass.
-- **NEW — Close #74 on GitHub** if not yet done.
+- **#74 CLOSED** on GitHub (S43).
+- **NEW — Arhitecture #1 AC4:** live MCP test ready. Anderson + PR #46. Needs org sub (arch-docs MCP).
 - **NEW — Substrate anomalies n≥2 for Cal:** peer-DM lag, task-state-loss. Sources: S42 wrap + S43 closing reports.
 - **Arhitecture #9-#13** external — unchanged.
 - **Round-3 candidate parked** — panel expansion hypothesis.
 
 ### NEXT-SESSION BOOT (re-orient instructions for S44)
 
-1. Read `startup.md` first (always). Steps 1-5. **Step 0.5 model gate:** roster pins 4.6; S43 ran 4.6 — verify before TeamCreate.
+1. Read `startup.md` first (always). Steps 1-5. **Step 0.5 model gate:** roster pins 4.6; S43 ran 4.6 — verify before TeamCreate. **S44 runs on org subscription** — arch-docs MCP will be available.
 2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S44 read.
 3. **Pull `mitselek-ai-teams` repo.**
 4. **Don't pre-spawn any agent at session start** — wait for PO direction.
-5. **Close #74 on GitHub** if not yet done: `gh issue close 74 --repo mitselek/ai-teams`.
+5. **Arhitecture #1 AC4 — LIKELY FIRST ASK.** Spawn Anderson (persona prompt at `Eesti-Raudtee/Arhitecture/.claude/agents/ross-anderson.md` on `master`) against dev-toolkit PR #46 (NFR convention). Verify arch-docs MCP is connected (`search_docs` for "NIS2" should return results). AC3 fully resolved — all 6 external sources catalogued/held (EN 50716, ISO 27001 Annex A, NIS2, KüTS, GDPR, OWASP Top 10). The test proves: (a) Anderson cites real MCP-grounded sources, (b) competency gates fire on missing backing, (c) zero fabricated links. If AC4 passes → close Arhitecture #1.
 6. **If PO surfaces task #8 (post-#74 prompt-edits):** spawn Celes. She has the diffs ready (1b + G1 + C2). One review pass. ~10 min.
 7. **If Cal spawns:** his queue has 2 substrate anomalies at n≥2 (peer-DM lag + task-state-loss; sources: S42 wrap, S43 closing reports, celes.md carry-forward). Plus S42 carryover (idle wake-churn, Wiki-115 v2/v3 instance).
 8. **A1 evidence-cycle audit is DUE** (S40-42 window closed) — raise with PO if not surfaced.
