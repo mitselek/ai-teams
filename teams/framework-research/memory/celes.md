@@ -1,10 +1,16 @@
 # Celes — Scratchpad
 
 ## Summary (lines 1-15 — always read on startup)
-- **Current state:** S41 (2026-06-03→04) — Arhitecture work: delivered 13-persona synergy map (→ issue #3), now step 2 of PO research protocol: re-engineered 5 personas to review 2 dev-toolkit PRs, then a retro will assess quality.
-- **Active items:** delivered 5 re-engineered prompts (Beck/Bach → PR #45; Leveson/Anderson/Booch → PR #46) to team-lead as one message — each with Synergy + Competency-gate + Review-focus sections.
-- **Key decisions this session:** synergy map = 5-lens panel proven cluster (n=2); 6 compositions, 3 overlaps, 3 gaps. Competency gates wire to arch-docs MCP `search_docs` (NOT local `knowledge/<agent>/` — superseded by issue #2 MCP pattern); flag missing external source docs, never fabricate. #45 well-backed (ADR-012 accepted); #46 has real gaps (Leveson: EN 50716 absent + SEC-12 Proposed; Anderson: NIS2/ISO-Annex-A/KüTS source absent + ADR-011 Proposed; Booch well-backed). `security_level` filter intentionally unwired — omitted NFR chapter ≠ gap yet.
-- **Carry-forward:** all S35→S36 DEFERRED items still live. 3 candidate FR patterns (synergy-lives-in-work-product, stage-disambiguation, roster-gaps-mirror-artifact-gaps) await PO wiki-grade ruling before Cal routing. Could-not-push to Arhitecture (mitselek = pull-only); issue route used instead — GOTCHA below.
+- **Current state:** S42 (2026-06-05). **BOTH TASKS COMPLETE.** Task#1 (assess #4–#8 prompt improvements) DONE. Task#2 (#73 round-2 re-review, 9 steps) DONE through step 9 — reported to team-lead, awaiting Task#2-close confirmation.
+- **Task#1 verdict:** all 5 personas SUBSTANTIALLY ADOPTED synergy+gates (Action-1). KEY FINDING: gap-reaction **Action 2 (file issue) was absent from ALL 5 prompts** (addendum was last issue comment). Resolved via PO Option-A: Action-2 delivered through round-2 DISPATCH brief; team-lead filing a follow-up Arhitecture issue to prompt-encode it. Report: `docs/2026-06-05-persona-improvement-assessment.md`.
+- **Task#2 verdict: HYPOTHESIS CONFIRMED — prompt-encoded gates+synergy ≥ ad-hoc R1; guild-specialist consultancy role = SETUP-ONLY, not per-engagement.** Mechanism Option-A (team-lead spawned 5 fresh-context agents from merged prompts; I wrote briefs, scored, assembled). 5/5 APPROVE dispositions-correct; **D2 zero-fab 5/5 incl. both highest-risk lenses (regression test PASSED)**; both wired consensus signals reproduced from independent contexts + a THIRD UNWIRED pairing emerged (Booch⟷Leveson, FINDING-6 bounds Leveson HIGH); **Action-2 fired 4/4 live → Arhitecture #10/#11/#12/#13 all OPEN-verified**; D8 efficiency-not-skim (3 went deeper than R1). Caveats: 4.8-vs-4.6 substrate uncontrolled (directional verdict only, no precise quality-delta claim); peer-DM delivery lag/stall ("disk inbox ≠ delivery truth").
+- **Step 8/9 DONE (PO-sanctioned):** posted round-2 panel comments to dev-toolkit PR#45 (issuecomment-4630259710) + PR#46 (issuecomment-4630260113) with FINDING-6⟷Leveson-HIGH cross + issue links + clean attribution; added round-2 rubric + collected reviews to the gist (a20d0be); updated topic 10 `10-guild-specialists.md` with S42 round-2 evidence section + unwired-pairing subsection + honest caveats (my `(*FR:Celes*)` section in Aen-authored doc).
+- **Artifacts:** `docs/2026-06-05-{persona-improvement-assessment,round2-dispatch-briefs,round2-reviews-collected,round2-retro-rubric}.md`. Briefs doc carries the v2/v3 SPAWNED-VERSION NOTE (Wiki-115 doc-vs-substrate divergence in real time, closed by Phase-2b MCP re-verify, zero effect).
+- **Mechanism = OPTION A (team-lead spawns 5 fresh bg agents: beck/bach/booch/leveson/anderson).** Each fetches own merged prompt via gh, reads ONLY prompt+brief+PR+its-R1-review (contamination guard: NO FR memory/docs/wiki). Action-2 LIVE (agent really files Arhitecture issues). Reviewers report finished review to ME (celes) via SendMessage; I assemble+post (step 8). 5 verbatim briefs HANDED to team-lead: `teams/framework-research/docs/2026-06-05-round2-dispatch-briefs.md`. **Substrate note for retro:** R2 on opus-4.8 (1-off, roster intent stays 4.6), R1 on 4.6-era — note as uncontrolled var, don't over-claim quality delta. Mechanism delta IS the treatment def, not a confound.
+- **S42 durable learnings (Task#2 mechanics):** (a) **D6 headline — UNWIRED-pairing consensus emerges** (Booch⟷Leveson: structural lens caught a safety-axis hole it defers content on; stronger signal than reproducing wired pairings). (b) **PR files live on PR HEAD branch not master** while PRs open — `gh api .../contents/<f>?ref=<sha>`. (c) **SUBSTRATE: peer-DM (agent→celes) delivery lag/stall, high-variance; "disk inbox JSON ≠ delivery truth"** — recover by reading own inbox file; spawner↔agent vectors fine (worktree-spawn-asymmetry cluster). (d) **Doc-vs-substrate divergence (Wiki-115) can hit a running experiment** — spawn used v2 briefs, my v3 edit landed after; runner rule = NO mid-run supplement (splits instrument), log the delta; PO post-submission uniform addendum (Phase-2b) is the clean way to add a whitelist after all submitted. (e) **D8 — fast ≠ skim**; discriminate via ground-truth verification of the reviewer's own claims (I verified every [GAP] + filing + schema claim).
+- **Active items (carry):** S41 retro NOW SCORED (Task#2 rubric). 3 candidate FR patterns from S41 still await PO wiki-grade ruling before Cal routing (below). Possible round-3 hypothesis parked: bonus-8 panel expansion (does a larger panel find more?) — deferred-by-design, not overlooked.
+- **Key decisions S41:** synergy map = 5-lens panel proven cluster (n=2); 6 task-type compositions, 3 overlaps, 3 gaps. Competency gates wire to arch-docs MCP `search_docs`/`get_doc` (NOT local `knowledge/<agent>/` — superseded by issue#2 MCP pattern); flag missing external source docs, never fabricate. #45 well-backed (ADR-012 accepted); #46 has real gaps (Leveson: EN50716 absent + SEC-12 Proposed; Anderson: NIS2/ISO-Annex-A/KüTS source absent + ADR-011 Proposed; Booch well-backed). `security_level` filter intentionally unwired — omitted NFR chapter ≠ gap yet.
+- **Carry-forward:** all S35→S36 DEFERRED items still live (see Active deferred). Marquee retro signal = Leveson⟷Anderson `security_level` safety-vs-security conflation check (the one finding only synergy wiring can produce).
 
 *Agent Resources Manager, framework-research team*
 
@@ -12,69 +18,39 @@
 
 ---
 
-## Session 41 — Arhitecture persona synergy audit (2026-06-03)
+## Session 41 — Arhitecture consultancy (2026-06-03→05) — DURABLE
 
-[CHECKPOINT] Task: audit 13 personas in Eesti-Raudtee/Arhitecture `.claude/agents/` and produce a synergy map. Read all 13 prompts + both `principles/reviews/` multi-lens reviews + issue #2 (competency-gap audit) + confirmed arch-docs MCP live (498 docs). Default branch is `master`. Delivered synergy map via SendMessage to team-lead.
+[CHECKPOINT] 4 deliverables to team-lead, all as message text (Arhitecture = collaborator repo, mitselek account is **pull-only / push:false** — filed synergy map as **issue #3** instead of a PR after push 403'd): (1) 13-persona synergy map; (2) issue #3 created; (3) 5 re-engineered persona prompts; (4) step-4 retro rubric. Default branch is `master`.
 
-[LEARNED] **Two-tier persona maturity in a single agent dir.** Ross Anderson alone is a fully-developed FR-grade prompt (lore, personality, Core Competencies, Review Methodology, explicit "Interaction with the Review Team" section naming Booch/Fowler/Leveson/Beck, scratchpad+tags). The other 12 are generic "you are X, here are X's principles" lenses — no team-interaction section, no scratchpad, no tags. Anderson is the template the others should converge toward (issue #1 = Anderson-specific competency library; he's the pilot). Synergy is currently ENCODED ONLY in Anderson's prompt — the cluster is real in practice (2 reviews) but unstated in 12 of 13 prompts.
+[LEARNED] **Synergy lives in the work product, not the agents** (issue #3 headline). Of 13 Arhitecture personas only Ross Anderson is fully-wired (lore, Core Competencies, Review Methodology, explicit "Interaction with the Review Team", scratchpad+tags). The other 12 are generic single-lens prompts. Yet 2 coordinated multi-lens reviews shipped — so the 5-lens panel cluster is real in practice but encoded in ONLY 1 of 13 prompts. A team can ship coordinated multi-lens output while the coordination is unstated in N-1 prompts; the cluster is fragile until prompt-encoded. **Candidate FR pattern — awaiting PO wiki-grade ruling before Cal.**
 
-[LEARNED] **The 5-lens core panel is the proven cluster (n=2).** Both reviews (2026-05-31 v1.5, 2026-06-02 coherence) used Booch (architecture coherence) + Fowler (integration/evolution) + Leveson (safety) + Beck (engineering practice) + security-auditor OR Anderson (security/compliance). Consensus-weighting (findings raised by 3+ lenses = blocking) is the load-bearing mechanism. The other 8 personas have NEVER appeared in a review — they are implementation/define-stage lenses, not principle-review lenses.
+[LEARNED] **Stage-disambiguation resolves apparent role overlap.** security-auditor and Ross Anderson both "own security" but split by pipeline stage: security-auditor = code-level/OWASP/exploit (REVIEW); Anderson = design-level/regulatory/NIS2/threat-model (PLANNING/principle-review). Two agents on the same domain aren't redundant if split by stage — using both on the SAME review is. **Candidate FR pattern — awaiting PO ruling.**
 
-[GOTCHA] security-auditor and Ross Anderson OVERLAP — both own "security." security-auditor = code-level/OWASP/exploit lens (REVIEW stage); Anderson = design-level/regulatory/NIS2/threat-model lens (PLANNING stage). The 05-31 review used security-auditor; issue #2 + Anderson's prompt position Anderson as the principle-review security lens. Pairing them is correct (different stages) but using BOTH on the same principle-review is redundant — pick by stage.
+[LEARNED] **Roster gaps mirror artifact gaps.** The persona set's blind spots (run-time/perf/observability — no owning lens) matched the reviewed principle set's blind spots (the 05-31 review's net: change-time discipline strong, run-time thin). A roster audit can predict deliverable blind spots. **Candidate FR pattern — awaiting PO ruling.**
 
----
+[LEARNED] **Competency-gate gold-standard shape** (from Anderson gist + issue#2): 3 blocks — (a) Competency Gates HARD RULE: query MCP for repo-internal backing, cite real docs by ID, flag `[GAP]` for missing *external* source docs, never fabricate, say "Proposed" for un-ratified ADRs; (b) Synergy/Interaction scoped to THIS task naming who-pairs-with-whom + the productive overlap + consensus mechanism; (c) Review focus = what to look for in the specific artifact. Add a grep-able `[GAP]` tag so a retro can count whether gates fired. Watch BOTH failure directions: fabrication AND over-flagging (a gate that cries gap on everything is as useless as one that fabricates).
 
-## Session 36 — Standby only (2026-05-26 → 2026-05-27 shutdown)
-
-[CHECKPOINT] Task #7 standby session. PO did not surface Brunel-Amendment (parallel-to-Hopper-4 shape, `prompts/brunel.md` §Diagnostic Discipline lines 123-129) — held per PO-pending decision (b). No Round 1 surface-prompts emerged from Brunel/Volta/Herald reviews during my window; no Protocol A → Cal routing needed. No hires. Cumulative still **61 agents across 13 teams**. Spawned 2026-05-26 post-session-35-wrap; shutdown request 2026-05-27 07:26 UTC from team-lead, PO-signaled.
-
-[LEARNED] **True-standby sessions are valid units of work.** No artifacts produced ≠ session wasted. The watch-readiness itself (re-oriented from scratchpad, intro-acked, Task #7 owned, surface-prompt routing primed) IS the deliverable when PO holds the trigger. Future-Celes: don't conflate "no edits this session" with "low-value session" — readiness has cost, and being ready-but-unused beats being-unprepared-when-needed.
-
-[CHECKPOINT] All S35 carry-forward deferred items remain live for S37: Brunel-Amendment still PO-pending; Hopper-Amendment-5 (Layer-0-library-first) still awaiting task #6 verification close + catalyzing-incident; Cal queue items still Aen-routed (batched-iterate + producer-side-staleness + wiki refresh at three-layer-substrate-truth-discipline.md lines 77/167/201); path-convention substrate for mvox-dev still PO-pending; Comenius prompt improvements still PO-discretion; Aen-prompt MAY WRITE latent gap still queued for post-session prompt-revision pass; esl-legal burn-rate posture flag still standing.
+[LEARNED] **MCP supersedes local knowledge-dirs for repo-internal docs.** Anderson's original gist said `knowledge/anderson/` local checkout; issue#2 established the arch-docs MCP (`search_docs`/`get_doc`, 500 docs) as the access pattern. Re-engineering must repoint competency gates to MCP; only genuinely-external source docs (NIS2 text, EN50716, ISO Annex A, KüTS, GDPR) stay "on-disk-or-flag-it."
 
 ---
 
-## Session 35 — Hopper-Amendment-4 (2026-05-25 → 2026-05-26 shutdown)
+## Active deferred (carry-forward — pre-S41, still live)
 
-[CHECKPOINT] Amendment-4 (three-layer Diagnostic Discipline) landed on `prompts/hopper.md` lines 130-211 in single coordinated Edit at 14:50 on 2026-05-25. Joint-review pass: Hopper conditional-clean with 3 calibrations (Option A line-126 cross-link, audit-template tied to §Graceful Degradation cases by number, first-dispatch front-loaded-within-pre-execution-phase wording); Brunel approve-with-2-optional-tightens (recreate-as-drift-resolution-event framing, Layer-2+3 fallback when L1 absent). All 5 folded into one batched edit per Pass 1 prose-only discipline. Brunel's cross-substrate-class forward-reference declined to preserve surgical-scope (lands separately as Cal queue E1 wiki extension). Aen close-out accepted 2026-05-25 13:32; Hopper + Brunel landing-confirmations received clean. Shutdown request 2026-05-26 10:39.
+[DEFERRED] **Brunel-side parallel amendment to `prompts/brunel.md` §Diagnostic Discipline** (lines 123-129, Layer-1-only gap, same as Hopper pre-Amendment-4). Aen QUEUED 2026-05-25 — separate Celes-dispatch when ready. Pattern: Brunel author-of-record, me cross-author, Hopper cross-reviewer. Standing watch.
 
-[LEARNED — STRONG] **Batched-iterate-on-multi-reviewer discipline.** When routing a prompt amendment past two joint authors in parallel, HOLD the iterate until both responses return rather than firing per-reviewer edits. Reasons: (i) Pass 1 prose-only structural-change-discipline gate calls for one coordinated batch, not multiple drips; (ii) reviewer-A's calibration may interact with reviewer-B's — folding A first might force B-rework when B's edit arrives; (iii) producer-consumer field-set-lock between wiki entry and prompt depends on single-pass consistency. Cost of holding: small latency (minutes-to-days). Cost of per-reviewer iterate: producer-consumer relock between passes. Asymmetric: hold-wins. Aen surfaced this for Cal as wiki-grade candidate (Pass-1-prose-only-batched-iterate-discipline).
+[DEFERRED] **Hopper-Amendment-5 (Layer-0-library-first)** — Hopper-surfaced 2026-05-25 from task#6 arc; pending task#6 verification PASS + catalyzing incident. Surface if Aen/Hopper route a future amendment-pass.
 
-[LEARNED — STRONG] **Surgical-scope claim is itself load-bearing structural property.** Aen explicitly framed Amendment-4 as "surgical amendment, not full rewrite." When Hopper offered Option A (low-touch supersession-line) vs Option B (also-edit-line-126), my call to take Option A was correct — Option B would have broken the surgical-scope claim and forced a scope-expand flag to Aen. Brunel made the same call by declining his own forward-reference suggestion ("preserve surgical-scope"). Pattern: when the surgeon offers two paths, the more-surgical one preserves the contract with the dispatcher.
+[DEFERRED — Cal queue, Aen-routed] (1) Batched-iterate-on-multi-reviewer discipline; (2) Producer-side-staleness pattern; (3) wiki refresh at `wiki/patterns/three-layer-substrate-truth-discipline.md` lines 77+167+201 (stale post-Amendment-4). Aen surfaces to Cal; not for me to file directly.
 
-[LEARNED] **Producer/consumer field-set-lock creates stale-back-reference burden on producer.** The amendment cross-LINKS the canonical wiki entry rather than re-deriving the three-layer model. This produces field-set lock: prompt is consumer, wiki is producer, both reference the same definitions. ALSO produces post-amendment staleness on the producer side: wiki lines 77 + 167 + 201 still describe Hopper's prompt as "Layer 1 only" — now stale post-Amendment-4. **Three-party-independent-surfacing signal:** Celes surfaced in close-out, Aen surfaced in 13:32 accept message, Brunel surfaced in landing-confirmation — three independent surfacings of the same producer-side text drift = strong signal staleness is structurally inevitable when amending cross-link-target, not Celes-specific oversight. Cal-routed; Aen surfaced as wiki-grade candidate (companion to batched-iterate).
+[DEFERRED] Path-convention substrate for mvox-dev (`~/projects/entu-research/`, `~/workspace/...`) — held pending PO ruling on Medici's twin Flag (S33+). Mine + Medici's + Pérotin's L127-130 + 4 other prompts + 3 memory files + startup.md all move together when PO rules.
 
-[LEARNED — Aen-named] **Recursive-discipline-stress-test closure-loop.** Hopper's author-of-record sign-off included observation that the discipline she just signed off on documents the posture she's currently in (mid-arc on task #6 apex DEV db tunnels). Amendment stress-tested against live operational case in same window it shipped — real-world n=1 validation, not retrospective. Pattern shape: when amendment lands during active dispatch arc by the author-of-record, the arc itself becomes the first verification surface. Pattern title: "amendment-shipped-mid-operation = built-in stress-test surface."
+[DEFERRED] Comenius prompt design improvements (escalation subsection + items 2-6 from S33+) — opinion only, PO discretion.
 
-[LEARNED] **Date-perception calibration on multi-day Phase windows.** Brunel's response surfaced 3-day delay from S35 start (2026-05-22) to landing (2026-05-25). My session-internal time-perception had collapsed elapsed time. Corrective: when joint-review messages reference "X days ago", treat as substrate-truth over my own elapsed-time estimate.
+[DEFERRED — pre-S35] Brief-scope-conflation pattern (S32 Cal queue): NEW failure-mode entry, not yet submitted.
 
-[CHECKPOINT — Hires Delivered cumulative] No new hires this session. Phase B is amendment work, not hiring. Cumulative still **61 agents across 13 teams** (last update post-Hopper deployment 2026-05-20).
+[DEFERRED] All-opus burn-rate posture for esl-legal — PO may downshift specialists to sonnet on dormant re-spawns. Flag for case#2.
 
-[CHECKPOINT] Aen approved archival of `designs/new/hopper-amendment-4/` after this session's commit — staged draft serves as audit trail of the joint-review pass. Aen's commit handles housekeeping; not for me to delete proactively.
-
----
-
-## Active deferred (carry-forward to S36)
-
-[DEFERRED] **Brunel-side parallel amendment to `prompts/brunel.md` §Diagnostic Discipline — Read Your Own Deployed Artifacts** (lines 123-129, Layer-1-only same gap as Hopper had pre-Amendment-4). Aen QUEUED at 2026-05-25 13:32 — separate Celes-dispatch when ready, not S35. Joint-review pattern: Brunel author-of-record (his own prompt); me as cross-author; Hopper as cross-reviewer for symmetry. Same surgical-scope discipline shape as Amendment-4. **S36 standing watch.**
-
-[DEFERRED] **Hopper-Amendment-5 candidate (Layer-0-library-first discipline)** — surfaced by Hopper 11:12 on 2026-05-25 from task #6 (apex DEV db tunnels) dispatch arc. Filed by Hopper as separate-amendment-pass candidate per our batched-iterate compact; pending task #6 verification PASS + catalyzing-incident materialization. Track in next-session reorientation; surface if Aen or Hopper routes a future amendment-pass after task #6 closes.
-
-[DEFERRED — Cal queue, surfaced by Aen] Two of my S35 [LEARNED] entries elevated to Cal-grade wiki candidates per Aen 13:32: (1) Batched-iterate-on-multi-reviewer discipline; (2) Producer-side-staleness pattern (when amending a consumer, check the producer for back-references). Aen surfaces to Cal at her next spawn; not for me to file directly.
-
-[DEFERRED — Cal queue] Wiki refresh at `wiki/patterns/three-layer-substrate-truth-discipline.md` lines 77 + 167 + 201 (post-amendment producer-side back-references now stale). Aen routed; Cal batches with C1+E1 queue.
-
-[DEFERRED] Path-convention substrate question for mvox-dev (`~/projects/entu-research/`, `~/workspace/...`) held pending PO ruling on Medici's twin Flag (S33+). Mine and Medici's prompt/memory-side edits both wait on same root cause.
-
-[DEFERRED] Comenius prompt design improvements (item 1: escalation subsection; items 2-6 from S33+ 13:23 opinion) — not requested as edits last session, just opinion. PO may pick them up later.
-
-[DEFERRED — pre-S35 carry-forward] Brief-scope-conflation pattern (S32 Cal queue): NEW failure mode entry — not submitted yet, carry into next.
-
-[DEFERRED] All-opus burn-rate posture for esl-legal. PO may want to downshift specialists to sonnet on dormant-between-cases re-spawns. Flag for case #2.
-
-[DEFERRED — Aen prompt latent gap] `prompts/aeneas.md:43` restricts `Edit/Write` to `memory/` + roster, but team-lead routinely edits prompts. Non-urgent per Aen's own message — queue for post-session prompt-revision pass. Not a simple MAY WRITE addition; Aen's prompt has distinctive FORBIDDEN/ALLOWED structure and fix needs design round.
-
-[DEFERRED] Pérotin's `~/workspace/...` startup paths (L127-130 mvox-dev) NOT touched in S33+ per Aen's explicit hold. When PO rules on the path convention, those 4 lines + 4 other prompts + 3 memory files + startup.md all move together.
+[DEFERRED — Aen prompt latent gap] `prompts/aeneas.md:43` restricts Edit/Write to `memory/`+roster but team-lead routinely edits prompts. Non-urgent; needs design round (distinctive FORBIDDEN/ALLOWED structure), not a simple MAY WRITE addition.
 
 ---
 
@@ -82,76 +58,48 @@
 
 [DECISION] Single-provider for governance/coordination/XP pipeline roles. Multi-provider only for (1) capability gaps (vision) and (2) fire-and-forget mechanical roles (Eilama-class).
 
-[PATTERN] **Pass 1 / Pass 2 separation discipline** for terminology renames. Pass 1 = prose/documentation language ships immediately. Pass 2 = machine identifiers (filenames, frontmatter values, agentType, TS literals) ship as coordinated batch with all consumers updated together. Default to **prose-only Pass 1** unless explicitly told otherwise. Cal-filed at `wiki/patterns/pass1-pass2-rename-separation.md`.
+[PATTERN] **Pass 1 / Pass 2 rename separation.** Pass 1 = prose ships immediately; Pass 2 = machine identifiers ship as coordinated batch with all consumers. Default prose-only Pass 1. Cal-filed `wiki/patterns/pass1-pass2-rename-separation.md`.
+[PATTERN] **Within-document rename grep discipline.** Grep ALL references, re-grep after edit, zero hits the only acceptable result. Cal-filed (cross-credited).
+[PATTERN] **Protocol shapes are typed contracts, not prose.** Cross-read producer + consumer specs before merging a protocol change. Brunel-filed.
+[PATTERN] **Scope-block drift from practice.** Cross-read MAY WRITE against prompt body + accepted artifacts. Scope block written LAST; every path in body must appear in MAY READ/WRITE. Cal-filed `scope-block-drift-from-practice.md` (n=3).
+[PATTERN] **Dual-team-dir ambiguity** — `teams/<team>/` in both `$HOME/.claude/` (ephemeral) and `$REPO/.claude/` (durable). Anchor bare paths. Cal-filed; Path Convention section in cross-dir prompts.
+[PATTERN] **Cross-read gate pays compound interest.** Reviewer catches structural bugs the author can't see. Apply at protocol-shape, design, and prompt-amendment time.
+[PATTERN] **Convergent independent design = strong adopt signal.** Two specialists converging from different routes > either alone.
+[PATTERN] **Throttling vs delegation distinction.** Don't decline to surface; but delegating through someone whose workflow fits better is fine.
+[PATTERN] **Named concepts beat descriptive phrases.** Coin a name, define once, reuse.
+[PATTERN] **Active dual-sourcing defense.** Same content in common-prompt + per-role prompt is intentional (specialists never read each other's prompts); coordinated 2-file edits cheaper than silent drift.
+[PATTERN] **Brilliant-first / toolkit-first context-read ladder.** Query Brilliant for context before opinion; read a toolkit's README+prompt+sample-output before extending it.
+[PATTERN] **Lore-fit: structural beats thematic.** Structural fit (Pérotin atop Léonin) produces behavioral payoff; thematic fit leaves role energy unclaimed.
+[PATTERN] **Sonnet-fit calibration.** Downgrade only when judgment calls are clear-criteria AND escalation paths crystal.
+[PATTERN] **Promotion as label vs behavioral change.** Scan for contradictions with prior status + missing "between dispatched work" framing.
+[PATTERN] **Naming heuristic — domain-named-tradition over language-tiebreak when domain has one.** Cal-submitted (esl-suvekool + esl-legal).
+[PATTERN] Team archetypes: Research / Development / Hybrid (+ candidates: Operational [esl-suvekool], Adversarial-Research [esl-legal red-team `[ADVERSARY-FLAG]`], Long-lived-per-domain-research-support [esl-legal, case-driven, dormant between cases]).
+[PATTERN] **Cross-team author attribution edge case.** Files authored by another team's member keep original trailer unless substantially rewritten; cross-check host CLAUDE.md.
+[PATTERN] Model tier driven by **consequence of error**, not complexity. Opus when no automated quality gate; sonnet when tests catch errors.
+[PATTERN] Data flow (pipeline vs independent-output) determines isolation. Pipeline → trunk + directory ownership. Independent → branch/worktree safe.
+[PATTERN] "Agent PO" is anti-pattern — PO is always human; agent = "Requirements Analyst" with explicit escalation rules.
+[PATTERN] Staging for cross-FR-team drafts = FR repo root `designs/new/<team-slug>/`; internal-to-FR stays under `teams/framework-research/`.
+[PATTERN] Inbox files created at registration, not lazily. **Spawn-order: spawn-by-message-direction trumps spawn-by-data-dependency.** Service roles (Librarian, team-lead) spawn first.
+[PATTERN] **"Why this section exists" documentation** — name the incident in the section so future readers don't delete it as redundant.
+[PATTERN] **"Credit the gate, not the gate-runner"** (Brunel) — design good gates, trust them, don't rely on heroism.
+[PATTERN] **Convention adopted before Phase 2 = retroactive telemetry.** Adopt structured markers early even when telemetry isn't active.
+[PATTERN] Almost everything is behavioral/prompt-enforced, not infrastructure. Real incidents drive design. `spawn_member.sh` > Agent tool for model-tier correctness. Coordination boundary tables for adjacent-domain agents.
 
-[PATTERN] **Within-document rename grep discipline.** When renaming a field/identifier, grep ALL references not just declaration site; re-grep after edit; zero hits is only acceptable result. Cal-filed at `wiki/patterns/within-document-rename-grep-discipline.md` (cross-credited).
-
-[PATTERN] **Protocol shapes are typed contracts, not prose.** A terse field-omitting form produces silent breakage at downstream behaviors. Cross-read producer-side and consumer-side specs before merging any protocol change. Brunel-filed.
-
-[PATTERN] **Scope-block drift from practice.** Detect via cross-read MAY WRITE against (a) prompt's own body instructions and (b) accepted artifacts by that agent. Scope block is written LAST in any new prompt; every path referenced in body must appear in MAY READ/MAY WRITE. Cal-filed at `wiki/patterns/scope-block-drift-from-practice.md` (n=3).
-
-[PATTERN] **Dual-team-dir ambiguity** — `teams/<team>/` exists in both `$HOME/.claude/` (ephemeral runtime, TeamCreate-managed) and `$REPO/.claude/` (durable). Bare relative paths must be anchored. Cal-filed at `wiki/gotchas/dual-team-dir-ambiguity.md`. Path Convention section in every prompt with cross-dir paths.
-
-[PATTERN] **Cross-read gate discipline pays compound interest.** Reviewer catches structural bugs the author cannot see because they wrote the structure. Apply at protocol-shape time, design-time, and prompt-amendment time alike.
-
-[PATTERN] **Convergent independent design = strong adopt signal.** When two specialists converge from different routes, evidence is stronger than either alone. Adopt without hesitation.
-
-[PATTERN] **Throttling vs delegation distinction.** "Don't preemptively self-throttle" means don't decline to surface; it does NOT mean "always submit yourself, never let others surface on your behalf." Delegating through someone whose workflow fits better is fine.
-
-[PATTERN] **Named concepts beat descriptive phrases.** When describing a concept with multi-word phrase more than once, coin a name, define it once, use it thereafter. Citable, reusable, harder to misremember.
-
-[PATTERN] **Active dual-sourcing defense.** Same content in two places (per-team common-prompt + per-role prompt) is intentional, not a DRY violation — specialists never read each other's prompts; coordinated 2-file edits are cheaper than silent drift. Defend when challenged.
-
-[PATTERN] **Brilliant-first / toolkit-first context-read ladder.** When designing teams that touch external orgs/people/projects, query Brilliant for context BEFORE forming opinion. When a role's scope claim says "extends existing toolkit X," READ the toolkit's README + active prompt + sample output BEFORE drafting.
-
-[PATTERN] **Lore-fit: thematic vs structural.** Structural fit (Pérotin=layered organum atop Léonin's chant) produces behavioral payoff. Thematic fit (Comenius=multilingual education) produces competent prompts but leaves role's energy unclaimed.
-
-[PATTERN] **Sonnet-fit calibration.** Model-tier rightness = (a) judgment-load shape + (b) escalation-path articulation. Downgrade to Sonnet only when judgment calls are clear-criteria AND escalation paths are crystal.
-
-[PATTERN] **Promotion as label vs promotion as behavioral change.** Scan for contradictions with prior status; scan for missing "between dispatched work" framing; only when both are clean does the promotion mean something behavioral.
-
-[PATTERN] **Naming-heuristic — domain-named-tradition over language-tiebreak when domain has one.** Cal-submitted from esl-suvekool (Estonian musical figures, language ruled) + esl-legal (Roman jurists, domain ruled).
-
-[PATTERN] **Long-lived per-domain research support unit** archetype (esl-legal). Case-driven activation, domain-specific knowledge accumulation, dormant between cases. n=1 watch; promotion trigger n=2 from different domain.
-
-[PATTERN] **Operational team archetype** (esl-suvekool). Persistent roster, episodic sessions, deliverables are drafts-for-PO-to-send. No `tdd-pipeline.md`. n=1; promote on n=2.
-
-[PATTERN] **Adversarial research team archetype** (esl-legal). Built-in red-team specialist who STEALS the case against the team's defense. `[ADVERSARY-FLAG]` annotations must be addressed by Editor before delivery. Distinct from Cathedral-lite PURPLE which audits the build.
-
-[PATTERN] **Cross-team author attribution edge case.** Files originally authored by another team's member keep the original trailer (`(*FR:Celes*)`) unless substantially rewritten. Cross-check host project's CLAUDE.md before flagging attribution surfaces for ruling.
-
-[PATTERN] Almost everything is behavioral/prompt-enforced, not infrastructure. Real incidents drive design.
-[PATTERN] `spawn_member.sh` > Agent tool for model-tier correctness.
-[PATTERN] Coordination boundary tables (section ownership + handshake protocol) for agents sharing adjacent domains.
-[PATTERN] Model tier driven by **consequence of error**, not task complexity. Opus when no automated quality gate; sonnet when tests catch errors.
-[PATTERN] Three team archetypes: Research, Development, Hybrid (+ Operational, Adversarial-Research, Long-lived-per-domain-research-support as candidates).
-[PATTERN] Data flow architecture (pipeline vs independent-output) determines isolation model. Pipeline → trunk + directory ownership. Independent → branch/worktree safe.
-[PATTERN] "Agent PO" is anti-pattern — PO is always human. Agent should be "Requirements Analyst" with explicit escalation rules.
-[PATTERN] Staging area for cross-FR-team drafts is FR repo root `designs/new/<team-slug>/`, not under `teams/framework-research/`. When designing internal-to-FR artifacts, stay under `teams/framework-research/`.
-[PATTERN] Inbox files created at registration, not lazily. Lost-message-has-no-recovery if a sender tries to message a destination before the destination's `<name>.json` inbox file exists. **Spawn-order rule: spawn-by-message-direction trumps spawn-by-data-dependency.** Service roles (Librarian, team-lead) spawn first.
-[PATTERN] **"Why this section exists" documentation.** When a prompt section exists because of a specific incident, name the incident in the section itself. Prevents future readers from deleting as "looks redundant."
-[PATTERN] **"Credit the gate, not the gate-runner"** (Brunel framing). Design good gates and trust them rather than relying on individual heroism.
-[PATTERN] **Convention adopted before Phase 2 = retroactive telemetry.** Any structured marker (frontmatter, tags, message prefixes, bracket tags) adopted consistently before Phase 2 activation builds passive data substrate. Build telemetry-shaped conventions early even when telemetry isn't active.
-
+[GOTCHA] **Arhitecture repo (Eesti-Raudtee) = pull-only for mitselek account** (push:false). Can't open PRs by push; use issue route or hand patch to a write-capable account. Default branch `master`. arch-docs MCP indexes 500 docs (`search_docs`/`get_doc`/`list_index`).
 [GOTCHA] Count **characters**, not roles-plus-characters. Team-lead IS one of the characters.
-[GOTCHA] `TeamCreate`/`TeamDelete` are first-class harness tools, bare names — NOT `mcp__teamwork__*`. Grep existing canonical startup.md drafts before writing the section.
-[GOTCHA] Read-side git permissions for curator/librarian/cross-session-aware roles — `log`, `diff`, `status` by default.
-[GOTCHA] Inbox persistence belongs repo-side from day 1 (FR Volta pattern verbatim with TEAM_NAME hardcoded for single-team repos; scripts at repo root).
-[GOTCHA] Long-lived team prompts must be case-agnostic; case paths live in `cases/<slug>/README.md`. Audit team-config for hardcoded case identifiers when designing a long-lived team; only `roster.json` and `README.md` may reference first case by name.
+[GOTCHA] `TeamCreate`/`TeamDelete` are first-class harness tools, bare names — NOT `mcp__teamwork__*`.
+[GOTCHA] Read-side git perms (`log`/`diff`/`status`) for curator/librarian/cross-session roles by default.
+[GOTCHA] Inbox persistence repo-side from day 1 (Volta pattern, TEAM_NAME hardcoded for single-team repos).
+[GOTCHA] Long-lived team prompts must be case-agnostic; case paths in `cases/<slug>/README.md`. Only roster.json + README may name the first case.
 [GOTCHA] When two specialists co-own a question, the file boundary must be in design-spec AND both prompts.
-[GOTCHA] Dropping a role requires updating TWO files: `roster.json` AND `common-prompt.md` members list. Easy to miss the second.
-[GOTCHA] Brilliant `session_init` and broad `search_entries` overflow output limit. Use `logical_path` filters and tight queries; read overflow via grep/sed.
+[GOTCHA] Dropping a role updates TWO files: `roster.json` AND `common-prompt.md` members list.
+[GOTCHA] Brilliant `session_init` + broad `search_entries` overflow output limit. Use `logical_path` filters + tight queries.
 
 ---
 
-## Hires Delivered (cumulative — 61 agents across 13 teams)
+## Hires + earlier-session detail — in git history
+61 agents / 13 teams cumulative; latest Hopper (FR Deploy Op, 2026-05-20 `25094d1`); no new hires S35-S42 (amendment + consultancy work). FR S29-S41 detail (Hopper-Amendment-4 S35, esl-suvekool/esl-legal deploys, mvox-dev audit, S41 Arhitecture consultancy) in git log. Durable patterns folded into Standing Decisions above.
 
-Full table + per-team session detail in git history. Latest: Hopper (FR Deployment Operator, 2026-05-20 commit `25094d1`).
-
----
-
-## Earlier session detail — in git history
-
-Detailed session logs for FR S29-S34, Eratosthenes deployment (2026-04-13), apex-research Librarian replication, esl-suvekool deployment (2026-05-01), esl-legal deployment (2026-05-13), mvox-dev prompt audit (2026-05-20), Hopper design + deployment (2026-05-19→20) are in git history of this file. The durable patterns from those sessions are folded into the Standing Decisions / Patterns section above.
+[FOR CAL QUEUE — S42 substrate, n=2 anomalies one run]: (1) peer-DM (agent→celes) delivery LAG/stall, high-variance (live channel ~4hr late; inbox-file copy earlier) → "disk inbox JSON ≠ delivery truth"; worktree-spawn-asymmetry cluster. (2) task-list STATE LOSS — TaskList returned empty for BOTH celes + team-lead mid-session (tasks #1/#2 vanished); different subsystem, same run. Both → Cal when he next spawns.
 
 (*FR:Celes*)

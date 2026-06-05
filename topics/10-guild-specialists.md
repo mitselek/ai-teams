@@ -76,6 +76,32 @@ The framework-research team (S41) ran a controlled trial of this pattern:
 - **Gap-detection results:** all 5 personas flagged `[GAP]` correctly (EN 50716, NIS2/ISO/KüTS, Workers failure modes, missing kata). Zero fabricated citations. 5 atomic issues filed ([#4](https://github.com/Eesti-Raudtee/Arhitecture/issues/4)–[#8](https://github.com/Eesti-Raudtee/Arhitecture/issues/8)) for persona improvements.
 - **Synergy results:** designed pairings (Beck⟷Bach, Leveson⟷Anderson) produced consensus findings neither lens would reach alone. Full trial: [review gist](https://gist.github.com/mitselek/a20d0be7ae193c8266725880005aa4a6).
 
+## Evidence — S42 round-2 re-review (the pattern validated) (*FR:Celes*)
+
+S41 validated the *personas*; S42 round 2 validated the *pattern*. After the PR authors addressed the round-1 findings, the framework-research team re-reviewed [PR #45](https://github.com/Eesti-Raudtee/dev-toolkit/pull/45) and [PR #46](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46) — but this time with a controlled change to isolate the key question.
+
+**Hypothesis:** do **prompt-encoded** competency gates + synergy wiring (the persona improvements merged as [#4](https://github.com/Eesti-Raudtee/Arhitecture/issues/4)–[#8](https://github.com/Eesti-Raudtee/Arhitecture/issues/8)) produce review quality equivalent-or-better than **ad-hoc Celes briefing** — i.e. does the consultancy role have to intervene *per engagement*, or only *per setup*?
+
+**Treatment difference (the experiment's whole point):** round 1 = one agent embodying all five personas in a single context, with consultancy-designer memory present, ad-hoc pairing briefs. Round 2 = **five independent fresh-context agents**, each reading only its merged retainer prompt + a thin dispatch brief (a contamination guard forbade reading any consultancy memory/docs), gates + synergy **prompt-encoded not briefed**, and the gap-reaction Action-2 delivered via the dispatch brief (not yet prompt-encoded). Full rubric + reviews: [gist](https://gist.github.com/mitselek/a20d0be7ae193c8266725880005aa4a6); scoring at `teams/framework-research/docs/2026-06-05-round2-retro-rubric.md`.
+
+**Result: HYPOTHESIS CONFIRMED — the consultancy role is SETUP-ONLY, not per-engagement.**
+
+- **All 5 reviewers APPROVE, with per-finding dispositions verified against the actual diffs** (resolved / partial / deferred, not rubber-stamps). Three reviewers went *deeper* than round 1 from the prompts alone.
+- **Zero fabrication, 5/5 — including the two highest-fabrication-risk lenses** (Leveson on a regulated standard; Anderson, whose round-1 fabricated-URL failure originally motivated the competency-gate work). The regression test that mattered most passed.
+- **Both designed consensus signals reproduced from genuinely independent contexts** (Beck⟷Bach "characterization tests pin bugs"; Leveson⟷Anderson `security_level`/`safety_related` conflation check) — not manufactured by a single embodying context.
+- **Gap-reaction Action 2 fired behaviorally 4/4 where a gap existed** — the specialists really filed retainer-repo issues ([#10](https://github.com/Eesti-Raudtee/Arhitecture/issues/10)–[#13](https://github.com/Eesti-Raudtee/Arhitecture/issues/13)) the moment they hit unbacked claims, delivered purely through the dispatch brief. The self-correcting loop (design component 4) is now demonstrated end-to-end, not just specified.
+
+### The synergy result is stronger than "designed pairings reproduced"
+
+The design wired two pairings (Beck⟷Bach, Leveson⟷Anderson). Both reproduced. But a **third, *undesigned* pairing also emerged: Booch⟷Leveson.** Booch's structural lens (which explicitly *defers* safety content to Leveson) caught that the safety-evidence `if/then` lives inside a `scope` object that isn't schema-required — so omitting `scope` bypasses the very safety enforcement Leveson had verified as resolved. Neither reviewer was told to cover the other's axis; the cross-lens coverage emerged purely from prompt-encoded lens-discipline (each persona staying in its lane and flagging structurally-adjacent holes). This is the deeper claim for the pattern: **prompt-encoded specialization produces emergent cross-coverage, not just the coverage you wire.** It is also a caution — emergent crosses are not guaranteed, so the consultancy's setup still matters for the *predictable* pairings.
+
+### Honest caveats (carried so the result isn't over-claimed)
+
+- **Substrate uncontrolled:** round 2 ran on a newer model generation than round 1 (opus-4.8 vs 4.6-era). The *directional* verdict (prompt-encoded gates are sufficient; consultancy = setup-only) is robust to this, but we do **not** claim a precise round-over-round quality delta attributable to the prompts alone — model uplift is a confound.
+- **Delivery substrate:** the spawned-agent→consultancy report vector showed high-variance delivery lag/stall (one report ~15 min late, four stalled in the on-disk inbox without surfacing). "Disk inbox file ≠ delivery truth." A guild at scale needs a reliable retainer→consultancy report channel; the git/worktree isolation that works for parallel *work* does not fix harness inbox cross-boundary *delivery*.
+
+**Implication for the design:** the consultancy (Celes-shaped role) is a **per-setup** investment — build the retainer prompts with gates + synergy + the gap-reaction protocol once, and the pool dispatches without per-engagement re-engineering. This sharpens the "Retainer quality assurance" open question below: the high-value consultancy work is the one-time prompt engineering and the competency-backend curation, not babysitting each review.
+
 ## Open questions
 
 - **Competency backend ownership at scale:** who pays the cost of obtaining and indexing external source docs (EN 50716, NIS2 directive text, ISO 27001 Annex A)? The domain owner? The consultancy? The client who needs the gap closed?

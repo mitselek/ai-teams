@@ -1,6 +1,84 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-05 — session-41 → session-42
+### [NEXT SESSION] 2026-06-05 — session-42 → session-43
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S43 read):**
+
+- **State of play:** S42 closed 2026-06-05 (~12:10–13:45, single session, ran on Opus 4.8 one-off — roster intent stays 4.6, re-run Step 0.5 gate at S43 start). **#73 re-review experiment executed end-to-end and CONFIRMED:** prompt-encoded gates + synergy wiring produce equivalent-or-better reviews than ad-hoc Celes briefing — guild-specialist consultancy is SETUP-ONLY. 5 independent fresh-context reviewers (Option A), 5/5 zero fabrication, both wired consensus pairs reproduced independently, PLUS emergent unwired Booch⟷Leveson cross (FINDING-6 schema bypass, verified real). D7 Action-2 fired 4/4 live → [Arhitecture #10–#13](https://github.com/Eesti-Raudtee/Arhitecture/issues/10). Posted: [PR #45 comment](https://github.com/Eesti-Raudtee/dev-toolkit/pull/45#issuecomment-4630259710) + [PR #46 comment](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4630260113) + gist a20d0be updated + topic 10 evidence section. Phase-1 assessment found Action-2 silently dropped from all 5 merged prompts → [Arhitecture #9](https://github.com/Eesti-Raudtee/Arhitecture/issues/9) filed.
+- **3 substrate anomalies in one run (Cal filing candidates, details in S42 wrap + celes.md carry-forward):** (1) peer-DM delivery lag/stall, high variance, + "inbox JSON file ≠ delivery truth"; (2) task-list full state loss mid-session (tasks #1/#2 vanished for both lead and specialist); (3) idle wake-churn loop (7+ empty wakes/min on celes post-flush; resolved by graceful shutdown). Plus a live Wiki-115 instance: v2/v3 dispatch-doc treatment divergence (SPAWNED-VERSION NOTE in round2-dispatch-briefs doc).
+- **NEW issue [#74](https://github.com/mitselek/ai-teams/issues/74):** reflexive competency gap analysis on FR's own roster (PO directive). Owner suggestion: Celes + Medici second lens. Future session.
+- **Open external dependencies:** Arhitecture #9 (Action-2 prompt patch, uniform across 12 gate-bearing personas) + #10–#13 (procurement gaps). Round-3 candidate hypothesis parked: panel expansion with bonus-8 personas (deliberate run, not bolt-on).
+- **All S41 watch items carry forward unchanged** — TPS-601 (no assignee), ITSD-38884, article draft awaiting Schliemann, ghost-bridge auto-restart gap, A1 evidence-cycle audit S40-42 (due!), S35 standing watch, TPS-583/mVox-dev/Manager-team dormant. **Retro rubric watch item RESOLVED** — filled at `docs/2026-06-05-round2-retro-rubric.md`.
+
+---
+
+## SESSION 42 WRAP — 2026-06-05 (#73 re-review experiment end-to-end: guild-specialist pattern CONFIRMED; consultancy = setup-only; 3 substrate anomalies)
+
+**Spans:** 2026-06-05 ~12:10 → ~13:45. Single session, ~1.5h active. Parent on Opus 4.8 (one-off exception, PO-sanctioned; roster intent stays 4.6).
+
+**Outcome:** #73 executed in full. Phase 1: Celes assessed Arhitecture #4-#8 merges — all 5 personas substantially adopted, zero divergence, ONE systematic omission (gap-reaction Action 2 dropped from all 5; root cause: protocol was last-comment on each issue, implementer worked from bodies) → Arhitecture #9 filed with per-persona patch text. Phase 2: Option-A mechanism (5 fresh-context background agents, verbatim-auditable briefs, contamination guard) — Celes caught the embodiment confound herself and surfaced it instead of guessing. Result: **HYPOTHESIS CONFIRMED** — 5/5 correct dispositions, 5/5 zero fabrication (incl. Anderson, the round-1 fabricator), both wired consensus pairs (Beck⟷Bach bug-pinning, Leveson⟷Anderson conflation) reproduced from independent contexts, 3 reviewers went DEEPER than round 1 (booch FINDING-6 scope-omission schema bypass — verified real; leveson ran validator on 7 edge cases; anderson caught documented-vs-enforced enum). D7 Action-2 via dispatch: 4/4 filed live at hit-time (#10-#13, all verified open). PO mid-run override: arch-docs MCP whitelisted → uniform post-submission Phase-2b re-verification (all GAPs survived; bach honestly refined his). Published: PR #45/#46 panel comments, gist updated, topic 10 evidence section + emergent-unwired-pairing subsection.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `docs/2026-06-05-persona-improvement-assessment.md` | NEW | Celes | 5×substantially-adopted verdict table; Action-2 omission root-cause |
+| [Arhitecture #9](https://github.com/Eesti-Raudtee/Arhitecture/issues/9) | NEW | Aen (Celes patch text) | Action-2 one-line append, uniform across 12 gate-bearing personas |
+| `docs/2026-06-05-round2-dispatch-briefs.md` | NEW | Celes | Verbatim spawn text + SPAWNED-VERSION NOTE (live Wiki-115 instance) |
+| 5 round-2 reviews | NEW | beck/bach/booch/leveson/anderson | Fresh-context agents; ~3 min each; D4 held at speed |
+| [Arhitecture #10-#13](https://github.com/Eesti-Raudtee/Arhitecture/issues/10) | NEW | reviewers (live Action-2) | kata / Workers-failure-modes / regulatory sources / EN 50716 |
+| `docs/2026-06-05-round2-reviews-collected.md` | NEW | Celes | Verbatim bodies + per-review scoring + FINDING-6 synthesis |
+| `docs/2026-06-05-round2-retro-rubric.md` | NEW | Celes | D1-D8 filled, round 1 vs round 2 side-by-side, CONFIRMED verdict |
+| [PR #45](https://github.com/Eesti-Raudtee/dev-toolkit/pull/45#issuecomment-4630259710) + [PR #46](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4630260113) panel comments | NEW | Celes (assembler) | FINDING-6⟷Leveson-HIGH cross visible, assembler-judgment attribution |
+| topics/10-guild-specialists.md | M | Celes section in Aen doc | Round-2 evidence + consultancy=setup-only + unwired-pairing subsection |
+| [mitselek/ai-teams #74](https://github.com/mitselek/ai-teams/issues/74) | NEW | Aen | Reflexive competency gap analysis on FR roster (PO directive) |
+| memory/celes.md | M | Celes | Trimmed ≤100 lines; 3 substrate anomalies in carry-forward FOR CAL |
+
+### Decisions (PO-ratified)
+
+[DECISION — S42] **Run round 2 as-is + Action-2 via dispatch.** PO: "we personally inform every hire to file GAP issues as soon as they hit them." Rescued the Action-2 behavioral signal (scored as dispatch-layer, not prompt-encoded). Same-5 composition (PO pre-sanctioned; A/B comparability decisive).
+
+[DECISION — S42] **Option A mechanism.** 5 independent fresh-context agents — Celes embodying would re-inject the designer-memory variable the experiment removes. Mechanism delta vs round 1 IS the treatment definition.
+
+[DECISION — S42] **arch-docs MCP whitelisted mid-run (PO override).** Landed post-submission → uniform Phase-2b verification layer; avoided split-instrument. All GAP claims survived MCP cross-check.
+
+[DECISION — S42] **Guild-specialist verdict: prompt-encoded gates + synergy sufficient; consultancy = one-time setup, not per-engagement.** Directional only — 4.8-vs-4.6 substrate uncontrolled, no precise quality-delta claim.
+
+### Substantive learnings
+
+[LEARNED — framework, promotion-grade] **The pattern survives transfer to independent instruments.** Gates+synergy held in fresh contexts with no designer memory; emergent UNWIRED cross (Booch⟷Leveson: structural lens caught a safety-axis hole booch defers on content) is stronger evidence than reproduced wired pairs — cross-lens coverage appeared without anyone designing it.
+
+[LEARNED — process] **Two-action protocols die in comment threads.** Action-2 was dropped from all 5 merges because it arrived as the last issue comment; implementers work from bodies. Put protocol-complete text in the issue body or expect silent partial adoption.
+
+[LEARNED — substrate, Cal-grade ×3] **(1) Peer-DM delivery lag, high variance** (minutes→hours on spawned-agent→spawned-agent vector; spawner↔agent fine) + **inbox JSON file ≠ delivery truth** (delivered msg never appeared in file; undelivered sat flagged unread). **(2) Task-list full state loss** mid-session (both tasks vanished, lead + specialist views). **(3) Idle wake-churn loop** post-backlog-flush (7+ empty wakes/min; graceful shutdown resolves). All n=1, same session, three subsystems.
+
+### Standing watch items going into session 43
+
+- **All S41 watch items carry forward** — TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, A1 evidence-cycle audit (S40-42 window — now DUE), S35 standing watch, Aen amendment Part C, TPS-583/mVox-dev/Manager-team dormant.
+- **RESOLVED:** retro rubric (filled); #73 (closed by this session — close the GitHub issue if not yet done).
+- **NEW — #74 reflexive gap analysis** — future session, Celes+Medici.
+- **NEW — Arhitecture #9 patch adoption + #10-#13 procurement** — external; round-2 follow-ups ride on them.
+- **NEW — Round-3 candidate:** panel expansion (bonus-8 personas) as deliberate separate run.
+- **NEW — 3 substrate anomalies → Cal queue** (sources: this wrap, celes.md carry-forward, briefs-doc SPAWNED-VERSION NOTE).
+
+### NEXT-SESSION BOOT (re-orient instructions for S43)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Re-register ghosts → Restore inboxes → Spawn — wait for PO direction). **Step 0.5 model gate:** roster pins 4.6; S42 ran 4.8 as one-off — verify what PO wants for S43 before TeamCreate.
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S43 read.
+3. **Pull `mitselek-ai-teams` repo** for external scratchpad updates.
+4. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+5. **If PO surfaces wiki/Cal work:** spawn Cal — queue has 3 substrate anomalies (peer-DM lag + inbox-file-not-truth; task-list state loss; idle wake-churn) + the live Wiki-115 instance (v2/v3 treatment divergence). Sources: S42 wrap [LEARNED], celes.md carry-forward, round2-dispatch-briefs SPAWNED-VERSION NOTE.
+6. **If PO surfaces #74 (reflexive gap analysis):** spawn Celes (+ Medici second lens). Issue has the four questions + dual-perspective framing.
+7. **If PO surfaces Arhitecture #9-#13 movement:** #9 merged → personas carry Action-2 prompt-encoded (round-3 could score it as prompt-layer); #10-#13 procurement → re-run affected persona's [GAP] verification.
+8. **If PO surfaces round-3 (panel expansion):** deliberate separate hypothesis — does a larger panel find more? Bonus-8 are gate-wired (commit 16dfcdc8 + #9 patch when merged). New baseline needed; round-2 comparability doesn't extend to new lenses.
+9. **If PO surfaces TPS-601 / ITSD-38884 / article feedback / ghost-bridge watchdog:** unchanged procedures per S41 boot items 6-10.
+10. **A1 evidence-cycle audit is DUE** (S40-42 window closed) — raise with PO if not surfaced.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-05] 2026-06-05 — session-41 → session-42
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S42 read):**
 
