@@ -8,7 +8,7 @@
 - **One deferred task (#8):** bundled post-#74 prompt-edits batch — `kind:external` tags (1b) + G1 (brunel.md missing-artifact surface-back) + C2 (aeneas.md work-hub bilateral wiring). All LOW, Celes proposes diffs / team-lead applies. One review pass.
 - **Substrate anomalies now n≥2 across S42/S43 (Cal filing candidates):** peer-DM delivery lag/stall ("disk inbox ≠ delivery truth") + task-state-loss with stale replays. Both reproduced this session.
 - **All S42 watch items carry forward unchanged** — TPS-601 (no assignee), ITSD-38884, article draft awaiting Schliemann, ghost-bridge auto-restart gap, A1 evidence-cycle audit S40-42 (DUE!), S35 standing watch, TPS-583/mVox-dev/Manager-team dormant. Arhitecture #9-#13 external. Round-3 candidate parked.
-- **#74 closed by this session** — close the GitHub issue if not yet done.
+- **NEW — Arhitecture #1 AC4 (live MCP test) PARKED:** arch-docs MCP at `arch-docs.dev.evr.ee` returning 404 on `/mcp`. Fix MCP, then spawn Anderson against PR #46 (NFR convention, strong regulatory surface). AC3 is fully resolved (all sources catalogued/held). PR #46 still open.
 
 ---
 
