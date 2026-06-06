@@ -1,0 +1,28 @@
+# formula-engine — competency slice (variant: HARRISON)
+#
+# DEFERRED for both formula variants (A/B experiment scope — see ../EXPERIMENT.md and
+# formula-engine-hamblin/competencies.yaml, which is identical). The formula domain is
+# anchored (persona + prompt + synergy) but its competency claims are NOT yet populated.
+# Claims are held deferred so the A/B compares the PERSONA effect, not claim-coverage
+# differences. When populated, BOTH variants draw the SAME generated slice
+# (search_claims(domain="formula")) from the global index — never hand-edited — with a
+# `generated-from: competency-index/formula/ @ <commit>` provenance header (spec §2.2).
+#
+# Known formula-domain material awaiting filing (from Finn's grounding digest, code-anchored
+# in entu/api: utils/formula.js):
+#   - strict RPN, single value stack, left-to-right; operators: variadic reducers (arity 'all'),
+#     fixed-arity, per-value.
+#   - implicit CONCAT appended if the formula doesn't end on a recognized operator.
+#   - single-hop references confirmed in code (token resolution caps at strParts.length === 3).
+#   - rights-bypass confirmed in code (formula field resolution queries Mongo with a direct
+#     private.* projection; does NOT apply getAccessArray/combineRights). Safe for aggregates,
+#     not raw projection.
+#   - output always scalar/string-coerced, never a reference (ObjectId -> String()).
+#   - re-aggregation eventually consistent for _referrer/_child formulas.
+#
+# (*FR:Celes*)
+
+domain: formula
+status: deferred
+variant: harrison
+claims: []

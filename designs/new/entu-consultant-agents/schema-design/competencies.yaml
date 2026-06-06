@@ -1,0 +1,24 @@
+# schema-design — competency slice
+#
+# DEFERRED (this worked-draft scope, PO decision): the schema-design domain is
+# anchored (persona + prompt + synergy) but its competency claims are NOT yet
+# populated. Only data-lifecycle is fully populated in this draft. When populated,
+# this file is a GENERATED slice (search_claims(domain="schema")) from the global
+# index — never hand-edited — with a `generated-from: competency-index/schema/ @ <commit>`
+# provenance header (spec §2.2).
+#
+# Known schema-domain material awaiting filing (from Finn's grounding digest):
+#   - "type is just an entity" — entity types and prop-defs are themselves entities,
+#     mutated via the same POST /entity + DELETE /entity/{id} endpoints.
+#   - add_from (controls where a type may be created); default_parent (auto-added _parent at create).
+#   - reference_query (a STATIC filter string limiting selectable entities in a reference field).
+#   - rights model: _noaccess > _owner > _editor > _expander > _viewer; _noaccess subtracts;
+#     _expander = "can add children".
+#   - type-level _sharing is a PROJECTION CAP (which property values project into domain/public
+#     responses), NOT instance access — instance-level _sharing governs instance accessibility.
+#
+# (*FR:Celes*)
+
+domain: schema
+status: deferred
+claims: []

@@ -1,0 +1,446 @@
+# data-lifecycle — competency slice
+# (*FR:Celes*) — assembled from (*FR:Finn*) harvest (Task #5); schema + sign-off (*FR:Callimachus*).
+
+# PROVENANCE (architecture spec §2.2; shape per Callimachus sign-off). In production this file is a
+# BUILD ARTIFACT — search_claims(domain="data-lifecycle") materialized from the global index, never
+# hand-authored. The machine fields below make the worked-draft state DETECTABLE (not just prose):
+# an auditor or build script reads source-commit:null + generation-status:worked-draft and knows
+# this is the slice it WOULD be, hand-assembled, not a real generated slice.
+generated-from: competency-index/data-lifecycle/
+source-commit: null              # worked-draft — global index store not yet materialized (Argo buy-in pending)
+generation-status: worked-draft  # vs "generated" in production; resolves to a real SHA once the store lands
+generated-at: 2026-06-06
+source-digest: "teams/framework-research/docs/2026-06-06-data-lifecycle-competency-harvest.md"
+note: >
+  In production this is a build artifact (search_claims(domain=data-lifecycle) materialized), never
+  hand-authored. Here it is the slice it WOULD be, hand-assembled from Finn's harvest as a worked
+  draft; source-commit resolves to a real SHA once the index store lands.
+
+# ROLL-UP (derived from the claim bodies below — a view, not a source; must not drift):
+#   18 filed claims = 16 backed + 2 partial (C12 touch-save-recompute, C16 limit-cap → known-gaps G1/G2).
+#   + 2 deferred-as-gaps (G3/G4) NOT filed as claims — filing would over-claim; absence IS the gap.
+#   (NB: Finn's harvest prose header says "13 backed / 3 partial"; the actual claim blocks are
+#    16 backed / 2 partial — flagged to Finn + team-lead. This roll-up reflects the true bodies.)
+roll-up:
+  filed-claims: 18
+  backed: 16
+  partial: 2
+  deferred-gaps: 2   # G3, G4 — see known-gaps; not filed as claims
+
+domain: data-lifecycle
+
+claims:
+  - id: post-appends-never-replaces
+    claim: >
+      POST /{db}/entity/{id} APPENDS a property value; it never updates in place.
+      To change a value you must DELETE the old value-id, then POST the new one.
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: routes/[db]/entity/[_id]/index.post.js"
+        stance: confirms
+        excerpt: "Route desc: 'Add properties to an entity. Does not remove existing properties.'"
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/entu-mutation-wire-shapes-2026-05-20"
+        stance: confirms
+        excerpt: "POST appends. Always DELETE the old value-id before POSTing a replacement. (ratified 43517ac)"
+    verification: { method: spec-derived, date: 2026-06-06, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    status: active
+
+  - id: delete-property-is-soft-delete
+    claim: >
+      DELETE /{db}/property/{id} soft-deletes a single property value (record retained
+      for audit); the entity is re-aggregated automatically. Reversible by re-POSTing the value.
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: routes/[db]/property/[_id]/index.delete.js"
+        stance: confirms
+        excerpt: "Route desc: 'Soft-delete a property. Entity is re-aggregated automatically. Requires editor rights; rights properties require owner rights. _type cannot be deleted.'"
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/entu-mutation-wire-shapes-2026-05-20"
+        stance: confirms
+        excerpt: "DELETE /property/{id} -> {deleted:true}; subsequent GET returns property key absent (not null)."
+    verification: { method: spec-derived, date: 2026-06-06, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    status: active
+
+  - id: no-bulk-mutation-api
+    claim: >
+      Entu has no bulk/batch mutation endpoint. Every property/entity DELETE and every
+      entity POST is a single-{id} operation; mutations at scale are serial calls.
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: routes/ (route tree)"
+        stance: confirms
+        excerpt: "Route tree has only single-{_id} mutation routes; no batch/collection-mutation route exists."
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/entu-mutation-wire-shapes-2026-05-20"
+        stance: confirms
+        excerpt: "No bulk DELETE. DELETE /property/{id1},{id2} returns HTTP 500. All deletes are serial."
+      - type: probe
+        ref: "mitselek/esmuseum-map-app#41 (consult reply)"
+        stance: confirms
+        excerpt: "Verified against live OpenAPI: no comma-list, no batch route, no query-scoped mutation. Serial calls only. (~104k serial DELETEs run in ~87 min)"
+    verification: { method: spec-derived, date: 2026-06-06, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    status: active
+
+  - id: sharing-create-time-escalation-copy
+    claim: >
+      At entity CREATION, if a parent's _sharing is public or domain AND the child does not
+      itself specify _sharing, Entu copies that value onto the new child (escalation only —
+      a parent _sharing of private writes nothing; the child then defaults to private).
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: utils/entity.js (inheritParentProperties)"
+        stance: confirms
+        excerpt: "needsSharing branch: parentSharings includes 'public' -> push _sharing public; else 'domain' -> push domain; parent 'private' -> nothing pushed."
+      - type: probe
+        ref: "mitselek/esmuseum-map-app#41 (Q4 truth table, Pérotin)"
+        stance: confirms
+        excerpt: "Create-time rule (controlled probe): parent public/domain -> copy materialized on child; parent private/absent -> no _sharing written -> child defaults private."
+    verification: { method: spec-derived, date: 2026-06-06, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    status: active
+
+  # C4 + C5 are the deliberate two-clause _sharing split. The mvox handbook §1.5 one-liner
+  # states only C5 and is over-absolute (drops C4). Filed as two claims so neither clause hides.
+  - id: sharing-no-post-creation-propagation
+    claim: >
+      After creation, no mechanic propagates _sharing. An entity with no explicit _sharing
+      resolves to the DEFAULT private regardless of its parent's value; _sharing is NOT
+      inherited via _inheritrights (only _viewer/_expander/_editor/_owner inherit).
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: utils/entity.js (setEntity allowlist) + utils/rights.js (getParentRights)"
+        stance: confirms
+        excerpt: "_sharing and _inheritrights are separate allowlisted types; getParentRights inherits only _noaccess/_viewer/_expander/_editor/_owner — _sharing absent from the inherit set."
+      - type: probe
+        ref: "mitselek/esmuseum-map-app#41 (Pérotin truth table)"
+        stance: confirms
+        excerpt: "parent private + child _sharing deleted + _inheritrights -> child 403 (hidden) because absent resolves to default private, NOT because it inherited."
+      - type: docs
+        ref: "entu/www: PR #13 (closes #12)"
+        stance: confirms
+        excerpt: "'_sharing is not propagated via _inheritrights; an entity with no explicit _sharing defaults to private regardless of its parent's setting.'"
+    verification: { method: spec-derived, date: 2026-06-06, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    status: active
+
+  - id: sharing-value-enum
+    claim: >
+      _sharing accepts exactly one of: public | domain | private. Any other value is
+      rejected with HTTP 400.
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: utils/entity.js (validatePropertyTypes)"
+        stance: confirms
+        excerpt: "if _sharing && !['public','domain','private'].includes(string) -> 400 'Property _sharing value must be public, domain or private'."
+    verification: { method: spec-derived, date: 2026-06-06, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    status: active
+
+  - id: rights-cascade-via-inheritrights
+    claim: >
+      When a child has _inheritrights: true, it inherits _owner/_editor/_expander/_viewer
+      from its _parent(s); multi-parent rights are a UNION, materialized, with inherited
+      entries flagged inherited:true, and _noaccess subtracts.
+    domain: data-lifecycle
+    evidence:
+      - type: src
+        ref: "entu/api: utils/rights.js (getParentRights, combineRights)"
+        stance: confirms
+        excerpt: "getParentRights merges _viewer/_expander/_editor/_owner across parents (union), marks inherited:true; combineRights removes _noaccess references."
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/org-rights-cascade-audit-2026-05-21"
+        stance: confirms
+        excerpt: "Live audit over 6 real orgs + sections + members: _inheritrights:false at org boundary isolates; inside the boundary sections/members inherit. Cascade verdict CLEAN."
+    verification: { method: live-audit, date: 2026-05-21, verifier: pérotin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: inheritrights-type-vs-instance
+    claim: >
+      Setting _inheritrights (or any system property) on a TYPE entity affects the type
+      entity only — existing and future instances carry their own _inheritrights set at
+      their creation. Retroactively changing instances requires a per-instance update pass.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/entu-schema-mutation-handbook (§1.5) + findings/org-rights-cascade-audit-2026-05-21 (Part 2 YELLOW-D4)"
+        stance: confirms
+        excerpt: "organization TYPE entity has _inheritrights=true -> every new instance born with true, requiring a manual flip on each. Sub-op 5 only fixed the 6 existing instances."
+      - type: src
+        ref: "entu/api: utils/entity.js (inheritParentProperties)"
+        stance: confirms
+        excerpt: "Create-time inheritance reads PARENT entities, not the TYPE entity, for _inheritrights/_sharing — type->instance does not propagate these at runtime."
+    verification: { method: live-audit, date: 2026-05-21, verifier: pérotin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  # C9 + C10 are a deliberate two-clause split: "no _id" (C9) and "yet persisted" (C10)
+  # are independently surprising; C10 corrects the naive reading of C9.
+  - id: formula-values-have-no-id
+    claim: >
+      A formula-computed property value has no per-value _id in the entity payload (unlike
+      a regular property value, which always carries an _id). There is no formula property
+      value on the instance to address directly.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q2, Josquin)"
+        stance: confirms
+        excerpt: "member_count_per_section:[{number:0}] and member_count:[{number:50}] — NO _id, vs name:[{_id,string}] which has one."
+    verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: formula-values-persisted-not-live
+    claim: >
+      Despite having no _id, a materialized formula value is PERSISTED on the instance and
+      survives deletion of its source property — it is NOT recomputed on every read. It
+      re-evaluates only on a write to the instance (any non-formula property POST) or a
+      formula-expression change on the prop-def.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q4, Josquin)"
+        stance: confirms
+        excerpt: "DELETE source forename -> name STILL 'Test User' (materialized value survived source deletion). Contradicts the naive 'virtual read' inference from Q2."
+    verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: formula-property-not-directly-writable
+    claim: >
+      POSTing a value directly to a formula property returns 200 (a new property _id is
+      issued) but the formula immediately re-evaluates against current sources and
+      overwrites the direct value — net effect: direct writes to formula properties are
+      silently dropped.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q5, Josquin)"
+        stance: confirms
+        excerpt: "POST name=OverrideName -> 200 + new _id; subsequent GET name=[{string:'Test User'}] — direct write rejected by formula re-eval."
+    verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: touch-save-via-nonformula-post
+    claim: >
+      Because formula values have no addressable _id, the way to trigger formula
+      recomputation on an instance is to POST any non-formula property value back to it;
+      Entu re-evaluates dependent formulas as part of the write/save path.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q2, Josquin)"
+        stance: confirms
+        excerpt: "POST re-asserted name -> 200, new prop _id; mechanism: 'POST any non-formula property; Entu re-runs formula evaluation as part of the write.'"
+    verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
+    confidence: partial
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+    # PARTIAL (honesty downgrade): the probe could not observe recompute end-to-end (dependent
+    # formula was broken at probe time -> value stayed 0). "POST succeeds + rotates _id" is backed;
+    # "triggers recompute" is a reasonable inference needing a fresh post-fix probe (gap G1).
+
+  - id: string-filter-exact-case-sensitive-nfc
+    claim: >
+      The query filter <prop>.string=<value> is an EXACT, case-sensitive match with no
+      substring matching, and the value must be NFC-normalized (NFD-encoded chars return 0).
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q3, Finn)"
+        stance: confirms
+        excerpt: "name.string=Soprano -> 1; name.string=soprano -> 0; name.string=Bas -> 0 (no substring). NFD-encoded chars return 0 — clients must NFC-normalize."
+      - type: docs
+        ref: "entu/www: src/api/query-reference"
+        stance: confirms
+        excerpt: "Documented {property}.string= and {property}.string.regex= / .in= filter operators."
+    verification: { method: live-probe, date: 2026-05-20, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: q-search-substring-case-insensitive
+    claim: >
+      The q=<term> query param is a case-insensitive substring/prefix search across all of
+      an entity's string properties (distinct from the exact .string= filter); it returns
+      full entities and does not honor props= exclusion.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q3, Finn)"
+        stance: confirms
+        excerpt: "q=Soprano and q=soprano both count=3; q=sop returns all 3 (substring); returns full entities."
+      - type: docs
+        ref: "entu/www: src/api/query-reference"
+        stance: confirms
+        excerpt: "Documented q= search-query parameter."
+    verification: { method: live-probe, date: 2026-05-20, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: pagination-offset-only-with-count
+    claim: >
+      Entu pagination is offset-based via skip + limit only (no cursor, no next URL). Every
+      list response is { entities, count, limit, skip } where count is the TOTAL matching
+      corpus size (not page size), usable to compute total pages from the first request.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q1, Finn)"
+        stance: confirms
+        excerpt: "{entities, count, limit, skip}; count=28 total across pages; 'skip + limit is the only pagination method', no next URL, no _id-cursor."
+      - type: docs
+        ref: "entu/www: src/api/query-reference"
+        stance: confirms
+        excerpt: "Documented limit (default 100) + skip (default 0) query params."
+    verification: { method: live-probe, date: 2026-05-20, verifier: finn }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: limit-default-100-no-observed-cap
+    claim: >
+      The list limit defaults to 100 and Entu does not silently cap it — it echoes the
+      requested limit. No cap observed up to limit=1000 (mvox verified to 500; esmuseum
+      verified 1000 against a separate large account).
+    domain: data-lifecycle
+    evidence:
+      - type: docs
+        ref: "entu/www: src/api/query-reference + entu/api: routes/[db]/entity/index.get.js"
+        stance: confirms
+        excerpt: "OpenAPI param: limit, integer, default 100."
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q1, Finn)"
+        stance: confirms
+        excerpt: "limit=500 -> all 28 returned, 'no error, no cap'; 'no documented max'."
+      - type: probe
+        ref: "mitselek/esmuseum-map-app#41 (client data-point back)"
+        stance: confirms
+        excerpt: "Client ran limit=1000 GETs against a 6,352-entity account, full clean pages, no issue."
+    verification: { method: live-probe, date: 2026-05-20, verifier: finn }
+    confidence: partial
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+    # PARTIAL (honesty): "default 100" is backed (openapi); "no cap" is probe-only and bounded
+    # (clean to 1000, never stress-tested beyond, no documented ceiling). Probe a large-N account
+    # before relying on >1000 (gap G2).
+
+  - id: properties-implicitly-multivalue
+    claim: >
+      Every non-formula property is implicitly multi-valued: POSTing a value to a property
+      that already has one ADDS a second value rather than replacing it. To set a single
+      value you must DELETE all existing values first. (This is the operational face of
+      post-appends-never-replaces.)
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q5, Josquin)"
+        stance: confirms
+        excerpt: "POST forename=Changed to entity with forename=Test -> forename=[Test, Changed] (two values); formula then concatenated both -> 'TestChanged User'."
+    verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+  - id: property-def-deleted-via-entity-endpoint
+    claim: >
+      A property DEFINITION is an entity, not a property value. DELETE /{db}/property/{id}
+      returns 404 for a prop-def _id; prop-defs (and entity types) must be deleted via
+      DELETE /{db}/entity/{id}. The /property endpoint addresses property VALUES only.
+    domain: data-lifecycle
+    evidence:
+      - type: probe
+        ref: "mvox-dev: docs/migration/findings/phase-b-execution-diagnostics-2026-05-20"
+        stance: confirms
+        excerpt: "DELETE /property/{propdef-id} -> 404 universally; DELETE /entity/69c7ea53...062 -> 200 {deleted:true} deleted the prop-def."
+    verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
+    confidence: backed
+    last-verified: 2026-06-06
+    ttl: 2026-09-06
+    status: active
+
+# ---------------------------------------------------------------------------------------------
+# known-gaps — the agent's DECLARED known-unknowns, surfaced in the artifact itself so an
+# integrator sees them at audit-before-hiring time (the whole differentiator), not only in the
+# harvest digest. Two kinds: (a) `partial` claims above whose weak portion is named here; and
+# (b) unknowns deliberately NOT filed as claims (filing would assert what the evidence does not
+# support — absence-of-claim is itself the visible gap, per the citation-backed pattern).
+# Source for all: Finn's harvest digest, Task #5
+#   (teams/framework-research/docs/2026-06-06-data-lifecycle-competency-harvest.md, FLAGGED GAPS).
+# ---------------------------------------------------------------------------------------------
+known-gaps:
+  - id: G1
+    relates-to-claim: touch-save-via-nonformula-post
+    kind: partial-claim
+    gap: >
+      "Touch-save triggers formula recompute" is inference, not observation — the probe could not
+      see the recompute end-to-end (dependent formula was broken at probe time). Backed only on
+      "POST succeeds + rotates _id"; the recompute step is unverified.
+    closes-with: "a fresh post-fix probe (touch-save POST -> read shows recomputed value)"
+    source: "Finn harvest G1"
+  - id: G2
+    relates-to-claim: limit-default-100-no-observed-cap
+    kind: partial-claim
+    gap: >
+      "No limit cap" is probe-only and bounded — observed clean to 1000 on two accounts, no
+      documented ceiling, never stress-tested beyond. Do not rely on >1000 at arbitrary scale.
+    closes-with: "a large-N probe (>1000) on a big account, or a maintainer-authoritative ceiling from Argo"
+    source: "Finn harvest G2"
+  - id: G3
+    relates-to-claim: null   # deliberately NOT a claim
+    kind: unfiled-unknown
+    gap: >
+      How a fresh instance gets its INITIAL _inheritrights when no parent sets it is unresolved:
+      the mvox handbook says "born with the type's _inheritrights" but the create-time code
+      (inheritParentProperties) reads the PARENT, not the TYPE. A handbook-vs-code contradiction.
+    closes-with: "code-trace of createEntityRecord defaults + a bare-entity create probe — a dispute->Argo candidate"
+    source: "Finn harvest G3"
+  - id: G4
+    relates-to-claim: null   # deliberately NOT a claim
+    kind: unfiled-unknown
+    gap: >
+      Rate-limiting / 429 behaviour under high concurrency is unconfirmed — only absence-of-
+      throttling observed at modest throughput (~8 calls/sec). No positive confirmation; do NOT
+      assert "no rate limits" (that would be the exact over-claim the gap-loop guards against).
+    closes-with: "a concurrency probe, or a maintainer statement"
+    source: "Finn harvest G4"
+
+# Cross-domain material (routed elsewhere — NOT data-lifecycle claims, listed for traceability):
+#   - JWT 12h-vs-48h contradiction -> auth domain (the canonical disputed/apex worked example).
+#   - DELETE /property does not remove the S3 object (src contradicts openapi desc) -> files/
+#     data-lifecycle author as a src-confirms + openapi-contradicts claim (code-beats-docs example).

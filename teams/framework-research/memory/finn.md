@@ -91,4 +91,13 @@ Key grounding facts (don't re-derive):
 - Live discrepancies for gap-loop examples: JWT 12h/48h; date YYYY-MM-DD vs ISO; **DELETE/property "removes from S3" — FALSE, code has no S3 call (file-property-wire-shape note, UNFILED = a live gap-loop output)**. Three confirmed doc↔code discrepancies.
 - **Verification methods = FIVE, not 3** (answered Cal ask-2): live-probe+artifact, LIVE-AUDIT (probe over real prod data), src-read (can OVERRIDE openapi), spec-cite (weakest/can be wrong), MAINTAINER-AUTHORITATIVE (Argo + source file:line = apex). Methods MIX per claim + can DISAGREE → told Cal: per-evidence stance field (confirms|contradicts|supersedes) + claim-level derived confidence (lattice not enum). Dist ~50% probe, ~25% live-audit, rest spec/src, maintainer on auth/keys.
 
+## [CHECKPOINT S44 2026-06-06] Task #5 — data-lifecycle harvest SHIPPED
+
+Digest: `docs/2026-06-06-data-lifecycle-competency-harvest.md`. 18 FILED claims (**16 backed / 2 partial** — C12, C16), schema-conformant to Cal's entu-competency-index-schema.md. (Header originally miscounted as 13/3/2 — Celes caught it via YAML parse; fixed 18:13. The 2 unverified G3/G4 are unfiled gaps, NOT among the 18.)
+- C1-C18 cover: POST-appends, soft-delete, no-bulk, _sharing 2-clause (C4/C5), _sharing enum, rights-cascade (live-audit), type-vs-instance inheritrights, formula-values-no-id (C9)+persisted (C10), formula-not-writable, touch-save, .string= exact/NFC, q= substring, pagination offset+count, limit default 100, multi-value-append-trap, prop-DEF-deleted-via-entity-endpoint (C18, /property 404s on defs).
+- 4 FLAGGED GAPS (consult-on-gaps candidates): G1 touch-save-recompute (unobserved), G2 limit-cap-at-scale (only to 1000), G3 inheritrights-create-default-source (code reads PARENT not TYPE — unresolved), G4 rate-limiting (absence-of-evidence only). G3/G4 deliberately NOT filed as claims (would be over-claim).
+- Routed cross-domain: api-key-expiry→auth (JWT 12/48h disputed/apex example); file-property S3-orphan→files/data-lifecycle author (src>docs precedence example).
+- Excluded 8 project-specific migration logs (member IDs, type names, ISBN) as non-generalizable. Honesty gate held.
+- Celes folds into designs/new/entu-consultant-agents/data-lifecycle/competencies.yaml; Cal schema-checks.
+
 (*FR:Finn*)
