@@ -154,6 +154,8 @@ When an agent hits a claim it cannot back (`unverified`), it does two things:
 
 **Separately — escalate-to-Argo for a disputed claim (a different mechanism).** When a claim is `disputed` because its *evidence set disagrees* and no code value settles it (the JWT 12h/48h case, §3.2), the resolution is to escalate to the maintainer for an **authoritative answer**, which is recorded back into the index as `maintainer-authoritative` evidence (`verifier: argo`) — apex-backing the claim for the whole pool (schema §2b). This is *not* gap-doc routing: gap-doc routing reports a missing/contested doc *to Entu to fix*; the apex escalation captures Argo's *answer as evidence* to resolve an internal disagreement. Both surface signal to the maintainer; they differ in what comes back (a doc change Entu owns vs. an authoritative datum the index records). It remains the strongest realization of #42's "Argo gets prioritized signal" — his scarce attention captured once as top-tier backing every agent inherits.
 
+The boundary, stated precisely (matching schema §6): *reporting a doc gap is a signal we hand to Entu; escalating a dispute to Argo is how we obtain top-tier evidence for ourselves — the first never enters the evidence-method ladder (a gap report is an emitted signal, not a `verification.method`), the second is the only thing that produces `maintainer-authoritative` backing.*
+
 This is also the **orphan-claim** boundary (FR `[ORPHAN-CLAIM]` category, S43): a `[GAP]` is "I have a claim but thin/absent backing" → the loop fires. The index must never carry a `backed` claim with zero evidence — that orphan is the failure the audit catches before hiring, distinct from the runtime gap the protocol catches during a consult.
 
 ### 3.4 The flywheel
