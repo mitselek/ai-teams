@@ -122,8 +122,8 @@ The four `type` values and their `ref` locator formats. **Reconciled against rea
 
 ```text
 Agent hits a claim it cannot back  →  [GAP]/unverified (or a disputed mixed-stance claim, §3a)
-   →  escalates the specific question to Argo (the gap-loop's apex destination,
-       above filing a PR/issue — used when the answer requires the maintainer, not doc text)
+   →  escalates the specific question to Argo (the dispute-resolution mechanism, §6 —
+       used when the answer requires the maintainer; distinct from gap reporting, which is a doc-fix signal)
    →  Argo answers (a statement, or "it's utils/auth.js:NN")
    →  the agent records his answer back into the index as a new evidence entry:
          type: src      # with his designated file:line  (or `probe` for a bare statement)
@@ -134,7 +134,7 @@ Agent hits a claim it cannot back  →  [GAP]/unverified (or a disputed mixed-st
    →  the claim is now apex-backed; the [GAP] stops firing for every future agent.
 ```
 
-This closes the loop at the **highest** authority: a single maintainer answer, recorded once, upgrades the claim to apex-backed for the whole pool. It is the strongest form of #42's "prioritized signal" — Argo's scarce attention is spent once per gap and captured permanently as top-tier backing, rather than re-asked per engagement. The escalation is the apex of the gap-loop ladder (§6): **PR when the gap is doc text the agent can write; issue when it's a maintainer-only change; escalate-to-Argo when it's a question only the maintainer can answer** — and that answer comes back as `maintainer-authoritative` evidence.
+This closes the dispute at the **highest** authority: a single maintainer answer, recorded once, upgrades the claim to apex-backed for the whole pool — Argo's scarce attention is spent once per dispute and captured permanently as top-tier backing, rather than re-asked per engagement. **This is one of the gap-loop's two distinct mechanisms (§6): dispute resolution.** It is separate from *gap reporting* (a doc-fix signal, issue-default, §6a) — escalation is for questions only the maintainer can answer, not for routing documentation fixes. The two must not be conflated into a single "remediation ladder": one obtains evidence authority, the other emits a signal Entu's own pipeline acts on.
 
 `maintainer-authoritative` evidence is **not TTL'd by default** (the maintainer's word doesn't perish on a clock), but it carries `verification.date` so a later substrate change can flag it for re-confirmation.
 
@@ -212,7 +212,7 @@ agents/
 **Why one-claim-per-file (not one big YAML/JSON):**
 
 - **Diffable** — a PR that adds or corrects a single claim touches one file; the diff *is* the claim's change history. An integrator reads the PR and sees exactly which assertion changed and how the evidence moved.
-- **PR-able** — the gap-detection loop (§6) produces a PR adding/strengthening one claim. One-claim-per-file keeps those PRs atomic and reviewable, matching #42's "PRs land, issues stall" observation — the format is optimised for the channel that works.
+- **Atomically revisable** — when a claim is added or corrected (a recorded maintainer answer, a new probe, a doc the index now cites), the change touches one file, so the review of the *index itself* is atomic. This is about the index's own change management — diffable, reviewable claim-by-claim — **not** about preferring any particular channel for reporting gaps *back to Entu* (that's issue-default with no bias, §6a). Keep the two separate: one-claim-per-file is good index hygiene; it implies nothing about Entu's remediation pipeline.
 - **Auditable before hiring** — the integrator's pre-hire audit is `ls agents/competency-index/<domain>/` + reading the cards. They can grep `confidence: unverified` to see exactly where the agent is honest about not-knowing, *before* trusting it.
 
 The on-disk file body is the same YAML block as §1, optionally followed by a short prose justification (mirroring how wiki entries carry frontmatter + body). The frontmatter is the contract; the body is human context.
@@ -268,13 +268,15 @@ This is the **mechanism behind #42's "trust is auditable"**: the label is not th
 When an agent needs a claim that `search_claims` does not return (or returns only `unverified`):
 
 1. **Label in output** — emit the `[GAP]` runtime label (the `unverified` row above). The answer is still given, but flagged as training-data-derived.
-2. **Resolve at the right rung** — the gap-loop is a three-rung escalation ladder, matching the evidence the gap needs:
-   - **PR** when the gap is **doc text the agent can write** (a real `evidence[].ref` the agent found) — prefer this per #42's PRs-land/issues-stall asymmetry. The PR adds one file under `agents/competency-index/<domain>/` (atomic, §4).
-   - **Issue** when it's a **change only a maintainer can make** (not PR-able by an integrator — e.g. #42's #39/#40 feature requests).
-   - **Escalate to Argo** when it's a **question only the maintainer can answer** (the JWT-lifetime contradiction — no doc/code/probe settles it). Argo's answer comes back as `maintainer-authoritative` evidence (§2b), upgrading the claim to apex-backed.
-3. **Triage closes or documents the gap** — merged PR / recorded maintainer answer ⇒ next `get_claim` returns the now-`backed` claim and the `[GAP]` flag stops firing automatically. Not obtainable ⇒ the gap is documented as a known caveat on the persona.
+2. **Route to the right mechanism.** The loop **produces a signal; it does not remediate Entu's pipeline.** There are **two distinct mechanisms**, not three rungs of a remediation preference — and the choice is by *kind of gap*, not by "which channel lands fastest at Entu":
 
-This is where the schema **closes the loop**: the gap loop's output is *a new index file (or evidence entry) in the schema's own format*. The index is self-densifying — every engagement either validates a claim (`last-verified` bumps) or adds one (gap → PR/maintainer-answer → `backed`). That is the topic-10 "converge toward truth" claim made concrete in a file format, and the **escalate-to-Argo rung is the strongest form of #42's "Argo gets prioritized signal"** — his scarce attention is captured once per gap as permanent apex backing.
+   **(a) Gap reporting** — a documentation gap (missing or wrong doc). The agent emits a **structured, evidence-backed gap report** through the standard permission-light channel: **an issue by default**, carrying the suggested fix as content. A **PR is a channel-neutral option** when it is natural *and* the actor has rights — it is **not a preferred rung**. We deliberately express **no PR-over-issue bias**: which channel Entu acts on fastest is *Entu's triage to fix*, not something the gap-loop should engineer around. The loop's job is to surface a high-quality, actionable signal; acting on it is Entu's pipeline.
+
+   **(b) Dispute resolution** — a claim with contradicting evidence that **no code/spec/probe can settle** (the JWT-lifetime case: two in-repo strings disagree). The agent **escalates the specific question to the maintainer (Argo) for an authoritative answer**, which is recorded as `maintainer-authoritative` apex **evidence** (§2b). This is *not* a doc-fix routing — it is about obtaining top-tier backing for a claim the substrate can't resolve. Unchanged by the no-bias principle, because it concerns *evidence authority*, not remediation-channel preference.
+
+3. **Resolution.** (a) ⇒ if/when Entu acts on the report, the claim's evidence is updated on the next pass; **the timing is Entu's, not ours.** (b) ⇒ the recorded maintainer answer makes the next `get_claim` return the now-`backed` claim and the `[GAP]` stops firing. Either way, a gap that cannot be closed is **documented as a known caveat** on the persona — honesty, not a promise to remediate.
+
+This is where the schema **closes the loop on its own side**: the loop's output is *a structured signal* (a gap report) or *a new evidence entry* (a recorded maintainer answer) in the schema's own format. The index is self-densifying on the part we own — every engagement either validates a claim (`last-verified` bumps), records a maintainer answer (dispute → apex), or emits an actionable gap report. That is the topic-10 "converge toward truth" claim made concrete — **as far as the signal-producer's responsibility extends.** Whether a reported doc gap actually gets fixed is Entu's pipeline; the loop guarantees the *signal*, not the *remediation*.
 
 ### Maps to topic-10's three-way competency taxonomy
 
