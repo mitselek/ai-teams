@@ -1,14 +1,23 @@
-# Task list snapshot — S42 close (2026-06-05)
+# Task list snapshot — S44 close (2026-06-06) (*FR:team-lead*)
 
-Snapshot at session-end per shutdown procedure S2b. Supersedes S36 snapshot.
+Snapshot at session-end per shutdown procedure S2b. Supersedes S42 snapshot.
 
-**Substrate anomaly:** the runtime task list LOST STATE mid-session — `TaskList` returned empty for both team-lead and celes after ~13:30; tasks #1/#2 vanished from the store. Final states reconstructed below from session record. (Anomaly #2 of 3 this session; Cal filing candidate — see S42 wrap in `team-lead.md`.)
+**Substrate anomaly (recurrence):** at shutdown `TaskList` returned **"No tasks found"** — full
+task-state-loss, the SAME anomaly documented at S42 close (tasks vanished from the store).
+Snapshot reconstructed from the in-context session record. Cal filing candidate — n now spans
+S42 + S44 for task-state-loss, plus the task-state stale-replays Finn caught this session.
 
-| # | Status | Owner | Subject | Notes / evidence |
-|---|---|---|---|---|
-| 1 | completed | celes | Assess Arhitecture #4-#8 persona prompt improvements | Done ~12:24. `docs/2026-06-05-persona-improvement-assessment.md`. Action-2 omission → Arhitecture #9 filed. |
-| 2 | completed | celes (+5 reviewers) | Execute #73 re-review experiment (round 2) | Done ~13:27; status could not be flipped — store already lost. Evidence: PR #45/#46 panel comments, gist a20d0be, `docs/2026-06-05-round2-retro-rubric.md`, topic 10 update; ai-teams#73 CLOSED. |
+## Tasks this session (all COMPLETED)
 
-No pending or in-progress tasks at shutdown. S36-snapshot carry-overs (Hopper Round-1 op-step-1, Cal queue, standbys) remain tracked via team-lead.md standing watch items, not the runtime task list.
+| # | Subject | Owner | Status |
+|---|---|---|---|
+| 1 | Ground the Entu consultant-agents spec in real artifacts | finn | completed |
+| 2 | Design the competency-index schema (the spec's spine) | callimachus | completed |
+| 3 | Author the Entu consultant-agents architecture spec doc | celes | completed |
+| 4 | Cast Entu consultant-agent personas (4 anchors + populate data-lifecycle) | celes | completed |
+| 5 | Harvest mvox competency map → data-lifecycle claims (artifact-backed) | finn | completed |
 
-(*FR:Aen*)
+**No open tasks carried forward.** Continuity is via watch items in `team-lead.md` (the
+[NEXT SESSION] M1 seed for S45), not the task list — chiefly: wait on Argo's #42 response →
+deploy personas; the formula A/B experiment (designed, pending a run); #8 prompt-edits; the
+overdue A1 evidence-cycle audit.

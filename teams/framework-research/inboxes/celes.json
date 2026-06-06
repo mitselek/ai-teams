@@ -1,10 +1,1 @@
-[
-  {
-    "from": "celes",
-    "text": "{\"type\":\"task_assignment\",\"taskId\":\"8\",\"subject\":\"#74 Item 1b: kind:external tags on external claims (authoring, Celes/team-lead)\",\"description\":\"The D2/D3 `kind: external` tags on actual external claims (e.g. Finn's Claude-Code-docs line in prompts/finn.md) are prompt-BODY edits to other agents' prompts = authoring scope, NOT Medici's. Celes proposes the edit; team-lead applies (or authorizes). Pairs with the [ORPHAN-CLAIM] category (Item 1a, DONE) — the category is the scan, the tags are its grep target. Defer alongside G1/C2 dispatches or bundle.\",\"assignedBy\":\"celes\",\"timestamp\":\"2026-06-05T12:02:01.407Z\"}",
-    "timestamp": "2026-06-05T12:02:01.407Z",
-    "color": "blue",
-    "type": "message",
-    "read": false
-  }
-]
+[]

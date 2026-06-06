@@ -34,16 +34,9 @@
 
 Three open items: unavailability protocol, platform-vs-provider, cost data.
 
-## [CHECKPOINT] Phase A research (S26) — shipped, architecture team pending
+## [CHECKPOINT] Shipped-archive (S26/S36) — all in docs/, do not re-surface unprompted
 
-Deliverables in `docs/2026-05-05-phase-a/`: dedup-census, cross-team-query-frequency, handoff-brief. Three optional tasks parked (do not re-surface unprompted).
-
-## [CHECKPOINT] S36 deliverables — shipped
-
-- `docs/webhook-sandbox-research-2026-05-26.md` (Task #6)
-- `docs/herald-g2-cross-agent-comms-brief-2026-05-26.md`
-- `docs/wake-mechanism-w4-finding-2026-05-26.md` (Hopper Task #11)
-- `docs/round-1-anthropic-platform-checklist-2026-05-26.md` (Surface-1)
+S26 Phase A: `docs/2026-05-05-phase-a/` (dedup-census, cross-team-query-frequency, handoff-brief; 3 optional tasks parked). S36: webhook-sandbox-research, herald-g2-cross-agent-comms-brief, wake-mechanism-w4-finding, round-1-anthropic-platform-checklist (all dated 2026-05-26 in docs/).
 
 ## [WATCHPOINT] auto-restoration-silently-overrides-explicit-state — n=2, watching for n=3
 
@@ -98,6 +91,10 @@ Digest: `docs/2026-06-06-data-lifecycle-competency-harvest.md`. 18 FILED claims 
 - 4 FLAGGED GAPS (consult-on-gaps candidates): G1 touch-save-recompute (unobserved), G2 limit-cap-at-scale (only to 1000), G3 inheritrights-create-default-source (code reads PARENT not TYPE — unresolved), G4 rate-limiting (absence-of-evidence only). G3/G4 deliberately NOT filed as claims (would be over-claim).
 - Routed cross-domain: api-key-expiry→auth (JWT 12/48h disputed/apex example); file-property S3-orphan→files/data-lifecycle author (src>docs precedence example).
 - Excluded 8 project-specific migration logs (member IDs, type names, ISBN) as non-generalizable. Honesty gate held.
-- Celes folds into designs/new/entu-consultant-agents/data-lifecycle/competencies.yaml; Cal schema-checks.
+- Celes folds into designs/new/entu-consultant-agents/data-lifecycle/competencies.yaml; Cal schema-checks. Both S44 digests committed at wrap.
+
+## [GOTCHA S44] Stale task_assignment replays — verify status before acting
+
+Twice this session a `task_assignment` for an already-completed task (#1, #5) arrived as a structured message with the ORIGINAL assign-timestamp (12:34 / 14:17), surfacing LATE — not new scope. Pattern: on any task_assignment, TaskGet first; if status=completed and the timestamp predates your completion, it's a replay → send a no-op confirmation (per requirement-ack discipline, so it's not read as silent absorption), do NOT redo. Also: messages cross in flight (Cal's asks, team-lead's line-10 fix both arrived after I'd already answered) — check timestamps before assuming a request is new.
 
 (*FR:Finn*)

@@ -1,6 +1,78 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-05 — session-43 → session-44
+### [NEXT SESSION] 2026-06-06 — session-44 → session-45
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S45 read):**
+
+- **State of play:** S44 closed 2026-06-06 — long, productive **extra/home-PC session**, ran on **Opus 4.8** (PO call: this Entu task is outside the S35–S43 4.6-comparability line; roster intent still 4.6 → **re-run Step 0.5 model gate at S45**). Productized the topic-10 guild pattern for the **Entu platform** ([entu/api #42](https://github.com/entu/api/issues/42)) end-to-end: (1) **architecture spec** `docs/2026-06-06-entu-consultant-agents-architecture.md` — competency-index spine, 5-element container w/ persona anchor + posture-not-facts guardrail — committed + **posted to #42** ([live comment](https://github.com/entu/api/issues/42#issuecomment-4638828820)); (2) **gap-loop revised to the signal-producer model** (PO correction: don't engineer around Entu's broken triage; the loop produces signal, Entu owns remediation; issue-default, PR channel-neutral); (3) **cast 4 personas** in `designs/new/entu-consultant-agents/` — data-lifecycle **fully populated** (18 evidence-backed claims + known-gaps block). Cal schema at `wiki/contracts/entu-competency-index-schema.md`. Commits: c6d09d9, c99776a, eea17d6, 5ca637f, 1d28d2c.
+- **#42 — WAIT ON ARGO (PO decision):** the architecture proposal is posted but **unanswered (it was fresh, ~16:20)**. Trigger for next move = **Argo's response** → then deploy/PR the personas (committed + ready) + offer the full populated set. Do NOT push unsolicited. `agents/`-location is Argo's open Q (spec §7.1); `mitselek/ai-teams` is **private** so personas aren't linkable — submitting later = comment/PR/gist (public).
+- **NEW research artifact — formula A/B experiment (ready to run, not yet run):** `designs/new/entu-consultant-agents/formula-engine-EXPERIMENT.md`. **Hamblin** (domain-fact-famous = treatment) ∥ **Harrison** (method-famous = control), BYTE-IDENTICAL scaffold + guardrail, **persona the sole variable** (guardrail deliberately NOT doubled for Hamblin — that's the control). Tests spec §2.4: does a domain-fact-famous anchor induce more index-bypass/fabrication? Run later (field use or follow-up trial); either outcome is a real result.
+- **Substrate anomalies climbing (Cal filing candidates):** **task-state stale-replay reproduced TWICE more in S44** (Finn correctly rejected late re-deliveries of the Task #1 and Task #5 assignments). **Peer-DM lag** again (Cal never received Finn's 15:47 DM; worked from the on-disk digest instead). n now spans S42–S44 for both.
+- **All prior watch items carry forward** — **#8 prompt-edits batch** (Celes has diffs: `kind:external` + G1 brunel + C2 aeneas), **A1 evidence-cycle audit OVERDUE** (S40-42 window long closed — raise with PO), **Arhitecture #1 AC4 still NOT done** (needs org-sub arch-docs MCP; S44 ran on personal sub), TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13 external, round-3 candidate parked.
+
+---
+
+## SESSION 44 WRAP — 2026-06-06 (Entu product-native consultant agents productized: spec posted to #42, gap-loop revised to signal-producer, 4 personas cast incl. a Hamblin∥Harrison A/B experiment)
+
+**Spans:** 2026-06-06, one long session (extra/home-PC). Parent on **Opus 4.8** (PO call — outside the 4.6 comparability line; roster intent stays 4.6).
+
+**Outcome:** Took the PO's fresh entu/api #42 idea ("ship product-native AI consultant agents alongside Entu") and executed it end-to-end as topic-10 guild work. Brainstormed the architecture (competency-index spine, approach B), built it via Celes (design lead) + Finn (grounding) + Cal (schema), posted the proposal to #42, then **revised the whole gap-loop** when the PO correctly rejected the PR-over-issue bias as "engineering around Argo's broken triage." Then cast the 4 personas, with the formula-engine deliberately built as a **controlled A/B experiment** (Hamblin vs Harrison) to test the §2.4 selection rule. Everything committed + pushed; the live #42 comment kept in sync through two revisions. Personas held internally pending Argo's response (PO decision).
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `docs/2026-06-06-entu-consultant-agents-architecture.md` | NEW | Celes | Full architecture/spec; competency-index spine; 5-element container + persona-anchor guardrail; signal-producer gap-loop |
+| `docs/2026-06-06-entu-42-proposal-comment.md` + **posted to [#42](https://github.com/entu/api/issues/42#issuecomment-4638828820)** | NEW | Celes (Aen posted) | Digestible proposal; revised to channel-neutral; live comment in sync |
+| `teams/framework-research/docs/2026-06-06-entu-consultant-grounding-digest.md` | NEW | Finn | Real entu/api Nitro routes (corrected #42's `src/api` path sketch); PoC trail; mvox notes |
+| `teams/framework-research/docs/2026-06-06-data-lifecycle-competency-harvest.md` | NEW | Finn | 18 artifact-backed claims (16 backed / 2 partial) + 4 flagged gaps |
+| `wiki/contracts/entu-competency-index-schema.md` (+card) | NEW | Cal | Claim→evidence index; 5-rung method ladder w/ maintainer-authoritative apex; stance field |
+| `wiki/patterns/citation-backed-beats-posture-backed-when-fact-is-subtle.md` (+card) | NEW | Celes/Cal | Protocol-A pattern; stage-2 **confirmed** (Finn+Celes read-backs) |
+| `designs/new/entu-consultant-agents/` (21 files + EXPERIMENT.md) | NEW | Celes | 4 personas; data-lifecycle populated; formula A/B pair |
+
+### Decisions (PO-ratified)
+
+[DECISION — S44] **Run S44 on Opus 4.8** — Entu task is outside the 4.6 review-experiment comparability line; roster intent unchanged (4.6).
+[DECISION — S44] **Architecture spine = the competency index (approach B)** — auditable claim→evidence store; prompts are thin consumers; persona anchors posture/voice never facts.
+[DECISION — S44] **Gap-loop is a signal producer, NOT a remediation service.** Issue-default, PR channel-neutral. Acting on gaps is Entu's pipeline; we do NOT engineer around Argo's triage (the PR-over-issue bias was removed). The surviving kernel is report *quality* (evidence + suggested fix), channel-agnostic.
+[DECISION — S44] **Persona selection rule: figures famed for method/posture, never domain-fact authority** (avoids the Anderson fabrication trap). Cast: Pérotin (data-lifecycle, reused), Phileas Fogg (auth), Linnaeus (schema), Hamblin∥Harrison (formula A/B).
+[DECISION — S44] **Formula-engine = a deliberate A/B experiment** ("design both now, compare later"), guardrail held constant as the control.
+[DECISION — S44] **Hold personas internally; wait for Argo's #42 response** before any submission. No unsolicited push.
+[DECISION — S44] **Source competency claims by harvesting mvox's repo, not consulting the dormant team** — the repo notes are mvox's experience in artifact-backed (higher-provenance) form. Consult only on flagged gaps. **PO: leave all 4 flagged gaps documented, no consult.**
+
+### Substantive learnings
+
+[LEARNED — framework] **"Don't design your architecture to remediate another party's broken pipeline."** The PR-over-issue bias (born of #42's own "issues get ignored at Entu" observation) was a category error: it burdened our agents, assumed PR permissions we lack, and entrenched the maintainer's bad habit by absorbing its cost. Correct shape: the loop *emits* evidence-backed signal; the platform owns acting on it; a stalled pipeline is itself a surfaced signal.
+[LEARNED — process] **Multi-layer verification caught a real slip:** Finn's harvest *prose summary* (13/3) disagreed with his actual *claim blocks* (16/2); Celes caught it folding the bodies (ground truth), flagged it; Cal + team-lead reconciled. Documentation-vs-ground-truth divergence in miniature — caught downstream, no over-claiming reached the artifact.
+[LEARNED — process] **Honest gap-flagging is the differentiator made concrete.** Finn left G3 (handbook-vs-code `_inheritrights` contradiction) + G4 (rate-limiting absence) **unfiled** rather than assert them; surfaced as a machine-readable `known-gaps` block in the agent artifact (audit-before-hiring). Filing G4 "no rate limits" would have been the exact over-claim the gap-loop guards against.
+
+### Standing watch items going into session 45
+
+- **Entu #42 — wait on Argo** (trigger to deploy personas + populated PR). Personas committed + ready.
+- **Formula A/B experiment** — designed + instrumented, pending a comparison run.
+- **#8 prompt-edits batch** (Celes has diffs) — unactioned, carries forward.
+- **A1 evidence-cycle audit — OVERDUE.** Raise with PO at S45 start.
+- **Arhitecture #1 AC4 — still pending** (needs org-sub arch-docs MCP; S44 was personal sub).
+- **Substrate anomalies** — task-state stale-replay (n up again, S44 ×2) + peer-DM lag → Cal queue.
+- **Unchanged externals/dormant** — TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate, TPS-583/mVox-dev/Manager-team dormant.
+
+### NEXT-SESSION BOOT (re-orient instructions for S45)
+
+1. Read `startup.md` first (always). Steps 1-5. **Step 0.5 model gate:** roster pins 4.6; S44 ran 4.8 (one-off for the Entu task) — verify what the PO wants for S45 before `TeamCreate`.
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S45 read.
+3. **Pull `mitselek-ai-teams`.** Don't pre-spawn; wait for PO direction.
+4. **If Argo responded on #42:** that's the trigger — spawn Celes, deploy/PR the personas (committed in `designs/new/entu-consultant-agents/`), offer the full populated set. Mind: `agents/`-location is Argo's call (spec §7.1); ai-teams is private (submit via comment/PR/gist).
+5. **If PO wants the formula A/B run:** spawn fresh-context probe agents (S42 Option-A style) against both variants on shared formula probes; populate a minimal formula index first; score fabrication / index-citation / [GAP]-flagging. See `formula-engine-EXPERIMENT.md`.
+6. **If PO surfaces #8 prompt-edits:** Celes has the diffs ready (~10 min, one pass).
+7. **A1 evidence-cycle audit is OVERDUE** — raise if not surfaced.
+8. **If Cal spawns:** substrate queue now includes task-state stale-replay (S42-44) + peer-DM lag (S44).
+9. **If PO surfaces Arhitecture #1 AC4 / #9-#13 / TPS-601 / ITSD-38884 / article / ghost-bridge:** unchanged procedures per prior boot items.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-06] 2026-06-05 — session-43 → session-44
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S44 read):**
 
