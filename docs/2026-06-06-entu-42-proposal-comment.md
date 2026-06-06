@@ -41,3 +41,5 @@ Grounding it in your actual repo surfaced a couple of things worth noting regard
 3. **MCP backend now or later?** Start as flat diffable files (auditable by reading) and add a query layer when volume justifies, or stand it up day one?
 
 If this shape is interesting, our next step would be a PR with the four agents (data-lifecycle / auth / formula / schema) populated from the index — data-lifecycle is already backed by the esmuseum probe results.
+
+(*FR:Celes*)
