@@ -77,4 +77,18 @@ Cal ACK'd all four. Wiki 112, 116, 119, 120 confirmed production-grade from join
 - `prompts/finn.md` co-source-agent role-expansion still pending
 - Aen's response on Team OS extraction mechanisms (which to pursue / Cal candidates to file) — may have landed before next spawn
 
+## [CHECKPOINT S44 2026-06-06] Entu consultant-agents grounding — Task #1 SHIPPED
+
+Digest: `docs/2026-06-06-entu-consultant-grounding-digest.md` (5 sections + cross-cutting).
+Key grounding facts (don't re-derive):
+- entu/api = Nitro file-router (`routes/`, `utils/`), NOT `src/api/*`. `src/api/*` = entu/www docs paths. main branch.
+- `_sharing` truth: create-time `inheritParentProperties` copies parent public/domain to child (escalate-only); ZERO post-creation propagation. Handbook §1.5 slightly over-absolute vs code — both clauses needed.
+- No bulk API (single-{id} routes only). POST appends; DELETE soft-deletes. JWT IP-bound, 12h-vs-48h in-repo discrepancy.
+- Formula: single-hop confirmed in code (strParts===3); rights-bypass confirmed (direct private.* projection, no access filter).
+- mvox behaviour notes location: `mvox-dev/mvox_v4e_web` repo, `docs/migration/findings/*.md` + `entu-schema-mutation-handbook.md` (§1.5 = canonical mental model, mirrored to Brilliant `Resources/mvox/entu-schema-mutation-handbook`). NOT under teams/mvox-dev/.
+- Evidence FORMAT: Title+date / Probe-script / Result-artifact-json / Architecture-decisions-commit / Question / Setup / STEP|OP|RESULT table / Conclusions / Gotchas / (*MVOX:author*). Three strength tiers: live-probe / live-audit / handbook-asserted.
+- PoC: Finn=API/docs-verify, Pérotin=live-probes. Client=esmuseum #41. Backflow=www PR#11(9 issues)+#13(_sharing)+api#41(date wire). All 3 still OPEN.
+- Live discrepancies for gap-loop examples: JWT 12h/48h; date YYYY-MM-DD vs ISO; **DELETE/property "removes from S3" — FALSE, code has no S3 call (file-property-wire-shape note, UNFILED = a live gap-loop output)**. Three confirmed doc↔code discrepancies.
+- **Verification methods = FIVE, not 3** (answered Cal ask-2): live-probe+artifact, LIVE-AUDIT (probe over real prod data), src-read (can OVERRIDE openapi), spec-cite (weakest/can be wrong), MAINTAINER-AUTHORITATIVE (Argo + source file:line = apex). Methods MIX per claim + can DISAGREE → told Cal: per-evidence stance field (confirms|contradicts|supersedes) + claim-level derived confidence (lattice not enum). Dist ~50% probe, ~25% live-audit, rest spec/src, maintainer on auth/keys.
+
 (*FR:Finn*)

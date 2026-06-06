@@ -22,22 +22,23 @@ Every wiki entry has a ~30-line **card** (TLDR + Key ideas) at `<subdir>/cards/<
 
 | Subdir | Entries | Card index |
 |---|---|---|
-| `patterns/` | 82 | [patterns/cards/INDEX.md](patterns/cards/INDEX.md) |
+| `patterns/` | 83 | [patterns/cards/INDEX.md](patterns/cards/INDEX.md) |
 | `gotchas/` | 18 | [gotchas/cards/INDEX.md](gotchas/cards/INDEX.md) |
 | `process/` | 7 | [process/cards/INDEX.md](process/cards/INDEX.md) |
 | `references/` | 5 | [references/cards/INDEX.md](references/cards/INDEX.md) |
 | `observations/` | 3 | [observations/cards/INDEX.md](observations/cards/INDEX.md) |
 | `decisions/` | 2 | [decisions/cards/INDEX.md](decisions/cards/INDEX.md) |
-| `contracts/` | 1 | [contracts/cards/INDEX.md](contracts/cards/INDEX.md) |
+| `contracts/` | 2 | [contracts/cards/INDEX.md](contracts/cards/INDEX.md) |
 | `findings/` | 0 | (empty) |
 | `archive/` | 0 | [archive/cards/INDEX.md](archive/cards/INDEX.md) (no archived entries yet) |
 
-**Total: 118 entries carded.** Card schema (validated S39): `title`, `directory`, `status`, `confidence`, `source-agents`, `discovered`, `last-verified`, `related`, `tags` + TLDR + Key ideas. `source-team` on cross-pollinated entries; `ttl` on TTL'd entries. No `id` field (filename is key).
+**Total: 120 entries carded.** Card schema (validated S39): `title`, `directory`, `status`, `confidence`, `source-agents`, `discovered`, `last-verified`, `related`, `tags` + TLDR + Key ideas. `source-team` on cross-pollinated entries; `ttl` on TTL'd entries. No `id` field (filename is key).
 
 ## Entries
 
 ### patterns/
 
+- [`citation-backed-beats-posture-backed-when-fact-is-subtle.md`](patterns/citation-backed-beats-posture-backed-when-fact-is-subtle.md) — Refines topic-10's competency taxonomy: citation-backed is strongest not for auditability but because evidence-per-clause *forces claim decomposition* — a subtle multi-part fact (Entu `_sharing`: create-time escalation-copy AND no post-creation propagation) can't be filed as a posture-prompt one-liner without leaving a visible gap. Posture prompts can be honest and still wrong (compress two clauses into one); the index's structure does the noticing. Source: celes/callimachus/finn. entu-api#42
 - [`in-process-respawn.md`](patterns/in-process-respawn.md) — Three-step fix for respawning agents after a crash without tmux (jq cleanup of dormant config.json entries)
 - [`cathedral-trigger-quality-teams.md`](patterns/cathedral-trigger-quality-teams.md) — Cathedral tier is deterministic when the team's mission IS eliminating structural debt
 - [`multi-repo-xp-composition.md`](patterns/multi-repo-xp-composition.md) — Shared ARCHITECT + separate PURPLEs + shared Librarian for multi-repo teams with different stacks
@@ -150,6 +151,7 @@ Every wiki entry has a ~30-line **card** (TLDR + Key ideas) at `<subdir>/cards/<
 ### contracts/
 
 - [`speculative-marker-for-cross-team-drafts.md`](contracts/speculative-marker-for-cross-team-drafts.md) — Inline `[speculative]` marker in cross-team handoff drafts flags author inference vs verified claim. Greppable + scannable; supports reviewer-targeted action during Stage 1 of two-stage adoption. Survival count tracked at each stage transition (decreasing across stages = speculation resolving). Distinct from `confidence: speculative` frontmatter (per-entry, future readers) and prose hedges (no machine-actionable contract). First-instance counts: 16 in standard, 2 in intake, 2 in tracking issue. Source: team-lead. n=1 deliberate, structural argument independent of sample
+- [`entu-competency-index-schema.md`](contracts/entu-competency-index-schema.md) — Schema for the competency index backing Entu's product-native consultant agents (entu/api#42); the PO-chosen **spine** (prompts consume an auditable claim→evidence KB, not embed knowledge). Atomic unit = a **claim** (verifiable assertion) + `evidence[]` of `{type: docs\|openapi\|src\|probe, ref, excerpt?}` + `verification` (doc-cited/spec-derived/live-probe) + `confidence` (backed/partial/unverified) + `domain`. Re-points `WikiProvenance` rather than reinventing (evidence.ref↔sourceFiles, ttl/status direct reuse; architectural-fact-vs-observation split → doc/spec-cited vs probe-TTL'd). One-claim-per-file (diffable, PR-able, auditable-before-hiring); `search_claims`/`get_claim` query surface; `confidence`→deterministic runtime label + `[GAP]` loop (citation-backed row of topic-10's three-way taxonomy). §3 evidence-ref formats drafted-to-plausible, reconcile vs Finn grounding digest. Source: callimachus. TTL 2026-09-06
 
 ### observations/
 

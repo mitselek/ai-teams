@@ -1,8 +1,8 @@
 # patterns/ — Card Index
 
-82 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
+83 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **50 confirmed, 32 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
+**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **50 confirmed, 1 partial, 32 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -14,6 +14,7 @@
 | Cadence-Crossing DYAD Variant + Asymmetric-Cross 3-Vector | [card](cadence-crossing-dyad-variant-with-asymmetric-cross-vector-framework.md) · [full](../cadence-crossing-dyad-variant-with-asymmetric-cross-vector-framework.md) |
 | Canonical-Taxonomy Check Before Naming | [card](canonical-taxonomy-check-before-naming.md) · [full](../canonical-taxonomy-check-before-naming.md) |
 | Cathedral Tier Trigger for Quality Teams | [card](cathedral-trigger-quality-teams.md) · [full](../cathedral-trigger-quality-teams.md) |
+| Citation-Backed Beats Posture-Backed When Fact Is Non-Atomic | [card](citation-backed-beats-posture-backed-when-fact-is-subtle.md) · [full](../citation-backed-beats-posture-backed-when-fact-is-subtle.md) |
 | Claude-Specific Infrastructure Dependencies | [card](claude-infrastructure-dependencies.md) · [full](../claude-infrastructure-dependencies.md) |
 | .claude/startup.md as Cross-Team Handoff Bootstrap | [card](claude-startup-md-as-cross-team-handoff.md) · [full](../claude-startup-md-as-cross-team-handoff.md) |
 | Cluster-Decomposition Meta-Principle | [card](cluster-decomposition-meta-principle.md) · [full](../cluster-decomposition-meta-principle.md) |
