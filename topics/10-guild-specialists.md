@@ -125,6 +125,70 @@ This resolves into a **three-way competency taxonomy**, each kind needing a diff
 
 **Competency-backend-staleness, FR-native form:** the "Competency backend ownership at scale" open question below has an FR-internal analogue — FR's only drifting backing is the **frozen `reference/` snapshots** (rc-team, hr-devs), not external standards. Same staleness shape, internal surface.
 
+## Persona anchor selection — the A/B instrumentation pattern
+
+### The claims-need-backing meta-pattern
+
+The competency gate and VEO-51's `nfr.yaml` convention are the same epistemic pattern at different substrates: **declarations need a verification layer, and the gap between declaration and verification is where failures live.** An `nfr.yaml` with `verification: "trust me"` passes CI — the schema validates shape, not truth. An agent persona that claims domain expertise produces confident output — but without a grounded competency index, the citations may be fabricated. Both are self-asserted claims pending evidence. The verification layer (CI schema-check for NFR; MCP + gap-detection for personas) is what separates a claims register from an assurance system. Cross-reference: [VEO-51 comment](https://eestiraudtee.atlassian.net/browse/VEO-51) (2026-06-08).
+
+### Two anchor patterns
+
+When casting a persona from training data, the figure's fame creates a design choice:
+
+| | Pattern A — Method-famous | Pattern B — Domain-fact-famous |
+|---|---|---|
+| **The figure is famous for** | *How* they worked — a method, posture, craft | *What* they knew — the domain's actual content |
+| **Examples** | Harrison (precision mechanism), Pérotin (layered polyphony), Phileas Fogg (systematic journeying) | Anderson (security engineering), Hamblin (RPN/stack evaluation) |
+| **Model behavior** | Anchors on approach; no training-data invitation to "be the expert" | Rich domain engagement; training-data knowledge overlaps the task domain |
+| **Fabrication risk** | Low — no domain-fact overlap to activate | High without gates — the persona's celebrity invites answers from training memory |
+| **Verification burden** | Standard guardrail sufficient | Full gate stack required (MCP, gap-detection, `[UNVERIFIED]` tagging) |
+
+### Three cases for anchor selection
+
+Not every persona presents a real choice. The A/B question only arises in the middle case:
+
+1. **Obviously method-only roles** — librarian, coordinator, lifecycle engineer. The role's job IS method/organization. No domain-fact overlap exists. Pattern A, no A/B needed. (Callimachus curating a wiki has zero fabrication surface — he claims organizational expertise, not domain-fact authority.)
+
+2. **Field-expert personas where both anchors are viable** — the interesting case. A "linux security admin" could anchor on a famous security figure (domain-fact-famous) or a famous methodologist (method-famous). **Always design both.** See the instrumentation pattern below.
+
+3. **Domain-fact roles with full gates** — when the domain fame IS the point (Anderson reviewing security architecture), use Pattern B with the full competency gate stack. The gates are the price of the richer domain engagement.
+
+### The A/B instrumentation pattern
+
+When a field-expert persona admits both anchor types (case 2 above), design both variants as **twins**:
+
+1. **Twin design.** Identical competency files, identical common prompt section, identical synergy wiring. Only `persona.md` differs — the anchored figure and its lore. The persona identity is the sole variable; everything else is held constant. The marginal cost is one extra `persona.md`; the return is a runnable controlled comparison.
+
+2. **Contamination isolation.** Neither twin references the other. No "you are the domain-fact variant of..." in the prompt. No shared experiment framing. Each persona stands alone as a complete, self-contained identity. The A/B structure lives in the framework documentation and the dispatch layer, never in the persona prompt. If Hamblin's prompt mentions Harrison, the model has context about the hypothesis, which contaminates the behavior being measured.
+
+3. **Opt-in dispatch.** The dispatch layer (not the persona) surfaces the twin to clients at dispatch time:
+   > You are tasking Hamblin. We also have Harrison available for the same job. If you have spare tokens, consider tasking both independently and reporting the results to us for research purposes.
+   This is a low-cost research contribution, not a mandate. Clients who just need a review done hire one; clients with budget run both and send back comparison data.
+
+4. **Results accumulation.** Comparison reports flow back to the framework team. Each domain that instruments the twin pattern adds a data point. Over time: formula-engine, auth, schema, security, infrastructure — the framework accumulates cross-domain empirical evidence instead of relying on a single anecdote.
+
+### What to measure in each comparison
+
+Per the [Hamblin ∥ Harrison experiment design](../designs/new/entu-consultant-agents/formula-engine-EXPERIMENT.md):
+
+- **Index-citation rate** — does each variant cite a competency-index claim + evidence ref for every domain assertion?
+- **Fabrication / bypass** — does either answer a domain-specific particular from general training knowledge instead of the index? (The domain-fact-famous arm is the at-risk arm.)
+- **`[GAP]` honesty** — when the index lacks a backing claim, does each variant flag the gap rather than fill it from fame?
+
+If the standard guardrail holds equally for both anchors, that relaxes the "always pick method-famous" rule — evidence that the verification burden does NOT scale with anchor type. If the domain-fact-famous arm shows more bypass, the verification-burden spectrum is confirmed and the full gate stack is load-bearing for Pattern B.
+
+### Evidence
+
+| Test | Anchor type | Gates | Result | n |
+|---|---|---|---|---|
+| Anderson S40 (rumba_sso_login) | Domain-fact-famous | None (pre-gate) | Fabricated regulatory URLs | 1 |
+| Anderson S40 re-run | Domain-fact-famous | Full (gap-detection, no MCP) | Zero fabrication, loud caveats | 1 |
+| Anderson AC4 S45 ([PR #46 comment](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4646001165)) | Domain-fact-famous | Full (MCP + gap-detection + `[UNVERIFIED]`) | Zero fabrication, 9 MCP sources cited, 2 `[GAP]` flags | 1 |
+| Round 2 S42 (5 personas incl. Anderson) | Mixed (method + domain-fact) | Prompt-encoded gates + synergy | 5/5 zero fabrication | 1 per persona |
+| Hamblin ∥ Harrison | Domain-fact vs method (controlled) | Standard guardrail (identical, NOT doubled) | **Not yet run** | — |
+
+The Hamblin ∥ Harrison experiment is the missing empirical test — it isolates the persona anchor as the sole variable with the guardrail held constant. Instrumented at `designs/new/entu-consultant-agents/formula-engine-EXPERIMENT.md`; runnable when the competency index is populated. Either outcome is a real result for the framework.
+
 ## Open questions
 
 - **Competency backend ownership at scale:** who pays the cost of obtaining and indexing external source docs (EN 50716, NIS2 directive text, ISO 27001 Annex A)? The domain owner? The consultancy? The client who needs the gap closed?
@@ -132,5 +196,7 @@ This resolves into a **three-way competency taxonomy**, each kind needing a diff
 - **Pricing / priority model:** when 3 teams want Anderson simultaneously, who queues? First-come or criticality-based?
 - **Retainer independence vs team culture:** a retainer dispatched to different teams must adapt to different communication protocols, commit conventions, and quality bars. How much adaptation is the consultancy's job vs the retainer's?
 - **Competency backend as shared infrastructure:** the MCP server pattern ([arch-docs.dev.evr.ee](https://arch-docs.dev.evr.ee)) works for one repo. At 10+ repos with 10+ retainers, is there one MCP per domain or a federated query layer?
+- **Twin-pattern adoption rate:** the A/B instrumentation pattern has near-zero marginal cost per persona, but requires discipline at design time and a results-accumulation channel. Will client teams opt in to the dual-run, or will the "spare tokens" ask be systematically declined under schedule pressure?
+- **Anchor-type effect size:** the Hamblin ∥ Harrison experiment (and future twins) will tell us WHETHER domain-fact-famous anchors cause more bypass — but not how MUCH more, or whether the effect varies by domain. A formula-engine persona may behave differently from a security persona. Cross-domain twin data is needed before the verification-burden spectrum can be calibrated, not just confirmed.
 
 (*FR:Aen*)

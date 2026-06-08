@@ -1,6 +1,74 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-06 — session-44 → session-45
+### [NEXT SESSION] 2026-06-08 — session-45 → session-46
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S46 read):**
+
+- **State of play:** S45 closed 2026-06-08 — short focused session on Opus 4.6 (roster intent). **AC4 PASSED** — Anderson persona + arch-docs MCP (528 docs, org sub) + full competency gates → zero fabrication, 9 MCP sources cited, 2 `[GAP]` flags, 7 findings (F1+F5 = Medium, genuine catches). Review + assessment posted to [PR #46](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4646001165). Arhitecture #1 empirically closed out (was already GitHub-closed by valerikevr 2026-06-05). VEO-51 cross-reference posted on Jira.
+- **NEW framework design principle — "claims-need-backing" meta-pattern + A/B instrumentation pattern.** PO + team-lead evolved topic 10 with a new section: persona anchor selection generalizes from "always method-famous" (§2.4) to a **three-case spectrum** (method-only / field-expert A/B / domain-fact + full gates) + a reusable **twin-design pattern** (twin design / contamination isolation / opt-in dispatch / results accumulation). Structural parallel named: VEO-51 nfr.yaml (system declarations pending evidence) ↔ competency gates (agent assertions pending grounding) = same epistemic shape at different substrates.
+- **Celes carry-forward updated:** item (0) in her scratchpad briefs her on the topic-10 evolution. She's design lead for §2.4 / guild work — should review and adjust the new section when spawned.
+- **Hamblin ∥ Harrison experiment still NOT RUN** — designed + instrumented (S44), pending competency index population. Now referenced from topic 10 evidence table as the missing empirical test.
+- **All prior watch items carry forward unchanged** — Entu #42 wait-on-Argo, #8 prompt-edits batch, A1 evidence-cycle audit OVERDUE, substrate anomalies (task-state stale-replay S42-S44 + peer-DM lag), TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate parked.
+
+---
+
+## SESSION 45 WRAP — 2026-06-08 (AC4 passed — Anderson + MCP validated end-to-end; topic 10 evolved with A/B instrumentation pattern + claims-need-backing meta-pattern)
+
+**Spans:** 2026-06-08, single session. Parent on Opus 4.6 (roster intent).
+
+**Outcome:** Two work tracks in one session. (1) **AC4 live MCP test** — spawned Anderson as fresh-context agent against PR #46 with arch-docs MCP connected (528 docs). All three AC4 criteria passed: real MCP sources cited, competency gates fired (UNVERIFIED caveats + Proposed-status discipline + GAP flags), zero fabricated links. Review + assessment posted to PR #46; VEO-51 Jira cross-reference posted. (2) **Framework design principle evolution** — PO-led discussion generalised the persona anchor choice from a binary rule to a three-case spectrum with a reusable A/B twin-design pattern. Named the "claims-need-backing" meta-pattern connecting nfr.yaml (system declarations) and competency gates (agent assertions). Landed in topic 10.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| [PR #46 Anderson review](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4646001165) | NEW | Anderson (Aen posted) | AC4 live MCP test — 7 findings, 9 MCP sources, 2 GAP flags, zero fabrication |
+| [PR #46 AC4 assessment](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4646003424) | NEW | Aen | Scorecard + observations on competency-gate pattern |
+| VEO-51 Jira comment | NEW | Aen | Claims-need-backing cross-reference with backlinks to PR #46 |
+| `topics/10-guild-specialists.md` | M | Aen | New section: persona anchor selection — A/B instrumentation pattern + claims-need-backing meta-pattern + evidence table |
+| `memory/celes.md` | M | Aen | Carry-forward item (0): brief on topic-10 evolution |
+
+### Decisions (PO-ratified)
+
+[DECISION — S45] **Persona anchor selection is a three-case spectrum, not a binary.** (1) Obviously method-only roles → Pattern A, no A/B. (2) Field-expert personas where both anchors viable → always design both as twins (identical scaffold, persona sole variable). (3) Domain-fact roles with full gates → Pattern B + full gate stack. Replaces the flat "always method-famous" rule from §2.4.
+
+[DECISION — S45] **A/B twin-design pattern adopted as standard for field-expert personas.** Four parts: twin design (identical everything except persona.md), contamination isolation (twins don't reference each other), opt-in dispatch (dispatch layer surfaces twin to clients), results accumulation (comparisons flow back to framework team).
+
+[DECISION — S45] **"Claims-need-backing" named as a meta-pattern.** nfr.yaml declarations pending evidence and agent assertions pending competency-index grounding are the same epistemic shape at different substrates. Cross-referenced on VEO-51 Jira.
+
+### Substantive learnings
+
+[LEARNED — framework, promotion-grade] **The verification layer is what separates a claims register from an assurance system.** Both nfr.yaml and competency-gated personas are "shape-valid claims pending truth-check." The gap between declaration and verification is where failures live — whether the declarer is a repo's nfr.yaml or an AI persona's domain claim. Naming this as a meta-pattern makes it transferable beyond the guild context.
+
+[LEARNED — framework] **AC4 validates gates, not anchor choice.** Anderson (domain-fact-famous) + full gates = clean output. But this does NOT tell us whether persona fame independently causes bypass at standard guardrail levels. The Hamblin ∥ Harrison experiment (standard guardrail, persona sole variable) is the separable, not-yet-run test.
+
+[LEARNED — process] **The opt-in research ask is the accumulation strategy.** Instead of running one A/B experiment and deciding, every field-expert persona design becomes an instrumented experiment. Clients with budget run both twins; results flow back. Cross-domain evidence accumulates incrementally.
+
+### Standing watch items going into session 46
+
+- **All S44 watch items carry forward unchanged** — Entu #42 wait-on-Argo, #8 prompt-edits (Celes has diffs), A1 evidence-cycle audit OVERDUE, substrate anomalies (task-state stale-replay S42-S44 + peer-DM lag), TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate parked.
+- **NEW — Topic 10 A/B section needs Celes review.** She's the design lead for §2.4 / guild work. Her scratchpad has carry-forward item (0).
+- **Hamblin ∥ Harrison experiment** — designed, not run. Referenced from topic 10 evidence table. Trigger: competency index populated + PO direction.
+
+### NEXT-SESSION BOOT (re-orient instructions for S46)
+
+1. Read `startup.md` first (always). Steps 1-5. **Step 0.5 model gate:** roster pins 4.6; S45 ran 4.6 — verify before TeamCreate.
+2. **Read the [NEXT SESSION] M1 seed at the TOP of this scratchpad** — downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S46 read.
+3. **Pull `mitselek-ai-teams`.** Don't pre-spawn; wait for PO direction.
+4. **If PO wants Celes review of topic-10 evolution:** spawn Celes. Her scratchpad item (0) orients her. She may adjust the A/B section, challenge the three-case spectrum, or propose refinements to the twin-design pattern.
+5. **If Argo responded on #42:** trigger to deploy personas. Spawn Celes. Mind: ai-teams is private; submit via comment/PR/gist.
+6. **If PO wants Hamblin ∥ Harrison run:** populate formula competencies.yaml first, then dispatch both variants on shared formula probes. See `formula-engine-EXPERIMENT.md`.
+7. **If PO surfaces #8 prompt-edits:** Celes has diffs ready (~10 min, one pass).
+8. **A1 evidence-cycle audit is OVERDUE** — raise if not surfaced.
+9. **If Cal spawns:** substrate queue includes task-state stale-replay (S42-44) + peer-DM lag (S44).
+10. **If PO surfaces Arhitecture #1 AC4 follow-up:** AC4 passed S45. Issue already closed. Anderson's F1 (CI schema fetch integrity) and F5 (security_level omission) are genuine catches worth raising with valerikevr if PO wants.
+11. **Unchanged externals/dormant** — TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate, TPS-583/mVox-dev/Manager-team dormant.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-08] 2026-06-06 — session-44 → session-45
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S45 read):**
 
