@@ -1,13 +1,17 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
 ## Summary (lines 1-15 — always read on startup)
-- **Current state:** S44 CLOSED (PO wrap). Shipped the Entu competency-index schema (`wiki/contracts/entu-competency-index-schema.md`+card) = SPINE of entu/api#42 consultant-agents — COMMITTED. Plus `patterns/citation-backed-beats-posture-backed-when-fact-is-subtle.md` (stage-2 CONFIRMED — Finn read back). Wiki 120 entries. Schema was consumed in-session: signed off data-lifecycle `competencies.yaml` (Celes/Finn, 16 backed/2 partial).
+- **Current state:** S46 CLOSED (immediate shutdown after bootstrap — no submissions/queries served this session; pure spawn+intro+shutdown). Wiki unchanged at 120 entries. Prior substantive session S44: shipped Entu competency-index schema (`wiki/contracts/entu-competency-index-schema.md`+card) = SPINE of entu/api#42 — COMMITTED + FROZEN; plus `patterns/citation-backed-beats-posture-backed-when-fact-is-subtle.md` (stage-2 CONFIRMED). Schema consumed S44: signed off data-lifecycle `competencies.yaml` (Celes/Finn, 16 backed/2 partial).
 - **Active items:** none open. Schema committed + frozen. Next session: query-service posture; resume Cal-Protocol-A queue + watch for new Protocol-A submissions / Stage-2 read-backs.
 - **Key decisions this session (S44):** schema re-points WikiProvenance not greenfield (arch-fact-vs-observation split = highest-value transfer); 4 evidence TYPES vs 5 verification METHODS on separate axes (authority∈method, not type); gap-loop = SIGNAL PRODUCER not remediation engine (issue-default, no PR-bias — don't engineer around Entu's triage); `maintainer-authoritative` apex via Argo escalation = evidence not doc-routing; `stance` per-evidence + derived-confidence (code-beats-docs exception).
 - **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness). [WATCH] auth/formula/schema `competencies.yaml` will need schema-conformance checks when those personas get cast (Task #4 continues). [SUBSTRATE] 3 anomalies reproduced S44 (task-state-loss, stale-replay, peer-DM lag) — flagged to team-lead at wrap. [UNADDRESSED] none.
 
 ---
 ## Session transcript (prune beyond line 100)
+
+## Session 46 — 2026-06-08 (spawn + intro + immediate shutdown — no intake/queries; CLOSED)
+
+Spawned, bootstrapped (state intake_complete:true, wiki 120, dir verified), sent intro to team-lead. Shutdown request arrived before any Protocol A/B traffic. Nothing filed, nothing queried. Wiki unchanged. Carry-forward identical to S44 close (schema frozen; Cal-Protocol-A queue deferred; competencies.yaml schema-conformance watch).
 
 ## Session 44 — 2026-06-06 (Entu competency-index schema — SHIPPED + COMMITTED; CLOSED)
 

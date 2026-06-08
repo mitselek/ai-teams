@@ -1,18 +1,63 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-08 — session-45 → session-46
+### [NEXT SESSION] 2026-06-08 — session-46 → session-47
 
-**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S46 read):**
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S47 read):**
 
-- **State of play:** S45 closed 2026-06-08 — short focused session on Opus 4.6 (roster intent). **AC4 PASSED** — Anderson persona + arch-docs MCP (528 docs, org sub) + full competency gates → zero fabrication, 9 MCP sources cited, 2 `[GAP]` flags, 7 findings (F1+F5 = Medium, genuine catches). Review + assessment posted to [PR #46](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4646001165). Arhitecture #1 empirically closed out (was already GitHub-closed by valerikevr 2026-06-05). VEO-51 cross-reference posted on Jira.
-- **NEW framework design principle — "claims-need-backing" meta-pattern + A/B instrumentation pattern.** PO + team-lead evolved topic 10 with a new section: persona anchor selection generalizes from "always method-famous" (§2.4) to a **three-case spectrum** (method-only / field-expert A/B / domain-fact + full gates) + a reusable **twin-design pattern** (twin design / contamination isolation / opt-in dispatch / results accumulation). Structural parallel named: VEO-51 nfr.yaml (system declarations pending evidence) ↔ competency gates (agent assertions pending grounding) = same epistemic shape at different substrates.
-- **Celes carry-forward updated:** item (0) in her scratchpad briefs her on the topic-10 evolution. She's design lead for §2.4 / guild work — should review and adjust the new section when spawned.
-- **Hamblin ∥ Harrison experiment still NOT RUN** — designed + instrumented (S44), pending competency index population. Now referenced from topic 10 evidence table as the missing empirical test.
-- **All prior watch items carry forward unchanged** — Entu #42 wait-on-Argo, #8 prompt-edits batch, A1 evidence-cycle audit OVERDUE, substrate anomalies (task-state stale-replay S42-S44 + peer-DM lag), TPS-601, ITSD-38884, article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate parked.
+- **State of play:** S46 closed 2026-06-08 — two tracks: (1) Celes reviewed topic 10 "Persona anchor selection" section, approved with 4 adjustments (all applied); (2) PO-driven container pipeline mapping — TPS-601 converted to Epic with 7 RACI-based child tasks (TPS-604→610), blocking links set, ITSD-38884 linked as blocker, ITSD-37672 linked as predecessor. ITOps space scanned (250 pages), RACI filled with real names: Tõnu Tammer (CF admin), Roland Kilusk (Sysops), Ruth Türk (Tech lead), Mihkel (Developer).
+- **Topic 10 adjustments landed (Celes S46 review):** (1) case-2 "Always design both" softened to "by default when results-accumulation channel exists"; (2) n-inflation caveat on evidence table (4 Anderson rows = within-persona, not independent); (3) claims-need-backing bridged to three-way taxonomy (genus/species); (4) wording fix §178 — experiment relaxes "state guardrail twice", not anchor preference.
+- **Container pipeline fully mapped in Jira.** Epic TPS-601 → 7 tasks with assignees + blocking chain. Critical path: TPS-604 (tunnel+DNS) → TPS-607 (compose) → TPS-608 (swarm) → TPS-609 (decommission). ITSD-38884 (CF token permission, Ain Simsalu, "Analysis" since May 27) blocks the CF admin tasks. Konteinerid page (1114800137) in ITOps Confluence is EMPTY placeholder — future landing spot.
+- **Celes item (0) DONE.** Her scratchpad updated. Remaining carry: formula A/B experiment (runnable, not run), persona-deploy-on-Argo-response, #8 prompt-edits batch.
+- **All prior watch items carry forward** — Entu #42 wait-on-Argo, #8 prompt-edits batch (Celes has diffs), A1 evidence-cycle audit OVERDUE, substrate anomalies (task-state stale-replay S42-S44 + peer-DM lag), ITSD-38884 (now linked to TPS-601), article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate parked. TPS-601 upgraded from watch to active Epic.
 
 ---
 
-## SESSION 45 WRAP — 2026-06-08 (AC4 passed — Anderson + MCP validated end-to-end; topic 10 evolved with A/B instrumentation pattern + claims-need-backing meta-pattern)
+## SESSION 46 WRAP — 2026-06-08 (Topic 10 Celes review + container pipeline RACI mapping)
+
+**Spans:** 2026-06-08, single session. Parent on Opus 4.6 (roster intent).
+
+**Outcome:** Two tracks. (1) **Topic 10 design-lead review** — Celes reviewed the S45 "Persona anchor selection" section, approved with 4 non-blocking adjustments (case-2 softening, n-inflation caveat, genus/species bridge, wording fix). All 4 applied to `topics/10-guild-specialists.md`. (2) **Container pipeline RACI mapping** — PO-driven. Scanned ITOps Confluence space (250 pages). Found ITSD-37672 (original container request, Roland Kilusk, Closed). Mapped RACI to real people. Converted TPS-601 to Epic, created 7 child tasks with assignees and blocking links. Linked ITSD-38884 as blocker, ITSD-37672 as predecessor.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `topics/10-guild-specialists.md` | M | Aen (Celes diffs) | 4 adjustments from design-lead review |
+| TPS-601 Epic + 7 child tasks | NEW | Aen | TPS-604→610, RACI-based, blocking links |
+| ITSD-37672 → TPS-601 link | NEW | Aen | Predecessor container request |
+| ITSD-38884 → TPS-601 blocker link | NEW | Aen | CF token permission blocks CF admin tasks |
+
+### Decisions (PO-ratified)
+
+[DECISION — S46] **Celes's 4 topic-10 adjustments approved and applied.** Case-2 softened ("by default when results-accumulation channel exists"), n-inflation caveat added, genus/species bridge sentence added, §178 wording corrected to match EXPERIMENT.md. No Cal wiki duplicate needed — topic 10 is canonical home.
+
+[DECISION — S46] **TPS-601 RACI filled with real names.** IT/CF admin = Tõnu Tammer (TPS-577 assignee, CF super-admin); Sysops/Infra = Roland Kilusk (built original container ITSD-37672); Tech lead = Ruth Türk (VJS 2 lead, VEO-4 assignee); Developer = Mihkel Putrinš.
+
+[DECISION — S46] **Skip story points on TPS-601 sub-tasks.** One-off ops tasks across 4 people/3 teams — value is assignee + acceptance criteria + dependency chain, not velocity tracking.
+
+### NEXT-SESSION BOOT (re-orient instructions for S47)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **If PO asks about container/TPS-601 progress:** check Jira status of TPS-604→610 + ITSD-38884. Critical path starts with Tõnu (TPS-604 tunnel+DNS) and Ain (ITSD-38884 token permission). Report what moved.
+5. **If PO wants Celes for guild/persona work:** spawn her. Open carry: formula A/B experiment (Hamblin∥Harrison, runnable but not run), persona-deploy-on-Argo (#42), #8 prompt-edits batch (she has diffs, team-lead applies).
+6. **If PO wants Entu #42 progress check:** check GitHub issue status. Argo response still pending as of S46. 3 deferred persona domains (auth/schema/formula) gated on his buy-in.
+7. **First operational item if research-spawning:** A1 evidence-cycle audit is OVERDUE (carried since S44). Surface to PO if no higher-priority work.
+
+### Standing watch items going into session 47
+
+- **TPS-601 Epic (7 tasks)** — check Jira for movement. ITSD-38884 (Ain, "Analysis" since May 27) is the gate for CF admin tasks. Tõnu owns TPS-577 + TPS-604/605/606.
+- **Entu #42 wait-on-Argo** — no change S46. Whole persona tree is worked-draft until Argo buys in.
+- **#8 prompt-edits batch** — Celes has diffs, team-lead applies. LOW priority, none blocking.
+- **A1 evidence-cycle audit OVERDUE** — carried forward unchanged since S44.
+- **Substrate anomalies** — task-state stale-replay (S42-S44) + peer-DM lag. Not investigated S46.
+- **Konteinerid Confluence page (1114800137)** — empty placeholder in ITOps space "Serverite sandard". Future landing spot for VEO-4 container standard.
+- **Remaining unchanged:** article/Schliemann, ghost-bridge auto-restart, Arhitecture #9-#13, round-3 candidate parked.
+
+---
+
+## [PROCESSED 2026-06-08] SESSION 45 WRAP — 2026-06-08 (AC4 passed — Anderson + MCP validated end-to-end; topic 10 evolved with A/B instrumentation pattern + claims-need-backing meta-pattern)
 
 **Spans:** 2026-06-08, single session. Parent on Opus 4.6 (roster intent).
 

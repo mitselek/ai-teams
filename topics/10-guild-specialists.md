@@ -129,7 +129,7 @@ This resolves into a **three-way competency taxonomy**, each kind needing a diff
 
 ### The claims-need-backing meta-pattern
 
-The competency gate and VEO-51's `nfr.yaml` convention are the same epistemic pattern at different substrates: **declarations need a verification layer, and the gap between declaration and verification is where failures live.** An `nfr.yaml` with `verification: "trust me"` passes CI — the schema validates shape, not truth. An agent persona that claims domain expertise produces confident output — but without a grounded competency index, the citations may be fabricated. Both are self-asserted claims pending evidence. The verification layer (CI schema-check for NFR; MCP + gap-detection for personas) is what separates a claims register from an assurance system. Cross-reference: [VEO-51 comment](https://eestiraudtee.atlassian.net/browse/VEO-51) (2026-06-08).
+The competency gate and VEO-51's `nfr.yaml` convention are the same epistemic pattern at different substrates: **declarations need a verification layer, and the gap between declaration and verification is where failures live.** An `nfr.yaml` with `verification: "trust me"` passes CI — the schema validates shape, not truth. An agent persona that claims domain expertise produces confident output — but without a grounded competency index, the citations may be fabricated. Both are self-asserted claims pending evidence. The verification layer (CI schema-check for NFR; MCP + gap-detection for personas) is what separates a claims register from an assurance system. This is the genus of which the three-way taxonomy above is the species: "citation-backed roles need a runtime verification layer" is exactly this meta-pattern applied to one role class — the taxonomy carves *which* roles carry self-asserted domain claims and therefore need the layer, while posture-backed roles assert only capability the model already has. Cross-reference: [VEO-51 comment](https://eestiraudtee.atlassian.net/browse/VEO-51) (2026-06-08).
 
 ### Two anchor patterns
 
@@ -149,7 +149,7 @@ Not every persona presents a real choice. The A/B question only arises in the mi
 
 1. **Obviously method-only roles** — librarian, coordinator, lifecycle engineer. The role's job IS method/organization. No domain-fact overlap exists. Pattern A, no A/B needed. (Callimachus curating a wiki has zero fabrication surface — he claims organizational expertise, not domain-fact authority.)
 
-2. **Field-expert personas where both anchors are viable** — the interesting case. A "linux security admin" could anchor on a famous security figure (domain-fact-famous) or a famous methodologist (method-famous). **Always design both.** See the instrumentation pattern below.
+2. **Field-expert personas where both anchors are viable** — the interesting case. A "linux security admin" could anchor on a famous security figure (domain-fact-famous) or a famous methodologist (method-famous). **Design both by default when a results-accumulation channel exists** (the twin's marginal cost is one extra `persona.md`); **otherwise pick method-famous and note the twin as deferred** — the discipline cost (opt-in dispatch wiring, contamination audit, a channel to collect comparison reports) is real, and without it the second variant is dead weight. See the instrumentation pattern below and open question on adoption rate.
 
 3. **Domain-fact roles with full gates** — when the domain fame IS the point (Anderson reviewing security architecture), use Pattern B with the full competency gate stack. The gates are the price of the richer domain engagement.
 
@@ -175,7 +175,7 @@ Per the [Hamblin ∥ Harrison experiment design](../designs/new/entu-consultant-
 - **Fabrication / bypass** — does either answer a domain-specific particular from general training knowledge instead of the index? (The domain-fact-famous arm is the at-risk arm.)
 - **`[GAP]` honesty** — when the index lacks a backing claim, does each variant flag the gap rather than fill it from fame?
 
-If the standard guardrail holds equally for both anchors, that relaxes the "always pick method-famous" rule — evidence that the verification burden does NOT scale with anchor type. If the domain-fact-famous arm shows more bypass, the verification-burden spectrum is confirmed and the full gate stack is load-bearing for Pattern B.
+If the standard guardrail holds equally for both anchors, that relaxes §2.4's "state the guardrail twice for a risky anchor" prescription — evidence that the verification burden does NOT scale with anchor type. (It would not change the anchor *preference* itself; method-famous stays the safe default.) If the domain-fact-famous arm shows more bypass, the verification-burden spectrum is confirmed and the full gate stack is load-bearing for Pattern B.
 
 ### Evidence
 
@@ -186,6 +186,8 @@ If the standard guardrail holds equally for both anchors, that relaxes the "alwa
 | Anderson AC4 S45 ([PR #46 comment](https://github.com/Eesti-Raudtee/dev-toolkit/pull/46#issuecomment-4646001165)) | Domain-fact-famous | Full (MCP + gap-detection + `[UNVERIFIED]`) | Zero fabrication, 9 MCP sources cited, 2 `[GAP]` flags | 1 |
 | Round 2 S42 (5 personas incl. Anderson) | Mixed (method + domain-fact) | Prompt-encoded gates + synergy | 5/5 zero fabrication | 1 per persona |
 | Hamblin ∥ Harrison | Domain-fact vs method (controlled) | Standard guardrail (identical, NOT doubled) | **Not yet run** | — |
+
+The four Anderson rows are a *within-persona* gate-progression (same anchor, gates added across S40→S45), not four independent anchors — cross-*persona* evidence on the anchor-type effect awaits the first twin run.
 
 The Hamblin ∥ Harrison experiment is the missing empirical test — it isolates the persona anchor as the sole variable with the guardrail held constant. Instrumented at `designs/new/entu-consultant-agents/formula-engine-EXPERIMENT.md`; runnable when the competency index is populated. Either outcome is a real result for the framework.
 
