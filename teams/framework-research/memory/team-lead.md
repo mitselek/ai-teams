@@ -8,6 +8,7 @@
 - **Ghost-bridge v2 shipped.** `ghost-bridge.py` iterates all `pairs[]` each cycle; `ssh_exec` handles keyless connections (bare metal). `hr-devs-lead-ghost` added to roster + runtime. Live config has both pairs (fr-apex + fr-hr-devs). Gist with hr-devs setup instructions: `https://gist.github.com/mitselek/7360d87c8060b3fc9a5212598fc6c839`.
 - **VEO-56 AC-7 hint sent to apex.** Infoset = infrastructure layer (ssp/llp/piilur servers, IBM MQ, FTP/SFTP scripts by Roland Kilusk). DB relationship is one-way inbound ("Info tuleb sisse läbi INFOSET"). ELEX = zero signal anywhere. Three Confluence pages cited: 1041727537, 1459716113, 615448619.
 - **hr-devs ghost-bridge gotcha:** Their team-lead confirmed `fr-lead-ghost` is in runtime config.json, but SendMessage fails from plain CLI (not TeamCreate-managed). The bridge will work in their normal team sessions. No code fix needed — architecture constraint.
+- **Lifecycle scripts hardened.** `persist-inboxes.sh`: per-file error handling, skips corrupt filenames (was killed by `\r`-in-filename artifact + `set -e`). `restore-ghost-members.sh`: EXISTS defaults to 0 on empty jq output (was `[: : integer expression expected]`). Corrupt `apex-lead-ghost\r.json` cleaned from repo.
 - **All prior S46 watch items carry forward unchanged** — TPS-601 Epic (7 tasks), Entu #42 wait-on-Argo, formula A/B experiment, #8 prompt-edits batch, A1 evidence-cycle audit OVERDUE, substrate anomalies, ITSD-38884, article/Schliemann, ghost-bridge auto-restart (now v2), Arhitecture #9-#13, round-3 candidate parked.
 
 ---
