@@ -137,6 +137,17 @@
         "origin": "RFC #66 ghost-member pattern. FR's local representation of apex-research's team-lead. Bridged by ghost-bridge daemon (see teams/framework-research/poc/ghost-bridge/SPEC.md).",
         "significance": "Comm endpoint only — no spawnable agent. SendMessage to this name routes to apex via ghost-bridge daemon."
       }
+    },
+    {
+      "name": "hr-devs-lead-ghost",
+      "agentType": "ghost",
+      "backendType": "ssh-bridge",
+      "color": "white",
+      "lore": {
+        "fullName": "HR Devs Lead as seen from FR",
+        "origin": "Ghost-member pattern. FR's local representation of hr-devs's team-lead on bare metal (100.96.54.170:22). Bridged by ghost-bridge daemon.",
+        "significance": "Comm endpoint only — no spawnable agent. SendMessage to this name routes to hr-devs via ghost-bridge daemon."
+      }
     }
   ]
 }

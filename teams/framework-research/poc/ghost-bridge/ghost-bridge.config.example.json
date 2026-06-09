@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy to ghost-bridge.config.json and edit. local_team is the name of YOUR team (the one ~/.claude/teams/<local_team>/inboxes/ resolves to). Paths in pid_file/log_file are resolved relative to this file's directory if not absolute.",
+  "_comment": "Copy to ghost-bridge.config.json and edit. local_team is the name of YOUR team (the one ~/.claude/teams/<local_team>/inboxes/ resolves to). Paths in pid_file/log_file are resolved relative to this file's directory if not absolute. remote_team_name (optional per pair) overrides the deployment alias when it differs from the team directory name on the remote host.",
   "local_team": "framework-research",
   "watch_interval_s": 2.0,
   "pid_file": "ghost-bridge.pid",
@@ -17,6 +17,21 @@
         "remote_outbox_inbox": "fr-lead-ghost",
         "local_inbox": "team-lead",
         "rewrite_from_to": "apex-lead-ghost"
+      }
+    },
+    {
+      "pair_name": "fr-hr-devs",
+      "remote_deployment_alias": "hr-devs (bare metal)",
+      "remote_team_name": "hr-devs",
+      "local_to_remote": {
+        "local_outbox_inbox": "hr-devs-lead-ghost",
+        "remote_inbox": "team-lead",
+        "rewrite_from_to": "fr-lead-ghost"
+      },
+      "remote_to_local": {
+        "remote_outbox_inbox": "fr-lead-ghost",
+        "local_inbox": "team-lead",
+        "rewrite_from_to": "hr-devs-lead-ghost"
       }
     }
   ]

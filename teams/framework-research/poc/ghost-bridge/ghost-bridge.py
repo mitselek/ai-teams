@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # (*FR:Aen via coding-subagent*)
-"""ghost-bridge — team-lead-to-team-lead cross-host comms daemon (v1).
+"""ghost-bridge — team-lead-to-team-lead cross-host comms daemon (v2).
 
-Generalizes the S31 ghost-chat PoC into a long-running daemon shape. One pair
-per process (v1 scope). Outbound forwards FR-local outbox -> remote inbox via
-ssh; inbound fetches remote outbox -> FR-local inbox.
+Generalizes the S31 ghost-chat PoC into a long-running daemon shape. Multi-pair
+support (v2): all pairs[] in config are polled each cycle. Outbound forwards
+FR-local outbox -> remote inbox via ssh; inbound fetches remote outbox ->
+FR-local inbox.
 
 Primitives (APPEND_INBOX_SCRIPT, FETCH_AND_MARK_READ_SCRIPT, ssh_exec,
 load_ssh_config) are adapted from teams/framework-research/poc/ghost-member-cli/
@@ -112,9 +113,10 @@ def ssh_exec(cfg: dict, remote_script: str, timeout: float = 30.0) -> tuple:
     """Run a base64-shipped shell snippet on the remote. Returns (rc, stdout, stderr)."""
     b64 = base64.b64encode(remote_script.encode("utf-8")).decode("ascii")
     remote_cmd = f"echo {b64} | base64 -d | bash"
-    args = [
-        "ssh",
-        "-i", cfg["key"],
+    args = ["ssh"]
+    if cfg.get("key"):
+        args += ["-i", cfg["key"]]
+    args += [
         "-p", str(cfg["port"]),
         "-o", "StrictHostKeyChecking=accept-new",
         "-o", "BatchMode=yes",
@@ -401,17 +403,16 @@ class Daemon:
         pairs = self.config.get("pairs", [])
         if not pairs:
             raise RuntimeError("config has no pairs[]")
-        if len(pairs) > 1:
-            self.log.warn(
-                f"v1 handles pairs[0] only; ignoring {len(pairs) - 1} additional pair(s) "
-                "(Known limitation #6)"
-            )
-        self.pair = pairs[0]
 
-        self.ssh_cfg = load_ssh_config(self.pair["remote_deployment_alias"])
+        self.pairs = []
+        for pair_cfg in pairs:
+            ssh_cfg = load_ssh_config(pair_cfg["remote_deployment_alias"])
+            if pair_cfg.get("remote_team_name"):
+                ssh_cfg["remote_team_name"] = pair_cfg["remote_team_name"]
+            missing = {}
+            self.pairs.append((pair_cfg, ssh_cfg, missing))
+
         self._stop = False
-        # State for log-noise suppression on missing files / transient errors.
-        self._missing = {}
 
     def _resolve(self, p: str) -> Path:
         path = Path(p)
@@ -438,14 +439,20 @@ class Daemon:
         signal.signal(signal.SIGINT, handler)
 
     def run(self) -> int:
+        pair_names = ", ".join(p[0]["pair_name"] for p in self.pairs)
         self.log.info(
             f"ghost-bridge starting "
             f"local_team={LOCAL_TEAM} "
-            f"pair={self.pair['pair_name']} "
-            f"remote={self.ssh_cfg['user']}@{self.ssh_cfg['host']}:{self.ssh_cfg['port']} "
+            f"pairs=[{pair_names}] ({len(self.pairs)} pair(s)) "
             f"interval={self.watch_interval}s "
             f"pid={os.getpid()}"
         )
+        for pair_cfg, ssh_cfg, _ in self.pairs:
+            self.log.info(
+                f"  pair={pair_cfg['pair_name']} "
+                f"remote={ssh_cfg['user']}@{ssh_cfg['host']}:{ssh_cfg['port']} "
+                f"team={ssh_cfg['remote_team_name']}"
+            )
         self.write_pid()
         self.install_signal_handlers()
 
@@ -456,18 +463,27 @@ class Daemon:
         try:
             while not self._stop:
                 cycle += 1
-                try:
-                    sent = poll_outbound(self.pair, self.ssh_cfg, self.log, self._missing)
-                    out_total += sent
-                except Exception as exc:
-                    self.log.error(f"poll_outbound raised {type(exc).__name__}: {exc}")
-                if self._stop:
-                    break
-                try:
-                    got = poll_inbound(self.pair, self.ssh_cfg, self.log, self._missing)
-                    in_total += got
-                except Exception as exc:
-                    self.log.error(f"poll_inbound raised {type(exc).__name__}: {exc}")
+                for pair_cfg, ssh_cfg, missing in self.pairs:
+                    if self._stop:
+                        break
+                    try:
+                        sent = poll_outbound(pair_cfg, ssh_cfg, self.log, missing)
+                        out_total += sent
+                    except Exception as exc:
+                        self.log.error(
+                            f"poll_outbound [{pair_cfg['pair_name']}] "
+                            f"raised {type(exc).__name__}: {exc}"
+                        )
+                    if self._stop:
+                        break
+                    try:
+                        got = poll_inbound(pair_cfg, ssh_cfg, self.log, missing)
+                        in_total += got
+                    except Exception as exc:
+                        self.log.error(
+                            f"poll_inbound [{pair_cfg['pair_name']}] "
+                            f"raised {type(exc).__name__}: {exc}"
+                        )
 
                 # Sleep responsively to signals: chunk into 0.25s slices.
                 t_end = time.monotonic() + self.watch_interval
@@ -486,7 +502,7 @@ class Daemon:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="ghost-bridge — FR<->apex team-lead comms daemon")
+    parser = argparse.ArgumentParser(description="ghost-bridge — multi-pair cross-team comms daemon")
     parser.add_argument("--config", "-c", default=str(DEFAULT_CONFIG_PATH),
                         help="path to ghost-bridge.config.json")
     args = parser.parse_args()

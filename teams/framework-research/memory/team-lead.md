@@ -1,6 +1,69 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-08 — session-46 → session-47
+### [NEXT SESSION] 2026-06-09 — session-47 → session-48
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S48 read):**
+
+- **State of play:** S47 closed 2026-06-09 — two tracks: (1) Cross-team intel for apex — VEO-56 AC-7 Infoset confirmed out-of-DB via 3 Confluence sources, hint relayed to apex-lead-ghost; ELEX zero Confluence hits, needs human ask. (2) Ghost-bridge v2 — daemon upgraded from single-pair to multi-pair, hr-devs comms bridge established. FR→hr-devs confirmed working (ping delivered+read). Return path untested — hr-devs wasn't in team harness (plain CLI session). Will work when they run a proper TeamCreate session.
+- **Ghost-bridge v2 shipped.** `ghost-bridge.py` iterates all `pairs[]` each cycle; `ssh_exec` handles keyless connections (bare metal). `hr-devs-lead-ghost` added to roster + runtime. Live config has both pairs (fr-apex + fr-hr-devs). Gist with hr-devs setup instructions: `https://gist.github.com/mitselek/7360d87c8060b3fc9a5212598fc6c839`.
+- **VEO-56 AC-7 hint sent to apex.** Infoset = infrastructure layer (ssp/llp/piilur servers, IBM MQ, FTP/SFTP scripts by Roland Kilusk). DB relationship is one-way inbound ("Info tuleb sisse läbi INFOSET"). ELEX = zero signal anywhere. Three Confluence pages cited: 1041727537, 1459716113, 615448619.
+- **hr-devs ghost-bridge gotcha:** Their team-lead confirmed `fr-lead-ghost` is in runtime config.json, but SendMessage fails from plain CLI (not TeamCreate-managed). The bridge will work in their normal team sessions. No code fix needed — architecture constraint.
+- **All prior S46 watch items carry forward unchanged** — TPS-601 Epic (7 tasks), Entu #42 wait-on-Argo, formula A/B experiment, #8 prompt-edits batch, A1 evidence-cycle audit OVERDUE, substrate anomalies, ITSD-38884, article/Schliemann, ghost-bridge auto-restart (now v2), Arhitecture #9-#13, round-3 candidate parked.
+
+---
+
+## SESSION 47 WRAP — 2026-06-09 (VEO-56 AC-7 cross-team intel + ghost-bridge v2 multi-pair + hr-devs comms bridge)
+
+**Spans:** 2026-06-08 → 2026-06-09, single session. Parent on Opus 4.6 (roster intent).
+
+**Outcome:** Two tracks, no agents spawned. (1) **Cross-team intel** — PO asked if S46's EVR ticket/doc skim could help apex team on VEO-56 AC-7 (Infoset/ELEX). Searched Confluence, found 3 pages proving Infoset is infrastructure-level (not DB). Relayed to apex-lead-ghost with sources. ELEX = zero hits anywhere, flagged for human ask. (2) **Ghost-bridge v2** — extended daemon from single-pair to multi-pair (iterates all `pairs[]`), fixed `ssh_exec` for keyless SSH (bare metal), added `remote_team_name` config field for deployment-alias/team-dir decoupling. Added `hr-devs-lead-ghost` to roster. Created gist with setup instructions for hr-devs side. PO mediated brief. hr-devs confirmed prereqs, registered ghost in runtime. FR→hr-devs ping delivered+read. Return path blocked by hr-devs running plain CLI (not team harness) — will work in their normal sessions.
+
+### Outcomes shipped
+
+| Artifact | Δ | Owner | Notes |
+|---|---|---|---|
+| `poc/ghost-bridge/ghost-bridge.py` | M | Aen | v1→v2: multi-pair poll loop, keyless SSH, remote_team_name override |
+| `poc/ghost-bridge/ghost-bridge.config.example.json` | M | Aen | Added fr-hr-devs pair template |
+| `roster.json` | M | Aen | Added hr-devs-lead-ghost (ghost, ssh-bridge) |
+| Gist: hr-devs setup instructions | NEW | Aen | https://gist.github.com/mitselek/7360d87c8060b3fc9a5212598fc6c839 |
+| VEO-56 AC-7 cross-team message | NEW | Aen | Sent to apex-lead-ghost with 3 Confluence source citations |
+
+### Decisions (PO-ratified)
+
+[DECISION — S47] **Extend ghost-bridge daemon to multi-pair (v2) rather than running separate instances.** Single process polls all pairs each cycle. Simpler ops.
+
+[DECISION — S47] **VEO-56 AC-7 Infoset = confirmed out-of-DB.** Three Confluence sources (ITOps 1041727537, WSO2 1459716113, VJS 615448619). ELEX = zero signal, needs human confirmation.
+
+[DECISION — S47] **hr-devs ghost: skip lore block.** hr-devs roster doesn't use lore on any member. Functional fields only (name, agentType, backendType, color). Roster PR as standalone branch (atomic PRs on collaborator repos).
+
+### NEXT-SESSION BOOT (re-orient instructions for S48)
+
+1. Read `startup.md` first (always). Steps 1-5 (Sync → Reset team state → Restore inboxes → Spawn — wait for PO direction).
+2. **Pull `mitselek-ai-teams` repo** for any external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **If PO asks about hr-devs bridge status:** FR→hr-devs confirmed. Return path untested — next test when hr-devs runs a TeamCreate session. Daemon is v2, live config has both pairs.
+5. **If PO asks about VEO-56 / apex progress:** AC-7 hint sent S47. Check apex-lead-ghost inbox for reply. ELEX still needs human ask (Denis Labunets or Anna Voronina).
+6. **If PO asks about TPS-601 / container pipeline:** check Jira for movement. ITSD-38884 (Ain) is still the gate. Tõnu owns TPS-604 tunnel+DNS.
+7. **If PO wants Celes for guild/persona work:** spawn her. Open carry: formula A/B experiment, persona-deploy-on-Argo (#42), #8 prompt-edits batch.
+8. **A1 evidence-cycle audit is OVERDUE** — carried since S44. Surface to PO if no higher-priority work.
+
+### Standing watch items going into session 48
+
+- **TPS-601 Epic (7 tasks)** — check Jira for movement. ITSD-38884 (Ain, "Analysis" since May 27) is the gate.
+- **Entu #42 wait-on-Argo** — no change S47.
+- **#8 prompt-edits batch** — Celes has diffs, team-lead applies. LOW priority.
+- **A1 evidence-cycle audit OVERDUE** — carried forward unchanged since S44.
+- **Substrate anomalies** — task-state stale-replay (S42-S44) + peer-DM lag. Not investigated S47.
+- **Ghost-bridge v2 running** — daemon PID on Windows dev machine. Auto-restart watch still applies (no systemd on Windows; daemon dies on reboot/sleep).
+- **hr-devs return-path test** — pending their next TeamCreate session.
+- **ELEX human ask** — Denis Labunets or Anna Voronina. No Confluence signal at all.
+- **Remaining unchanged:** article/Schliemann, Arhitecture #9-#13, round-3 candidate parked.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-09] 2026-06-08 — session-46 → session-47
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S47 read):**
 
