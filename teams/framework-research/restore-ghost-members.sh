@@ -57,7 +57,8 @@ while IFS= read -r GHOST_NAME; do
   fi
 
   # Skip if already present in runtime members[]
-  EXISTS=$(jq --arg n "$GHOST_NAME" '[.members[] | select(.name == $n)] | length' "$RUNTIME_CONFIG")
+  EXISTS=$(jq --arg n "$GHOST_NAME" '[.members[] | select(.name == $n)] | length' "$RUNTIME_CONFIG" 2>/dev/null) || EXISTS=0
+  EXISTS=${EXISTS:-0}
   if [ "$EXISTS" -gt 0 ]; then
     continue
   fi
