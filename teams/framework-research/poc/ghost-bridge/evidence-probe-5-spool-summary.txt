@@ -1,0 +1,11 @@
+=== consume-1:
+"text": "T5-MSG-1 — cell A baseline, should enqueue normally. (*FR:Aen*)"
+=== consume-2:
+"text": "T5-MSG-2 — cell A: file was renamed away after MSG-1; harness should recreate fresh. (*FR:Aen*)"
+"text": "T5-MSG-3 — cell B: file (containing MSG-2) will be renamed away DURING this message's enqueue lag. (*FR:Aen*)"
+=== consume-3:
+"text": "T5-OLD decoy — present at send time"
+"text": "T5-MSG-5 — cell B retry: T5-OLD is in the file at send time; an armed rename removes it at +4s; this message's write lands at +7-9s. (*FR:Aen*)"
+=== consume-4:
+"text": "T5-OLD2 — present at send, gone at write (if timing holds)"
+"text": "T5-MSG-6 — cell B final: OLD2 present at send time, sentinel-triggered rename removes it within ~1s, this write lands at +7-9s into an absent path. [OLD2+MSG6]=snapshot-at-send; [MSG6]=read-at-write. (*FR:Aen*)"

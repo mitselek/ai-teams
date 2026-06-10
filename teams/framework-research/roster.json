@@ -1,14 +1,14 @@
 {
   "name": "framework-research",
   "description": "Research team designing the multi-team AI agent framework for Eesti Raudtee. Studies existing team patterns, identifies risks, and evolves the framework design.",
-  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only — TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-opus-4-6[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
+  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only — TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-fable-5[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
   "commonPromptFile": "common-prompt.md",
   "workDir": "$HOME/Documents/github/mitselek/ai-teams",
   "members": [
     {
       "name": "team-lead",
       "agentType": "team-lead",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "prompt": "prompts/aeneas.md",
       "lore": {
         "fullName": "Aeneas",
@@ -20,7 +20,7 @@
     {
       "name": "finn",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "black",
       "prompt": "prompts/finn.md",
       "lore": {
@@ -32,7 +32,7 @@
     {
       "name": "medici",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "magenta",
       "prompt": "prompts/medici.md",
       "lore": {
@@ -44,7 +44,7 @@
     {
       "name": "celes",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "cyan",
       "prompt": "prompts/celes.md",
       "lore": {
@@ -56,7 +56,7 @@
     {
       "name": "volta",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "blue",
       "prompt": "prompts/volta.md",
       "lore": {
@@ -68,7 +68,7 @@
     {
       "name": "herald",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "green",
       "prompt": "prompts/herald.md",
       "lore": {
@@ -80,7 +80,7 @@
     {
       "name": "brunel",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "yellow",
       "prompt": "prompts/brunel.md",
       "lore": {
@@ -92,7 +92,7 @@
     {
       "name": "hopper",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "navy",
       "prompt": "prompts/hopper.md",
       "lore": {
@@ -105,7 +105,7 @@
     {
       "name": "monte",
       "agentType": "general-purpose",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "white",
       "prompt": "prompts/montesquieu.md",
       "lore": {
@@ -118,35 +118,13 @@
     {
       "name": "callimachus",
       "agentType": "librarian",
-      "model": "claude-opus-4-6[1m]",
+      "model": "claude-fable-5[1m]",
       "color": "gold",
       "prompt": "prompts/callimachus.md",
       "lore": {
         "fullName": "Callimachus of Cyrene",
         "origin": "Hellenistic scholar and poet (c. 310–240 BC) at the Library of Alexandria, creator of the Pinakes — the first known library catalogue, classifying 400,000 scrolls by genre, author, and subject. Motto: mega biblion, mega kakon (a great book is a great evil).",
         "significance": "The Oracle who curates, indexes, and serves the team's accumulated knowledge. Not a hoarder — a cataloguer. Agents discover; Callimachus preserves, cross-references, and serves on query."
-      }
-    },
-    {
-      "name": "apex-lead-ghost",
-      "agentType": "ghost",
-      "backendType": "ssh-bridge",
-      "color": "white",
-      "lore": {
-        "fullName": "Apex Lead (Schliemann) as seen from FR",
-        "origin": "RFC #66 ghost-member pattern. FR's local representation of apex-research's team-lead. Bridged by ghost-bridge daemon (see teams/framework-research/poc/ghost-bridge/SPEC.md).",
-        "significance": "Comm endpoint only — no spawnable agent. SendMessage to this name routes to apex via ghost-bridge daemon."
-      }
-    },
-    {
-      "name": "hr-devs-lead-ghost",
-      "agentType": "ghost",
-      "backendType": "ssh-bridge",
-      "color": "white",
-      "lore": {
-        "fullName": "HR Devs Lead as seen from FR",
-        "origin": "Ghost-member pattern. FR's local representation of hr-devs's team-lead on bare metal (100.96.54.170:22). Bridged by ghost-bridge daemon.",
-        "significance": "Comm endpoint only — no spawnable agent. SendMessage to this name routes to hr-devs via ghost-bridge daemon."
       }
     }
   ]

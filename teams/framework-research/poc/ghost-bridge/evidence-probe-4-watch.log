@@ -1,0 +1,16 @@
+15:13:40.123696400 | ABSENT
+15:14:01.184146700 | [{"from":"ghost-probe","text":"INJECTED-A direct file write at 2026-06-10T12:14:00.000Z","summary":"injected message A","timestamp":"2026-06-10T12:14:00.000Z","read":false}]
+15:14:01.630137000 | []
+15:14:42.405088700 | [{"from":"ghost-probe","text":"INJECTED-B direct file write at 2026-06-10T12:14:42.000Z","summary":"injected message B","timestamp":"2026-06-10T12:14:42.000Z","read":false}]
+15:14:42.922408500 | []
+15:14:47.897287000 | [
+  {
+    "from": "team-lead",
+    "text": "HARNESS-B sent at 15:14:44",
+    "summary": "HARNESS-B race-test message",
+    "timestamp": "2026-06-10T12:14:47.690Z",
+    "type": "message",
+    "read": false
+  }
+]
+15:14:49.159435100 | []

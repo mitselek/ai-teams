@@ -1,5 +1,10 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+### [WIP — S48 in-session notes] 2026-06-10
+
+- **[GOTCHA — substrate anomaly, fresh instance]** 2026-06-10 10:31Z: received `idle_notification` from "brunel" with current timestamp, while runtime `members[]` contained ONLY `team-lead` (no agent spawned this session). Sequence: TeamDelete → TeamCreate → restore-inboxes (43 files) → sanitize-inboxes (rewrote all 43 inbox JSONs, marked 15 read). Hypothesis: the sanitizer's inbox-file rewrites triggered the harness notification path — consistent with `wiki/references/inbox-file-write-as-wake-mechanism.md` + the new dispatch-is-file-I/O finding (harness is file-driven; a write to/near `brunel*.json` may surface as agent activity). Only brunel fired so far. Candidate Protocol A follow-up after the dispatch finding lands. Related standing item: task-state stale-replay (S42-S44).
+- **[DECISION — S48, PO]** Parent session on `claude-fable-5[1m]`; PO chose "proceed on fable-5". Roster model pins (all 10 members) + `_substrate_note` updated to match. Uncommitted alongside S47 WIP.
+
 ### [NEXT SESSION] 2026-06-09 — session-47 → session-48
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S48 read):**
