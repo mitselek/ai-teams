@@ -110,9 +110,7 @@ def load_ssh_config(deployment_alias: str) -> dict:
 # === SSH wrapper (verbatim shape from ghost-chat.py) ===
 
 def ssh_exec(cfg: dict, remote_script: str, timeout: float = 30.0) -> tuple:
-    """Run a base64-shipped shell snippet on the remote. Returns (rc, stdout, stderr)."""
-    b64 = base64.b64encode(remote_script.encode("utf-8")).decode("ascii")
-    remote_cmd = f"echo {b64} | base64 -d | bash"
+    """Run a shell script on the remote via stdin. Returns (rc, stdout, stderr)."""
     args = ["ssh"]
     if cfg.get("key"):
         args += ["-i", cfg["key"]]
@@ -121,11 +119,11 @@ def ssh_exec(cfg: dict, remote_script: str, timeout: float = 30.0) -> tuple:
         "-o", "StrictHostKeyChecking=accept-new",
         "-o", "BatchMode=yes",
         f"{cfg['user']}@{cfg['host']}",
-        remote_cmd,
+        "bash",
     ]
     proc = subprocess.run(
         args,
-        stdin=subprocess.DEVNULL,
+        input=remote_script.encode("utf-8"),
         capture_output=True,
         timeout=timeout,
     )
@@ -297,6 +295,7 @@ def poll_outbound(cfg: dict, ssh_cfg: dict, log: Logger, missing_logged: dict) -
         if rc == 0 and "OK" in stdout:
             arr[i]["read"] = True
             forwarded += 1
+            local_write_inbox(local_path, arr)
             log.info(
                 f"outbound: forwarded -> {remote_team}:{remote_inbox_name} "
                 f"(ts={orig.get('timestamp','?')}, summary={orig.get('summary','')[:40]!r})"
@@ -309,10 +308,6 @@ def poll_outbound(cfg: dict, ssh_cfg: dict, log: Logger, missing_logged: dict) -
             # Don't continue draining on failure — likely transport-wide;
             # try again next poll cycle.
             break
-
-    if forwarded > 0:
-        # Race-on-local-flag-flip is Known limitation #2 — accepted v1.
-        local_write_inbox(local_path, arr)
 
     return forwarded
 

@@ -1,5 +1,28 @@
 # Medici — Knowledge Health Checker Scratchpad
 
+## [CHECKPOINT] 2026-06-09 session — hr-devs ghost-member members[] claim audit
+
+Consultancy audit (hr-devs via ghost-bridge): "fr-lead-ghost does NOT need to be in members[] for SendMessage outbound; inbox-file presence suffices; removed config entry without breaking." Deliverable: `docs/health-report-hr-devs-ghost-members-claim-2026-06-09.md` (dated file; did NOT overwrite v6 baseline `health-report.md`).
+
+**VERDICT: directionally ambiguous → NO contradiction with finding #8 v3 once the two legs are separated.** Read `ghost-bridge.py`: ghost path has Leg 1 (FR-agent → ghost via SendMessage = harness dispatch, members[]-gated, lands in local outbox file the daemon forwards) and Leg 2 (remote → FR inbox via daemon `local_append_inbox()` = DIRECT file write, never members[]-gated). hr-devs' claim, charitably read, is about Leg 2 / direct-write = ALREADY documented in `inbox-slot-vs-members-validation-asymmetry.md`. It does NOT touch #8 v3 (strictly SendMessage dispatch validation). Relayed disambiguating Q to team-lead: "does any agent SendMessage(to=ghost), or does the daemon write the inbox file directly?"
+
+**Config-zeroing = separate script bug**, NOT evidence against #8 v3. `restore-ghost-members.sh` does `jq > $TMP; mv $TMP config` — jq exiting 0 with empty/partial stdout (Win-Git-Bash quoting divergence) installs empty config. Volta-owned hardening (validate non-empty + .members before mv). Per memory `feedback_no_windows_substrate_findings`: NOT wiki-grade. Bundling "buggy" with "unnecessary" is a non-sequitur — separated them.
+
+No wiki edit triggered. Escalation trigger left open: IF hr-devs confirms SendMessage(to=name-NOT-in-members[]) SUCCEEDED → WOULD contradict #8 v3 → Protocol A to Cal + re-verify.
+
+**[ESCALATION FIRED 14:24 → RESOLVED 14:28]** hr-devs confirmed Leg 1: `SendMessage(to=fr-lead-ghost)` SUCCEEDS with ghost NOT in members[] (Linux opus-4-7; inbox PRE-EXISTED w/ prior `from` = confound). I called a 3-cell test on FR 4.6; team-lead ran **Cell 1** (name NOT in members[], inbox file ABSENT) → SUCCESS, harness auto-created inbox + delivered. Strongest negative case, unconfounded. Cells 2/3 moot.
+- **KEY RE-READING:** FR's corpus only ever tested members[]-presence as SUFFICIENT (positive case — append entry THEN dispatch). NEVER tested NECESSITY. "members[]-gating required" was an INFERENCE. hr-devs + Cell 1 supplied the missing negative datapoint.
+- **SETTLED VERDICT: REFINE #8 v3 + NEW reference entry. NO version-split** (works on 4.6 AND 4.7 → hypothesis (a) falsified). #8 v3's tested claim (presence sufficient, edits honored) STAYS; the NECESSITY inference DROPS.
+- New property: **SendMessage dispatch NOT members[]-gated; auto-create-on-dispatch** (first send to unknown name creates `inboxes/<name>.json`). `restore-ghost-members.sh` unnecessary for routing (members[] still governs presentation: /list, color, notif identity — out of scope).
+- Two sibling entries carry the wrong necessity language → one-line corrections each: wake-mech "harness only checks members[]"; asymmetry "dispatch through members[] first."
+- Protocol A draft written + handed to team-lead.
+
+**[PO CORRECTION 2026-06-10]** PO collapsed the whole thing: **SendMessage writes a message to a file named after the target; creates it if absent. That's the entire dispatch mechanic. members[] was never in the dispatch path.** The two-leg split, 3-cell test, sufficiency-vs-necessity chain = over-built scaffolding for a one-line answer. Redrafted Protocol A to the single file-I/O property (Type: reference, architectural-fact, source-agents hr-devs+team-lead+medici, TTL 2026-12-10, suggested `references/sendmessage-dispatch-is-inbox-file-write.md`). Still corrects the same two siblings (wake-mech "harness only checks members[]"; asymmetry "dispatch through members[] first"). Audit-trail framing kept in report below a supersession note for provenance.
+
+[LEARNED — biggest] **Lead with the mechanic, not the hypothesis chain.** I got the right ANSWER but wrapped it in elaborate scaffolding (two legs, 3 cells, sufficiency/necessity) when the substrate was just "SendMessage = write file named after target, create if absent." When a finding can be stated as one concrete mechanic, the Protocol A submission should BE that mechanic — the investigation path is provenance, not the canonical statement. My sufficiency-vs-necessity move was a good audit instrument for detecting the wrong inference, but I over-promoted process-of-discovery into the deliverable. Next time: once the simple mechanic is in hand, state it plainly and demote the scaffolding.
+
+[LEARNED] "Outbound" is direction-ambiguous for ghost-bridge paths — but this turned out to not even matter once the mechanic was clear (file I/O on both directions).
+
 ## [CHECKPOINT] 2026-06-05 session 43 — #74 reflexive competency-gap audit (second lens)
 
 Second lens on #74 (Celes leads). Deliverable: `docs/health-report-competency-gap-2026-06-05.md` (new dated file, NOT overwriting v6 health-report.md baseline). Swept all 10 FR prompts → claim→backing table. **OUTCOME: design COMPLETE + faithful to both lenses, PO ruling pending.** Celes's doc `docs/2026-06-05-competency-gap-analysis.md` adopted my findings: three-way taxonomy (citation/substrate/posture → gate/substrate-read/audit), "two mechanisms one name" headline (credited), D3 collapsed to single-policy YAGNI (matches team-lead's read), orphan-claim nuance in §1.4. No prompt edits required (2 optional one-line mirrors G1/C2 post-ratification). My report carries a reconciliation note (my narrow "0 external-citation" yields to her broader "claim-heavy = cites OR derives-from").
