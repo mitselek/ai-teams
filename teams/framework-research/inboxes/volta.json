@@ -108,6 +108,6 @@
     "timestamp": "2026-05-27T10:09:51.422Z",
     "color": "green",
     "type": "message",
-    "read": false
+    "read": true
   }
 ]

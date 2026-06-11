@@ -34,7 +34,7 @@
     "summary": "T07 safety evidence report for Monte",
     "timestamp": "2026-03-18T10:13:13.575Z",
     "color": "blue",
-    "read": false
+    "read": true
   },
   {
     "from": "finn",
@@ -42,7 +42,7 @@
     "summary": "S8 audit data for Monte: Q4 Q5 Q6",
     "timestamp": "2026-03-19T11:39:08.707Z",
     "color": "blue",
-    "read": false
+    "read": true
   },
   {
     "from": "finn",
@@ -50,7 +50,7 @@
     "summary": "CORRECTION: ADRs and methodology now in repo",
     "timestamp": "2026-03-19T11:52:30.764Z",
     "color": "blue",
-    "read": false
+    "read": true
   },
   {
     "from": "finn",
@@ -58,6 +58,6 @@
     "summary": "PO responded on #47 — post round 2",
     "timestamp": "2026-04-08T16:47:56.745Z",
     "color": "orange",
-    "read": false
+    "read": true
   }
 ]

@@ -3,6 +3,6 @@
     "from": "team-lead",
     "text": "{\"type\":\"task_assignment\",\"taskId\":\"7\",\"subject\":\"Brunel + Volta joint: substrate gap analysis vs Cloudflare Claude Managed Agents\",\"description\":\"Joint research dispatch following PO assessment of Cloudflare's Claude Managed Agents announcement (https://blog.cloudflare.com/claude-managed-agents/). Brunel owns containerization angle (V8 isolates vs Docker, microVMs, network mode, secrets injection at proxy); Volta owns lifecycle angle (state persistence across session sleeps, sandbox allocation per session, restart/cleanup semantics). Both contribute to: bottleneck-determines-substrate-choice mapping, what FR remains responsible for, migration paths per FR-shipped team. Dual-perspective discipline mandatory (we-as-target adoption analysis + we-as-researchers framework finding). Joint report routed to team-lead; will fold into docs/findings.md or topics/06-lifecycle.md or both.\",\"assignedBy\":\"team-lead\",\"timestamp\":\"2026-05-25T12:37:54.631Z\"}",
     "timestamp": "2026-05-25T12:37:54.631Z",
-    "read": false
+    "read": true
   }
 ]

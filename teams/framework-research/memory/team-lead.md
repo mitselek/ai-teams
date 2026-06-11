@@ -1,11 +1,66 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [WIP — S48 in-session notes] 2026-06-10
+### [NEXT SESSION] 2026-06-10 — session-48 → session-49
 
-- **[GOTCHA — substrate anomaly, fresh instance]** 2026-06-10 10:31Z: received `idle_notification` from "brunel" with current timestamp, while runtime `members[]` contained ONLY `team-lead` (no agent spawned this session). Sequence: TeamDelete → TeamCreate → restore-inboxes (43 files) → sanitize-inboxes (rewrote all 43 inbox JSONs, marked 15 read). Hypothesis: the sanitizer's inbox-file rewrites triggered the harness notification path — consistent with `wiki/references/inbox-file-write-as-wake-mechanism.md` + the new dispatch-is-file-I/O finding (harness is file-driven; a write to/near `brunel*.json` may surface as agent activity). Only brunel fired so far. Candidate Protocol A follow-up after the dispatch finding lands. Related standing item: task-state stale-replay (S42-S44).
-- **[DECISION — S48, PO]** Parent session on `claude-fable-5[1m]`; PO chose "proceed on fable-5". Roster model pins (all 10 members) + `_substrate_note` updated to match. Uncommitted alongside S47 WIP.
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S49 read):**
 
-### [NEXT SESSION] 2026-06-09 — session-47 → session-48
+- **State of play:** S48 closed 2026-06-11 00:xx — ghost-bridge v3 full-redesign day, solo (no spawns). CLI `2.1.170` (released day after S47) flipped inbox semantics UNANNOUNCED: delivered messages now REMOVED from inbox files, not retained with `read:true`. PO directive: trust no baked-in history → 6 empirical probes → `poc/ghost-bridge/TRUTHS.md` (23 entries, version-stamped). `SPEC-v3.md` "stationmaster" design COMPLETE — all D1–D11 ⬛ (D1/D11 substrate-verified by Tests #5/#6). **Tomorrow's task (PO-stated): find an always-on host for stationmaster.**
+- **Key substrate truths (2.1.170):** inbox = pending-only queue, drained ≲0.8s; ghost outboxes persist (no consumer); direct file write into live inbox → delivered + WAKES idle session ≲0.5s; arbitrary `from` passes verbatim; enqueue lag VARIABLE 0.5–9s; mtime lies; rename-aside + exclusive-create verified atomic (50/50 race rounds). `members[]` never on dispatch path.
+- **Stationmaster (SPEC-v3):** hub daemon — Ubuntu+systemd, hot-reloaded `timetable.json`, four-inbox bidirectional routes with DERIVED attribution (ghost name = address AND identity), per-endpoint executors (local/ssh → any-to-any team bridging), consume-by-rename, inject-by-exclusive-create, at-least-once spool+ledger. **Owed before prod: T6.a race re-run on Ubuntu.**
+- **CASUALTIES (I-1) — own lifecycle scripts now suspect:** persist-inboxes.sh captures only undelivered residue; restore+sanitize semantics undermined — restored inbox files for SPAWNED agents may RE-DELIVER stale entries on the new harness (drain-on-pickup ignores read flags — unverified, test before first spawn!). Startup/shutdown procedure revision is Volta-grade work.
+- **Carry:** GitHub issue on undocumented retention flip (evidence ready, PO go pending); Protocol A batch to Cal (dispatch finding + S48 T-entries); phantom-brunel anomaly (idle_notification from non-member during sanitize rewrite, 10:31Z); A1 audit OVERDUE; TPS-601/ITSD-38884 watch; ELEX human ask; hr-devs relay update.
+
+---
+
+## SESSION 48 WRAP — 2026-06-10/11 (ghost-bridge v3 redesign: empirical truths + complete SPEC)
+
+**Spans:** 2026-06-10 → 2026-06-11 00:xx, single session, solo (zero spawns). Parent on `claude-fable-5[1m]` (PO decision; roster pins updated from opus-4-6).
+
+**Outcome:** PO called the redesign at morning standup after S47's ghost-bridge assumptions proved stale: CLI 2.1.170 changed inbox retention semantics unannounced (caught via empty-inbox observation; changelog research confirms NOTHING published). Built `TRUTHS.md` ledger from scratch — 6 probes (self-dispatch, drain timing, ghost persistence, direct-write injection, rename-aside, exclusive-create race), 23 atomic entries, evidence logs committed. Designed SPEC-v3 "stationmaster" interactively with PO: mirror-vs-relay dialectic (PO's one-way-flow axiom §3.1 + PO's own true-mirror refutation §3.2), four-inbox route model with derived attribution, hub topology. All 11 design concerns DECIDED — two substrate-verified in-session (Tests #5/#6), nine PO-ratified.
+
+### Outcomes shipped
+
+| Artifact | Δ | Notes |
+|---|---|---|
+| `poc/ghost-bridge/TRUTHS.md` | NEW | 23 version-stamped entries; Invalidated section opened (I-1) |
+| `poc/ghost-bridge/SPEC-v3.md` | NEW | Design complete, D1–D11 ⬛ |
+| `poc/ghost-bridge/evidence-*` | NEW | 6 watcher logs / summaries |
+| `docs/health-report-hr-devs-ghost-members-claim-2026-06-09.md` | committed | Medici's dispatch-finding audit chain (S47/48 boundary) |
+| `roster.json` | M | fable-5 pins; ghosts removed (dispatch finding) |
+
+### Decisions (PO-ratified)
+
+[DECISION — S48] Proceed on `claude-fable-5[1m]`; roster pins follow runtime.
+[DECISION — S48] Redesign ghost-bridge from scratch; empirical tests first, atomic truths saved; prior history untrusted.
+[DECISION — S48] SPEC-v3 §3.1 one-way-flow axiom; §3.2 true-mirror REJECTED (drain-back wipe race + contested-target ambiguity); replication unit = entry, never file state.
+[DECISION — S48] D1 consume-by-atomic-rename (Test #5); D11 inject via verify-empty→rename-aside→exclusive-create (Test #6); D2 at-least-once; D3 hub topology w/ per-endpoint executors; D4–D10 per SPEC-v3.
+
+### NEXT-SESSION BOOT (re-orient instructions for S49)
+
+1. Read `startup.md` first (always). Steps 1–5 — BUT see item 5 before restoring/sanitizing inboxes for any team you'll spawn agents into.
+2. **Pull `mitselek-ai-teams` repo** for external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **PO's stated S49 task: find an always-on host for stationmaster.** Prep: D10 requirements (Ubuntu, systemd, outbound ssh to team hosts, `~/.claude` on one filesystem). Candidates to evaluate: hr-devs bare metal (100.96.54.170), apex container host, TPS-601 pipeline boxes (ITSD-38884 still gates CF-admin tasks; Tõnu owns TPS-604 tunnel+DNS). Cross-check Jira movement first.
+5. **Inbox restore/sanitize is now HAZARDOUS-UNVERIFIED** on 2.1.170 (I-1): restored entries in a spawned agent's inbox may re-deliver (drain ignores read flags — untested). Before first spawn: either test with a scratch entry, or restore that agent's inbox as `[]`. Volta-grade procedure revision pending.
+6. **If PO greenlights implementation:** delegate `stationmaster.py` to a specialist (Herald = protocol fit, Brunel = containment fit) against SPEC-v3 verbatim; first implementation gate = T6.a race harness on Ubuntu.
+7. **If PO gives the go on the GitHub issue** (undocumented retention flip): draft from TRUTHS.md I-1 + probe-1b evidence + 2.1.166–170 bracket; PO reviews before filing (outward-facing).
+8. **If Cal spawns:** Protocol A batch — Medici's dispatch-finding draft (in health report) + S48 substrate truths (T-entries are wiki-grain).
+
+### Standing watch items going into session 49
+
+- **Stationmaster host hunt** — S49 primary (PO-stated).
+- **TPS-601 Epic / ITSD-38884** — check Jira; gate for any TPS-hosted stationmaster option.
+- **Lifecycle-scripts revision** (persist/restore/sanitize vs I-1) — Volta-grade, blocks confident agent spawning.
+- **Phantom-brunel anomaly** — file-driven notification path suspicion; candidate probe when Volta/Cal active.
+- **A1 evidence-cycle audit OVERDUE** (since S44) — surface if no higher-priority work.
+- **hr-devs:** relay Medici's final one-liner if not yet sent; return-path test pending their TeamCreate session; ask their CLI version (T1.b replication datapoint).
+- **Unchanged:** ELEX human ask (Denis Labunets / Anna Voronina), Entu #42 wait-on-Argo, formula A/B experiment, #8 prompt-edits batch, article/Schliemann, Arhitecture #9–#13, round-3 candidate parked.
+
+(*FR:Aen*)
+
+---
+
+### [PROCESSED 2026-06-10] 2026-06-09 — session-47 → session-48
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S48 read):**
 
