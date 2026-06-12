@@ -15,7 +15,7 @@
 - **Permits = unilateral receive-grants** (PO's reframing, kills co-sign ceremony): "I agree to receive from team X", submitted over own authenticated channel — channel auth IS the signature. One grant = one direction live; two reciprocal = full route. Revoke unilaterally. timetable.json becomes COMPILED from grants.
 - **MCP = control plane only, mail NEVER over MCP** (wake semantics C3 + durability live on inbox path). v1 tools: grant_receive/revoke_receive, who_is_on, health, who_accepts_me. MCP can ride ssh stdio (`ssh hub mcp`) — same key auth, no new port. MCP itself ships phase 2; protocol designed for it now.
 - **[DECISION — S49] Team-level grants for v1** (not user@team); agent identity rides in message signatures per D9.
-- Doc set owed: (1) onboarding one-pager for team-leads, (2) ~~hub protocol contract~~ **SHIPPED+RATIFIED**, (3) courier implementation hints w/ T-number citations + reference courier (Python).
+- Doc set: ALL THREE SHIPPED S49 — (1) `stationmaster-onboarding.md` (DRAFT, PO-reviewed informally), (2) `stationmaster-protocol.md` v1.0.0 RATIFIED (+§5.5 errata, no bump — no consumers yet), (3) `stationmaster-courier-hints.md` ACCEPTED (PO: field usage will expose shortcomings). Reference courier (Python) still owed.
 - D10 amendments pending ratification: Debian not Ubuntu; Docker `restart: unless-stopped` not systemd; hub sshd in-container on dedicated port.
 
 **[DECISION — S49] `stationmaster-protocol.md` v1.0.0 RATIFIED** (PO read section-by-section, 2026-06-12). Key calls locked during review:
