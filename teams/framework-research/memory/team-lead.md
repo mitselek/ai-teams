@@ -1,6 +1,18 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [WIP — S49 checkpoint 2026-06-12] Stationmaster host + post-office pivot (PO-ratified in dialogue)
+### [NEXT SESSION] 2026-06-12 — session-49 → session-50
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S50 read):**
+
+- **State of play:** S49 closed 2026-06-12 — solo stationmaster design day (zero spawns). Host DECIDED: containerized hub on **prod-llm** (10.100.136.162, michelek = passwordless sudo + docker). Architecture PIVOTED hub-pull → **post-office model** (customers dial out, hub holds only pubkeys). **Doc set complete & accepted:** `stationmaster-protocol.md` v1.0.0 RATIFIED, `stationmaster-onboarding.md` ACCEPTED, `stationmaster-courier-hints.md` ACCEPTED (all in `poc/ghost-bridge/`). **S50 task (PO-stated): BUILD.**
+- **Key probe results (2026-06-11):** reachability strictly one-way rc→prod-llm; prod-llm cannot reach rc on ANY address — moot under post-office. **rc 100.96.54.170 = Cloudflare WARP, NOT Tailscale** (memory corrected); rc LAN = 10.200.13.114. Jira: zero movement (TPS-601 epic + subtasks Open; ITSD-38884 Analysis).
+- **Architecture essence:** ssh-only customers; `restrict,command="sm-shell <team>"` forced-command identity; symmetric NDJSON conversation (request envelope `{v,cmd,args}` + body ⇄ response envelope + data); `deposit` / `collect`+`ack` two-phase, all idempotent; unilateral team-level receive-grants; stationmaster's own grant silent/unmodeled; REST+MCP = phase-2 bindings, non-breaking.
+- **Build order S50:** (1) hub container + `sm-shell` (Brunel-shaped) → (2) reference courier, single file stdlib (Herald/Brunel) → (3) **T6.a race re-run on prod-llm = FIRST GATE** → (4) FR self-registration as first customer (dogfood). Specialists work from the three docs VERBATIM.
+- **Carry:** GitHub issue retention-flip (PO go pending); Protocol A batch to Cal (S48 truths + S49 decisions); A1 audit OVERDUE; D10 amendments fold-in (Debian/Docker/in-container sshd); phantom-brunel; ELEX human ask; hr-devs relay; ghost-bridge v2 daemon = SUPERSEDED by stationmaster, decommission after cutover.
+
+---
+
+## SESSION 49 WRAP — 2026-06-11/12 (stationmaster: host hunt → post-office pivot → doc set ratified)
 
 **Host findings (probed 2026-06-11):**
 - rc = 100.96.54.170 is **Cloudflare WARP, NOT Tailscale** (memory correction); real LAN addr 10.200.13.114/23; hostname `paarisprogemis-fyysiline`; Debian 13, systemd 257, no sudo for dev, Linger=no, 9 users — somebody's physical machine.
@@ -26,7 +38,30 @@
 - ack = custody transfer: only after durable local write; partial ack legitimate; re-ack after crash via ledger.
 - All seven embedded calls ratified: deposit-time consent enforcement, accepted=fsync-durable, duplicate=success, revoke-keeps-queued, status-covers-health, hub-alerts-as-mail, size caps [CONV].
 
-### [NEXT SESSION] 2026-06-10 — session-48 → session-49
+### NEXT-SESSION BOOT (re-orient instructions for S50)
+
+1. Read `startup.md` first (always). Steps 1–5 — BUT before any spawn, see item 4 (I-1 inbox hazard).
+2. **Pull `mitselek-ai-teams` repo** for external scratchpad updates.
+3. **Don't pre-spawn any agent at session start.** Wait for PO direction.
+4. **Pre-spawn safety (I-1, still unverified):** restored inbox entries for a SPAWNED agent may re-deliver on 2.1.x (drain ignores read flags). Before first spawn: test with a scratch entry OR restore that agent's inbox as `[]`. Check CLI version vs 2.1.170 — if changed, re-validate ghost-outbox accumulation (TRUTHS.md I-1 precedent) before trusting any stationmaster doc claim.
+5. **PO-stated S50 task: BUILD stationmaster.** Delegate against the three accepted docs VERBATIM (`poc/ghost-bridge/stationmaster-{protocol,onboarding,courier-hints}.md`). Build order: hub container + `sm-shell` (Brunel: Dockerfile, compose, in-container sshd on dedicated port, forced-command shell; target michelek@10.100.136.162 — passwordless sudo + docker confirmed) → reference courier `stationmaster-courier.py` (Herald or Brunel: single file, stdlib only, section-numbered comments against hints doc) → **FIRST GATE: T6.a race harness re-run on prod-llm** (only Windows-verified so far) → FR registers as first customer.
+6. **If Cal spawns:** Protocol A batch — S48 substrate truths (T-entries) + S49 decision set (post-office pivot, channel-is-identity, consent-as-grants, transport-failure rule, inject-before-ledger ordering).
+7. **If PO gives the go on the GitHub issue** (undocumented retention flip): draft from TRUTHS.md I-1 + probe-1b evidence + 2.1.166–170 bracket; PO reviews before filing.
+8. **If PO asks about D10:** fold S49 amendments into SPEC-v3 D10 text (Debian-not-Ubuntu, Docker-restart-not-systemd, in-container sshd) — small edit, PO already ratified in dialogue.
+
+### Standing watch items going into session 50
+
+- **Stationmaster build** — S50 primary (PO-stated).
+- **ghost-bridge v2 daemon** (Windows dev machine) — superseded by stationmaster; keep alive until cutover, then decommission; pairs fr-apex + fr-hr-devs migrate to grants.
+- **TPS-601 Epic / ITSD-38884** — checked 2026-06-11, zero movement; re-check before any CF-Access-dependent plan.
+- **Lifecycle-scripts revision** (persist/restore/sanitize vs I-1) — Volta-grade, still blocks confident spawning.
+- **A1 evidence-cycle audit OVERDUE** (since S44) — surface if no higher-priority work.
+- **Phantom-brunel anomaly** — candidate probe when Volta/Cal active.
+- **Unchanged:** ELEX human ask, hr-devs return-path test + relay, Entu #42, formula A/B, #8 prompt-edits, article/Schliemann, Arhitecture #9–#13, round-3 candidate.
+
+(*FR:Aen*)
+
+### [PROCESSED 2026-06-11] 2026-06-10 — session-48 → session-49
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S49 read):**
 
