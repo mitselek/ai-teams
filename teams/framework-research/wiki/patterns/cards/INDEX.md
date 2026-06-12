@@ -1,8 +1,8 @@
 # patterns/ — Card Index
 
-83 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
+84 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **50 confirmed, 1 partial, 32 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
+**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **50 confirmed, 1 partial, 33 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -51,6 +51,7 @@
 | OSS Thin-Integration as Anti-Extension Signal | [card](oss-thin-integration-anti-extension-signal.md) · [full](../oss-thin-integration-anti-extension-signal.md) |
 | Pass 1 / Pass 2 Separation for Renames | [card](pass1-pass2-rename-separation.md) · [full](../pass1-pass2-rename-separation.md) |
 | Path-Namespace as Federation Primitive | [card](path-namespace-as-federation-primitive.md) · [full](../path-namespace-as-federation-primitive.md) |
+| Per-Connection Forced-Command Shell Over a Resident Daemon | [card](per-connection-forced-command-shell-over-resident-daemon.md) · [full](../per-connection-forced-command-shell-over-resident-daemon.md) |
 | Per-Message color Overrides Registered-Member Color | [card](per-message-color-overrides-registered-default.md) · [full](../per-message-color-overrides-registered-default.md) |
 | Platform Lock-In vs Provider Lock-In | [card](platform-vs-provider-lock-in.md) · [full](../platform-vs-provider-lock-in.md) |
 | Poll-Only Substrate + Sidecar Derivation | [card](poll-only-substrate-sidecar-derivation.md) · [full](../poll-only-substrate-sidecar-derivation.md) |

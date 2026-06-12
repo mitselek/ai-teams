@@ -1,8 +1,8 @@
 # gotchas/ — Card Index
 
-18 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+19 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **14 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **15 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -17,6 +17,7 @@
 | Embedded GITHUB_TOKEN in .git/config Survives Rebuilds | [card](embedded-github-token-in-git-config.md) · [full](../embedded-github-token-in-git-config.md) |
 | External Synthesis Promotes Cautious Suggestions to Recommendations | [card](external-synthesis-overreach.md) · [full](../external-synthesis-overreach.md) |
 | Inbox Drained on Spawn, Cleared Without Deliver | [card](inbox-drained-on-spawn-clear-without-deliver.md) · [full](../inbox-drained-on-spawn-clear-without-deliver.md) |
+| Inbox Is a Pending-Only Queue, Not an Accumulating Log (CLI 2.1.170) | [card](inbox-retention-flip-pending-only-queue.md) · [full](../inbox-retention-flip-pending-only-queue.md) |
 | Inverted-Trigger Primitives Antipattern on Poll-Based Substrates | [card](inverted-trigger-primitives-antipattern-on-poll-based-substrates.md) · [full](../inverted-trigger-primitives-antipattern-on-poll-based-substrates.md) |
 | jq File Parser vs Command-Line Arg Parser Escape Divergence | [card](jq-file-vs-arg-escape-divergence.md) · [full](../jq-file-vs-arg-escape-divergence.md) |
 | persist-project-state.sh Leaks Per-User Auto-Memory | [card](persist-project-state-leaks-per-user-memory.md) · [full](../persist-project-state-leaks-per-user-memory.md) |
