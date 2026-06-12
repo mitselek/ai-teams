@@ -1,13 +1,21 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
 ## Summary (lines 1-15 — always read on startup)
-- **Current state:** S46 CLOSED (immediate shutdown after bootstrap — no submissions/queries served this session; pure spawn+intro+shutdown). Wiki unchanged at 120 entries. Prior substantive session S44: shipped Entu competency-index schema (`wiki/contracts/entu-competency-index-schema.md`+card) = SPINE of entu/api#42 — COMMITTED + FROZEN; plus `patterns/citation-backed-beats-posture-backed-when-fact-is-subtle.md` (stage-2 CONFIRMED). Schema consumed S44: signed off data-lifecycle `competencies.yaml` (Celes/Finn, 16 backed/2 partial).
-- **Active items:** none open. Schema committed + frozen. Next session: query-service posture; resume Cal-Protocol-A queue + watch for new Protocol-A submissions / Stage-2 read-backs.
-- **Key decisions this session (S44):** schema re-points WikiProvenance not greenfield (arch-fact-vs-observation split = highest-value transfer); 4 evidence TYPES vs 5 verification METHODS on separate axes (authority∈method, not type); gap-loop = SIGNAL PRODUCER not remediation engine (issue-default, no PR-bias — don't engineer around Entu's triage); `maintainer-authoritative` apex via Argo escalation = evidence not doc-routing; `stance` per-evidence + derived-confidence (code-beats-docs exception).
-- **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness). [WATCH] auth/formula/schema `competencies.yaml` will need schema-conformance checks when those personas get cast (Task #4 continues). [SUBSTRATE] 3 anomalies reproduced S44 (task-state-loss, stale-replay, peer-DM lag) — flagged to team-lead at wrap. [UNADDRESSED] none.
+- **Current state:** S50 — Wiki 120 → **124**. Task #5 batch (3 entries, all stage-2 confirmed) + Brunel Protocol A pattern `per-connection-forced-command-shell-over-resident-daemon.md` [pending — Brunel read-back] = structural antidote to S48 zombie-daemon (forced-command shell makes multi-instance impossible vs liveness-probe discipline). Task #5 = 3 entries+cards from S48 TRUTHS.md + S49 decision set: (1) gotcha `inbox-retention-flip-pending-only-queue.md` [confirmed]; (2) reference `inbox-substrate-properties-2.1.170.md` [confirmed]; (3) decision `stationmaster-post-office-model.md` [CONFIRMED via Aen read-back 16:55 — 1 correction folded: onboarding doc ACCEPTED not DRAFT (87ef7d4), courier landed S50; decisions now 3 confirmed/0 pending]. All INDEX + main-index counts updated. Curation call: 23 atomic T-entries → 2 substrate entries (one load-bearing flip gotcha + one version-stamped property sheet pointing at TRUTHS.md as evidentiary source); 5 named S49 decisions → 1 pointer decision-entry per Decisions Boundary (protocol doc is authoritative).
+- **Active items:** Brunel forced-command-shell pattern stage-2:PENDING (Brunel read-back advances). [WATCH] Herald inbound — 2 Protocol A submissions expected (ghost-outbox routing gap, same-volume startup gate pattern).
+- **Key decisions this session (S50):** version-coupled-vs-version-stable distinction is load-bearing — the retention flip is observation-based + CLI-version-coupled (revision trigger = version change, NOT n+1 sightings), UNLIKE the version-stable wake/registration/lifecycle property family. Honored *mega biblion*: did NOT file 23 entries; clustered + pointed at TRUTHS.md. Decision entry = pointer not copy (rejected-alternatives captured: hub-pull/true-mirror/co-sign/mail-over-MCP/relaying).
+- **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness). [WATCH] stationmaster decision stage-2 read-back from Aen; brief had WRONG paths (claimed `poc/ghost-bridge/` at repo root, actual = `teams/framework-research/poc/ghost-bridge/`) — confirmed before filing. [TTL] new entries TTL 2026-09-10 (version re-verify). [UNADDRESSED] none.
 
 ---
 ## Session transcript (prune beyond line 100)
+
+## Session 50 — 2026-06-12 (Task #5 Protocol A batch: S48 truths + S49 decisions — SHIPPED)
+
+Filed 3 entries (+3 cards, +3 card-INDEX edits, +main-index): wiki 120→123.
+- **gotcha** `inbox-retention-flip-pending-only-queue.md` (CLI 2.1.170): live inbox = pending-only queue, delivered msgs REMOVED not retained (T1.b). Flip from S30–S47 accumulating-log, shipped unannounced. Casualties section (persist/restore/sanitize, ghost-bridge v1/v2 read-flag dedup). [GOTCHA] version-COUPLED arch-fact — revision trigger = CLI version change (re-run probe-1b), NOT n+1; distinct from version-stable property family.
+- **reference** `inbox-substrate-properties-2.1.170.md`: 14-row property sheet, curated POINTER to TRUTHS.md (evidentiary source). Wake/from-passthrough/enqueue-lag/mtime-lies/append-preserves/consume-by-rename/exclusive-create-atomic/batch/ghost-outbox. TTL 2026-09-10. [PATTERN] 23 atomic T-entries do NOT map to 23 wiki entries — cluster + point at source ledger (*mega biblion*).
+- **decision** `stationmaster-post-office-model.md`: POINTER to protocol v1.0.0 RATIFIED (Decisions Boundary — no copy). 5 named sub-decisions + rejected-alternatives (hub-pull/true-mirror/co-sign/mail-over-MCP/relaying). stage-2 PENDING (filed-on-behalf of Aen).
+[GOTCHA] Spawn brief paths WRONG (`poc/ghost-bridge/` at repo root → actual `teams/framework-research/poc/ghost-bridge/`); Glob-located before filing. Reported to team-lead at wrap.
 
 ## Session 46 — 2026-06-08 (spawn + intro + immediate shutdown — no intake/queries; CLOSED)
 
@@ -84,17 +92,10 @@ S39: Wiki 115 Instance-4 amendment (roster.model non-load-bearing on Agent-tool 
 [S35]: Wiki 105→107. Brunel+Hopper joint S34 wrap (discriminator-anchored + three-layer). Hopper-Amendment-4 via Celes. docs/findings.md (Brunel+Volta substrate-gap). Harness-restriction gotcha surfaced.
 [S36]: Wiki 107→114. C1+C4 methodology pair. Sub-shape-E-at-design-domain n=4. Recursive-narrowing. Three-role-stacking. 8 entries shipped. Stage-2-feedback typology crystallized (5 shapes).
 
-## Sessions 26-35 (heavily pruned — load-bearing items only; see git history)
+## Sessions 1-35 (heavily pruned — load-bearing only; see git history)
 
-[S26-S28]: Wiki 59→82. Protocol C promotions (substrate-invariant-mismatch, worktree-isolation, semver-strict, relay-fidelity). Companion-pair cross-pollinated from apex-research.
-[S29-S30]: Wiki 82→86. Monte submissions + Brunel review. Recursive-citation + inbox-drained-on-spawn-clear.
-[S31]: Wiki 86→89. RFC #66 ghost-member assessment. PO architecture decision (per-team librarian + messenger-ghost).
-[S33]: Wiki 92→93. Substrate finding #8 v3 canonicalization.
-
-## Sessions 1-25 (heavily pruned)
-
-[DECISION] Phase 2 activated S6; Protocol C first cycle = Structural Change Discipline.
-[LEARNED] Git-blame for dispute handling; sibling entries beat variants when failure surfaces diverge; architectural-fact gotchas don't gain confidence from n+1; cross-pollination unit is the idea not the file.
-[CHECKPOINT] TTL scan: earliest expiry `model-inventory-baseline.md` 2026-07-10; `inbox-drained-on-spawn-clear` 2026-08-07; substrate-property references 2026-11-12/14/19; edit-tool-trap 2026-11-27; inverted-trigger 2026-11-27.
+[S1-25] Phase 2 activated S6; Protocol C first cycle = Structural Change Discipline. [LEARNED] git-blame for disputes; sibling entries beat variants when failure surfaces diverge; arch-fact gotchas don't gain confidence from n+1; cross-pollination unit = idea not file.
+[S26-35] Wiki 59→93: Protocol C promotions (substrate-invariant-mismatch, worktree-isolation, semver-strict, relay-fidelity); companion-pair from apex; recursive-citation + inbox-drained-on-spawn-clear; RFC #66 ghost-member + PO per-team-librarian decision; #8 v3 canonicalization.
+[CHECKPOINT] TTL scan: `model-inventory-baseline` 2026-07-10; `inbox-drained-on-spawn-clear` 2026-08-07; new inbox-2.1.170 pair 2026-09-10; substrate-property refs 2026-11-12/14/19; edit-tool-trap + inverted-trigger 2026-11-27.
 
 (*FR:Callimachus*)

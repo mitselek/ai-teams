@@ -1,5 +1,54 @@
 # Herald Scratchpad
 
+## Summary (lines 1-15 — always read on startup)
+- **Current state:** S50 — Task #2 DONE; Task #6 ACCEPTED completed by Aen 16:55 (courier-logic layer; my 3-layer separation argument sound). **Task #4 now mine (courier side)** — FR registers as first production customer, real-ssh end-to-end. BLOCKED on #3 (gate) + #7 (deploy), both in_progress by Hopper. IDLE until Aen pings hub-live. Claimed owner on #4.
+- **Active items:** Local pre-deploy harness (`integration-test.py`, 14/14) = pre-deploy evidence. 2 Protocol-A subs sent to Cal (standing by). Fan-out amendment candidate written up below (Aen 16:55 reconfirmed: must land before session end — DONE).
+- **Key decisions this session:** Built VERBATIM against S49 docs. Integration wires real courier loop to real Brunel sm-shell; only ssh/Docker hop stubbed (covered by Brunel's smoke-test.sh over real ssh + the Task #4 end-to-end). Aen folded the real-ssh end-to-end into Task #4.
+- **Carry-forward:**
+  - **NEXT WAKE (Task #4 — FR production registration, real-ssh end-to-end):** the ONE untested path. Courier runs HERE on Windows/Git-Bash → hints §8 `Path.home()`-not-`$HOME` first field exercise (Aen watch-point). Need: Hopper does real `sm-register` for framework-research (operator); hub addr `sm@<prod-llm>` with `-p 2222`; courier config → ssh_key at FR key, ssh_opts `["-p","2222"]`. Run: ping → deposit (incl duplicate) → collect+ack two-phase → E_NOGRANT → grant→accepted → full round-trip with real local inject+ledger; capture + version-stamp evidence. Operator side: Brunel's runbook `docs/stationmaster-hub-deployment-runbook.md`.
+  - WARNING: CLI 2.1.170→2.1.175 substrate shift — courier-hints S2 facts (S1/S3 ghost-outbox accumulation + live-inbox drain) need re-validation before production reliance.
+  - **[DEFERRED — PO ratification]** Ghost-outbox fan-out routing — amendment candidate written up below (S50 Task #6 section). Aen surfaces at PO return. Do NOT edit ratified docs.
+  - DEFERRED: T6.a inject race-harness Windows-only (hints S4 / D10) — re-run on prod-llm (Task #3, operator gate). My integration-test.py does NOT cover the inbox-injection race; orthogonal.
+  - NOTE: Task #1 description text says `grant_receive/revoke_receive` but Brunel's sm-shell DISPATCH correctly uses `grant`/`revoke` (matches §5.5). Cosmetic task-text drift, not a code bug.
+
+---
+## 2026-06-12 (session #50 — Task #6 courier⇄hub integration)
+
+[CHECKPOINT] **Shipped `integration-test.py` — 14/14 pass.** Drives the REAL courier loop against the REAL Brunel `sm-shell` (invoked as `sm-shell <team>` on stdin/stdout, shared SM_STATE_DIR), only the ssh/Docker transport hop stubbed. Covers every Task #6 acceptance item: ping; deposit; duplicate=success; collect+ack two-phase; E_NOGRANT rejection + spool-retention (no drop); grant→deposit-accepted; PLUS courier-side disciplines Brunel's smoke-test.sh can't reach (consume-by-rename, inject-by-exclusive-create, anti-spoof attribution hr-devs-ghost over IMPERSONATED-LEAD claim, ledger dedup + crash-survival re-run).
+
+[LEARNED] **Two smoke tests, orthogonal coverage.** Brunel's `smoke-test.sh` = hub wire surface over REAL ssh (proves forced-command + sshd + sm-shell line up on substrate), talks raw `printf|ssh`. Mine = courier loop ⇄ hub logic wired direct (proves the customer-side file disciplines + protocol consumption), stubs ssh. Neither covers the T6.a inbox-injection race (Task #3, operator). Three distinct layers; no overlap, no gap between #6 and #1's smoke-test.
+
+[GOTCHA] **Brunel's sm-shell verbs are CORRECT (`grant`/`revoke`), but Task #1's description TEXT says `grant_receive/revoke_receive`.** Same phase-2-MCP-name drift Aen flagged me on. Code is right, task text is stale. Surfaced as cosmetic note, not a bug.
+
+### [DEFERRED — PO ratification] Amendment candidate: ghost-outbox → destination-team routing (fan-out case)
+
+**Disposition (Aen 16:49):** the v1 courier handling stands as a DOCUMENTED CONVENTION (courier scope, changes nothing in the ratified protocol). The fan-out/multi-destination case is a PROTOCOL AMENDMENT CANDIDATE requiring PO ratification — PO away, so it queues. Write-up below is intentionally NON-prescriptive (surfaces options, recommends none as decided).
+
+**Problem statement.** A consignment is `{"to": <team>, "entry": {...verbatim harness inbox entry...}}` (protocol §4). The hub routes by the `to` field. But a harness inbox entry carries NO destination field — and a ghost outbox (`inboxes/<name>.json`, a session-less name agents SendMessage to) is a generic accumulation slot. So the courier must supply `to` from somewhere OTHER than the entry. The ratified docs never specify where. This is the one place a courier MUST originate routing data the protocol doesn't define.
+
+**The two cases v1 covers unambiguously (the documented convention):**
+1. **Single configured ghost outbox** → its one destination team is the courier's config/derivation. No ambiguity: one outbox, one destination.
+2. **`<team>-bridge` naming convention** → a ghost outbox named `hr-devs-bridge` routes to `hr-devs` (the hub's own example, hints §1). Destination encoded in the outbox name; courier strips `-bridge`.
+
+**The undefined case:** one ghost outbox whose entries must fan out to MULTIPLE destination teams (e.g. a single `outbox.json` carrying mail for hr-devs AND apex-research). Nothing in the entry or the outbox name disambiguates per-entry destination. v1 courier returns None and refuses-to-guess (mail retained in spool, logged, never dropped — hints §7 no-TTL honored).
+
+**Possible resolutions (NOT ranked, NOT recommended — for PO):**
+- **(A) Per-destination ghost outboxes only** (codify convention 2 as the rule). Fan-out is achieved by N outboxes, one per destination. Zero protocol change; pushes the cost to the sender (agents must SendMessage to the right `<team>-bridge` name). Simplest; matches current hub example.
+- **(B) Routing sidecar / entry-envelope extension.** Define an optional courier-read wrapper the sender writes around the entry (e.g. `{"to": "<team>", "entry": {...}}` at the LOCAL ghost-outbox level, mirroring the consignment shape). Adds a local-format contract; entry stays verbatim on the wire. Protocol-adjacent (it's a local-file-format addition, arguably courier-hints scope not wire-protocol scope — boundary question for PO).
+- **(C) Leave undefined; single-destination + naming convention is the supported v1 surface.** Fan-out is explicitly out of scope until a real consumer needs it (YAGNI posture). The courier's refuse-and-retain is the correct behavior for an unsupported configuration.
+
+**Boundary note for PO:** (A) and (C) need NO wire-protocol change (courier-hints convention only); only (B) touches a contract surface, and even then it's the LOCAL outbox format, not the hub wire envelope. So the "amendment" may resolve as a courier-hints doc clarification rather than a protocol §4 change — that classification is itself a PO call.
+
+## 2026-06-12 (session #50 — Task #2 reference courier)
+
+[CHECKPOINT] **Shipped `stationmaster-courier.py`** — single file, stdlib only. Outbound: poll-by-content → parse-before-consume → atomic-rename-to-spool → deposit → delete-on-accepted/duplicate (hints S3, FIFO oldest-first). Inbound: collect → ledger-check → inject-via-verify-empty/rename-aside/exclusive-create (hints S4) → ledger-append → ack-all (hints S6). Custody transfer: ack only after durable inject (protocol S5.4). Inject-before-ledger ordering (hints S6 row 4 — at-least-once, dup-not-loss). Anti-spoof attribution from envelope `from_team` → `<from_team>-ghost`, body verbatim (protocol S4). Single-instance lock (exclusive-create + PID staleness, hints S7). Same-volume startup gate (hints S3). 8/8 tests pass (5 offline file-discipline + 3 simulated-hub transport).
+
+[GOTCHA] **Ghost-outbox→destination-team routing is UNDEFINED in the S49 docs.** Consignment is `{"to":<team>,"entry":{...}}` (protocol S4) but the harness inbox entry carries no `to_team`, and a ghost outbox is a generic accumulation slot. v1 reference: single-destination config, or `<team>-bridge`→`<team>` (hints S1 example `hr-devs-bridge`). Multi-destination fan-out from one outbox = undefined. Surfaced to team-lead per brief (do-not-invent-resolution); coded the convention + an explicit ambiguity comment + a None-return-rather-than-guess on the multi-outbox case.
+
+[DECISION] **Per-consignment inject (1 entry per inject_batch call), NOT batch-of-collect.** Keeps the delivered-ledger 1:1 with hub envelope `id` (the dedup key). collect returns one entry per consignment; injecting per consignment means a crash mid-loop re-delivers exactly the un-ledgered ids, not a whole batch.
+
+[DECISION] **Partial-deposit handling:** on a multi-entry spool file where some consignments are `rejected` (E_NOGRANT/E_UNKNOWN_TEAM, per-consignment per protocol S5.2), rewrite the spool file to retain ONLY the non-accepted entries (courier-private file → in-place atomic-replace allowed, hints S3.5) and retry next cycle. Never drop mail on own initiative (hints S7: no TTL).
+
 ## 2026-06-02 (session #40 — issue #71 playbook extraction)
 
 [CHECKPOINT] **Extracted 4 procedural recipes from common-prompt.md into `playbooks/`.** Before 141 lines / 14582 chars (~3.6k tok); after 112 lines / 7680 chars (~1.9k tok). Delta −29 lines / −6902 chars (~−1.7k tok, ~47% of file). Files: `verify-structural-change.md`, `version-typed-contract.md`, `relay-fidelity.md`, `shutdown-agent.md`. All `(*FR:Herald*)`.

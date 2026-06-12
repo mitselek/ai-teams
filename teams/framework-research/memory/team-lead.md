@@ -1,6 +1,21 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
-### [NEXT SESSION] 2026-06-12 — session-49 → session-50
+## SESSION 50 — 2026-06-12 (stationmaster BUILD; PO delegated autonomous coordination)
+
+- [DECISION — S50, PO 16:4x] **Full build-order authorization, PO absent:** deploy hub container to prod-llm (michelek@10.100.136.162), run T6.a gate there, on pass register FR as first customer. No further PO gate inside the build order.
+- [DECISION — S50, PO 16:4x] **Session-end:** full S1–S5 shutdown incl. commit + push when work wraps or stalls.
+- [DECISION — S50, Aen] Protocol §5 verbs `grant`/`revoke` are the contract; `grant_receive`/`revoke_receive` were phase-2 MCP tool names only (Brunel caught the discrepancy in my brief; ratified doc wins).
+- [WIP] Spawned: brunel (T#1 hub container), herald (T#2 courier), callimachus (T#5 Protocol A batch, not yet checked in). T#3 (T6.a gate) unowned — plan: spawn Hopper (deployment operator) at staging time, per Brunel's operator-domain scoping. T#4 blocked by 1–3.
+- [GOTCHA] CLI 2.1.175 now (TRUTHS.md stamped 2.1.170) — substrate claims carry re-validation flag; baked into briefs + T#3.
+- [GOTCHA] I-1 mitigation applied at startup: zeroed runtime inboxes of all three spawn targets before spawn (were already empty). Hopper's inbox had 15.6KB stale restored entries at her later spawn — zeroing was LOAD-BEARING; datapoint for lifecycle-scripts revision.
+- [DECISION — S50, Aen 16:49] Herald's ghost-outbox routing gap: v1 handling = documented convention (single-outbox config + `<team>-bridge`→`<team>`; refuse-and-retain on fan-out). Fan-out routing = PROTOCOL AMENDMENT CANDIDATE, queued `[DEFERRED — PO ratification]` in Herald's scratchpad. Ratified docs untouched.
+- [DECISION — S50, Aen 16:49] T6.a gate-of-record definition (Hopper's per-filesystem catch): host-fs baseline ≠ gate; gate runs against the EXACT inbox+spool filesystem layout of Brunel's artifact (volume/bind-mount explicit in compose). Task #3 closes only on that run.
+- [WIP] T#2 COMPLETE (courier shipped, 8/8 tests). T#6 created: local courier⇄hub integration smoke (Herald, blocked by #1) before deploy.
+- [DECISION — S50, Aen 16:52] T6.a gate ADJUDICATED (amends 16:49 criterion): hub does NOT depend on exclusive-create (Brunel: flock + tmp/fsync/rename, exclusive spool ownership) — T6.a gates CUSTOMER-side courier injection. Gate-of-record = Hopper's prod-llm host-fs run (customer substrate for prod-llm-hosted teams) + cheap supplementary inside sm-state volume. Windows customer substrate already S48-verified.
+- [WIP 16:52] T#1 COMPLETE+ACCEPTED (hub artifact set + runbook; image assembly UNVERIFIED — no Docker on dev box). T#7 created (Hopper): compose build dry-run on prod-llm → up -d → smoke-test.sh acceptance; Brunel standby for build failures. T#6 RE-SCOPED: integration vs DEPLOYED hub (no local Docker), blocked by #3+#7. T#5 COMPLETE (wiki 120→123); stage-2 read-back on post-office decision entry sent CONFIRMED w/ 1 correction (onboarding=ACCEPTED not DRAFT); wiki commit pending Cal's fix.
+- [LEARNED] Spawn-brief path discipline: always full repo-relative paths (`teams/framework-research/poc/...`) — three agents independently caught the missing prefix.
+
+### [PROCESSED 2026-06-12] 2026-06-12 — session-49 → session-50
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S50 read):**
 
