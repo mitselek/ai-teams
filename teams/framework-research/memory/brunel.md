@@ -195,7 +195,8 @@ Shared lesson: verify-substrate-truth-anchored-grammar at innermost parser BEFOR
 [GOTCHA] WARP TLS interception: `network_mode:host` + `NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem` + system CA.
 [GOTCHA] Named volumes created as root → `chown 1000:1000` in entrypoint.
 [GOTCHA] SSH: useradd creates locked account. Fix: `usermod -p '*'` for pubkey auth.
-[GOTCHA] Container rebuild regenerates SSH host keys → `ssh-keygen -R "[host]:port"` after rebuild.
+[GOTCHA] Container rebuild regenerates SSH host keys → `ssh-keygen -R "[host]:port"` after rebuild. (Stationmaster avoids this by persisting host keys on the state volume.)
+[GOTCHA — S50, OpenSSH 9.x] `ssh-keygen -A -f <prefix>` does NOT create `<prefix>/etc/ssh` and FAILS "No such file or directory" if absent — keys silently don't land. Caught pre-deploy in stationmaster entrypoint (would have left hub with no host key → sshd fails at `up`, NOT at build). Fix: generate the single needed key directly with explicit `-f <path>` (`ssh-keygen -t ed25519 -f $HK_DIR/ssh_host_ed25519_key -N ""`); sshd_config references only the ed25519 host key anyway.
 [GOTCHA] CRLF from Windows git autocrlf breaks entrypoints. Fix: `sed -i 's/\r$//'` then rebuild.
 [GOTCHA] Inbox files created at agent registration time. Specialist → unregistered agent = message LOST. Spawn order: service-role agents BEFORE message senders.
 [GOTCHA] Base64-encode-via-SSH strips shell-escape backslashes. Use heredoc with single-quote delimiter for scripts with `\"` or `\s`.

@@ -38,18 +38,18 @@ chown -R "$SM_USER:$SM_USER" "$STATE_DIR"
 
 # --- host keys -----------------------------------------------------------
 # Persist host keys on the state volume so a rebuild/restart does not change
-# the hub fingerprint out from under registered couriers.
+# the hub fingerprint out from under registered couriers. sshd_config only
+# references the ed25519 host key, so generate exactly that one, directly into
+# HK_DIR. (Note: `ssh-keygen -A -f <prefix>` does NOT create <prefix>/etc/ssh
+# and fails "No such file or directory" if it is absent -- verified on OpenSSH
+# 9.x. Generating the single key with an explicit -f path sidesteps that.)
 HK_DIR="$STATE_DIR/ssh_host_keys"
 mkdir -p "$HK_DIR"
-if [ -z "$(ls -A "$HK_DIR" 2>/dev/null || true)" ]; then
-    ssh-keygen -A -f "$STATE_DIR" >/dev/null 2>&1 || true
-    # ssh-keygen -A writes under <dir>/etc/ssh; relocate into HK_DIR.
-    if [ -d "$STATE_DIR/etc/ssh" ]; then
-        mv "$STATE_DIR"/etc/ssh/ssh_host_* "$HK_DIR"/ 2>/dev/null || true
-        rm -rf "$STATE_DIR/etc"
-    fi
+if [ ! -f "$HK_DIR/ssh_host_ed25519_key" ]; then
+    ssh-keygen -t ed25519 -f "$HK_DIR/ssh_host_ed25519_key" -N "" -C stationmaster-hub >/dev/null
 fi
-chmod 600 "$HK_DIR"/ssh_host_*_key 2>/dev/null || true
+chmod 600 "$HK_DIR/ssh_host_ed25519_key" 2>/dev/null || true
+chmod 644 "$HK_DIR/ssh_host_ed25519_key.pub" 2>/dev/null || true
 
 # --- authorized_keys -----------------------------------------------------
 # Registrations live on the state volume (operator-managed). Link them into
