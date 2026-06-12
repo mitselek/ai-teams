@@ -35,6 +35,14 @@ check() {  # check "<label>" "<expected substring>" "<actual>"
 
 echo "== stationmaster smoke test against $HUB:$PORT =="
 
+# Step 0 -- host-key existence (catches the entrypoint host-key-gen failure
+# class directly, before the protocol tests). If sshd came up with no host
+# key, ssh-keyscan returns nothing; a healthy hub presents its ed25519 key.
+# This is the explicit assertion of the invariant the S50 ssh-keygen -A -f
+# bug would have violated -- a runtime failure invisible to the build.
+HK=$(ssh-keyscan -t ed25519 -p "$PORT" "$HUB" 2>/dev/null || true)
+check "hub presents an ed25519 host key (sshd started with a host key)" "ssh-ed25519" "$HK"
+
 R=$(asA '{"v":1,"cmd":"ping"}')
 check "ping returns bound team A" "\"team\":\"$TA\"" "$R"
 check "ping reports a fingerprint" "SHA256:" "$R"
