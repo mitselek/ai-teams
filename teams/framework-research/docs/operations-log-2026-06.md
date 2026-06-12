@@ -69,3 +69,105 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** — **success (transfer + build phase).** Brunel's previously-unverified image assembly is now verified clean on the Debian deployment substrate. Reporting build result to Aen before the Tier-D `up -d`; clean build is the explicit go-condition per Aen's "clean build → up -d (PO-authorized, on record)." Continues in next entry.
 
 ---
+
+## 2026-06-12T17:01+03:00 — Stationmaster hub `up -d` (Task #7 step 2): HARD-GATE STOP — container crash-loops on missing host key
+
+**timestamp** — 2026-06-12T17:00+03:00 (`up -d`) through 2026-06-12T17:01+03:00 (crash-loop halted via `docker compose stop`).
+
+**tasker** — Aen (team-lead). Task #7 step 2.
+
+**dispatch summary** — `docker compose up -d` to bring the hub live on prod-llm. Up succeeded structurally (network + volume + container created, EXIT 0) but the container CRASH-LOOPS: sshd exits immediately because the entrypoint's generated host key is absent at the path sshd is pointed to. Expected-outcome (healthy <10s, sshd:2222 listening) NOT met → hard-gate STOP, surfaced to Brunel (artifact author) + Aen. Did NOT patch the artifact.
+
+**tier classification + sanction status** —
+- `docker compose up -d` = **Tier D**, sanction complete (logged prior entry): exact command per runbook §4; reason = deploy ratified hub per S50; expected = healthy <10s + sshd:2222 + sm-state volume.
+- `docker compose stop` (crash-loop halt) = **Tier M** (designed lifecycle event; halts the `restart: unless-stopped` loop; leaves volume + image intact). Within-dispatch agency to stop a crash-looping container I just started under the dispatch — standard recovery posture, not scope expansion.
+- Volume/host-key inspection = Tier R.
+
+**deployed-artifacts-read declaration** —
+- **Layer 1 (FR design):** `stationmaster/entrypoint.sh:24-34` (host-key generation + relocation block) and `:50-54` (sshd exec with `-o HostKey=$HK_DIR/ssh_host_ed25519_key`).
+- **Layer 2 (operational on host):** `~/stationmaster` artifact (transferred this session).
+- **Layer 3 (running container + volume):** `docker compose logs`; `docker inspect` State; `sudo ls -la /var/lib/docker/volumes/stationmaster_sm-state/_data/` + `ssh_host_keys/`.
+- **Audit-trail (this repo):** this entry; prior transfer+build entry; scratchpad.
+
+**commands executed** (verbatim) —
+1. `ssh ... michelek@10.100.136.162 'cd ~/stationmaster && docker compose up -d; echo EXIT $?; sleep 12; docker compose ps; docker volume ls | grep sm-state; ss -tlnp | grep :2222; docker compose logs --tail=20'`
+2. `ssh ... 'cd ~/stationmaster && docker compose logs --tail=40 --no-color; docker inspect stationmaster --format "ExitCode={{.State.ExitCode}} ... Restarts={{.RestartCount}}"'`
+3. `ssh ... 'sudo ls -la /var/lib/docker/volumes/stationmaster_sm-state/_data/ ; sudo ls -la .../ssh_host_keys/ ; sudo ls -la .../etc/ssh/'`
+4. `ssh ... 'cd ~/stationmaster && docker compose stop; echo EXIT $?; docker compose ps -a'`
+
+**outputs** —
+- `up -d` EXIT 0; network `stationmaster_default` + volume `stationmaster_sm-state` + container created/started.
+- Container State: `ExitCode=1 Restarts=8 OOM=false`. Logs repeat: `stationmaster hub up: sshd :2222 ...` → `Unable to load host key: /var/lib/stationmaster/ssh_host_keys/ssh_host_ed25519_key` → `sshd: no hostkeys available -- exiting.`
+- Port 2222 NOT listening.
+- **Substrate-truth root cause (Layer 3):** `/var/lib/docker/volumes/stationmaster_sm-state/_data/ssh_host_keys/` is **EMPTY**; no `etc/ssh/` leftover under the volume. `entrypoint.sh:27` `ssh-keygen -A -f "$STATE_DIR"` produced zero keys under `$STATE_DIR`, so the relocation `mv "$STATE_DIR"/etc/ssh/ssh_host_* "$HK_DIR"/` (`:30`, `|| true`-suppressed) matched nothing. sshd is pointed at the empty `$HK_DIR` (`:52`) → no hostkeys → exit. **Likely mechanism: `ssh-keygen -A` ignores `-f <dir>` as a path-prefix (it writes to the compiled-in `/etc/ssh/` default and `-f` does not relocate `-A` output on this OpenSSH 9.2p1); the entrypoint assumes `-f` prefixes the output dir, which it does not.**
+- `docker compose stop` EXIT 0; container `Exited (1)`, crash-loop halted; volume + image intact.
+
+**outcome** — **aborted-mid-execution (hard-gate STOP).** Deploy did not reach healthy. Root cause is a defect in Brunel's entrypoint host-key generation, NOT a substrate problem. Per operator discipline (do not patch the artifact from own diagnostic judgment), surfaced to Brunel with substrate-truth evidence + Aen for role-of-record. Substrate left clean: container stopped, volume + image preserved for the fix. Re-deploy (re-`up`) pending Brunel's entrypoint fix.
+
+---
+
+## 2026-06-12T17:07+03:00 — Stationmaster re-transfer + rebuild at fixed HEAD f022fed (Task #7, recovery prep)
+
+**timestamp** — 2026-06-12T17:07+03:00.
+
+**tasker** — Aen (team-lead). Task #7 recovery, after Brunel's host-key fix.
+
+**dispatch summary** — Brunel fixed the entrypoint host-key defect (commit f022fed, "ssh-keygen -A -f prefix never lands keys"), one commit after bfe3060 (same-filesystem startup assertion). Aen 17:00 version-skew alert named bfe3060 as new source-of-truth; HEAD is f022fed which supersedes it and carries both changes. Re-transferred the fixed artifact + rebuilt the image as non-mutating recovery prep; the Tier-D `up -d` remains gated on Aen's sm-state-volume reuse-vs-clear decision (the failed `up` created the volume → trips the greenfield STOP condition in Aen's standing sanction).
+
+**tier classification + sanction status** —
+- Re-transfer = Tier R-adjacent (home-dir source write; explicitly approved by Aen 16:58, source-of-truth f022fed). 
+- `docker compose build` = Tier R-adjacent (image-store write; no service/volume/container mutation). Within-dispatch agency under clean-build standing go.
+- `docker compose up -d` = **Tier D, HELD** — verbatim sanction on record (Aen 16:58) but NOT executed; gated on the volume decision per Aen's own "STOP if sm-state exists" condition.
+
+**deployed-artifacts-read declaration** —
+- **Layer 1 (FR design):** read current `entrypoint.sh` at HEAD f022fed — host-key gen now `ssh-keygen -t ed25519 -f "$HK_DIR/ssh_host_ed25519_key" -N ""` direct (`:48-50`); same-filesystem assertion `stat -c %d` across STATE_DIR/spool/dedup with FATAL-on-divergence (`:24-32`). `git log` confirms f022fed (host-key fix) > bfe3060 (fs-assertion) > 62bba75 (original).
+- **Layer 2 (operational on host):** re-transferred `~/stationmaster` at f022fed; entrypoint.sh sha256 2c4afe11 (was the broken variant); sm-shell d5b2fe40 + Dockerfile ae0a2f6b unchanged across commits (only entrypoint moved).
+- **Layer 3 (running container):** stopped container from failed `up` still present (Exited 1); volume `stationmaster_sm-state` present (empty/inert).
+- **Audit-trail (this repo):** this entry; prior two Task #7 entries; scratchpad.
+
+**commands executed** (verbatim) —
+1. `git rev-parse --short HEAD` (f022fed); `git log --oneline -8` (confirmed f022fed host-key fix > bfe3060 fs-assertion).
+2. (local) `tar -cf - -C stationmaster <8 files> | base64 -w0 | ssh ... 'rm -rf ~/stationmaster && mkdir -p ~/stationmaster && base64 -d | tar -xf - -C ~/stationmaster && sed -n 46,52p entrypoint.sh && grep -c "spans multiple filesystems" entrypoint.sh && sha256sum entrypoint.sh sm-shell Dockerfile'`
+3. `ssh ... 'cd ~/stationmaster && docker compose build; echo EXIT; docker images stationmaster:1.0.0'`
+
+**outputs** — re-transfer confirmed fixed entrypoint (direct ed25519 gen + fs-assertion present). Rebuild EXIT 0; new image manifest `b16179a77e98` (was `cc1417f0139b` — fixed entrypoint layer baked in), 195MB.
+
+**outcome** — **success (recovery prep phase).** Fixed artifact deployed-to-host + rebuilt; crash blocker resolved at the image level. Re-`up` held for Aen's sm-state-volume decision (reuse recommended). On "reuse" → up -d (held sanction) → watch for FATAL-fs line (expect none) + healthy + sshd:2222 → 2 scratch keys + smoke-test → confirmatory in-container T6.a → close #7.
+
+---
+
+## 2026-06-12T17:10+03:00 — Stationmaster remediation up (Task #7): hub HEALTHY, but smoke-test HARD-GATE STOP (sm user nologin shell blocks forced command)
+
+**timestamp** — 2026-06-12T17:09+03:00 (remediation up) through 2026-06-12T17:10+03:00 (smoke-test failure diagnosed).
+
+**tasker** — Aen (team-lead). Task #7 remediation; Aen 17:02 SECOND version-skew alert extended the sanction verbatim to the remediation.
+
+**dispatch summary** — Executed Aen's verbatim-sanctioned remediation `docker compose down && docker compose build && docker compose up -d` with the f022fed (fixed) entrypoint. Hub came up HEALTHY this time (host-key bug fixed). Proceeded to step D (register 2 scratch keys + smoke-test) — smoke-test FAILED at the protocol layer: the hub's sshd authenticates but the forced command never runs ("This account is currently not available"). Root cause: `sm` user shell is `/usr/sbin/nologin`, which refuses to exec the `command="sm-shell <team>"` forced command. SECOND artifact defect (distinct from the host-key bug). Hard-gate STOP; did NOT patch.
+
+**tier classification + sanction status** —
+- `docker compose down && docker compose build && docker compose up -d` = **Tier D**, sanction EXTENDED VERBATIM by Aen 17:02: exact command quoted; reason = "replace known-defective entrypoint pre-first-customer"; expected = "healthy <10s, sshd :2222, sm-state volume preserved (down does NOT remove named volumes)." Pre-state confirmed branch-2 (container Exited 1) before executing, matching Aen's described precondition.
+- `sm-register` (×2) = **Tier M** (appends to operator-owned authorized_keys on volume; idempotent). Step D per dispatch §3.
+- `smoke-test.sh` + diagnostic probes (direct ping, getent passwd, cat authorized_keys, sshd_config grep) = **Tier R**.
+
+**deployed-artifacts-read declaration** —
+- **Layer 1 (FR design):** `stationmaster/Dockerfile:22` (`useradd --shell /usr/sbin/nologin ... sm`); `sshd_config.stationmaster` (PermitTTY no); `smoke-test.sh` f022fed (Step 0 host-key-existence check added vs the version read earlier — now leads with `ssh-keyscan` ed25519 assertion).
+- **Layer 2 (operational):** `~/stationmaster` at f022fed.
+- **Layer 3 (running container):** healthy after remediation (Status=running, Health=healthy, Restarts=0); `getent passwd sm` → `/usr/sbin/nologin`; authorized_keys lines `restrict,command="sm-shell <team>"`; host key now present on volume (`ssh_host_ed25519_key` 17:09).
+- **Audit-trail (this repo):** this entry + prior three Task #7 entries; scratchpad.
+
+**commands executed** (verbatim) —
+1. `ssh ... 'cd ~/stationmaster && docker compose ps -a; docker compose down; docker compose build; docker compose up -d; docker volume ls | grep sm-state'`
+2. `ssh ... 'cd ~/stationmaster && sleep 14; docker compose ps; docker inspect stationmaster --format "...Health..."; docker compose logs --tail=15; ss -tlnp | grep :2222; sudo ls -la /var/lib/docker/volumes/stationmaster_sm-state/_data/ssh_host_keys/'`
+3. `ssh ... 'cd ~/stationmaster && ssh-keygen -t ed25519 -f /tmp/sm_alpha -N ""; ssh-keygen -t ed25519 -f /tmp/sm_beta -N ""; docker compose exec -T stationmaster sm-register alpha "$(cat /tmp/sm_alpha.pub)"; ... beta ...; sm-register --list'`
+4. `ssh ... 'cd ~/stationmaster && ./smoke-test.sh 127.0.0.1 2222 /tmp/sm_alpha alpha /tmp/sm_beta beta'`
+5. `ssh ... 'printf ... ping ... | ssh -T -p 2222 -i /tmp/sm_alpha sm@127.0.0.1; docker compose exec -T stationmaster getent passwd sm; ... cat authorized_keys; ... grep sshd_config'`
+
+**outputs** —
+- Remediation: down EXIT 0 (container+network removed, **sm-state volume preserved**), build EXIT 0, up EXIT 0.
+- Health: `Up (healthy)`, Restarts=0, sshd listening 0.0.0.0:2222 + [::]:2222, host key generated on volume. **Host-key bug FIXED — confirmed.** No FATAL-fs line (same-fs assertion passed).
+- `sm-register alpha`/`beta`: both "registered ... live immediately"; `--list` shows alpha+beta.
+- **smoke-test FAILED, EXIT 1:** passed Step 0 (host-key exists) then aborted (`set -e`) at first protocol call. Direct ping as alpha returns **`This account is currently not available.`** (ssh exit 1). **Substrate-truth root cause:** `sm` shell = `/usr/sbin/nologin`; sshd execs the forced command via the user's login shell; `nologin` refuses → `sm-shell` never runs.
+
+**outcome** — **partial / aborted-mid-execution (hard-gate STOP).** Transport layer (sshd + host key + port + healthcheck) all GREEN; protocol layer BLOCKED by a second artifact defect — `sm` user `nologin` shell prevents forced-command execution. This is exactly Brunel dispatch §6 trigger 4 (forced-command behaves differently on Debian than Windows unit-smoke predicted — the Windows unit-smoke ran sm-shell directly, never through sshd's login-shell-exec path). NOT patched (Brunel's design — likely fix: give `sm` a real shell e.g. `/bin/sh`). Surfaced to Brunel + Aen. Substrate left running-but-non-functional-at-protocol (hub up, 2 scratch keys registered, no protocol conversation possible). Task #7 held; re-remediation pending Brunel's shell fix.
+
+---

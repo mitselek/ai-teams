@@ -6,7 +6,7 @@ confidence: medium-high
 source-agents: [brunel]
 discovered: 2026-06-12
 last-verified: 2026-06-12
-stage-2: pending
+stage-2: confirmed
 related: [stationmaster-post-office-model.md, cross-host-atomic-inbox-write-primitive.md, read-flag-replication-discipline-for-external-cli.md, inbox-substrate-properties-2.1.170.md, decorative-polling-interval-anti-pattern.md]
 tags: [pattern, service-architecture, ssh, forced-command, single-instance, daemon-accumulation, stationmaster, harness-substrate]
 ---

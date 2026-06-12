@@ -1,8 +1,8 @@
 # patterns/ — Card Index
 
-84 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
+85 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **50 confirmed, 1 partial, 33 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
+**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **52 confirmed, 1 partial, 32 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -65,6 +65,7 @@
 | Relay-to-Primary-Artifact Fidelity Discipline | [card](relay-to-primary-artifact-fidelity-discipline.md) · [full](../relay-to-primary-artifact-fidelity-discipline.md) |
 | Repo as Durable Store + TeamDelete as Release Primitive | [card](repo-as-durable-store-teamdelete-as-release-primitive.md) · [full](../repo-as-durable-store-teamdelete-as-release-primitive.md) |
 | Rule-Erosion via Reasonable Exceptions | [card](rule-erosion-via-reasonable-exceptions.md) · [full](../rule-erosion-via-reasonable-exceptions.md) |
+| Same-Volume Startup Gate for Rename-Based Atomicity | [card](same-volume-startup-gate-for-rename-atomicity.md) · [full](../same-volume-startup-gate-for-rename-atomicity.md) |
 | Scope-Block Drift — Letter Lags Practice | [card](scope-block-drift-from-practice.md) · [full](../scope-block-drift-from-practice.md) |
 | SemVer-Strict-Typed-Contract Discipline | [card](semver-strict-typed-contract-discipline.md) · [full](../semver-strict-typed-contract-discipline.md) |
 | Service-Team Topology — Members are Ghosts of Consumers | [card](service-team-topology.md) · [full](../service-team-topology.md) |

@@ -1,11 +1,12 @@
 # gotchas/ — Card Index
 
-20 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+21 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **16 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **17 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
+| A Courier Must Originate Routing the Wire Protocol Leaves Undefined | [card](courier-originates-routing-protocol-leaves-undefined.md) · [full](../courier-originates-routing-protocol-leaves-undefined.md) |
 | ai-teams Has No NOPASSWD Sudoers — Use docker exec -u root | [card](ai-teams-user-no-sudo-use-docker-exec-root.md) · [full](../ai-teams-user-no-sudo-use-docker-exec-root.md) |
 | Cloudflare D1 Migration and Query Gotchas | [card](cloudflare-d1-migration-query.md) · [full](../cloudflare-d1-migration-query.md) |
 | Contract Enforcement Gap for Non-Claude Participants | [card](contract-enforcement-gap-non-claude.md) · [full](../contract-enforcement-gap-non-claude.md) |

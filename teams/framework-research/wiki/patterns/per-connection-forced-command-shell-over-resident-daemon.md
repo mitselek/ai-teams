@@ -7,7 +7,7 @@ last-verified: 2026-06-12
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell
-  - teams/framework-research/poc/ghost-bridge/docs/stationmaster-hub-deployment-runbook.md
+  - teams/framework-research/docs/stationmaster-hub-deployment-runbook.md
 ---
 
 # Per-connection forced-command shell beats a resident daemon for hub-style services
@@ -47,15 +47,17 @@ The coarse-lock simplification holds **only because the hub's spool is exclusive
 
 ## Evidence
 
-- Catalyzing artifact: `teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell` + `docs/stationmaster-hub-deployment-runbook.md` §1, §6 (S50, 2026-06-12).
+- Catalyzing artifact: `teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell` + `teams/framework-research/docs/stationmaster-hub-deployment-runbook.md` §1, §6 (S50, 2026-06-12).
 - Negative instance (the failure this counters): S48 ghost-bridge daemon — 11 accumulated instances, N× duplicate forwarding, liveness-probe blindness on Git-Bash.
-- Confidence: medium-high. n=1 concrete positive instance (sm-shell), but the structural argument (state-on-disk + transport-supervised single process = accumulation-impossible-by-construction) is independent of the sample.
+- Confidence: medium-high. n=1 concrete positive instance (sm-shell), but the structural argument (state-on-disk + transport-supervised single process = accumulation-impossible-by-construction) is independent of the sample. **2026-06-12: sm-shell now BUILD-VERIFIED on the Debian substrate (Hopper prod-llm build, exit 0, S50) — the catalyzing artifact is deploy-validated, not just design-grade.** Confidence held at medium-high (build-verification strengthens the instance; an n=2 distinct positive instance is what would bump to high).
+
+*Stage-2 confirmed 2026-06-12 (Brunel read-back): pattern statement, both-conditions boundary, substrate-ownership distinction, and the S48 negative instance all verified faithful; no claim-level objections. Two provenance-path corrections folded (runbook path `poc/ghost-bridge/docs/` → `docs/`; one Related display-text label).*
 
 ## Related
 
 - [`decisions/stationmaster-post-office-model.md`](../decisions/stationmaster-post-office-model.md) — the hub this pattern implements; the post-office model's "hub never initiates connections" + spool-ownership are what make the forced-command shape fit.
 - [`patterns/cross-host-atomic-inbox-write-primitive.md`](cross-host-atomic-inbox-write-primitive.md), [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) — the courier-side disciplines for the harness-contended case the boundary excludes.
-- [`gotchas/inbox-substrate-properties-2.1.170.md`](../references/inbox-substrate-properties-2.1.170.md) — exclusive-create atomicity (T6.a) is the same primitive the coarse-lock relies on.
+- [`references/inbox-substrate-properties-2.1.170.md`](../references/inbox-substrate-properties-2.1.170.md) — exclusive-create atomicity (T6.a) is the same primitive the coarse-lock relies on.
 - [`patterns/decorative-polling-interval-anti-pattern.md`](decorative-polling-interval-anti-pattern.md) — sibling from the ghost-bridge/RFC #66 PoC family (process-supervision anti-patterns).
 
 (*FR:Brunel* — submitted; *FR:Callimachus* — filed)
