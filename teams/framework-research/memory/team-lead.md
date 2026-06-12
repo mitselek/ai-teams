@@ -1,5 +1,31 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+### [WIP — S49 checkpoint 2026-06-12] Stationmaster host + post-office pivot (PO-ratified in dialogue)
+
+**Host findings (probed 2026-06-11):**
+- rc = 100.96.54.170 is **Cloudflare WARP, NOT Tailscale** (memory correction); real LAN addr 10.200.13.114/23; hostname `paarisprogemis-fyysiline`; Debian 13, systemd 257, no sudo for dev, Linger=no, 9 users — somebody's physical machine.
+- prod-llm = 10.100.136.162 `ai-agenditiimide-tookeskkond`; Debian 13, **michelek has passwordless sudo + docker**, hosts hr-devs/comms-dev/backlog-triage, own ports 2225-7 open on localhost. **PO choice: stationmaster = container on prod-llm.**
+- Reachability strictly one-way: rc→prod-llm:22 OK; prod-llm→rc unreachable (both WARP addr and LAN addr, all ports). Post-office pivot makes this moot.
+- Jira 2026-06-11: TPS-601 epic + all subtasks Open, ITSD-38884 still Analysis. No movement.
+
+**[DECISION — S49] Post-office model replaces hub-pull (SPEC-v4 delta over v3):**
+- Customers dial OUT to hub (only outbound ssh assumed). Hub holds NO customer credentials, only registered public keys. Registration = pubkey + team name; key lands in hub sshd authorized_keys with forced command (`restrict,command=`).
+- Courier = customer-side component, **pattern not product**: does D1 consume-by-rename + D11 inject locally (atomicity is per-filesystem — forced), pushes/pulls hub over plain ssh exec. D1/D2/D11 disciplines transfer intact from v3.
+- Hub protocol (layer-2, typed contract, version it): `deposit` (stdin entries → accepted IDs), `collect` + `ack` two-phase (hub deletes only after ack — at-least-once end-to-end). Clean JSON out everywhere so MCP wrapper is trivial.
+- **Permits = unilateral receive-grants** (PO's reframing, kills co-sign ceremony): "I agree to receive from team X", submitted over own authenticated channel — channel auth IS the signature. One grant = one direction live; two reciprocal = full route. Revoke unilaterally. timetable.json becomes COMPILED from grants.
+- **MCP = control plane only, mail NEVER over MCP** (wake semantics C3 + durability live on inbox path). v1 tools: grant_receive/revoke_receive, who_is_on, health, who_accepts_me. MCP can ride ssh stdio (`ssh hub mcp`) — same key auth, no new port. MCP itself ships phase 2; protocol designed for it now.
+- **[DECISION — S49] Team-level grants for v1** (not user@team); agent identity rides in message signatures per D9.
+- Doc set owed: (1) onboarding one-pager for team-leads, (2) ~~hub protocol contract~~ **SHIPPED+RATIFIED**, (3) courier implementation hints w/ T-number citations + reference courier (Python).
+- D10 amendments pending ratification: Debian not Ubuntu; Docker `restart: unless-stopped` not systemd; hub sshd in-container on dedicated port.
+
+**[DECISION — S49] `stationmaster-protocol.md` v1.0.0 RATIFIED** (PO read section-by-section, 2026-06-12). Key calls locked during review:
+- **Symmetric envelope pivot (PO):** protocol = transport-agnostic NDJSON *conversation* (request envelope `{v,cmd,args}` + body lines ⇄ response envelope + data lines). ssh binding = pure authenticated byte pipe (`ssh -T`, stdin/stdout); SSH_ORIGINAL_COMMAND no longer parsed. Client declares major in request envelope → real version negotiation. REST + MCP = phase-2 bindings, non-breaking by construction. Relaying = YAGNI, left out.
+- Registration v1 = human step (operator edits authorized_keys; `restrict,command="sm-shell <team>"`, linked to sshd(8) upstream doc).
+- **Stationmaster silent grant (PO):** hub mail needs no grant — not modeled, not revocable, only documented (§10); unenforceable since hub runs the consent checks itself.
+- Transport-failure rule: response envelope authoritative; no envelope = retry whole conversation; safety bought by per-command idempotency (deposit dedup-by-id, collect non-destructive, ack idempotent).
+- ack = custody transfer: only after durable local write; partial ack legitimate; re-ack after crash via ledger.
+- All seven embedded calls ratified: deposit-time consent enforcement, accepted=fsync-durable, duplicate=success, revoke-keeps-queued, status-covers-health, hub-alerts-as-mail, size caps [CONV].
+
 ### [NEXT SESSION] 2026-06-10 — session-48 → session-49
 
 **M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S49 read):**
