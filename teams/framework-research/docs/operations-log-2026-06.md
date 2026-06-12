@@ -35,4 +35,37 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 
 **outcome** — **success (baseline phase).** Both exclusive-create primitives are atomic on prod-llm at both tmpfs and the ext4-on-LVM backing filesystem; the T6.a S48 Windows/NTFS result reproduces on the Debian 13 deployment substrate with zero anomalies across 200 total race rounds (50×2 primitives × 2 filesystems). **Residual gap surfaced to Aen, NOT closed by this entry:** the in-container view of the named-volume mount (overlay/bind-mount indirection) is not yet exercised because Brunel's container does not yet exist. O_EXCL/rename atomicity is a property of the backing fs (ext4, verified), and Docker named-volume mounts pass through to the backing fs without overlay translation — so the ext4 baseline is the authoritative substrate result; an in-container re-run once Task #1 lands is belt-and-suspenders confirmation, recommended before Task #4 flips green. Task #3 held in_progress pending that confirmation + Aen's call on whether the backing-fs result is sufficient to pass the gate.
 
+**ADDENDUM 2026-06-12T17:00+03:00 — Aen [DECISION] re-adjudicated the T6.a gate scope (message ts 16:52, absorbed 16:57):** the host-fs run IS the gate-of-record because prod-llm IS the customer substrate for the first migration targets (hr-devs, comms-dev, backlog-triage); the hub does not depend on exclusive-create (coarse flock + tmp/fsync/rename per Brunel's design). The 2026-06-12T16:51 ext4-on-LVM host-fs run above is therefore the LOAD-BEARING gate-of-record evidence (PASS); the sm-state in-container run is now SUPPLEMENTARY (see Task #7 entry below, step 6). Task #3 closes on host-fs PASS + supplementary volume run.
+
+---
+
+## 2026-06-12T17:00+03:00 — Stationmaster hub deploy to prod-llm (Task #7): artifact transfer + build dry-run
+
+**timestamp** — 2026-06-12T16:58+03:00 (artifact transfer) through 2026-06-12T17:00+03:00 (build complete EXIT 0). Continues below for up -d + smoke.
+
+**tasker** — Aen (team-lead). Task #7, S50 build-order item 7. Deploy per runbook `docs/stationmaster-hub-deployment-runbook.md` §4-§5.
+
+**dispatch summary** — Deploy the stationmaster hub to prod-llm in three steps: (1) `docker compose build` no-deploy dry-run (image assembly unverified — Brunel had no local Docker; report before proceeding); (2) `docker compose up -d` on clean build (PO-authorized, on record); (3) post-deploy `smoke-test.sh` acceptance over real ssh with two scratch keys. This entry covers the artifact-transfer (substrate gap resolution) + build dry-run.
+
+**tier classification + sanction status** —
+- **Artifact transfer** = Tier R-adjacent (write of source files into michelek's home; no service/state mutation). Substrate gap surfaced to Aen 16:56 (artifact not on prod-llm — runbook §4 assumes a deployed repo copy that did not exist); proceeded as within-dispatch agency under Aen's full-sequence GO (16:52) + 16:57 ack, flagged not hidden.
+- **`docker compose build`** = Tier R-adjacent (image-store write; no running container, no volume, no port bind). Within-dispatch agency under the deploy dispatch.
+- **`docker compose up -d`** (next entry) = **Tier D.** Sanction assessed COMPLETE from dispatch + runbook + Aen "PO-authorized, on record": (a) exact command `docker compose up -d` (runbook §4); (b) reason = deploy ratified stationmaster hub to prod-llm per S50 build order; (c) expected = healthcheck healthy <10s, sshd listening on 2222, sm-state volume created.
+
+**deployed-artifacts-read declaration** —
+- **Layer 1 (FR design-as-shipped):** runbook §3-§9; `stationmaster/Dockerfile`, `docker-compose.yml`, `entrypoint.sh`, `sm-shell`, `sm-register`, `sshd_config.stationmaster`, `.dockerignore`, `smoke-test.sh` (all read pre-transfer).
+- **Layer 2 (consumer-team operational on substrate host):** probed 16:56 — clean slate (no image, no container, port 2222 free, no sm-state volume, NO artifact on host). Gap resolved by transfer to `~/stationmaster`.
+- **Layer 3 (running container state):** N/A this entry (no container yet).
+- **Audit-trail artifacts (this repo):** this ops-log entry; scratchpad Task #7 [DISPATCH]; transferred files sha256-verified against local (5 image files byte-identical).
+
+**commands executed** (verbatim) —
+1. (local) `tar -cf - -C stationmaster Dockerfile docker-compose.yml entrypoint.sh sm-shell sm-register sshd_config.stationmaster .dockerignore smoke-test.sh | base64 -w0 | ssh -i ~/.ssh/id_ed25519_apex -p 22 michelek@10.100.136.162 'mkdir -p ~/stationmaster && base64 -d | tar -xf - -C ~/stationmaster && ls -la && sha256sum <5 image files>'`
+2. `ssh ... michelek@10.100.136.162 'cd ~/stationmaster && docker compose version && docker compose build; echo EXIT $?; docker images stationmaster:1.0.0'`
+
+**outputs** —
+- Transfer: 8 files present in `~/stationmaster`, exec bits preserved (entrypoint/sm-shell/sm-register/smoke-test 0755). 5 image-file sha256 hashes match local byte-for-byte (Dockerfile ae0a2f6b…, entrypoint 7c6c5190…, sm-shell d5b2fe40…, sm-register 87823246…, sshd_config 8bde374e…).
+- Build: Docker Compose v5.1.1; `docker compose build` completed all 8 stages, **EXIT 0**; image `stationmaster:1.0.0` (manifest sha256 cc1417f0139b), 195MB disk / 48.2MB content. apt install of openssh-server + python3 + ca-certificates clean; sm user created uid 1000; all 4 COPY + CRLF-strip + chmod 0755 stages succeeded. (debconf "TERM not set" Readline frontend warnings are cosmetic non-interactive-build noise, not errors.)
+
+**outcome** — **success (transfer + build phase).** Brunel's previously-unverified image assembly is now verified clean on the Debian deployment substrate. Reporting build result to Aen before the Tier-D `up -d`; clean build is the explicit go-condition per Aen's "clean build → up -d (PO-authorized, on record)." Continues in next entry.
+
 ---

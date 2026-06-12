@@ -17,6 +17,8 @@ This is the **first-ever dispatch against the stationmaster substrate**. It is *
 - **Layer 2 (operational copy on prod-llm):** the deployed copy of the repo on prod-llm. Discover the path; confirm the stationmaster artifacts are present and match Layer 1 (this repo). **There is no prior operational divergence to drift from — this is the first deploy.**
 - **Layer 3 (running container):** does not exist yet (no container). Per §Graceful Degradation case 3, Layer 3 is legitimately absent pre-deploy; it comes into existence as the *result* of this dispatch. Acknowledge the gap; proceed (the dispatch's purpose is to create Layer 3).
 
+**Volume-layout note (explicit, per Aen's S50 requirement + courier-hints:54):** the hub puts its *entire* state subtree on ONE named volume `sm-state` at `/var/lib/stationmaster` — `spool/`, `dedup/`, and the tmp side of every `os.replace` are co-located by construction (rename atomicity is per-volume). `entrypoint.sh` asserts single-filesystem at startup (`stat -c %d` across STATE_DIR/spool/dedup) and refuses to start if they diverge. On bring-up (step B), watch the logs for a `FATAL: ... spans multiple filesystems` line — if it appears, the volume layout is wrong and that is a hard-gate STOP back to Brunel. Expected: no such line, hub comes up healthy. This is the exact filesystem layout the T6.a gate-of-record (step E) validates.
+
 ## 1. Tier classification — Tier M throughout (greenfield bring-up)
 
 | Step | Operation | Tier | Why |

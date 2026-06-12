@@ -13,6 +13,24 @@ SSHD_PORT="${SSHD_PORT:-2222}"
 # --- state dir -----------------------------------------------------------
 mkdir -p "$STATE_DIR/grants" "$STATE_DIR/spool" "$STATE_DIR/dedup"
 [ -f "$STATE_DIR/registry.json" ] || echo '{}' > "$STATE_DIR/registry.json"
+
+# Same-filesystem assertion (courier-hints line 54: rename atomicity is
+# per-volume). sm-shell writes consignments tmp-file then os.replace(tmp,final)
+# within the spool subtree; that rename is atomic only if the whole STATE_DIR
+# subtree is one filesystem. Refuse to start if spool/ or dedup/ sit on a
+# different device than STATE_DIR -- a misconfigured layout (e.g. spool bind-
+# mounted onto a second volume) would make durability writes non-atomic and
+# silently break the "accepted = fsync-durable" guarantee.
+ROOT_DEV=$(stat -c %d "$STATE_DIR")
+SPOOL_DEV=$(stat -c %d "$STATE_DIR/spool")
+DEDUP_DEV=$(stat -c %d "$STATE_DIR/dedup")
+if [ "$ROOT_DEV" != "$SPOOL_DEV" ] || [ "$ROOT_DEV" != "$DEDUP_DEV" ]; then
+    echo "FATAL: $STATE_DIR subtree spans multiple filesystems" >&2
+    echo "  STATE_DIR dev=$ROOT_DEV spool dev=$SPOOL_DEV dedup dev=$DEDUP_DEV" >&2
+    echo "  rename atomicity is per-volume; refusing to start (courier-hints:54)." >&2
+    exit 1
+fi
+
 # Record container-start epoch for `status` uptime (sm-shell is per-conversation).
 date +%s > "$STATE_DIR/started_at"
 # The sm user must own its own spool (named volume is created root-owned).

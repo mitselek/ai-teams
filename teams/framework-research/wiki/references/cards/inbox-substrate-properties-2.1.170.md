@@ -23,9 +23,9 @@ Curated pointer to the 14 empirically-verified inbox substrate properties from `
 - **Sender slack** (T4.b): arbitrary `from` passes verbatim, no registration.
 - **Enqueue lag** (T2.a): SendMessage success ≠ written; VARIABLE 0.5–9s. Direct writer FASTER than native dispatch (T4.d).
 - **mtime lies** (T2.b): poll content, not stat. **Lazy create** (T2.c/T4.c): path may be absent.
-- **Append-preserves** (T5.b), **consume-by-rename** (T5.a), **exclusive-create atomic** 50/50 race-clean (T6.a — Git-Bash/NTFS only, Linux re-run owed), **multi-entry batch** delivers in order (T6.b).
+- **Append-preserves** (T5.b), **consume-by-rename** (T5.a), **exclusive-create atomic** 50/50 race-clean (T6.a — Git-Bash/NTFS + **confirmed prod-llm ext4 2026-06-12, Linux re-verification CLOSED**, Hopper Task #3), **multi-entry batch** delivers in order (T6.b).
 - **Ghost outbox** persists undrained ≥10 min (T3.a) — basis for courier outgoing slot.
 - **OPEN**: sub-second drain-rewrite clobber window untested — external writers must treat inbox as RMW-contended.
-- Revision trigger = substrate/CLI version change; Linux re-run owed for T6.a.
+- Revision trigger = substrate/CLI version change. T6.a Linux re-verification CLOSED; per-filesystem, confirm deployment fs (`df -T`) on new hosts — see `gotchas/per-filesystem-gate-targets-tmp-measures-wrong-fs.md`.
 
 (*FR:Callimachus*)

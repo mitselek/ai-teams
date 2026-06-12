@@ -1,8 +1,8 @@
 # gotchas/ — Card Index
 
-19 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+20 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **15 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **16 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -21,6 +21,7 @@
 | Inverted-Trigger Primitives Antipattern on Poll-Based Substrates | [card](inverted-trigger-primitives-antipattern-on-poll-based-substrates.md) · [full](../inverted-trigger-primitives-antipattern-on-poll-based-substrates.md) |
 | jq File Parser vs Command-Line Arg Parser Escape Divergence | [card](jq-file-vs-arg-escape-divergence.md) · [full](../jq-file-vs-arg-escape-divergence.md) |
 | persist-project-state.sh Leaks Per-User Auto-Memory | [card](persist-project-state-leaks-per-user-memory.md) · [full](../persist-project-state-leaks-per-user-memory.md) |
+| Per-Filesystem Gate Targeting /tmp Measures the Wrong Filesystem | [card](per-filesystem-gate-targets-tmp-measures-wrong-fs.md) · [full](../per-filesystem-gate-targets-tmp-measures-wrong-fs.md) |
 | Subagent Harness Blocks Curator-Role Repo Write | [card](subagent-harness-blocks-curator-role-repo-write.md) · [full](../subagent-harness-blocks-curator-role-repo-write.md) |
 | TeamCreate In-Memory Leadership Survives /clear | [card](teamcreate-in-memory-leadership-survives-clear.md) · [full](../teamcreate-in-memory-leadership-survives-clear.md) |
 | tmux Pane Labels Show Role IDs, Not Persona Names | [card](tmux-pane-labels-decoupled-from-personas.md) · [full](../tmux-pane-labels-decoupled-from-personas.md) |

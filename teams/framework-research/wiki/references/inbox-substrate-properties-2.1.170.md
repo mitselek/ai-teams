@@ -35,7 +35,7 @@ ttl: 2026-09-10
 | Append-preserves | Harness enqueue APPENDS, preserving pre-existing foreign entries (alien `from`-names) — nothing stripped or validated away (n=2) | T5.b | |
 | Ghost outbox | A message to a session-less name persists undrained ≥10 min across turn boundaries (no live consumer) | T3.a | The basis for the courier's outgoing-mail slot |
 | Consume-by-rename | Rename a ghost outbox aside, harness recreates the path fresh with only the next message — no resurrection, no residue | T5.a | |
-| Exclusive-create atomic | Bash `set -C` and Python `open('x')` both hard-fail on existing path, succeed on absent; 50/50 race rounds, exactly one winner, zero anomalies | T6.a | **Git Bash/NTFS only — Linux re-run owed before deploy (D10)** |
+| Exclusive-create atomic | Bash `set -C` and Python `open('x')` both hard-fail on existing path, succeed on absent; 50/50 race rounds, exactly one winner, zero anomalies | T6.a | Git-Bash/NTFS (orig) **+ confirmed on prod-llm ext4-on-LVM 2026-06-12, 50/50 both primitives (Hopper, Task #3)** — Linux re-verification CLOSED. See `gotchas/per-filesystem-gate-targets-tmp-measures-wrong-fs.md` (the run also surfaced the tmpfs-`/tmp` gate-targeting trap) |
 | Batch delivery | Externally-injected multi-entry batch delivers as separate messages, in batch order, distinct `from` identities, content intact | T6.b | Via the D11 verify-empty→rename-aside→exclusive-create algorithm |
 | Race-robustness | Three deliberate consume-race timing attacks lost nothing, duplicated nothing (absence of evidence at n=3, not proof) | T5.c | Dedup stays as the unprovable-negative backstop |
 
@@ -45,7 +45,7 @@ ttl: 2026-09-10
 
 ## Revision trigger
 
-These are substrate properties on a pinned CLI version. The trigger to revise is a **substrate change** — primarily a CLI version change (the Drain row already flipped unannounced between adjacent versions; see Related gotcha). n+1 re-sightings on 2.1.170 do not strengthen; a sighting on a different version is a new datapoint. The Git-Bash/NTFS exclusive-create atomicity (T6.a) also needs a **Linux re-run before any Linux deploy** (D10 substrate).
+These are substrate properties on a pinned CLI version. The trigger to revise is a **substrate change** — primarily a CLI version change (the Drain row already flipped unannounced between adjacent versions; see Related gotcha). n+1 re-sightings on 2.1.170 do not strengthen; a sighting on a different version is a new datapoint. The exclusive-create atomicity (T6.a) **Linux re-verification is now CLOSED** — confirmed on prod-llm ext4-on-LVM 2026-06-12 (Hopper, Task #3); per-filesystem, so confirm the actual deployment fs (`df -T`) before relying on it on a new host (see `gotchas/per-filesystem-gate-targets-tmp-measures-wrong-fs.md`).
 
 ## Related
 

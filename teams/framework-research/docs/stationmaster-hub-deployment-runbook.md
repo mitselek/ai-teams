@@ -85,6 +85,16 @@ printf '%s\n' '{"v":1,"cmd":"ping"}' \
 
 **Hub spool needs no T6.a discipline.** The courier-side in-place-write ban (and the exclusive-create race T6.a guards) exists because the *harness* contends for inbox files with no lock. The hub owns its spool exclusively; `sm-shell` takes one coarse `flock` (`hub.lock`) for the whole conversation, serialising all writers. Correct over clever for v1, low org-internal volume.
 
+### Volume-layout decision (explicit — load-bearing for rename atomicity)
+
+Per courier-hints §"Spool placement" (line 54): **rename atomicity is per-volume.** `sm-shell`'s durability write is tmp-file → `os.replace(tmp, final)` inside the spool subtree; that rename is atomic *only* if tmp and final are on the same filesystem.
+
+- **Decision:** ONE named volume `sm-state` mounted at `/var/lib/stationmaster` carries the *entire* state subtree (`spool/`, `dedup/`, `grants/`, `registry.json`, `ssh_host_keys/`, `authorized_keys`). Every tmp file and its final target are therefore co-located by construction. There is no inbox-vs-spool split to misconfigure on the hub side — the hub has no harness-watched inbox (that split is the *courier's* concern, on the customer host).
+- **Named volume, not bind-mount:** hub state is hub-private with no host-side editing workflow (registrations go through `sm-register` inside the container). A named volume keeps all state on one docker-managed filesystem, survives container replacement, and avoids host-FS uid/permission drift. A bind mount would invite cross-device layouts and uncoordinated host edits — wrong for this substrate. If host-visible backups are later needed, use a bind mount to a *single* host filesystem and keep the assertion below.
+- **Enforced at startup:** `entrypoint.sh` runs a `stat -c %d` device-equality check across `STATE_DIR`, `spool/`, and `dedup/` and **refuses to start** if they span filesystems (the same "validate at startup; refuse otherwise" discipline courier-hints:54 mandates for the courier). So a future misconfiguration that breaks the invariant fails loud at boot, not silently at the first durability write.
+
+This is the exact filesystem layout the T6.a gate-of-record validates: the gate (when run hub-side) exercises exclusive-create on the `sm-state` volume's filesystem; when run courier-side it exercises the customer host's inbox-dir filesystem (the gate's true subject — see §8 item 1).
+
 ## 7. Failure modes
 
 | Event | Behaviour |
