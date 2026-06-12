@@ -125,12 +125,13 @@ Confirm consignments landed in local inboxes; hub deletes them.
 - Unknown or already-acked IDs are reported `"already_gone"` -- `ack` is idempotent, retry-safe.
 - **Courier duty:** `ack` only after the entry is durably written into the local target inbox (or local spool). A crash between `collect` and `ack` re-delivers; the courier's delivered-ledger (D2 recipe, keyed by envelope `id`) deduplicates. At-least-once end-to-end; the rare duplicate message to an agent is the accepted cost (SPEC-v3 D2).
 
-### 5.5 `grant <team>` / `revoke <team>`
+### 5.5 `grant` / `revoke`
 
 Receive-consent management -- unilateral, team-level (v1).
 
-- `grant hr-devs` = "I accept mail from hr-devs." Effective immediately; idempotent.
-- `revoke hr-devs` stops **new** deposits from hr-devs (`E_NOGRANT`). Mail already queued was consented when deposited and **remains collectable**.
+- args: `{"team": "<name>"}`. No body.
+- `{"cmd":"grant","args":{"team":"hr-devs"}}` = "I accept mail from hr-devs." Effective immediately; idempotent.
+- `{"cmd":"revoke","args":{"team":"hr-devs"}}` stops **new** deposits from hr-devs (`E_NOGRANT`). Mail already queued was consented when deposited and **remains collectable**.
 - Response: your updated grant list.
 - A full two-way route = two reciprocal grants. One-way links are legitimate (SPEC-v3 §3.1 -- flow per inbox is one-way anyway).
 
