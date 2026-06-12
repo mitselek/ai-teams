@@ -1,0 +1,73 @@
+# Stationmaster hub -- one service, one purpose.
+# Deploy target: prod-llm (michelek@10.100.136.162), Debian, passwordless
+# sudo + docker confirmed. Build only until team-lead gives the deploy go.
+# (*FR:Brunel*)
+
+services:
+  stationmaster:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: stationmaster:1.0.0
+    container_name: stationmaster
+    restart: unless-stopped
+
+    # Publish the dedicated sshd port on the host. The hub never initiates
+    # connections; this is the only inbound surface. Bind to all interfaces
+    # so registered couriers can dial in from their own hosts -- the forced
+    # command + pubkey-only auth is the gate, not network reachability.
+    ports:
+      - "2222:2222"
+
+    environment:
+      SM_STATE_DIR: /var/lib/stationmaster
+      SM_USER: sm
+      SSHD_PORT: "2222"
+
+    # VOLUME LAYOUT DECISION (load-bearing, per courier-hints §"Spool placement"
+    # line 54: rename atomicity is PER-VOLUME). All hub state lives under ONE
+    # mount point, /var/lib/stationmaster, on ONE named volume `sm-state`:
+    #
+    #   /var/lib/stationmaster/
+    #     spool/<to>/<from>/*.json   <- consignments; written tmp+rename
+    #     spool/.../<f>.json.tmp     <- the tmp side of the SAME os.replace
+    #     dedup/, grants/, registry.json, ssh_host_keys/, authorized_keys
+    #
+    # sm-shell's durability writes are tmp-file -> os.replace(tmp, final). That
+    # rename is atomic ONLY if tmp and final are on the same filesystem. Because
+    # the WHOLE subtree is one volume, every tmp and its final are co-located by
+    # construction -- there is no inbox-vs-spool split on the hub side to get
+    # wrong (the hub has no harness-watched inbox; that split is a COURIER-side
+    # concern). entrypoint.sh asserts single-filesystem at startup and refuses
+    # to run otherwise (same discipline as courier-hints line 54).
+    #
+    # WHY NAMED VOLUME, NOT BIND-MOUNT: the hub state is hub-private and has no
+    # host-side editing workflow (registrations go through `sm-register` inside
+    # the container, not host file edits). A named volume keeps the data on a
+    # single docker-managed filesystem (no host-path device surprises), survives
+    # container replacement, and avoids host-FS permission/uid drift. A bind
+    # mount would be the wrong call here: it invites cross-device layouts (host
+    # path on a different mount than the container overlay) and host-side edits
+    # that the hub does not coordinate with. Revisit only if the operator needs
+    # host-visible backups -- then a bind mount to a single host filesystem,
+    # documented as such, with the same-FS assertion still enforced.
+    volumes:
+      - sm-state:/var/lib/stationmaster
+
+    # The hub holds no customer credentials and runs one unprivileged service.
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      # sshd listening == hub up. A protocol ping needs a registered key,
+      # which a healthcheck shouldn't carry; port-liveness is the right
+      # altitude. python3 is already in the image (sm-shell); ss/netstat are
+      # not (slim base), so probe the port with a stdlib socket connect.
+      test: ["CMD-SHELL", "python3 -c \"import socket,sys; s=socket.socket(); s.settimeout(3); sys.exit(0 if s.connect_ex(('127.0.0.1',2222))==0 else 1)\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  sm-state:

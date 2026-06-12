@@ -1,0 +1,616 @@
+#!/usr/bin/env python3
+# sm-shell -- stationmaster hub forced-command shell.
+#
+# Implements the customer-facing side of stationmaster-protocol.md v1.0.0
+# (RATIFIED, S49). One invocation == one conversation: read a request
+# envelope (+ optional body lines) from stdin, write a response envelope
+# (+ optional data lines) to stdout. NDJSON throughout.
+#
+# Identity is the channel (protocol Sec.2): the team name arrives ONLY as
+# argv[1], bound by the sshd forced command. Nothing the client sends can
+# change who the hub thinks it is. The client's requested command is in
+# SSH_ORIGINAL_COMMAND and is ignored by design.
+#
+# stdlib only. Author: (*FR:Brunel*)
+
+import sys
+import os
+import re
+import json
+import time
+import base64
+import hashlib
+from pathlib import Path
+from datetime import datetime, timezone
+
+try:
+    import fcntl                       # POSIX only; the hub runs on Debian.
+except ImportError:                    # pragma: no cover -- Windows dev hosts
+    fcntl = None
+
+PROTOCOL_MAJOR = 1
+
+# Limits (protocol Sec.5.2). [CONV] -- conventions, free to change at a
+# version bump; no substrate fact forces these numbers.
+MAX_CONSIGNMENTS_PER_CONV = 100
+MAX_CONV_BYTES = 1 * 1024 * 1024        # 1 MiB per deposit conversation
+MAX_ENTRY_BYTES = 256 * 1024            # 256 KiB per entry
+MAX_COLLECT_LIMIT = 1000                # ceiling on collect args.limit
+
+# Dedup window (protocol Sec.6 / D2 recipe): 7 days or 10k IDs per pair.
+DEDUP_TTL_S = 7 * 24 * 3600
+DEDUP_MAX_IDS = 10_000
+
+TEAM_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")   # protocol Sec.2.4
+RESERVED_TEAMS = {"stationmaster", "sm"}                      # protocol Sec.10
+
+# Hub state root. Overridable for tests; defaults to the volume mount point
+# the compose file provides.
+STATE_ROOT = Path(os.environ.get("SM_STATE_DIR", "/var/lib/stationmaster"))
+
+# sm-shell is a per-conversation process, so "hub uptime" cannot come from
+# this process's clock. The entrypoint writes STATE_ROOT/started_at (epoch
+# seconds) once at container start; we read it here.
+def _hub_started_epoch():
+    try:
+        return float((STATE_ROOT / "started_at").read_text().strip())
+    except Exception:
+        return None
+
+
+# --------------------------------------------------------------------------
+# Wire helpers
+# --------------------------------------------------------------------------
+
+def now_iso():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def emit(obj):
+    """Write one NDJSON line to stdout."""
+    sys.stdout.write(json.dumps(obj, separators=(",", ":"), sort_keys=False))
+    sys.stdout.write("\n")
+
+
+def ok_env(cmd, **extra):
+    env = {"v": PROTOCOL_MAJOR, "ok": True, "cmd": cmd, "ts": now_iso()}
+    env.update(extra)
+    return env
+
+
+def err_env(cmd, code, detail=""):
+    return {"v": PROTOCOL_MAJOR, "ok": False, "cmd": cmd,
+            "ts": now_iso(), "error": {"code": code, "detail": detail}}
+
+
+def die(cmd, code, detail=""):
+    """Emit an error envelope and exit cleanly. No envelope only on transport
+    failure -- a malformed request still gets an authoritative error reply."""
+    emit(err_env(cmd, code, detail))
+    sys.stdout.flush()
+    sys.exit(0)
+
+
+def canonical_id(entry):
+    """SHA-256 over the entry's canonical JSON (sorted keys, UTF-8), 16 hex.
+    Same recipe as SPEC-v3 D2 / protocol Sec.4."""
+    canon = json.dumps(entry, sort_keys=True, separators=(",", ":"),
+                       ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(canon).hexdigest()[:16]
+
+
+def fsync_dir(path: Path):
+    """fsync a directory entry so a create/rename is durable (Sec.5.2).
+    Directory fsync is a POSIX guarantee; Windows raises, so degrade there
+    (dev hosts only -- the deployed hub is Linux and gets the real fsync)."""
+    try:
+        fd = os.open(str(path), os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    except OSError:
+        pass
+    finally:
+        os.close(fd)
+
+
+# --------------------------------------------------------------------------
+# State layout (hub-owned; no harness contention here, so ordinary file I/O
+# with a coarse hub lock is correct -- the courier-side in-place ban does NOT
+# apply to the hub spool).
+#
+#   STATE_ROOT/
+#     registry.json                      {team: {registered, last_seen}}
+#     grants/<team>.json                 {grants_in: [{from, since}], ...}
+#     spool/<to_team>/<from_team>/        one file per consignment, FIFO by name
+#         <epoch_ms>-<seq>-<id>.json      {id, from_team, to_team, deposited_at, entry}
+#     dedup/<to_team>/<from_team>.jsonl   {id, ts} append-only, trimmed
+#     hub.lock                            flock held for the whole conversation
+# --------------------------------------------------------------------------
+
+def ensure_layout():
+    for sub in ("grants", "spool", "dedup"):
+        (STATE_ROOT / sub).mkdir(parents=True, exist_ok=True)
+    reg = STATE_ROOT / "registry.json"
+    if not reg.exists():
+        reg.write_text("{}", encoding="utf-8")
+
+
+_LOCK_FH = None
+
+
+def acquire_lock():
+    """One coarse exclusive lock for the whole conversation. Conversations are
+    short and low-volume (org-internal); a single writer lock removes every
+    interleaving question at the cost of serialising the hub. Correct over
+    clever for v1."""
+    global _LOCK_FH
+    _LOCK_FH = open(STATE_ROOT / "hub.lock", "w")
+    if fcntl is not None:
+        fcntl.flock(_LOCK_FH, fcntl.LOCK_EX)
+    # else: Windows dev host (no fcntl) -- single-process tests only; the
+    # deployed hub is always Linux where the lock is real.
+
+
+def load_json(path: Path, default):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return default
+    except (ValueError, OSError):
+        return default
+
+
+def store_json(path: Path, obj):
+    """Atomic durable write: tmp + fsync + rename + dir-fsync."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(obj, fh, separators=(",", ":"))
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
+    fsync_dir(path.parent)
+
+
+# --------------------------------------------------------------------------
+# Registry / grants
+# --------------------------------------------------------------------------
+
+def load_registry():
+    return load_json(STATE_ROOT / "registry.json", {})
+
+
+def is_registered(reg, team):
+    return team in reg or team in RESERVED_TEAMS
+
+
+def touch_last_seen(reg, team):
+    # Reserved hub identities are not tracked in the registry.
+    if team in RESERVED_TEAMS:
+        return
+    rec = reg.get(team)
+    if rec is None:
+        # First contact for a key whose registration predates a registry
+        # file (key in authorized_keys but never seen): adopt it.
+        rec = {"registered": now_iso()}
+        reg[team] = rec
+    rec["last_seen"] = now_iso()
+    store_json(STATE_ROOT / "registry.json", reg)
+
+
+def grants_path(team):
+    return STATE_ROOT / "grants" / f"{team}.json"
+
+
+def load_grants(team):
+    g = load_json(grants_path(team), {})
+    g.setdefault("grants_in", [])
+    return g
+
+
+def grant_set(team):
+    return {e["from"] for e in load_grants(team).get("grants_in", [])}
+
+
+# --------------------------------------------------------------------------
+# Dedup ledger (per directed pair)
+# --------------------------------------------------------------------------
+
+def dedup_path(to_team, from_team):
+    return STATE_ROOT / "dedup" / to_team / f"{from_team}.jsonl"
+
+
+def dedup_seen(to_team, from_team, cid):
+    p = dedup_path(to_team, from_team)
+    try:
+        with open(p, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    if json.loads(line).get("id") == cid:
+                        return True
+                except ValueError:
+                    continue
+    except FileNotFoundError:
+        return False
+    return False
+
+
+def dedup_record(to_team, from_team, cid):
+    p = dedup_path(to_team, from_team)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with open(p, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps({"id": cid, "ts": now_iso()}) + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())
+
+
+def dedup_compact(to_team, from_team):
+    """Trim to DEDUP_MAX_IDS most recent and drop entries older than TTL.
+    Cheap to run before each deposit pair-write; pairs are low volume."""
+    p = dedup_path(to_team, from_team)
+    try:
+        lines = [l for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
+    except FileNotFoundError:
+        return
+    cutoff = time.time() - DEDUP_TTL_S
+    kept = []
+    for l in lines:
+        try:
+            rec = json.loads(l)
+            ts = datetime.strptime(rec["ts"], "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=timezone.utc).timestamp()
+            if ts >= cutoff:
+                kept.append(l)
+        except (ValueError, KeyError):
+            kept.append(l)
+    kept = kept[-DEDUP_MAX_IDS:]
+    if len(kept) != len(lines):
+        store_text(p, "\n".join(kept) + ("\n" if kept else ""))
+
+
+def store_text(path: Path, text):
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as fh:
+        fh.write(text)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
+    fsync_dir(path.parent)
+
+
+# --------------------------------------------------------------------------
+# Spool (per directed pair, FIFO by filename)
+# --------------------------------------------------------------------------
+
+def pair_spool_dir(to_team, from_team):
+    return STATE_ROOT / "spool" / to_team / from_team
+
+
+_SEQ = [0]
+
+
+def spool_write(to_team, from_team, hub_env):
+    """Write one hub-enveloped consignment durably. Filename encodes deposit
+    order (epoch_ms-seq) so a plain sorted listing is FIFO per pair (Sec.7)."""
+    d = pair_spool_dir(to_team, from_team)
+    d.mkdir(parents=True, exist_ok=True)
+    _SEQ[0] += 1
+    fname = f"{int(time.time() * 1000):013d}-{_SEQ[0]:04d}-{hub_env['id']}.json"
+    store_json(d / fname, hub_env)
+
+
+def spool_list_for(to_team):
+    """All waiting consignments for to_team, FIFO per pair (oldest first).
+    Returns list of (path, hub_env)."""
+    base = STATE_ROOT / "spool" / to_team
+    out = []
+    if not base.exists():
+        return out
+    for from_dir in sorted(base.iterdir()):
+        if not from_dir.is_dir():
+            continue
+        for f in sorted(from_dir.iterdir()):
+            if f.suffix != ".json" or f.name.endswith(".tmp"):
+                continue
+            env = load_json(f, None)
+            if env is not None:
+                out.append((f, env))
+    return out
+
+
+def spool_counts_inbound(to_team):
+    counts = {}
+    for _, env in spool_list_for(to_team):
+        counts[env["from_team"]] = counts.get(env["from_team"], 0) + 1
+    return counts
+
+
+def spool_counts_outbound(from_team):
+    """What I sent that the recipient hasn't collected/acked yet."""
+    base = STATE_ROOT / "spool"
+    out = {}
+    if not base.exists():
+        return out
+    for to_dir in base.iterdir():
+        if not to_dir.is_dir():
+            continue
+        pd = to_dir / from_team
+        if not pd.is_dir():
+            continue
+        files = sorted(f for f in pd.iterdir()
+                       if f.suffix == ".json" and not f.name.endswith(".tmp"))
+        if files:
+            oldest = load_json(files[0], {}).get("deposited_at")
+            out[to_dir.name] = {"count": len(files), "oldest": oldest}
+    return out
+
+
+# --------------------------------------------------------------------------
+# Commands
+# --------------------------------------------------------------------------
+
+def client_fingerprint():
+    """Derive the client's SSH key fingerprint (SHA256:...base64) from the
+    file sshd writes when ExposeAuthInfo is on ($SSH_USER_AUTH). Lines look
+    like: `publickey ssh-ed25519 AAAA...`. Empty string if unavailable."""
+    path = os.environ.get("SSH_USER_AUTH")
+    if not path:
+        return ""
+    try:
+        for line in Path(path).read_text().splitlines():
+            parts = line.split()
+            if len(parts) >= 3 and parts[0] == "publickey":
+                blob = base64.b64decode(parts[2])
+                digest = hashlib.sha256(blob).digest()
+                b64 = base64.b64encode(digest).decode().rstrip("=")
+                return "SHA256:" + b64
+    except Exception:
+        return ""
+    return ""
+
+
+def cmd_ping(team, args, body, reg):
+    emit(ok_env("ping"))
+    emit({"team": team, "fingerprint": client_fingerprint(),
+          "protocol": PROTOCOL_MAJOR})
+
+
+def cmd_deposit(team, args, body, reg):
+    if len(body) > MAX_CONSIGNMENTS_PER_CONV:
+        die("deposit", "E_TOOBIG",
+            f"more than {MAX_CONSIGNMENTS_PER_CONV} consignments")
+    emit(ok_env("deposit"))
+    for line in body:
+        raw = line.encode("utf-8")
+        try:
+            cons = json.loads(line)
+            to_team = cons["to"]
+            entry = cons["entry"]
+        except (ValueError, KeyError, TypeError):
+            emit({"id": None, "to": None, "status": "rejected",
+                  "error": {"code": "E_MALFORMED", "detail": "bad consignment"}})
+            continue
+
+        entry_bytes = json.dumps(entry, separators=(",", ":"),
+                                 ensure_ascii=False).encode("utf-8")
+        if len(entry_bytes) > MAX_ENTRY_BYTES:
+            emit({"id": None, "to": to_team, "status": "rejected",
+                  "error": {"code": "E_TOOBIG", "detail": "entry over 256 KiB"}})
+            continue
+
+        if not (isinstance(to_team, str) and TEAM_RE.match(to_team)):
+            emit({"id": None, "to": to_team, "status": "rejected",
+                  "error": {"code": "E_MALFORMED", "detail": "bad team name"}})
+            continue
+        if not is_registered(reg, to_team):
+            emit({"id": None, "to": to_team, "status": "rejected",
+                  "error": {"code": "E_UNKNOWN_TEAM", "detail": "not registered"}})
+            continue
+
+        # Consent enforced at deposit time (Sec.5.2). The hub itself
+        # (from_team == reserved) needs no grant (Sec.10).
+        if team not in RESERVED_TEAMS and team not in grant_set(to_team):
+            emit({"id": to_team and None, "to": to_team, "status": "rejected",
+                  "error": {"code": "E_NOGRANT",
+                            "detail": f"{to_team} has not granted {team}"}})
+            continue
+
+        cid = canonical_id(entry)
+        dedup_compact(to_team, team)
+        if dedup_seen(to_team, team, cid):
+            # duplicate is success, not error (Sec.5.2) -- deposit retry-safe.
+            emit({"id": cid, "to": to_team, "status": "duplicate"})
+            continue
+
+        hub_env = {"id": cid, "from_team": team, "to_team": to_team,
+                   "deposited_at": now_iso(), "entry": entry}
+        spool_write(to_team, team, hub_env)   # fsync-durable before reply
+        dedup_record(to_team, team, cid)
+        emit({"id": cid, "to": to_team, "status": "accepted"})
+
+
+def cmd_collect(team, args, body, reg):
+    limit = MAX_COLLECT_LIMIT
+    if isinstance(args.get("limit"), int):
+        limit = max(0, min(args["limit"], MAX_COLLECT_LIMIT))
+    waiting = spool_list_for(team)[:limit]
+    emit(ok_env("collect"))
+    for _, env in waiting:          # does NOT delete (Sec.5.3)
+        emit(env)
+
+
+def cmd_ack(team, args, body, reg):
+    ids = args.get("ids")
+    if not isinstance(ids, list):
+        die("ack", "E_MALFORMED", "args.ids must be a list")
+    want = set(ids)
+    # Index this team's spool by id.
+    by_id = {}
+    for path, env in spool_list_for(team):
+        by_id[env["id"]] = path
+    results = []
+    for cid in ids:
+        path = by_id.get(cid)
+        if path is None:
+            results.append({"id": cid, "status": "already_gone"})  # idempotent
+            continue
+        try:
+            path.unlink()
+            results.append({"id": cid, "status": "deleted"})
+        except FileNotFoundError:
+            results.append({"id": cid, "status": "already_gone"})
+    # fsync the parent dirs we deleted from, for durability of the deletion.
+    fsync_dir(STATE_ROOT / "spool")
+    emit(ok_env("ack"))
+    for r in results:
+        emit(r)
+
+
+def _grants_mutate(team, args, add):
+    other = args.get("team")
+    if not (isinstance(other, str) and TEAM_RE.match(other)):
+        return None
+    g = load_grants(team)
+    cur = g.get("grants_in", [])
+    have = {e["from"] for e in cur}
+    if add and other not in have:
+        cur.append({"from": other, "since": now_iso()})
+    elif (not add) and other in have:
+        cur = [e for e in cur if e["from"] != other]
+    g["grants_in"] = cur
+    store_json(grants_path(team), g)
+    return g
+
+
+def cmd_grant(team, args, body, reg):
+    g = _grants_mutate(team, args, add=True)
+    if g is None:
+        die("grant", "E_MALFORMED", "args.team invalid")
+    emit(ok_env("grant"))
+    emit({"grants_in": g["grants_in"]})
+
+
+def cmd_revoke(team, args, body, reg):
+    g = _grants_mutate(team, args, add=False)
+    if g is None:
+        die("revoke", "E_MALFORMED", "args.team invalid")
+    # Already-queued mail stays collectable (Sec.5.5) -- we touch only grants.
+    emit(ok_env("revoke"))
+    emit({"grants_in": g["grants_in"]})
+
+
+def cmd_status(team, args, body, reg):
+    g = load_grants(team)
+    grants_in = [{"from": e["from"], "since": e.get("since")}
+                 for e in g.get("grants_in", [])]
+    # grants_out = who accepts me (scan every team's grants_in for my name).
+    grants_out = []
+    gdir = STATE_ROOT / "grants"
+    if gdir.exists():
+        for f in sorted(gdir.glob("*.json")):
+            other = f.stem
+            if other == team:
+                continue
+            for e in load_json(f, {}).get("grants_in", []):
+                if e.get("from") == team:
+                    grants_out.append({"to": other, "since": e.get("since")})
+    started = _hub_started_epoch()
+    uptime_s = int(time.time() - started) if started is not None else 0
+    emit(ok_env("status"))
+    emit({"team": team,
+          "grants_in": grants_in,
+          "grants_out": grants_out,
+          "waiting_for_me": spool_counts_inbound(team),
+          "deposited_uncollected": spool_counts_outbound(team),
+          "hub": {"uptime_s": uptime_s, "protocol": PROTOCOL_MAJOR}})
+
+
+def cmd_registry(team, args, body, reg):
+    teams = [{"name": name,
+              "registered": rec.get("registered"),
+              "last_seen": rec.get("last_seen")}
+             for name, rec in sorted(reg.items())]
+    emit(ok_env("registry"))
+    emit({"teams": teams})   # never returns key material (Sec.5.7)
+
+
+DISPATCH = {
+    "ping": cmd_ping,
+    "deposit": cmd_deposit,
+    "collect": cmd_collect,
+    "ack": cmd_ack,
+    "grant": cmd_grant,
+    "revoke": cmd_revoke,
+    "status": cmd_status,
+    "registry": cmd_registry,
+}
+
+
+# --------------------------------------------------------------------------
+# Conversation entry point
+# --------------------------------------------------------------------------
+
+def read_conversation():
+    """First non-empty line is the request envelope; the rest are body lines.
+    Enforce the conversation byte cap as we read (Sec.5.2)."""
+    data = sys.stdin.buffer.read(MAX_CONV_BYTES + 1)
+    if len(data) > MAX_CONV_BYTES:
+        die("?", "E_TOOBIG", "conversation exceeds 1 MiB")
+    text = data.decode("utf-8", errors="replace")
+    lines = [l for l in text.split("\n")]
+    # Drop a single trailing empty line from the final newline.
+    if lines and lines[-1] == "":
+        lines.pop()
+    if not lines:
+        die("?", "E_MALFORMED", "empty request")
+    return lines[0], lines[1:]
+
+
+def main():
+    if len(sys.argv) < 2:
+        # Misconfigured forced command -- no team bound to the key.
+        die("?", "E_INTERNAL", "no team bound to this key")
+    team = sys.argv[1]
+    if not TEAM_RE.match(team) or team in RESERVED_TEAMS:
+        die("?", "E_INTERNAL", "bound team name invalid or reserved")
+
+    ensure_layout()
+    acquire_lock()
+
+    env_line, body = read_conversation()
+    try:
+        env = json.loads(env_line)
+    except ValueError:
+        die("?", "E_MALFORMED", "request envelope is not JSON")
+
+    v = env.get("v")
+    if v != PROTOCOL_MAJOR:
+        die(env.get("cmd", "?"), "E_VERSION",
+            f"hub speaks v{PROTOCOL_MAJOR}")
+
+    cmd = env.get("cmd")
+    args = env.get("args") or {}
+    if not isinstance(args, dict):
+        die(cmd or "?", "E_MALFORMED", "args must be an object")
+    handler = DISPATCH.get(cmd)
+    if handler is None:
+        die(cmd or "?", "E_MALFORMED", f"unknown command {cmd!r}")
+
+    reg = load_registry()
+    touch_last_seen(reg, team)
+    try:
+        handler(team, args, body, reg)
+    except SystemExit:
+        raise
+    except Exception as exc:               # never leak a stack trace on the wire
+        die(cmd, "E_INTERNAL", type(exc).__name__)
+    sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    main()

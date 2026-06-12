@@ -1,0 +1,94 @@
+#!/bin/sh
+# sm-register -- operator helper to register a customer team (protocol Sec.2).
+# Appends a forced-command authorized_keys line binding a public key to a
+# team name, on the state volume. Run inside the container:
+#
+#   docker compose exec stationmaster sm-register hr-devs 'ssh-ed25519 AAAA... comment'
+#
+# The pubkey arg is the one-line contents of the customer's sm_<team>.pub.
+# (*FR:Brunel*)
+set -eu
+
+STATE_DIR="${SM_STATE_DIR:-/var/lib/stationmaster}"
+AK="$STATE_DIR/authorized_keys"
+SM_USER="${SM_USER:-sm}"
+
+usage() {
+    echo "usage: sm-register <team-name> '<ssh-pubkey line>'" >&2
+    echo "       sm-register --list" >&2
+    echo "       sm-register --revoke <team-name>" >&2
+    exit 2
+}
+
+[ $# -ge 1 ] || usage
+
+mkdir -p "$STATE_DIR"
+[ -f "$AK" ] || : > "$AK"
+
+case "$1" in
+    --list)
+        echo "registered teams (forced-command bindings):"
+        # Pull the team out of command="sm-shell <team>" on each line.
+        sed -n 's/.*command="sm-shell \([^"]*\)".*/  \1/p' "$AK"
+        exit 0
+        ;;
+    --revoke)
+        [ $# -eq 2 ] || usage
+        TEAM="$2"
+        TMP="$AK.tmp.$$"
+        grep -v "command=\"sm-shell $TEAM\"" "$AK" > "$TMP" || true
+        mv "$TMP" "$AK"
+        SSH_HOME="/home/$SM_USER/.ssh"
+        if [ -d "$SSH_HOME" ]; then
+            cp "$AK" "$SSH_HOME/authorized_keys"
+            chown "$SM_USER:$SM_USER" "$SSH_HOME/authorized_keys" 2>/dev/null || true
+            chmod 600 "$SSH_HOME/authorized_keys"
+        fi
+        echo "revoked all keys bound to team '$TEAM' (effective for new connections)" >&2
+        exit 0
+        ;;
+esac
+
+[ $# -eq 2 ] || usage
+TEAM="$1"
+PUBKEY="$2"
+
+# Team name hygiene -- same regex as protocol Sec.2.4 and sm-shell.
+case "$TEAM" in
+    stationmaster|sm)
+        echo "refused: '$TEAM' is reserved (protocol Sec.10)" >&2
+        exit 1 ;;
+esac
+if ! printf '%s' "$TEAM" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$'; then
+    echo "refused: team name '$TEAM' fails ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$" >&2
+    exit 1
+fi
+
+# The pubkey must be a single ed25519/rsa key line; we keep the key type +
+# blob and ignore any client-supplied options by reconstructing the line.
+set -- $PUBKEY
+KEYTYPE="${1:-}"
+KEYBLOB="${2:-}"
+if [ -z "$KEYTYPE" ] || [ -z "$KEYBLOB" ]; then
+    echo "refused: pubkey must be '<type> <base64blob> [comment]'" >&2
+    exit 1
+fi
+
+# Idempotent: drop any existing binding for this team before re-adding.
+TMP="$AK.tmp.$$"
+grep -v "command=\"sm-shell $TEAM\"" "$AK" > "$TMP" 2>/dev/null || true
+mv "$TMP" "$AK"
+
+printf 'restrict,command="sm-shell %s" %s %s %s\n' \
+    "$TEAM" "$KEYTYPE" "$KEYBLOB" "$TEAM" >> "$AK"
+
+# Reflect into the live authorized_keys the running sshd reads.
+SSH_HOME="/home/$SM_USER/.ssh"
+if [ -d "$SSH_HOME" ]; then
+    cp "$AK" "$SSH_HOME/authorized_keys"
+    chown "$SM_USER:$SM_USER" "$SSH_HOME/authorized_keys"
+    chmod 600 "$SSH_HOME/authorized_keys"
+fi
+
+echo "registered team '$TEAM' (forced command: sm-shell $TEAM)" >&2
+echo "live immediately -- next ssh from this key lands as team '$TEAM'." >&2
