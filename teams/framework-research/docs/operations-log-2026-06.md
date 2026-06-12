@@ -204,3 +204,36 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** — **SUCCESS — Task #7 deploy COMPLETE.** Hub deployed + healthy + protocol-functional on prod-llm (Debian 13, ext4-on-LVM). Both Brunel artifact defects (host-key gen f022fed, sm shell 909bbe9) fixed + verified on substrate. T6.a gate fully closed: host-fs (load-bearing, 2026-06-12T16:51) + in-container sm-state-volume (confirmatory, this entry), both 50/50 both primitives. Smoke-test 14/15 with the 1 fail diagnosed as a test-script ordering artifact (lazy-registry vs eager-register assumption), NOT a hub or deploy defect — flagged to Brunel for a test fix. Task #4 (FR production-key registration) DEFERRED to S51 per Aen; hub left running with 2 inert scratch keys (alpha/beta) for S51 pickup. **Three layered-gate catches this deploy arc: structural-EXIT-0≠success (crash-loop), transport-green≠protocol-OK (nologin), and smoke-fail-triage (test-artifact-not-defect) — each surfaced with substrate-truth, none patched unilaterally.**
 
 ---
+
+## 2026-06-12T17:28+03:00 — framework-research registered on the hub + real-ssh verify (Task #4, operator portion)
+
+**timestamp** — 2026-06-12T17:28+03:00. Aen 17:28 LIFTED the session-limit constraint and REVERSED the Task #4 deferral — FR registration back ON this session.
+
+**tasker** — Aen (team-lead). Task #4 (dogfood + end-to-end); operator portion = register FR + verify; Herald drives the courier round-trip.
+
+**dispatch summary** — Generated the framework-research production keypair on the Windows dev box (the courier host, per onboarding §1 — private key stays where the courier runs), registered the public half on the live hub via `sm-register`, and verified end-to-end with a real-ssh ping from the Windows box directly to prod-llm:2222. This is the operator portion of Task #4; the courier deposit/collect/ack round-trip is Herald's.
+
+**tier classification + sanction status** —
+- FR keypair generation = local Windows dev-box action (courier key material; not an FR-shipped-substrate op). Per onboarding §1, the customer team generates its own key; FR is the customer, Herald's courier runs here.
+- `sm-register framework-research <pubkey>` = **Tier M** (operator action; appends `restrict,command="sm-shell framework-research"` to operator-owned authorized_keys on the volume; idempotent). Aen 17:28 explicit GO ("DO register the FR production key via sm-register").
+- Real-ssh ping verify = **Tier R**.
+
+**deployed-artifacts-read declaration** —
+- **Layer 1:** `stationmaster-onboarding.md` §1-§3 (key-gen + register + verify recipe); runbook §5.
+- **Layer 2:** `~/stationmaster` on prod-llm (HEAD 909bbe9).
+- **Layer 3:** hub running + healthy; `sm-register --list` now shows alpha, beta, framework-research.
+- **Audit-trail:** this entry; prior Task #7 entries.
+
+**commands executed** (verbatim) —
+1. (local Windows) `ssh-keygen -t ed25519 -f ~/.ssh/sm_framework-research -N "" -C "framework-research"`
+2. `PUB=$(cat ~/.ssh/sm_framework-research.pub); echo "$PUB" | base64 | ssh ... michelek@prod-llm "PUB=\$(base64 -d); docker compose exec -T stationmaster sm-register framework-research \"\$PUB\"; sm-register --list"`
+3. (local Windows, real-ssh direct to hub) `printf '{"v":1,"cmd":"ping"}' | ssh -T -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i ~/.ssh/sm_framework-research -p 2222 sm@10.100.136.162`
+
+**outputs** —
+- Keypair generated: `~/.ssh/sm_framework-research`(.pub) on the Windows dev box. Pubkey comment `framework-research`.
+- `sm-register`: "registered team 'framework-research' (forced command: sm-shell framework-research) ... live immediately"; `--list` = alpha, beta, framework-research.
+- **Real-ssh ping (the courier's exact path, Windows/Git-Bash → prod-llm:2222, no proxy):** `{"v":1,"ok":true,"cmd":"ping","ts":"2026-06-12T14:28:46Z"}` then `{"team":"framework-research","fingerprint":"SHA256:nkmhWNccqwpk5t4tQmLbrPOJoIcQZAr2jPomCegDpyQ","protocol":1}`. ssh EXIT 0. **The previously-untested real-ssh transport from the Windows dev box is CONFIRMED working** — port 2222 reachable over org network, forced-command lands as `framework-research`.
+
+**outcome** — **SUCCESS — Task #4 operator portion COMPLETE.** framework-research registered + verified live over real ssh from the Windows dev box (the one untested transport path per Task #4). Hub now carries 3 keys (alpha, beta scratch + framework-research production). Herald's courier round-trip (deposit/collect/ack with local inject + ledger) is the remaining Task #4 acceptance — unblocked, his to drive. FR private key at `~/.ssh/sm_framework-research` on the Windows dev box (courier host).
+
+---

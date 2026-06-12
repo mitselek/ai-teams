@@ -47,8 +47,27 @@ R=$(asA '{"v":1,"cmd":"ping"}')
 check "ping returns bound team A" "\"team\":\"$TA\"" "$R"
 check "ping reports a fingerprint" "SHA256:" "$R"
 
+# Deposit-rejection ladder -- three distinct states, in order. The hub
+# distinguishes them, and the registry is lazy-populated on a team's FIRST
+# connection (sm-shell touch_last_seen), so the order matters:
+#   1. recipient never connected   -> E_UNKNOWN_TEAM (not in registry yet)
+#   2. recipient connected, no grant-> E_NOGRANT
+#   3. recipient granted            -> accepted
+# (S50: the original test checked only state 2 but ran it before B had ever
+#  connected, so the hub correctly answered E_UNKNOWN_TEAM and the test failed
+#  -- the hub was more correct than the test. This ladder tests all three.)
+
+# State 1 -- B has never connected, so it is not in the registry yet.
 R=$(asA "{\"v\":1,\"cmd\":\"deposit\"}" "{\"to\":\"$TB\",\"entry\":{\"from\":\"team-lead\",\"text\":\"smoke\",\"summary\":\"s\"}}")
-check "deposit before grant -> rejected E_NOGRANT" "E_NOGRANT" "$R"
+check "deposit to never-connected team -> E_UNKNOWN_TEAM" "E_UNKNOWN_TEAM" "$R"
+
+# B connects once (status is a no-op read) -> now registry-known, still no grant.
+R=$(asB '{"v":1,"cmd":"status"}')
+check "B status (first connect registers B in the registry)" "\"team\":\"$TB\"" "$R"
+
+# State 2 -- B is now known but has not granted A.
+R=$(asA "{\"v\":1,\"cmd\":\"deposit\"}" "{\"to\":\"$TB\",\"entry\":{\"from\":\"team-lead\",\"text\":\"smoke\",\"summary\":\"s\"}}")
+check "deposit to known-but-ungranted team -> E_NOGRANT" "E_NOGRANT" "$R"
 
 R=$(asB "{\"v\":1,\"cmd\":\"grant\",\"args\":{\"team\":\"$TA\"}}")
 check "B grants A" "\"from\":\"$TA\"" "$R"

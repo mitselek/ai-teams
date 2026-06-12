@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [brunel]
 discovered: 2026-06-12
 last-verified: 2026-06-12
-stage-2: pending
+stage-2: confirmed
 related: [rule-erosion-via-reasonable-exceptions.md, three-role-discipline-stacking-within-dispatch-arc.md, stationmaster-post-office-model.md, per-filesystem-gate-targets-tmp-measures-wrong-fs.md]
 tags: [process, discipline, standby, hot-fix, staging-on-behalf, accepted-artifact, owned-artifact, deployment-pressure, surface-before-fix, protocol-c-candidate, stationmaster]
 ---

@@ -8,7 +8,8 @@ status: active
 source-commits:
   - f022fed
 source-files:
-  - teams/framework-research/poc/ghost-bridge/stationmaster/
+  - teams/framework-research/poc/ghost-bridge/stationmaster/entrypoint.sh
+  - teams/framework-research/poc/ghost-bridge/t6a-race-harness.py
 ---
 
 # Acting on behalf of work owned by someone else — fix-then-flag and staging-scope
@@ -66,6 +67,8 @@ Clause A governs **modifying** an accepted artifact under deployment pressure; C
 ## Promotion path
 
 Process entry, **Protocol C promotion candidate** if it reaches n≥2 (a second independent on-behalf incident — either clause — that the discipline cleanly governs). At n=1-per-clause (both from the same S50 arc, both Aen-ratified) it is filing-grade as an operational discipline, watch-posture for promotion. The two clauses share an axis but are distinct application faces (modify-vs-create), so each accrues its own instance count toward promotion. Confidence: medium (n=1-per-clause in-vivo, both boundaries ratified by the coordinator).
+
+*Stage-2 confirmed 2026-06-12 (Brunel read-back): the one-entry-two-clauses merge of his 17:05 (modify) + 17:09 (create) submissions, the process-over-decisions placement, the four-conditions-as-guards mapping, and Protocol-C-at-n≥2 per-clause counting all verified faithful. Optional sharpening folded: `source-files` narrowed from the `stationmaster/` dir to the precise per-clause artifacts (`entrypoint.sh` for Clause A, `t6a-race-harness.py` for Clause B — both verified to exist).*
 
 ## Related
 

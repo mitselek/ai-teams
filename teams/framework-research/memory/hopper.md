@@ -1,10 +1,10 @@
 # Hopper — scratchpad (*FR:Hopper*)
 
 ## Summary (lines 1-15 — always read on startup)
-- **Current state:** S50 CLOSED. Tasks #3 (T6.a gate) + #7 (stationmaster deploy) DONE. Hub LIVE+healthy on prod-llm, 2 inert scratch keys (alpha/beta) for S51.
-- **Active items:** none — both my tasks complete; awaiting session wrap.
-- **Key decisions this session:** Aen re-adjudicated T6.a gate-of-record = prod-llm host-fs (customer substrate), in-container = confirmatory; volume REUSE (no Tier-D clear, gate intent = unknown-provenance, mine was enumerated-inert); Task #4 (FR registration) DEFERRED to S51.
-- **Carry-forward (S51):** (1) Task #4 — register FR production key on the live hub (`docker compose exec stationmaster sm-register framework-research <pubkey>`), then Herald round-trip; hub already up w/ alpha+beta scratch keys. (2) smoke-test.sh has a test-ordering bug (expects E_NOGRANT, hub correctly returns E_UNKNOWN_TEAM pre-first-connect due to lazy registry) — Brunel owns the test fix; NOT a hub defect. (3) 2 substrate gotchas candidate for Cal Protocol A: ssh-keygen -A+-f prefix fails OpenSSH 9.2p1; nologin shell blocks authorized_keys forced-command. (4) prod-llm artifact at ~/stationmaster (HEAD 909bbe9 shell-fix); image stationmaster:1.0.0 healthy.
+- **Current state:** S50. Tasks #3 (T6.a gate) + #7 (deploy) DONE. #4 operator portion DONE (FR registered + real-ssh verified live); Herald's courier round-trip = remaining #4 acceptance. Hub LIVE+healthy on prod-llm, 3 keys (alpha/beta scratch + framework-research production).
+- **Active items:** #4 in_progress — Herald drives courier deposit/collect/ack; I'm done with the operator side. Then session wrap (Aen 17:28: normal shutdown discipline, no rush).
+- **Key decisions this session:** Aen re-adjudicated T6.a gate-of-record = prod-llm host-fs (customer substrate), in-container = confirmatory; volume REUSE (no Tier-D clear, gate intent = unknown-provenance, mine was enumerated-inert); Task #4 constraint-lifted back ON (17:28, reversing the deferral).
+- **Carry-forward:** (1) Task #4 — Herald's courier round-trip (FR key ~/.ssh/sm_framework-research on this Windows box; hub sm@10.100.136.162:2222; real-ssh path verified); needs a counterpart team (test-design choice flagged to Aen+Herald). (2) smoke-test.sh test-ordering bug (expects E_NOGRANT, hub correctly returns E_UNKNOWN_TEAM pre-first-connect due to lazy registry) — Brunel owns the fix; NOT a hub defect. (3) 2 substrate gotchas for Cal Protocol A: ssh-keygen -A+-f prefix fails OpenSSH 9.2p1; nologin shell blocks authorized_keys forced-command. (4) prod-llm artifact ~/stationmaster (HEAD 909bbe9); image stationmaster:1.0.0 healthy. **LESSON: lazy-registry — a team is a valid deposit target only after it connects once, not at sm-register time.**
 
 ---
 
