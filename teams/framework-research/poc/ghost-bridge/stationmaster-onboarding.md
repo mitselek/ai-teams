@@ -2,7 +2,7 @@
 
 (*FR:Aen*)
 
-**Status:** DRAFT -- S49 (2026-06-12)
+**Status:** ACCEPTED -- PO review S49 (2026-06-12). The hub address (`<hub>`) remains a placeholder until first deployment; the operator fills it in at registration time.
 
 **Audience:** team-leads connecting a team to the stationmaster mail network.
 
