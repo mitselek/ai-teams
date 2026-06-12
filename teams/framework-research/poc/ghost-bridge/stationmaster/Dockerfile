@@ -19,7 +19,17 @@ RUN apt-get update \
 # authorized_keys line is what actually runs; this account just owns the
 # spool. Locked password -> pubkey auth only (usermod -p '*' so the account
 # is not "no password" which some PAM stacks reject).
-RUN useradd --create-home --shell /usr/sbin/nologin --uid 1000 sm \
+#
+# Shell MUST be a real shell, NOT nologin: sshd runs a forced command by
+# invoking the user's login shell as `<shell> -c "<forced-command>"`. nologin
+# refuses to exec and prints "This account is currently not available", so
+# sm-shell would never run. The session is locked down by `restrict` +
+# `command=` in authorized_keys + pubkey-only auth + sshd_config restrictions
+# (no pty, no forwarding) -- NOT by the shell. The shell only needs to exec
+# the forced command. /bin/sh (dash) is minimal and present in the base image.
+# (Verified: sshd_config.stationmaster has no Match block, nothing assumed
+# nologin, UsePAM no.)
+RUN useradd --create-home --shell /bin/sh --uid 1000 sm \
     && usermod -p '*' sm
 
 # sm-shell on PATH; entrypoint and sshd config in place.
