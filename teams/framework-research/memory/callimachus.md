@@ -1,21 +1,27 @@
 # Callimachus Scratchpad (*FR:Callimachus*)
 
 ## Summary (lines 1-15 — always read on startup)
-- **Current state:** S50 — Wiki 120 → **129** (8 new this session + 1 index-drift backfill). All stationmaster/S48-S49 knowledge landed. Task #5 batch (3, all conf): `inbox-retention-flip-pending-only-queue.md` + `inbox-substrate-properties-2.1.170.md` (TTL 2026-09-10) + `stationmaster-post-office-model.md` (Aen read-back). 5 Protocol A across 3 teammates: Brunel `per-connection-forced-command-shell-over-resident-daemon.md` [CONF] + `process/standby-agent-fix-then-flag-discipline.md` [pend]; Hopper `per-filesystem-gate-targets-tmp-measures-wrong-fs.md` [conf, CLOSED T6.a Linux re-verify D10]; Herald `same-volume-startup-gate-for-rename-atomicity.md` [CONF] + `courier-originates-routing-protocol-leaves-undefined.md` [CONF].
-- **Active items:** 1 stage-2 PENDING (Brunel `standby-agent-fix-then-flag-discipline` — read-back advances). [DEFERRED-PO] Herald multi-outbox fan-out = queued protocol-amendment candidate (memory/herald.md). [INDEX-DRIFT FIXED] `process/stage-2-confirms-filing-gate.md` was carded since S40 but missing from main-index entries list + count (showed 7, actual 8); backfilled + reconciled to 9 process / 129 total this session. [GOTCHA-self] edit-tool Read-state expired ~6x this session on Grep/Edit-between-Edit — re-read recovery held each time; my own entry warns of exactly this.
-- **Key decisions this session (S50):** version-coupled-vs-version-stable distinction is load-bearing — the retention flip is observation-based + CLI-version-coupled (revision trigger = version change, NOT n+1 sightings), UNLIKE the version-stable wake/registration/lifecycle property family. Honored *mega biblion*: did NOT file 23 entries; clustered + pointed at TRUTHS.md. Decision entry = pointer not copy (rejected-alternatives captured: hub-pull/true-mirror/co-sign/mail-over-MCP/relaying).
-- **Carry-forward:** [DEFERRED] Cal-Protocol-A queue (Routing-by-action/Stage-0-contribution/Candidate-B n=1; C3/E2/E3/A.3/Companion-Pair/Producer-staleness). [WATCH] stationmaster decision stage-2 read-back from Aen; brief had WRONG paths (claimed `poc/ghost-bridge/` at repo root, actual = `teams/framework-research/poc/ghost-bridge/`) — confirmed before filing. [TTL] new entries TTL 2026-09-10 (version re-verify). [UNADDRESSED] none.
+- **Current state:** S50 ACTIVE (wrap relaxed 17:28 — limit interrupt at 17:15 passed, tokens refreshed; #7-close + #4 FR-registration still to land, may produce filings). Wiki 120 → **129** (6 new entries + index-drift backfill of 1 carded-but-uncounted entry). All S48-S49 stationmaster knowledge landed + 5 Protocol A from 3 teammates, all gates resolved bar one. Committed through 4fc499e (wiki 128) + standby-discipline filing after = 129; that filing + 2-clause amendment + drift-fix are UNCOMMITTED beyond 4fc499e (flagged to team-lead 17:25). Index 129 VERIFIED (disk 130 files = 129 entries + archive/README signpost).
+- **S50 entries:** Task #5 (3, all CONF): `gotchas/inbox-retention-flip-pending-only-queue.md` + `references/inbox-substrate-properties-2.1.170.md` (TTL 2026-09-10) + `decisions/stationmaster-post-office-model.md` (Aen read-back, onboarding-ACCEPTED fix folded). Protocol A: `patterns/per-connection-forced-command-shell-over-resident-daemon.md` [Brunel CONF]; `patterns/same-volume-startup-gate-for-rename-atomicity.md` [Herald CONF]; `gotchas/courier-originates-routing-protocol-leaves-undefined.md` [Herald CONF]; `gotchas/per-filesystem-gate-targets-tmp-measures-wrong-fs.md` [Hopper CONF — CLOSED T6.a Linux re-verify D10, updated property-sheet T6.a row]; `process/standby-agent-fix-then-flag-discipline.md` [Brunel, 2 clauses on one axis — fix-then-flag + staging-on-behalf; **stage-2 PENDING**].
+- **Active watch (this session):** [FILING-CANDIDATE] version-skew / artifact-freeze incident — Hopper's deploy `up` ran a STALE OLD entrypoint despite a clean build (Brunel 17:12; resolving via re-transfer-to-HEAD + rebuild). NOT yet a wiki entry (only referenced in standby-discipline as catalyzing-incident aside). Hold for #7-close report: file IF the close carries resolved root-cause + evidence (don't file from secondhand in-flight fragments — testimony not artifact). Candidate shape: deploy-freeze/stale-artifact gotcha, family-adjacent to three-layer-substrate-truth (L2-operational-copy drift) + Hopper's tmpfs-gate.
+- **Carry-forward (next session):** [PENDING-STAGE2] `process/standby-agent-fix-then-flag-discipline.md` awaits Brunel read-back (only open gate from S50). [DEFERRED-PO] Herald multi-outbox-fan-out = queued protocol-amendment candidate (`memory/herald.md` `[DEFERRED — PO ratification]`, 3 candidates none decided) — survives to PO return; if PO rules, fold resolution into courier-routing-gap gotcha. [TTL] inbox-2.1.170 pair re-verify 2026-09-10 (version-coupled — re-run probe-1b if CLI ≠ 2.1.170; now 2.1.175).
+- **Key calls S50:** version-coupled-vs-version-stable distinction (retention flip is CLI-version-coupled, revision-trigger = version change NOT n+1; unlike wake/registration/lifecycle family). *mega biblion*: 23 T-entries → 2 substrate entries, not 23. Decision/protocol = POINTER not copy (Decisions Boundary). Standby-discipline = 2-clauses-1-axis (one entry, not split — same axis modify-vs-create). [GOTCHA-self] edit-tool Read-state expired ~7x on Grep/Edit-between-Edit; re-read recovery held every time (my own entry warns of exactly this).
+- **Cal-Protocol-A queue (pre-S50 backlog, still DEFERRED):** Routing-by-action / Stage-0-contribution / Candidate-B n=1; C3 / E2 / E3 / A.3 / Companion-Pair / Producer-staleness. [UNADDRESSED] none.
 
 ---
 ## Session transcript (prune beyond line 100)
 
-## Session 50 — 2026-06-12 (Task #5 Protocol A batch: S48 truths + S49 decisions — SHIPPED)
+## Session 50 — 2026-06-12 (stationmaster knowledge intake — 6 entries + drift-fix; CLOSED)
 
-Filed 3 entries (+3 cards, +3 card-INDEX edits, +main-index): wiki 120→123.
-- **gotcha** `inbox-retention-flip-pending-only-queue.md` (CLI 2.1.170): live inbox = pending-only queue, delivered msgs REMOVED not retained (T1.b). Flip from S30–S47 accumulating-log, shipped unannounced. Casualties section (persist/restore/sanitize, ghost-bridge v1/v2 read-flag dedup). [GOTCHA] version-COUPLED arch-fact — revision trigger = CLI version change (re-run probe-1b), NOT n+1; distinct from version-stable property family.
-- **reference** `inbox-substrate-properties-2.1.170.md`: 14-row property sheet, curated POINTER to TRUTHS.md (evidentiary source). Wake/from-passthrough/enqueue-lag/mtime-lies/append-preserves/consume-by-rename/exclusive-create-atomic/batch/ghost-outbox. TTL 2026-09-10. [PATTERN] 23 atomic T-entries do NOT map to 23 wiki entries — cluster + point at source ledger (*mega biblion*).
-- **decision** `stationmaster-post-office-model.md`: POINTER to protocol v1.0.0 RATIFIED (Decisions Boundary — no copy). 5 named sub-decisions + rejected-alternatives (hub-pull/true-mirror/co-sign/mail-over-MCP/relaying). stage-2 PENDING (filed-on-behalf of Aen).
-[GOTCHA] Spawn brief paths WRONG (`poc/ghost-bridge/` at repo root → actual `teams/framework-research/poc/ghost-bridge/`); Glob-located before filing. Reported to team-lead at wrap.
+Wiki 120 → 129. Full detail lives in the entries; header carries the durable state. Load-bearing lessons only:
+- [PATTERN] *mega biblion* on T-entries: 23 atomic TRUTHS.md entries → 2 wiki entries (1 load-bearing flip gotcha + 1 version-stamped property-sheet POINTER to TRUTHS.md as evidentiary source). Don't 1:1 a ledger into the wiki.
+- [DECISION] retention-flip gotcha is **version-COUPLED** observation-based, not version-stable arch-fact — revision trigger = CLI version change (re-run probe-1b), NOT n+1 sightings. The distinction from the wake/registration/lifecycle property family is the curatorial call worth keeping.
+- [DECISION] stationmaster entry = POINTER to the RATIFIED protocol doc, NOT a copy (Decisions Boundary). Captured rejected-alternatives the doc states-but-doesn't-argue (hub-pull/true-mirror/co-sign/mail-over-MCP/relaying).
+- [DECISION] standby-discipline = ONE entry, TWO clauses on one axis (fix-then-flag = modify accepted artifact; staging-on-behalf = create ahead of owner). Same axis "touch owned work on behalf" → one entry not split (opposite of companion-pair, which is for audience/format-split views). Aen confirmed the generalization.
+- [DOUBLE-DUTY] Hopper's tmpfs-gate gotcha also CLOSED the owed T6.a Linux re-verification (D10) — folded the ext4 confirmation into the property-sheet T6.a row. One submission, two effects.
+- [INDEX-DRIFT FIXED] `process/stage-2-confirms-filing-gate.md` carded since S40 but missing from main-index entries-list + count (table showed process=7, disk+card-INDEX=8). Backfilled + reconciled 9 process / 129 total. Verified disk-130-files = 129-entries + archive/README signpost.
+- [GOTCHA] Spawn brief paths WRONG (`poc/ghost-bridge/` at repo root → actual `teams/framework-research/poc/ghost-bridge/`); Glob-verified before filing. Reported to team-lead; team-lead made path-prefix a standing brief discipline (3rd agent to catch it).
+- [LEARNED] All 5 Protocol A read-backs/corrections folded clean; provenance-path accuracy (Glob-verify-before-fix) is the discipline working both directions. Crossed-message storms with Brunel resolved zero-loss.
 
 ## Session 46 — 2026-06-08 (spawn + intro + immediate shutdown — no intake/queries; CLOSED)
 
@@ -53,38 +59,9 @@ Designed + committed the competency-index schema (spine of entu/api#42, approach
 
 S39: Wiki 115 Instance-4 amendment (roster.model non-load-bearing on Agent-tool teams; authoring-tier divergence, architecture-enforcement-mechanism disambiguator-class, n=3→n=4). Finn 4 Stage-2 read-backs ABSORBED 0-corrections (Wiki 116/119/120/112). Team OS 13-idea analysis to team-lead. 3 prototype cards created (the S40 #68 backfill built on these). [LEARNED] card-tier writing is extractive not transformative; queryable-vs-evidentiary is the curator judgment.
 
-## S37 CLOSE-OUT STATE (2026-05-28) — load-bearing carry-forward only
+## S37 (2026-05-28) — pruned; durable items folded into header Cal-Protocol-A queue + git history
 
-**Wiki 114 → 123 in S37** (9 new entries + 2 deferred). All Edit-tool-trap recovery primitive applied throughout.
-
-**Cal-Protocol-A queue for S39+ (remaining items after S37 batch)**:
-- C2 substrate-vs-framework-boundary-primitive — FILED S37 as Wiki 117
-- Stage-2-feedback typology — FILED S37 as Wiki 118
-- Layer-0-library-first PRE-DRAFT — FILED S37 as Wiki 119
-- Inverted-trigger primitives — FILED S37 as Wiki 120
-- Stage-2-cycle yield narrowing — FILED S37 as Wiki 121
-- Cadence-crossing DYAD variant — FILED S37 as Wiki 122
-- Credential-handoff via temp-file — FILED S37 as Wiki 123
-- **Routing-by-action** — DEFERRED at n=1 watch-posture (S37 item #10)
-- **Stage-0-contribution-from-filer** — DEFERRED at n=1 watch-posture (S37 item #11)
-- **Candidate B (Hopper bundled-shred)** — held at n=1; 3-way family-adjacency decision (i)/(ii)/(iii) preserved
-- C3 industry-primitive-convergence — hold for n=5 fifth-substrate-offering watch
-- E2 relay-fidelity extension — announcement-grade as outer-layer pass-through
-- E3 cross-session-deferred-state-primitive edit
-- GOTCHA orphaned-leaf-with-dead-parent-PID
-- Sub-shape A.3 candidate
-- Pass-1-prose-only-batched-iterate-discipline
-- Volta S35 thread-1/3/4 + §VL5.1 candidates
-- Companion-Pair application
-- Producer-side-staleness pattern (n=1 watch)
-
-**Stage 2 read-back surfaces pending from S37 entries**: consolidated list per Aen S37 dispatch — deferred to S39 via direct-DM channel. Finn DMs expected on Wiki 116, 119, 120, + Recursive-Narrowing.
-
-**Discipline-meta observations at watch-grade**:
-- Shape-F "proceeding-to-as-gate-slip" candidate for Stage-2-feedback typology amendment at n=2
-- Substrate-fit-researcher fourth-vantage at n=2 for three-role-discipline-stacking
-- Substrate-truth-evidence cluster now n=8 entries on disk
-- S6 yield-narrowing confirmed at n=5 (solo-author drafting clean; joint yield at read-back phase)
+Wiki 114→123 (9 entries: C2-boundary/Stage-2-typology/Layer-0-predraft/inverted-trigger/yield-narrowing/cadence-DYAD/credential-handoff all FILED). Still-DEFERRED watch-items carried in header queue (Routing-by-action, Stage-0-contribution, Candidate-B, C3, E2/E3, A.3, Companion-Pair, Producer-staleness). Discipline-meta at watch-grade: Shape-F gate-slip (n=2 trigger for typology amendment); substrate-fit fourth-vantage (n=2); substrate-truth cluster n=8.
 
 ## Sessions 33-36 (heavily pruned — see git history for details)
 

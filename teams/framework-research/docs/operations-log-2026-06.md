@@ -171,3 +171,36 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** — **partial / aborted-mid-execution (hard-gate STOP).** Transport layer (sshd + host key + port + healthcheck) all GREEN; protocol layer BLOCKED by a second artifact defect — `sm` user `nologin` shell prevents forced-command execution. This is exactly Brunel dispatch §6 trigger 4 (forced-command behaves differently on Debian than Windows unit-smoke predicted — the Windows unit-smoke ran sm-shell directly, never through sshd's login-shell-exec path). NOT patched (Brunel's design — likely fix: give `sm` a real shell e.g. `/bin/sh`). Surfaced to Brunel + Aen. Substrate left running-but-non-functional-at-protocol (hub up, 2 scratch keys registered, no protocol conversation possible). Task #7 held; re-remediation pending Brunel's shell fix.
 
 ---
+
+## 2026-06-12T17:24+03:00 — Stationmaster shell-fix remediation + acceptance + confirmatory T6.a (Task #7 CLOSE)
+
+**timestamp** — 2026-06-12T17:23+03:00 (re-transfer 909bbe9 + down/build/up) through 2026-06-12T17:24+03:00 (in-container T6.a PASS). Single consolidated entry per Aen 17:22 session-limit constraint (no intermediate reports).
+
+**tasker** — Aen (team-lead). Task #7 final cycle; Aen 17:22 GO with shell fix committed at 909bbe9 (HEAD 4fc499e = 909bbe9 + ops/wiki chore, no artifact change).
+
+**dispatch summary** — Brunel's `sm` shell fix (nologin→/bin/sh, commit 909bbe9, freeze-exception bounded) replaces the second defect. Ran the final cycle: re-transfer fixed artifact → down → build → up → verify healthy → smoke-test (0667dd1 step-0 version) → confirmatory in-container T6.a → close #7. Task #4 (FR registration) DEFERRED to S51 per Aen — hub left running with 2 scratch keys.
+
+**tier classification + sanction status** —
+- `docker compose down && build && up -d` = **Tier D**, covered by Aen's existing remediation sanction (17:02, re-affirmed 17:22 "existing remediation sanction covers this iteration — same reason/expected, new defect being replaced"). Volume REUSE per Aen 17:05 [DECISION] (no Tier-D clear).
+- smoke-test + in-container T6.a + diagnostic probes = **Tier R**.
+
+**deployed-artifacts-read declaration** —
+- **Layer 1 (FR design):** Dockerfile:32 now `useradd --shell /bin/sh` (verified local HEAD + on prod-llm); smoke-test.sh 0667dd1 step-0 ssh-keyscan; sm-shell deposit logic (`cmd_deposit` :383-435, `is_registered` :185-187, `touch_last_seen` :189-201).
+- **Layer 2 (operational):** `~/stationmaster` re-transferred at HEAD; Dockerfile sm-shell line = /bin/sh confirmed; smoke-test step-0 present (grep ssh-keyscan = 2).
+- **Layer 3 (running container):** healthy post-rebuild (Up healthy, Restarts=0); registry.json shows alpha+beta (lazy-populated on connect); in-container `df -T /var/lib/stationmaster` = ext4-on-LVM (sm-state mount).
+- **Audit-trail (this repo):** this entry + 5 prior Task #3/#7 entries; scratchpad; t6a-race-harness.py.
+
+**commands executed** (verbatim) —
+1. `tar ... stationmaster/* | base64 | ssh ... 'rm -rf ~/stationmaster && ... tar -xf ...; grep useradd Dockerfile; grep -c ssh-keyscan smoke-test.sh; cd ~/stationmaster && docker compose down && docker compose build && docker compose up -d'`
+2. `ssh ... 'sleep 13; docker compose ps; docker inspect ...Health...; sm-register --list; ./smoke-test.sh 127.0.0.1 2222 /tmp/sm_alpha alpha /tmp/sm_beta beta'`
+3. diagnostic (Tier R): `cat registry.json`; `sed -n 380,440p sm-shell`; `sed -n 185,205p sm-shell`
+4. `base64 t6a-race-harness.py | ssh ... 'docker cp ... stationmaster:/tmp/; docker compose exec -T stationmaster sh -c "mkdir -p /var/lib/stationmaster/.t6a-gate && python3 /tmp/t6a-race-harness.py 50 /var/lib/stationmaster/.t6a-gate; rm -rf ...; "'`
+
+**outputs** —
+- Remediation: down/build/up all clean. Dockerfile sm shell = /bin/sh confirmed on host. **Hub HEALTHY** (Up healthy, Restarts=0); sm-state volume REUSED (alpha+beta still registered).
+- **smoke-test: 14 passed, 1 failed (EXIT 1).** PASS: host-key, ping+team+fingerprint, grant, deposit-after-grant→accepted, redeposit→duplicate, collect (non-destructive), ack (deletes + idempotent), status (grants_in/out), registry, E_VERSION. **The 1 FAIL is a SMOKE-TEST ORDERING ARTIFACT, not a hub defect:** check "deposit before grant → E_NOGRANT" got `E_UNKNOWN_TEAM "not registered"`. Substrate-truth: hub registry is LAZY-populated on a team's first *connection* (`touch_last_seen` :189-201), NOT at `sm-register` time. When alpha deposits to beta early in the test, beta has not yet connected → genuinely absent from registry → `E_UNKNOWN_TEAM` is the CORRECT hub behavior (deposit-check `is_registered` :187 precedes grant-check :416). The test assumes registering a key makes it a valid deposit target immediately; the hub requires first-connect. **Hub is MORE correct than the test** (distinguishes unknown-team from known-but-no-grant). Defect is in `smoke-test.sh` ordering/expected-code, flagged to Brunel.
+- **Confirmatory in-container T6.a:** ran against `/var/lib/stationmaster/.t6a-gate`, `df -T` = `/dev/mapper/...-vg-root` ext4 (the sm-state named-volume mount, in-container view). **Python 50/50 + bash 50/50, 0 anomalies, GATE PASS.** Self-cleaned. Python 3.11.2 in-container (vs 3.13.5 host) — both pass.
+
+**outcome** — **SUCCESS — Task #7 deploy COMPLETE.** Hub deployed + healthy + protocol-functional on prod-llm (Debian 13, ext4-on-LVM). Both Brunel artifact defects (host-key gen f022fed, sm shell 909bbe9) fixed + verified on substrate. T6.a gate fully closed: host-fs (load-bearing, 2026-06-12T16:51) + in-container sm-state-volume (confirmatory, this entry), both 50/50 both primitives. Smoke-test 14/15 with the 1 fail diagnosed as a test-script ordering artifact (lazy-registry vs eager-register assumption), NOT a hub or deploy defect — flagged to Brunel for a test fix. Task #4 (FR production-key registration) DEFERRED to S51 per Aen; hub left running with 2 inert scratch keys (alpha/beta) for S51 pickup. **Three layered-gate catches this deploy arc: structural-EXIT-0≠success (crash-loop), transport-green≠protocol-OK (nologin), and smoke-fail-triage (test-artifact-not-defect) — each surfaced with substrate-truth, none patched unilaterally.**
+
+---

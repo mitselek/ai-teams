@@ -1,5 +1,17 @@
 # Team-Lead Scratchpad (*FR:team-lead*)
 
+### [NEXT SESSION] 2026-06-12 — session-50 → session-51
+
+**M1 seed (A1 pattern; 5 bullets max; downgrade tag to `[PROCESSED YYYY-MM-DD]` on first S51 read):**
+
+- **State of play:** S50 hit an Anthropic session-limit interrupt mid-deploy (~17:15–17:20, 5-min outage; agents emitted `interrupted` idle-storm then RECOVERED — not killed; PO confirmed post-recovery). Hub BUILT + DEPLOYED + HEALTHY on prod-llm (michelek@10.100.136.162, ~/stationmaster, stationmaster:1.0.0, port 2222, sm-state volume); TWO deploy-blockers found+fixed (f022fed host-key gen; 909bbe9 nologin→/bin/sh shell). Hopper's final cycle (909bbe9 re-transfer → down/build/up → smoke → in-container T6.a) dispatched 17:22 post-recovery — check her consolidated close report / ops-log for outcome.
+- **DONE S50:** #1 hub artifacts, #2 courier (8/8), #3 T6.a gate CLOSED (ext4 host-fs 50/50 = gate-of-record; tmpfs trap caught → wiki gotcha), #5 Protocol A batch, #6 pre-deploy integration (14/14, transport stubbed). Wiki 120→128, all stage-2 gates confirmed except possibly Brunel's pattern (check). All work committed+pushed through 4fc499e + wrap commits.
+- **OPEN → S51:** #7 deploy close (final cycle verification: smoke-test 0667dd1 + confirmatory in-container T6.a) and #4 FR registration + Herald's real-ssh round-trip (PO authorization for full build order STILL STANDS — granted 2026-06-12 pre-departure). Scratch keys alpha/beta registered on hub. Herald's NEXT-WAKE checklist in his scratchpad.
+- **Key S50 process learnings (wiki-grade, mostly filed):** 3 version skews <1h → ARTIFACT FREEZE pattern (builder edits while operator mid-transfer = the hazard; freeze + bounded surface-before-fix exceptions WORKED on defect 2); standby-agent fix-then-flag 4-condition rule (filed, wiki/process/); Hopper sanction discipline (sanction binds to state not command-string; pre-crash GO ≠ post-crash re-execution); completed-flag-must-match-evidence (Herald, task #6 rewording).
+- **Carry:** [DEFERRED] fan-out routing protocol-amendment candidate (Herald's scratchpad, needs PO ratification); duplicate-harness git rm (done in wrap if committed, else first S51 commit); ghost-bridge v2 decommission after stationmaster cutover; A1 audit OVERDUE; GitHub issue retention-flip (PO go pending); D10 amendments fold-in; phantom-brunel + NEW idle-storm-on-session-kill anomaly (family?); ELEX human ask; hr-devs relay.
+
+---
+
 ## SESSION 50 — 2026-06-12 (stationmaster BUILD; PO delegated autonomous coordination)
 
 - [DECISION — S50, PO 16:4x] **Full build-order authorization, PO absent:** deploy hub container to prod-llm (michelek@10.100.136.162), run T6.a gate there, on pass register FR as first customer. No further PO gate inside the build order.
