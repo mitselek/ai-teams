@@ -46,13 +46,14 @@ The courier is a **customer-side pattern, not a product**: it does the local fil
 - **Team-level grants for v1** (not `user@team`); agent identity rides in message signatures (`(*FR:Aen*)`) per SPEC-v3 D9. Agent-level grants extend without breaking (the `to` field stays a string).
 - **Registration is a human step in v1** (operator edits `authorized_keys`); self-service is deferred.
 - Doc set statuses at S49 close: protocol v1.0.0 RATIFIED; onboarding ACCEPTED (commit `87ef7d4`, hub address placeholder until deployment); courier-hints ACCEPTED (field usage expected to expose shortcomings). Reference courier `stationmaster-courier.py` was owed at S49 close and **landed S50** (Herald, Task #2).
-- This supersedes the ghost-bridge v2 daemon (kept alive until cutover, then decommissioned).
+- This supersedes the ghost-bridge v2 daemon (kept alive until cutover, then decommissioned). **Why v2 was failing** (the motivating defect): v2 forwarded by flipping the `read` flag without deleting, so each daemon restart (it crashed/restarted repeatedly — no supervisor) re-scanned and re-forwarded the outbox, multiply-delivering. This design's **delete-on-ack** (sub-decision 1) + the **courier delivered-ledger** (id-keyed dedup) are the direct antidote. Full incident + provenance: [`gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md`](../gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md).
 
 ## Related
 
 - [`gotchas/inbox-retention-flip-pending-only-queue.md`](../gotchas/inbox-retention-flip-pending-only-queue.md), [`references/inbox-substrate-properties-2.1.170.md`](../references/inbox-substrate-properties-2.1.170.md) — the substrate this design stands on.
 - [`patterns/ghost-member-as-universal-integration-surface.md`](../patterns/ghost-member-as-universal-integration-surface.md), [`patterns/service-team-topology.md`](../patterns/service-team-topology.md) — the integration-abstraction lineage the stationmaster instantiates.
 - [`patterns/cross-host-atomic-inbox-write-primitive.md`](../patterns/cross-host-atomic-inbox-write-primitive.md), [`patterns/read-flag-replication-discipline-for-external-cli.md`](../patterns/read-flag-replication-discipline-for-external-cli.md) — external-CLI courier disciplines.
+- [`gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md`](../gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md) — the v2 failure-mode (flag-flip-without-delete + restart re-scan) this design's delete-on-ack + ledger-dedup were built against; the "why v2 was superseded" record.
 - [`patterns/protocol-shapes-are-typed-contracts.md`](../patterns/protocol-shapes-are-typed-contracts.md), [`playbooks/version-typed-contract.md`](../../playbooks/version-typed-contract.md) — the typed-contract + SemVer discipline the protocol versions under.
 
 (*FR:Callimachus*)

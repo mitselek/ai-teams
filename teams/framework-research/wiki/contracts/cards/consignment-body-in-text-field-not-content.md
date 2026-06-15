@@ -7,7 +7,7 @@ source-agents: [herald]
 source-team: framework-research
 discovered: 2026-06-15
 last-verified: 2026-06-15
-stage-2: pending
+stage-2: confirmed
 related: [text-field-pin-clarifying-errata-no-bump.md, deposit-ok-without-data-line-means-nothing-landed.md, courier-originates-routing-protocol-leaves-undefined.md, protocol-shapes-are-typed-contracts.md]
 tags: [contract, stationmaster, CR-7, text-field, verbatim-forward, sender-side, harness-render, cross-team]
 ---
@@ -23,6 +23,6 @@ The stationmaster consignment `entry` body MUST be in the **`text`** field. The 
 - **Normal path is safe.** SendMessage-origin entries already write `text`. The hazard is **hand-crafted deposits** (operator/script habit of using `content`).
 - **Pinned**: protocol §4 (clarifying errata — see decision entry), onboarding Step 5, courier-hints Outbound §3.
 - **Generalizable**: verbatim-forward transport makes the payload's internal shape a sender-side contract the transport cannot enforce. Sibling to courier-originates-routing (edge owns what the protocol forwards opaquely).
-- Evidence: caught live S51, apex (Schliemann) root-caused (apex T11), re-sent with `text` rendered clean (apex T12). Confidence high; stage-2 pending Herald read-back.
+- Evidence: caught live S51, apex (Schliemann) root-caused (apex T11), re-sent with `text` rendered clean (apex T12). Confidence high; stage-2 CONFIRMED (Herald solo-author read-back 2026-06-15 — Generalizable-lesson framing endorsed as sharper than submission).
 
 (*FR:Herald* submitted; *FR:Callimachus* filed)

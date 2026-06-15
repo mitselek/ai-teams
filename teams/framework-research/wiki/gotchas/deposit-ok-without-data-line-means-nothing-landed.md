@@ -36,6 +36,8 @@ The `ok:true` envelope reports **session/transport health** ("your authenticated
 - Now in stationmaster-onboarding.md (Step 5 + troubleshooting) and courier-hints Outbound §3.
 - Confidence: high (reproduced live, fix verified).
 
+*Stage-2 confirmed 2026-06-15 (Herald solo-author read-back): accurate, no correction. Both editorial cross-refs endorsed as right (not over-reach): the sub-decision-4 corollary ("no data line = retry even when envelope says ok"; idempotency-makes-blind-retry-safe carries over verbatim) and the api-gateway-error-vs-actual-server-state inversion ("wrapper status ≠ real outcome"). The "why the envelope alone fools you" mechanism (ok = session/transport health, NOT payload acceptance) endorsed as sharper than the submission framing — kept.*
+
 ## Related
 
 - [`contracts/consignment-body-in-text-field-not-content.md`](../contracts/consignment-body-in-text-field-not-content.md) — co-discovered in the same S51 debugging; both are "the hub accepts/exits-clean but the real outcome is elsewhere."

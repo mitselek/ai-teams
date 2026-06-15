@@ -2,7 +2,7 @@
 
 4 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `contracts/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): the card carries a `stage-2` field. contracts/ — **3 confirmed, 1 pending** (single-source entries confirmed per three-bucket rule; registered-two-meanings confirmed via Brunel read-back 2026-06-12; the CR-7 text-field contract is **pending** Herald read-back). Audit: `grep -rl 'stage-2: pending' contracts/cards/`.
+**Stage-2-confirms gate** (#70): the card carries a `stage-2` field. contracts/ — **4 confirmed, 0 pending** (single-source entries confirmed per three-bucket rule; registered-two-meanings confirmed via Brunel read-back 2026-06-12; CR-7 text-field contract confirmed via Herald read-back 2026-06-15). Audit: `grep -rl 'stage-2: pending' contracts/cards/`.
 
 | Card | Full entry |
 |---|---|

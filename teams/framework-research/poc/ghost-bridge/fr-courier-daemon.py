@@ -55,6 +55,15 @@ Usage:
     (no flag)     session-scoped daemon: immediate cycle, then poll loop, with a
                   drain-once on SIGINT/SIGTERM.
 
+PLATFORM NOTE on the SIGINT/SIGTERM drain-on-shutdown (verified 2026-06-15): the
+signal-driven drain is the POSIX/Linux path -- there a SIGTERM is delivered and the
+handler runs the final cycle + atexit releases the lock. On WINDOWS, the usual stop
+(PowerShell Stop-Process == TerminateProcess) is a HARD KILL: Python receives no
+signal, so neither this drain nor atexit fires on stop. On Windows the drain is
+performed EXTERNALLY by stop-fr-courier.ps1 (kill -> wait-for-exit -> `--drain-once`,
+whose NORMAL exit fires atexit and releases the lock). No data is lost on either
+platform because the spool journals before deposit (spool-durability).
+
 Per team-lead 2026-06-15: validate with --ping and --once FIRST, checkpoint the
 build, and do NOT start the persistent loop against the live hub until told.
 """

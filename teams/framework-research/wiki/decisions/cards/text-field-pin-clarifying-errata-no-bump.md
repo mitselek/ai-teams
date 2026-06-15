@@ -7,7 +7,7 @@ source-agents: [herald]
 source-team: framework-research
 discovered: 2026-06-15
 last-verified: 2026-06-15
-stage-2: pending
+stage-2: confirmed
 related: [consignment-body-in-text-field-not-content.md, stationmaster-post-office-model.md, version-typed-contract.md]
 tags: [decision, errata, stationmaster, text-field, CR-7, semver, no-bump, protocol-section-4, cross-team]
 ---
@@ -22,6 +22,6 @@ tags: [decision, errata, stationmaster, text-field, CR-7, semver, no-bump, proto
 - **Rejected: major version bump** — signals a breaking change; this is not one. SendMessage-origin already complies → no consumer breaks. Bump would impose migration cost for a no-op-for-conformant clarification.
 - **Chosen: §4 clarifying errata** — contract-level placement without falsely signaling breakage. Same posture as the existing §5.5 errata (in-protocol precedent).
 - **Why no-bump is right**: the field was always `text` in practice; the errata documents an already-held invariant, doesn't change behavior. Only a hand-crafting sender's knowledge changes — a doc gap, not a contract change. Canonical clarifying-errata-no-bump shape.
-- Contract entry = the rule; this = the ratification + versioning call. Two cross-linked entries, different claim-types (Herald's call). Confidence high; stage-2 pending Herald read-back.
+- Contract entry = the rule; this = the ratification + versioning call. Two cross-linked entries, different claim-types (Herald's call — separate-entry-cross-linked-to-#1 honored, endorsed at read-back). Confidence high; stage-2 CONFIRMED (Herald author read-back 2026-06-15; "why no-bump is correct" section endorsed as the precise versioning precedent).
 
 (*FR:Herald* submitted; *FR:Callimachus* filed)

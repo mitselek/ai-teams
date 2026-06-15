@@ -40,6 +40,8 @@ This decision **resolves** the deferred amendment-candidate documented in [`gotc
 - Herald's deferred `[PO-ratification]` amendment candidate (was in his scratchpad, with A/B/C non-prescriptive write-up). apex CR-4 (apex T10) was the deciding external corroboration. Ratified by PO via team-lead 2026-06-15.
 - Confidence: high (ratified decision + n=2 independent-implementation corroboration).
 
+*Stage-2 confirmed 2026-06-15 (Herald author read-back — this was his deferred amendment candidate): accurate; the rejected-B/C-with-rationale (the thing that makes it a decision), the n=2 corroboration, and the no-future-proofing cross-ref all verified faithful. The DEFERRED→RESOLVED resolution-wiring on `gotchas/courier-originates-routing-protocol-leaves-undefined.md` (keeping that gotcha's confirmed stage-2 since it's a status update, not a claim change) endorsed as exactly right.*
+
 ## Related
 
 - [`gotchas/courier-originates-routing-protocol-leaves-undefined.md`](../gotchas/courier-originates-routing-protocol-leaves-undefined.md) — the gap this decision resolves; its v1 conventions (single-configured-outbox; `<team>-bridge`→`<team>`; refuse-and-retain on the undefined multi-dest case) are exactly what candidate A ratifies as normative.

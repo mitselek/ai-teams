@@ -3,8 +3,15 @@
 #
 # Gap B lifecycle, start side: launch fr-courier-daemon.py in the background, bound
 # to THIS session. The daemon does an immediate cycle on startup, then polls every
-# poll_interval_s. Stop it with stop-fr-courier.ps1 (sends CTRL/terminate -> the
-# daemon drains once, then releases its lock and exits -- no detached zombie).
+# poll_interval_s. Stop it with stop-fr-courier.ps1.
+#
+# WINDOWS DRAIN NOTE (verified 2026-06-15): on Windows, stop is a hard kill
+# (Stop-Process = TerminateProcess); Python receives NO signal, so the daemon's own
+# SIGINT/SIGTERM drain-on-shutdown does NOT run on the stop path. stop-fr-courier.ps1
+# therefore performs the drain EXTERNALLY (kill -> wait -> `--drain-once`), which is
+# what actually ships queued outbound + releases the lock cleanly. The in-process
+# signal-driven drain is the POSIX/Linux path; on Windows the drain is the stopper's
+# job, not the kill's. No data is lost either way (spool journals before deposit).
 #
 # This is the Windows dev box (FR's only host; dev-only by policy). The daemon's
 # InstanceLock already enforces single-instance + reclaims a stale lock via tasklist,

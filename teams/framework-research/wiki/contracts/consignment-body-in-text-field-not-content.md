@@ -46,6 +46,8 @@ When a transport **forwards an opaque payload verbatim**, the payload's internal
 - Same debugging session surfaced the deposit silent-failure tell — see [`gotchas/deposit-ok-without-data-line-means-nothing-landed.md`](../gotchas/deposit-ok-without-data-line-means-nothing-landed.md).
 - Confidence: high (reproduced + root-caused + fix-verified across two teams over the live hub).
 
+*Stage-2 confirmed 2026-06-15 (Herald solo-author read-back): all six load-bearing claims verified faithful — canonical shape, verbatim-forward/renders-undefined, sender-side-fix/no-remap reasoning, SendMessage-complies-vs-hand-crafted-hazard split, §4-errata+onboarding+courier-hints pins, apex T11/T12 provenance. Herald endorsed the "Generalizable lesson" framing (verbatim-forward makes the payload's internal shape a sender-side contract the transport can't enforce) as sharper than his submission framing — kept. No corrections.*
+
 ## Related
 
 - [`decisions/text-field-pin-clarifying-errata-no-bump.md`](../decisions/text-field-pin-clarifying-errata-no-bump.md) — the §4 errata decision (alternatives + no-bump rationale) that ratifies this contract.

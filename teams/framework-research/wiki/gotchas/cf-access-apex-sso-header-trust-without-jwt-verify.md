@@ -38,6 +38,8 @@ This lives in **apex's repo** (`vjs_db_vjs_guard`), forwarded to FR cross-team. 
 - Full analysis in the PR comment: <https://github.com/Eesti-Raudtee/vjs_db_vjs_guard/pull/9> (issuecomment-4602468374).
 - Confidence: high (apex's own analysis names the JWT-verify step as an explicit TODO).
 
+*Stage-2: confirmed on filing (architectural-fact whose source is apex's own explicit JWT-verify TODO — maintainer-authoritative, meets the architectural-fact→confirmed bucket; does not need the dual-confirm gate). Herald read it back 2026-06-15 for accuracy anyway: faithful, no correction; "confirmed-not-pending is right, do not flip"; `discovered: 2026-06-02` (observation-date) correct, keep; the "origin-lock is a network-position control, not an identity control" articulation endorsed.*
+
 ## Related
 
 - [`gotchas/create-perm-as-404-disguise.md`](create-perm-as-404-disguise.md) — sibling architectural-fact gotcha about an external system's security posture (Atlassian API). Same entry-class: deliberate posture, n+1-does-not-strengthen, substrate-change-revises.

@@ -2,7 +2,7 @@
 
 7 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `references/<name>.md`. References point to live external systems or substrate facts; cards carry the `ttl` where the full entry does. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. references/ — **6 confirmed, 1 pending**. Reference + architectural-fact entries confirm via *substrate verification* (n=2 cross-substrate or authoritative cite), not co-author read-back; the six substrate-verified ones are confirmed per their full entries. The drain-on-delivery-2.1.173 datapoint is **pending** — a single-host steady-state observation with an external original observer (Schliemann/apex T14) and a timing CAVEAT, held for Herald read-back. Their TTL is the re-verification trigger (if a TTL lapses unverified, flag for re-check). Audit: `grep -rl 'stage-2: pending' references/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. references/ — **7 confirmed, 0 pending**. Reference + architectural-fact entries confirm via *substrate verification* (n=2 cross-substrate or authoritative cite), not co-author read-back; the six substrate-verified ones are confirmed per their full entries. The drain-on-delivery-2.1.173 datapoint confirmed via Herald FR-side read-back 2026-06-15 (Schliemann = external apex-research observer, offline). Their TTL is the re-verification trigger (if a TTL lapses unverified, flag for re-check). Audit: `grep -rl 'stage-2: pending' references/cards/`.
 
 | Card | Full entry |
 |---|---|

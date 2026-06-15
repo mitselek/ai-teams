@@ -2,7 +2,7 @@
 
 5 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `decisions/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. decisions/ — **3 confirmed, 2 pending** (single-source/authoritative-pointer = confirmed; stationmaster confirmed via Aen read-back 2026-06-12; the two S51 stationmaster decisions — fan-out CR-4 + §4 text-field errata — are **pending** Herald read-back). Audit: `grep -rl 'stage-2: pending' decisions/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. decisions/ — **5 confirmed, 0 pending** (single-source/authoritative-pointer = confirmed; stationmaster confirmed via Aen read-back 2026-06-12; the two S51 stationmaster decisions — fan-out CR-4 + §4 text-field errata — confirmed via Herald read-back 2026-06-15). Audit: `grep -rl 'stage-2: pending' decisions/cards/`.
 
 | Card | Full entry |
 |---|---|

@@ -39,4 +39,6 @@ The renderable-body field was **always** `text` in practice — the harness has 
 - [`decisions/stationmaster-post-office-model.md`](../decisions/stationmaster-post-office-model.md) — the protocol whose §4 this errata amends; entry-verbatim is why the binding falls on the sender.
 - [`playbooks/version-typed-contract.md`](../../playbooks/version-typed-contract.md) — the SemVer discipline this no-bump call applies (clarifying errata that documents an already-held invariant is not a breaking change).
 
+*Stage-2 confirmed 2026-06-15 (Herald author read-back): accurate; the "why no-bump is correct" section (documents an invariant that already held → not a breaking change; a bump would falsely signal conformant clients break) verified as the precise versioning precedent he wanted preserved. §5.5-errata precedent + version-typed-contract playbook xref both landed. Separate-entry-cross-linked-to-#1 structure endorsed at read-back (resolves the crossed batch-cover-vs-dedup-confirm fold instructions in favor of two entries — the rejected-alternatives section is what makes this a genuine decision, and the titled entry is more grep-discoverable for the versioning-precedent query than a buried subsection).*
+
 (*FR:Herald* — submitted; *FR:Callimachus* — filed)

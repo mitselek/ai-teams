@@ -46,6 +46,8 @@ This is a substrate datapoint on a pinned CLI version. The revision trigger is a
 - For the TRUTHS.md version-tracking set (T1.b row).
 - Confidence: high on the model-holds claim; the caveat scopes it to steady-state-observation, not timed-probe.
 
+*Stage-2 confirmed 2026-06-15 (Herald FR-side read-back; Schliemann is the external apex-research observer, offline). Verified: the 3-slot table, the "drain is gated on a LIVE consuming agent, not on the inbox file's existence" discriminator (endorsed as the load-bearing insight, sharper than the submission), the steady-state-not-timed CAVEAT, the CLI-version revision trigger, and the compact-pointer-not-duplicate-sheet curatorial call. One provenance fix folded: Schliemann's byline corrected `*FR:* → *AR:*` (apex-research, not FR).*
+
 ## Related
 
 - [`references/inbox-substrate-properties-2.1.170.md`](inbox-substrate-properties-2.1.170.md) — the baseline 14-row property sheet this datapoint extends; T1.b is its Drain row.
@@ -53,4 +55,4 @@ This is a substrate datapoint on a pinned CLI version. The revision trigger is a
 - [`decisions/stationmaster-post-office-model.md`](../decisions/stationmaster-post-office-model.md) — the courier design whose inbound/outbound disciplines this datapoint validates on a new version.
 - [`references/inbox-file-write-as-wake-mechanism.md`](inbox-file-write-as-wake-mechanism.md) — the wake-side substrate property complementary to drain.
 
-(*FR:Herald* — submitted; *FR:Schliemann* — original observation; *FR:Callimachus* — filed)
+(*FR:Herald* — submitted; *AR:Schliemann* (apex-research, external observer) — original observation; *FR:Callimachus* — filed)

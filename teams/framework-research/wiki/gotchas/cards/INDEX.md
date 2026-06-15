@@ -1,8 +1,8 @@
 # gotchas/ — Card Index
 
-25 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+26 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **20 confirmed, 5 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **21 confirmed, 5 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending; deposit-no-data-line confirmed via Herald read-back 2026-06-15; the v2-restart-redelivery-dupe entry is **pending** Herald read-back). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -30,4 +30,5 @@
 | Subagent Harness Blocks Curator-Role Repo Write | [card](subagent-harness-blocks-curator-role-repo-write.md) · [full](../subagent-harness-blocks-curator-role-repo-write.md) |
 | TeamCreate In-Memory Leadership Survives /clear | [card](teamcreate-in-memory-leadership-survives-clear.md) · [full](../teamcreate-in-memory-leadership-survives-clear.md) |
 | tmux Pane Labels Show Role IDs, Not Persona Names | [card](tmux-pane-labels-decoupled-from-personas.md) · [full](../tmux-pane-labels-decoupled-from-personas.md) |
+| v2 Ghost-Bridge Re-Forwarded on Every Restart — the Defect the Hub Was Built Against | [card](v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md) · [full](../v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md) |
 | WARP DNS vs. Routing Asymmetry on RC Host | [card](warp-dns-vs-routing-asymmetry-rc-host.md) · [full](../warp-dns-vs-routing-asymmetry-rc-host.md) |
