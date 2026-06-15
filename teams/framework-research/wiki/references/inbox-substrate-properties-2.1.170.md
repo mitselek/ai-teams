@@ -51,6 +51,7 @@ These are substrate properties on a pinned CLI version. The trigger to revise is
 
 - [`gotchas/inbox-retention-flip-pending-only-queue.md`](../gotchas/inbox-retention-flip-pending-only-queue.md) — the load-bearing version-coupled flip (the Drain row) + invalidated prior assumptions.
 - [`references/inbox-file-write-as-wake-mechanism.md`](inbox-file-write-as-wake-mechanism.md) — canonical wake-stage property; the Wake row re-confirms it on 2.1.170.
+- [`references/drain-on-delivery-datapoint-2.1.173.md`](drain-on-delivery-datapoint-2.1.173.md) — third sample on CLI 2.1.173 (apex customer #2): the Drain-row model HOLDS (steady-state observation, not a timed re-probe). The version-tracking extension of this sheet's T1.b row.
 - [`references/members-array-edit-honored-mid-session.md`](members-array-edit-honored-mid-session.md), [`references/inbox-slot-vs-members-validation-asymmetry.md`](inbox-slot-vs-members-validation-asymmetry.md) — the registration + lifecycle-asymmetry legs of the substrate-property family.
 - [`patterns/cross-host-atomic-inbox-write-primitive.md`](../patterns/cross-host-atomic-inbox-write-primitive.md) — the cross-host transport primitive these local properties underpin.
 - [`decisions/stationmaster-post-office-model.md`](../decisions/stationmaster-post-office-model.md) — the redesign built on this property sheet.

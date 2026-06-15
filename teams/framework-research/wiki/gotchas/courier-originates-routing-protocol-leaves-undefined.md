@@ -3,7 +3,7 @@ source-agents:
   - herald
 discovered: 2026-06-12
 filed-by: librarian
-last-verified: 2026-06-12
+last-verified: 2026-06-15
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster-courier.py
@@ -24,15 +24,17 @@ So the courier **MUST supply `to` from somewhere other than the entry** — and 
 
 1. **Single configured ghost outbox** → its one configured destination.
 2. **`<team>-bridge` name** → strip `-bridge` → `<team>` (matches the hub's own §1 example, `hr-devs-bridge`).
-3. **Undefined case — one outbox fanning out to MULTIPLE teams** → the courier **refuses-and-retains**: logs, holds in spool, **never drops** (honors hints §7 no-TTL). It does NOT guess. This case is a **queued protocol-amendment candidate** pending PO ratification.
+3. **Undefined case — one outbox fanning out to MULTIPLE teams** → the courier **refuses-and-retains**: logs, holds in spool, **never drops** (honors hints §7 no-TTL). It does NOT guess. ~~This case is a queued protocol-amendment candidate pending PO ratification.~~ **RESOLVED 2026-06-15 (CR-4): refuse-and-retain is now the ratified normative v1 behavior** for this case — single-outbox multi-destination fan-out is explicitly OUT OF SCOPE in v1. See [`decisions/fan-out-routing-per-destination-outboxes-cr4.md`](../decisions/fan-out-routing-per-destination-outboxes-cr4.md).
 
 ## Generalizable lesson
 
 When a wire protocol **forwards an opaque payload verbatim**, any routing metadata that **isn't IN the payload** must be supplied by the **edge component** — and any case the convention doesn't cover should **refuse-and-retain, never silently drop or guess**. The verbatim-forwarding guarantee and the routing requirement are in tension by construction; the edge is the only place that tension can be resolved, and the safe default for the uncovered case is loud retention.
 
-## Status of the amendment candidate
+## Status of the amendment candidate — RESOLVED 2026-06-15 (CR-4)
 
-The multi-outbox fan-out case is **deferred pending PO ratification** — NOT yet a protocol change. The full non-prescriptive write-up (problem + 2 covered cases + the undefined case + 3 candidate resolutions A/B/C, **none recommended-as-decided**) lives in `teams/framework-research/memory/herald.md` under `[DEFERRED — PO ratification]`. Disposition by Aen 2026-06-12 16:49. This entry documents the gap and the ratified v1 convention; it does not pre-empt the PO decision on fan-out.
+The multi-outbox fan-out case was **deferred pending PO ratification** at filing; the original non-prescriptive write-up (problem + 2 covered cases + the undefined case + 3 candidate resolutions A/B/C, none recommended-as-decided) lived in `teams/framework-research/memory/herald.md` under `[DEFERRED — PO ratification]` (Aen disposition 2026-06-12 16:49).
+
+**Resolved 2026-06-15 (CR-4, PO-ratified via team-lead): candidate A — per-destination outboxes — is normative v1.** Single-outbox multi-destination fan-out is OUT OF SCOPE; the refuse-and-retain behavior in case 3 above is now the ratified v1 behavior, not a placeholder. Alternatives B (routing sidecar / local entry-envelope) and C (leave-undefined) were rejected, kept as future fallbacks only if a real consumer forces single-outbox fan-out. Full decision record with rationale: [`decisions/fan-out-routing-per-destination-outboxes-cr4.md`](../decisions/fan-out-routing-per-destination-outboxes-cr4.md).
 
 ## Evidence
 
@@ -45,9 +47,10 @@ The multi-outbox fan-out case is **deferred pending PO ratification** — NOT ye
 
 ## Related
 
+- [`decisions/fan-out-routing-per-destination-outboxes-cr4.md`](../decisions/fan-out-routing-per-destination-outboxes-cr4.md) — **the decision that resolves this gotcha's deferred amendment-candidate** (CR-4, 2026-06-15): per-destination outboxes ratified normative v1; single-outbox multi-dest fan-out OUT OF SCOPE (refuse-and-retain).
 - [`decisions/stationmaster-post-office-model.md`](../decisions/stationmaster-post-office-model.md) — the protocol whose §4 entry-verbatim guarantee creates this gap; `from_team` is stamped by the hub from the channel, but `to` has no such hub-side source.
 - [`patterns/same-volume-startup-gate-for-rename-atomicity.md`](../patterns/same-volume-startup-gate-for-rename-atomicity.md), [`patterns/per-connection-forced-command-shell-over-resident-daemon.md`](../patterns/per-connection-forced-command-shell-over-resident-daemon.md) — sibling findings from the same S50 stationmaster build.
 - [`patterns/protocol-shapes-are-typed-contracts.md`](../patterns/protocol-shapes-are-typed-contracts.md) — the contract-completeness lens: a verbatim-forward field-set leaves routing as an edge-supplied concern the contract must name (or explicitly delegate).
-- [`patterns/no-future-proofing.md`](../patterns/no-future-proofing.md) — why the fan-out case is queued (refuse-and-retain) rather than designed-ahead; the convention covers observed need, the uncovered case waits for PO ratification.
+- [`patterns/no-future-proofing.md`](../patterns/no-future-proofing.md) — why the fan-out case is refuse-and-retain rather than designed-ahead; the convention covers observed need. (CR-4 ratified this posture as v1; B/C kept as fallbacks only if a real consumer forces single-outbox fan-out.)
 
 (*FR:Herald* — submitted; *FR:Callimachus* — filed)

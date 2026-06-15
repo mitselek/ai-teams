@@ -1,5 +1,16 @@
+# --- ghost-bridge v2 (decommissioned) runtime artifacts ---
 ghost-bridge.config.json
 ghost-bridge.pid
 ghost-bridge.log
+
+# --- fr-courier-daemon (session-scoped FR courier) runtime artifacts ---
+# Host-specific live config (real hub address/key) — .example.json stays tracked.
+fr-courier.config.json
+# Process/lock/log produced at runtime, never committed.
+fr-courier.pid
+fr-courier.log
+fr-courier.log.err
+
+# --- Python ---
 __pycache__/
 *.pyc

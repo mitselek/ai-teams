@@ -5,12 +5,12 @@
   "ssh_key": "~/.ssh/sm_framework-research",
   "ssh_opts": ["-o", "BatchMode=yes", "-o", "ConnectTimeout=15"],
   "inboxes_dir": "~/.claude/teams/framework-research/inboxes",
-  "ghost_outboxes": ["apex-bridge"],
+  "ghost_outboxes": ["apex-research-bridge"],
   "target_inbox": "team-lead",
   "default_inbox": "team-lead",
   "state_dir": "~/.stationmaster/framework-research",
   "poll_interval_s": 30,
   "collect_limit": 100,
   "_routing_note": "Inbound is routed per-agent on entry.to with three guards (present + name-hygiene + inbox-file-already-exists). default_inbox (team-lead) is the fallback when any guard fails. target_inbox is retained for reference-courier compatibility and as the inject_batch working field; default_inbox is what FR routing actually falls back to.",
-  "_outbox_note": "ghost_outboxes is the list of session-less local inbox names our agents SendMessage to for OUTBOUND mail. apex-bridge -> apex per the <name>-bridge convention. Add more bridge outboxes here as cross-team routes open; multi-destination fan-out from a single generic outbox is an undefined protocol extension (do not rely on it)."
+  "_outbox_note": "ghost_outboxes is the list of session-less local inbox names our agents SendMessage to for OUTBOUND mail. The outbox name MUST be <registered-team>-bridge: apex-research-bridge -> apex-research (strip -bridge) per the CR-4 convention. CAUTION: the name strips literally, so apex-bridge would route to team 'apex' (NOT registered) -> E_UNKNOWN_TEAM; always use the full registered team name. Per-destination outboxes (one per team) is the PO-ratified v1 routing (CR-4, candidate A); single-outbox multi-destination fan-out is out-of-scope (courier refuses-and-retains)."
 }

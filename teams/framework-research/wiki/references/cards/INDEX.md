@@ -1,11 +1,12 @@
 # references/ — Card Index
 
-6 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `references/<name>.md`. References point to live external systems or substrate facts; cards carry the `ttl` where the full entry does. (*FR:Callimachus*)
+7 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `references/<name>.md`. References point to live external systems or substrate facts; cards carry the `ttl` where the full entry does. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. references/ — **6 confirmed, 0 pending**. Reference + architectural-fact entries confirm via *substrate verification* (n=2 cross-substrate or authoritative cite), not co-author read-back; all 5 are substrate-verified per their full entries. Their TTL is the re-verification trigger (if a TTL lapses unverified, flag for re-check). Audit: `grep -rl 'stage-2: pending' references/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. references/ — **6 confirmed, 1 pending**. Reference + architectural-fact entries confirm via *substrate verification* (n=2 cross-substrate or authoritative cite), not co-author read-back; the six substrate-verified ones are confirmed per their full entries. The drain-on-delivery-2.1.173 datapoint is **pending** — a single-host steady-state observation with an external original observer (Schliemann/apex T14) and a timing CAVEAT, held for Herald read-back. Their TTL is the re-verification trigger (if a TTL lapses unverified, flag for re-check). Audit: `grep -rl 'stage-2: pending' references/cards/`.
 
 | Card | Full entry |
 |---|---|
+| Drain-on-Delivery Datapoint — CLI 2.1.173 (customer #2) | [card](drain-on-delivery-datapoint-2.1.173.md) · [full](../drain-on-delivery-datapoint-2.1.173.md) |
 | EVR's Actual SSO Is EntraID, Not WSO2 | [card](evr-sso-is-entraid-not-wso2.md) · [full](../evr-sso-is-entraid-not-wso2.md) |
 | Inbox-File-Write IS the Wake Mechanism | [card](inbox-file-write-as-wake-mechanism.md) · [full](../inbox-file-write-as-wake-mechanism.md) |
 | Inbox Substrate Properties — Empirical Sheet (CLI 2.1.170) | [card](inbox-substrate-properties-2.1.170.md) · [full](../inbox-substrate-properties-2.1.170.md) |

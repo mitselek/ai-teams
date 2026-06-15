@@ -1,16 +1,18 @@
 # gotchas/ — Card Index
 
-23 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+25 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **19 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **20 confirmed, 5 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
 | A Courier Must Originate Routing the Wire Protocol Leaves Undefined | [card](courier-originates-routing-protocol-leaves-undefined.md) · [full](../courier-originates-routing-protocol-leaves-undefined.md) |
 | ai-teams Has No NOPASSWD Sudoers — Use docker exec -u root | [card](ai-teams-user-no-sudo-use-docker-exec-root.md) · [full](../ai-teams-user-no-sudo-use-docker-exec-root.md) |
+| CF Access → APEX SSO Trusts Email Header Without JWT Verification | [card](cf-access-apex-sso-header-trust-without-jwt-verify.md) · [full](../cf-access-apex-sso-header-trust-without-jwt-verify.md) |
 | Cloudflare D1 Migration and Query Gotchas | [card](cloudflare-d1-migration-query.md) · [full](../cloudflare-d1-migration-query.md) |
 | Contract Enforcement Gap for Non-Claude Participants | [card](contract-enforcement-gap-non-claude.md) · [full](../contract-enforcement-gap-non-claude.md) |
 | Confluence Create-Perm Denial Returns 404, Not 403 | [card](create-perm-as-404-disguise.md) · [full](../create-perm-as-404-disguise.md) |
+| Stationmaster deposit: ok:true With No Data Line Means Nothing Landed | [card](deposit-ok-without-data-line-means-nothing-landed.md) · [full](../deposit-ok-without-data-line-means-nothing-landed.md) |
 | Cross-Document Prose vs Procedure Drift | [card](cross-document-prose-procedure-drift.md) · [full](../cross-document-prose-procedure-drift.md) |
 | Cross-MSYS argv Mangling | [card](cross-msys-argv-mangling.md) · [full](../cross-msys-argv-mangling.md) |
 | Dual Team-Dir Ambiguity — Runtime vs. Repo | [card](dual-team-dir-ambiguity.md) · [full](../dual-team-dir-ambiguity.md) |
