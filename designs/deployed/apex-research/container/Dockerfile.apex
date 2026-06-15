@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # apex-research Container — Python + Node.js + SSH (*FR:Brunel*)
 #
 # Extends ai-teams-claude:latest (ubuntu 24.04, nodejs, npm, git, gh, gosu, claude)
@@ -35,8 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 # ── Python 3 + SSH server + sudo + tmux ──────────────────────────────────────
 # Single apt layer: Python (extraction scripts), SSH (PO access), sudo (PO perms),
-# tmux (HUMAN SSH session scaffolding only — post-#60, agent spawning is
-# Agent-tool-based, not tmux-based; tmux can be removed if PO SSH drops).
+# tmux (session management for Claude Code).
 # Venv and pip install happen at entrypoint (depends on workspace volume).
 RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 \
@@ -57,6 +57,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && sed -i 's/^#\?Port .*/Port 2222/' /etc/ssh/sshd_config \
     && echo 'Port 2222' >> /etc/ssh/sshd_config
 
+# ── Chromium / Playwright runtime deps (*FR:Brunel*) ─────────────────────────
+# Required for headless Chromium (Playwright, puppeteer-style browser automation).
+# Standard set output by `playwright install-deps chromium` on Ubuntu 24.04 noble.
+# `t64` suffix marks Debian/Ubuntu post-time64 transition (noble+).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libglib2.0-0t64 \
+        libnss3 \
+        libnspr4 \
+        libatk1.0-0t64 \
+        libatk-bridge2.0-0t64 \
+        libcups2t64 \
+        libdbus-1-3 \
+        libxcb1 \
+        libxkbcommon0 \
+        libasound2t64 \
+        libgbm1 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxfixes3 \
+        libxrandr2 \
+        libxext6 \
+        libx11-6 \
+        libcairo2 \
+        libpango-1.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 # ── Lock root password ────────────────────────────────────────────────────────
 # No root login via any method. Entrypoint runs as root but drops to ai-teams.
 RUN passwd -l root
@@ -68,6 +94,21 @@ RUN usermod -p '*' ai-teams \
     && mkdir -p /home/ai-teams/.ssh \
     && chmod 700 /home/ai-teams/.ssh \
     && chown 1000:1000 /home/ai-teams/.ssh
+
+# ── Build-time courier key seed (approach b) (*FR:Brunel*) ──────────────────────
+# The courier's OUTBOUND SSH key (to the FR stationmaster hub) is injected as a
+# BuildKit secret (NOT an ARG/layer — no leak into image history). It lands on the
+# IMAGE filesystem at a seed path. The entrypoint (Step 7b) copies it into the
+# ephemeral ~/.ssh on every start (~/.ssh is the containerd overlay — does NOT
+# survive a rebuild). Key generated ONCE off-build by FR (the hub operator), so
+# the same key is injected every build => no hub-side registration churn.
+# Seed filename = stationmaster_apex, matching the name the live courier.json
+# already dials (~/.ssh/stationmaster_apex) — no courier.json edit needed.
+# Build: DOCKER_BUILDKIT=1 docker build --secret id=courier_key,src=./stationmaster_apex ...
+RUN --mount=type=secret,id=courier_key \
+    install -d -m 700 -o ai-teams -g ai-teams /home/ai-teams/.ssh-seed \
+    && install -m 600 -o ai-teams -g ai-teams /run/secrets/courier_key \
+         /home/ai-teams/.ssh-seed/stationmaster_apex
 
 # ── Native Claude Code install ───────────────────────────────────────────────
 # Install Claude Code natively (not npm-global) so auto-updates work without sudo.

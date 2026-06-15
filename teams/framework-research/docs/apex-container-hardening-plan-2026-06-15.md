@@ -14,21 +14,13 @@
 
 ## 1. HARD PRECONDITION BLOCK — execution gates (ALL must hold before a single change lands on apex's box)
 
-This plan is inert until **all three** of the following are satisfied, in addition to team-lead's go to execute:
+**GATE STATUS — UPDATED 2026-06-15 (S52), PO direction folded in.** The original three-gate block is now mostly satisfied; one gate (apex-online) has been STRUCK.
 
-- **(a) PO explicit green light + scheduled restart window.** Team-lead's go ALONE is NOT sufficient — the PO (Mihkel) must explicitly approve, and a maintenance window must be scheduled. (Per the 2026-06-15 hard gate.)
-- **(b) CONFIRMED WORKING FR→apex docker-exec route AT WINDOW-TIME.** The registry (`~/bin/rc-deployments.json`) maps apex `rc → 100.96.54.170:2222`, but apex's live read shows **tailscale LOGGED OUT** → that CGNAT addr is STALE; the container's live IP is `10.200.13.114` which may be unreachable without the tailnet. Resolve by EITHER:
-  - (i) apex logs tailscale back IN for the window, OR
-  - (ii) a confirmed alternate route: SSH to the `rc` HOST (`dev@`) then run `docker exec` locally on that host, bypassing the tailnet.
-  Without a confirmed route, FR cannot docker-exec apex's container and the window cannot proceed.
-- **(c) apex ONLINE to coordinate the restart.** Apex's session is CLOSED now (S52 wrap). The restart drops the apex↔hub channel and the dashboard briefly; apex must be online to confirm pre-state, observe the restart, and re-verify the round-trip after.
+- **(a) PO explicit green light — GIVEN (Gate (b)=GO).** PO authorizes execution once the diff is final + window set; the final pre-bake confirm is the last manual gate.
+- **(b) CONFIRMED FR→apex docker-exec route — SATISFIED.** Resolved via path (ii): SSH to the `rc` HOST (`dev@`) then `docker exec apex-research` locally on that host as root — tailnet-independent, Hopper-confirmed. The stale-CGNAT / tailscale-logged-out concern is moot for this route. (The tailnet path (i) is no longer needed.)
+- **(c) apex ONLINE — STRUCK.** Rebuild runs during apex's CURRENT QUIESCENCE (session stays DOWN). The round-trip is verifiable WITHOUT the apex agent online: the supervised courier collects to the persistent `~/.claude` inbox dir regardless of the agent session, and Hopper read-only-verifies the collect. apex re-verifies their side on their next session (deferred, non-blocking). The one cross-team item that DOES need apex: the single-owner startup.md cutover, which is QUEUED to apex (applied before their next session), not coordinated live.
 
-**Probe scoping (do NOT exceed, per team-lead ruling):**
-- NOW (safe, local-only): Hopper desk-reconciles his own access records (`~/bin/rc-deployments.json` etc.). No apex-box touch.
-- AT window-scheduling (PO + apex online): the LIVE reachability probe — does `100.96.54.170:2222` still answer / is `10.200.13.114` the only route / is it reachable without the tailnet. Checklist step for scheduling, NOT now.
-- NEVER until the gate clears: no docker-exec, no container touch, not even a "harmless" probe.
-
-**Post-change verification (at window):** after the supervised restart, confirm dashboard `:5173` answers, courier process is alive AND survives a deliberate kill (supervisor relaunch test), and FR↔apex hub round-trip works (deposit a test FR→apex, confirm apex collects it). Apex re-verifies their side.
+**Post-change verification (at window, all by Hopper via docker-exec during quiescence):** dashboard `:5173` answers (host-net, `curl` from rc host), courier process alive AND survives a deliberate kill (supervisor relaunch test), FR↔apex hub round-trip green (deposit test FR→apex → supervised courier collects to `~/.claude` inbox → Hopper verifies). No apex agent required. See rebuild-steps §3.
 
 ---
 
@@ -101,33 +93,35 @@ supervise courier   'python3 /home/ai-teams/workspace/teams/apex-research/statio
 
 **The core constraint (F5/F6):** `~/.ssh` is on the ephemeral overlay, so a key generated/stored there dies on rebuild. And a naive `ssh-keygen` in the Dockerfile regenerates a DIFFERENT key on every `docker build` → the hub registration goes stale every rebuild = "silent churn." We must avoid both.
 
-**Design — build-arg-injected key, persisted to a persistent volume, registered hub-side from the same provenance.**
+**Design — build-secret-injected key, seeded to the image FS, copied to ephemeral `~/.ssh` at start, registered hub-side from the same provenance.**
+
+**Key name (decision A, S52):** the key filename is `stationmaster_apex` — matching the name the LIVE `courier.json` already dials (`~/.ssh/stationmaster_apex`). This means ZERO courier.json edit (the consumer is unchanged). NOT the FR `sm_<team>` convention — that names FR's OWN hub keys; this is apex's courier key, and the hub registers by pubkey content, not filename. Build-secret id = `courier_key` (generic build-time handle).
 
 1. **Key generated ONCE, outside the image build, by FR (we are the hub operator).** Generate the apex courier keypair on a controlled host:
-   `ssh-keygen -t ed25519 -f sm_apex-research -N "" -C "apex-research"`.
+   `ssh-keygen -t ed25519 -f stationmaster_apex -N "" -C "apex-research"`.
    The PRIVATE key is the build secret; the PUBLIC key is what we register hub-side. Generating once (not per-build) is what kills the churn — the key's identity is fixed.
 
 2. **Inject the private key at build time as a Docker BUILD SECRET (not a layer, not an ARG baked into history).** Use BuildKit `--secret`:
    ```dockerfile
    # syntax=docker/dockerfile:1.4
-   RUN --mount=type=secret,id=sm_apex_key \
+   RUN --mount=type=secret,id=courier_key \
        install -d -m 700 -o ai-teams -g ai-teams /home/ai-teams/.ssh-seed \
-       && install -m 600 -o ai-teams -g ai-teams /run/secrets/sm_apex_key \
-            /home/ai-teams/.ssh-seed/sm_apex-research
+       && install -m 600 -o ai-teams -g ai-teams /run/secrets/courier_key \
+            /home/ai-teams/.ssh-seed/stationmaster_apex
    ```
    The key lands at a build-baked seed path (`/home/ai-teams/.ssh-seed/`, on the image filesystem — NOT `~/.ssh` which is the ephemeral mount). A build secret does NOT persist in the image history/layers, so the private key isn't leaked into the image metadata.
 
 3. **Entrypoint copies the seed key into `~/.ssh` at every start** (because `~/.ssh` is ephemeral — F5 — it's empty after a rebuild; the seed on the image filesystem is the durable source):
    ```bash
-   if [ -f /home/ai-teams/.ssh-seed/sm_apex-research ] && [ ! -f /home/ai-teams/.ssh/sm_apex-research ]; then
+   if [ -f /home/ai-teams/.ssh-seed/stationmaster_apex ] && [ ! -f /home/ai-teams/.ssh/stationmaster_apex ]; then
        install -d -m 700 -o ai-teams -g ai-teams /home/ai-teams/.ssh
-       install -m 600 -o ai-teams -g ai-teams /home/ai-teams/.ssh-seed/sm_apex-research \
-            /home/ai-teams/.ssh/sm_apex-research
+       install -m 600 -o ai-teams -g ai-teams /home/ai-teams/.ssh-seed/stationmaster_apex \
+            /home/ai-teams/.ssh/stationmaster_apex
    fi
    ```
    This makes the key **survive a full rebuild** (the seed is in the image) AND **non-churning** (same key every build, because step 1 generated it once and step 2 injects that same file).
 
-4. **Hub-side registration (FR, same flow):** because we generated the key (step 1), we register its PUBLIC key on the stationmaster hub via `sm-register apex-research "$(cat sm_apex-research.pub)"`. `sm-register` is idempotent (re-registering replaces the line), so this is safe to re-run and does not churn. The courier's `courier.json` points its `ssh_key` at `~/.ssh/sm_apex-research`. **Net: rebuild → seed copied to ~/.ssh → same key → hub still recognizes it → zero manual re-registration.**
+4. **Hub-side registration (FR, same flow):** because we generated the key (step 1), we register its PUBLIC key on the stationmaster hub via `sm-register apex-research "$(cat stationmaster_apex.pub)"`. `sm-register` is idempotent (re-registering replaces the line), so this is safe to re-run and does not churn. The courier's `courier.json` ALREADY points its `ssh_key` at `~/.ssh/stationmaster_apex` (decision A — no edit needed). **Net: rebuild → seed copied to ~/.ssh → same key the courier already dials → hub still recognizes it → zero manual re-registration, zero courier.json edit.**
 
 **Alternative considered + rejected:** persisting the key on the `apex-claude-home` (`~/.claude`) persistent volume (a relative of the DECLINED approach c). Rejected because (i) PO declined the relocate, and (ii) a volume-persisted key does NOT survive `docker compose down -v` (volume wipe), whereas the build-time seed does — build-time provenance is strictly more durable. The seed-on-image + copy-to-ephemeral-~/.ssh pattern gives rebuild-durability without relying on volume persistence.
 
@@ -135,13 +129,16 @@ supervise courier   'python3 /home/ai-teams/workspace/teams/apex-research/statio
 
 ---
 
-## 5. Network-mode gap (F10) — must close before the window
+## 5. Network mode (F10) — RESOLVED: host networking (*FR:Brunel*, S52 update)
 
-The FR-shipped compose describes **bridge** networking with a **cloudflared** sidecar tunnel in front (tunnel `526a23d1-...` → `apex-research.dev.evr.ee`). Apex's live read did NOT confirm the runtime network mode or whether cloudflared is still up. This matters for the hardening because:
-- The supervised dashboard binds `--host 0.0.0.0:5173`; whether that's reachable (and by whom) depends on the network mode + tunnel.
-- The courier's hub reachability (`sm@10.100.136.162:2222`) depends on egress, which a host-network override vs bridge could change.
+**RESOLVED 2026-06-15 (S52), empirically.** Hopper's live `docker inspect` of the running container shows **`NetworkMode=host`** — no per-container bridge IP; the "`10.200.13.114`" seen earlier is host-stack addressing, not a bridge address. I independently confirmed the **build source** is self-consistent with this: `apex-migration-research/docker-compose.yml` declares `network_mode: host` (line 35, "required on WARP-protected hosts where Docker bridge traffic is not routed through the WARP tunnel"), and `entrypoint-apex.sh` Step 0 already assumes host-net. **The bridge + cloudflared-sidecar description was the STALE FR-shipped copy only** — now re-synced to match the host-net build source. Both Brunel and Hopper surfaced host-net independently; they converge.
 
-**Action:** Herald is queuing the network-mode + cloudflared-status question to apex for their next session (deferred — not deposited during the cutover quiesce). Fold the answer into the §1(b) route resolution before scheduling the window. This is a Layer-3 drift check; do not assume the compose (Layer-1) matches runtime.
+Implication for the hardening (host-net, not bridge):
+- The supervised dashboard binds `--host 0.0.0.0:5173` directly on the host network stack — reachable on the host's `:5173` (no port mapping, no bridge translation). Whether an external tunnel still fronts it is a separate, non-blocking question (the apex service has no cloudflared sidecar in the host-net compose).
+- The courier's hub egress (`sm@10.100.136.162:2222`) goes through the host's network stack + WARP routing — host-net is exactly why WARP DNS/routing works (the documented reason for choosing it). No bridge-vs-host egress ambiguity remains.
+- The Gate-(a) docker-exec route (`dev@` host → `docker exec apex-research`) is host-side and tailnet-independent — confirmed by Hopper. Host networking does not affect this control-plane path.
+
+**Remaining Layer-3 item (non-blocking for network mode):** whether any external tunnel still fronts `:5173` for browser access. Not required for the supervisor/seed hardening; note for apex at the window.
 
 ---
 

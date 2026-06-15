@@ -154,7 +154,7 @@ These are real artifacts from the first external customer's onboarding (cross-re
   "ssh_target": "sm@<hub-ip>",                 // operator-provided
   "ssh_key": "~/.ssh/stationmaster_apex",      // private key PATH (never the key itself); never leaves host
   "ssh_opts": ["-p", "2222",
-    "-o", "UserKnownHostsFile=~/.ssh/stationmaster_known_hosts",  // host-key pinning lives in ssh_opts
+    "-o", "UserKnownHostsFile=~/.ssh/stationmaster_known_hosts",  // host-key pinning lives in ssh_opts — this file MUST be provisioned (see lesson iv); ephemeral ~/.ssh ⇒ bake or use persistent vol
     "-o", "StrictHostKeyChecking=yes", "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes"],
   "inboxes_dir": "<repo-or-home>/.claude/teams/<team>/inboxes",
   "ghost_outboxes": ["framework-research-bridge"],   // <dest-team>-bridge per CR-4 → routes to framework-research
@@ -166,6 +166,9 @@ These are real artifacts from the first external customer's onboarding (cross-re
 ```
 
 Worked-example lessons baked in: (i) host-key pinning rides in `ssh_opts` (the reference courier passes them through verbatim); (ii) `state_dir` co-located with `inboxes_dir` on the **same persistent volume** (`rename()` atomicity is per-volume); (iii) `ghost_outboxes` uses the `<dest>-bridge` form (CR-4), not a historical per-pair name.
+
+(iv) **the host key in `stationmaster_known_hosts` must be PROVISIONED — the config requires it but does not create it.** `StrictHostKeyChecking=yes` means the courier refuses to connect until that file contains the hub's real host key (Step 3: pin it out-of-band, never TOFU / `accept-new`, never `ssh-keyscan` the hub blind — that trusts whatever answers). On an **ephemeral-`~/.ssh` container** the file does not survive a rebuild, so it must be provisioned durably: bake the known-authentic host-key line at image/entrypoint build time (same pattern as the courier private key), OR point `UserKnownHostsFile` at the **persistent volume** (the same volume as `state_dir`). Symptom if skipped: the courier authenticates its own key fine but every poll fails `No ED25519 host key is known … strict checking` → collect blocked, no mail moves. (apex-research S52: this was the 3rd provisioning gap; closed by baking the host key into the entrypoint.)
+*(*FR:Herald*)*
 
 ### B. T1.b drain-on-delivery datapoint — CLI 2.1.173
 

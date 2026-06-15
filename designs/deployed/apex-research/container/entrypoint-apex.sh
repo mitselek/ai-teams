@@ -55,6 +55,29 @@ clone_or_pull() {
     fi
 }
 
+# supervise <name> <command...>  — relaunch the service whenever it exits.
+# Mirrors the sshd background-launch precedent (Step 7) but with a restart loop.
+# Runs as the ai-teams user via gosu; backgrounded so PID 1 stays bash and reaps it.
+supervise() {
+    local name="$1"; shift
+    (
+        # set +e is REQUIRED: the script runs under `set -e` (errexit), which is
+        # inherited by this subshell. The supervisor's whole job is to handle a
+        # service's NON-ZERO exit (crash, SIGTERM=143, SIGKILL=137) and relaunch —
+        # under errexit the first non-zero exit would kill this subshell BEFORE the
+        # loop can restart it (verified: restart-on-exit silently fails with set -e).
+        set +e
+        while true; do
+            echo "[supervisor] starting ${name}..."
+            gosu "${CONTAINER_USER}" bash -lc "$*"
+            rc=$?
+            echo "[supervisor] ${name} exited (rc=${rc}); restarting in 5s"
+            sleep 5
+        done
+    ) &
+    echo "[supervisor] ${name} supervised (loop pid $!)"
+}
+
 # ── Step 0: Fix hostname resolution ─────────────────────────────────────────────
 # network_mode: host + hostname: apex-research doesn't update /etc/hosts.
 # Without this, sudo and other tools warn about unresolvable hostname.
@@ -163,6 +186,32 @@ else
     echo "[entrypoint] Jira MCP server exists."
 fi
 
+# ── Step 6c: Persist the container's OWN sshd host keys (*FR:Brunel*) ─────────────
+# The Dockerfile's `ssh-keygen -A` writes host keys into /etc/ssh on the EPHEMERAL
+# overlay (st_dev 78), so they REGENERATE on every rebuild → anyone SSHing IN
+# (PO/operators) hits REMOTE-HOST-IDENTIFICATION-CHANGED after each rebuild.
+# Fix (mirrors the stationmaster hub, which persists its host keys on its state
+# volume, generate-if-absent): keep the host keys on the PERSISTENT volume
+# (~/.claude, st_dev 65024), generate once on first boot, and copy them into
+# /etc/ssh BEFORE sshd starts (Step 7). Stable identity across all future rebuilds.
+# SECURITY: the host PRIVATE keys live ONLY here on the persistent volume — never
+# baked into an image layer. Dir is root:root 700 so the agent (uid 1000) can't
+# read them, even though it's under the ai-teams home volume.
+HOSTKEY_DIR="/home/ai-teams/.claude/ssh-host-keys"
+install -d -m 700 -o root -g root "${HOSTKEY_DIR}"
+for kt in ed25519 rsa ecdsa; do
+    if [ ! -f "${HOSTKEY_DIR}/ssh_host_${kt}_key" ]; then
+        ssh-keygen -q -t "${kt}" -N "" -f "${HOSTKEY_DIR}/ssh_host_${kt}_key" \
+            && echo "[entrypoint] generated persistent sshd ${kt} host key (first boot)."
+    fi
+    # Restore the persistent key into /etc/ssh (overwrites the build-time ephemeral one).
+    if [ -f "${HOSTKEY_DIR}/ssh_host_${kt}_key" ]; then
+        install -m 600 -o root -g root "${HOSTKEY_DIR}/ssh_host_${kt}_key"     /etc/ssh/ssh_host_${kt}_key
+        install -m 644 -o root -g root "${HOSTKEY_DIR}/ssh_host_${kt}_key.pub" /etc/ssh/ssh_host_${kt}_key.pub
+    fi
+done
+echo "[entrypoint] sshd host keys restored from persistent volume (stable across rebuilds)."
+
 # ── Step 7: SSH setup ──────────────────────────────────────────────────────────
 # Collects all SSH_PUBLIC_KEY* env vars into authorized_keys for both users.
 # Supports SSH_PUBLIC_KEY, SSH_PUBLIC_KEY_2, SSH_PUBLIC_KEY_3, etc.
@@ -193,6 +242,39 @@ if [ "$KEY_COUNT" -gt 0 ]; then
     echo "[entrypoint] sshd started on port 2222."
 else
     echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set — SSH access disabled."
+fi
+
+# ── Step 7b: Seed courier key into ephemeral ~/.ssh (*FR:Brunel*) ────────────────
+# ~/.ssh is on the ephemeral overlay (does not survive rebuild). The durable
+# source is the build-baked seed on the image FS (Dockerfile build-secret RUN).
+# Copy once per start; same key every build (seed generated once) => no hub-side churn.
+# Key filename matches the name the live courier.json already dials (~/.ssh/stationmaster_apex)
+# so no courier.json edit is needed — the hub registers by pubkey content, not filename.
+if [ -f /home/ai-teams/.ssh-seed/stationmaster_apex ] && [ ! -f /home/ai-teams/.ssh/stationmaster_apex ]; then
+    install -d -m 700 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh
+    install -m 600 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh-seed/stationmaster_apex \
+         /home/ai-teams/.ssh/stationmaster_apex
+    echo "[entrypoint] courier key seeded into ~/.ssh."
+fi
+
+# ── Step 7c: Provision the hub HOST key into known_hosts (*FR:Brunel*) ───────────
+# The courier dials the hub with StrictHostKeyChecking=yes +
+# UserKnownHostsFile=~/.ssh/stationmaster_known_hosts. ~/.ssh is ephemeral (does
+# NOT survive rebuild), so the known_hosts must be re-provisioned each start or the
+# courier can't TRUST the hub → collect leg fails (ssh rc=255, "No ED25519 host key
+# is known"). The host PUBLIC key is not secret, so we PIN it inline here (NOT a
+# blind ssh-keyscan — that would defeat StrictHostKeyChecking). This key is verified:
+# SHA256:CNcFjOxr8vREOueOS8nxJN8W3LaQHet62du+PHyK13U for [10.100.136.162]:2222.
+# To rotate: update this line if the hub's host key changes (it persists on the
+# hub's state volume, so it's stable across hub restarts).
+KNOWN_HOSTS="/home/ai-teams/.ssh/stationmaster_known_hosts"
+HUB_HOSTKEY='[10.100.136.162]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDr8dFknoJWDpD+tRz0uYcpBFWy5cw+GkNQu7BxDYVix'
+install -d -m 700 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh
+if ! grep -qF "${HUB_HOSTKEY}" "${KNOWN_HOSTS}" 2>/dev/null; then
+    echo "${HUB_HOSTKEY}" >> "${KNOWN_HOSTS}"
+    chown "${CONTAINER_UID}:${CONTAINER_GID}" "${KNOWN_HOSTS}"
+    chmod 644 "${KNOWN_HOSTS}"
+    echo "[entrypoint] hub host key pinned into ${KNOWN_HOSTS}."
 fi
 
 # ── Step 8: Runtime validation ──────────────────────────────────────────────────
@@ -237,6 +319,15 @@ else
     echo "  WARN: vjs_apex_apps not available — cached inventory still usable."
 fi
 
+# Oracle dev-DB tunnel check (soft: container starts regardless).
+# Tunnels are opened by the operator from their Windows machine; see
+# apex-migration-research/.claude/bin/open-db-tunnels.sh.
+if command -v nc >/dev/null 2>&1 && nc -z -w3 127.0.0.1 11521 2>/dev/null; then
+    echo "  OK: DB tunnel up (127.0.0.1:11521 -> VJSDBTEST)"
+else
+    echo "  WARN: DB tunnel down — run 'bash .claude/bin/open-db-tunnels.sh' on your Windows machine"
+fi
+
 echo "[entrypoint] All gates passed. Starting..."
 
 # ── Step 9: Persist env vars for interactive shells ───────────────────────────
@@ -253,8 +344,10 @@ declare -A SHELL_VARS=(
     [ATLASSIAN_API_TOKEN]="${ATLASSIAN_API_TOKEN}"
     [ATLASSIAN_BASE_URL]="${ATLASSIAN_BASE_URL}"
     [CLAUDE_ENV_ID]="APEX-R"
+    [TERM]="xterm-256color"
     [LANG]="en_US.UTF-8"
     [LC_ALL]="en_US.UTF-8"
+    [CLAUDE_CODE_NO_FLICKER]="1"
 )
 # PATH for native Claude install (~/.local/bin)
 if ! grep -q '\.local/bin' "$BASHRC" 2>/dev/null; then
@@ -268,15 +361,14 @@ for var in "${!SHELL_VARS[@]}"; do
     fi
 done
 
+# ── Step 9a1: Source team aliases ────────────────────────────────────────────
+ALIASES_SRC='[ -f ~/workspace/teams/apex-research/aliases.sh ] && source ~/workspace/teams/apex-research/aliases.sh'
+if ! grep -q 'aliases.sh' "$BASHRC" 2>/dev/null; then
+    echo "$ALIASES_SRC" >> "$BASHRC"
+fi
+
 # ── Step 9a2: tmux config ────────────────────────────────────────────────────
 # .tmux.conf is on container filesystem — recreate on every start.
-#
-# NOTE (2026-04-24, #60): tmux is no longer required for agent SPAWNING —
-# agents are spawned via the Agent tool (team_name + name) from the team-lead
-# Claude Code session. The .tmux.conf + tmux-apex launcher below are kept
-# purely for HUMAN terminal use: PO SSH-in attaches a persistent multi-pane
-# shell session. If PO access goes away (or switches to a plain shell), these
-# two blocks can be removed without affecting agent lifecycle.
 for user_home in "${HOME_DIR}" /home/michelek; do
     cat > "${user_home}/.tmux.conf" << 'TMUX_EOF'
 set -g default-terminal "tmux-256color"
@@ -289,9 +381,7 @@ TMUX_EOF
     chown "$(basename "${user_home}"):$(basename "${user_home}")" "${user_home}/.tmux.conf"
 done
 
-# ── Step 9a3: tmux-apex launcher (human-terminal only, post-#60) ─────────────
-# Human-use: PO runs `tmux-apex` from SSH to attach/create a named session.
-# NOT used by agent spawn path — that now routes through the Agent tool.
+# ── Step 9a3: tmux-apex launcher ─────────────────────────────────────────────
 cat > /usr/local/bin/tmux-apex << 'TMUX_APEX_EOF'
 #!/usr/bin/env bash
 tmux -u attach -t 'apex-research' 2>/dev/null || tmux -u new -s 'apex-research'
@@ -369,6 +459,51 @@ if [ ! -f "$MCP_FILE" ] && [ -f "/opt/jira-mcp-server/dist/index.js" ]; then
 MCP_EOF
     chown "${CONTAINER_UID}:${CONTAINER_GID}" "$MCP_FILE"
     echo "[entrypoint] MCP config (mcp.json) created with Jira server."
+fi
+
+# ── Step 9e: Supervise long-lived services (dashboard + courier) (*FR:Brunel*) ──
+# Previously launched session-side (startup.md 4e/5); did NOT survive a container
+# restart. Supervised here so they come up on every boot and relaunch on exit.
+# Backgrounded — PID 1 stays bash (mirrors the sshd Step 7 precedent).
+# Single-owner: apex drops the session-side launches as part of the cutover.
+supervise dashboard 'cd /home/ai-teams/workspace/dashboard && npx vite --host 0.0.0.0 --port 5173'
+
+# Courier config path: in-container-confirmed (Hopper find-sweep, S52) — single
+# file, no alternates. Overridable via COURIER_CONFIG env. The guard below still
+# degrades gracefully (loud warn, no crash-loop) if the script/config goes missing.
+COURIER_SCRIPT="/home/ai-teams/workspace/teams/apex-research/stationmaster/stationmaster-courier.reference.py"
+COURIER_CONFIG="${COURIER_CONFIG:-/home/ai-teams/workspace/teams/apex-research/stationmaster/courier.json}"
+
+# Pre-create the courier inboxes_dir (boot-order fix, *FR:Brunel* S52).
+# The supervised courier now launches at container BOOT — earlier than apex's
+# agent session, which previously created this dir. The courier's validate_startup
+# requires inboxes_dir to EXIST (files auto-create inside it, but the DIR must be
+# present) and to be on the SAME VOLUME as state_dir. Both live under ~/.claude
+# (persistent), so this mkdir satisfies both invariants and is what makes the
+# supervised courier boot-order-independent. Idempotent; the session would create
+# the same dir. ai-teams-owned because the courier runs as ai-teams.
+COURIER_INBOXES_DIR="/home/ai-teams/.claude/teams/apex-research/inboxes"
+install -d -m 755 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" "${COURIER_INBOXES_DIR}"
+
+# Pre-clean a stale courier lock at boot (*FR:Brunel* S52). The courier's
+# single-instance lock lives on the PERSISTENT state_dir (~/.claude), so an
+# ungraceful prior-container death (SIGKILL/OOM/crash) leaves a lock that
+# survives recreate. The courier's staleness check is pid-only, and PIDs reset
+# per container → a prior-container pid can alias a live process in the new
+# container → the courier false-refuses to start, defeating the supervisor.
+# Boot invariant makes this SAFE: the entrypoint runs once at container start,
+# BEFORE the supervised courier launches, so any lock present here is necessarily
+# a prior-container artifact (no live courier can hold it yet) = stale by
+# definition. Same boot-setup class as the inboxes_dir pre-create above.
+# (The durable general fix — a container-instance discriminator in the lock —
+# is Herald's courier.reference.py follow-up; this closes the apex case now.)
+COURIER_LOCK="/home/ai-teams/.claude/teams/apex-research/stationmaster-state/courier.lock"
+rm -f "${COURIER_LOCK}"
+
+if [ -f "${COURIER_SCRIPT}" ] && [ -f "${COURIER_CONFIG}" ]; then
+    supervise courier "python3 ${COURIER_SCRIPT} --config ${COURIER_CONFIG}"
+else
+    echo "[entrypoint] WARNING: courier NOT supervised — script or config missing (${COURIER_SCRIPT} / ${COURIER_CONFIG})."
 fi
 
 # ── Step 10: Drop privileges and exec ──────────────────────────────────────────
