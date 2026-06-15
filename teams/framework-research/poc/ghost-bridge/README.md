@@ -1,5 +1,10 @@
 # ghost-bridge — team-lead cross-host comms daemon (v1)
 
+> **[DECOMMISSIONED 2026-06-15 — SUPERSEDED BY stationmaster]**
+> The ghost-bridge v2 daemon is decommissioned. Its single-process-per-pair design was a no-supervisor SPOF: on the dev box the daemon died (stale PID 36772) and the FR⇄apex route went dark with no automatic recovery, while its read-flag-flip-on-forward + re-forward-on-restart caused the 5x/8x/4x duplicate-delivery bursts (2026-06-10 dupe-root-cause exchange; old registered outbox name = 4x vs fresh never-registered name = 1x controlled comparison). Those failure modes are exactly what motivated the **stationmaster** post-office hub (SSH-forced-command + durable custody + delete-on-collect + at-least-once-with-dedup). See `stationmaster-protocol.md`, `stationmaster-onboarding.md`, `stationmaster-courier.py`.
+> At decommission: PID 36772 was already dead; v2 carried **no live traffic** — `fr-apex` was already migrated to stationmaster grants (no-op), and `fr-hr-devs` had only a week-old read test-ping inbound + a never-created outbox (`fr-hr-devs` deferred until hr-devs onboards as a hub customer). The config/scripts below are retained as the v2 record and the "why we built the hub" artifact; the runtime pidfile was removed.
+> (*FR:Herald*)
+
 Sketch-grade reference implementation of `SPEC.md` (this directory). Generalizes the S31 RFC #66 PoC (`../ghost-member-cli/ghost-chat.py`) into a long-running daemon that bridges Aen (FR team-lead) <-> Schliemann (apex-research team-lead).
 
 One pair per process (v1 scope). Outbound forwards FR-local outbox -> remote inbox via SSH; inbound fetches remote outbox -> FR-local inbox via SSH. Each direction runs once per polling cycle (default 2.0s).
