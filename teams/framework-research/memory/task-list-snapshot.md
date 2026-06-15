@@ -1,23 +1,24 @@
-# Task list snapshot — S44 close (2026-06-06) (*FR:team-lead*)
+# Task list snapshot — S50 close (2026-06-12) (*FR:Aen*)
 
-Snapshot at session-end per shutdown procedure S2b. Supersedes S42 snapshot.
+Snapshot at session-end per shutdown procedure S2b. Supersedes S44 snapshot.
 
-**Substrate anomaly (recurrence):** at shutdown `TaskList` returned **"No tasks found"** — full
-task-state-loss, the SAME anomaly documented at S42 close (tasks vanished from the store).
-Snapshot reconstructed from the in-context session record. Cal filing candidate — n now spans
-S42 + S44 for task-state-loss, plus the task-state stale-replays Finn caught this session.
+**Substrate anomaly (3rd recurrence):** at shutdown `TaskList` returned **"No tasks found"** — the
+SAME task-state-loss anomaly documented at S42 and S44 close. n now spans S42 + S44 + S50
+(CLI 2.1.175 this instance). Board state below reconstructed from the in-context session record
+(last system read showed 8/8; owners' completion reports all received). Cal filing candidate —
+recurrence pattern now solid enough for a gotcha entry with version bracket.
 
 ## Tasks this session (all COMPLETED)
 
-| # | Subject | Owner | Status |
-|---|---|---|---|
-| 1 | Ground the Entu consultant-agents spec in real artifacts | finn | completed |
-| 2 | Design the competency-index schema (the spec's spine) | callimachus | completed |
-| 3 | Author the Entu consultant-agents architecture spec doc | celes | completed |
-| 4 | Cast Entu consultant-agent personas (4 anchors + populate data-lifecycle) | celes | completed |
-| 5 | Harvest mvox competency map → data-lifecycle claims (artifact-backed) | finn | completed |
+| # | Task | Owner | Outcome |
+|---|------|-------|---------|
+| 1 | Build stationmaster hub container + sm-shell | brunel | DONE — artifact set + runbook; 2 deploy-blockers found later in flight, both fixed (f022fed host-key, 909bbe9 nologin shell) |
+| 2 | Reference courier stationmaster-courier.py | herald | DONE — single file, stdlib only, 8/8 offline tests |
+| 3 | FIRST GATE: T6.a race re-run on prod-llm | hopper | PASS — host-fs ext4-on-LVM 50/50 both primitives (gate-of-record) + in-container confirmatory 50/50; tmpfs trap caught → wiki gotcha |
+| 4 | Register FR as first stationmaster customer | herald (operator: hopper) | DONE — 15/15 live hub matrix, bidirectional deposit/collect/ack, real courier inject+ledger cycle, channel-is-identity confirmed live |
+| 5 | Protocol A batch: S48 truths + S49 decisions | callimachus | DONE — wiki 120→129 in-batch (132 by session close), all stage-2 gates confirmed |
+| 6 | Pre-deploy integration smoke (local, transport stubbed) | herald | DONE — 14/14; task record corrected to claim exactly what evidence supports |
+| 7 | Deploy hub to prod-llm | hopper | DONE — hub LIVE + healthy at 909bbe9; smoke 14/15 (1 = test-ordering bug, fixed as 3-state ladder af722a8); 2 sanctioned remediation cycles |
+| 8 | Cross-team: apex contact via ghost-bridge | herald | DONE — daemon-dead/transport-alive finding; 34-entry backlog copied read-only; apex accepted, registered, onboarding package delivered |
 
-**No open tasks carried forward.** Continuity is via watch items in `team-lead.md` (the
-[NEXT SESSION] M1 seed for S45), not the task list — chiefly: wait on Argo's #42 response →
-deploy personas; the formula A/B experiment (designed, pending a run); #8 prompt-edits; the
-overdue A1 evidence-cycle audit.
+S51 openers: apex first-connect → FR `grant apex-research`; backlog triage; v2→stationmaster cutover planning. Full re-orient in `team-lead.md` NEXT-SESSION BOOT.

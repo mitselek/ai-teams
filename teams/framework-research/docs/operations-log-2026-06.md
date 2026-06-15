@@ -237,3 +237,70 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** — **SUCCESS — Task #4 operator portion COMPLETE.** framework-research registered + verified live over real ssh from the Windows dev box (the one untested transport path per Task #4). Hub now carries 3 keys (alpha, beta scratch + framework-research production). Herald's courier round-trip (deposit/collect/ack with local inject + ledger) is the remaining Task #4 acceptance — unblocked, his to drive. FR private key at `~/.ssh/sm_framework-research` on the Windows dev box (courier host).
 
 ---
+
+## 2026-06-12T17:35+03:00 — apex-research registered (cross-team customer, PO-sanctioned)
+
+**timestamp** — 2026-06-12T17:35+03:00.
+
+**tasker** — Aen (team-lead), relaying PO sanction. The apex cross-team test is the PO's explicit S50 ask.
+
+**dispatch summary** — apex-research accepted the second-customer invite and sent their pubkey over the ghost-bridge; Aen relayed it with PO sanction. Registered it as a second cross-team customer on the live hub.
+
+**tier classification + sanction status** — `sm-register apex-research <pubkey>` = **Tier M** (operator action; appends `restrict,command="sm-shell apex-research"` to operator-owned authorized_keys; idempotent). PO-sanctioned via Aen 17:52 ("the apex cross-team test is the PO's explicit ask this session").
+
+**deployed-artifacts-read declaration** — Layer 1: onboarding §2 (operator registers customer pubkey). Layer 3: hub running + healthy; `sm-register --list` post = alpha, beta, framework-research, apex-research. Audit-trail: this entry.
+
+**commands executed** (verbatim) —
+1. `PUB='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfUQ3nKW1OvAycfiq2pqTz/64G1qY0HB9lnAClJm/y3 apex-research@stationmaster'; echo "$PUB" | base64 | ssh ... michelek@prod-llm "PUB=\$(base64 -d); docker compose exec -T stationmaster sm-register apex-research \"\$PUB\"; sm-register --list"`
+
+**outputs** — "registered team 'apex-research' (forced command: sm-shell apex-research) ... live immediately"; `--list` = alpha, beta, framework-research, apex-research.
+
+**outcome** — **SUCCESS.** apex-research registered as cross-team customer. **OPERATOR NOTE FOR NEXT OPERATOR (per Aen 17:52, PO-relayed):** apex-research's `~/.ssh` is EPHEMERAL (container overlay); their stated v1 policy is ROTATE-ON-RESTART — they will send a FRESH pubkey for re-registration after any container restart. This is ACCEPTED for v1: a rotation request = one more `sm-register apex-research <new-pubkey>` (normal Tier-M operator action), and the old key line is replaced (sm-register is idempotent / re-registering a team replaces its key). Do NOT be surprised by a re-registration request from apex. The sturdier infra-mount alternative (persistent apex-side key) is queued for the PO. Hub roster now: alpha, beta (scratch), framework-research (production, my key), apex-research (cross-team). **fr-test still PENDING** Herald's verbatim pubkey (Aen relayed only a fragment; awaiting full key — will be a 5th registration).
+
+---
+
+## 2026-06-12T17:37+03:00 — fr-test registered (Herald's key, per Aen intercept) — ALL registrations complete
+
+**timestamp** — 2026-06-12T17:37+03:00.
+
+**tasker** — Aen (team-lead). Task #4 counterpart; Aen 17:48 intercept + ruling.
+
+**dispatch summary** — Herald sent his full pubkey (17:37) labeled team `framework-research`, believing it was FR production — but he was operating PRE-intercept (his send crossed my 17:35 correction + Aen's 17:48 ruling). Aen 17:48 intercept: register Herald's key (fragment `...BI1u`) as `fr-test`, NOT framework-research (FR production = my already-verified key; two keys under one team = sshd first-match-forced-command hazard). Registered as fr-test per the ruling.
+
+**tier classification + sanction status** — `sm-register fr-test <pubkey>` = **Tier M** (operator action; idempotent; appends `restrict,command="sm-shell fr-test"`). Aen 17:48 ruling explicit.
+
+**deployed-artifacts-read declaration** — Layer 3: hub running; `sm-register --list` post = alpha, beta, framework-research, apex-research, fr-test (5, as expected). Audit-trail: this entry; Aen 17:48 intercept.
+
+**commands executed** (verbatim) —
+1. Verified key bytes end in `BI1u` (matches Aen's relayed fragment).
+2. `PUB='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBJXvU6hOp3vzBC8WKtGv93NmpCSpLC49fYMjeAyBI1u framework-research'; echo "$PUB" | base64 | ssh ... michelek@prod-llm "PUB=\$(base64 -d); docker compose exec -T stationmaster sm-register fr-test \"\$PUB\"; sm-register --list"`
+
+**outputs** — "registered team 'fr-test' (forced command: sm-shell fr-test) ... live immediately"; `--list` = alpha, beta, framework-research, apex-research, fr-test.
+
+**outcome** — **SUCCESS — ALL Task #4 operator registrations COMPLETE.** Hub roster (5): alpha + beta (scratch, my smoke-test), framework-research (production, MY key ~/.ssh/sm_framework-research), fr-test (Herald's key, counterpart for the FR courier round-trip), apex-research (cross-team, PO-sanctioned, ephemeral-rotate). **Note the key-vs-comment decoupling:** Herald's key carries comment `framework-research` but is registered as team `fr-test` — the forced command (`sm-shell fr-test`) sets the team identity, the .pub comment is cosmetic and does NOT affect routing. Each key appears exactly once in authorized_keys → clean sshd first-match. Herald's courier round-trip (deposit/collect/ack) remains his to drive; lazy-registry ordering note relayed. **Hopper operator work for S50: DONE.**
+
+---
+
+## 2026-06-12T17:40+03:00 — fr-test RE-registered with Herald's dedicated key (corrects the 17:37 entry above)
+
+**timestamp** — 2026-06-12T17:40+03:00.
+
+**tasker** — Aen Task #4 / Herald (key supply). Correction to the 2026-06-12T17:37 fr-test entry by reference (append-only; do not edit prior).
+
+**dispatch summary** — The 17:37 fr-test registration used Herald's FIRST key (ends `BI1u`, comment `framework-research`, his private `~/.ssh/sm_framework_research`) as a stopgap per Aen's intercept. Herald 17:43 then supplied a DEDICATED fr-test keypair (ends `mrx7`, comment `fr-test`, his private `~/.ssh/sm_fr_test`) — this is the key his courier will actually dial for the fr-test identity. Re-registered fr-test with the `mrx7` key so the hub-registered key matches the private key Herald holds for that identity.
+
+**tier classification + sanction status** — `sm-register fr-test <mrx7-key>` = **Tier M** (idempotent; re-registering a team REPLACES its key line). Within Task #4 registration scope.
+
+**deployed-artifacts-read declaration** — Layer 3: post-register, grepped the fr-test authorized_keys line → carries `mrx7`, NOT `BI1u` (replacement confirmed); `--list` still 5 teams. Audit-trail: this entry + the 17:37 entry it corrects.
+
+**commands executed** (verbatim) —
+1. Verified new key ends `mrx7`.
+2. `PUB='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK9ijoXMlSGB9MoGF3SY+Eo2lO0aOcA/BBo89jMNmrx7 fr-test'; echo "$PUB" | base64 | ssh ... 'docker compose exec -T stationmaster sm-register fr-test "$PUB"; grep "sm-shell fr-test" authorized_keys | grep -o mrx7\|BI1u; sm-register --list'`
+
+**outputs** — "registered team 'fr-test' ... live immediately"; fr-test line now carries `mrx7`; `BI1u` no longer on the fr-test line; `--list` = 5 teams (alpha, beta, framework-research, apex-research, fr-test).
+
+**outcome** — **SUCCESS — fr-test now bound to Herald's dedicated `mrx7` key.** The `BI1u` key (Herald's original framework-research-labeled key, the intercept stopgap) is now registered to NO team — correct, since FR production = my key. Herald's courier dials fr-test with `~/.ssh/sm_fr_test` (mrx7) and framework-research with my key. Final clean state: 5 teams, each one key. **Hopper operator work for S50: DONE (final).**
+
+**CLARIFICATION 2026-06-12T18:10+03:00 (Herald audit-flag, append-only — corrects the byte-tail SHORTHAND in the entry above, NOT the key):** the entry above uses the 4-char shorthand `mrx7` for the fr-test key. The FULL base64 tail is `...BBo89jMNmrx7` (Herald references it as `MNmrx7`) — re-verified on the live hub authorized_keys this timestamp. The registered KEY was always correct (`ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK9ijoXMlSGB9MoGF3SY+Eo2lO0aOcA/BBo89jMNmrx7`, Herald's `sm_fr_test`); only my log's abbreviation was shorter than the real tail, which could trip a future byte-tail match. Hub state + Herald's courier config both confirmed matching. Herald reports Task #4 round-trip DONE: 15/15 on the live hub + courier `--once` inject+ledger; all 3 rungs of Brunel's lazy-registry ladder (af722a8) demonstrated live (E_UNKNOWN_TEAM never-connected → E_NOGRANT known-ungranted → accepted post-grant). **LESSON: log full discriminating key-tails (≥8 base64 chars), not 4-char shorthands — a 4-char tail risks ambiguity in an audit byte-match.**
+
+---
