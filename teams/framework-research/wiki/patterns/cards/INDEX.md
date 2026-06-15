@@ -1,13 +1,14 @@
 # patterns/ — Card Index
 
-85 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
+87 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **52 confirmed, 1 partial, 32 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
+**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **52 confirmed, 2 partial, 33 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 
 | Card | Full entry |
 |---|---|
 | agentType vs backendType — Two Orthogonal Type Fields | [card](agenttype-vs-backendtype-separation.md) · [full](../agenttype-vs-backendtype-separation.md) |
 | API Gateway Error vs Actual Server State | [card](api-gateway-error-vs-actual-server-state.md) · [full](../api-gateway-error-vs-actual-server-state.md) |
+| Artifact Claims More Than It Implements (honesty-pass + probe-don't-infer) | [card](artifact-claims-more-than-it-implements.md) · [full](../artifact-claims-more-than-it-implements.md) |
 | Audit-Trail for Rejection Rationale | [card](audit-trail-for-rejection-rationale.md) · [full](../audit-trail-for-rejection-rationale.md) |
 | Bootstrap-Preamble as In-Band Signal Channel | [card](bootstrap-preamble-as-in-band-signal-channel.md) · [full](../bootstrap-preamble-as-in-band-signal-channel.md) |
 | Bottleneck Determines Adoption (Cross-Domain) | [card](bottleneck-determines-adoption.md) · [full](../bottleneck-determines-adoption.md) |
@@ -71,6 +72,7 @@
 | Service-Team Topology — Members are Ghosts of Consumers | [card](service-team-topology.md) · [full](../service-team-topology.md) |
 | Single-Channel Saturation via Mode Partition | [card](single-channel-saturation-via-mode-partition.md) · [full](../single-channel-saturation-via-mode-partition.md) |
 | Snapshot-State Mis-Names Path-to-End-State | [card](snapshot-state-mis-names-path-to-end-state.md) · [full](../snapshot-state-mis-names-path-to-end-state.md) |
+| Spool Stores the Raw Entry, Re-Resolve at Deposit Time (config-fix self-heals stuck mail) | [card](spool-stores-raw-entry-reresolve-on-deposit.md) · [full](../spool-stores-raw-entry-reresolve-on-deposit.md) |
 | Structural Match Beats Free-String for Protocol Filters | [card](structural-match-beats-free-string-for-protocol-filters.md) · [full](../structural-match-beats-free-string-for-protocol-filters.md) |
 | Sub-Shape E at the Design Domain | [card](sub-shape-e-at-design-domain.md) · [full](../sub-shape-e-at-design-domain.md) |
 | Substrate-Invariant Mismatch (prototype) | [card](substrate-invariant-mismatch.md) · [full](../substrate-invariant-mismatch.md) |

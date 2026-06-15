@@ -2,7 +2,7 @@
 
 26 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **21 confirmed, 5 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending; deposit-no-data-line confirmed via Herald read-back 2026-06-15; the v2-restart-redelivery-dupe entry is **pending** Herald read-back). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ — **22 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending; deposit-no-data-line + v2-restart-redelivery-dupe both confirmed via Herald read-back 2026-06-15). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
