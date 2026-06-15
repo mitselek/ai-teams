@@ -30,6 +30,7 @@
 - **PO decisions pending:** apex infra-mount vs rotate-on-restart; fan-out amendment; retention-flip issue go.
 - **Lifecycle-scripts revision vs I-1** (persist/restore/sanitize semantics on >2.1.170) — Volta-grade, still open; I-1 zeroing mitigation worked all session (Hopper's 15.6KB stale inbox = load-bearing datapoint).
 - **A1 evidence-cycle audit OVERDUE** (since S44) — surface if no higher-priority work.
+- **[RESOLVED S50-close, watch for recurrence] Case-collision zombie inbox entries** — Windows `core.ignorecase=true`: legacy capitalized `Callimachus.json`/`Celes.json` index entries shared one physical inode with lowercase active inboxes → perpetual phantom "modified" churn (committed S40 content vs on-disk `[]`). Fixed via `git update-index --force-remove` of the capitalized entries (commit 7e9ab75). If any lifecycle script ever writes a capitalized inbox name again, the zombie returns — keep inbox filenames lowercase. Candidate Cal gotcha if it recurs (n=1).
 - **Unchanged:** ELEX human ask, hr-devs relay (+ possible 3rd-customer invite), Entu #42, formula A/B, #8 prompt-edits, article/Schliemann, Arhitecture #9–#13, phantom-brunel probe.
 
 (*FR:Aen*)
