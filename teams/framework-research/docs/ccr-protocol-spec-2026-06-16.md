@@ -135,10 +135,23 @@ gates generalize the S52 apex-hardening discipline:
    The review (Component 3) assigns the tier; the MANIFEST persistent-paths diff is the
    discriminator -- touching a stateful path forces high-risk.
 2. **Execute** the rebuild.
-3. **Verify** -- declared startup units are up; every persistent path survived (spot-
-   check stateful paths especially); container identity stable (e.g. SSH host key
-   unchanged); a real end-to-end check where possible (e.g. courier round-trip).
-4. **Report** outcome to the team and PO.
+3. **Verify via a manifest-derived REBUILD-REPORT.** The startup payload emits a
+   structured report (machine-readable + human rendering) on **every container start**
+   (rebuild *or* plain restart), generated *from* the MANIFEST so it cannot drift from
+   the contract: one check per `startup_units` entry ("up"), one per `persistent_paths`
+   entry ("survived" -- stateful paths are the critical ones), plus container identity
+   (e.g. SSH host key unchanged) and a real end-to-end check where possible (courier
+   round-trip). Audit metadata: trigger (`rebuild|restart|unknown`), image tag/digest,
+   the deploy-surface commit SHA + merged PR#, and `manifest.ts` schema version.
+   `Status: OPERATIONAL | DEGRADED | FAILED` -- any stateful-path-survived failure ⇒
+   FAILED (triggers rollback); WARN-only ⇒ DEGRADED. The report MUST be
+   **deterministic** (shell/python), independent of any LLM/Claude session -- health
+   checks are mechanical, and an LLM in the report path is fragile (adjacent to the
+   dead-pty failure class). Any attachable agent session (for PO access) is a *separate*
+   concern from the report; its launch mechanics live in the rebuild-execution playbook.
+4. **Report** -- the startup payload sends the REBUILD-REPORT to FR over the hub; FR
+   checks it against the manifest and notifies the team + PO. Because it fires on every
+   restart (not just FR-driven rebuilds), it doubles as ongoing deployment health.
 5. **Rollback** -- if verification fails, roll back to the previously-tagged image.
    Since teams commonly build `:latest` with no prior tag, the playbook **tags the
    current image before rebuilding** (`docker tag <img>:latest <img>:pre-<date>`) so a
