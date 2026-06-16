@@ -141,7 +141,9 @@ gates generalize the S52 apex-hardening discipline:
    the contract: one check per `startup_units` entry ("up"), one per `persistent_paths`
    entry ("survived" -- stateful paths are the critical ones), plus container identity
    (e.g. SSH host key unchanged) and a real end-to-end check where possible (courier
-   round-trip). Audit metadata: trigger (`rebuild|restart|unknown`), image tag/digest,
+   round-trip). Audit metadata: trigger (`rebuild|restart|session-start|unknown` -- `session-start`
+   per apex's first live report, where the beacon fires on a Claude session-start),
+   image tag/digest,
    the deploy-surface commit SHA + merged PR#, and `manifest.ts` schema version.
    `Status: OPERATIONAL | DEGRADED | FAILED` -- any stateful-path-survived failure ⇒
    FAILED (triggers rollback); WARN-only ⇒ DEGRADED. The report MUST be

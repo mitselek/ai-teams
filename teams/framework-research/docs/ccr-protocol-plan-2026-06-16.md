@@ -104,7 +104,7 @@ export interface CcrManifest {
   maintenance_contact: string;
 }
 
-export type RebuildTrigger = "rebuild" | "restart" | "unknown";
+export type RebuildTrigger = "rebuild" | "restart" | "session-start" | "unknown";
 export type CheckResult = "pass" | "warn" | "fail";
 export type RebuildStatus = "OPERATIONAL" | "DEGRADED" | "FAILED";
 
