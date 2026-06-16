@@ -69,7 +69,12 @@ supervise() {
         set +e
         while true; do
             echo "[supervisor] starting ${name}..."
-            gosu "${CONTAINER_USER}" bash -lc "$*"
+            # Service output goes to a durable per-service logfile on the persistent
+            # ~/.claude volume (not the shared docker-logs stream) -- survives detach
+            # and container recreate, and is not interleaved with other services.
+            # The [supervisor] status lines stay on the main stream. Boot pre-creates
+            # the logs dir (Step 9e). (CCR review item 5 -- durable output.)
+            gosu "${CONTAINER_USER}" bash -lc "$*" >> "/home/ai-teams/.claude/logs/${name}.log" 2>&1
             rc=$?
             echo "[supervisor] ${name} exited (rc=${rc}); restarting in 5s"
             sleep 5
@@ -466,6 +471,13 @@ fi
 # restart. Supervised here so they come up on every boot and relaunch on exit.
 # Backgrounded -- PID 1 stays bash (mirrors the sshd Step 7 precedent).
 # Single-owner: apex drops the session-side launches as part of the cutover.
+
+# Durable per-service logs dir on the persistent ~/.claude volume (*FR:Brunel*).
+# supervise() redirects each service's stdout/stderr to ~/.claude/logs/<name>.log.
+# Created here, before the first supervise() call. Idempotent; ai-teams-owned
+# because the supervised services run as ai-teams. (CCR review item 5.)
+install -d -m 755 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.claude/logs
+
 supervise dashboard 'cd /home/ai-teams/workspace/dashboard && npx vite --host 0.0.0.0 --port 5173'
 
 # Courier config path: in-container-confirmed (Hopper find-sweep, S52) -- single
