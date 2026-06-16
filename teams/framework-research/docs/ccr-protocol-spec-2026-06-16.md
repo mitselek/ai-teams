@@ -1,6 +1,6 @@
 # Spec: Coordinated Container Rebuild (CCR) Protocol (*FR:Aen*)
 
-**Date:** 2026-06-16 · **Status:** design approved (PO), pre-implementation
+**Date:** 2026-06-16 · **Status:** design approved (PO) + apex review incorporated; reference instance **DEFERRED** (PO: finish protocol design first)
 
 ## Problem
 
@@ -46,25 +46,42 @@ Each deployed team keeps a thin, *predictable* surface at a standard location in
 own repo: `deploy/`.
 
 - **Dockerfile** pins a **stable entrypoint path** (e.g. `deploy/startup`). The path
-  is constant; the Dockerfile rarely changes.
+  is constant; the Dockerfile rarely changes. Existing files are **not relocated** — the
+  Dockerfile stays where it already lives (e.g. `Dockerfile.apex` at repo root); the
+  convention only *adds* the stable-path payload + `MANIFEST.md`, so the first PR does
+  not bikeshed on file placement (apex review pt 1).
 - **Startup payload** at that stable path — the versioned, mutable "what runs on
   container start." This is what teams edit. Its internal form is the team's business
   (a script that launches their processes); the framework only requires it be
   idempotent and safe to run on every (re)start.
-- **`deploy/MANIFEST.md`** — one page, the only structured artifact the framework
-  mandates. It declares:
-  1. **Startup units** — what runs on start (human-readable list; long-running units
-     noted, since each needs supervision + single-instance discipline).
-  2. **Persistent paths** — every path the deployment depends on surviving a rebuild,
-     each tagged **generate-able** (regenerate-if-absent on a persistent volume) or
-     **stateful** (restore/preserve, *never* reset). This is the S52 ephemeral-home
-     discipline baked into the convention — it is the single highest-leverage field,
-     because mis-tagging a stateful path as generate-able is how a rebuild silently
-     wipes config (the `.claude.json` class of bug).
-  3. **Maintenance contact** — the team PO / who to coordinate the window with.
+- **`deploy/MANIFEST.md`** — the one structured artifact the framework mandates. It
+  carries **YAML frontmatter** (the typed, machine-parseable declaration) above a
+  human-readable body (rationale, notes). The frontmatter is validated against a
+  committed **`deploy/manifest.ts`** schema companion — the typed contract for the
+  manifest shape, versioned per `playbooks/version-typed-contract.md`. This keeps the
+  manifest both human-readable *and* mechanically checkable. Frontmatter fields:
+  1. **`startup_units`** — what runs on start: `name`, `command`, `long_running: bool`.
+     Long-running units require supervision + single-instance discipline (Component 3).
+  2. **`persistent_paths`** — every path that must survive a rebuild, each with `path`
+     and `kind: generate-able | stateful`. **generate-able** = regenerate-if-absent on a
+     persistent volume; **stateful** = restore/preserve, *never* reset. This is the S52
+     ephemeral-home discipline baked into the convention — the single highest-leverage
+     field, because mis-tagging a stateful path as generate-able is how a rebuild
+     silently wipes config (the `.claude.json` class of bug).
+  3. **`maintenance_contact`** — the team PO / who to coordinate the window with.
+
+  The typed frontmatter lets the review (Component 3) validate the manifest against
+  `manifest.ts` programmatically rather than eyeballing prose, and lets the rebuild
+  playbook read `persistent_paths` to drive its preserve/verify steps.
 
 "Minimal specificity" means exactly this: stable path + versioned payload + one-page
 manifest. Everything else is the team's own concern.
+
+**Ownership split (apex review pt 2):** FR owns the container *bootstrap* (Dockerfile,
+base image, volume wiring); the team owns the *startup units* (the payload — what runs).
+Where a team's entrypoint was originally FR-authored, FR factors it once into
+bootstrap + team-owned units while standing up that team's first instance, then the
+team owns the units thereafter.
 
 ## Component 2 — Change → rebuild-request flow
 
@@ -97,24 +114,41 @@ the PR* (normal review loop):
   is explicit in the PR.
 - **Supervision & single-instance** — every long-running unit is supervised
   (restart-on-exit), captures stdout/stderr reliably (not to a dead pty), and is
-  guarded against duplicate instances (lock + pre-clean of a dead predecessor).
+  guarded against duplicate instances (lock + pre-clean of a dead predecessor). The
+  **recommended supervisor is the shell trap-loop** proven in FR's courier and apex's
+  own entrypoint (`while true; do <unit>; sleep <backoff>; done`, with pre-clean of a
+  dead predecessor); s6/runit/supervisord are allowed if the PR justifies the added
+  dependency. Defaulting to the shared pattern keeps review consistent across teams
+  (apex review pt 3).
 
 ## Component 4 — Coordinated rebuild (gated playbook)
 
 After the PR is approved and merged, FR (Hopper, operator) executes the rebuild. The
 gates generalize the S52 apex-hardening discipline:
 
-1. **Gates (all must hold):** route to the container confirmed · FR PO go · window
-   agreed with the team · target quiescent (team idle, no in-flight work).
+1. **Risk tier sets gate weight (apex review pt 6):**
+   - *Low-risk* — adds/edits a supervised startup unit, no volume/persistence/secret
+     change: light gate (FR review approval + a brief agreed window; quiescence still
+     required).
+   - *High-risk* — volume, persistence-path, or secret changes: full gates (route
+     confirmed · FR PO go · window agreed · quiescence).
+   The review (Component 3) assigns the tier; the MANIFEST persistent-paths diff is the
+   discriminator — touching a stateful path forces high-risk.
 2. **Execute** the rebuild.
 3. **Verify** — declared startup units are up; every persistent path survived (spot-
    check stateful paths especially); container identity stable (e.g. SSH host key
    unchanged); a real end-to-end check where possible (e.g. courier round-trip).
 4. **Report** outcome to the team and PO.
-5. **Rollback** — if verification fails, the previous image/tag is the rollback target;
-   define it before executing.
+5. **Rollback** — if verification fails, roll back to the previously-tagged image.
+   Since teams commonly build `:latest` with no prior tag, the playbook **tags the
+   current image before rebuilding** (`docker tag <img>:latest <img>:pre-<date>`) so a
+   rollback target always exists (apex review pt 5).
 
 ## Reference instance #1 — apex courier-bake
+
+**Status: DEFERRED** (PO, 2026-06-16) — finish the full protocol design (all
+deliverables) before standing up the first instance; apex's courier-bake waits. apex's
+review fed the design; execution does not start yet.
 
 Validates the protocol end to end. apex (Eesti-Raudtee/apex-migration-research)
 already supplied its courier runtime expectations, which map directly onto the
@@ -145,6 +179,9 @@ manifest:
 
 - Where the canonical CCR docs live (a new `topics/NN-deployment-lifecycle.md` vs the
   `playbooks/` dir). Resolve at planning time.
-- Whether `MANIFEST.md` should later harden into a typed/parseable form once several
-  teams have adopted it (deferred — keep it human-readable until reuse proves the
-  shape, per "minimal specificity").
+- `manifest.ts` ownership: a per-team copy vs a single FR-published schema each team
+  imports. Leaning FR-published (one canonical typed contract, version-bumped per
+  `playbooks/version-typed-contract.md`) so the shape can't drift per team; resolve at
+  planning. (Decided 2026-06-16: type the manifest now via YAML frontmatter + a
+  `manifest.ts` schema, rather than deferring — aligns with the org's typed-contract
+  discipline.)
