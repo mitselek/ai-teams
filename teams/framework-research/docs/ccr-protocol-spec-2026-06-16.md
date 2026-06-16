@@ -190,13 +190,21 @@ manifest:
 4. **apex reference instance** -- PR #166 against apex's repo, produced by following
    the protocol. Owner: Brunel (authoring) + Hopper (rebuild), PO-gated.
 
-## Open questions
+## Resolved (at planning, 2026-06-16)
 
-- Where the canonical CCR docs live (a new `topics/NN-deployment-lifecycle.md` vs the
-  `playbooks/` dir). Resolve at planning time.
-- `manifest.ts` ownership: a per-team copy vs a single FR-published schema each team
-  imports. Leaning FR-published (one canonical typed contract, version-bumped per
-  `playbooks/version-typed-contract.md`) so the shape can't drift per team; resolve at
-  planning. (Decided 2026-06-16: type the manifest now via YAML frontmatter + a
-  `manifest.ts` schema, rather than deferring -- aligns with the org's typed-contract
-  discipline.)
+- **Docs location:** canonical protocol -> `topics/11-deployment-lifecycle.md` (09 and 10
+  were taken). The two playbooks live in `teams/framework-research/playbooks/`
+  (`ccr-review-checklist.md`, `ccr-rebuild-execution.md`).
+- **`manifest.ts` ownership:** the canonical typed contract is FR-published at
+  `types/t10-ccr-contracts.ts` (`CcrManifest` + `RebuildReport`), version-bumped per
+  `playbooks/version-typed-contract.md`. Each team vendors a copy as `deploy/manifest.ts`,
+  version-pinned, so the shape cannot drift per team. The manifest is typed now (YAML
+  frontmatter validated against the schema), not deferred.
+
+## Deliverables -- shipped on branch `fr/ccr-protocol` (2026-06-16)
+
+- `topics/11-deployment-lifecycle.md` -- protocol doc (Components 1-2 + authority)
+- `types/t10-ccr-contracts.ts` + `teams/framework-research/poc/ccr/validate-manifest.ts` (+ tests, 5/5) -- typed contracts + validator
+- `teams/framework-research/playbooks/ccr-review-checklist.md` -- review checklist (Component 3)
+- `teams/framework-research/playbooks/ccr-rebuild-execution.md` -- rebuild playbook (Component 4)
+- Reference instance #1 (apex courier-bake) remains DEFERRED -- stands up after this lands.
