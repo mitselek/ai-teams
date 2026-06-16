@@ -21,12 +21,15 @@ validator with zero errors.
 `validateManifest` from `teams/framework-research/poc/ccr/validate-manifest.ts`. A
 zero-length errors array is required to proceed. One-off invocation (run from repo
 root; replace the inline object with the PR's parsed frontmatter, or read+parse the
-file):
+file). Use a TEMP FILE, not `npx tsx -e '<inline>'` -- the inline-eval form silently
+swallows relative-import errors on the Windows/tsx setup and exits 0 with no output,
+which a reviewer can misread as a PASS (a dangerous false-green). A temp file surfaces
+import failures and returns a real exit code:
 
 ```bash
-npx tsx -e '
+cat > check-manifest.ts <<'TS'
 import { validateManifest } from "./teams/framework-research/poc/ccr/validate-manifest.ts";
-// Paste the manifest frontmatter parsed to an object here:
+// Replace with the PR's parsed MANIFEST.md frontmatter:
 const manifest = {
   schema_version: "1.0.0",
   startup_units: [
@@ -41,7 +44,8 @@ const manifest = {
 const errors = validateManifest(manifest);
 console.log(errors.length === 0 ? "VALID (0 errors)" : errors);
 process.exit(errors.length === 0 ? 0 : 1);
-'
+TS
+npx tsx check-manifest.ts && rm check-manifest.ts
 ```
 
 To parse straight from the checked-out PR instead of pasting, read
