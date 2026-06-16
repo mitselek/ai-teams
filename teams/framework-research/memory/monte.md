@@ -356,3 +356,41 @@ Additionally: Brunel's §10 oscillation (7-revision trajectory) was substrate-sp
 - 4-signature ownership-transfer ritual appropriateness (my flag -- PO's call)
 - Post-pilot efficacy-review session trigger (my flag)
 - Cal's §6.4 pass/fail criteria as runtime acceptance gate for the asymmetric-slice pilot (Cal's flag -- needs explicit PO confirmation that the asymmetric shape is the pilot he wants)
+
+## Session: 2026-06-16 (S53 -- CCR protocol, Component 3 review-checklist)
+
+[CHECKPOINT] Authored the CCR (Coordinated Container Rebuild) review-checklist playbook,
+Task 3 of the protocol build. Artifact: `teams/framework-research/playbooks/ccr-review-checklist.md`.
+Source: spec Component 3 (`docs/ccr-protocol-spec-2026-06-16.md`), protocol overview in
+`topics/11-deployment-lifecycle.md`. Companion line + `(*FR:Monte*)` sign-off in place.
+
+[DECISION] Six runnable items, each a concrete check + how-to-verify:
+1. Manifest validity -- invoke the real `validateManifest` (poc/ccr/validate-manifest.ts)
+   against parsed MANIFEST.md frontmatter; zero errors to proceed.
+2-5. Map 1:1 to spec Component 3 bullets: startup-execution safety, persistence
+   correctness, ordering traps (the `.claude.json`-wipe class), supervision &
+   single-instance (shell trap-loop recommended, durable stdout, lock + dead-predecessor
+   pre-clean).
+6. Risk-tier assignment -- same discriminator as Component 4 rebuild playbook: any
+   stateful/volume/secret change in the persistent_paths diff => high-risk, else low-risk.
+   Recorded on the PR; drives rebuild gates. Ends with reviewer action: approve / request-changes.
+First commit `cffda26` (fr/ccr-protocol).
+
+[GOTCHA] **`npx tsx -e '<inline>'` silently swallows relative-import errors on this
+Windows/tsx setup -- exits 0 with NO output, a dangerous false-green in a review tool.**
+team-lead's PR #166 review caught it in my item-1. Fix: repo-rooted TEMP FILE
+(`cat > check-manifest.ts <<'TS' ... TS; npx tsx check-manifest.ts && rm check-manifest.ts`)
+so failures surface and exit codes are real. Verified empirically before editing: temp-file
+form prints "VALID (0 errors)" + exits 0; `tsx -e` was silent. Added a one-line note in the
+doc warning against `tsx -e` for this reason. Fix commit `84264f8` (on main).
+
+[LEARNED] **For a check that a reviewer reads as PASS/FAIL, the invocation mechanism is
+load-bearing, not incidental.** A silent-on-error invocation (tsx -e) turns "validator
+failed to even run" into an apparent green. When documenting a verification step, prefer
+the form whose failure mode is loud (temp file with real exit code over inline-eval).
+Candidate for Cal Protocol A if a second sighting of "silent-failure-as-false-green in a
+documented check" surfaces (n=1 today).
+
+[NEXT-SESSION] S53 closed -- CCR Component 3 (review-checklist) + authority model shipped,
+tsx-e defect fixed. No active work; idling pending PO direction. Reference instance #1
+(apex courier-bake, PR #166) is DEFERRED per PO -- protocol design finishes first.
