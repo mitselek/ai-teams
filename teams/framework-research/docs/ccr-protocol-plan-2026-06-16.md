@@ -16,7 +16,7 @@
 
 | File | Responsibility | Task |
 |---|---|---|
-| `topics/09-deployment-lifecycle.md` | Canonical CCR protocol: principle, deploy-surface convention, change→rebuild flow, authority model | 1 |
+| `topics/11-deployment-lifecycle.md` | Canonical CCR protocol: principle, deploy-surface convention, change→rebuild flow, authority model | 1 |
 | `types/t10-ccr-contracts.ts` | Typed contracts: `CcrManifest` (frontmatter) + `RebuildReport` | 2 |
 | `teams/framework-research/poc/ccr/validate-manifest.ts` | Pure validator over a parsed manifest object (returns error strings) | 2 |
 | `teams/framework-research/poc/ccr/validate-manifest.test.ts` | Tests for the validator | 2 |
@@ -28,12 +28,12 @@ Tasks 1, 3, 4 are independent doc-authoring and may run in parallel (separate fi
 
 ---
 
-## Task 1: Protocol doc — `topics/09-deployment-lifecycle.md`
+## Task 1: Protocol doc — `topics/11-deployment-lifecycle.md`
 
 **Owner:** Herald (protocol) + Monte (authority model section).
 
 **Files:**
-- Create: `topics/09-deployment-lifecycle.md`
+- Create: `topics/11-deployment-lifecycle.md`
 
 - [ ] **Step 1: Author the doc with these exact sections**
 
@@ -58,7 +58,7 @@ Verify every spec Component (1 deploy-surface, 2 flow, governing principle, scop
 - [ ] **Step 3: Commit**
 
 ```bash
-git add topics/09-deployment-lifecycle.md
+git add topics/11-deployment-lifecycle.md
 git commit -m "docs(fr): CCR protocol — topics/09 deployment-lifecycle (Component 1-2 + authority)"
 ```
 
@@ -79,7 +79,7 @@ Create `types/t10-ccr-contracts.ts`:
 
 ```ts
 // CCR (Coordinated Container Rebuild) typed contracts.
-// Versioned per playbooks/version-typed-contract.md. See topics/09-deployment-lifecycle.md.
+// Versioned per playbooks/version-typed-contract.md. See topics/11-deployment-lifecycle.md.
 // (*FR:Brunel*)
 
 export const CCR_CONTRACT_VERSION = "1.0.0";
@@ -320,11 +320,11 @@ git commit -m "docs(fr): CCR rebuild-execution playbook (Component 4 + verified 
 
 - [ ] **Step 1: Resolve spec open questions**
 
-In `docs/ccr-protocol-spec-2026-06-16.md`, update the "Open questions" section: canonical schema lives at `types/t10-ccr-contracts.ts` (teams vendor a copy as `deploy/manifest.ts`, version-pinned); docs location resolved to `topics/09-deployment-lifecycle.md` + `playbooks/`.
+In `docs/ccr-protocol-spec-2026-06-16.md`, update the "Open questions" section: canonical schema lives at `types/t10-ccr-contracts.ts` (teams vendor a copy as `deploy/manifest.ts`, version-pinned); docs location resolved to `topics/11-deployment-lifecycle.md` + `playbooks/`.
 
 - [ ] **Step 2: Add signposts**
 
-Add `topics/09-deployment-lifecycle.md` to any topics index; add the two playbooks under the playbooks listing; cross-link the protocol doc ↔ spec ↔ playbooks ↔ types.
+Add `topics/11-deployment-lifecycle.md` to any topics index; add the two playbooks under the playbooks listing; cross-link the protocol doc ↔ spec ↔ playbooks ↔ types.
 
 - [ ] **Step 3: Commit**
 
