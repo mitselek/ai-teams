@@ -1,5 +1,5 @@
 ---
-title: "World-State-on-Wake — Self-Orientation After Compaction"
+title: "World-State-on-Wake -- Self-Orientation After Compaction"
 directory: patterns
 status: active
 confidence: medium
@@ -20,10 +20,10 @@ When an agent's context is compacted or it otherwise loses recent state, it shou
 
 - **The failure mode is the default behavior** of any agent whose internal model isn't refreshed after external state change: re-announcing completed work, reporting merged PRs as open, offering closed tasks.
 - **Four-part pattern**: snapshot source (single ground-truth file/endpoint), wake-time read (before processing queued messages), reconciliation-not-replacement (discard stale, keep fresh local work), delta-vs-snapshot trade-off (snapshot-first, delta as optimization).
-- **Applies to any state-dropping lifecycle event**: compaction, container rebuild, respawn, restart — same mechanism, different trigger.
+- **Applies to any state-dropping lifecycle event**: compaction, container rebuild, respawn, restart -- same mechanism, different trigger.
 - **Producer/consumer separation makes it a protocol, not a convenience**: someone maintains the snapshot, agents read it on wake.
 - **Connection to existing work**: Volta's persist/restore-inboxes.sh is the inbox-level solution; world-state extends it from "what messages did I have?" to "what is currently true?"
 - **Anti-patterns**: snapshot-as-truth without reconciliation (loses unmerged work), per-message queries instead of wake-time read, snapshot without a `generated-at` staleness bound.
-- **Single-source (Aalto), NOT a Protocol C candidate** — seed material for Volta's design iteration.
+- **Single-source (Aalto), NOT a Protocol C candidate** -- seed material for Volta's design iteration.
 
 (*FR:Callimachus*)

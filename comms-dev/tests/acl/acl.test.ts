@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// RED tests for ACL evaluation — allow/deny, wildcards, default-deny, hot-reload.
+// RED tests for ACL evaluation -- allow/deny, wildcards, default-deny, hot-reload.
 // Spec: #15 §4, #16 §4
 
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
@@ -35,7 +35,7 @@ const SAMPLE_ACL: ACLConfig = {
   default: 'deny',
 };
 
-// ── matchesPattern — unit ─────────────────────────────────────────────────────
+// ── matchesPattern -- unit ─────────────────────────────────────────────────────
 
 describe('matchesPattern', () => {
 
@@ -73,14 +73,14 @@ describe('matchesPattern', () => {
     expect(matchesPattern('herald', '*@framework-research')).toBe(false);
   });
 
-  it('exact match takes precedence — exact pattern matches correctly', () => {
+  it('exact match takes precedence -- exact pattern matches correctly', () => {
     expect(matchesPattern('herald@framework-research', 'herald@framework-research')).toBe(true);
   });
 });
 
-// ── isAllowed — unit ──────────────────────────────────────────────────────────
+// ── isAllowed -- unit ──────────────────────────────────────────────────────────
 
-describe('isAllowed — send direction', () => {
+describe('isAllowed -- send direction', () => {
 
   it('allows send when remote address is in allowed_to (exact)', () => {
     expect(isAllowed(SAMPLE_ACL, 'send', 'babbage', 'herald@framework-research')).toBe(true);
@@ -109,7 +109,7 @@ describe('isAllowed — send direction', () => {
   });
 });
 
-describe('isAllowed — receive direction', () => {
+describe('isAllowed -- receive direction', () => {
 
   it('allows receive when sender is in allowed_from (exact)', () => {
     expect(isAllowed(SAMPLE_ACL, 'receive', 'babbage', 'herald@framework-research')).toBe(true);
@@ -128,18 +128,18 @@ describe('isAllowed — receive direction', () => {
   });
 });
 
-describe('isAllowed — one-directional ACL', () => {
+describe('isAllowed -- one-directional ACL', () => {
 
   it('A→B allowed does not imply B→A allowed', () => {
     // babbage can send to herald@framework-research
     expect(isAllowed(SAMPLE_ACL, 'send', 'babbage', 'herald@framework-research')).toBe(true);
-    // but herald cannot necessarily send to babbage — that's controlled by herald's team ACL
+    // but herald cannot necessarily send to babbage -- that's controlled by herald's team ACL
     // (separate daemon; we test local agent: kerckhoffs has no allowed_from for framework-research)
     expect(isAllowed(SAMPLE_ACL, 'receive', 'kerckhoffs', 'herald@framework-research')).toBe(false);
   });
 });
 
-describe('isAllowed — *@* wildcard rejection', () => {
+describe('isAllowed -- *@* wildcard rejection', () => {
 
   it('treats *@* in allowed_to as no-match (not a blanket allow)', () => {
     const aclWithFullWildcard: ACLConfig = {
@@ -152,13 +152,13 @@ describe('isAllowed — *@* wildcard rejection', () => {
       },
       default: 'deny',
     };
-    // *@* should NOT match — returns false
+    // *@* should NOT match -- returns false
     expect(isAllowed(aclWithFullWildcard, 'send', 'testAgent', 'herald@framework-research')).toBe(false);
     expect(isAllowed(aclWithFullWildcard, 'receive', 'testAgent', 'herald@framework-research')).toBe(false);
   });
 });
 
-// ── loadAcl — parsing and validation ─────────────────────────────────────────
+// ── loadAcl -- parsing and validation ─────────────────────────────────────────
 
 let aclDir: string;
 
@@ -171,7 +171,7 @@ afterAll(() => {
   rmSync(aclDir, { recursive: true, force: true });
 });
 
-describe('loadAcl — parsing', () => {
+describe('loadAcl -- parsing', () => {
 
   it('loads a valid ACL JSON file', () => {
     const path = join(aclDir, 'valid-acl.json');
@@ -198,9 +198,9 @@ describe('loadAcl — parsing', () => {
   });
 });
 
-// ── createAclManager — SIGHUP hot-reload ──────────────────────────────────────
+// ── createAclManager -- SIGHUP hot-reload ──────────────────────────────────────
 
-describe('createAclManager — hot-reload via SIGHUP', () => {
+describe('createAclManager -- hot-reload via SIGHUP', () => {
 
   it('initially loads the ACL and evaluates correctly', () => {
     const path = join(aclDir, 'hot-reload.json');
@@ -217,7 +217,7 @@ describe('createAclManager — hot-reload via SIGHUP', () => {
     // Initially babbage can send to herald@framework-research
     expect(manager.isAllowed('send', 'babbage', 'herald@framework-research')).toBe(true);
 
-    // Update ACL — remove babbage's allowed_to
+    // Update ACL -- remove babbage's allowed_to
     const updatedAcl: ACLConfig = {
       ...SAMPLE_ACL,
       agents: {
@@ -242,7 +242,7 @@ describe('createAclManager — hot-reload via SIGHUP', () => {
 
     // Write malformed JSON
     writeFileSync(path, '{ bad json');
-    // reload() should not throw — just log and keep old ACL
+    // reload() should not throw -- just log and keep old ACL
     expect(() => manager.reload()).not.toThrow();
 
     // Still using old ACL

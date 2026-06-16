@@ -7,8 +7,8 @@ How teams avoid stepping on each other's work.
 - Can two teams work on the same repo simultaneously?
 - Who owns the `develop` branch? Can teams push directly or only via PR?
 - How do we prevent D1 migration conflicts?
-- Shared Cloudflare account — how to scope deployments?
-- Rate limits — Cloudflare API, GitHub API, Jira API — how to partition?
+- Shared Cloudflare account -- how to scope deployments?
+- Rate limits -- Cloudflare API, GitHub API, Jira API -- how to partition?
 
 ## Resources to Isolate
 
@@ -16,17 +16,17 @@ How teams avoid stepping on each other's work.
 
 - Branch naming conventions per team?
 - Worktree isolation (already used for parallel agents)
-- PR ownership — which team owns which PR?
+- PR ownership -- which team owns which PR?
 
 ### Database (D1)
 
-- Migrations — serialized? per-team dev databases?
-- Seed data — team-specific or shared?
-- Remote dev DB — single shared instance, conflict risk
+- Migrations -- serialized? per-team dev databases?
+- Seed data -- team-specific or shared?
+- Remote dev DB -- single shared instance, conflict risk
 
 ### Deployments
 
-- One Cloudflare project, multiple teams deploying — queue? locks?
+- One Cloudflare project, multiple teams deploying -- queue? locks?
 - Environment separation (dev, staging, production)
 
 ### External APIs
@@ -39,27 +39,27 @@ How teams avoid stepping on each other's work.
 
 ## Patterns from Reference Teams (*FR:Finn*)
 
-### Git isolation — single shared workspace, serialized ownership
+### Git isolation -- single shared workspace, serialized ownership
 
 Both teams share **one git working directory**. Isolation is behavioral, not structural:
 
 - Only one agent owns git operations at a time (the agent creating the PR)
-- Team-lead is read-only during implementation — delegates, never touches files
+- Team-lead is read-only during implementation -- delegates, never touches files
 - Agents coordinate before `git checkout` by messaging team-lead, who alerts others
 - Force-push/reset requires team-lead approval
 - Branch naming convention: `story/<issue-number>-short-description` or `fix/<issue-number>-short-description`
 
-**Evolution:** hr-devs team-lead prompt is even more restrictive — explicitly forbidden from running `git add/commit/push`.
+**Evolution:** hr-devs team-lead prompt is even more restrictive -- explicitly forbidden from running `git add/commit/push`.
 
 ### Worktree isolation for parallel agents
 
-The MEMORY.md for the workspace (`dev-toolkit`) notes: use `isolation: "worktree"` when spawning parallel agents that work in the same git repo — shared workspace causes branch conflicts and lost work. Worktrees are the recommended mechanism when two agents need different branches simultaneously.
+The MEMORY.md for the workspace (`dev-toolkit`) notes: use `isolation: "worktree"` when spawning parallel agents that work in the same git repo -- shared workspace causes branch conflicts and lost work. Worktrees are the recommended mechanism when two agents need different branches simultaneously.
 
 ### Branch strategy: develop not main
 
 - All branches branch from `develop`, never `main`
 - PRs always target `develop`
-- `main` is protected — no direct pushes from agents
+- `main` is protected -- no direct pushes from agents
 
 ### DB isolation: naming convention
 
@@ -68,7 +68,7 @@ D1 database names are environment-scoped:
 - dev: `conversations-dev`
 - production: `conversations`
 
-No per-team databases in current practice — single dev DB shared. Migration conflicts are a known risk (open question, unresolved).
+No per-team databases in current practice -- single dev DB shared. Migration conflicts are a known risk (open question, unresolved).
 
 ### Rate limits: known but unmanaged
 
@@ -87,7 +87,7 @@ Wrangler commands use `--env dev` / `--env production`. No per-team deployment q
 
 ## Deep Research: Multi-Team Isolation Design (*FR:Finn*)
 
-### 1. Git Isolation — Worktrees vs Forks vs Separate Repos
+### 1. Git Isolation -- Worktrees vs Forks vs Separate Repos
 
 #### Current state (single-team)
 
@@ -107,7 +107,7 @@ git worktree add ~/github/hr-platform--beta develop
 
 **Strengths:**
 - Already proven: the MEMORY.md pattern from dev-toolkit recommends `isolation: "worktree"` for parallel agents
-- Shared object store — no fetch duplication, instant branch visibility
+- Shared object store -- no fetch duplication, instant branch visibility
 - Each team can checkout different branches simultaneously without coordination
 - Low disk overhead (only working tree files duplicated, not `.git`)
 
@@ -127,7 +127,7 @@ git worktree add ~/github/hr-platform--beta develop
 **How it works:** Each team forks the upstream repo. PRs flow from fork to upstream.
 
 **Strengths:**
-- Complete isolation — no shared refs, no shared working directory
+- Complete isolation -- no shared refs, no shared working directory
 - GitHub permission model applies naturally (fork can have different collaborators)
 - Already standard in open-source workflows
 
@@ -159,7 +159,7 @@ git worktree add ~/github/hr-platform--beta develop
 
 #### The problem
 
-D1 migrations are numbered sequentially (`0001_`, `0002_`, ...). Two teams creating migrations concurrently will collide on the sequence number. Worse: `wrangler d1 migrations apply` runs all unapplied migrations in order — interleaved migrations from different teams could create schema dependencies that neither team intended.
+D1 migrations are numbered sequentially (`0001_`, `0002_`, ...). Two teams creating migrations concurrently will collide on the sequence number. Worse: `wrangler d1 migrations apply` runs all unapplied migrations in order -- interleaved migrations from different teams could create schema dependencies that neither team intended.
 
 #### Current state
 
@@ -197,11 +197,11 @@ Each team gets its own D1 dev database:
 
 Replace sequential numbers with timestamps: `20260314_143000_add_column.sql`. Eliminates sequence conflicts.
 
-**Pros:** No coordination needed. **Cons:** D1's `migrations apply` uses alphabetical order — timestamps sort correctly but break the numbered convention already established.
+**Pros:** No coordination needed. **Cons:** D1's `migrations apply` uses alphabetical order -- timestamps sort correctly but break the numbered convention already established.
 
 #### Recommendation
 
-**Option A (migration lock) for same-project teams** — it preserves the existing numbered convention and forces teams to coordinate. For the framework: expose a `claimMigrationRange(team, count)` utility that writes to the registry and returns assigned numbers.
+**Option A (migration lock) for same-project teams** -- it preserves the existing numbered convention and forces teams to coordinate. For the framework: expose a `claimMigrationRange(team, count)` utility that writes to the registry and returns assigned numbers.
 
 **Option B (per-team databases)** as an escape hatch for long-running parallel feature branches where schema divergence is expected.
 
@@ -334,7 +334,7 @@ Agent → localhost:8080/github/repos/... → proxy tracks team budget → GitHu
 
 #### Behavioral vs structural isolation
 
-The reference teams rely almost entirely on **behavioral isolation** — protocols, conventions, and trust. This works for 1 team but does not scale. The framework needs to introduce **structural isolation** incrementally:
+The reference teams rely almost entirely on **behavioral isolation** -- protocols, conventions, and trust. This works for 1 team but does not scale. The framework needs to introduce **structural isolation** incrementally:
 
 | Resource | Current (behavioral) | Target (structural) |
 |----------|---------------------|---------------------|
@@ -347,7 +347,7 @@ The reference teams rely almost entirely on **behavioral isolation** — protoco
 
 #### Secret isolation
 
-Currently all teams would share `~/.claude/.env`. At scale this is a security risk — a compromised agent in one team could access another team's credentials. The framework should support per-team secret scoping:
+Currently all teams would share `~/.claude/.env`. At scale this is a security risk -- a compromised agent in one team could access another team's credentials. The framework should support per-team secret scoping:
 
 - `~/.claude/teams/{team-name}/.env` for team-specific secrets
 - Global secrets (like the Anthropic API key) remain in `~/.claude/.env`
@@ -380,12 +380,12 @@ This maps to the existing pattern where team-lead is forbidden from editing sour
 
 The patterns above describe **intra-team** resource isolation (Finn's research) and the scaling paths for structural isolation. This section designs the **inter-team coordination protocols**: the message flows, lock lifecycles, and failure modes that govern how teams request, hold, and release shared resources.
 
-These protocols complement the communication protocols in T03. Resource coordination messages use the existing communication infrastructure — no new primitives are needed.
+These protocols complement the communication protocols in T03. Resource coordination messages use the existing communication infrastructure -- no new primitives are needed.
 
 ### Design Principles
 
 1. **Locks are leased, never permanent.** Every lock has a TTL. No team can hold a resource indefinitely.
-2. **Manager agent is the lock authority.** Teams request locks through the manager agent (consistent with T03 Protocol 2 — hybrid topology). Direct-linked teams may fast-path for pre-authorized resource types.
+2. **Manager agent is the lock authority.** Teams request locks through the manager agent (consistent with T03 Protocol 2 -- hybrid topology). Direct-linked teams may fast-path for pre-authorized resource types.
 3. **Behavioral enforcement first, infrastructure later.** Like the reference teams, v1 enforces coordination via protocol and prompt instructions. Infrastructure enforcement (file locks, CI gates) is the v2 path.
 4. **Conflicts are detected, not just prevented.** Even with perfect protocol adherence, concurrent systems can conflict. Detection and resolution matter as much as prevention.
 
@@ -400,11 +400,11 @@ When two teams share a repository, they may:
 - Both attempt to merge to `develop` simultaneously, causing merge conflicts
 - Rebase over each other's in-flight work
 
-The single-team pattern (one agent owns git at a time) doesn't scale — it would serialize all work across all teams.
+The single-team pattern (one agent owns git at a time) doesn't scale -- it would serialize all work across all teams.
 
 #### Branch Namespace Partitioning
 
-Each team gets an exclusive branch prefix registered in roster.json (extends Finn's recommendation in "Git Isolation — Worktrees"):
+Each team gets an exclusive branch prefix registered in roster.json (extends Finn's recommendation in "Git Isolation -- Worktrees"):
 
 ```json
 {
@@ -423,7 +423,7 @@ Each team gets an exclusive branch prefix registered in roster.json (extends Fin
 **Rules:**
 - A team may only create branches under its own prefix
 - The existing `story/` and `fix/` conventions become suffixes: `<team-prefix>/story/<issue>-<desc>`
-- `develop` and `main` are shared — no team owns them
+- `develop` and `main` are shared -- no team owns them
 - Branch prefixes are registered in roster.json, validated by the manager agent, and must be unique
 
 #### Merge Coordination
@@ -453,7 +453,7 @@ Merging to `develop` is the critical contention point. Two teams merging simulta
 
 - **From:** <team-name>
 - **Resource:** merge:<repo-name>:develop
-- **Reason:** PR #<N> — <one-line summary>
+- **Reason:** PR #<N> -- <one-line summary>
 - **Estimated duration:** <minutes>
 - **Priority:** normal | urgent
 - **Files changed:** <output of git diff develop...<branch> --name-only>
@@ -500,7 +500,7 @@ Multiple teams deploying to the same Cloudflare project simultaneously can produ
 
 | Environment | Lock authority | Concurrency |
 |---|---|---|
-| `dev-{team}` | Team-lead (no lock needed — exclusive) | Unlimited |
+| `dev-{team}` | Team-lead (no lock needed -- exclusive) | Unlimited |
 | `dev` (shared) | Manager agent | One team at a time |
 | staging | Manager agent | One team at a time |
 | production | PO (human) + manager agent | One team at a time, human-gated |
@@ -574,7 +574,7 @@ This is the **highest-risk** resource coordination problem because migration con
 
 #### Migration Sequence Authority
 
-The manager agent owns the migration sequence for each shared database. No team may create or apply a migration to a shared database without coordination. (Per-team dev databases, as recommended by Finn's research, are exempt — teams own their own sequence.)
+The manager agent owns the migration sequence for each shared database. No team may create or apply a migration to a shared database without coordination. (Per-team dev databases, as recommended by Finn's research, are exempt -- teams own their own sequence.)
 
 #### Migration Protocol
 
@@ -598,10 +598,10 @@ The manager agent owns the migration sequence for each shared database. No team 
    └─ Assign sequence number from Finn's registry model
 
 4. Manager agent responds:
-   ├─ APPROVED — sequence number <N>, proceed
-   ├─ QUEUED — another migration in progress, estimated wait: <time>
-   ├─ CONFLICT — overlaps with <team>'s migration on <table>, coordinate first
-   └─ REJECTED — reason (e.g., destructive migration during freeze)
+   ├─ APPROVED -- sequence number <N>, proceed
+   ├─ QUEUED -- another migration in progress, estimated wait: <time>
+   ├─ CONFLICT -- overlaps with <team>'s migration on <table>, coordinate first
+   └─ REJECTED -- reason (e.g., destructive migration during freeze)
 
 5. Team creates migration file with assigned sequence number
 6. Team applies migration to target database, verifies
@@ -620,7 +620,7 @@ The manager agent owns the migration sequence for each shared database. No team 
 
 - **PARALLEL:** Both can proceed independently (assigned consecutive sequence numbers)
 - **SERIALIZE:** One completes before the other starts (FIFO)
-- **WAIT:** Destructive migration gets exclusive access — all others wait
+- **WAIT:** Destructive migration gets exclusive access -- all others wait
 
 #### Migration Ledger
 
@@ -628,8 +628,8 @@ The manager agent owns the migration sequence for each shared database. No team 
 | Seq | Team | Database | Type | Tables | Status | Applied |
 |---|---|---|---|---|---|---|
 | 042 | hr-devs | conversations-staging | additive | messages | APPLIED | 2026-03-14 |
-| 043 | platform | conversations-staging | modify | users | IN_PROGRESS | — |
-| 044 | hr-devs | conversations-staging | additive | attachments | QUEUED (behind 043) | — |
+| 043 | platform | conversations-staging | modify | users | IN_PROGRESS | -- |
+| 044 | hr-devs | conversations-staging | additive | attachments | QUEUED (behind 043) | -- |
 ```
 
 #### Integration with Finn's Scaling Recommendations
@@ -728,7 +728,7 @@ All resource locks (merge, deployment, migration) follow the same lifecycle and 
 | L-001 | merge:hr-platform:develop | hr-devs | 2026-03-14 10:00 | 15min | 2026-03-14 10:15 | HELD |
 | L-002 | deploy:hr-platform:staging | platform | 2026-03-14 10:05 | 30min | 2026-03-14 10:35 | HELD |
 | L-003 | migration:conversations-staging | hr-devs | 2026-03-14 09:50 | 60min | 2026-03-14 10:50 | HELD |
-| L-004 | merge:hr-platform:develop | qa-team | 2026-03-14 10:10 | — | — | QUEUED |
+| L-004 | merge:hr-platform:develop | qa-team | 2026-03-14 10:10 | -- | -- | QUEUED |
 ```
 
 #### Lock Types and TTLs
@@ -737,7 +737,7 @@ All resource locks (merge, deployment, migration) follow the same lifecycle and 
 |---|---|---|---|
 | `merge:<repo>:<branch>` | 15 min | 1 | Force-release, notify team |
 | `deploy:<project>:<env>` | 30 min (shared dev/staging), 60 min (prod) | 1 | Force-release, mark env UNCERTAIN, notify PO |
-| `migration:<db>` | 60 min | 2 | Escalate to PO (data risk — never force-release) |
+| `migration:<db>` | 60 min | 2 | Escalate to PO (data risk -- never force-release) |
 | `api-reserve:<api>` | 30 min | 3 | Auto-release, redistribute budget |
 
 Note on migration locks: Unlike merge and deploy locks, migration locks are **never force-released** on timeout. A half-applied migration can corrupt data. Instead, the manager agent escalates to PO for manual intervention.
@@ -746,9 +746,9 @@ Note on migration locks: Unlike merge and deploy locks, migration locks are **ne
 
 The manager agent tracks contention to identify scaling triggers:
 
-- **Average wait time** per resource type — if merge lock wait exceeds 10 min average, recommend repo splitting or worktree isolation
-- **Lock hold duration** vs TTL — if teams consistently use >80% of TTL, increase default
-- **Queue depth** — if any resource regularly has 3+ teams waiting, escalate to PO for structural solution (per Finn's scaling recommendations)
+- **Average wait time** per resource type -- if merge lock wait exceeds 10 min average, recommend repo splitting or worktree isolation
+- **Lock hold duration** vs TTL -- if teams consistently use >80% of TTL, increase default
+- **Queue depth** -- if any resource regularly has 3+ teams waiting, escalate to PO for structural solution (per Finn's scaling recommendations)
 
 ---
 
@@ -762,30 +762,30 @@ Resource coordination messages use the existing communication infrastructure:
 | Lock grants/denials | Manager agent response via Protocol 1 ACK |
 | Rate limit alerts | Protocol 3 (Broadcast), category: `incident` |
 | Migration conflicts | Protocol 1 (Handoff), `type: consult` between affected teams |
-| Contention metrics | Protocol 4B (Knowledge Layer — GitHub Issues), `type: finding` |
+| Contention metrics | Protocol 4B (Knowledge Layer -- GitHub Issues), `type: finding` |
 
 No new communication primitives are needed. Resource coordination is a **use case** of the communication protocols, not a separate system.
 
 ---
 
-### Open Questions — Resource Coordination (*FR:Herald*)
+### Open Questions -- Resource Coordination (*FR:Herald*)
 
 #### Resolved by this design
 
 - ~~Can two teams work on the same repo simultaneously?~~ --> Yes, with branch namespace partitioning (R1) and merge locks. Worktrees (Finn's recommendation) provide structural isolation; merge locks provide coordination at the integration point.
 - ~~Who owns the `develop` branch?~~ --> No team owns it. Merge access is governed by the merge lock (R1). Manager agent is the lock authority.
 - ~~How do we prevent D1 migration conflicts?~~ --> Migration queue with sequence authority at manager agent (R3), compatible with Finn's migration lock registry model.
-- ~~Shared Cloudflare account — how to scope deployments?~~ --> Deployment locks (R2) for shared environments. Per-team dev environments (Finn's recommendation) eliminate locking at dev tier.
-- ~~Rate limits — Cloudflare API, GitHub API, Jira API — how to partition?~~ --> Tiered partitioning (R4): centralized for scarce, soft quotas for moderate, per-team tokens for scaling.
+- ~~Shared Cloudflare account -- how to scope deployments?~~ --> Deployment locks (R2) for shared environments. Per-team dev environments (Finn's recommendation) eliminate locking at dev tier.
+- ~~Rate limits -- Cloudflare API, GitHub API, Jira API -- how to partition?~~ --> Tiered partitioning (R4): centralized for scarce, soft quotas for moderate, per-team tokens for scaling.
 
 #### Still open
 
-1. **Lock infrastructure implementation** — v1 is behavioral (manager agent tracks locks in memory/file). When does it need real infrastructure (Redis, Durable Objects, file locks on shared volume)? Likely when lock request latency matters (>5 teams contending). This intersects with Finn's deployment queue implementation options.
+1. **Lock infrastructure implementation** -- v1 is behavioral (manager agent tracks locks in memory/file). When does it need real infrastructure (Redis, Durable Objects, file locks on shared volume)? Likely when lock request latency matters (>5 teams contending). This intersects with Finn's deployment queue implementation options.
 
-2. **Cross-repo lock scoping** — Protocols assume teams share a single repo. Some teams may span multiple repos (e.g., a platform team managing infra across repos). Lock resource identifiers include repo name but the manager agent's registry would need multi-repo awareness.
+2. **Cross-repo lock scoping** -- Protocols assume teams share a single repo. Some teams may span multiple repos (e.g., a platform team managing infra across repos). Lock resource identifiers include repo name but the manager agent's registry would need multi-repo awareness.
 
-3. **Migration rollback** — Protocol R3 treats migrations as irreversible (consistent with D1 practice). Should the framework require down-migrations for additive changes? Trade-off: safety vs development speed. Finn's research did not resolve this.
+3. **Migration rollback** -- Protocol R3 treats migrations as irreversible (consistent with D1 practice). Should the framework require down-migrations for additive changes? Trade-off: safety vs development speed. Finn's research did not resolve this.
 
-4. **Lock fairness** — Current FIFO queuing can starve low-priority teams when high-priority teams repeatedly request locks. Should the manager agent implement priority aging (queued requests gain priority over time)?
+4. **Lock fairness** -- Current FIFO queuing can starve low-priority teams when high-priority teams repeatedly request locks. Should the manager agent implement priority aging (queued requests gain priority over time)?
 
-5. **Offline team recovery** — If a team holds a lock and goes offline (container crash, session end), the TTL handles eventual release. But the team's in-progress work (uncommitted changes, partial migration) may leave the resource in an inconsistent state. Recovery protocol needed beyond "force-release." This connects to T06 lifecycle — shutdown protocol should include lock release as a mandatory step.
+5. **Offline team recovery** -- If a team holds a lock and goes offline (container crash, session end), the TTL handles eventual release. But the team's in-progress work (uncommitted changes, partial migration) may leave the resource in an inconsistent state. Recovery protocol needed beyond "force-release." This connects to T06 lifecycle -- shutdown protocol should include lock release as a mandatory step.

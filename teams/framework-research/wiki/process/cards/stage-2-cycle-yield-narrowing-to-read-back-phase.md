@@ -17,9 +17,9 @@ The hypothesis that joint Stage 2 read-back cycles have higher structural yield 
 
 ## Key ideas
 
-- **n=5 cumulative, zero counter-instances**: bottleneck-determines-adoption, sub-shape-e, three-layer amendment, recursive-narrowing, three-role-stacking — all solo-drafted clean on joint-source material.
+- **n=5 cumulative, zero counter-instances**: bottleneck-determines-adoption, sub-shape-e, three-layer amendment, recursive-narrowing, three-role-stacking -- all solo-drafted clean on joint-source material.
 - **Why drafting is solo even when joint-sourced**: the joint-source material is already-committed scratchpad/ops-log/relay content; the joint-author contribution is UPSTREAM of drafting; FLAG annotations resolve mid-draft uncertainty.
-- **Where joint yield lives — Stage 2**: the same five entries each surfaced substantive Stage 2 feedback (mechanism-sharpenings, attribution corrections, family-completion guardrails) the solo-drafted artifact lacked.
+- **Where joint yield lives -- Stage 2**: the same five entries each surfaced substantive Stage 2 feedback (mechanism-sharpenings, attribution corrections, family-completion guardrails) the solo-drafted artifact lacked.
 - **Discriminator question**: is the source-of-truth committed at drafting time? YES → solo-author Stage 1 drafting; NO → surface-back-for-context or wait for commit.
 - **Within-system self-applications also surface at Stage 2** (cousin to first-use-recursive-validation, recursive-citation).
 - **Not "joint-source entries don't benefit from joint authors"** (yield is real, just at Stage 2) and **not "Stage 2 is optional"** (drafting clean ≠ skip read-back).

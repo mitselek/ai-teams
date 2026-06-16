@@ -81,7 +81,7 @@ describe('deriveKey', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Encrypt / decrypt — happy path
+// Encrypt / decrypt -- happy path
 // ---------------------------------------------------------------------------
 
 describe('encrypt/decrypt roundtrip', () => {
@@ -481,7 +481,7 @@ describe('known-answer vectors', () => {
     );
   });
 
-  it('HMAC-SHA256 known-answer: Vigenere vector — "Hello, World!" with derived integrity key', () => {
+  it('HMAC-SHA256 known-answer: Vigenere vector -- "Hello, World!" with derived integrity key', () => {
     const psk = loadPsk('a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2');
     const derived = deriveKey(psk, 'comms-v1');
     const officialApi = createCryptoAPI(derived);
@@ -544,7 +544,7 @@ describe('createCryptoProvider adapter', () => {
     expect(recovered.byteLength).toBe(0);
   });
 
-  it('encrypt with AAD — decrypt recovers plaintext', async () => {
+  it('encrypt with AAD -- decrypt recovers plaintext', async () => {
     const provider = createCryptoProvider(api);
     const plaintext = Buffer.from('aad via provider');
     const cipherBuf = await provider.encrypt(plaintext, 'msg-id:test:sender:team-a');

@@ -13,7 +13,7 @@ $VbsLauncher = "C:\Users\mihkel.putrinsh\Documents\github\mitselek-ai-teams\team
 # so Windows Terminal / conhost never opens a window. //B = batch mode (no
 # UI dialogs), //Nologo suppresses the wscript banner. The VBS uses
 # WshShell.Run wait=True so the wscript process stays alive for the bash
-# supervisor's lifetime — Task Scheduler's MultipleInstances IgnoreNew can
+# supervisor's lifetime -- Task Scheduler's MultipleInstances IgnoreNew can
 # then see the running instance and skip duplicate spawns.
 $action = New-ScheduledTaskAction -Execute $WScriptExe -Argument "//B //Nologo `"$VbsLauncher`""
 

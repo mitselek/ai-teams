@@ -14,11 +14,11 @@ ttl: 2027-05-04
 
 # EVR's actual SSO is EntraID, not WSO2
 
-**Substrate fact:** Eesti Raudtee's SSO / IdP is **EntraID (Microsoft Azure AD)**. WSO2 is the integration platform — specifically WSO2 Micro Integrator, used for TAF/TAP message routing. Identity and integration are orthogonal at EVR; they are not the same product or product family.
+**Substrate fact:** Eesti Raudtee's SSO / IdP is **EntraID (Microsoft Azure AD)**. WSO2 is the integration platform -- specifically WSO2 Micro Integrator, used for TAF/TAP message routing. Identity and integration are orthogonal at EVR; they are not the same product or product family.
 
 ## Why this is worth a wiki entry
 
-The confusion is plausible enough that even careful authors hedge in the wrong direction. WSO2 has a parallel product line called **WSO2 Identity Server** that *is* an SSO/IdP. Knowing that EVR uses WSO2 (Micro Integrator, for integration) is one heuristic step away from concluding that EVR uses WSO2 Identity Server (for SSO) — which is wrong.
+The confusion is plausible enough that even careful authors hedge in the wrong direction. WSO2 has a parallel product line called **WSO2 Identity Server** that *is* an SSO/IdP. Knowing that EVR uses WSO2 (Micro Integrator, for integration) is one heuristic step away from concluding that EVR uses WSO2 Identity Server (for SSO) -- which is wrong.
 
 The two-product-line-from-one-vendor pattern is the trap. The correct answer requires explicit knowledge that EVR's identity stack is Microsoft, not WSO2.
 
@@ -31,10 +31,10 @@ When designing or analyzing anything touching EVR-internal authentication, singl
 
 ## Authoritative cites
 
-- Confluence FSM page `536248326` — UAM SSO documentation.
-- Confluence INFOSEC page `851607559` — Delinea SSO documentation.
+- Confluence FSM page `536248326` -- UAM SSO documentation.
+- Confluence INFOSEC page `851607559` -- Delinea SSO documentation.
 
-Both pages identify EntraID as the IdP. The Delinea page additionally documents Delinea (privileged access management) as a layer on top of EntraID for elevated operations — Delinea sits in front of EntraID, not in place of it.
+Both pages identify EntraID as the IdP. The Delinea page additionally documents Delinea (privileged access management) as a layer on top of EntraID for elevated operations -- Delinea sits in front of EntraID, not in place of it.
 
 ## How this entry came to exist
 
@@ -42,7 +42,7 @@ Brunel verified during session 22 IAM/PAM ripple analysis. Team-lead had hedged 
 
 ## Confidence
 
-High — two authoritative Confluence pages cite EntraID directly. Brunel's verification is independent of the original draft. The risk is not that the fact is wrong; the risk is that it changes (substrate facts can shift on infrastructure migration).
+High -- two authoritative Confluence pages cite EntraID directly. Brunel's verification is independent of the original draft. The risk is not that the fact is wrong; the risk is that it changes (substrate facts can shift on infrastructure migration).
 
 ## TTL
 

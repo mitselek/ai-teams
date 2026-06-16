@@ -15,12 +15,12 @@ tags: [pattern, anti-pattern, honesty-pass, probe-not-infer, aspirational-claim,
 
 ## TLDR
 
-An artifact's prose (header/docstring/comment/status-line/`[TESTED]` tag) asserts a property the implementation doesn't deliver — written aspirationally or inferred-from-reading, drifting from what the code does. Fix = **honesty-pass**: rewrite the claim to describe actual behavior; downgrade inferred claims to "verified empirically by X" only when probed. Framework-grade (any prose-carrying artifact), reinforces the S50 completed-flag-must-not-claim-more-than-evidence principle.
+An artifact's prose (header/docstring/comment/status-line/`[TESTED]` tag) asserts a property the implementation doesn't deliver -- written aspirationally or inferred-from-reading, drifting from what the code does. Fix = **honesty-pass**: rewrite the claim to describe actual behavior; downgrade inferred claims to "verified empirically by X" only when probed. Framework-grade (any prose-carrying artifact), reinforces the S50 completed-flag-must-not-claim-more-than-evidence principle.
 
 ## Key ideas
 
 - **Discriminator: EMPIRICAL PROBE > ARTIFACT-INFERENCE.** Code HAVING a signal handler + atexit ≠ they FIRE at runtime. Only a controlled probe establishes runtime behavior. Same shape as S48 "an observation doesn't validate the mechanism you guessed produced it."
-- **n=3 this session**: (1) over-generous `[TESTED]` tag (tested an adjacent observation, not the mechanism — S48 recurrence); (2) `stop-fr-courier.ps1` header claimed signal-drain+atexit-on-stop, but Windows `Stop-Process`=hard-kill → no signal/drain/atexit (Hopper probe); (3) daemon docstring "drain via SIGINT/SIGTERM" unqualified — true POSIX, false Windows stop-path.
+- **n=3 this session**: (1) over-generous `[TESTED]` tag (tested an adjacent observation, not the mechanism -- S48 recurrence); (2) `stop-fr-courier.ps1` header claimed signal-drain+atexit-on-stop, but Windows `Stop-Process`=hard-kill → no signal/drain/atexit (Hopper probe); (3) daemon docstring "drain via SIGINT/SIGTERM" unqualified -- true POSIX, false Windows stop-path.
 - **Canonical case (inst. 2)**: Brunel inferred "drain works on stop" by READING (handler+atexit present); Hopper's controlled stop probe refuted it.
 - **Honesty-pass**: describe-what-code-does; downgrade inferred→`[INFERRED]` not `[TESTED]`; qualify platform/condition-dependent claims.
 - **Similar-not-same** to prompt-to-artifact-cross-verification (existence/structure ACROSS artifacts) vs this (claim-vs-runtime WITHIN one artifact); adjacent to citation-backed; same family as substrate-invariant-mismatch at the artifact-claim layer.

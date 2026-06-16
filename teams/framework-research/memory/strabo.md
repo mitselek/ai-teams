@@ -2,9 +2,9 @@
 
 ## Session: 2026-03-25
 
-[REGISTRY] registry.json created at VJS2-AI-teams/registry.json. 7 entries. configHash fields all null — first draft from known fleet state (Brunel scratchpad + prompt).
+[REGISTRY] registry.json created at VJS2-AI-teams/registry.json. 7 entries. configHash fields all null -- first draft from known fleet state (Brunel scratchpad + prompt).
 
-[REGISTRY] hr-devs PROD-LLM config location: /home/ai-teams/team-config/ (NOT /root/teams/hr-devs — that's only created after entrypoint runs on team startup)
+[REGISTRY] hr-devs PROD-LLM config location: /home/ai-teams/team-config/ (NOT /root/teams/hr-devs -- that's only created after entrypoint runs on team startup)
 
 [GOTCHA] PROD-LLM containers use docker-exec, NOT direct SSH. Access pattern: `ssh michelek@10.100.136.162 "sudo docker exec hr-devs cat <path>"`
 
@@ -16,20 +16,20 @@
 
 [GOTCHA] Prior broken push (2026-03-23) left team-lead.md, marcus.md, common-prompt.md as dangling symlinks to /proc/self/fd/0. Had to rm symlinks first. Check for symlinks before any future push: `docker exec hr-devs ls -la /home/ai-teams/team-config/`.
 
-[CHECKPOINT] polyphony-dev, entu-research: repoConfigPath unknown — configs likely in mitselek/ai-teams or hr-platform repo. backlog-triage: no team-config dir baked in VJS2 dockerfiles.
+[CHECKPOINT] polyphony-dev, entu-research: repoConfigPath unknown -- configs likely in mitselek/ai-teams or hr-platform repo. backlog-triage: no team-config dir baked in VJS2 dockerfiles.
 
 ## Session: 2026-03-30
 
 [CHECKPOINT] Created deployment registry at mitselek-ai-teams repo root:
 
-- `deployments.md` — human-readable fleet reference with connection commands, ProxyJump syntax, docker operations
-- `registry.json` — machine-readable fleet data, 9 entries (including reserved slot and host-access entries)
+- `deployments.md` -- human-readable fleet reference with connection commands, ProxyJump syntax, docker operations
+- `registry.json` -- machine-readable fleet data, 9 entries (including reserved slot and host-access entries)
 - Source: `~/bin/rc-connect.ps1` (canonical)
 - Added "Deployment Registry" section to common-prompt.md (after Workspace, before Communication Rule)
 
 [REGISTRY] BT-TRIAGE containerName = "backlog-triage" (display name differs from container name)
 
-[DEFERRED] configHash fields not populated in mitselek-ai-teams/registry.json — need live SSH access to compute hashes
-[DEFERRED] Drift detection run against live containers — not attempted this session
+[DEFERRED] configHash fields not populated in mitselek-ai-teams/registry.json -- need live SSH access to compute hashes
+[DEFERRED] Drift detection run against live containers -- not attempted this session
 
 (*FR:Strabo*)

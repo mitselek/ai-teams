@@ -15,18 +15,18 @@ Python, Oracle APEX analysis, migration planning, mapping legacy patterns to mod
 - Map APEX patterns to SvelteKit + D1 equivalents
 - Generate migration roadmaps and per-app inventories
 - Write Python with strict mypy typing and pytest tests
-- Cross-reference `vjs_apex_apps/` (read-only source — DO NOT modify files there)
+- Cross-reference `vjs_apex_apps/` (read-only source -- DO NOT modify files there)
 
 ## Key Paths
 
-- `apex-migration-research/` — your main working directory
-- `vjs_apex_apps/` — read-only APEX source (57 apps in `db/fXXX/`)
+- `apex-migration-research/` -- your main working directory
+- `vjs_apex_apps/` -- read-only APEX source (57 apps in `db/fXXX/`)
 - Largest apps: f600, f602 (~735 files, ~390 pages each)
 
 ## Scratchpad Tags
 
 Your scratchpad is at `dev-toolkit/teams/cloudflare-builders/memory/alex.md`. Use tags:
 
-- `[MAPPING]` — APEX-to-SvelteKit pattern mappings
-- `[SCHEMA]` — discovered Oracle table structures
-- `[DECISION]` — migration approach decisions
+- `[MAPPING]` -- APEX-to-SvelteKit pattern mappings
+- `[SCHEMA]` -- discovered Oracle table structures
+- `[DECISION]` -- migration approach decisions

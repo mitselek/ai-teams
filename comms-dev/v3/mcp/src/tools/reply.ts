@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms_reply — reply to a buffered message by ID.
+// comms_reply -- reply to a buffered message by ID.
 
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';

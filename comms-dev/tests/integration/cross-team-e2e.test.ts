@@ -1,9 +1,9 @@
 // (*CD:Kerckhoffs*)
-// Phase 6 — End-to-end integration tests.
+// Phase 6 -- End-to-end integration tests.
 // Spec: #18 Phase 6
 //
 // Two DaemonV2 instances wired in-process via mTLS tunnel.
-// CrossTeamSend MCP tool is the entry point — exactly as agents use it.
+// CrossTeamSend MCP tool is the entry point -- exactly as agents use it.
 // Proves all components compose correctly end-to-end.
 //
 // Scenarios:
@@ -181,7 +181,7 @@ async function waitForInboxFiles(inboxDir: string, n: number, timeoutMs = 3000):
 
 // ── 1. Happy path: cd → fr ────────────────────────────────────────────────────
 
-describe('Phase 6 E2E — happy path cd → fr', () => {
+describe('Phase 6 E2E -- happy path cd → fr', () => {
 
   it('message sent via CrossTeamSend arrives as inbox file on remote', async () => {
     const { frInbox, cdSocketDir, cleanup } = await setupTwoTeams();
@@ -231,7 +231,7 @@ describe('Phase 6 E2E — happy path cd → fr', () => {
 
 // ── 2. Reverse direction: fr → cd ────────────────────────────────────────────
 
-describe('Phase 6 E2E — reverse direction fr → cd', () => {
+describe('Phase 6 E2E -- reverse direction fr → cd', () => {
 
   it('message from fr reaches cd inbox via CrossTeamSend', async () => {
     const { cdInbox, frSocketDir, cleanup } = await setupTwoTeams();
@@ -261,7 +261,7 @@ describe('Phase 6 E2E — reverse direction fr → cd', () => {
 
 // ── 3. ACL denied end-to-end ─────────────────────────────────────────────────
 
-describe('Phase 6 E2E — ACL denied', () => {
+describe('Phase 6 E2E -- ACL denied', () => {
 
   it('agent not in local ACL gets ACL_DENIED, nothing written to remote inbox', async () => {
     const { frInbox, cdSocketDir, cleanup } = await setupTwoTeams();
@@ -298,7 +298,7 @@ describe('Phase 6 E2E — ACL denied', () => {
     };
     const { frInbox, cdSocketDir, cleanup } = await setupTwoTeams({ frAcl: narrowFrAcl });
     try {
-      // Send to vigenere@fr — local ACL passes (babbage can send to *@fr if we widen cd acl)
+      // Send to vigenere@fr -- local ACL passes (babbage can send to *@fr if we widen cd acl)
       // But this needs cd ACL to allow it too. Use sendMessageRaw via cdDaemon directly.
       // Actually: test the remote-side ACL by observing no inbox file for a message
       // that gets through the tunnel but fails receive-ACL on fr side.
@@ -309,7 +309,7 @@ describe('Phase 6 E2E — ACL denied', () => {
       // So we verify via inbox: even if tunnel delivers, no file for denied agent.
       const { buildMessage } = await import('../../src/broker/message-builder.js');
       const { cdDaemon } = await (async () => {
-        // Re-use the outer setup's cdDaemon — already running in cleanup scope
+        // Re-use the outer setup's cdDaemon -- already running in cleanup scope
         // We can't easily get cdDaemon here; use a separate approach.
         // Instead verify: send to herald (allowed) works, send to vigenere (denied on fr side) does not produce a file.
         return { cdDaemon: null };
@@ -336,7 +336,7 @@ describe('Phase 6 E2E — ACL denied', () => {
 
 // ── 4. from.team forgery ──────────────────────────────────────────────────────
 
-describe('Phase 6 E2E — from.team forgery', () => {
+describe('Phase 6 E2E -- from.team forgery', () => {
 
   it('forged from.team causes remote to close connection, no inbox file written', async () => {
     const { cdDaemon, frInbox, cleanup } = await setupTwoTeams();
@@ -352,7 +352,7 @@ describe('Phase 6 E2E — from.team forgery', () => {
         body:  'forged message',
       });
 
-      // sendMessageRaw bypasses local ACL — goes directly through the tunnel
+      // sendMessageRaw bypasses local ACL -- goes directly through the tunnel
       const result = await cdDaemon.sendMessageRaw(forgedMsg);
       // Remote closes connection → tunnel treats it as unavailable → FORGERY_REJECTED
       expect(result).toBe('FORGERY_REJECTED');
@@ -370,9 +370,9 @@ describe('Phase 6 E2E — from.team forgery', () => {
 
 // ── 5. Bidirectional conversation ─────────────────────────────────────────────
 
-describe('Phase 6 E2E — bidirectional conversation', () => {
+describe('Phase 6 E2E -- bidirectional conversation', () => {
 
-  it('A sends to B, B replies to A — both inbox files exist', async () => {
+  it('A sends to B, B replies to A -- both inbox files exist', async () => {
     const { cdInbox, frInbox, cdSocketDir, frSocketDir, cleanup } = await setupTwoTeams();
     try {
       // babbage → herald
@@ -421,7 +421,7 @@ describe('Phase 6 E2E — bidirectional conversation', () => {
 
 // ── 6. SIGHUP mid-session ────────────────────────────────────────────────────
 
-describe('Phase 6 E2E — SIGHUP ACL hot-reload', () => {
+describe('Phase 6 E2E -- SIGHUP ACL hot-reload', () => {
 
   it('denied agent succeeds after ACL reload adds them', async () => {
     const restrictedCdAcl = {

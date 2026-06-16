@@ -248,7 +248,7 @@ describe('verifyPeerCert', () => {
 
 // ── JSON output shape ─────────────────────────────────────────────────────────
 
-describe('listKeys — JSON output shape matches spec #17', () => {
+describe('listKeys -- JSON output shape matches spec #17', () => {
 
   it('daemon object has subject, fingerprint, not_after fields', async () => {
     const result = await listKeys({ keysDir });
@@ -271,7 +271,7 @@ describe('listKeys — JSON output shape matches spec #17', () => {
   });
 
   it('fingerprint format uses SHA256: prefix (spec #17 format)', async () => {
-    // Spec shows "SHA256:ab:cd:ef:..." — SHA256: prefix, colon-separated hex
+    // Spec shows "SHA256:ab:cd:ef:..." -- SHA256: prefix, colon-separated hex
     const result = await listKeys({ keysDir });
     expect(result.daemon.fingerprint).toMatch(/^SHA256:([0-9A-F]{2}:)*[0-9A-F]{2}$/i);
   });

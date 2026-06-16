@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Restore project-scoped auto-memory from repo to runtime.
+# (*FR:Volta*) -- Restore project-scoped auto-memory from repo to runtime.
 # Runs on TeamCreate post-bootstrap. Merge semantics (not mirror): ADDs repo
 # versions over whatever is in runtime, does NOT wipe runtime first.
 #
@@ -36,7 +36,7 @@ PROJECT_DIR="$HOME/.claude/projects/$PROJECT_DIR_NAME"
 RUNTIME_MEMORY="$PROJECT_DIR/memory"
 
 if [ ! -d "$REPO_PROJECT_MEMORY" ]; then
-  echo "No repo project-memory at $REPO_PROJECT_MEMORY — cold start, nothing to restore."
+  echo "No repo project-memory at $REPO_PROJECT_MEMORY -- cold start, nothing to restore."
   exit 0
 fi
 

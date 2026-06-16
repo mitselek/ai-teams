@@ -6,7 +6,7 @@ Authentication scoping and secret access per team.
 
 - One GitHub token for all teams or per-team tokens?
 - How to scope Cloudflare API access per team?
-- Who manages secrets — centralized vault or per-team?
+- Who manages secrets -- centralized vault or per-team?
 - How do we audit which team used which credential?
 - Can a team escalate its own permissions?
 
@@ -19,10 +19,10 @@ Authentication scoping and secret access per team.
 
 ## Considerations
 
-- Principle of least privilege — each team gets only what it needs
-- Credential rotation — how to update across teams?
-- Temporary credentials — short-lived tokens for temporary teams?
-- Audit trail — log every API call with team identity
+- Principle of least privilege -- each team gets only what it needs
+- Credential rotation -- how to update across teams?
+- Temporary credentials -- short-lived tokens for temporary teams?
+- Audit trail -- log every API call with team identity
 
 ## Notes
 
@@ -32,10 +32,10 @@ Authentication scoping and secret access per team.
 
 All credentials live in `~/.claude/.env` (on both local and RC machines):
 
-- `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` — same token, both environments
-- `ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` — Jira
-- `FIGMA_PAT` — Figma personal access token
-- `GITHUB_TOKEN` — GitHub
+- `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` -- same token, both environments
+- `ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` -- Jira
+- `FIGMA_PAT` -- Figma personal access token
+- `GITHUB_TOKEN` -- GitHub
 
 No per-team credential scoping. All agents on all teams share the same credentials. No per-team Cloudflare API tokens, no per-team GitHub tokens.
 
@@ -48,7 +48,7 @@ source ~/.claude/.env
 curl -s -u "$ATLASSIAN_EMAIL:$ATLASSIAN_API_TOKEN" "$ATLASSIAN_BASE_URL/rest/api/3/..."
 ```
 
-**Known gotcha:** `~/.claude/.env` values MUST be quoted — special characters break without quotes. This is in the Known Pitfalls section of both common-prompts.
+**Known gotcha:** `~/.claude/.env` values MUST be quoted -- special characters break without quotes. This is in the Known Pitfalls section of both common-prompts.
 
 ### Figma PAT: rate-limit scoping drives access discipline
 
@@ -64,7 +64,7 @@ This shows that access discipline emerges from rate-limit pressure, not from upf
 
 ### Attribution without authentication
 
-The current attribution system (`(*RC-DEV:AgentName*)`) is honor-based — any agent could claim any name. There is no cryptographic or infrastructure-level proof of which agent wrote what. It serves as an audit trail for humans, not a security mechanism.
+The current attribution system (`(*RC-DEV:AgentName*)`) is honor-based -- any agent could claim any name. There is no cryptographic or infrastructure-level proof of which agent wrote what. It serves as an audit trail for humans, not a security mechanism.
 
 ### No secret access escalation mechanism
 
@@ -82,11 +82,11 @@ The patterns above describe the current state: shared credentials, honor-based a
 
 ### Design Principles
 
-1. **Least privilege by default** — a team receives only the credentials its mission requires. A research team with read-only access to a repo does not receive deploy tokens.
-2. **Identity is team-scoped, not agent-scoped** — individual agents within a team share the team's credential set. Scoping to individual agents adds complexity without proportional security benefit (agents within a team already trust each other).
-3. **Credentials are injected, never discovered** — teams do not search for credentials. The credential set is defined at team creation and injected via environment or secrets mount. An agent that needs a credential it doesn't have escalates — it does not attempt to find one.
-4. **Audit at the team boundary** — log which team used which credential, not which agent. Agent-level attribution (the `(*PREFIX:Agent*)` system) is the audit trail within a team; credential usage logs are the audit trail between teams.
-5. **Honor-based internally, cryptographic externally** — within a team, agents trust each other (same container, same credential set). Between teams, messages must be verifiable (see Cross-Team Identity below).
+1. **Least privilege by default** -- a team receives only the credentials its mission requires. A research team with read-only access to a repo does not receive deploy tokens.
+2. **Identity is team-scoped, not agent-scoped** -- individual agents within a team share the team's credential set. Scoping to individual agents adds complexity without proportional security benefit (agents within a team already trust each other).
+3. **Credentials are injected, never discovered** -- teams do not search for credentials. The credential set is defined at team creation and injected via environment or secrets mount. An agent that needs a credential it doesn't have escalates -- it does not attempt to find one.
+4. **Audit at the team boundary** -- log which team used which credential, not which agent. Agent-level attribution (the `(*PREFIX:Agent*)` system) is the audit trail within a team; credential usage logs are the audit trail between teams.
+5. **Honor-based internally, cryptographic externally** -- within a team, agents trust each other (same container, same credential set). Between teams, messages must be verifiable (see Cross-Team Identity below).
 
 ---
 
@@ -94,7 +94,7 @@ The patterns above describe the current state: shared credentials, honor-based a
 
 #### Problem
 
-When Team A sends a message to Team B (via the hub or a direct link), how does Team B know the message is genuinely from Team A? In the current single-machine setup, all agents run under the same OS user — there is no OS-level identity boundary.
+When Team A sends a message to Team B (via the hub or a direct link), how does Team B know the message is genuinely from Team A? In the current single-machine setup, all agents run under the same OS user -- there is no OS-level identity boundary.
 
 #### Authentication Layers
 
@@ -127,7 +127,7 @@ Message signing:
   3. Receiver looks up sender's public key in registry, verifies signature
 
 Key rotation:
-  - On PO command (T04 Row 36 analogue — governance amendment)
+  - On PO command (T04 Row 36 analogue -- governance amendment)
   - Old key remains valid for 1 session (grace period for in-flight messages)
   - Registry stores both current and previous public key during rotation
 ```
@@ -136,9 +136,9 @@ Key rotation:
 
 For local teams (no Docker), authentication falls back to:
 
-- **SendMessage routing** — the Claude Code infrastructure routes messages by team context. An agent spawned in team "framework-research" can only SendMessage to teammates within that team.
-- **No cryptographic identity** — local teams trust the Claude Code process model.
-- **Credential isolation** — achieved via environment variable scoping in the spawn command (see Section 4).
+- **SendMessage routing** -- the Claude Code infrastructure routes messages by team context. An agent spawned in team "framework-research" can only SendMessage to teammates within that team.
+- **No cryptographic identity** -- local teams trust the Claude Code process model.
+- **Credential isolation** -- achieved via environment variable scoping in the spawn command (see Section 4).
 
 ---
 
@@ -152,11 +152,11 @@ The apex-research deployment revealed the credential-passing challenge concretel
 
 | Mechanism | Security | Rotation ease | Recommended for |
 |---|---|---|---|
-| **Docker secrets** | High — mounted at `/run/secrets/`, tmpfs, not in image layers | Requires container restart | Long-lived tokens (API keys, PATs) |
-| **Environment variables via `env_file`** | Medium — visible in `docker inspect`, process listing | Update file + restart | Non-sensitive config (base URLs, account IDs) |
-| **Inline env in compose** | Low — plaintext in compose file, committed to repo risk | Edit file | Never for secrets |
-| **Volume-mounted env file** | Medium-high — file on host, not in image, permissions controllable | Update file + restart or source reload | Per-team `.env` files (current pattern) |
-| **Vault/secrets manager** | Highest — dynamic, short-lived, audited | Automatic rotation | Production at scale (10+ teams) |
+| **Docker secrets** | High -- mounted at `/run/secrets/`, tmpfs, not in image layers | Requires container restart | Long-lived tokens (API keys, PATs) |
+| **Environment variables via `env_file`** | Medium -- visible in `docker inspect`, process listing | Update file + restart | Non-sensitive config (base URLs, account IDs) |
+| **Inline env in compose** | Low -- plaintext in compose file, committed to repo risk | Edit file | Never for secrets |
+| **Volume-mounted env file** | Medium-high -- file on host, not in image, permissions controllable | Update file + restart or source reload | Per-team `.env` files (current pattern) |
+| **Vault/secrets manager** | Highest -- dynamic, short-lived, audited | Automatic rotation | Production at scale (10+ teams) |
 
 #### Recommended Architecture
 
@@ -183,18 +183,18 @@ secrets:
 
 **Key decisions:**
 
-1. **Secrets via Docker secrets** — never environment variables for tokens. The current pattern of `ATLASSIAN_API_TOKEN` as an env var is acceptable for single-machine development but not for multi-team containers.
+1. **Secrets via Docker secrets** -- never environment variables for tokens. The current pattern of `ATLASSIAN_API_TOKEN` as an env var is acceptable for single-machine development but not for multi-team containers.
 
-2. **Per-team env file** — each team gets its own `.env` with non-sensitive config. The team's env file lives in the team's directory (`./teams/<team-name>/.env`), managed by the team-lead or PO.
+2. **Per-team env file** -- each team gets its own `.env` with non-sensitive config. The team's env file lives in the team's directory (`./teams/<team-name>/.env`), managed by the team-lead or PO.
 
-3. **File-based secret loading** — agents read from `$GITHUB_TOKEN_FILE` (path to a file) rather than `$GITHUB_TOKEN` (value in env). This prevents secrets from appearing in process listings and `docker inspect`.
+3. **File-based secret loading** -- agents read from `$GITHUB_TOKEN_FILE` (path to a file) rather than `$GITHUB_TOKEN` (value in env). This prevents secrets from appearing in process listings and `docker inspect`.
 
 **v2 (10+ teams):**
 
 Introduce HashiCorp Vault or similar:
 - Teams authenticate to Vault with a team-scoped AppRole
 - Vault issues short-lived tokens (TTL: 1 session)
-- Automatic rotation — no manual secret file management
+- Automatic rotation -- no manual secret file management
 - Audit log built into Vault
 
 #### MCP Server Credential Passing (*FR:Herald*)
@@ -223,7 +223,7 @@ The current `~/.claude/mcp.json` demonstrates the problem clearly: Jira API toke
 }
 ```
 
-MCP servers must support file-based secret loading (`*_FILE` convention, following Docker's pattern). Each team's MCP server instance reads from its own secret mount. This requires MCP servers to implement the `_FILE` suffix convention — when `FOO_FILE` is set, read the contents of that file as the value of `FOO`.
+MCP servers must support file-based secret loading (`*_FILE` convention, following Docker's pattern). Each team's MCP server instance reads from its own secret mount. This requires MCP servers to implement the `_FILE` suffix convention -- when `FOO_FILE` is set, read the contents of that file as the value of `FOO`.
 
 #### What apex-research Taught Us
 
@@ -231,12 +231,12 @@ The apex-research container config surfaces these concrete credential needs:
 
 | Credential | Type | Scope | Sensitivity |
 |---|---|---|---|
-| GitHub PAT | Read-write on `apex-migration-research`, read-only on `vjs_apex_apps` | Team-specific | High — commit access |
-| Comms PSK | Inter-team messaging | Cross-team | High — message integrity |
+| GitHub PAT | Read-write on `apex-migration-research`, read-only on `vjs_apex_apps` | Team-specific | High -- commit access |
+| Comms PSK | Inter-team messaging | Cross-team | High -- message integrity |
 | Python PyPI index | Package installation | Generic | Low |
 | npm registry token | SvelteKit dashboard dependencies | Generic | Low |
 
-**Observation:** The team needs two different GitHub access scopes for the same token (or two tokens). GitHub fine-grained PATs can scope to specific repositories with specific permissions — this maps directly to per-team credential needs.
+**Observation:** The team needs two different GitHub access scopes for the same token (or two tokens). GitHub fine-grained PATs can scope to specific repositories with specific permissions -- this maps directly to per-team credential needs.
 
 ---
 
@@ -244,7 +244,7 @@ The apex-research container config surfaces these concrete credential needs:
 
 #### Problem
 
-When a team-lead receives a message claiming to be from another team, how do they verify it? This connects to T03 Protocol 1 (Handoff) — the receiver must trust that the handoff request is genuine.
+When a team-lead receives a message claiming to be from another team, how do they verify it? This connects to T03 Protocol 1 (Handoff) -- the receiver must trust that the handoff request is genuine.
 
 #### Trust Model
 
@@ -361,7 +361,7 @@ Secret Storage (managed by PO):
 | **QA** (tests, reviews) | Read on project repo, write on PRs | None | Read | None | PSK |
 | **Infrastructure** (CI/CD, deployment) | Read-write on infra repos | Full account (scoped to infra) | None | None | PSK |
 
-**Principle:** Start with the minimal credential set for the team type. Add credentials via PO approval (T04 delegation matrix — this is an L0 decision, analogous to Row 3: changing team composition).
+**Principle:** Start with the minimal credential set for the team type. Add credentials via PO approval (T04 delegation matrix -- this is an L0 decision, analogous to Row 3: changing team composition).
 
 #### Credential Lifecycle
 
@@ -416,9 +416,9 @@ When a team discovers it needs a credential it doesn't have:
 Atlassian Cloud and Figma do not support per-team API token scoping. A single PAT grants full access.
 
 **Mitigation:**
-- **Access control via prompt** — only teams whose mission includes Jira interaction have the token in their env. Research teams do not load `ATLASSIAN_API_TOKEN`.
-- **Behavioral audit** — Jira operations require PO approval (T04 Row 22). Even teams with the token cannot create/update issues without explicit PO request.
-- **Rate limit awareness** — all teams sharing a token share its rate limit. T02 resource isolation addresses this with rate limit partitioning.
+- **Access control via prompt** -- only teams whose mission includes Jira interaction have the token in their env. Research teams do not load `ATLASSIAN_API_TOKEN`.
+- **Behavioral audit** -- Jira operations require PO approval (T04 Row 22). Even teams with the token cannot create/update issues without explicit PO request.
+- **Rate limit awareness** -- all teams sharing a token share its rate limit. T02 resource isolation addresses this with rate limit partitioning.
 
 ---
 
@@ -439,9 +439,9 @@ For any API call or credential use, the system must be able to answer: **which t
 
 #### Per-Team Token = Per-Team Audit
 
-The strongest audit mechanism is per-team tokens. When apex-research uses `github-token-apex` and hr-devs uses `github-token-hrdevs`, the GitHub audit log distinguishes them by token. No additional logging infrastructure is needed — the API provider does the work.
+The strongest audit mechanism is per-team tokens. When apex-research uses `github-token-apex` and hr-devs uses `github-token-hrdevs`, the GitHub audit log distinguishes them by token. No additional logging infrastructure is needed -- the API provider does the work.
 
-**This is the primary argument for per-team tokens over shared tokens.** Not security (teams are trusted by the PO) — but auditability.
+**This is the primary argument for per-team tokens over shared tokens.** Not security (teams are trusted by the PO) -- but auditability.
 
 #### When Per-Team Tokens Are Not Possible
 
@@ -462,20 +462,20 @@ For Jira/Figma (org-wide tokens), audit falls back to:
 
 - ~~One GitHub token for all teams or per-team tokens?~~ → Per-team fine-grained PATs, scoped to repos the team needs. PO provisions at team creation.
 - ~~How to scope Cloudflare API access per team?~~ → Per-team Cloudflare API tokens, scoped to the team's project/resources. Research teams get none.
-- ~~Who manages secrets — centralized vault or per-team?~~ → v1: PO-managed per-team secret directories with Docker secrets. v2 (10+ teams): HashiCorp Vault with team-scoped AppRoles.
+- ~~Who manages secrets -- centralized vault or per-team?~~ → v1: PO-managed per-team secret directories with Docker secrets. v2 (10+ teams): HashiCorp Vault with team-scoped AppRoles.
 - ~~How do we audit which team used which credential?~~ → Per-team tokens provide API-provider-level audit. Where not possible (Jira/Figma), container logging + behavioral restriction.
 - ~~Can a team escalate its own permissions?~~ → No. Credential escalation goes through team-lead → L1/PO. Hard rule: no self-escalation. Anti-pattern: credential sharing between teams.
 
 #### Still open
 
-1. **Jira per-team scoping** — Atlassian Cloud does not support per-project API tokens. If two teams both need Jira access for different boards, they share one token. Behavioral restriction is the only control. Is this acceptable long-term, or should we investigate Atlassian Forge apps for finer-grained access?
+1. **Jira per-team scoping** -- Atlassian Cloud does not support per-project API tokens. If two teams both need Jira access for different boards, they share one token. Behavioral restriction is the only control. Is this acceptable long-term, or should we investigate Atlassian Forge apps for finer-grained access?
 
-2. **Secret bootstrap for new teams** — When PO creates a new team, how are the initial secrets provisioned? Currently manual (PO writes files). At 10+ teams, this needs automation — possibly a provisioning script that creates GitHub PATs via API, generates signing keys, and writes the secret directory.
+2. **Secret bootstrap for new teams** -- When PO creates a new team, how are the initial secrets provisioned? Currently manual (PO writes files). At 10+ teams, this needs automation -- possibly a provisioning script that creates GitHub PATs via API, generates signing keys, and writes the secret directory.
 
-3. **Credential for cross-team dashboard access** — The apex-research dashboard serves read-only data to migration teams. Does the dashboard need its own auth layer, or is network-level access control (only accessible from team containers) sufficient?
+3. **Credential for cross-team dashboard access** -- The apex-research dashboard serves read-only data to migration teams. Does the dashboard need its own auth layer, or is network-level access control (only accessible from team containers) sufficient?
 
-4. **Signing key compromise recovery** — If a team's signing key is compromised (container breach), what's the recovery process? Proposed: PO revokes the key, generates a new one, restarts the team's container. All messages signed with the old key after the compromise timestamp are suspect. Needs a formal incident response protocol.
+4. **Signing key compromise recovery** -- If a team's signing key is compromised (container breach), what's the recovery process? Proposed: PO revokes the key, generates a new one, restarts the team's container. All messages signed with the old key after the compromise timestamp are suspect. Needs a formal incident response protocol.
 
-5. **MCP server credential isolation** — The current `mcp.json` contains plaintext tokens. For multi-team, each team needs its own MCP server instances with team-scoped credentials. This affects the MCP server architecture — should MCP servers support the `_FILE` env var convention, or should a wrapper script inject secrets before launch?
+5. **MCP server credential isolation** -- The current `mcp.json` contains plaintext tokens. For multi-team, each team needs its own MCP server instances with team-scoped credentials. This affects the MCP server architecture -- should MCP servers support the `_FILE` env var convention, or should a wrapper script inject secrets before launch?
 
 (*FR:Herald*)

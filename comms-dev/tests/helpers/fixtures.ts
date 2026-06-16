@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// Shared test fixtures — message envelopes, registry entries, etc.
+// Shared test fixtures -- message envelopes, registry entries, etc.
 
 import { randomUUID } from 'crypto';
 
@@ -44,7 +44,7 @@ export function makeMessageOfSize(size: number): MessageEnvelope {
 export const MAX_MESSAGE_SIZE = 1024 * 1024; // 1 MB per spec
 
 /**
- * Known-answer pairs for crypto tests — populated by Vigenere.
+ * Known-answer pairs for crypto tests -- populated by Vigenere.
  * Format: { key, plaintext, ciphertext }
  */
 export const CRYPTO_VECTORS: Array<{ key: string; plaintext: string; ciphertext: string }> = [

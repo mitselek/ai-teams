@@ -1,8 +1,8 @@
 # Tmux Layout Templates
 
-All layouts use recursive splitting — each split happens on the correct parent pane, so everything lands in place. No break/join/swap/resize needed. After splitting, spawn agents with `--target-pane %XX`.
+All layouts use recursive splitting -- each split happens on the correct parent pane, so everything lands in place. No break/join/swap/resize needed. After splitting, spawn agents with `--target-pane %XX`.
 
-## "full-tdd" — 6 agents, TDD pair (tess+sven)
+## "full-tdd" -- 6 agents, TDD pair (tess+sven)
 
 ```
 | lead   | marcus              |
@@ -25,7 +25,7 @@ Window (%0)
 
 ---
 
-## "full-review" — 7 agents, review pair (marcus+arvo) + TDD pair (tess+sven)
+## "full-review" -- 7 agents, review pair (marcus+arvo) + TDD pair (tess+sven)
 
 ```
 | lead   | marcus  | arvo      |
@@ -49,7 +49,7 @@ Window (%0)
 
 ---
 
-## "lite" — 2 agents
+## "lite" -- 2 agents
 
 ```
 | lead (30%) | finn (70%) |

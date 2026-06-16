@@ -1,15 +1,15 @@
-# Restart Test Plan — framework-research (*FR:Volta*)
+# Restart Test Plan -- framework-research (*FR:Volta*)
 
 ## Purpose
 
-Validate the canonical startup/shutdown protocol from `topics/06-lifecycle.md` by executing a full shutdown and cold restart of the framework-research team. The new session has no resumed context — a fresh team-lead must self-orient using only persisted state.
+Validate the canonical startup/shutdown protocol from `topics/06-lifecycle.md` by executing a full shutdown and cold restart of the framework-research team. The new session has no resumed context -- a fresh team-lead must self-orient using only persisted state.
 
 ## Pre-Shutdown Checklist
 
 Team-lead must verify these before initiating shutdown:
 
 - [ ] All topic files are committed (topics/01 through 08)
-- [ ] All scratchpads are written (memory/*.md) — 5 agents: celes, finn, herald, medici, volta
+- [ ] All scratchpads are written (memory/*.md) -- 5 agents: celes, finn, herald, medici, volta
 - [ ] docs/health-report.md is current
 - [ ] This file (docs/restart-test.md) is committed
 - [ ] roster.json reflects all 6 members (team-lead + 5 specialists)
@@ -26,7 +26,7 @@ Team-lead announces shutdown. No new tasks delegated.
 ### Phase 2: Notify
 **2a. Create task-list-snapshot** (BEFORE sending shutdown requests):
 - Dump TaskList output to `memory/task-list-snapshot.md`
-- This is when the lead has the best picture of task state — all agents still alive
+- This is when the lead has the best picture of task state -- all agents still alive
 
 **2b. Send shutdown requests** to each active agent. Each agent must:
 1. Write final state to scratchpad (`[WIP]` or `[CHECKPOINT]`)
@@ -71,7 +71,7 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 
 | # | Criterion | How to verify | Pass/Fail |
 |---|---|---|---|
-| 2a | Phase 0 Orient executed without broad exploration | Team lead read roster.json, common-prompt.md, and own scratchpad directly — no Explore agent, no glob sweep | |
+| 2a | Phase 0 Orient executed without broad exploration | Team lead read roster.json, common-prompt.md, and own scratchpad directly -- no Explore agent, no glob sweep | |
 | 2b | workDir validated | Team lead checked that `workDir` from roster.json resolves to an existing directory | |
 | 2c | Phase 2.0 Diagnose executed | Team lead identified scenario (WARM RESTART / PARTIAL STATE / COLD START / MISCREATION) before cleaning | |
 | 2d | Anomaly detection applied | If COLD START or PARTIAL STATE on a non-first session: team lead asked user about missing dir (not silently accepted) | |
@@ -86,14 +86,14 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 |---|---|---|---|
 | 3a | Each agent reads its scratchpad on startup | Agent's intro message references scratchpad content | |
 | 3b | No duplicate agents spawned | `config.json` has no `name-2` entries | |
-| 3c | Agents know their prior work | Ask any agent "what did you work on last session?" — answer should match scratchpad | |
+| 3c | Agents know their prior work | Ask any agent "what did you work on last session?" -- answer should match scratchpad | |
 
 ### SC-4: Work product continuity
 
 | # | Criterion | How to verify | Pass/Fail |
 |---|---|---|---|
-| 4a | topics/06-lifecycle.md contains canonical protocol + amendments | Read file — Volta's protocol present, plus Phase 2.0 Diagnose, Shutdown Phase 2a snapshot timing, and Path 2.5 spawn_local.sh | |
-| 4b | topics/03-communication.md contains Herald's inter-team design | Read file — Herald's routing/topology/broadcast design is present | |
+| 4a | topics/06-lifecycle.md contains canonical protocol + amendments | Read file -- Volta's protocol present, plus Phase 2.0 Diagnose, Shutdown Phase 2a snapshot timing, and Path 2.5 spawn_local.sh | |
+| 4b | topics/03-communication.md contains Herald's inter-team design | Read file -- Herald's routing/topology/broadcast design is present | |
 | 4c | All 8 topic files have Finn's extracted patterns | Each file has `## Patterns from Reference Teams (*FR:Finn*)` section | |
 | 4d | Celes's specialist gap analysis is in her scratchpad | memory/celes.md has 8-topic domain model | |
 
@@ -109,10 +109,10 @@ The new team-lead (fresh context, no memory of this session) must verify each cr
 
 This file is at `teams/framework-research/docs/restart-test.md`. It is committed to git and will be discoverable by:
 
-1. **Team-lead prompt** — if the prompt mentions restart test, it can point here
-2. **Medici health report** — Medici should flag this file as action item on startup
-3. **common-prompt.md** — could add a "Restart Validation" section (recommended)
-4. **README.md** — could add a note (optional)
+1. **Team-lead prompt** -- if the prompt mentions restart test, it can point here
+2. **Medici health report** -- Medici should flag this file as action item on startup
+3. **common-prompt.md** -- could add a "Restart Validation" section (recommended)
+4. **README.md** -- could add a note (optional)
 
 **Recommendation:** Add one line to `common-prompt.md` under "On Startup":
 
@@ -135,8 +135,8 @@ This makes the test discoverable without changing any agent prompts.
 
 ## Open Questions
 
-1. **Task tool state** — TaskCreate/TaskUpdate state is session-scoped and does NOT persist across restarts. The task-list-snapshot.md is the only cross-session record. Is this sufficient?
+1. **Task tool state** -- TaskCreate/TaskUpdate state is session-scoped and does NOT persist across restarts. The task-list-snapshot.md is the only cross-session record. Is this sufficient?
 
-2. **Inbox message value** — Are there messages in the current session's inboxes worth preserving for the new session, or are scratchpads sufficient? For a research team (vs. a dev team), scratchpads likely capture everything valuable.
+2. **Inbox message value** -- Are there messages in the current session's inboxes worth preserving for the new session, or are scratchpads sufficient? For a research team (vs. a dev team), scratchpads likely capture everything valuable.
 
-3. **Partial success** — If some criteria pass but others fail, what's the threshold for "protocol works"? Recommendation: SC-1 and SC-2 are must-pass (fundamental protocol). SC-3 through SC-5 are should-pass (continuity quality).
+3. **Partial success** -- If some criteria pass but others fail, what's the threshold for "protocol works"? Recommendation: SC-1 and SC-2 are must-pass (fundamental protocol). SC-3 through SC-5 are should-pass (continuity quality).

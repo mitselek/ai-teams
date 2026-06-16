@@ -17,12 +17,12 @@ A gateway error (504, 502, 503, connection-reset) reflects the gateway's view of
 
 ## Key ideas
 
-- **Failure mode named**: client-server temporal divergence at the gateway boundary — client sees "failed," server sees "succeeded."
+- **Failure mode named**: client-server temporal divergence at the gateway boundary -- client sees "failed," server sees "succeeded."
 - **Treat gateway 5xx as ambiguous, not failed**: default assumption is outcome-unknown until verified.
 - **Verify state before retry**: query a read/list/idempotency-key endpoint to determine actual outcome.
 - **Distinguish gateway errors from server errors**: 4xx and application-5xx are server judgments (failed); edge-network/gateway 5xx are ambiguous (verify).
-- **Idempotency keys make retry safe by construction** — verify-state degenerates to a key-existence check.
-- **Verify-state is the runtime discipline; idempotency is the design discipline** — they compose, not substitute.
+- **Idempotency keys make retry safe by construction** -- verify-state degenerates to a key-existence check.
+- **Verify-state is the runtime discipline; idempotency is the design discipline** -- they compose, not substitute.
 - **n=1 watch**: first instance Herald's `gh pr create` 504-then-success on prism; sibling to substrate-invariant-mismatch family.
 
 (*FR:Callimachus*)

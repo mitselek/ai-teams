@@ -21,7 +21,7 @@ When an OSS substrate has **no push events** (no `pg_notify` / `LISTEN`, no WebS
 
 1. **Sidecar polling** of the substrate's append-only logs with a sequence-cursor.
 2. **Rule-based derivation** of higher-level signals (heat, collision, gap) from the firehose.
-3. **Emit derived events only** — never the raw firehose — to downstream consumers.
+3. **Emit derived events only** -- never the raw firehose -- to downstream consumers.
 
 This is preferable to "fork the substrate to add `pg_notify`" or "wrap every write in a coordinator call" for three reasons:
 
@@ -34,7 +34,7 @@ This is preferable to "fork the substrate to add `pg_notify`" or "wrap every wri
 All three conditions:
 
 1. The substrate's **read+write surface is captured in append-only tables** the substrate itself populates synchronously (request log, audit log, access log, etc.).
-2. The substrate **emits zero push events** — `pg_notify`, `LISTEN`, WebSocket, SSE, queue middleware all confirmed absent.
+2. The substrate **emits zero push events** -- `pg_notify`, `LISTEN`, WebSocket, SSE, queue middleware all confirmed absent.
 3. The downstream consumer's **latency budget is seconds, not milliseconds.** Polling at 1-10s introduces 1-10s lag; that is acceptable for human/agent reactivity, not for sub-second hard-real-time use cases.
 
 ## When it does not apply
@@ -45,20 +45,20 @@ All three conditions:
 
 ## What to log on the sidecar
 
-The sidecar's own state is the sequence-cursor (last-processed `(table, seq_id)` tuple). This is the only persistent state required — it lets the sidecar resume after restart without replaying the full log or losing events. Everything else is derivation rules + transient working memory.
+The sidecar's own state is the sequence-cursor (last-processed `(table, seq_id)` tuple). This is the only persistent state required -- it lets the sidecar resume after restart without replaying the full log or losing events. Everything else is derivation rules + transient working memory.
 
 ## Promotion from poll-derived to push-trigger
 
-When polling latency becomes a measurable constraint, promote *specific* derived signals to `pg_notify` triggers in the substrate. This is a targeted upgrade — not "switch from poll to push wholesale." The substrate keeps its append-only logs (still useful for forensics + new derivation rules); the few hot signals get push paths.
+When polling latency becomes a measurable constraint, promote *specific* derived signals to `pg_notify` triggers in the substrate. This is a targeted upgrade -- not "switch from poll to push wholesale." The substrate keeps its append-only logs (still useful for forensics + new derivation rules); the few hot signals get push paths.
 
-## First instance — Brilliant request_log + entry_access_log + audit_log
+## First instance -- Brilliant request_log + entry_access_log + audit_log
 
 Observed: `thejeremyhodge/xireactor-brilliant @eb1d1bf` v0.5.1, FastAPI + psycopg + Anthropic. Read by Finn 2026-05-05 (`finn-staging-review-deepread.md` §8).
 
 | Substrate property | Brilliant evidence |
 |---|---|
 | Append-only logs capture full read+write | `request_log` (every read+write, indexed `(org_id, ts DESC)`), `entry_access_log` (every read returning entry IDs), `audit_log` (writes only, allowlisted verbs) |
-| Zero push events | Zero matches for `pg_notify \| LISTEN \| NOTIFY \| WebSocket \| SSE \| StreamingResponse \| EventSourceResponse`. Bare deps: `fastapi, uvicorn, psycopg, bcrypt, anthropic, boto3, pypdf, PyYAML` — no Redis, Celery, Kafka, NATS |
+| Zero push events | Zero matches for `pg_notify \| LISTEN \| NOTIFY \| WebSocket \| SSE \| StreamingResponse \| EventSourceResponse`. Bare deps: `fastapi, uvicorn, psycopg, bcrypt, anthropic, boto3, pypdf, PyYAML` -- no Redis, Celery, Kafka, NATS |
 | Latency budget tolerable for poll | Curator-team orchestration is human/agent-paced; 1-10s sidecar polling well under reactivity floor |
 
 **Architecture verdict (Finn's Q8):** sidecar polling with sequence-cursor on the three tables → rule-based derivation (heat thresholds, collision detection on overlapping pending stages, gap signals on empty searches) → emit derived events to curator-team orchestrator. Brilliant's own `get_usage_stats` rollups (`top-entries`, `session-depth`, 15-min windows) make the same call: reads are listenable by querying, just not by subscribing.
@@ -67,11 +67,11 @@ Observed: `thejeremyhodge/xireactor-brilliant @eb1d1bf` v0.5.1, FastAPI + psycop
 
 ## Promotion posture
 
-n=1. **Watch for second instance** before promotion to common-prompt or topic-file. The cost-bounding insight (deriving signals before spawning, not per raw event) is the load-bearing claim — a second instance would establish that the polling+derivation shape generalizes outside Brilliant. Until then, treat as a candidate architecture for poll-only substrates.
+n=1. **Watch for second instance** before promotion to common-prompt or topic-file. The cost-bounding insight (deriving signals before spawning, not per raw event) is the load-bearing claim -- a second instance would establish that the polling+derivation shape generalizes outside Brilliant. Until then, treat as a candidate architecture for poll-only substrates.
 
 ## Related
 
-- [`oss-thin-integration-anti-extension-signal.md`](oss-thin-integration-anti-extension-signal.md) — sibling finding from the same Brilliant deep-read. The thin-integration signal applies to the substrate's *orchestration* (cannot be plugged into); this poll-only pattern applies to the substrate's *event surface* (no push events, but rich logs). Two different layers, both observed in the same project.
-- [`substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) — adjacent: deriving data on the read path that should have been written on the write path is the substrate-invariant-mismatch failure mode. The sidecar-derivation shape avoids this by *not* claiming to be authoritative — derived events are signals to spawn, not facts to store.
+- [`oss-thin-integration-anti-extension-signal.md`](oss-thin-integration-anti-extension-signal.md) -- sibling finding from the same Brilliant deep-read. The thin-integration signal applies to the substrate's *orchestration* (cannot be plugged into); this poll-only pattern applies to the substrate's *event surface* (no push events, but rich logs). Two different layers, both observed in the same project.
+- [`substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) -- adjacent: deriving data on the read path that should have been written on the write path is the substrate-invariant-mismatch failure mode. The sidecar-derivation shape avoids this by *not* claiming to be authoritative -- derived events are signals to spawn, not facts to store.
 
 (*FR:Cal*)

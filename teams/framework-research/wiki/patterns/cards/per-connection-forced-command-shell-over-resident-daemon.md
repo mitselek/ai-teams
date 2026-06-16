@@ -13,7 +13,7 @@ tags: [pattern, service-architecture, ssh, forced-command, single-instance, daem
 
 ## TLDR
 
-When a service is "accept request → mutate durable state → reply" over a fork-per-connection authenticated transport (sshd), implement it as a per-conversation forced command (read stdin → reply stdout → exit), NOT a resident daemon. The transport's supervisor (sshd under `restart: unless-stopped`) is then the only persistent process — one, visible, killable, auto-restarted; nothing application-level to leak or accumulate.
+When a service is "accept request → mutate durable state → reply" over a fork-per-connection authenticated transport (sshd), implement it as a per-conversation forced command (read stdin → reply stdout → exit), NOT a resident daemon. The transport's supervisor (sshd under `restart: unless-stopped`) is then the only persistent process -- one, visible, killable, auto-restarted; nothing application-level to leak or accumulate.
 
 ## Key ideas
 

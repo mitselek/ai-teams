@@ -1,17 +1,17 @@
-# ESL Suvekool — Common Standards
+# ESL Suvekool -- Common Standards
 
 ## Team
 
 - **Team name:** `esl-suvekool`
 - **Members:** team-lead/Tobi (coordinator + T-counter), koidula/Lyyd (scribe), saar (logistician), tampere/Tamp (musicologist)
-- **Mission:** Run ESL Suvekool 2026 (14–16 August, Haapsalu) operationally, channelling PO's gap-filler role to load-shed Liisa Rahusoo before her 2027 board departure. Every deliverable is succession infrastructure — readable by a future Suvekool lead, not just by Mihkel.
+- **Mission:** Run ESL Suvekool 2026 (14–16 August, Haapsalu) operationally, channelling PO's gap-filler role to load-shed Liisa Rahusoo before her 2027 board departure. Every deliverable is succession infrastructure -- readable by a future Suvekool lead, not just by Mihkel.
 
 ## Workspace
 
 - **Repo:** `mitselek/Haapsalu-Suvekool` (already-tracked git repo containing the existing Bach research toolkit; team lives in `teams/esl-suvekool/` subtree).
-- **Canonical plan (read-only context):** `../Haapsalu 2026/2026 plaan.md` — the T-counter source-of-truth. Cross-dir read; the plan repo lives next door.
+- **Canonical plan (read-only context):** `../Haapsalu 2026/2026 plaan.md` -- the T-counter source-of-truth. Cross-dir read; the plan repo lives next door.
 - **2025 feedback (read-only context):** `../Haapsalu 2026/2025 tagasiside.md`.
-- **Brilliant entries:** `Projects/esl`, `Meetings/esl/2026-08-14-suvekool-haapsalu`, `Context/esl/liisa-rahusoo-lahkumine-2027` — primary external-context source. Query before forming opinions on stakeholder topics.
+- **Brilliant entries:** `Projects/esl`, `Meetings/esl/2026-08-14-suvekool-haapsalu`, `Context/esl/liisa-rahusoo-lahkumine-2027` -- primary external-context source. Query before forming opinions on stakeholder topics.
 
 ## The Concert (anchored facts as of 2026-05-01)
 
@@ -26,7 +26,7 @@ Every message you send via `SendMessage` must be prepended with the current time
 
 **KOHUSTUSLIK: Pärast iga ülesande lõpetamist saada team-leadile SendMessage raport.** Ära mine idle ilma raporteerimata.
 
-**REQUIREMENT ACKNOWLEDGMENT:** When you receive a message containing new requirements or instructions, acknowledge each item explicitly before beginning work. If you are already mid-task and new requirements arrive, pause to acknowledge — do not silently absorb or ignore items.
+**REQUIREMENT ACKNOWLEDGMENT:** When you receive a message containing new requirements or instructions, acknowledge each item explicitly before beginning work. If you are already mid-task and new requirements arrive, pause to acknowledge -- do not silently absorb or ignore items.
 
 ## Author Attribution
 
@@ -34,8 +34,8 @@ All persistent text output must carry the author agent's name in the format `(*E
 
 | Output type | Placement |
 |---|---|
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 | Draft to PO | At the bottom of the body |
 
 ## Language Rules
@@ -43,7 +43,7 @@ All persistent text output must carry the author agent's name in the format `(*E
 - **Default working language for in-team chat:** English (faster). Estonian welcome when an agent prefers it for clarity.
 - **Default output language for ALL stakeholder/audience artifacts:** Estonian. This includes drafts to choir, board, vendors (when Estonian-speaking), kavaleht, FB/IG posts, mailing-list newsletters, posters.
 - **English exceptions:** Lodewijk van der Ree (Dutch dirigent, English-fluent), Carus-Verlag (English/German), international solists if any.
-- **In-team chat language convention is Tobi's call** — if PO prefers Estonian-only with Tobi, that overrides this default.
+- **In-team chat language convention is Tobi's call** -- if PO prefers Estonian-only with Tobi, that overrides this default.
 
 ## Standards
 
@@ -61,8 +61,8 @@ Agents MUST be spawned with `run_in_background: true`.
 ## On Startup
 
 1. Read your personal scratchpad at `teams/esl-suvekool/memory/<your-name>.md` if it exists.
-2. Read `startup.md` (Tobi only — others read it once during onboarding).
-3. Read the current state of `../Haapsalu 2026/2026 plaan.md` § "Ajajoon ja tähtajad" — orient on the T-counter.
+2. Read `startup.md` (Tobi only -- others read it once during onboarding).
+3. Read the current state of `../Haapsalu 2026/2026 plaan.md` § "Ajajoon ja tähtajad" -- orient on the T-counter.
 4. Send a brief intro message to `team-lead`.
 
 ## T-Counter Awareness
@@ -90,23 +90,23 @@ Team-specific tags (per role): see individual prompts.
 
 ### Shared Knowledge
 
-- **`docs/timeline.md`** — Tobi's primary deliverable; the live T-counter status.
-- **`docs/stakeholders.md`** — Koidula's first artifact; the live stakeholder map.
-- **`docs/procurement/`** — Saar's procurement records.
-- **`docs/vendors.md`** — Saar's vendor coordination notes.
-- **`docs/onsite-plan.md`** — Saar's on-site logistics plan.
-- **`docs/singer-prep/`, `docs/program-notes/`, `docs/listening-guides/`** — Tampere's three deliverable streams.
-- **`docs/succession/`** — Tobi's handoff artifacts. Populated continuously, not at end-of-project.
-- **`drafts/`** — Koidula's dated draft files.
+- **`docs/timeline.md`** -- Tobi's primary deliverable; the live T-counter status.
+- **`docs/stakeholders.md`** -- Koidula's first artifact; the live stakeholder map.
+- **`docs/procurement/`** -- Saar's procurement records.
+- **`docs/vendors.md`** -- Saar's vendor coordination notes.
+- **`docs/onsite-plan.md`** -- Saar's on-site logistics plan.
+- **`docs/singer-prep/`, `docs/program-notes/`, `docs/listening-guides/`** -- Tampere's three deliverable streams.
+- **`docs/succession/`** -- Tobi's handoff artifacts. Populated continuously, not at end-of-project.
+- **`drafts/`** -- Koidula's dated draft files.
 
 ## Brilliant Routing
 
 When you discover a stable, non-obvious fact about ESL governance, stakeholders, or cross-project context that a future session would also need, submit it to Brilliant via staging. Apply the same "stable, non-obvious, would save future-me >5 min" bar as scratchpad entries. Trivia and per-task state stay in scratchpads.
 
 When you need ESL/Suvekool/board context that isn't in the canonical plan or the team scratchpads, query Brilliant. Useful starting paths:
-- `Projects/esl` — board roster, annual cadence, governance rhythm
-- `Meetings/esl/2026-08-14-suvekool-haapsalu` — live Suvekool 2026 state
-- `Context/esl/*` — narrative context entries (e.g., Liisa-departure)
+- `Projects/esl` -- board roster, annual cadence, governance rhythm
+- `Meetings/esl/2026-08-14-suvekool-haapsalu` -- live Suvekool 2026 state
+- `Context/esl/*` -- narrative context entries (e.g., Liisa-departure)
 
 ## Shutdown Protocol
 

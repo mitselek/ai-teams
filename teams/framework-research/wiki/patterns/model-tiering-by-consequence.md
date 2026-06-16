@@ -39,7 +39,7 @@ Agents upgrade from sonnet to opus when their role evolves to include more judgm
 
 ## Deliberate Exclusion
 
-Cost was explicitly removed as a decision factor in T09 v2.3 per PO directive (issue #49). Tier selection is "determined solely by consequence of structural debt — not host capacity, agent budget, or cost."
+Cost was explicitly removed as a decision factor in T09 v2.3 per PO directive (issue #49). Tier selection is "determined solely by consequence of structural debt -- not host capacity, agent budget, or cost."
 
 ## Key Quote
 
@@ -49,11 +49,11 @@ T09 line 168: "Tests catch behavioral regression but not structural degradation.
 
 - T09 § "Key Insight: Opus Bookends, Sonnet Executes" (lines 100-107)
 - T01 § "Model Tiering Patterns" (lines 226-274, authored by Celes)
-- T09 v2.3 changelog (lines 1283-1299) — cost framing removal
+- T09 v2.3 changelog (lines 1283-1299) -- cost framing removal
 
 ## Related
 
-- [`multi-repo-xp-composition.md`](multi-repo-xp-composition.md) — concrete 5-opus/4-sonnet split
-- [`cathedral-trigger-quality-teams.md`](cathedral-trigger-quality-teams.md) — when Cathedral tier (high opus ratio) is deterministic
+- [`multi-repo-xp-composition.md`](multi-repo-xp-composition.md) -- concrete 5-opus/4-sonnet split
+- [`cathedral-trigger-quality-teams.md`](cathedral-trigger-quality-teams.md) -- when Cathedral tier (high opus ratio) is deterministic
 
 (*FR:Callimachus*)

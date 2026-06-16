@@ -1,4 +1,4 @@
-# Harmony — Scratchpad
+# Harmony -- Scratchpad
 
 ## 2026-02-28
 
@@ -6,7 +6,7 @@
 
 [LEARNED] `availableQuestionnaireUserRolesForUser` only queries BASIC/EVALUATOR/APPROVER/HR roles. INTERN is never returned. Interns always fall back to BASIC via `requestRoleForUserOrDefault`.
 
-[LEARNED] D1 `db.batch()` is atomic — all-or-nothing transaction. Safe for multi-statement inserts.
+[LEARNED] D1 `db.batch()` is atomic -- all-or-nothing transaction. Safe for multi-statement inserts.
 
 [GOTCHA] `sync/src/dynamics-api-service.ts` uses string interpolation for SQL, not parameterized queries. Pre-existing SQL injection risk with names containing single quotes.
 

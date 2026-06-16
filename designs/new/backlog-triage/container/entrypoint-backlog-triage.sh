@@ -3,7 +3,7 @@
 #
 # Runs as root. Prepares the backlog-triage container before handing off to ai-teams.
 #
-# This is a simplified entrypoint — no Wrangler, no Dynamics, no Vite port.
+# This is a simplified entrypoint -- no Wrangler, no Dynamics, no Vite port.
 # The team only reads code and talks to Jira.
 #
 # Steps:
@@ -18,27 +18,27 @@
 #  6.   Persist env vars to .bashrc (covers SSH / interactive shells)
 #  7.   tmux config + auto-tmux on SSH login (session: backlog-triage)
 #  8.   Git attribution
-#  9.   Claude settings.json (first run only — no Wrangler/Cloudflare in allow list)
-#  9b.  mcp.json (first run only — Jira MCP only, no Dynamics)
+#  9.   Claude settings.json (first run only -- no Wrangler/Cloudflare in allow list)
+#  9b.  mcp.json (first run only -- Jira MCP only, no Dynamics)
 #  10.  SSH key install + start sshd on port 2226
 #  11.  Drop privileges and exec
 #
 # Required env vars:
-#   GITHUB_TOKEN         — PAT with read access to Eesti-Raudtee org (clone + gh CLI)
-#   ATLASSIAN_EMAIL      — Atlassian account email for Jira MCP
-#   ATLASSIAN_API_TOKEN  — Atlassian API token for Jira MCP
+#   GITHUB_TOKEN         -- PAT with read access to Eesti-Raudtee org (clone + gh CLI)
+#   ATLASSIAN_EMAIL      -- Atlassian account email for Jira MCP
+#   ATLASSIAN_API_TOKEN  -- Atlassian API token for Jira MCP
 #
 # Optional env vars:
-#   ANTHROPIC_API_KEY    — leave blank if using OAuth (standard on RC server)
-#   REPO_URL             — hr-platform URL (default: github.com/Eesti-Raudtee/hr-platform.git)
-#   TOOLKIT_URL          — dev-toolkit URL (default: github.com/Eesti-Raudtee/dev-toolkit.git)
-#   ATLASSIAN_BASE_URL   — Jira base URL (default: https://eestiraudtee.atlassian.net)
-#   TEAM_NAME            — team name written into env (default: backlog-triage)
-#   GIT_USER_NAME        — git attribution name (default: backlog-triage)
-#   GIT_USER_EMAIL       — git attribution email
-#   NODE_EXTRA_CA_CERTS  — path to WARP CA cert (set in compose on WARP hosts)
-#   SSH_PUBLIC_KEY       — public key for ai-teams SSH access (port 2226)
-#   SSH_PUBLIC_KEY_2     — additional key (supports SSH_PUBLIC_KEY_N pattern)
+#   ANTHROPIC_API_KEY    -- leave blank if using OAuth (standard on RC server)
+#   REPO_URL             -- hr-platform URL (default: github.com/Eesti-Raudtee/hr-platform.git)
+#   TOOLKIT_URL          -- dev-toolkit URL (default: github.com/Eesti-Raudtee/dev-toolkit.git)
+#   ATLASSIAN_BASE_URL   -- Jira base URL (default: https://eestiraudtee.atlassian.net)
+#   TEAM_NAME            -- team name written into env (default: backlog-triage)
+#   GIT_USER_NAME        -- git attribution name (default: backlog-triage)
+#   GIT_USER_EMAIL       -- git attribution email
+#   NODE_EXTRA_CA_CERTS  -- path to WARP CA cert (set in compose on WARP hosts)
+#   SSH_PUBLIC_KEY       -- public key for ai-teams SSH access (port 2226)
+#   SSH_PUBLIC_KEY_2     -- additional key (supports SSH_PUBLIC_KEY_N pattern)
 set -e
 
 CONTAINER_USER="ai-teams"
@@ -69,17 +69,17 @@ clone_or_pull() {
     auth_url=$(echo "$repo_url" | sed "s|https://|https://${GITHUB_TOKEN}@|")
 
     if [ -d "${target_dir}/.git" ]; then
-        echo "[entrypoint] ${target_dir} exists — running git pull..."
+        echo "[entrypoint] ${target_dir} exists -- running git pull..."
         gosu "${CONTAINER_USER}" git -C "${target_dir}" remote set-url origin "${auth_url}"
         gosu "${CONTAINER_USER}" git -C "${target_dir}" pull --ff-only || {
             echo "[entrypoint] WARNING: git pull failed (non-fast-forward or network). Using existing state."
         }
     else
-        echo "[entrypoint] First run — cloning ${repo_url} to ${target_dir}..."
+        echo "[entrypoint] First run -- cloning ${repo_url} to ${target_dir}..."
         # Remove any volume-seeded stub dir (Docker copies image contents into empty
         # named volumes at mount time, leaving a non-empty dir without .git).
         rm -rf "${target_dir}"
-        # Recreate workspace parent — rm may have deleted the WORKDIR.
+        # Recreate workspace parent -- rm may have deleted the WORKDIR.
         mkdir -p "${WORKSPACE}"
         chown "${CONTAINER_UID}:${CONTAINER_GID}" "${WORKSPACE}"
         # cd to / before gosu so the subprocess doesn't inherit a deleted cwd.
@@ -97,7 +97,7 @@ build_mcp_server() {
         gosu "${CONTAINER_USER}" bash -c "cd '${server_dir}' && npm ci && npm run build" 2>&1 | tail -5
         echo "[entrypoint] ${name} MCP server built."
     elif [ -d "${server_dir}/dist" ]; then
-        echo "[entrypoint] ${name} MCP server dist/ already exists — skipping build."
+        echo "[entrypoint] ${name} MCP server dist/ already exists -- skipping build."
     else
         echo "[entrypoint] WARNING: ${name} MCP server directory not found: ${server_dir}"
     fi
@@ -114,7 +114,7 @@ fi
 # Cloudflare WARP intercepts HTTPS and re-signs with a corporate CA.
 # Without this cert in the system store, curl/apt inside the container fail.
 # The cert is bind-mounted from the host at /opt/warp-ca.pem (read-only).
-# NODE_EXTRA_CA_CERTS (set in compose) handles Node.js separately — Node does
+# NODE_EXTRA_CA_CERTS (set in compose) handles Node.js separately -- Node does
 # not use the system CA store.
 WARP_CA="/opt/warp-ca.pem"
 if [ -f "$WARP_CA" ]; then
@@ -122,7 +122,7 @@ if [ -f "$WARP_CA" ]; then
     update-ca-certificates --fresh > /dev/null 2>&1
     echo "[entrypoint] WARP CA added to system CA store."
 else
-    echo "[entrypoint] No WARP CA at ${WARP_CA} — skipping (non-WARP host or not mounted)."
+    echo "[entrypoint] No WARP CA at ${WARP_CA} -- skipping (non-WARP host or not mounted)."
 fi
 
 # ── Step 1: Fix volume ownership ──────────────────────────────────────────────
@@ -140,7 +140,7 @@ for DIR in "$CLAUDE_DIR" "$WORKSPACE"; do
 done
 
 # ── Step 2: Validate required env vars ────────────────────────────────────────
-# Fail fast — better to abort here than to have agents fail mid-task.
+# Fail fast -- better to abort here than to have agents fail mid-task.
 # No Cloudflare vars needed: this team does not deploy, only reads.
 MISSING=""
 [ -z "${GITHUB_TOKEN:-}" ]           && MISSING="${MISSING} GITHUB_TOKEN"
@@ -160,7 +160,7 @@ clone_or_pull "$REPO_URL" "$REPO_DIR"
 clone_or_pull "$TOOLKIT_URL" "$TOOLKIT_DIR"
 
 # ── Step 4: Build Jira MCP server ─────────────────────────────────────────────
-# No Dynamics MCP — this team does not need Dynamics data.
+# No Dynamics MCP -- this team does not need Dynamics data.
 build_mcp_server "$JIRA_MCP_DIR" "Jira"
 
 # ── Step 5: Runtime validation gates ──────────────────────────────────────────
@@ -169,19 +169,19 @@ echo "[entrypoint] Runtime validation:"
 # Node.js must be >= 20 (Claude Code requirement).
 NODE_VERSION=$(node --version 2>&1 | grep -oP '\d+' | head -1)
 if [ "$NODE_VERSION" -lt 20 ]; then
-    echo "  FAIL: Node.js v${NODE_VERSION} < 20 — aborting." >&2
+    echo "  FAIL: Node.js v${NODE_VERSION} < 20 -- aborting." >&2
     exit 1
 fi
 echo "  OK: Node.js v${NODE_VERSION}"
 
-# gh CLI — required for Archivist's GitHub issue/PR searches.
+# gh CLI -- required for Archivist's GitHub issue/PR searches.
 if ! command -v gh >/dev/null 2>&1; then
-    echo "  FAIL: gh CLI not found — aborting." >&2
+    echo "  FAIL: gh CLI not found -- aborting." >&2
     exit 1
 fi
 echo "  OK: gh $(gh --version 2>&1 | head -1)"
 
-# Claude Code — warn if missing (OAuth may still be in volume).
+# Claude Code -- warn if missing (OAuth may still be in volume).
 if [ -f "${HOME_DIR}/.local/bin/claude" ]; then
     echo "  OK: claude (native install at ~/.local/bin/claude)"
 elif command -v claude >/dev/null 2>&1; then
@@ -190,27 +190,27 @@ else
     echo "  WARN: claude not found in PATH. OAuth credentials may still be in volume."
 fi
 
-# hr-platform repo — must exist for the team to do anything.
+# hr-platform repo -- must exist for the team to do anything.
 if [ -d "${REPO_DIR}/.git" ]; then
     echo "  OK: hr-platform repo"
 else
-    echo "  FAIL: hr-platform repo missing — aborting." >&2
+    echo "  FAIL: hr-platform repo missing -- aborting." >&2
     exit 1
 fi
 
-# dev-toolkit repo — needed for Jira MCP server.
+# dev-toolkit repo -- needed for Jira MCP server.
 if [ -d "${TOOLKIT_DIR}/.git" ]; then
     echo "  OK: dev-toolkit repo"
 else
-    echo "  FAIL: dev-toolkit repo missing — aborting." >&2
+    echo "  FAIL: dev-toolkit repo missing -- aborting." >&2
     exit 1
 fi
 
-# Jira MCP server must be built — all agents depend on it.
+# Jira MCP server must be built -- all agents depend on it.
 if [ -d "${JIRA_MCP_DIR}/dist" ]; then
     echo "  OK: Jira MCP server built"
 else
-    echo "  WARN: Jira MCP server dist/ missing — Jira tools unavailable."
+    echo "  WARN: Jira MCP server dist/ missing -- Jira tools unavailable."
 fi
 
 echo "[entrypoint] All gates passed. Starting..."
@@ -225,7 +225,7 @@ if ! grep -q '\.local/bin' "$BASHRC" 2>/dev/null; then
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASHRC"
 fi
 
-# Write each env var — remove stale value first, then append.
+# Write each env var -- remove stale value first, then append.
 declare -A SHELL_VARS=(
     [HOME]="/home/ai-teams"
     [TZ]="Europe/Tallinn"
@@ -261,7 +261,7 @@ done
 
 # ── Step 7: tmux config + auto-tmux on SSH login ──────────────────────────────
 # NOTE (2026-04-24, #60): tmux here is HUMAN-TERMINAL scaffolding only.
-# Agent spawning no longer uses tmux panes — agents spawn via the Agent tool
+# Agent spawning no longer uses tmux panes -- agents spawn via the Agent tool
 # (team_name + name) from the team-lead Claude Code session. The auto-tmux
 # block below supports PO SSH-in with persistent pre-arranged panes. If PO
 # SSH access goes away, this step + the tmux install in the Dockerfile can
@@ -277,8 +277,8 @@ TMUX_EOF
 chown "${CONTAINER_UID}:${CONTAINER_GID}" "${HOME_DIR}/.tmux.conf"
 
 # Auto-tmux on SSH login (runbook §18 pattern).
-# Path 1: no session — create layout (4 labeled panes) + start claude in team-lead pane.
-# Path 2/3: session exists (detached or attached) — attach directly.
+# Path 1: no session -- create layout (4 labeled panes) + start claude in team-lead pane.
+# Path 2/3: session exists (detached or attached) -- attach directly.
 #
 # apply-layout.sh is baked into the image at /home/ai-teams/apply-layout.sh
 # (COPYed in Dockerfile) so it's available before any repo is cloned.
@@ -300,7 +300,7 @@ AUTOTMUX_EOF
 
 # ── Step 8: Git attribution ───────────────────────────────────────────────────
 # Commits from agents are attributed to the team name, not a real person.
-# Required even though this team is read-heavy — agents may write output files.
+# Required even though this team is read-heavy -- agents may write output files.
 GIT_USER_NAME_VAL="${GIT_USER_NAME:-backlog-triage}"
 GIT_USER_EMAIL_VAL="${GIT_USER_EMAIL:-mihkel.putrinsh@evr.ee}"
 gosu "${CONTAINER_USER}" git config --global user.name "${GIT_USER_NAME_VAL}"
@@ -308,7 +308,7 @@ gosu "${CONTAINER_USER}" git config --global user.email "${GIT_USER_EMAIL_VAL}"
 
 # ── Step 9: Claude settings.json (first run only) ─────────────────────────────
 # Only written if the file doesn't already exist (volume persists it across restarts).
-# No Wrangler or Cloudflare tools in the allow list — this team doesn't deploy.
+# No Wrangler or Cloudflare tools in the allow list -- this team doesn't deploy.
 SETTINGS_FILE="${CLAUDE_DIR}/settings.json"
 if [ ! -f "$SETTINGS_FILE" ]; then
     mkdir -p "${CLAUDE_DIR}"
@@ -343,7 +343,7 @@ SETTINGS_EOF
 fi
 
 # ── Step 9b: mcp.json (first run only) ────────────────────────────────────────
-# Jira MCP only. No Dynamics — this team doesn't need HR entity data.
+# Jira MCP only. No Dynamics -- this team doesn't need HR entity data.
 MCP_FILE="${CLAUDE_DIR}/mcp.json"
 if [ ! -f "$MCP_FILE" ]; then
     mkdir -p "${CLAUDE_DIR}"
@@ -389,10 +389,10 @@ if [ "$KEY_COUNT" -gt 0 ]; then
     /usr/sbin/sshd -p 2226
     echo "[entrypoint] sshd started on port 2226."
 else
-    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set — SSH access disabled."
+    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set -- SSH access disabled."
 fi
 
 # ── Step 11: Drop privileges and exec ─────────────────────────────────────────
 # gosu is the POSIX-correct alternative to su/sudo for privilege drop from init.
-# Replaces the current process — PID 1 becomes ai-teams, not root.
+# Replaces the current process -- PID 1 becomes ai-teams, not root.
 exec gosu "${CONTAINER_USER}" "$@"

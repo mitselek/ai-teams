@@ -1,11 +1,11 @@
 // (*CD:Kerckhoffs*)
-// Tests for comms-watch CLI — issue #25: remove redundant --consume flag.
+// Tests for comms-watch CLI -- issue #25: remove redundant --consume flag.
 //
 // SendMessageBridge is the production inbox consumer. comms-watch must be
 // read-only so it is safe to run alongside the broker without racing.
 //
 // Test categories:
-//   1. Read-only behaviour (no --consume) — files survive after watch
+//   1. Read-only behaviour (no --consume) -- files survive after watch
 //   2. --consume flag rejected [RED]:
 //      a. Process exits non-zero (currently: killed by timeout, status null)
 //      b. Stderr contains no "will be deleted" message (currently: it does)
@@ -15,7 +15,7 @@
 // it as a subprocess. The process loops indefinitely (--no-follow is not
 // supported by the current parseArgs config), so tests use spawnSync timeout.
 //
-// Read-only tests: process is killed by timeout (status null) — that's fine,
+// Read-only tests: process is killed by timeout (status null) -- that's fine,
 // we only care that files survive.
 //
 // --consume RED tests: after fix, parseArgs rejects the unknown/removed option
@@ -101,9 +101,9 @@ afterEach(() => {
 
 // ── 1. Read-only behaviour (no --consume) ─────────────────────────────────────
 //
-// These should all be GREEN — comms-watch without --consume never calls unlink.
+// These should all be GREEN -- comms-watch without --consume never calls unlink.
 
-describe('comms-watch — read-only (no --consume flag)', () => {
+describe('comms-watch -- read-only (no --consume flag)', () => {
 
   it('does NOT delete inbox files when run without --consume', () => {
     const fp1 = writeMsg(inboxDir, 'read-only-001');
@@ -112,7 +112,7 @@ describe('comms-watch — read-only (no --consume flag)', () => {
 
     runWatch(baseDir); // killed by timeout after POLL_WAIT_MS
 
-    // All files must survive — comms-watch is read-only without --consume
+    // All files must survive -- comms-watch is read-only without --consume
     expect(existsSync(fp1)).toBe(true);
     expect(existsSync(fp2)).toBe(true);
     expect(existsSync(fp3)).toBe(true);
@@ -135,7 +135,7 @@ describe('comms-watch — read-only (no --consume flag)', () => {
     writeMsg(inboxDir, 'concurrent-001');
     writeMsg(inboxDir, 'concurrent-002');
 
-    runWatch(baseDir); // first watcher (synchronous — these are sequential here)
+    runWatch(baseDir); // first watcher (synchronous -- these are sequential here)
     runWatch(baseDir); // second watcher
 
     expect(existsSync(join(inboxDir, 'concurrent-001.json'))).toBe(true);
@@ -165,7 +165,7 @@ describe('comms-watch — read-only (no --consume flag)', () => {
   });
 });
 
-// ── 2. --consume flag rejected [RED — Lovelace to fix] ───────────────────────
+// ── 2. --consume flag rejected [RED -- Lovelace to fix] ───────────────────────
 //
 // Current (RED) state:
 //   - --consume IS accepted by parseArgs
@@ -180,7 +180,7 @@ describe('comms-watch — read-only (no --consume flag)', () => {
 //   - result.status === 1
 //   - Files are NOT deleted
 
-describe('comms-watch — --consume flag rejected', () => {
+describe('comms-watch -- --consume flag rejected', () => {
 
   it('--consume: process exits with non-zero status (not killed by timeout)', () => {
     // RED: process loops (--consume accepted), killed by timeout → status null

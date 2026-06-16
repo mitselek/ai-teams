@@ -6,13 +6,13 @@ Blast radius limits, permissions, enforcement mechanisms, and safety architectur
 
 ## Design Principle (*FR:Montesquieu*)
 
-Safety in an AI agent framework is not a single mechanism — it is a layered system where each layer compensates for the failure modes of the layer below it. No single guardrail is sufficient. Prompt-level restrictions can be ignored. CI gates only catch what they test for. Audits are periodic, not real-time. The goal is defense in depth: every safety-critical boundary is enforced at multiple layers.
+Safety in an AI agent framework is not a single mechanism -- it is a layered system where each layer compensates for the failure modes of the layer below it. No single guardrail is sufficient. Prompt-level restrictions can be ignored. CI gates only catch what they test for. Audits are periodic, not real-time. The goal is defense in depth: every safety-critical boundary is enforced at multiple layers.
 
 The framework distinguishes three safety concerns:
 
-1. **Blast radius** — how much damage can an agent cause if it acts incorrectly?
-2. **Authority compliance** — is the agent making decisions within its delegated scope?
-3. **Quality preservation** — is the team maintaining its output standards over time?
+1. **Blast radius** -- how much damage can an agent cause if it acts incorrectly?
+2. **Authority compliance** -- is the agent making decisions within its delegated scope?
+3. **Quality preservation** -- is the team maintaining its output standards over time?
 
 Each concern has different enforcement mechanisms. Blast radius is primarily structural (tool restrictions, file permissions). Authority compliance is primarily behavioral (prompt instructions, peer enforcement). Quality preservation is primarily observational (CI gates, audits, trend tracking).
 
@@ -26,18 +26,18 @@ The safety architecture in this document is grounded in empirical evidence from 
 
 | # | Incident | Severity | Enforcement that failed | Enforcement that caught it | Lesson |
 |---|---|---|---|---|---|
-| 1 | **$5K MCP data loss** — `workers-bindings` MCP `d1_database_query` has no read-only mode, hits production DB. WHERE-less UPDATE caused $5,000 loss. | CRITICAL | Prompt-level "be careful" — behavioral enforcement failed entirely | Post-hoc discovery | **Strongest argument for infrastructure enforcement.** Prompt-level restrictions are insufficient for production database access. |
-| 2 | **SQL injection in dynamics sync** — `sync/src/dynamics-api-service.ts` uses string interpolation, not parameterized queries. | HIGH | No enforcement caught it before deployment | Medici health audit flagged; Marcus cross-referenced | Infrastructure-level enforcement (parameterized query requirement in CI lint rules) would have prevented this |
-| 3 | **SENDING status stuck** — `send` action sets all conversations to SENDING before API call. If API throws, no recovery path. | HIGH | No enforcement — architectural design gap | Finn's code audit | Transactional safety patterns need enforcement at the architectural level, not just code review |
-| 4 | **`unblockExitConversation` silent data corruption** — sets `exit_blocked=0` but leaves `deleted_at` set. Employee stays invisible. | MEDIUM | No tests covered this path | Finn code review + test-gaps analysis | Missing test coverage for state transition edge cases |
-| 5 | **Figma rate limit exhaustion** — 6 req/month limit. Token syntax (`$FIGMA_PAT` vs `${FIGMA_PAT}`) caused 403 that still counted. Recovery: 4.5 days. | MEDIUM | Initial prompt-level "be careful" insufficient | Evolved into 7 operational rules + Medici enforcement | Shows the Known Pitfalls feedback loop in action |
-| 6 | **`hasElevatedRights` security bypass** — `||` fallback applied in production, would bypass Cloudflare Access. | HIGH | Implementation (agent wrote the bypass) | Marcus code review (E3) — caught as YELLOW, fixed to GREEN | **Code review is the last defense before production.** |
-| 7 | **False green tests** — `LIMIT 1` returns wrong questionnaire; assertions pass trivially. | MEDIUM | CI gate passed (tests green, but testing nothing) | Marcus code review (E3) | CI gates have a blind spot: tests that pass but don't test what they claim |
-| 8 | **Vite `?raw` shipping 82KB test data to production** — top-level import bundles into all builds. | LOW | CI build passed (file is valid) | Marcus code review (E3) | Build-time safety requires review, not just compilation |
-| 9 | **Agent spawn duplicates** — repeated violation in MEMORY.md. Wastes tokens, creates `name-2` clutter. | LOW | MEMORY.md rule exists but repeatedly violated | Human PO noticed pattern | Behavioral rules need stronger reinforcement for repeated violations |
-| 10 | **Worktree isolation ignored** — parallel agents without worktree isolation cause branch conflicts and lost work. | MEDIUM | MEMORY.md rule exists but repeatedly violated | Human PO noticed pattern | Same as #9 — repeated behavioral violations need structural enforcement |
-| 11 | **Plaintext credentials in MCP config** — `mcp.json` contains plaintext Jira API token inline. | MEDIUM | No enforcement — design gap | Herald analysis for T05 | Credential exposure risk scales with team count |
-| 12 | **npm audit: 9 vulnerabilities including SSRF and XSS** — 5 high, 3 moderate, 1 low in hr-platform dependencies. | HIGH | No automated dependency audit | Piper (CI agent) ran `npm audit` | CI quality gates catching real security issues |
+| 1 | **$5K MCP data loss** -- `workers-bindings` MCP `d1_database_query` has no read-only mode, hits production DB. WHERE-less UPDATE caused $5,000 loss. | CRITICAL | Prompt-level "be careful" -- behavioral enforcement failed entirely | Post-hoc discovery | **Strongest argument for infrastructure enforcement.** Prompt-level restrictions are insufficient for production database access. |
+| 2 | **SQL injection in dynamics sync** -- `sync/src/dynamics-api-service.ts` uses string interpolation, not parameterized queries. | HIGH | No enforcement caught it before deployment | Medici health audit flagged; Marcus cross-referenced | Infrastructure-level enforcement (parameterized query requirement in CI lint rules) would have prevented this |
+| 3 | **SENDING status stuck** -- `send` action sets all conversations to SENDING before API call. If API throws, no recovery path. | HIGH | No enforcement -- architectural design gap | Finn's code audit | Transactional safety patterns need enforcement at the architectural level, not just code review |
+| 4 | **`unblockExitConversation` silent data corruption** -- sets `exit_blocked=0` but leaves `deleted_at` set. Employee stays invisible. | MEDIUM | No tests covered this path | Finn code review + test-gaps analysis | Missing test coverage for state transition edge cases |
+| 5 | **Figma rate limit exhaustion** -- 6 req/month limit. Token syntax (`$FIGMA_PAT` vs `${FIGMA_PAT}`) caused 403 that still counted. Recovery: 4.5 days. | MEDIUM | Initial prompt-level "be careful" insufficient | Evolved into 7 operational rules + Medici enforcement | Shows the Known Pitfalls feedback loop in action |
+| 6 | **`hasElevatedRights` security bypass** -- `||` fallback applied in production, would bypass Cloudflare Access. | HIGH | Implementation (agent wrote the bypass) | Marcus code review (E3) -- caught as YELLOW, fixed to GREEN | **Code review is the last defense before production.** |
+| 7 | **False green tests** -- `LIMIT 1` returns wrong questionnaire; assertions pass trivially. | MEDIUM | CI gate passed (tests green, but testing nothing) | Marcus code review (E3) | CI gates have a blind spot: tests that pass but don't test what they claim |
+| 8 | **Vite `?raw` shipping 82KB test data to production** -- top-level import bundles into all builds. | LOW | CI build passed (file is valid) | Marcus code review (E3) | Build-time safety requires review, not just compilation |
+| 9 | **Agent spawn duplicates** -- repeated violation in MEMORY.md. Wastes tokens, creates `name-2` clutter. | LOW | MEMORY.md rule exists but repeatedly violated | Human PO noticed pattern | Behavioral rules need stronger reinforcement for repeated violations |
+| 10 | **Worktree isolation ignored** -- parallel agents without worktree isolation cause branch conflicts and lost work. | MEDIUM | MEMORY.md rule exists but repeatedly violated | Human PO noticed pattern | Same as #9 -- repeated behavioral violations need structural enforcement |
+| 11 | **Plaintext credentials in MCP config** -- `mcp.json` contains plaintext Jira API token inline. | MEDIUM | No enforcement -- design gap | Herald analysis for T05 | Credential exposure risk scales with team count |
+| 12 | **npm audit: 9 vulnerabilities including SSRF and XSS** -- 5 high, 3 moderate, 1 low in hr-platform dependencies. | HIGH | No automated dependency audit | Piper (CI agent) ran `npm audit` | CI quality gates catching real security issues |
 
 ### Incident Distribution by Enforcement Layer
 
@@ -49,7 +49,7 @@ The safety architecture in this document is grounded in empirical evidence from 
 | **Evolved enforcement (feedback loop)** | 1 | #5 |
 | **Design analysis (no enforcement existed)** | 1 | #11 |
 
-**Key insight:** Code review (E3) is the most effective detective mechanism — it caught 4 of 12 incidents that no other layer detected. But the most damaging incident (#1, $5K loss) was caught by NO enforcement layer. This validates the defense-in-depth principle: the most catastrophic failures occur where no enforcement layer exists at all.
+**Key insight:** Code review (E3) is the most effective detective mechanism -- it caught 4 of 12 incidents that no other layer detected. But the most damaging incident (#1, $5K loss) was caught by NO enforcement layer. This validates the defense-in-depth principle: the most catastrophic failures occur where no enforcement layer exists at all.
 
 ### Identified Gaps (*FR:Finn*)
 
@@ -57,10 +57,10 @@ Finn's analysis identified 6 enforcement gaps. This table maps each gap to the T
 
 | Gap | Risk | Addressed by |
 |---|---|---|
-| No infrastructure-level file access control | Low (behavioral holds) but doesn't scale | §Blast Radius Containment — container isolation, read-only mounts |
-| No credential isolation | Medium — cross-team credential access at scale | §Blast Radius Containment — credential scoping; T05 per-team tokens |
-| No automated runaway detection | Medium — human must notice and kill | §Runaway Agent / Runaway Team Detection |
-| No kill switch | Low in single-team, high at scale | §Circuit Breakers — Emergency PO override / HALT protocol |
+| No infrastructure-level file access control | Low (behavioral holds) but doesn't scale | §Blast Radius Containment -- container isolation, read-only mounts |
+| No credential isolation | Medium -- cross-team credential access at scale | §Blast Radius Containment -- credential scoping; T05 per-team tokens |
+| No automated runaway detection | Medium -- human must notice and kill | §Runaway Agent / Runaway Team Detection |
+| No kill switch | Low in single-team, high at scale | §Circuit Breakers -- Emergency PO override / HALT protocol |
 | No deployment lock | Medium at scale | T02 Protocol R2 (deployment locks); §Cascade Failure Prevention |
 | No rate limit enforcement | Already caused near-misses (incident #5) | T02 Protocol R4 (rate limit partitioning); §Circuit Breakers |
 
@@ -128,14 +128,14 @@ These actions are within the team's scope but require the coordinator's judgment
 | Branch strategy decisions | Row 9 | Team-lead sets branching model |
 | Spawn agents within approved roster | Row 4 | Team-lead controls spawn order |
 | Dev database migrations | Row 20 | Team-lead coordinates with implementer |
-| Close GitHub issues | Row 16 | Team-lead exclusive — governance signal |
+| Close GitHub issues | Row 16 | Team-lead exclusive -- governance signal |
 | Assign code reviewers | Row 32 | Team-lead delegates to reviewer specialist |
 
 **Enforcement:** Prompt-level role boundaries in specialist prompts ("report to team-lead, do not merge independently"). Anti-pattern tables in team-lead prompts reinforce the boundary from the coordinator side.
 
 #### Tier 3: Specialist Autonomy (any authorized agent)
 
-These actions are low-risk, reversible, and contained within the agent's owned scope. They require no approval — the agent acts and reports.
+These actions are low-risk, reversible, and contained within the agent's owned scope. They require no approval -- the agent acts and reports.
 
 | Action | Constraint | Enforcement |
 |---|---|---|
@@ -144,9 +144,9 @@ These actions are low-risk, reversible, and contained within the agent's owned s
 | Create feature branches | Under team's branch prefix | Branch naming convention (T02 Protocol R1) |
 | Make commits to feature branch | Own branch only | Prompt instruction; CI gates catch cross-branch contamination |
 | Create GitHub issues | Labeling conventions | Agent-managed; no approval needed (Row 24) |
-| Comment on GitHub issues/PRs | — | — |
+| Comment on GitHub issues/PRs | -- | -- |
 | Write to own scratchpad | Personal memory file | File ownership in common-prompt |
-| Local development operations | No external side effects | — |
+| Local development operations | No external side effects | -- |
 
 **Enforcement:** Directory ownership tables in common-prompt (T02). Branch prefix conventions. Post-hoc audit by Medici.
 
@@ -168,9 +168,9 @@ Safety is enforced at five layers. Each layer has a different failure mode, and 
 
 **The feedback loop:** Audit findings (E4) feed back into prompt updates (E0). Known Pitfalls sections in common-prompts are the living record of this feedback loop. Each entry represents a real incident that was detected by audit or observation, then codified as a prompt-level restriction to prevent recurrence. Incident #5 (Figma rate limit) demonstrates this cycle: initial prompt-level "be careful" failed; after near-misses, 7 operational rules were codified into the prompt; Medici verified compliance in subsequent audits.
 
-**Cross-reference with Finn's enforcement taxonomy:** Finn identified 5 enforcement mechanisms in reference teams: (1) agent prompt restrictions, (2) peer enforcement, (3) quality gates (CI), (4) PR template checklist, (5) health audits (Medici). These map directly to the E0-E4 stack above — Finn's mechanisms #1-#2 are E0-E1, #3-#4 are E2, and #5 is E4. E3 (code review) is implicit in Finn's taxonomy but is the single most effective detective mechanism: it caught 4 of 12 documented incidents (see Evidence Base).
+**Cross-reference with Finn's enforcement taxonomy:** Finn identified 5 enforcement mechanisms in reference teams: (1) agent prompt restrictions, (2) peer enforcement, (3) quality gates (CI), (4) PR template checklist, (5) health audits (Medici). These map directly to the E0-E4 stack above -- Finn's mechanisms #1-#2 are E0-E1, #3-#4 are E2, and #5 is E4. E3 (code review) is implicit in Finn's taxonomy but is the single most effective detective mechanism: it caught 4 of 12 documented incidents (see Evidence Base).
 
-**The infrastructure enforcement gap:** The $5K MCP incident (#1 in Evidence Base) is the strongest evidence that behavioral enforcement alone is insufficient for production-critical resources. Prompt-level "be careful" did not prevent a WHERE-less UPDATE on a production database. For Tier 0 prohibitions (production DB access, deployment credentials), infrastructure enforcement (read-only mounts, token scoping, CI branch protection) is not optional — it is the minimum viable safety measure.
+**The infrastructure enforcement gap:** The $5K MCP incident (#1 in Evidence Base) is the strongest evidence that behavioral enforcement alone is insufficient for production-critical resources. Prompt-level "be careful" did not prevent a WHERE-less UPDATE on a production database. For Tier 0 prohibitions (production DB access, deployment credentials), infrastructure enforcement (read-only mounts, token scoping, CI branch protection) is not optional -- it is the minimum viable safety measure.
 
 ### Enforcement per Tier
 
@@ -187,13 +187,13 @@ Safety is enforced at five layers. Each layer has a different failure mode, and 
 
 ### Principle
 
-Every agent has a blast radius — the maximum damage it can cause if it acts incorrectly or maliciously. The framework minimizes blast radius through containment: restricting each agent to the smallest scope needed for its role.
+Every agent has a blast radius -- the maximum damage it can cause if it acts incorrectly or maliciously. The framework minimizes blast radius through containment: restricting each agent to the smallest scope needed for its role.
 
 ### Blast Radius by Role
 
 | Role | Can modify | Cannot modify | Blast radius |
 |---|---|---|---|
-| **PO (human)** | Everything | — | Entire organization |
+| **PO (human)** | Everything | -- | Entire organization |
 | **Manager agent (L1)** | Own memory directory only | Source code, team files, prompts, rosters | Cross-team coordination state only |
 | **Team-lead (L2)** | Team memory directory, roster | Source code, config, other teams | Team configuration only |
 | **Specialist (L3)** | Owned directories, own branch | Other agents' directories, other branches, other teams | Own feature scope only |
@@ -215,7 +215,7 @@ Every team's common-prompt includes a directory ownership table (see apex-resear
 
 **Design requirement:** Every team's common-prompt MUST include a directory ownership table. This is the primary blast radius control for specialist agents.
 
-**Empirical validation (apex-research):** Schliemann's RFC #3 pushback provides evidence that directory ownership as behavioral enforcement is sufficient for pipeline architectures: 37 commits across 4 agents with zero conflicts, because no two agents write to the same directory. The PO ratified this by choosing "directory ownership, not branch isolation" (RFC #3 Q7). The failure mode when directory ownership is violated is a merge conflict — visible, fixable, not data loss. This makes it an acceptable risk for pipeline teams. The same argument does NOT hold for shared-write scenarios (two agents writing to the same directory), where structural isolation (worktrees or separate repos) is necessary.
+**Empirical validation (apex-research):** Schliemann's RFC #3 pushback provides evidence that directory ownership as behavioral enforcement is sufficient for pipeline architectures: 37 commits across 4 agents with zero conflicts, because no two agents write to the same directory. The PO ratified this by choosing "directory ownership, not branch isolation" (RFC #3 Q7). The failure mode when directory ownership is violated is a merge conflict -- visible, fixable, not data loss. This makes it an acceptable risk for pipeline teams. The same argument does NOT hold for shared-write scenarios (two agents writing to the same directory), where structural isolation (worktrees or separate repos) is necessary.
 
 #### 2. Tool Restrictions (behavioral, enforced by prompt)
 
@@ -253,7 +253,7 @@ For teams running in Docker containers (apex-research pattern):
 Per-team API tokens limit blast radius:
 - A compromised research team token cannot deploy to production
 - A compromised dev team token cannot access another team's repositories
-- Org-wide tokens (Jira, Figma) are the blast radius exception — mitigated by behavioral restriction (only teams with mission-relevant access load the token)
+- Org-wide tokens (Jira, Figma) are the blast radius exception -- mitigated by behavioral restriction (only teams with mission-relevant access load the token)
 
 ---
 
@@ -261,23 +261,23 @@ Per-team API tokens limit blast radius:
 
 ### The Problem
 
-Authority compliance is whether agents are making decisions within their delegated scope (T04 delegation matrix). Unlike blast radius (which is about capability), authority compliance is about behavior — an agent may have the technical ability to do something but not the organizational authority.
+Authority compliance is whether agents are making decisions within their delegated scope (T04 delegation matrix). Unlike blast radius (which is about capability), authority compliance is about behavior -- an agent may have the technical ability to do something but not the organizational authority.
 
 ### Detection Mechanisms
 
 | Mechanism | What it detects | Frequency | Reliability |
 |---|---|---|---|
-| **Self-check prompt** | Agent pauses before acting: "Am I routing, or am I deciding something that belongs to PO or team-lead?" | Per action | Low — self-regulation under token pressure is unreliable |
-| **Peer observation** | Teammates notice team-lead editing source code or specialist closing issues | Per observation | Medium — depends on teammate attention |
-| **Scratchpad audit** | Medici reads scratchpads for evidence of authority-level decisions | Per session | Medium — only catches decisions that were written down |
-| **Git history audit** | Who committed what, when, to which branch | Post-hoc | High — git is authoritative; but only for git-tracked actions |
-| **Decision log review** | PO reviews emergency decision log and manager agent actions | Per session | High — but only for documented decisions |
+| **Self-check prompt** | Agent pauses before acting: "Am I routing, or am I deciding something that belongs to PO or team-lead?" | Per action | Low -- self-regulation under token pressure is unreliable |
+| **Peer observation** | Teammates notice team-lead editing source code or specialist closing issues | Per observation | Medium -- depends on teammate attention |
+| **Scratchpad audit** | Medici reads scratchpads for evidence of authority-level decisions | Per session | Medium -- only catches decisions that were written down |
+| **Git history audit** | Who committed what, when, to which branch | Post-hoc | High -- git is authoritative; but only for git-tracked actions |
+| **Decision log review** | PO reviews emergency decision log and manager agent actions | Per session | High -- but only for documented decisions |
 
 ### Common Authority Violations and Prevention
 
 | Violation | Role | How it happens | Prevention | Detection |
 |---|---|---|---|---|
-| **TL implements** | Team-lead | "Quick fix" — TL reads source code and edits directly | Anti-pattern table in TL prompt; spawn-before-delegate rule | Peer enforcement; Medici audit of TL scratchpad |
+| **TL implements** | Team-lead | "Quick fix" -- TL reads source code and edits directly | Anti-pattern table in TL prompt; spawn-before-delegate rule | Peer enforcement; Medici audit of TL scratchpad |
 | **Specialist closes issue** | Specialist | Specialist assumes issue is done and closes it | Prompt: "Closing issues is team-lead's exclusive responsibility" | Git/GitHub audit: who closed the issue? |
 | **Agent creates Jira** | Any | Agent proactively creates Jira issues to "be helpful" | Constitutional rule: "agents never create Jira on own initiative" | Jira audit log; MEMORY.md enforcement |
 | **TL approves production deploy** | Team-lead | TL deploys to production under time pressure | Prompt: "Always PO" for production (Row 19) | Deployment log; Medici audit |
@@ -286,7 +286,7 @@ Authority compliance is whether agents are making decisions within their delegat
 
 ### Authority Quick-Reference for Common-Prompts
 
-Every team's common-prompt SHOULD include a decision authority section — a filtered view of the T04 delegation matrix showing only the decisions relevant to that team. This prevents the authority uncertainty pattern identified in the RFC #3 analysis: team-leads asking permission for decisions already within their authority.
+Every team's common-prompt SHOULD include a decision authority section -- a filtered view of the T04 delegation matrix showing only the decisions relevant to that team. This prevents the authority uncertainty pattern identified in the RFC #3 analysis: team-leads asking permission for decisions already within their authority.
 
 **Template:**
 
@@ -322,7 +322,7 @@ for an autonomous team.
 
 ### The Problem
 
-Quality erodes gradually, not catastrophically. An agent under time pressure skips one test. Then another. The CI gate doesn't catch missing tests (only broken tests). The reviewer doesn't flag low coverage because there's no baseline. After several sessions, the team has a passing CI pipeline with 10% test coverage. No single actor caused the problem — it was a systemic failure of quality enforcement.
+Quality erodes gradually, not catastrophically. An agent under time pressure skips one test. Then another. The CI gate doesn't catch missing tests (only broken tests). The reviewer doesn't flag low coverage because there's no baseline. After several sessions, the team has a passing CI pipeline with 10% test coverage. No single actor caused the problem -- it was a systemic failure of quality enforcement.
 
 ### Defense in Depth for Quality
 
@@ -331,19 +331,19 @@ Quality erodes gradually, not catastrophically. An agent under time pressure ski
 | **Prompt mandate** | Common-prompt TDD section: "RED -> GREEN -> REFACTOR" | Self-motivated agents comply | Erodes under time pressure; agent may interpret "test" loosely |
 | **Delegation message** | Team-lead includes "write tests first" in task delegation | Reinforces prompt mandate per task | Only as reliable as team-lead's discipline |
 | **CI gate** | `npm run build && npm run check && npm test` must pass before merge. Warning ratchet: `eslint --max-warnings=N` with decreasing threshold ensures quality only improves. | Build breakage, type errors, test regressions, warning count increase | Does NOT catch missing tests for new features |
-| **PR test summary** | PR template includes "Tests added: [yes/no, what]" | Creates audit trail; patterns of "no tests" become visible | Self-reported — agent can claim tests exist when they don't |
+| **PR test summary** | PR template includes "Tests added: [yes/no, what]" | Creates audit trail; patterns of "no tests" become visible | Self-reported -- agent can claim tests exist when they don't |
 | **Code review** | Reviewer checks test coverage and quality | Catches missing tests, weak assertions, incomplete coverage | Reviewer capability varies; review-of-reviewer problem |
-| **Periodic audit** | Medici tracks test coverage trends across sessions | Catches slow quality erosion that no single-session check reveals | Delayed — by the time audit detects the trend, multiple sessions of low-quality work have been committed |
+| **Periodic audit** | Medici tracks test coverage trends across sessions | Catches slow quality erosion that no single-session check reveals | Delayed -- by the time audit detects the trend, multiple sessions of low-quality work have been committed |
 
-**No single layer is sufficient.** The combination of all six layers provides defense in depth. The critical gap — missing tests for new features — is only caught by review (E3) and audit (E4). This makes review and audit the most important quality enforcement mechanisms, not CI.
+**No single layer is sufficient.** The combination of all six layers provides defense in depth. The critical gap -- missing tests for new features -- is only caught by review (E3) and audit (E4). This makes review and audit the most important quality enforcement mechanisms, not CI.
 
 ### Quality Enforcement for Autonomous Teams
 
 Autonomous teams (like apex-research) face additional quality risks:
 
-1. **No real-time PO oversight** — PO cannot spot-check quality during the session
-2. **TDD pair enforcement** — when the PO mandates TDD pairs (RED then GREEN), who enforces the sequencing? (Apex-research RFC #3 Q4 — PO directive: "RED always before GREEN, never parallel")
-3. **Quality erosion across sessions** — no single session is responsible; the trend emerges only over time
+1. **No real-time PO oversight** -- PO cannot spot-check quality during the session
+2. **TDD pair enforcement** -- when the PO mandates TDD pairs (RED then GREEN), who enforces the sequencing? (Apex-research RFC #3 Q4 -- PO directive: "RED always before GREEN, never parallel")
+3. **Quality erosion across sessions** -- no single session is responsible; the trend emerges only over time
 
 **Enforcement design for autonomous teams:**
 
@@ -381,8 +381,8 @@ Circuit breakers are automatic or semi-automatic shutdown triggers that halt wor
 
 | Circuit breaker | Trigger | Action | Authority to override |
 |---|---|---|---|
-| **Build broken** | CI gate fails | PR cannot merge; agent must fix before proceeding | None — gate is absolute (Tier 0 analogue for code quality) |
-| **Test suite failing** | Tests fail on commit | Agent cannot push until tests pass (prompt-level gate) | None — agent self-enforces |
+| **Build broken** | CI gate fails | PR cannot merge; agent must fix before proceeding | None -- gate is absolute (Tier 0 analogue for code quality) |
+| **Test suite failing** | Tests fail on commit | Agent cannot push until tests pass (prompt-level gate) | None -- agent self-enforces |
 | **Merge conflict on shared branch** | Git detects conflict during merge | Agent stops, reports to team-lead; team-lead coordinates resolution | Team-lead decides resolution approach |
 | **Rate limit hit** | 429 response from API | Agent stops API calls, reports to team-lead, follows rate limit incident protocol (T02 Protocol R4) | Manager agent reallocates budget |
 | **Agent stuck loop** | Agent retrying same failed command >3 times | Agent should stop and report the blocker to team-lead | Team-lead reassigns or provides alternative approach |
@@ -402,7 +402,7 @@ A cascade failure is when one team's safety boundary violation propagates to oth
 
 ---
 
-## Safety Mechanisms — Summary (*FR:Montesquieu*)
+## Safety Mechanisms -- Summary (*FR:Montesquieu*)
 
 ### Preventive Mechanisms (stop bad things from happening)
 
@@ -451,7 +451,7 @@ A cascade failure is when one team's safety boundary violation propagates to oth
 
 ### Runaway Agent
 
-A runaway agent is one that burns tokens without producing useful output — retrying failed commands, generating excessive output, or executing in a loop.
+A runaway agent is one that burns tokens without producing useful output -- retrying failed commands, generating excessive output, or executing in a loop.
 
 | Signal | Detection method | Response |
 |---|---|---|
@@ -462,7 +462,7 @@ A runaway agent is one that burns tokens without producing useful output — ret
 
 ### Runaway Team
 
-A runaway team is one where the team-lead is also part of the problem — either drifting alongside specialists or failing to enforce quality standards.
+A runaway team is one where the team-lead is also part of the problem -- either drifting alongside specialists or failing to enforce quality standards.
 
 | Signal | Detection method | Response |
 |---|---|---|
@@ -474,11 +474,11 @@ A runaway team is one where the team-lead is also part of the problem — either
 
 ### Kill Switch
 
-PO can halt all teams instantly by broadcasting a HALT message. This is the nuclear option — used only when cascade failure is imminent or a serious safety boundary has been breached.
+PO can halt all teams instantly by broadcasting a HALT message. This is the nuclear option -- used only when cascade failure is imminent or a serious safety boundary has been breached.
 
 **HALT protocol:**
 
-1. PO broadcasts: "HALT — all teams stop current work immediately. Reason: [reason]."
+1. PO broadcasts: "HALT -- all teams stop current work immediately. Reason: [reason]."
 2. All team-leads acknowledge and instruct their agents to stop
 3. Agents persist current state to scratchpads (prevent work loss)
 4. PO investigates and issues resume or shutdown directives per team
@@ -499,7 +499,7 @@ Dry-run mode is a safety mechanism for high-risk operations or newly deployed te
 | Scenario | Dry-run recommended? | Rationale |
 |---|---|---|
 | First session of a new team | Yes | Verify agent behavior matches prompt design before allowing autonomous operation |
-| Production deployment | Partially — agent prepares, PO executes | Already covered by Tier 1 (human approval required) |
+| Production deployment | Partially -- agent prepares, PO executes | Already covered by Tier 1 (human approval required) |
 | Cross-team handoff | No | Handoff protocol already has PO gate at `handed-off` transition |
 | New agent role added to team | Yes, for 1 session | Verify role boundaries and tool restrictions are correct |
 | After governance incident | Yes, until PO is satisfied | Restore trust after authority violation |
@@ -529,7 +529,7 @@ PO deactivates dry-run mode by updating the agent's prompt (T04 Row 38) or sendi
 
 ## Integration with Other Topics (*FR:Montesquieu*)
 
-### T04 — Hierarchy & Governance (WHO decides)
+### T04 -- Hierarchy & Governance (WHO decides)
 
 T07 defines WHAT the boundaries are; T04 defines WHO has authority to set, enforce, and amend them.
 
@@ -540,7 +540,7 @@ T07 defines WHAT the boundaries are; T04 defines WHO has authority to set, enfor
 | Emergency PO override / HALT | Emergency Authority Protocol (T04) defines elevated authority boundaries |
 | Governance amendment (changing safety rules) | Rows 36-39: PO exclusive, no agent may self-amend |
 
-### T05 — Identity & Credentials (access control)
+### T05 -- Identity & Credentials (access control)
 
 | T07 concept | T05 connection |
 |---|---|
@@ -548,7 +548,7 @@ T07 defines WHAT the boundaries are; T04 defines WHO has authority to set, enfor
 | No self-escalation of permissions | T05 Credential Escalation Protocol; T07 Tier 0 prohibition |
 | Audit of credential usage | T05 per-team tokens enable per-team audit; T07 uses this for authority compliance detection |
 
-### T02 — Resource Isolation (shared resource safety)
+### T02 -- Resource Isolation (shared resource safety)
 
 | T07 concept | T02 connection |
 |---|---|
@@ -556,7 +556,7 @@ T07 defines WHAT the boundaries are; T04 defines WHO has authority to set, enfor
 | Branch isolation | T02 Protocol R1 branch namespace partitioning |
 | Deployment safety | T02 Protocol R2 deployment locks with TTL |
 
-### T08 — Observability (detection and trending)
+### T08 -- Observability (detection and trending)
 
 | T07 concept | T08 connection |
 |---|---|
@@ -572,20 +572,20 @@ T07 defines WHAT the boundaries are; T04 defines WHO has authority to set, enfor
 ### Resolved by this document
 
 - ~~What actions should be globally forbidden for agents?~~ --> Tier 0 prohibitions: 8 absolute prohibitions with rationale (see Permission Architecture)
-- ~~Per-team permission profiles — how granular?~~ --> 4-tier system determined by 3 dimensions (reversibility, blast radius, external visibility). Per-role within teams, not per-agent.
+- ~~Per-team permission profiles -- how granular?~~ --> 4-tier system determined by 3 dimensions (reversibility, blast radius, external visibility). Per-role within teams, not per-agent.
 - ~~How do we detect and stop a runaway agent/team?~~ --> Runaway detection signals + team-lead/PO response ladder + HALT protocol (see Runaway Agent / Runaway Team Detection)
-- ~~Circuit breakers — automatic shutdown triggers?~~ --> 6 circuit breaker types with triggers, actions, and override authority (see Circuit Breakers)
+- ~~Circuit breakers -- automatic shutdown triggers?~~ --> 6 circuit breaker types with triggers, actions, and override authority (see Circuit Breakers)
 - ~~How do we prevent cascade failures across teams?~~ --> 5 cascade risk types with prevention mechanisms, all grounded in T02 protocols (see Cascade Failure Prevention)
 
 ### Still Open
 
-1. **Infrastructure enforcement vs behavioral enforcement** — Currently, all safety enforcement is behavioral (prompt-level) or protocol-level (manager agent coordination). Infrastructure enforcement (file ACLs, Docker security profiles, CI branch protection rules) would make Tier 0 prohibitions truly unbypassable. When is the infrastructure investment justified? Likely: when teams operate without real-time human oversight (containerized autonomous teams). The apex-research deployment is the first candidate for infrastructure enforcement — read-only mounts are already implemented; file ACLs and branch protection rules are the next step.
+1. **Infrastructure enforcement vs behavioral enforcement** -- Currently, all safety enforcement is behavioral (prompt-level) or protocol-level (manager agent coordination). Infrastructure enforcement (file ACLs, Docker security profiles, CI branch protection rules) would make Tier 0 prohibitions truly unbypassable. When is the infrastructure investment justified? Likely: when teams operate without real-time human oversight (containerized autonomous teams). The apex-research deployment is the first candidate for infrastructure enforcement -- read-only mounts are already implemented; file ACLs and branch protection rules are the next step.
 
-2. **Safety testing / red-teaming** — How do we verify that safety mechanisms actually work? A team could be deployed with correct prompts, CI gates, and audit — but has anyone tested whether an agent can be induced to violate its restrictions? Red-teaming (intentionally trying to break safety boundaries) is standard in AI safety. Should the framework include a periodic red-team exercise? If so, who performs it — Medici, a dedicated safety agent, or PO?
+2. **Safety testing / red-teaming** -- How do we verify that safety mechanisms actually work? A team could be deployed with correct prompts, CI gates, and audit -- but has anyone tested whether an agent can be induced to violate its restrictions? Red-teaming (intentionally trying to break safety boundaries) is standard in AI safety. Should the framework include a periodic red-team exercise? If so, who performs it -- Medici, a dedicated safety agent, or PO?
 
-3. **Proportional response to violations** — The current model is binary: violation detected, then either team-lead corrects or PO intervenes. For minor violations (accidental directory write, followed by immediate self-correction), is a full audit finding warranted? A proportional response framework would distinguish: (a) self-corrected violations (log only), (b) team-lead-corrected violations (log + prompt review), (c) PO-escalated violations (log + prompt update + potential team restructuring).
+3. **Proportional response to violations** -- The current model is binary: violation detected, then either team-lead corrects or PO intervenes. For minor violations (accidental directory write, followed by immediate self-correction), is a full audit finding warranted? A proportional response framework would distinguish: (a) self-corrected violations (log only), (b) team-lead-corrected violations (log + prompt review), (c) PO-escalated violations (log + prompt update + potential team restructuring).
 
-4. **Safety metrics** — What quantitative metrics indicate a healthy safety posture vs. a degrading one? Candidates: authority violation count per session, test coverage trend, Medici finding severity distribution, time-to-detection for violations, Known Pitfalls growth rate. Currently unmeasured.
+4. **Safety metrics** -- What quantitative metrics indicate a healthy safety posture vs. a degrading one? Candidates: authority violation count per session, test coverage trend, Medici finding severity distribution, time-to-detection for violations, Known Pitfalls growth rate. Currently unmeasured.
 
 (*FR:Montesquieu*)
 
@@ -595,7 +595,7 @@ T07 defines WHAT the boundaries are; T04 defines WHO has authority to set, enfor
 
 ### Guardrails are prompt-level, not infrastructure-level
 
-Both reference teams implement safety primarily through agent prompts, not infrastructure enforcement. The team-lead is forbidden from editing source code by prompt instruction, not by file system ACLs. Any agent could technically violate these rules — the guardrail is behavioral.
+Both reference teams implement safety primarily through agent prompts, not infrastructure enforcement. The team-lead is forbidden from editing source code by prompt instruction, not by file system ACLs. Any agent could technically violate these rules -- the guardrail is behavioral.
 
 ### Team-lead tool restriction is the primary blast radius control
 
@@ -610,7 +610,7 @@ The strictest guardrails are on the team-lead (highest-privilege coordinator):
 
 **Allowed Bash:** only `date`, tmux commands, `git pull` (on dev-toolkit only), cleanup scripts, `gh` commands for issue/PR management.
 
-This limits the team-lead's blast radius — it cannot accidentally modify or deploy code.
+This limits the team-lead's blast radius -- it cannot accidentally modify or deploy code.
 
 ### Peer enforcement mechanism
 
@@ -624,7 +624,7 @@ Before any PR creation, agents must pass:
 - `npm run check`
 - `npm run lint`
 
-PR template: all `[ ]` checkboxes must be ticked to `[x]` before `gh pr create`. Cannot create PR with unchecked boxes. This is a hard gate — behavioral, enforced by prompt instruction.
+PR template: all `[ ]` checkboxes must be ticked to `[x]` before `gh pr create`. Cannot create PR with unchecked boxes. This is a hard gate -- behavioral, enforced by prompt instruction.
 
 ### No-force-push / no-reset rule
 
@@ -640,12 +640,12 @@ Both common-prompts include a `## Known Pitfalls` section with concrete failure 
 - Jira API endpoint change (`/search` → `/search/jql`)
 - `overflow-x: auto/scroll/hidden` blocks `position: sticky`
 
-This is a living safety checklist — pitfalls discovered in production get added to the common-prompt to prevent recurrence.
+This is a living safety checklist -- pitfalls discovered in production get added to the common-prompt to prevent recurrence.
 
 ### External communication gates
 
 - **GitHub issues:** agents can create and comment freely
-- **Jira issues:** only when user explicitly requests — agents do NOT create/update on own initiative
+- **Jira issues:** only when user explicitly requests -- agents do NOT create/update on own initiative
 - **Email:** never post to external systems without PO review
 - **Production deployment:** human approval required (Level 0)
 
@@ -655,7 +655,7 @@ From workspace CLAUDE.md: "Be careful not to introduce security vulnerabilities 
 
 ### Cyrillic homoglyph detection
 
-From MEMORY.md: LLM-generated text can contain Cyrillic homoglyphs. `audit_cyrillic.py` exists to detect them. This is a content safety mechanism — code that looks correct but contains invisible wrong characters.
+From MEMORY.md: LLM-generated text can contain Cyrillic homoglyphs. `audit_cyrillic.py` exists to detect them. This is a content safety mechanism -- code that looks correct but contains invisible wrong characters.
 
 ### git worktree isolation for parallel agents
 

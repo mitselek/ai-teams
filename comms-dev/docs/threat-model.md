@@ -1,4 +1,4 @@
-# Threat Model — comms-dev Encrypted Chat System (v1) (*CD:Vigenere*)
+# Threat Model -- comms-dev Encrypted Chat System (v1) (*CD:Vigenere*)
 
 ## Scope
 
@@ -47,9 +47,9 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 
 | Asset | Value | Location |
 |---|---|---|
-| **Pre-shared key (PSK)** | Master encryption key — compromise breaks all confidentiality and integrity | `/run/secrets/comms-psk` in each container |
-| **Message plaintext** | Inter-team operational messages — may contain task details, decisions, coordination | In-memory during encrypt/decrypt |
-| **Registry** | Team discovery metadata — socket paths, capabilities, heartbeats | `/shared/comms/registry.json` |
+| **Pre-shared key (PSK)** | Master encryption key -- compromise breaks all confidentiality and integrity | `/run/secrets/comms-psk` in each container |
+| **Message plaintext** | Inter-team operational messages -- may contain task details, decisions, coordination | In-memory during encrypt/decrypt |
+| **Registry** | Team discovery metadata -- socket paths, capabilities, heartbeats | `/shared/comms/registry.json` |
 | **Socket files** | UDS endpoints for each team's broker | `/shared/comms/<team>.sock` |
 
 ---
@@ -64,7 +64,7 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 
 **Mitigation:**
 - All messages are encrypted with AES-256-GCM before transmission over UDS
-- GCM provides authenticated encryption — ciphertext without the PSK yields no plaintext
+- GCM provides authenticated encryption -- ciphertext without the PSK yields no plaintext
 - UDS traffic does not traverse the network stack (kernel-internal IPC), reducing sniffing surface compared to TCP
 
 **Residual risk:** An attacker with access to the shared volume can observe *metadata*: which sockets exist, connection timing, message sizes (length prefix is unencrypted). Traffic analysis remains possible. v1 does NOT defend against traffic analysis.
@@ -80,7 +80,7 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 **Attack vector:** Man-in-the-middle on the shared volume, or a compromised broker relaying modified messages.
 
 **Mitigation:**
-- AES-256-GCM provides built-in authentication — any modification to ciphertext, AAD, IV, or tag causes decryption to fail
+- AES-256-GCM provides built-in authentication -- any modification to ciphertext, AAD, IV, or tag causes decryption to fail
 - The JSON envelope `checksum` field (SHA-256 of the plaintext body) provides an additional application-layer integrity check after decryption
 - Modified messages are rejected and logged; they are never delivered to the application layer
 
@@ -100,9 +100,9 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 - Each message carries a unique `id` field (`msg-<uuid>`)
 - The receiving broker maintains a dedup set of recently seen message IDs
 - Duplicate IDs are rejected at the broker level before decryption
-- AES-GCM uses a unique 96-bit IV (nonce) per message — reuse of an IV with the same key would be catastrophic, so the crypto module MUST guarantee IV uniqueness (counter-based or random with collision check)
+- AES-GCM uses a unique 96-bit IV (nonce) per message -- reuse of an IV with the same key would be catastrophic, so the crypto module MUST guarantee IV uniqueness (counter-based or random with collision check)
 
-**Residual risk:** The dedup window is finite. If an attacker replays a message after the dedup window expires, it may be accepted. Mitigation: timestamp validation — reject messages older than a configurable threshold (default: 300 seconds).
+**Residual risk:** The dedup window is finite. If an attacker replays a message after the dedup window expires, it may be accepted. Mitigation: timestamp validation -- reject messages older than a configurable threshold (default: 300 seconds).
 
 **Severity:** LOW with dedup + timestamp validation in place.
 
@@ -118,15 +118,15 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 3. Other teams connect to the attacker's socket, believing it to be the legitimate team
 
 **Mitigation:**
-- In v1, **impersonation defense is limited**. All containers share the same PSK, so possession of the PSK does not prove identity — it only proves membership in the set of authorized containers.
+- In v1, **impersonation defense is limited**. All containers share the same PSK, so possession of the PSK does not prove identity -- it only proves membership in the set of authorized containers.
 - The `from.team` field in the message envelope is self-asserted and NOT cryptographically verified in v1.
-- Registry writes are file-locked but not authenticated — any container can write any team name.
+- Registry writes are file-locked but not authenticated -- any container can write any team name.
 
 **Residual risk:** HIGH. v1 relies on Docker's container isolation and the assumption that only authorized containers mount the shared volume. If an unauthorized container gains volume access, it can impersonate any team.
 
 **v2 mitigation path:** Per-team X25519 keypairs with public keys in the registry. Messages are signed with the sender's private key, and the receiver verifies against the registered public key. This binds identity to a cryptographic key, not just volume access.
 
-**Severity:** HIGH — accepted risk in v1, mitigated by infrastructure trust.
+**Severity:** HIGH -- accepted risk in v1, mitigated by infrastructure trust.
 
 ---
 
@@ -141,9 +141,9 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 4. **Weak key:** PSK is not generated with sufficient entropy
 
 **Impact of compromise:**
-- All confidentiality is lost — attacker can decrypt all past and future messages (no forward secrecy in v1)
-- All integrity is lost — attacker can forge valid messages
-- All authentication is lost — attacker can impersonate any team
+- All confidentiality is lost -- attacker can decrypt all past and future messages (no forward secrecy in v1)
+- All integrity is lost -- attacker can forge valid messages
+- All authentication is lost -- attacker can impersonate any team
 
 **Mitigation:**
 - PSK MUST be 256 bits of cryptographically random data (e.g., `openssl rand -hex 32`)
@@ -170,7 +170,7 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 
 **Residual risk:** A malicious writer can continuously poison the registry faster than cleanup runs. v1 accepts this risk under the assumption that only authorized containers have volume access.
 
-**Severity:** MEDIUM — enables impersonation (T4) and denial of service.
+**Severity:** MEDIUM -- enables impersonation (T4) and denial of service.
 
 ---
 
@@ -193,7 +193,7 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 
 **Residual risk:** DoS is inherently difficult to fully prevent when the attacker has write access to the shared volume. v1 relies on Docker isolation to limit the attack surface.
 
-**Severity:** MEDIUM — disrupts availability but does not compromise confidentiality or integrity.
+**Severity:** MEDIUM -- disrupts availability but does not compromise confidentiality or integrity.
 
 ---
 
@@ -214,7 +214,7 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 | **Impersonation** | Shared PSK provides no per-team identity | v2: per-team X25519 keypairs |
 | **Traffic analysis** | Message sizes and timing are observable | Padding + constant-rate heartbeats (future) |
 | **Forward secrecy** | PSK compromise reveals all past messages | v2: ephemeral X25519 key exchange |
-| **Compromised Docker host** | Host has full access to volumes, secrets, memory | Out of scope — infrastructure trust assumption |
+| **Compromised Docker host** | Host has full access to volumes, secrets, memory | Out of scope -- infrastructure trust assumption |
 | **Insider threat (authorized container)** | All authorized containers share the PSK | v2: per-team keys + message signing |
 | **Key rotation without downtime** | No online key rotation protocol | v2: key versioning + graceful rollover |
 | **Side-channel attacks** | Timing attacks on crypto operations | Use constant-time crypto primitives (Node.js `crypto` module) |
@@ -242,13 +242,13 @@ This threat model covers **v1** of the inter-team encrypted chat system:
 
 ---
 
-# Threat Model — Hub/Relay Architecture (v2) (*CD:Vigenere*)
+# Threat Model -- Hub/Relay Architecture (v2) (*CD:Vigenere*)
 
 ## Scope
 
-This section covers the hub/relay architecture where all inter-host communication passes through a central hub. It supplements the v1 threat model above — v1 threats still apply to the UDS layer; v2 adds hub-specific threats.
+This section covers the hub/relay architecture where all inter-host communication passes through a central hub. It supplements the v1 threat model above -- v1 threats still apply to the UDS layer; v2 adds hub-specific threats.
 
-**Architecture change:** Fleet spans two hosts (RC server + PROD-LLM). A single hub relays ALL messages between teams — there is no peer-to-peer fallback. If the hub is down, teams wait for it to recover. Hub availability is an ops concern (restart/monitoring), not an application concern.
+**Architecture change:** Fleet spans two hosts (RC server + PROD-LLM). A single hub relays ALL messages between teams -- there is no peer-to-peer fallback. If the hub is down, teams wait for it to recover. Hub availability is an ops concern (restart/monitoring), not an application concern.
 
 ---
 
@@ -282,7 +282,7 @@ This section covers the hub/relay architecture where all inter-host communicatio
 | Boundary | Description |
 |---|---|
 | **B5: Hub process** | The hub is a distinct process with its own TLS identity (`CN=comms-hub`). It sees message envelopes but NOT plaintext bodies. It has NO E2E key material. |
-| **B6: Cross-host network** | TCP/TLS connection between hosts. Subject to network-level attacks (eavesdropping, injection) — mitigated by mTLS. |
+| **B6: Cross-host network** | TCP/TLS connection between hosts. Subject to network-level attacks (eavesdropping, injection) -- mitigated by mTLS. |
 | **B7: Key bundle provisioning** | The key bundle containing all teams' public keys is provisioned out-of-band. Compromise of the provisioning channel allows MITM on key distribution. |
 
 ---
@@ -291,9 +291,9 @@ This section covers the hub/relay architecture where all inter-host communicatio
 
 | Asset | Value | Location |
 |---|---|---|
-| **Ed25519 signing private key** | Per-team sender authentication — compromise allows message forgery as that team | `/run/secrets/comms-sign-key` |
-| **X25519 encryption private key** | Per-team E2E decryption — compromise allows reading messages TO that team | `/run/secrets/comms-enc-key` |
-| **Key bundle** | All teams' public keys — integrity is critical for E2E trust | `/run/secrets/comms-key-bundle.json` |
+| **Ed25519 signing private key** | Per-team sender authentication -- compromise allows message forgery as that team | `/run/secrets/comms-sign-key` |
+| **X25519 encryption private key** | Per-team E2E decryption -- compromise allows reading messages TO that team | `/run/secrets/comms-enc-key` |
+| **Key bundle** | All teams' public keys -- integrity is critical for E2E trust | `/run/secrets/comms-key-bundle.json` |
 | **Pairwise derived keys** | Cached symmetric keys for E2E encryption between team pairs | In-memory only |
 | **Message metadata** | Routing info visible to the hub: from, to, timestamp, type, priority | Hub memory during forwarding |
 
@@ -301,7 +301,7 @@ This section covers the hub/relay architecture where all inter-host communicatio
 
 ## Threat Analysis (v2)
 
-### T8: Compromised Hub — Content Exposure
+### T8: Compromised Hub -- Content Exposure
 
 **Threat:** An attacker gains control of the hub process and attempts to read message content.
 
@@ -309,7 +309,7 @@ This section covers the hub/relay architecture where all inter-host communicatio
 
 **Mitigation:**
 - Message bodies are E2E encrypted with X25519-derived AES-256-GCM keys
-- The hub possesses NO team X25519 private keys — it cannot derive pairwise keys
+- The hub possesses NO team X25519 private keys -- it cannot derive pairwise keys
 - The hub sees only ciphertext in the `body` field
 - Even with full hub compromise, the attacker gets metadata (from, to, timestamp) but NOT content
 
@@ -331,7 +331,7 @@ This section covers the hub/relay architecture where all inter-host communicatio
 - The hub does NOT possess any team's Ed25519 signing private key
 - Forged messages fail signature verification and are rejected
 
-**Residual risk:** If the hub colludes with a team, that team can sign messages legitimately. This is inherent — you cannot prevent a willing participant from signing messages.
+**Residual risk:** If the hub colludes with a team, that team can sign messages legitimately. This is inherent -- you cannot prevent a willing participant from signing messages.
 
 **Severity:** MITIGATED by Ed25519 signatures.
 
@@ -345,9 +345,9 @@ This section covers the hub/relay architecture where all inter-host communicatio
 
 **Mitigation:**
 - Message ID (`msg-<uuid>`) dedup at the receiver (existing v1 mechanism)
-- Timestamp validation — reject messages older than threshold (default: 300s)
+- Timestamp validation -- reject messages older than threshold (default: 300s)
 - Ed25519 signature is valid for the replay (it's a genuine message), so dedup + timestamp are the primary defenses
-- AAD in E2E encryption binds the message ID to the ciphertext — cannot change the ID without breaking decryption
+- AAD in E2E encryption binds the message ID to the ciphertext -- cannot change the ID without breaking decryption
 
 **Residual risk:** Same as v1 T3. Dedup window is finite.
 
@@ -364,8 +364,8 @@ This section covers the hub/relay architecture where all inter-host communicatio
 **Mitigation:**
 - E2E AAD includes both sender and receiver team names: `"v2:<msg-id>:<sender>:<receiver>"`
 - If the hub changes the `to` field, the receiver (Team C) would attempt to derive the wrong pairwise key (Team A↔C instead of Team A↔B), AND the AAD would not match
-- AES-GCM decryption fails — message rejected
-- Additionally, Ed25519 signature covers the `to` field — modifying it breaks the signature
+- AES-GCM decryption fails -- message rejected
+- Additionally, Ed25519 signature covers the `to` field -- modifying it breaks the signature
 
 **Residual risk:** None for content exposure. The hub CAN drop messages (DoS), but cannot redirect them.
 
@@ -381,7 +381,7 @@ This section covers the hub/relay architecture where all inter-host communicatio
 
 **Mitigation:**
 - Key bundle is provisioned via Docker secrets (tmpfs, not persisted to disk on host)
-- Key bundle has a `version` field — teams reject bundles with version ≤ previously seen version
+- Key bundle has a `version` field -- teams reject bundles with version ≤ previously seen version
 - Out-of-band verification: operators can verify key fingerprints manually
 - Future: sign the key bundle with an offline root key
 
@@ -415,11 +415,11 @@ This section covers the hub/relay architecture where all inter-host communicatio
 **Attack vector:** Hub crash, resource exhaustion, network partition, or deliberate takedown.
 
 **Impact:**
-- ALL messages are blocked — hub is the single communication path (no peer-to-peer fallback)
+- ALL messages are blocked -- hub is the single communication path (no peer-to-peer fallback)
 - Messages are queued locally at the sender until hub recovers
 
 **Mitigation:**
-- Hub restart is an ops responsibility — automatic restart via Docker restart policy
+- Hub restart is an ops responsibility -- automatic restart via Docker restart policy
 - Message queue with configurable retention at the sender
 - Hub health monitoring via heartbeat (existing 60s interval)
 - Future: hub redundancy (active-passive or multi-hub)
@@ -443,9 +443,9 @@ This section covers the hub/relay architecture where all inter-host communicatio
 **Mitigation:**
 - Key compromise is isolated per team (unlike v1 where PSK compromise breaks everything)
 - Revocation: remove compromised team from key bundle, distribute updated bundle
-- Future (v3): ephemeral X25519 ratcheting for forward secrecy — past messages remain safe even after key compromise
+- Future (v3): ephemeral X25519 ratcheting for forward secrecy -- past messages remain safe even after key compromise
 
-**Severity:** HIGH for the compromised team. Contained — does not cascade to other teams.
+**Severity:** HIGH for the compromised team. Contained -- does not cascade to other teams.
 
 **Improvement over v1:** v1 PSK compromise breaks ALL confidentiality and integrity for ALL teams. v2 key compromise is scoped to the affected team only.
 
@@ -468,7 +468,7 @@ This section covers the hub/relay architecture where all inter-host communicatio
 | Threat | Reason | Mitigation Path |
 |---|---|---|
 | **Metadata / traffic analysis** | Hub sees routing info by design | Padding + dummy traffic (v3) |
-| **Forward secrecy** | Static X25519 — past messages decryptable with compromised key | v3: ephemeral X25519 ratcheting (Double Ratchet) |
+| **Forward secrecy** | Static X25519 -- past messages decryptable with compromised key | v3: ephemeral X25519 ratcheting (Double Ratchet) |
 | **Key bundle TOFU** | First bundle must be trusted | Signed key bundles with offline root (v3) |
 | **Hub availability** | Single point of failure for cross-host | Multi-hub / active-passive (v3) |
 | **Compromised provisioning pipeline** | Attacker controls Docker secrets | Infrastructure security (out of scope) |

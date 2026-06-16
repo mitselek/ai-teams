@@ -35,7 +35,7 @@ if [ "$MODE" = "--wipe-memory" ]; then
             ;;
     esac
     echo ""
-    echo "WARNING: Deleting $MEM_VOLUME — wipes $TEAM's ~/.claude/ memory permanently."
+    echo "WARNING: Deleting $MEM_VOLUME -- wipes $TEAM's ~/.claude/ memory permanently."
     read -r -p "Are you sure? (yes/no): " confirm
     if [ "$confirm" = "yes" ]; then
         docker volume rm "$MEM_VOLUME" && echo "Volume deleted."

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# DEPRECATED -- 2026-04-24 (mitselek/ai-teams#60)
 # ──────────────────────────────────────────────────────────────────────────────
 # tmux-pane spawning retired as the framework default. This design artifact
 # remains in designs/new/ as historical reference; do NOT invoke.
@@ -25,7 +25,7 @@ exit 1
 #
 # Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
 #
-# tmux session name: "hr-devs" (short name — NOT "hr-devs" full team name, they happen to match)
+# tmux session name: "hr-devs" (short name -- NOT "hr-devs" full team name, they happen to match)
 # See container-deployment-runbook.md §15 and §21.
 
 # Parse --target-pane option
@@ -89,7 +89,7 @@ SPAWN_SCRIPT=$(mktemp /tmp/spawn-cmd-XXXXXX.sh)
   echo 'export CLAUDECODE=1'
   echo 'export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1'
   # NODE_EXTRA_CA_CERTS: use the value from .bashrc (set by entrypoint).
-  # Not hardcoded — path differs between bare-metal (/home/dev/.claude/custom_certs.pem)
+  # Not hardcoded -- path differs between bare-metal (/home/dev/.claude/custom_certs.pem)
   # and container (/opt/warp-ca.pem). Source .bashrc to pick up the correct value.
   echo 'source ~/.bashrc 2>/dev/null || true'
   echo "export CLAUDE_ENV_ID=\"HR-DEVS\""
@@ -112,7 +112,7 @@ if [[ -n "$TARGET_PANE" ]]; then
   TMUX_PANE_ID="$TARGET_PANE"
   tmux send-keys -t "$TARGET_PANE" "bash $SPAWN_SCRIPT" Enter
 else
-  # Fallback: split a new pane (uncontrolled layout — prefer --target-pane)
+  # Fallback: split a new pane (uncontrolled layout -- prefer --target-pane)
   tmux split-window -t "$TMUX_SESSION" -h -l '70%' -c "$HOME/workspace/hr-platform/conversations" \
     "$SPAWN_SCRIPT"
   TMUX_PANE_ID=$(tmux list-panes -t "$TMUX_SESSION" -F '#{pane_id}' | tail -1)

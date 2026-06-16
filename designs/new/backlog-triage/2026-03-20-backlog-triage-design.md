@@ -1,4 +1,4 @@
-# Backlog Triage Team — Design Spec
+# Backlog Triage Team -- Design Spec
 
 **Team:** `backlog-triage`
 **Mission:** Cross-reference the Jira VL project backlog with GitHub issues, PRs, and commits in `Eesti-Raudtee/hr-platform` to identify which Jira tickets can be closed.
@@ -8,9 +8,9 @@
 
 ## 1. Problem Statement
 
-The Jira VL project backlog contains 97 items (primarily VL-116 through VL-198, plus older items). Many of these may already be implemented — evidenced by closed GitHub issues, merged PRs, and commits in the hr-platform repo. There is no systematic link between the two systems.
+The Jira VL project backlog contains 97 items (primarily VL-116 through VL-198, plus older items). Many of these may already be implemented -- evidenced by closed GitHub issues, merged PRs, and commits in the hr-platform repo. There is no systematic link between the two systems.
 
-The team performs **functional matching**: understanding what each Jira ticket describes, then searching GitHub and the codebase for evidence that the work has been done — even when no explicit cross-reference exists.
+The team performs **functional matching**: understanding what each Jira ticket describes, then searching GitHub and the codebase for evidence that the work has been done -- even when no explicit cross-reference exists.
 
 ## 2. Team Composition
 
@@ -21,7 +21,7 @@ The team performs **functional matching**: understanding what each Jira ticket d
 | **forensic** | Code Researcher | sonnet | Searches commits, diffs, and live codebase for implementation evidence |
 | **consul** | Stakeholder Advocate | opus | Reviews evidence with product/business lens, renders verdict |
 
-**Model rationale:** Consul gets opus because verdict requires judgment — understanding whether code actually fulfills a business requirement. The two researchers are pattern-matching tasks that sonnet handles well. Lead gets opus for coordination and Jira write operations.
+**Model rationale:** Consul gets opus because verdict requires judgment -- understanding whether code actually fulfills a business requirement. The two researchers are pattern-matching tasks that sonnet handles well. Lead gets opus for coordination and Jira write operations.
 
 ## 3. Pipeline Flow
 
@@ -31,11 +31,11 @@ Each of the 97 Jira tickets is processed sequentially through the pipeline, in t
 Lead → Archivist → Forensic → Consul → Lead
 ```
 
-### Step 1 — Lead picks ticket
+### Step 1 -- Lead picks ticket
 
 Reads the Jira ticket (summary, description, acceptance criteria) via `jira_get_issue`. Sends ticket details to Archivist.
 
-### Step 2 — Archivist researches issues
+### Step 2 -- Archivist researches issues
 
 Searches hr-platform GitHub for:
 
@@ -45,7 +45,7 @@ Searches hr-platform GitHub for:
 
 Reports findings (with links) back to Lead, who forwards to Forensic.
 
-### Step 3 — Forensic researches code
+### Step 3 -- Forensic researches code
 
 Receives the ticket + Archivist's findings. Searches for:
 
@@ -55,7 +55,7 @@ Receives the ticket + Archivist's findings. Searches for:
 
 Reports findings (with links) back to Lead, who forwards to Consul.
 
-### Step 4 — Consul renders verdict
+### Step 4 -- Consul renders verdict
 
 Receives the ticket + all evidence. Evaluates:
 
@@ -65,7 +65,7 @@ Receives the ticket + all evidence. Evaluates:
 
 Renders one of three verdicts: `not_connected`, `needs_confirmation`, `done`.
 
-### Step 5 — Lead acts on verdict
+### Step 5 -- Lead acts on verdict
 
 | Verdict | Jira action | Report file |
 |---|---|---|
@@ -77,17 +77,17 @@ Renders one of three verdicts: `not_connected`, `needs_confirmation`, `done`.
 
 ### Jira (MCP tools)
 
-- `jira_search` — query the VL backlog
-- `jira_get_issue` — read individual ticket details
-- `jira_update_issue` — post comments with evidence links
-- `jira_transition` — move tickets to Done (transition ID 31)
+- `jira_search` -- query the VL backlog
+- `jira_get_issue` -- read individual ticket details
+- `jira_update_issue` -- post comments with evidence links
+- `jira_transition` -- move tickets to Done (transition ID 31)
 
 ### GitHub (`gh` CLI + git)
 
-- `gh issue list/view` — search hr-platform issues
-- `gh pr list/view` — search PRs
-- `git log --all --grep` — search commit messages
-- `git log -S` / `git log -G` — search for code changes (pickaxe)
+- `gh issue list/view` -- search hr-platform issues
+- `gh pr list/view` -- search PRs
+- `git log --all --grep` -- search commit messages
+- `git log -S` / `git log -G` -- search for code changes (pickaxe)
 - Standard file reading for codebase inspection
 
 ### Access matrix
@@ -105,19 +105,19 @@ Lead holds the write tools (`jira_update_issue`, `jira_transition`) since all ve
 
 Three markdown files in the team's working directory, updated incrementally as each ticket is processed:
 
-### `todo.md` — Not connected
+### `todo.md` -- Not connected
 
 | Jira | Summary | Notes |
 |---|---|---|
 | VL-xxx | ... | No matching GitHub activity found |
 
-### `toconfirm.md` — Connected, needs PO confirmation
+### `toconfirm.md` -- Connected, needs PO confirmation
 
 | Jira | Summary | GitHub evidence | Jira comment posted | Why uncertain |
 |---|---|---|---|---|
 | VL-xxx | ... | #215, #220, abc123 | Yes | UI behavior not verifiable from code |
 
-### `done.md` — Connected and closed
+### `done.md` -- Connected and closed
 
 | Jira | Summary | GitHub evidence | Jira comment posted | Transitioned |
 |---|---|---|---|---|
@@ -159,8 +159,8 @@ The team's job is done when all 97 backlog items have been processed:
 
 ### After completion
 
-1. PO reviews `toconfirm.md` — decides which to close, which stay open
-2. `todo.md` becomes the remaining backlog — what actually still needs development
+1. PO reviews `toconfirm.md` -- decides which to close, which stay open
+2. `todo.md` becomes the remaining backlog -- what actually still needs development
 3. Container stays available for future re-triage runs
 
 ## 8. Jira Reference

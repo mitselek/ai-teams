@@ -2,13 +2,13 @@
 #
 # Builds the backlog-triage team container from scratch on Debian bookworm-slim.
 # Unlike hr-devs (which extends ai-teams-claude:latest/Ubuntu), this image starts
-# from a minimal Debian base — cleaner, smaller, no inherited apt source conflicts.
+# from a minimal Debian base -- cleaner, smaller, no inherited apt source conflicts.
 #
 # Purpose: Read-only cross-reference agent team (Jira + GitHub + git history).
 # No Wrangler, no Dynamics MCP, no dev server ports. Just SSH + Jira + gh CLI.
 #
 # What gets installed from scratch:
-#   - Node.js 22 LTS (binary tarball — bypasses Ubuntu PPA entanglement)
+#   - Node.js 22 LTS (binary tarball -- bypasses Ubuntu PPA entanglement)
 #   - git, gh CLI (GitHub CLI), curl, jq
 #   - openssh-server (SSH on port 2226)
 #   - tmux, locales
@@ -20,14 +20,14 @@
 #   bt-repo         → /home/ai-teams/workspace  (hr-platform + dev-toolkit repos)
 #
 # Ports:
-#   2226  — SSH (PO access, auto-tmux on login)
+#   2226  -- SSH (PO access, auto-tmux on login)
 #
 # Port allocation on RC server (100.96.54.170):
-#   2222  — apex-research
-#   2223  — polyphony-dev
-#   2224  — entu-research
-#   2225  — hr-devs
-#   2226  — backlog-triage (this image)
+#   2222  -- apex-research
+#   2223  -- polyphony-dev
+#   2224  -- entu-research
+#   2225  -- hr-devs
+#   2226  -- backlog-triage (this image)
 #
 # Build (run from designs/new/backlog-triage/container/):
 #   docker compose -f docker-compose.backlog-triage.yml build
@@ -96,11 +96,11 @@ RUN curl --insecure -fsSL https://cli.github.com/packages/githubcli-archive-keyr
     && gh --version
 
 # ── Node.js 22 LTS ────────────────────────────────────────────────────────────
-# Download official binary tarball directly from nodejs.org — avoids nodesource
+# Download official binary tarball directly from nodejs.org -- avoids nodesource
 # PPA complexities and Ubuntu-only scripts.
 #
 # WARP note: --insecure for nodejs.org download (WARP TLS interception at build time).
-# The binary is identified by its versioned filename — not by TLS alone.
+# The binary is identified by its versioned filename -- not by TLS alone.
 RUN curl --insecure -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz \
         -o /tmp/node.tar.gz \
     && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
@@ -120,7 +120,7 @@ RUN groupadd -g 1000 ai-teams \
 
 # ── SSH server configuration ───────────────────────────────────────────────────
 # Port 2226 (backlog-triage allocation).
-# Root login and password auth disabled — pubkey only via ai-teams user.
+# Root login and password auth disabled -- pubkey only via ai-teams user.
 # UsePAM=no: PAM would block locked accounts; pubkey auth handles auth directly.
 RUN mkdir -p /run/sshd \
     && ssh-keygen -A \
@@ -137,7 +137,7 @@ ENV DEBIAN_FRONTEND=
 # Installed via npm global as root, then symlinked into ai-teams PATH.
 # npm install -g works natively (no SOCKS5 proxy needed) on PROD-LLM.
 # The claude.ai/install.sh native installer uses Node.js fetch() which does NOT
-# support SOCKS5 proxies — unusable on hosts where api.anthropic.com requires a
+# support SOCKS5 proxies -- unusable on hosts where api.anthropic.com requires a
 # SOCKS tunnel. npm install avoids this entirely.
 RUN npm install -g @anthropic-ai/claude-code 2>&1 | tail -3 \
     && claude --version
@@ -145,7 +145,7 @@ RUN npm install -g @anthropic-ai/claude-code 2>&1 | tail -3 \
 # ── Entrypoint + scripts + team config ────────────────────────────────────────
 # apply-layout.sh, statusline-command.sh, spawn_member.sh, and start-team.sh
 # live in ai-teams home dir so they are available before any repo is cloned.
-# team-config/ holds roster, prompts, and common-prompt — read by agents at startup.
+# team-config/ holds roster, prompts, and common-prompt -- read by agents at startup.
 # CLAUDE.md lands at workspace root so Claude picks it up automatically when cwd
 # is set to /home/ai-teams/workspace/hr-platform.
 COPY entrypoint-backlog-triage.sh /entrypoint-backlog-triage.sh
@@ -170,7 +170,7 @@ RUN chmod +x /entrypoint-backlog-triage.sh \
 
 WORKDIR /home/ai-teams/workspace
 
-# Only SSH port — this team reads, it does not serve.
+# Only SSH port -- this team reads, it does not serve.
 EXPOSE 2226
 
 ENTRYPOINT ["/entrypoint-backlog-triage.sh"]

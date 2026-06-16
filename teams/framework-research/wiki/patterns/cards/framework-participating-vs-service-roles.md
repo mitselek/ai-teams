@@ -17,9 +17,9 @@ The provider strategy boundary for any role is determined by its relationship to
 
 ## Key ideas
 
-- **Framework-participating (Claude-only)**: team-leads, ARCHITECT, PURPLE, Librarian, Medici, code reviewers — inside the five-layer lock-in model; replacing the model means re-validating all five layers.
-- **Service roles (provider-agnostic)**: Eilama, potentially RED/GREEN — below all five lock-in layers; output validated structurally (tests pass/fail), not behaviorally.
-- **Key corollary — tool vs agent**: "adding a non-Claude model does not mean adding a non-Claude agent." A vision API via MCP is a tool, not an agent; it doesn't change provider composition. Prevents multi-provider scope creep.
+- **Framework-participating (Claude-only)**: team-leads, ARCHITECT, PURPLE, Librarian, Medici, code reviewers -- inside the five-layer lock-in model; replacing the model means re-validating all five layers.
+- **Service roles (provider-agnostic)**: Eilama, potentially RED/GREEN -- below all five lock-in layers; output validated structurally (tests pass/fail), not behaviorally.
+- **Key corollary -- tool vs agent**: "adding a non-Claude model does not mean adding a non-Claude agent." A vision API via MCP is a tool, not an agent; it doesn't change provider composition. Prevents multi-provider scope creep.
 - **Decision flowchart**: uses SendMessage? → Claude-only. Submits to Librarian? → Claude-only. Output verified by tests/schema? → service role. Else → case-by-case.
 - **Sidecar/peer maps to service/framework-participating** at the governance level.
 

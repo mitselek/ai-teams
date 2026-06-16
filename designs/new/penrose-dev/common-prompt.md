@@ -1,4 +1,4 @@
-# Penrose Development — Common Standards
+# Penrose Development -- Common Standards
 
 ## Team
 
@@ -12,7 +12,7 @@
 - **Project directory:** `~/Documents/github/mitselek/projects/penrose/`
 - **Source code:** `src/` directory within the project
 - **Tests:** `tests/` directory within the project
-- **Design spec:** `~/Documents/github/mitselek/docs/superpowers/specs/2026-03-23-penrose-modularization-design.md` — the authoritative reference for types, module structure, data flow, and test cases
+- **Design spec:** `~/Documents/github/mitselek/docs/superpowers/specs/2026-03-23-penrose-modularization-design.md` -- the authoritative reference for types, module structure, data flow, and test cases
 
 ## Tech Stack
 
@@ -20,7 +20,7 @@
 - **Build:** Vite (serves `.ts` in dev, no build step required)
 - **Testing:** Vitest (zero-config with Vite)
 - **Rendering:** SVG (browser DOM, no canvas)
-- **No frameworks** — vanilla TypeScript, no React/Vue/Svelte
+- **No frameworks** -- vanilla TypeScript, no React/Vue/Svelte
 
 ## Domain Gotcha: TAU ≠ 2π
 
@@ -28,7 +28,7 @@ In this codebase, `TAU = 1/PHI ≈ 0.618` (reciprocal of the golden ratio). This
 
 Three competing conventions exist in mathematics:
 - τ = φ ≈ 1.618 (European mathematical tradition)
-- τ = 1/φ ≈ 0.618 (this project — subdivision scaling factor)
+- τ = 1/φ ≈ 0.618 (this project -- subdivision scaling factor)
 - τ = 2π ≈ 6.283 (Tau Manifesto, modern programming)
 
 Always verify against `penrose.js` line 6: `const TAU = 1 / PHI`.
@@ -60,13 +60,13 @@ tests/
 
 ## Hard Boundary Rule
 
-`types.ts`, `geometry.ts`, `subdivision.ts`, `tiling.ts`, `wiring.ts`, `signals.ts`, `simulation.ts` — **ZERO DOM imports.** Only `renderer.ts`, `controls.ts`, and `main.ts` may touch browser APIs.
+`types.ts`, `geometry.ts`, `subdivision.ts`, `tiling.ts`, `wiring.ts`, `signals.ts`, `simulation.ts` -- **ZERO DOM imports.** Only `renderer.ts`, `controls.ts`, and `main.ts` may touch browser APIs.
 
 ## Module Ownership
 
 | Module | Owner | Notes |
 |---|---|---|
-| `types.ts` | Ammann | Shared types — changes require Penrose review |
+| `types.ts` | Ammann | Shared types -- changes require Penrose review |
 | `geometry.ts` | Ammann | Vec2 ops, constants |
 | `subdivision.ts` | Ammann | Robinson triangles, heal mechanics |
 | `tiling.ts` | Ammann | buildTiling, tile construction loop |
@@ -94,8 +94,8 @@ All persistent text output must carry the author agent's name in the format `(*P
 | Output type | Placement |
 |---|---|
 | Source code file | Comment at top of file: `// (*PD:<AgentName>*)` |
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 
 ## Language Rules
 
@@ -106,9 +106,9 @@ All persistent text output must carry the author agent's name in the format `(*P
 
 All new functionality follows the **Red → Green → Refactor** cycle:
 
-1. **Shechtman writes failing tests first** — from the design spec, before any implementation exists
-2. **Ammann/Bruijn/Escher implement** — write the minimum code to make the tests pass
-3. **Penrose reviews** — RED/YELLOW/GREEN verdict before merge
+1. **Shechtman writes failing tests first** -- from the design spec, before any implementation exists
+2. **Ammann/Bruijn/Escher implement** -- write the minimum code to make the tests pass
+3. **Penrose reviews** -- RED/YELLOW/GREEN verdict before merge
 
 ### TDD Workflow
 
@@ -126,15 +126,15 @@ All new functionality follows the **Red → Green → Refactor** cycle:
 
 | Verdict | Meaning | Action |
 |---|---|---|
-| **RED** | Blockers present — mathematical errors, type safety violations, spec deviations, missing edge cases | Implementer must fix and re-submit |
-| **YELLOW** | Minor issues — style, naming, small improvements | Approve with notes, implementer addresses in follow-up |
+| **RED** | Blockers present -- mathematical errors, type safety violations, spec deviations, missing edge cases | Implementer must fix and re-submit |
+| **YELLOW** | Minor issues -- style, naming, small improvements | Approve with notes, implementer addresses in follow-up |
 | **GREEN** | Clean, correct, spec-compliant | Merge ready |
 
 ## Migration Pipeline
 
 The extraction follows a strict order matching module dependencies:
 
-1. **Scaffold** — `package.json`, `vite.config.ts`, empty `src/` and `tests/`
+1. **Scaffold** -- `package.json`, `vite.config.ts`, empty `src/` and `tests/`
 2. **Phase 1: Geometry** (Shechtman → Ammann → Penrose)
    - `types.ts` → `geometry.ts` → `subdivision.ts` → `tiling.ts`
 3. **Phase 2: Simulation** (Shechtman → Bruijn → Penrose)
@@ -142,11 +142,11 @@ The extraction follows a strict order matching module dependencies:
 4. **Phase 3: Rendering** (Escher → Penrose)
    - `renderer.ts` → `controls.ts` → `main.ts` → `index.html`
 5. **Phase 4: Integration** (Shechtman writes integration tests, Penrose final review)
-6. **Phase 5: Cleanup** — remove old `penrose.js`, strip `index.html` to shell
+6. **Phase 5: Cleanup** -- remove old `penrose.js`, strip `index.html` to shell
 
 ## Standards
 
-- This is a DEVELOPMENT team — we write production code
+- This is a DEVELOPMENT team -- we write production code
 - All code goes into `src/` and `tests/` within the project directory
 - Tests are mandatory for all simulation logic (no DOM tests required)
 - Git commits follow conventional commits: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`

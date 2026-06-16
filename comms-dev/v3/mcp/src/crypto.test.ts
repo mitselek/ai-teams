@@ -1,44 +1,44 @@
 // (*CD:Kerckhoffs*)
 // RED tests for story/33: Wire E2E crypto into hub and MCP.
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — sender encrypts + signs before POST:
+//   AC1 -- sender encrypts + signs before POST:
 //     Given: MCP configured with team-a's Ed25519 sign key + X25519 enc key + key bundle
 //     When:  comms_send tool called with { to: 'team-b', body: 'plaintext hello' }
 //     Then:  message POSTed to hub has: signature field, body_hash field,
 //            body is NOT 'plaintext hello' (it's JSON-encoded E2EPayload);
 //            decrypting body with team-b's key recovers 'plaintext hello'
 //
-//   AC2 — receiver verifies + decrypts on SSE:
+//   AC2 -- receiver verifies + decrypts on SSE:
 //     Given: team-b's MCP server has crypto configured; team-a sends encrypted+signed message
 //     When:  team-b's SSESubscriber receives the SSE event
 //     Then:  inbox contains the decrypted plaintext body, not the E2EPayload JSON
 //
-//   AC3 — hub forwards body verbatim (hub is crypto-blind):
+//   AC3 -- hub forwards body verbatim (hub is crypto-blind):
 //     Given: team-a sends a message with encrypted body to hub
 //     When:  hub routes to team-b via SSE
 //     Then:  SSE event body field equals the exact encrypted blob team-a sent (unchanged)
 //
-//   AC4 — invalid signature dropped at receiver:
+//   AC4 -- invalid signature dropped at receiver:
 //     Given: MCP server with crypto configured (verifySignature enabled)
 //     When:  a message with tampered signature arrives via SSE
 //     Then:  message is NOT added to inbox (dropped silently)
 //
-//   AC5 — key bundle loaded from configurable path:
+//   AC5 -- key bundle loaded from configurable path:
 //     Given: key bundle JSON written to a temp file; path set in McpOptions.keyBundlePath
 //     When:  createMcpServer({ ..., keyBundlePath, signKeyPath, encKeyPath }) is called
 //     Then:  the resulting server can send encrypted, signed messages
 //
-//   AC6 — pairwise key isolation (C cannot decrypt A→B messages):
+//   AC6 -- pairwise key isolation (C cannot decrypt A→B messages):
 //     Given: team-a encrypts a message for team-b using X25519 pairwise keys
 //     When:  team-c (with its own key pair) tries to decrypt the same E2EPayload
 //     Then:  e2eDecrypt throws "E2E decryption failed: authentication tag mismatch"
 //
-//   AC7 — AAD includes sender + receiver (decryption fails if swapped):
+//   AC7 -- AAD includes sender + receiver (decryption fails if swapped):
 //     Given: team-a encrypts body for team-b with AAD = "v2:<id>:team-a:team-b"
 //     When:  team-b tries to decrypt treating sender as team-b, receiver as team-a
-//     Then:  decryption fails — AAD mismatch → authentication tag error
+//     Then:  decryption fails -- AAD mismatch → authentication tag error
 //
 // RED conditions:
 //   AC1: SendTool.ToolDeps has no `crypto` field; tool does not call e2eEncrypt/signEnvelope
@@ -73,7 +73,7 @@ import { InboxBuffer, SSESubscriber } from './subscribe.js';
 import { createMcpServer } from './server.js';
 import * as SendTool from './tools/send.js';
 
-// Crypto module — from comms-dev root src/
+// Crypto module -- from comms-dev root src/
 import { createCryptoAPIv2 } from '../../../src/crypto/index.js';
 import type { CryptoAPIv2, E2EPayload, KeyBundle } from '../../../src/crypto/index.js';
 
@@ -259,7 +259,7 @@ beforeAll(async () => {
   cEnc = genX25519();
 
   // Key bundle: only team-a and team-b
-  // (team-c intentionally excluded from A↔B bundle — pairwise isolation)
+  // (team-c intentionally excluded from A↔B bundle -- pairwise isolation)
   keyBundle = {
     version: 1,
     generated_at: new Date().toISOString(),
@@ -269,7 +269,7 @@ beforeAll(async () => {
     },
   };
 
-  // Key bundle for team-c (contains A, B, C — so C can encrypt for anyone)
+  // Key bundle for team-c (contains A, B, C -- so C can encrypt for anyone)
   const cBundle: KeyBundle = {
     version: 1,
     generated_at: new Date().toISOString(),
@@ -345,9 +345,9 @@ afterAll(async () => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — sender encrypts + signs before POST ──────────────────────────────────
+// ── AC1 -- sender encrypts + signs before POST ──────────────────────────────────
 
-describe('AC1 — comms_send encrypts body and signs envelope', () => {
+describe('AC1 -- comms_send encrypts body and signs envelope', () => {
   it('sent message has signature + body_hash; body is E2E encrypted, not plaintext', async () => {
     // Capture the message sent to the hub via a mock client
     type SentMsg = Record<string, unknown>;
@@ -360,7 +360,7 @@ describe('AC1 — comms_send encrypts body and signs envelope', () => {
     };
 
     const inbox = new InboxBuffer();
-    // RED: ToolDeps has no `crypto` field — tool ignores the crypto instance even if passed
+    // RED: ToolDeps has no `crypto` field -- tool ignores the crypto instance even if passed
     const deps = {
       client: mockClient,
       inbox,
@@ -393,9 +393,9 @@ describe('AC1 — comms_send encrypts body and signs envelope', () => {
   });
 });
 
-// ── AC2 — receiver verifies + decrypts on SSE receive ──────────────────────────
+// ── AC2 -- receiver verifies + decrypts on SSE receive ──────────────────────────
 
-describe('AC2 — inbox contains decrypted plaintext, not raw E2EPayload JSON', () => {
+describe('AC2 -- inbox contains decrypted plaintext, not raw E2EPayload JSON', () => {
   it('MCP subscriber decrypts body before pushing to inbox', async () => {
     // Build an encrypted+signed message from team-a to team-b
     const msgId = `e2e-ac2-${Date.now()}`;
@@ -455,9 +455,9 @@ describe('AC2 — inbox contains decrypted plaintext, not raw E2EPayload JSON', 
   });
 });
 
-// ── AC3 — hub forwards body verbatim ──────────────────────────────────────────
+// ── AC3 -- hub forwards body verbatim ──────────────────────────────────────────
 
-describe('AC3 — hub forwards E2E body verbatim (hub is crypto-blind)', () => {
+describe('AC3 -- hub forwards E2E body verbatim (hub is crypto-blind)', () => {
   it('SSE event body at receiver matches exactly what sender posted', async () => {
     const msgId = `e2e-ac3-${Date.now()}`;
     const e2ePayload = await aCrypto.e2eEncrypt(
@@ -507,9 +507,9 @@ describe('AC3 — hub forwards E2E body verbatim (hub is crypto-blind)', () => {
   });
 });
 
-// ── AC4 — invalid signature dropped at receiver ────────────────────────────────
+// ── AC4 -- invalid signature dropped at receiver ────────────────────────────────
 
-describe('AC4 — messages with invalid signature are not delivered to inbox', () => {
+describe('AC4 -- messages with invalid signature are not delivered to inbox', () => {
   it('tampered signature: message dropped; inbox stays empty', async () => {
     // Build a properly-encrypted message but tamper the signature
     const msgId = `e2e-ac4-${Date.now()}`;
@@ -570,7 +570,7 @@ describe('AC4 — messages with invalid signature are not delivered to inbox', (
       // No signature, no body_hash
     };
 
-    // Subscribe team-b with crypto configured — subscriber drops unverified messages
+    // Subscribe team-b with crypto configured -- subscriber drops unverified messages
     const { inbox, subscriber } = createMcpServer({
       hubUrl,
       cert: teamBCert.cert,
@@ -586,18 +586,18 @@ describe('AC4 — messages with invalid signature are not delivered to inbox', (
 
     await httpsPost(hubPort, '/api/send', caCrt, teamACert, unsignedMsg);
 
-    // Wait a short time — if message arrives it's a failure
+    // Wait a short time -- if message arrives it's a failure
     await new Promise<void>((r) => setTimeout(r, 200));
     subscriber.stop();
 
-    // SSESubscriber with crypto must drop unsigned messages — inbox stays empty
+    // SSESubscriber with crypto must drop unsigned messages -- inbox stays empty
     expect(inbox.messages.length).toBe(0);
   });
 });
 
-// ── AC5 — key bundle from configurable file path ───────────────────────────────
+// ── AC5 -- key bundle from configurable file path ───────────────────────────────
 
-describe('AC5 — createMcpServer loads crypto from key file paths', () => {
+describe('AC5 -- createMcpServer loads crypto from key file paths', () => {
   it('McpOptions accepts keyBundlePath + signKeyPath + encKeyPath', async () => {
     // Write team-b's private keys to temp files
     const bSignKeyPath = join(tmpDir, 'b-sign.pem');
@@ -646,9 +646,9 @@ describe('AC5 — createMcpServer loads crypto from key file paths', () => {
   });
 });
 
-// ── AC6 — pairwise key isolation ───────────────────────────────────────────────
+// ── AC6 -- pairwise key isolation ───────────────────────────────────────────────
 
-describe('AC6 — pairwise key isolation: C cannot decrypt A→B messages', () => {
+describe('AC6 -- pairwise key isolation: C cannot decrypt A→B messages', () => {
   it('team-c decryption of A→B message throws authentication tag mismatch', async () => {
     const msgId = `e2e-ac6-${Date.now()}`;
 
@@ -659,7 +659,7 @@ describe('AC6 — pairwise key isolation: C cannot decrypt A→B messages', () =
       msgId,
     );
 
-    // team-c tries to decrypt — should fail with GCM auth tag error
+    // team-c tries to decrypt -- should fail with GCM auth tag error
     // team-c has its own keys; the pairwise key for C↔A differs from A↔B
     await expect(cCrypto.e2eDecrypt(e2ePayload, msgId)).rejects.toThrow(
       'E2E decryption failed: authentication tag mismatch',
@@ -678,9 +678,9 @@ describe('AC6 — pairwise key isolation: C cannot decrypt A→B messages', () =
   });
 });
 
-// ── AC7 — AAD binds sender + receiver ─────────────────────────────────────────
+// ── AC7 -- AAD binds sender + receiver ─────────────────────────────────────────
 
-describe('AC7 — AAD "v2:<id>:<sender>:<receiver>" prevents ciphertext transplant', () => {
+describe('AC7 -- AAD "v2:<id>:<sender>:<receiver>" prevents ciphertext transplant', () => {
   it('decryption fails when sender/receiver are swapped in AAD', async () => {
     const msgId = `e2e-ac7-${Date.now()}`;
 
@@ -698,7 +698,7 @@ describe('AC7 — AAD "v2:<id>:<sender>:<receiver>" prevents ciphertext transpla
       sender_team: TEAM_B, // lie: claim it came from team-b
     };
 
-    // team-a tries to decrypt, expecting AAD "v2:id:team-b:team-a" — will mismatch
+    // team-a tries to decrypt, expecting AAD "v2:id:team-b:team-a" -- will mismatch
     await expect(aCrypto.e2eDecrypt(spoofedPayload, msgId)).rejects.toThrow(
       'E2E decryption failed: authentication tag mismatch',
     );

@@ -15,12 +15,12 @@ tags: [substrate-fact, wake-mechanism, inbox, members, ghost-member, architectur
 
 ## TLDR
 
-The Claude Code multi-agent harness wakes a team member when their inbox file is written. The wake mechanism IS the file write — there is no separate signal channel. This is the canonical substrate invariant FR's failure-mode entries assume but never articulate in one place.
+The Claude Code multi-agent harness wakes a team member when their inbox file is written. The wake mechanism IS the file write -- there is no separate signal channel. This is the canonical substrate invariant FR's failure-mode entries assume but never articulate in one place.
 
 ## Key ideas
 
-- **Corollary 1**: member identity is `members[]` array membership, nothing more — SendMessage accepts dispatch to any named entry with no live process required (appends `read:false`, returns `success:true`).
-- **Corollary 2**: external processes are first-class team members — anything writing/reading inbox JSON can be a teammate (chat.py ~150 LOC demo).
+- **Corollary 1**: member identity is `members[]` array membership, nothing more -- SendMessage accepts dispatch to any named entry with no live process required (appends `read:false`, returns `success:true`).
+- **Corollary 2**: external processes are first-class team members -- anything writing/reading inbox JSON can be a teammate (chat.py ~150 LOC demo).
 - **RFC #66 Findings 1-3**: ghost-relay entry accepted dispatch without wake; direct Write to an inbox woke the recipient in ~3s; chat.py self-registered.
 - **Substrate scope**: tested macOS + Linux/Docker + Windows-Git-Bash; Linux verified empirically 2026-05-14; Windows out-of-scope (not a deployment target).
 - **The property FR's failure-modes describe violations of**: worktree-spawn-asymmetry (writer/reader see different filesystem objects), inbox-drained-on-spawn (drain ≠ deliver).

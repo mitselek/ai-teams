@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms-acl — ACL inspection CLI for the cross-team relay daemon.
+// comms-acl -- ACL inspection CLI for the cross-team relay daemon.
 // Spec: #17 §1
 //
 // Commands:
@@ -7,11 +7,11 @@
 //   comms-acl check --from <agent@team> --to <agent@team>
 //   comms-acl show --agent <name>
 //
-// Read-only — never writes. ACL is pre-provisioned.
+// Read-only -- never writes. ACL is pre-provisioned.
 //
 // Environment:
-//   COMMS_KEYS_DIR   — default /run/secrets/comms
-//   COMMS_TEAM_NAME  — required for check command (determines local side)
+//   COMMS_KEYS_DIR   -- default /run/secrets/comms
+//   COMMS_TEAM_NAME  -- required for check command (determines local side)
 
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';

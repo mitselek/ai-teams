@@ -1,4 +1,4 @@
-# apex-research Container — Docker Compose (*FR:Brunel*)
+# apex-research Container -- Docker Compose (*FR:Brunel*)
 #
 # Usage:
 #   docker compose build                    # build image
@@ -8,8 +8,8 @@
 #   docker compose down -v                  # stop, DELETE volumes (full reset)
 #
 # Container layout:
-#   User:        ai-teams  (uid=1000)     — runs Claude Code
-#   PO user:     michelek                  — SSH access for inspection
+#   User:        ai-teams  (uid=1000)     -- runs Claude Code
+#   PO user:     michelek                  -- SSH access for inspection
 #   $HOME:       /home/ai-teams/
 #   ~/.claude/:  /home/ai-teams/.claude    → apex-claude-home volume
 #   Repo:        /home/ai-teams/workspace  → apex-research-repo volume (read-write)
@@ -21,7 +21,7 @@
 # Network: host mode required on WARP-protected hosts where Docker bridge
 # traffic is not routed through the WARP tunnel. With host networking,
 # the container shares the host's network stack (including WARP DNS/routing).
-# Ports 22 (SSH) and 5173 (dashboard) bind directly on the host — no mapping needed.
+# Ports 22 (SSH) and 5173 (dashboard) bind directly on the host -- no mapping needed.
 
 services:
   apex-research:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: Dockerfile.apex
       network: host
-      # Build-time courier key (approach b). BuildKit secret — not baked into
+      # Build-time courier key (approach b). BuildKit secret -- not baked into
       # image history. src is FR-generated once (see Dockerfile courier_key RUN).
       secrets:
         - courier_key
@@ -42,11 +42,11 @@ services:
       - apex-claude-home:/home/ai-teams/.claude
       # Research repo (cloned from GitHub on first start)
       - apex-research-repo:/home/ai-teams/workspace
-      # Source data — writable for entrypoint (root) to clone on first run.
+      # Source data -- writable for entrypoint (root) to clone on first run.
       # Entrypoint enforces read-only for ai-teams user via filesystem permissions.
       # NOT using :ro because entrypoint needs write access for initial clone.
       - apex-source-data:/home/ai-teams/source-data
-      # WARP TLS interception CA — bind mount from host (read-only).
+      # WARP TLS interception CA -- bind mount from host (read-only).
       # Required so Node.js (Claude Code) trusts HTTPS through WARP proxy.
       # Mounted to /opt/ to avoid conflicting with update-ca-certificates in /etc/ssl/certs/.
       - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
@@ -56,7 +56,7 @@ services:
       - SOURCE_REPO_URL=${SOURCE_REPO_URL:-https://github.com/Eesti-Raudtee/vjs_apex_apps.git}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       # GH_TOKEN preserved through recreate (Hopper S34 P4.05, 2026-05-21, PO Option B).
-      # Was a live rc-host working-tree-only edit, never committed upstream — folded
+      # Was a live rc-host working-tree-only edit, never committed upstream -- folded
       # into the hardening branch so checkout+recreate does not drop it (credential regression).
       - GH_TOKEN=${GH_TOKEN:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
@@ -69,7 +69,7 @@ services:
       - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL:-}
       - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN:-}
       - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-}
-    # No ports: section needed — network_mode: host exposes ports directly.
+    # No ports: section needed -- network_mode: host exposes ports directly.
     # SSH on port 2222 (avoids conflict with host sshd on port 22).
     # Dashboard on port 5173.
     stdin_open: true

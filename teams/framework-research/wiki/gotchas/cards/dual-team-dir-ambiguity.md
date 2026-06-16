@@ -1,5 +1,5 @@
 ---
-title: "Dual Team-Dir Ambiguity — Runtime vs. Repo"
+title: "Dual Team-Dir Ambiguity -- Runtime vs. Repo"
 directory: gotchas
 status: active
 confidence: high
@@ -20,8 +20,8 @@ The path `teams/<team>/` is two different directories in Claude Code, and a prom
 - **Two roots**: Repo team config dir (`$REPO/teams/<team>/`, durable, where the agent writes) vs Runtime team dir (`$HOME/.claude/teams/<team>/`, ephemeral, platform-managed, do NOT write).
 - **Terminology**: bare path (no root prefix, ambiguous), anchored path ($HOME/ or $REPO/ prefix), path anchoring (the discipline of resolving bare paths to the correct root).
 - **The fix**: a leading Path Convention section in every prompt declaring all bare `teams/<team>/` paths anchor at $REPO; body references stay bare for readability; `pwd` before any write.
-- **Production incident**: Eratosthenes first boot wrote librarian-state.json + scratchpad to $HOME (ephemeral) — caught in post-bootstrap audit, files migrated, v2.7 shipped with Path Convention.
-- **Latent in every bare-path prompt** (including Callimachus) — held by luck across sessions.
+- **Production incident**: Eratosthenes first boot wrote librarian-state.json + scratchpad to $HOME (ephemeral) -- caught in post-bootstrap audit, files migrated, v2.7 shipped with Path Convention.
+- **Latent in every bare-path prompt** (including Callimachus) -- held by luck across sessions.
 - **Anti-patterns**: "it worked in my session" (non-deterministic), documenting both roots without flagging the ambiguity (makes it worse), per-reference rewriting (high-churn, miss-prone).
 - **Canonical structural-discipline gotcha**; Instance 1 of substrate-invariant-mismatch (path-as-substrate-invariant).
 

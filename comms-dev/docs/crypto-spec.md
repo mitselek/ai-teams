@@ -1,4 +1,4 @@
-# Cryptographic Protocol Specification — v1 (*CD:Vigenere*)
+# Cryptographic Protocol Specification -- v1 (*CD:Vigenere*)
 
 ## Overview
 
@@ -52,8 +52,8 @@ PSK (256-bit, hex-encoded)
 HKDF-SHA256 with domain separation:
 
 - **Salt:** empty (PSK already has high entropy)
-- **Info (encryption):** `"comms-v1:encryption"` — binds the derived key to the encryption purpose
-- **Info (integrity):** `"comms-v1:integrity"` — binds the derived key to the integrity purpose
+- **Info (encryption):** `"comms-v1:encryption"` -- binds the derived key to the encryption purpose
+- **Info (integrity):** `"comms-v1:integrity"` -- binds the derived key to the integrity purpose
 - **Output length:** 32 bytes (256 bits) each
 
 This ensures the encryption key and integrity key are cryptographically independent, even though they derive from the same PSK.
@@ -94,7 +94,7 @@ Input: `EncryptedPayload`
 5. Set authentication tag
 6. If AAD is present, call `decipher.setAAD(aad)`
 7. Decrypt: `decipher.update(ciphertext) + decipher.final()`
-8. If `final()` throws, the authentication tag did not verify — data is tampered. **Reject the message.**
+8. If `final()` throws, the authentication tag did not verify -- data is tampered. **Reject the message.**
 9. Return plaintext
 
 ### AAD Usage
@@ -234,7 +234,7 @@ const provider = createCryptoProvider(crypto);
 
 ## Security Invariants
 
-1. **IV uniqueness:** Every encrypt() call generates a fresh random IV. IV reuse with the same key is catastrophic for GCM — it leaks the XOR of two plaintexts and allows tag forgery.
+1. **IV uniqueness:** Every encrypt() call generates a fresh random IV. IV reuse with the same key is catastrophic for GCM -- it leaks the XOR of two plaintexts and allows tag forgery.
 2. **No key material in logs:** The crypto module never logs, prints, or includes keys in error messages.
 3. **Fail closed:** Any crypto error (bad tag, bad IV length, bad version) throws an exception. The caller must not deliver the message.
 4. **Constant-time comparison:** All checksum verification uses `timingSafeEqual`.
@@ -242,11 +242,11 @@ const provider = createCryptoProvider(crypto);
 
 ---
 
-# Hub-Mode Cryptographic Protocol — v2 (*CD:Vigenere*)
+# Hub-Mode Cryptographic Protocol -- v2 (*CD:Vigenere*)
 
 ## Motivation
 
-v1 assumes peer-to-peer mTLS between teams on a shared Docker volume. The fleet now spans two hosts (RC server + PROD-LLM) separated by a firewall. Cross-firewall tunnels for every peer pair are not viable — O(n²) tunnels for n teams. A hub/relay architecture reduces this to O(n) connections (each team connects to the hub).
+v1 assumes peer-to-peer mTLS between teams on a shared Docker volume. The fleet now spans two hosts (RC server + PROD-LLM) separated by a firewall. Cross-firewall tunnels for every peer pair are not viable -- O(n²) tunnels for n teams. A hub/relay architecture reduces this to O(n) connections (each team connects to the hub).
 
 **Critical constraint:** The hub routes messages but **MUST NOT read message content**. This requires E2E encryption between sender and receiver teams, with the hub blind to the payload.
 
@@ -263,10 +263,10 @@ v2 layers E2E encryption on top of mTLS:
 - Hub forging messages claiming to be from another team
 - Hub replaying messages between teams
 - Man-in-the-middle between team and hub
-- Metadata correlation by the hub (partially — see limitations)
+- Metadata correlation by the hub (partially -- see limitations)
 
 **NOT defending against:**
-- Hub dropping messages (availability — not a crypto problem)
+- Hub dropping messages (availability -- not a crypto problem)
 - Hub performing traffic analysis on message sizes/timing (accepted risk, mitigate with padding)
 - Compromise of a team's private keys (endpoint security, not hub crypto)
 - Collusion between hub and a team (if hub + team A collude, team A's messages are readable by definition)
@@ -289,7 +289,7 @@ Each team possesses three independent keypairs, serving distinct purposes:
 
 **Why three separate keypairs:**
 - **TLS identity** authenticates the transport connection. The hub uses this to verify which team is connected. This is the existing ECDSA cert.
-- **Signing key** authenticates individual messages. Replaces `from.team === peerCertCN` invariant — the receiver verifies the Ed25519 signature, not the TLS peer identity (which is now always "hub").
+- **Signing key** authenticates individual messages. Replaces `from.team === peerCertCN` invariant -- the receiver verifies the Ed25519 signature, not the TLS peer identity (which is now always "hub").
 - **Encryption key** enables E2E confidentiality. X25519 DH between sender and receiver derives a pairwise symmetric key the hub never sees.
 
 Ed25519 and X25519 are intentionally kept separate (even though they use the same curve) to enforce domain separation and avoid cross-protocol attacks.
@@ -298,9 +298,9 @@ Ed25519 and X25519 are intentionally kept separate (even though they use the sam
 
 | Keypair | Algorithm | Purpose |
 |---|---|---|
-| **TLS identity** | ECDSA P-256 | mTLS authentication — hub authenticates to teams, teams authenticate to hub |
-| **No signing key** | — | Hub does NOT sign messages. It forwards them opaquely. |
-| **No encryption key** | — | Hub does NOT participate in E2E encryption. |
+| **TLS identity** | ECDSA P-256 | mTLS authentication -- hub authenticates to teams, teams authenticate to hub |
+| **No signing key** | -- | Hub does NOT sign messages. It forwards them opaquely. |
+| **No encryption key** | -- | Hub does NOT participate in E2E encryption. |
 
 The hub's TLS certificate has `CN=comms-hub`. Teams authenticate the hub by having its cert in their `peers/` directory (existing mechanism).
 
@@ -322,7 +322,7 @@ openssl pkey -in enc-key.pem -pubout -out enc-key.pub
 
 ### Public Key Bundle
 
-Each team needs the public keys (Ed25519 verify + X25519 encrypt) of every other team. These are distributed as a **key bundle** — a JSON file provisioned out-of-band (Docker Compose volume mount or secret).
+Each team needs the public keys (Ed25519 verify + X25519 encrypt) of every other team. These are distributed as a **key bundle** -- a JSON file provisioned out-of-band (Docker Compose volume mount or secret).
 
 ```json
 {
@@ -418,7 +418,7 @@ interface E2EPayload {
   ciphertext: string;
   /** GCM authentication tag (16 bytes, base64) */
   tag: string;
-  /** Sender team name — needed by receiver to derive pairwise key */
+  /** Sender team name -- needed by receiver to derive pairwise key */
   sender_team: string;
   /** Crypto protocol version */
   version: 2;
@@ -431,7 +431,7 @@ interface E2EPayload {
 
 ### The Problem
 
-In v1 peer-to-peer, `from.team === peerCertCN` works because the TLS peer IS the sender. In hub mode, the TLS peer is always the hub (`CN=comms-hub`). The receiver cannot trust the `from.team` field in the envelope — the hub could forge it.
+In v1 peer-to-peer, `from.team === peerCertCN` works because the TLS peer IS the sender. In hub mode, the TLS peer is always the hub (`CN=comms-hub`). The receiver cannot trust the `from.team` field in the envelope -- the hub could forge it.
 
 ### The Solution: Ed25519 Envelope Signatures
 
@@ -453,7 +453,7 @@ The signature covers:
 - Message identity (version, id, timestamp)
 - A hash of the encrypted body (binding the metadata to the specific ciphertext)
 
-The signature does NOT cover the body directly — it covers `body_hash` (SHA-256 of the encrypted body string). This allows the hub to forward the message without needing to understand the body contents while still binding the signature to the specific ciphertext.
+The signature does NOT cover the body directly -- it covers `body_hash` (SHA-256 of the encrypted body string). This allows the hub to forward the message without needing to understand the body contents while still binding the signature to the specific ciphertext.
 
 ### Signed Message Envelope
 
@@ -477,7 +477,7 @@ interface SignedMessage extends Message {
 ### Verify
 
 1. Extract `signature` from the message
-2. Recompute `body_hash = SHA-256(message.body)` — verify it matches the claimed body_hash
+2. Recompute `body_hash = SHA-256(message.body)` -- verify it matches the claimed body_hash
 3. Reconstruct sign input (same canonicalization)
 4. Look up sender's Ed25519 public key from the key bundle using `message.from.team`
 5. Verify: `crypto.verify('ed25519', sign_input, public_key, signature)`
@@ -492,11 +492,11 @@ The old invariant is replaced by a two-step verification:
 | Transport auth | `from.team === peerCertCN` | `peerCertCN === "comms-hub"` (verify connected to hub) |
 | Message auth | (implicit from transport) | Ed25519 signature verification against key bundle |
 
-**Hub validation:** The hub itself should validate `from.team === peerCertCN` on the incoming connection (team→hub). This prevents a team from claiming to be another team at the hub level. But the receiver still MUST verify the Ed25519 signature — the hub's validation is defense-in-depth, not the primary trust mechanism.
+**Hub validation:** The hub itself should validate `from.team === peerCertCN` on the incoming connection (team→hub). This prevents a team from claiming to be another team at the hub level. But the receiver still MUST verify the Ed25519 signature -- the hub's validation is defense-in-depth, not the primary trust mechanism.
 
 ---
 
-## Hub Routing — What the Hub Sees
+## Hub Routing -- What the Hub Sees
 
 The hub sees the **envelope** (routing metadata) but NOT the **plaintext body**:
 
@@ -537,11 +537,11 @@ A message with `signature` field present is v2. Absence means v1 (legacy).
 
 | Asset | Impact if hub is compromised |
 |---|---|
-| Message content | **SAFE** — E2E encrypted, hub has no decryption keys |
-| Message metadata | **EXPOSED** — hub sees from, to, timestamp, type, priority |
-| Message integrity | **SAFE** — Ed25519 signatures are verified by receiver, not hub |
-| Availability | **AT RISK** — compromised hub can drop, delay, or reorder messages |
-| Sender identity | **SAFE** — hub cannot forge Ed25519 signatures |
+| Message content | **SAFE** -- E2E encrypted, hub has no decryption keys |
+| Message metadata | **EXPOSED** -- hub sees from, to, timestamp, type, priority |
+| Message integrity | **SAFE** -- Ed25519 signatures are verified by receiver, not hub |
+| Availability | **AT RISK** -- compromised hub can drop, delay, or reorder messages |
+| Sender identity | **SAFE** -- hub cannot forge Ed25519 signatures |
 
 **Key insight:** A compromised hub is equivalent to a network adversary who can observe and drop traffic but cannot read or forge messages. This is the standard security model for E2E encrypted systems (analogous to Signal's server model).
 
@@ -584,7 +584,7 @@ interface E2EPayload {
 /** Extended message with Ed25519 signature */
 interface SignedMessage extends Message {
   signature: string;    // base64 Ed25519 signature
-  body_hash: string;    // "sha256:<hex>" — hash of body field
+  body_hash: string;    // "sha256:<hex>" -- hash of body field
 }
 ```
 
@@ -703,8 +703,8 @@ const plaintext = await crypto.e2eDecrypt(e2eBody, signedMessage.id);
 | Choice | Rationale |
 |---|---|
 | X25519 over ECDH P-256 | Simpler, constant-time by design, no point validation needed. Montgomery ladder is side-channel resistant. |
-| Ed25519 over ECDSA P-256 | Deterministic (no random nonce — eliminates a class of implementation bugs). Faster signature generation. |
-| Separate Ed25519 + X25519 over dual-use | Avoids cross-protocol attacks. Ed25519 keys on twisted Edwards curve, X25519 on Montgomery curve — mathematically related but operationally isolated. |
+| Ed25519 over ECDSA P-256 | Deterministic (no random nonce -- eliminates a class of implementation bugs). Faster signature generation. |
+| Separate Ed25519 + X25519 over dual-use | Avoids cross-protocol attacks. Ed25519 keys on twisted Edwards curve, X25519 on Montgomery curve -- mathematically related but operationally isolated. |
 | Static X25519 over ephemeral | Ephemeral DH per message would provide forward secrecy but requires a key exchange round-trip or prekey bundles (Signal-style). Static DH is simpler for v2; ephemeral ratcheting is a v3 upgrade path. |
 
 ---

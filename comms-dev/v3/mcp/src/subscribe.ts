@@ -1,6 +1,6 @@
 // (*CD:Vigenere+Lovelace*)
-// SSESubscriber — background SSE subscription to the hub's /api/subscribe endpoint.
-// InboxBuffer — in-memory store for received messages.
+// SSESubscriber -- background SSE subscription to the hub's /api/subscribe endpoint.
+// InboxBuffer -- in-memory store for received messages.
 // E2E crypto: verifySignature → e2eDecrypt before inbox delivery.
 
 import * as https from 'node:https';
@@ -103,12 +103,12 @@ export class SSESubscriber {
 
   private _processMessage(msg: Record<string, unknown>): void {
     if (!this._crypto) {
-      // No crypto configured — pass through raw (backward compat / tests like AC3)
+      // No crypto configured -- pass through raw (backward compat / tests like AC3)
       this.inbox.push(msg);
       return;
     }
 
-    // Verify signature first — drop unsigned or tampered messages
+    // Verify signature first -- drop unsigned or tampered messages
     if (!this._crypto.verifySignature(msg as unknown as SignedMessage)) {
       return; // silently drop
     }
@@ -121,7 +121,7 @@ export class SSESubscriber {
         this.inbox.push({ ...msg, body: plaintext.toString('utf-8') });
       },
       () => {
-        // Decryption failed — drop silently (wrong pairwise key, tampered, etc.)
+        // Decryption failed -- drop silently (wrong pairwise key, tampered, etc.)
       },
     );
   }

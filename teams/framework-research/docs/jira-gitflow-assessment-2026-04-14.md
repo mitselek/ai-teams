@@ -1,10 +1,10 @@
-# Eesti Raudtee Jira + GitFlow Pipeline Assessment — Read-and-Digest Pass
+# Eesti Raudtee Jira + GitFlow Pipeline Assessment -- Read-and-Digest Pass
 
-*(*FR:Finn*) — 2026-04-14*
+*(*FR:Finn*) -- 2026-04-14*
 
-Phase 1 read-and-digest of two Confluence pages in the VJS2 space that together describe Eesti Raudtee's current Jira workflow and GitFlow release process. Strictly read-only on Confluence. No patterns/gotchas classification yet — that is Phase 2, post-team-lead-review.
+Phase 1 read-and-digest of two Confluence pages in the VJS2 space that together describe Eesti Raudtee's current Jira workflow and GitFlow release process. Strictly read-only on Confluence. No patterns/gotchas classification yet -- that is Phase 2, post-team-lead-review.
 
-## Source 1: Arendusprotsessi Workflow (JIRA) — page 1163755527
+## Source 1: Arendusprotsessi Workflow (JIRA) -- page 1163755527
 
 ### Raw Summary (faithful to source, Estonian terms preserved)
 
@@ -43,21 +43,21 @@ Work start: **TODO → INPROGRESS**. When the arendus sub-task is complete **and
 
 **Release order rule:** First, deploy to LIVE the release whose end date is today, then **close** that release after the deploy. Second, deploy to **Staging** all repositories listed in the **Staging Deploy task**.
 
-**HOTFIX — Staging variant:** cut a new branch **from the release branch** (e.g. `release/x.y.z`), fix, then merge **both** to `develop` (so the fix survives into future work) **and** back to `release` (so staging picks it up).
+**HOTFIX -- Staging variant:** cut a new branch **from the release branch** (e.g. `release/x.y.z`), fix, then merge **both** to `develop` (so the fix survives into future work) **and** back to `release` (so staging picks it up).
 
-**HOTFIX — Production variant:** cut a new branch **from the production branch** (e.g. `production/x.y.z-hotfix`), fix, create a **new release just for the fix**, then merge **both** to `develop` and `release`.
+**HOTFIX -- Production variant:** cut a new branch **from the production branch** (e.g. `production/x.y.z-hotfix`), fix, create a **new release just for the fix**, then merge **both** to `develop` and `release`.
 
 The summary bullets at the bottom restate: Demo → Testimine → Release nr → Tagimine → Staging Deploy task; releases are weekly (Staging at start, Production at end); hotfixes merge to both develop and release; test tasks are bound to stories and ship in the same release.
 
 ### Key Elements
 
 - **Issue types in use:**
-  - **Story** — unit of planning, owned by toote omanik / projektijuht
+  - **Story** -- unit of planning, owned by toote omanik / projektijuht
   - **alam task (sub-task)** with three sub-kinds by name:
     - **analüüs** (optional)
     - **arendus** (mandatory)
     - **testimine** (mandatory per page rule: "Igale lool peab olema vähemalt kaks alam taski, arendus ja testimine")
-  - **Bug** — created only for *side-effect* defects, never for direct failures of the current arendus work
+  - **Bug** -- created only for *side-effect* defects, never for direct failures of the current arendus work
 
 - **Statuses / state machine:**
   - Story and sub-task share the same 4-state machine: **OPEN (Backlog) → TODO → INPROGRESS → DONE**
@@ -70,15 +70,15 @@ The summary bullets at the bottom restate: Demo → Testimine → Release nr →
   - Release membership: a story enters a release only after its testimine sub-task is successful.
 
 - **Roles / responsibilities:**
-  - **Toote omanik** (product owner) — owns story status
-  - **Projektijuht** (project manager) — alternative owner of story status
-  - **Arendaja** (developer) — owns arendus sub-task
-  - **Tester / QA** — owns testimine sub-task (implicit; role is not named on the page, only the sub-task is)
+  - **Toote omanik** (product owner) -- owns story status
+  - **Projektijuht** (project manager) -- alternative owner of story status
+  - **Arendaja** (developer) -- owns arendus sub-task
+  - **Tester / QA** -- owns testimine sub-task (implicit; role is not named on the page, only the sub-task is)
 
 - **Custom fields / labels:**
-  - **estimate** (tööpäevad) — required field, hard cap 2 days
-  - **release number** — added to story after successful testing; same number tags all touched repositories
-  - **Staging Deploy task** — a task (issue type unclear) that lists all repositories to deploy in a given window
+  - **estimate** (tööpäevad) -- required field, hard cap 2 days
+  - **release number** -- added to story after successful testing; same number tags all touched repositories
+  - **Staging Deploy task** -- a task (issue type unclear) that lists all repositories to deploy in a given window
 
 - **Other notable conventions:**
   - Stories that span multiple systems/repositories must have one arendus sub-task per system
@@ -86,7 +86,7 @@ The summary bullets at the bottom restate: Demo → Testimine → Release nr →
   - Priority-sorted backlog is an invariant the page asserts ("peab alati olema")
   - Release cadence is weekly, but each release has a 1-week staging runway before going to production (so two releases are always live in staging+production hand-off)
 
-## Source 2: Väljalaskeprotsess & GitFlow — page 1660518403
+## Source 2: Väljalaskeprotsess & GitFlow -- page 1660518403
 
 ### Raw Summary (faithful to source, Estonian terms preserved)
 
@@ -132,7 +132,7 @@ This page describes the GitFlow workflow and release process for "this project" 
 
 ### Key Elements
 
-- **Branches in use:** `main`, `develop`, `feature/*`, `release/*`, `hotfix/*` — textbook git-flow, five branches, no more. **No `production` branch**, **no `staging` branch**.
+- **Branches in use:** `main`, `develop`, `feature/*`, `release/*`, `hotfix/*` -- textbook git-flow, five branches, no more. **No `production` branch**, **no `staging` branch**.
 
 - **Branch naming conventions:**
   - Features: free-form name via `git flow feature start <name>` (no prefix constraint shown)
@@ -143,7 +143,7 @@ This page describes the GitFlow workflow and release process for "this project" 
   - Features → PR into `develop`, auto-preview via Cloudflare Pages, reviewed, then `git flow feature finish`
   - Releases → PR from `release/vX.Y.Z` into `main`, reviewed, then `git flow release finish` (which merges to both `main` and `develop`)
   - Hotfixes → `git flow hotfix finish` (which merges to both `main` and `develop`)
-  - The tooling is `git flow` CLI, not plain `git merge` — this is load-bearing because it constrains merge topology (git-flow always does merge commits, never fast-forward; always merges back to develop on release finish; always tags on release/hotfix finish).
+  - The tooling is `git flow` CLI, not plain `git merge` -- this is load-bearing because it constrains merge topology (git-flow always does merge commits, never fast-forward; always merges back to develop on release finish; always tags on release/hotfix finish).
 
 - **Tagging / versioning:**
   - Semantic versioning: `vMAJOR.MINOR.PATCH`
@@ -159,59 +159,59 @@ This page describes the GitFlow workflow and release process for "this project" 
 - **Cloudflare-specific details:**
   - `main` auto-deploys to production
   - `feature/*`, `release/*`, and PR branches auto-deploy to preview environments
-  - No mention of `develop` being deployed anywhere by Cloudflare Pages (which contradicts Source 1's "deploy'tud develop keskkonda" gate — see cross-reference)
+  - No mention of `develop` being deployed anywhere by Cloudflare Pages (which contradicts Source 1's "deploy'tud develop keskkonda" gate -- see cross-reference)
 
-## Cross-Reference (where the two pipelines touch — and where they DIVERGE)
+## Cross-Reference (where the two pipelines touch -- and where they DIVERGE)
 
 **Touching points:**
 
 1. **Both pages describe the same release dimension**, but at different altitudes: Source 1 (Jira) describes *when* a release happens and *who owns* its Jira artefacts; Source 2 (GitFlow) describes *how* the git operations execute. On paper they should compose.
 
-2. **Both pages mention `develop` and `release` branches by name** — so the vocabulary overlaps.
+2. **Both pages mention `develop` and `release` branches by name** -- so the vocabulary overlaps.
 
 3. **Both describe a hotfix concept**, and both require hotfix merges to return to `develop` (Source 1 says "et fix säiliks tulevases arenduses"; Source 2 says `git flow hotfix finish` merges back to `main` and `develop`).
 
-**Divergences — these are the load-bearing discrepancies between the two sources:**
+**Divergences -- these are the load-bearing discrepancies between the two sources:**
 
-### Divergence 1 — Branch set mismatch
+### Divergence 1 -- Branch set mismatch
 
-Source 1 refers to a **`production` branch** (in the Production HOTFIX procedure: "Tee uus branch production harust") and to a **`release` branch** that persists and receives merged hotfixes. Source 2 has **no `production` branch at all** — it uses `main` as production, and `release/*` is a short-lived per-release branch that closes via `git flow release finish`.
+Source 1 refers to a **`production` branch** (in the Production HOTFIX procedure: "Tee uus branch production harust") and to a **`release` branch** that persists and receives merged hotfixes. Source 2 has **no `production` branch at all** -- it uses `main` as production, and `release/*` is a short-lived per-release branch that closes via `git flow release finish`.
 
 Possible readings:
 - **(a)** Source 1 is describing an older or differently-structured project, and Source 2 is the new reference. Page 2 is **new** (created 2026-04-13, v1), which supports this.
-- **(b)** Source 1 uses "production" and "release" as *environment names* rather than git branch names, and the text is loose. The phrasing "Tee uus **branch** production harust" works against this reading — it explicitly says "haru" (branch).
+- **(b)** Source 1 uses "production" and "release" as *environment names* rather than git branch names, and the text is loose. The phrasing "Tee uus **branch** production harust" works against this reading -- it explicitly says "haru" (branch).
 - **(c)** Two different projects are in play and Source 1 describes a different one.
 
 **This is the most important question for PO and cannot be resolved from the pages alone.**
 
-### Divergence 2 — DONE gate mismatch
+### Divergence 2 -- DONE gate mismatch
 
 Source 1 gates the arendus sub-task `INPROGRESS → DONE` transition on **deployment to the develop environment**. Source 2 (GitFlow) says `develop` is a branch that accumulates merged features; Cloudflare Pages deploys preview environments from **feature**, **release**, and **PR branches**, but **not** explicitly from `develop`. If "develop environment" in Source 1 means "preview build produced by the PR to develop," that reconciles cleanly. If it means "a dedicated persistent develop-environment hosted somewhere," that environment is not documented on Source 2's page.
 
-### Divergence 3 — Hotfix origin branch mismatch
+### Divergence 3 -- Hotfix origin branch mismatch
 
 - **Source 1 (Staging HOTFIX):** "Tee uus branch **release harust**"
 - **Source 1 (Production HOTFIX):** "Tee uus branch **production harust**"
-- **Source 2 (Kiirparanduse protsess):** `git flow hotfix start` — by git-flow convention this cuts from `main`.
+- **Source 2 (Kiirparanduse protsess):** `git flow hotfix start` -- by git-flow convention this cuts from `main`.
 
 So Source 1 has **two flavours** of hotfix based on which environment is broken; Source 2 has one flavour based on git-flow conventions. These are reconcilable only if "production" in Source 1 maps to `main` in Source 2 AND Source 1's "release hotfix" is an additional case Source 2 simply does not cover.
 
-### Divergence 4 — Release branch lifetime
+### Divergence 4 -- Release branch lifetime
 
-- **Source 1** treats `release/*` as **persistent enough to receive hotfix merges after release**. "Merge: release harusse (et stagingus fix rakenduks)" — this only works if the release branch still exists and staging deploys from it.
+- **Source 1** treats `release/*` as **persistent enough to receive hotfix merges after release**. "Merge: release harusse (et stagingus fix rakenduks)" -- this only works if the release branch still exists and staging deploys from it.
 - **Source 2** treats `release/*` as **short-lived**. `git flow release finish` closes it by merging to `main` and `develop`, then deletes it. After finish, there is no `release/vX.Y.Z` branch to merge into.
 
 These are architecturally incompatible release-branch lifecycles. Either the two pages describe different projects, or Source 2 supersedes Source 1 on this point.
 
-### Divergence 5 — Weekly cadence
+### Divergence 5 -- Weekly cadence
 
-Source 1 is explicit about weekly releases with a fixed staging runway. Source 2 does not mention cadence at all. This is a gap in Source 2, not a conflict — but it means a developer reading only Source 2 would have no idea that releases are weekly and that staging happens a week before production.
+Source 1 is explicit about weekly releases with a fixed staging runway. Source 2 does not mention cadence at all. This is a gap in Source 2, not a conflict -- but it means a developer reading only Source 2 would have no idea that releases are weekly and that staging happens a week before production.
 
-## Observations (Finn's analysis — not yet patterns/gotchas)
+## Observations (Finn's analysis -- not yet patterns/gotchas)
 
 ### Unusual or load-bearing details
 
-- **The 2-day estimate cap is a hard gate before TODO, not a soft guideline.** Stories exceeding 2 days *must* be split. This is a structural constraint, not an estimation hint — it forces decomposition discipline into the backlog-to-sprint transition rather than allowing big stories through.
+- **The 2-day estimate cap is a hard gate before TODO, not a soft guideline.** Stories exceeding 2 days *must* be split. This is a structural constraint, not an estimation hint -- it forces decomposition discipline into the backlog-to-sprint transition rather than allowing big stories through.
 
 - **The 10-15 backlog-scan cadence** is a written expectation on developers. It is not a tool-enforced rule, and Jira does not surface "did you scan" as a metric, so the accountability mechanism is social or absent.
 
@@ -219,7 +219,7 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 
 - **`git flow` CLI dependency.** Source 2 commits hard to the `git flow` extension CLI. Every git operation in the page is a `git flow ...` command. This means onboarding requires `git flow init` and the extension installed locally; plain-git contributors cannot follow the page literally. It also constrains tooling: git hosts, squash-merge policies, and fast-forward-only rules are all incompatible with git-flow finish semantics.
 
-- **Cloudflare Pages drives the preview loop.** Source 2 is explicitly Cloudflare-bound; it would need to be rewritten for a different host. Every feature branch and PR automatically gets a preview URL — this is the review substrate.
+- **Cloudflare Pages drives the preview loop.** Source 2 is explicitly Cloudflare-bound; it would need to be rewritten for a different host. Every feature branch and PR automatically gets a preview URL -- this is the review substrate.
 
 - **Reverse-transition rule is explicit.** Source 1 names the reverse path when testing fails: arendus `DONE → INPROGRESS`, testimine `INPROGRESS → TODO`. Most Jira workflows leave failure paths implicit; documenting them makes the state machine symmetric and auditable.
 
@@ -231,9 +231,9 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 
 - **No rollback procedure.** Both hotfix paths are forward-fix only. Neither page describes how to revert a production deploy that is already live but discovered to be bad (pre-hotfix).
 
-- **No "what happens if the story is in-flight when the release cuts" rule.** Source 1 has weekly releases but doesn't say what happens to a story that is INPROGRESS when Friday arrives — does it stall? Does it bleed into the next release? Does the testimine sub-task determine cutoff?
+- **No "what happens if the story is in-flight when the release cuts" rule.** Source 1 has weekly releases but doesn't say what happens to a story that is INPROGRESS when Friday arrives -- does it stall? Does it bleed into the next release? Does the testimine sub-task determine cutoff?
 
-- **No environment naming.** Source 1 uses "develop keskkond," "Staging," "Production" without saying what those environments actually are — URLs, DNS, configuration files, Cloudflare Pages environment names, or something else.
+- **No environment naming.** Source 1 uses "develop keskkond," "Staging," "Production" without saying what those environments actually are -- URLs, DNS, configuration files, Cloudflare Pages environment names, or something else.
 
 - **No link between the two pages.** Neither page references the other. Source 1 describes weekly releases, tags, and branches without telling readers to read Source 2; Source 2 describes branch strategy without telling readers to read Source 1.
 
@@ -241,17 +241,17 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 
 ### Things that look like patterns vs gotchas vs decisions (for Cal's later classification, *not* submitted yet)
 
-- **Pattern candidate:** "Reverse-transition explicit in state machine" — the testimine-fail rule makes failure a first-class path rather than an exception. Worth comparing against how other projects (hr-platform, apex-migration-research, uikit-dev) handle test-fail returns.
+- **Pattern candidate:** "Reverse-transition explicit in state machine" -- the testimine-fail rule makes failure a first-class path rather than an exception. Worth comparing against how other projects (hr-platform, apex-migration-research, uikit-dev) handle test-fail returns.
 
-- **Pattern candidate:** "Deploy to env as DONE gate, not merge-to-branch as DONE gate" — tighter than most workflows, which stop at merge. Creates a stronger "DONE means really running somewhere" invariant.
+- **Pattern candidate:** "Deploy to env as DONE gate, not merge-to-branch as DONE gate" -- tighter than most workflows, which stop at merge. Creates a stronger "DONE means really running somewhere" invariant.
 
-- **Pattern candidate:** "Weekly release with overlapping staging runway" — two releases are always live (one in production, one in staging waiting to promote). This is a specific cadence pattern worth naming.
+- **Pattern candidate:** "Weekly release with overlapping staging runway" -- two releases are always live (one in production, one in staging waiting to promote). This is a specific cadence pattern worth naming.
 
-- **Gotcha candidate:** "Two pages describing the same pipeline with incompatible branch sets" — the Divergence 1 / Divergence 4 mismatch between Source 1 and Source 2 is exactly the kind of silent-failure mode the team's Structural Change Discipline was written to prevent. The two pages have the same domain (one project's dev pipeline) but have not been kept in sync. A developer who reads Source 1 first will be primed for a `production` branch that Source 2 shows does not exist.
+- **Gotcha candidate:** "Two pages describing the same pipeline with incompatible branch sets" -- the Divergence 1 / Divergence 4 mismatch between Source 1 and Source 2 is exactly the kind of silent-failure mode the team's Structural Change Discipline was written to prevent. The two pages have the same domain (one project's dev pipeline) but have not been kept in sync. A developer who reads Source 1 first will be primed for a `production` branch that Source 2 shows does not exist.
 
-- **Decision candidate:** "Cloudflare Pages as preview/production substrate" — this is a deliberate stack choice that predates both pages, and Source 2 makes it explicit. Worth recording as a project-level decision even though it's not novel.
+- **Decision candidate:** "Cloudflare Pages as preview/production substrate" -- this is a deliberate stack choice that predates both pages, and Source 2 makes it explicit. Worth recording as a project-level decision even though it's not novel.
 
-- **Decision candidate:** "Git-flow CLI extension over plain git" — also deliberate, and unusual in 2026 (git-flow CLI is less common than trunk-based or plain-branch workflows). Worth recording.
+- **Decision candidate:** "Git-flow CLI extension over plain git" -- also deliberate, and unusual in 2026 (git-flow CLI is less common than trunk-based or plain-branch workflows). Worth recording.
 
 ### Open questions for PO
 
@@ -263,7 +263,7 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 
 4. **Do Source 1 and Source 2 describe the same project?** The two pages sit in the same VJS2 Confluence space and neither names its project. If they describe different projects, the divergences are non-issues; if they describe the same project, the divergences are defects.
 
-5. **What is the relationship between Jira release number (Source 1) and the semver tag `vX.Y.Z` (Source 2)?** Source 1 shows releases numbered 43, 44 — these are week numbers, not semver. How does week-43 map to a `vX.Y.Z` tag? Is the semver tag derived from the week number, or tracked independently?
+5. **What is the relationship between Jira release number (Source 1) and the semver tag `vX.Y.Z` (Source 2)?** Source 1 shows releases numbered 43, 44 -- these are week numbers, not semver. How does week-43 map to a `vX.Y.Z` tag? Is the semver tag derived from the week number, or tracked independently?
 
 6. **Who is the release approver in Source 2?** Source 1 clearly assigns story ownership to toote omanik / projektijuht. Source 2 is silent on the release-PR approver. Are they the same person?
 
@@ -277,7 +277,7 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 
 ## Provenance
 
-**Source 1: page 1163755527 — Arendusprotsessi Workflow (JIRA)**
+**Source 1: page 1163755527 -- Arendusprotsessi Workflow (JIRA)**
 
 - **Space:** VJS2 (`spaceId: 84180996`)
 - **URL:** `https://eestiraudtee.atlassian.net/wiki/spaces/VJS2/pages/1163755527/Arendusprotsessi+Workflow+JIRA`
@@ -289,7 +289,7 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 - **Tables:** 3 (Story-status table, Release-weeks example table, Summary status table)
 - **Code macros / embedded images:** none
 
-**Source 2: page 1660518403 — Väljalaskeprotsess & GitFlow**
+**Source 2: page 1660518403 -- Väljalaskeprotsess & GitFlow**
 
 - **Space:** VJS2 (same space as Source 1)
 - **URL:** `https://eestiraudtee.atlassian.net/wiki/spaces/VJS2/pages/1660518403/V+ljalaskeprotsess+GitFlow`
@@ -310,8 +310,8 @@ Source 1 is explicit about weekly releases with a fixed staging runway. Source 2
 - `~/.claude/cache/finn-jira-gitflow/page_1163755527.json` (raw v2 response)
 - `~/.claude/cache/finn-jira-gitflow/page_1660518403.json` (raw v2 response)
 - `~/.claude/cache/finn-jira-gitflow/page_1163755527.txt` (extracted plain text with table dump)
-- `~/.claude/cache/finn-jira-gitflow/page_1660518403.txt` (extracted plain text with table dump; does not include the 15 `git flow` code macros — those were extracted separately from the storage JSON)
+- `~/.claude/cache/finn-jira-gitflow/page_1660518403.txt` (extracted plain text with table dump; does not include the 15 `git flow` code macros -- those were extracted separately from the storage JSON)
 
-**Extraction note:** the custom HTMLParser-based extractor I wrote strips Confluence macros (`ac:structured-macro`) by default, which silently dropped all 15 `git flow` code blocks from the initial Source 2 text dump. I re-extracted them directly from the storage JSON via regex on `<!\[CDATA\[...\]\]>` inside `ac:name="code"` macros. **Flagging this as a gotcha for the future:** any automated Confluence-to-text pipeline that ignores `ac:structured-macro` will silently lose code blocks, info panels, expand macros, and inline images — all of which can be load-bearing. Worth remembering if this research branch ever becomes a regular ingestion pipeline.
+**Extraction note:** the custom HTMLParser-based extractor I wrote strips Confluence macros (`ac:structured-macro`) by default, which silently dropped all 15 `git flow` code blocks from the initial Source 2 text dump. I re-extracted them directly from the storage JSON via regex on `<!\[CDATA\[...\]\]>` inside `ac:name="code"` macros. **Flagging this as a gotcha for the future:** any automated Confluence-to-text pipeline that ignores `ac:structured-macro` will silently lose code blocks, info panels, expand macros, and inline images -- all of which can be load-bearing. Worth remembering if this research branch ever becomes a regular ingestion pipeline.
 
 (*FR:Finn*)

@@ -1,39 +1,39 @@
 // (*CD:Kerckhoffs*)
-// RED tests for story/29: POST /api/send — message routing + offline queue.
+// RED tests for story/29: POST /api/send -- message routing + offline queue.
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — push to active SSE subscriber:
+//   AC1 -- push to active SSE subscriber:
 //     Given: hub running; team-a registered; team-b has active SSE subscription
 //     When:  team-a POSTs valid envelope { from: team-a, to: team-b, ... }
 //     Then:  HTTP 200, body { ok: true, id }; SSE event delivered to team-b
 //
-//   AC2 — offline queue:
+//   AC2 -- offline queue:
 //     Given: hub running; team-a registered; team-c has NO active SSE subscription
 //     When:  team-a POSTs valid envelope { from: team-a, to: team-c, ... }
 //     Then:  HTTP 200, body { ok: true, id, queued: true }
 //
-//   AC3 — invalid envelope → 400:
+//   AC3 -- invalid envelope → 400:
 //     Given: hub running; team-a registered
 //     When:  team-a POSTs envelope missing required fields
 //     Then:  HTTP 400
 //
-//   AC4 — duplicate message ID → 409:
+//   AC4 -- duplicate message ID → 409:
 //     Given: hub running; team-a registered; message with id 'dup-001' already accepted
 //     When:  team-a POSTs envelope with same id 'dup-001'
 //     Then:  HTTP 409
 //
-//   AC5 — valid Ed25519 signature verified:
+//   AC5 -- valid Ed25519 signature verified:
 //     Given: hub configured with team-a Ed25519 sign_pub; message signed with team-a sign_priv
 //     When:  team-a POSTs envelope with valid signature + body_hash
 //     Then:  HTTP 200 (signature accepted, routed normally)
 //
-//   AC6 — invalid signature → 403:
+//   AC6 -- invalid signature → 403:
 //     Given: hub configured with team-a Ed25519 sign_pub; message signed with WRONG key
 //     When:  team-a POSTs envelope with invalid signature
 //     Then:  HTTP 403
 //
-//   AC7 — hub forwards body verbatim:
+//   AC7 -- hub forwards body verbatim:
 //     Given: team-b has active SSE subscription
 //     When:  team-a sends message with body 'VERBATIM-BODY-CHECK'
 //     Then:  SSE event at team-b has body field === 'VERBATIM-BODY-CHECK' (no modification)
@@ -330,7 +330,7 @@ beforeAll(async () => {
   teamASignPrivPem = teamAKeys.privateKey.export({ type: 'pkcs8', format: 'pem' }) as string;
   teamASignPubPem = teamAKeys.publicKey.export({ type: 'spki', format: 'pem' }) as string;
 
-  // Attacker keypair — wrong key, not registered with hub
+  // Attacker keypair -- wrong key, not registered with hub
   const attackerKeys = generateKeyPairSync('ed25519');
   attackerSignPrivPem = attackerKeys.privateKey.export({ type: 'pkcs8', format: 'pem' }) as string;
 
@@ -362,9 +362,9 @@ afterAll(async () => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — Valid envelope + active SSE subscriber ──────────────────────────────
+// ── AC1 -- Valid envelope + active SSE subscriber ──────────────────────────────
 
-describe('AC1 — push to active SSE subscriber', () => {
+describe('AC1 -- push to active SSE subscriber', () => {
   it('given team-b subscribed via SSE, when team-a sends to team-b, then HTTP 200 { ok, id }', async () => {
     const sub = openSSE(hubPort, caCrt, teamBCert);
 
@@ -396,9 +396,9 @@ describe('AC1 — push to active SSE subscriber', () => {
   });
 });
 
-// ── AC2 — Offline destination → queued ────────────────────────────────────────
+// ── AC2 -- Offline destination → queued ────────────────────────────────────────
 
-describe('AC2 — offline destination queued', () => {
+describe('AC2 -- offline destination queued', () => {
   it('given team-c has no SSE subscription, when team-a sends to team-c, then { ok, id, queued: true }', async () => {
     const msg = makeMsg('team-a', 'team-c', 'offline-queued-message');
     const res = await httpsPost(hubPort, caCrt, teamACert, '/api/send', msg);
@@ -411,9 +411,9 @@ describe('AC2 — offline destination queued', () => {
   });
 });
 
-// ── AC3 — Invalid envelope → 400 ──────────────────────────────────────────────
+// ── AC3 -- Invalid envelope → 400 ──────────────────────────────────────────────
 
-describe('AC3 — invalid envelope', () => {
+describe('AC3 -- invalid envelope', () => {
   it('given missing "to" field, when team-a POSTs, then HTTP 400', async () => {
     const { to: _, ...noTo } = makeMsg('team-a', 'team-b', 'bad-msg');
     const res = await httpsPost(hubPort, caCrt, teamACert, '/api/send', noTo);
@@ -433,9 +433,9 @@ describe('AC3 — invalid envelope', () => {
   });
 });
 
-// ── AC4 — Duplicate message ID → 409 ─────────────────────────────────────────
+// ── AC4 -- Duplicate message ID → 409 ─────────────────────────────────────────
 
-describe('AC4 — duplicate message ID', () => {
+describe('AC4 -- duplicate message ID', () => {
   it('given first send accepted, when same message ID re-sent, then HTTP 409', async () => {
     const msg = makeMsg('team-a', 'team-c', 'dup-test', 'dup-001');
 
@@ -447,9 +447,9 @@ describe('AC4 — duplicate message ID', () => {
   });
 });
 
-// ── AC5 — Valid Ed25519 signature accepted ────────────────────────────────────
+// ── AC5 -- Valid Ed25519 signature accepted ────────────────────────────────────
 
-describe('AC5 — valid Ed25519 signature', () => {
+describe('AC5 -- valid Ed25519 signature', () => {
   it('given team-a sign_pub configured, when message has valid signature, then HTTP 200', async () => {
     const msg = signMessage(makeMsg('team-a', 'team-c', 'signed-message'), teamASignPrivPem);
     const res = await httpsPost(hubPort, caCrt, teamACert, '/api/send', msg);
@@ -457,9 +457,9 @@ describe('AC5 — valid Ed25519 signature', () => {
   });
 });
 
-// ── AC6 — Invalid signature → 403 ────────────────────────────────────────────
+// ── AC6 -- Invalid signature → 403 ────────────────────────────────────────────
 
-describe('AC6 — invalid Ed25519 signature', () => {
+describe('AC6 -- invalid Ed25519 signature', () => {
   it('given team-a sign_pub configured, when message has wrong-key signature, then HTTP 403', async () => {
     // Sign with attacker key (not team-a's registered key)
     const msg = signMessage(makeMsg('team-a', 'team-c', 'bad-sig-message'), attackerSignPrivPem);
@@ -468,9 +468,9 @@ describe('AC6 — invalid Ed25519 signature', () => {
   });
 });
 
-// ── AC7 — Hub forwards body verbatim ─────────────────────────────────────────
+// ── AC7 -- Hub forwards body verbatim ─────────────────────────────────────────
 
-describe('AC7 — body forwarded verbatim', () => {
+describe('AC7 -- body forwarded verbatim', () => {
   it('given team-b subscribed via SSE, when team-a sends with specific body, then SSE event body is unchanged', async () => {
     const VERBATIM_BODY = 'VERBATIM-BODY-CHECK-' + Math.random().toString(36).slice(2);
     const sub = openSSE(hubPort, caCrt, teamBCert);

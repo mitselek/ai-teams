@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Verify the comms-dev broker stack works correctly when two team brokers run in separate Docker containers sharing a `/shared/comms/` volume. These tests cannot be executed as Vitest unit tests — they require real container orchestration. The planned implementation is a shell script (`scripts/acceptance-test.sh`) that drives `docker compose` and validates outcomes via file inspection and `curl`/`nc` probes.
+Verify the comms-dev broker stack works correctly when two team brokers run in separate Docker containers sharing a `/shared/comms/` volume. These tests cannot be executed as Vitest unit tests -- they require real container orchestration. The planned implementation is a shell script (`scripts/acceptance-test.sh`) that drives `docker compose` and validates outcomes via file inspection and `curl`/`nc` probes.
 
 ## Infrastructure Setup
 
@@ -36,7 +36,7 @@ Shared secret: /run/secrets/comms-psk (same 256-bit key in both containers)
 ### TC-01: Broker Registration in registry.json
 
 **Category:** Discovery
-**Priority:** P0 — all other tests depend on this
+**Priority:** P0 -- all other tests depend on this
 
 **Preconditions:**
 - Shared volume mounted at `/shared/comms/` in both containers
@@ -230,7 +230,7 @@ Shared secret: /run/secrets/comms-psk (same 256-bit key in both containers)
 **Expected outcomes:**
 - Broker process exits with code 0
 - `teams["comms-dev"]` is absent from `registry.json` (deregistered)
-- `comms-dev.sock` file may still exist on the volume (socket files persist) — this is acceptable
+- `comms-dev.sock` file may still exist on the volume (socket files persist) -- this is acceptable
 - `registry.json` is valid JSON after deregistration write
 
 **Failure signal:** broker still in registry after SIGTERM, registry corrupted, non-zero exit
@@ -265,7 +265,7 @@ The acceptance script (`scripts/acceptance-test.sh`) should:
 
 1. **Bring up containers:** `docker compose up -d`
 2. **Wait for both brokers to register:** poll `registry.json` with 500ms intervals, timeout 15s
-3. **Run TC-01 through TC-07 in order** — each test:
+3. **Run TC-01 through TC-07 in order** -- each test:
    - Prints `[TC-NN] <name> ... PASS` or `FAIL: <reason>`
    - On FAIL, dumps relevant log lines from both containers
 4. **Tear down:** `docker compose down -v`

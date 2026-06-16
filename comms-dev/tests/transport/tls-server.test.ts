@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// RED tests for TLS server — mTLS handshake, peer authentication,
+// RED tests for TLS server -- mTLS handshake, peer authentication,
 // from.team === peerCertCN enforcement at tunnel level.
 // Spec: #16 §3, #15 §3, #18 Phase 2.1
 
@@ -89,9 +89,9 @@ afterAll(() => {
   );
 });
 
-// ── TlsServer — bind address ──────────────────────────────────────────────────
+// ── TlsServer -- bind address ──────────────────────────────────────────────────
 
-describe('TlsServer — bind address', () => {
+describe('TlsServer -- bind address', () => {
 
   it('defaults to 0.0.0.0 when no host is specified', async () => {
     const config = await loadDaemonCrypto({
@@ -161,9 +161,9 @@ describe('TlsServer — bind address', () => {
   });
 });
 
-// ── TlsServer — construction and lifecycle ───────────────────────────────────
+// ── TlsServer -- construction and lifecycle ───────────────────────────────────
 
-describe('TlsServer — construction', () => {
+describe('TlsServer -- construction', () => {
 
   it('starts listening on a port when started', async () => {
     const config = await loadDaemonCrypto({
@@ -189,9 +189,9 @@ describe('TlsServer — construction', () => {
   });
 });
 
-// ── TlsServer — peer authentication ──────────────────────────────────────────
+// ── TlsServer -- peer authentication ──────────────────────────────────────────
 
-describe('TlsServer — mTLS peer authentication', () => {
+describe('TlsServer -- mTLS peer authentication', () => {
 
   let server: TlsServer;
   let serverConfig: Awaited<ReturnType<typeof loadDaemonCrypto>>;
@@ -264,7 +264,7 @@ describe('TlsServer — mTLS peer authentication', () => {
       const socket = connect({
         host: '127.0.0.1',
         port: server.port,
-        // No key/cert — anonymous client
+        // No key/cert -- anonymous client
         rejectUnauthorized: false,
         ca: [],
         minVersion: 'TLSv1.3',
@@ -280,9 +280,9 @@ describe('TlsServer — mTLS peer authentication', () => {
   });
 });
 
-// ── TlsServer — from.team === peerCertCN enforcement ─────────────────────────
+// ── TlsServer -- from.team === peerCertCN enforcement ─────────────────────────
 
-describe('TlsServer — from.team invariant enforcement at tunnel level', () => {
+describe('TlsServer -- from.team invariant enforcement at tunnel level', () => {
 
   let server: TlsServer;
   let deliveredMessages: Message[];

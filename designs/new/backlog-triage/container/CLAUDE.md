@@ -1,4 +1,4 @@
-# CLAUDE.md — backlog-triage
+# CLAUDE.md -- backlog-triage
 
 ## On Startup
 
@@ -16,7 +16,7 @@ Cross-reference the Jira VL backlog with GitHub issues, PRs, and commits in `Ees
 
 | Path | Purpose |
 |------|---------|
-| `~/workspace/hr-platform/` | hr-platform repo (code + git history — read only) |
+| `~/workspace/hr-platform/` | hr-platform repo (code + git history -- read only) |
 | `~/workspace/dev-toolkit/` | dev-toolkit repo (source for Jira MCP server) |
 | `~/workspace/todo.md` | Tickets with no matching GitHub activity |
 | `~/workspace/toconfirm.md` | Tickets with evidence but uncertain match (PO review needed) |
@@ -46,7 +46,7 @@ bash /home/ai-teams/start-team.sh
 |-----------|-----------|
 | Jira | Jira MCP server (`~/workspace/dev-toolkit/jira-mcp-server/`) |
 | GitHub | `gh` CLI + `git` (local clone at `~/workspace/hr-platform/`) |
-| No frontend | This team reads and reports only — no dev server |
+| No frontend | This team reads and reports only -- no dev server |
 
 ## Jira Reference
 

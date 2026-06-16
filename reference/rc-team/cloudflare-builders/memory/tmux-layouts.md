@@ -1,6 +1,6 @@
 # Tmux Layout Templates
 
-## "full-tdd" — 6 agents, TDD pair (tess+sven)
+## "full-tdd" -- 6 agents, TDD pair (tess+sven)
 
 ```yaml
 layout: full-tdd
@@ -40,7 +40,7 @@ tmux break-pane -s $DAG -d
 # 2. Join finn under lead (left column)
 tmux join-pane -s $FINN -t %0 -v -l 31
 
-# 3. Join marcus right of lead (top-right) — use explicit -l, not -p
+# 3. Join marcus right of lead (top-right) -- use explicit -l, not -p
 tmux join-pane -s $MARCUS -t %0 -h -l 155
 
 # 4. Join dag below marcus
@@ -59,11 +59,11 @@ tmux resize-pane -t $TESS -y 20
 # dag gets the remainder
 ```
 
-**Gotcha:** Use `-l` (explicit pixel size) instead of `-p` (percentage) — tmux often returns "size missing" with `-p` on join-pane.
+**Gotcha:** Use `-l` (explicit pixel size) instead of `-p` (percentage) -- tmux often returns "size missing" with `-p` on join-pane.
 
 ---
 
-## "full-review" — 7 agents, review pair (marcus+arvo) + TDD pair (tess+sven)
+## "full-review" -- 7 agents, review pair (marcus+arvo) + TDD pair (tess+sven)
 
 ```yaml
 layout: full-review
@@ -95,7 +95,7 @@ vertical:
 
 ---
 
-## "lite" — 2 agents
+## "lite" -- 2 agents
 
 ```yaml
 layout: lite

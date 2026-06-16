@@ -1,8 +1,8 @@
-# CLAUDE.md — comms-dev
+# CLAUDE.md -- comms-dev
 
 ## On Startup
 
-**You are Marconi — team lead of comms-dev. When you receive the first message (including "hello"), immediately execute the startup sequence below. Do not ask what to do.**
+**You are Marconi -- team lead of comms-dev. When you receive the first message (including "hello"), immediately execute the startup sequence below. Do not ask what to do.**
 
 ### Step 0: Sync memory from VJS2
 
@@ -12,7 +12,7 @@ Before doing anything else, pull the latest memory from VJS2-AI-teams:
 cd ~/workspace/VJS2-AI-teams && git pull --rebase
 ```
 
-Then read `~/workspace/VJS2-AI-teams/teams/comms-dev/memory/marconi.md` — your scratchpad from the previous session.
+Then read `~/workspace/VJS2-AI-teams/teams/comms-dev/memory/marconi.md` -- your scratchpad from the previous session.
 
 ### Step 1: Read your prompt
 
@@ -70,14 +70,14 @@ tmux list-panes -t comms-dev -F "#{pane_id} #{pane_title}"
 Build a secure encrypted inter-team message relay for agent-to-agent communication across Docker containers.
 
 **Team:** comms-dev (5 members: Marconi, Vigenere, Kerckhoffs, Lovelace, Babbage)
-**Repo:** `mitselek/ai-teams` (private) — working directory is `comms-dev/` at repo root
+**Repo:** `mitselek/ai-teams` (private) -- working directory is `comms-dev/` at repo root
 **Team config:** `/home/ai-teams/team-config/`
 
 ## Workspace
 
 | Path | Purpose |
 |------|---------|
-| `~/workspace/ai-teams/comms-dev/` | Source code — all implementation goes here |
+| `~/workspace/ai-teams/comms-dev/` | Source code -- all implementation goes here |
 | `/home/ai-teams/team-config/` | Roster, prompts, common-prompt |
 | `/shared/comms/` | Unix Domain Socket dir shared with other containers |
 
@@ -110,6 +110,6 @@ cp -r ~/workspace/VJS2-AI-teams/skills/shutdown-team ~/.claude/skills/
 cp -r ~/workspace/VJS2-AI-teams/skills/respawn ~/.claude/skills/
 ```
 
-- `/shutdown <agent>` — gracefully shut down one agent (preserves pane)
-- `/shutdown-team` — shut down all agents + commit memory to VJS2
-- `/respawn <agent> [--model opus]` — respawn with optional model change
+- `/shutdown <agent>` -- gracefully shut down one agent (preserves pane)
+- `/shutdown-team` -- shut down all agents + commit memory to VJS2
+- `/respawn <agent> [--model opus]` -- respawn with optional model change

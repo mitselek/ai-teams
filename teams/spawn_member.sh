@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# DEPRECATED -- 2026-04-24 (mitselek/ai-teams#60)
 # ──────────────────────────────────────────────────────────────────────────────
 # tmux-pane spawning is no longer the framework default. Use the Agent tool
 # with team_name + name parameters from a Claude Code team-lead session.

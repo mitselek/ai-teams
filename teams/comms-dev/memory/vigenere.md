@@ -1,4 +1,4 @@
-# Vigenere Scratchpad — comms-dev Crypto Engineer
+# Vigenere Scratchpad -- comms-dev Crypto Engineer
 
 ## Codebase Review (2026-03-23)
 
@@ -33,15 +33,15 @@
 
 ### Test Coverage (`tests/`)
 
-- `tests/crypto/crypto.test.ts` — 40+ tests: key derivation, encrypt/decrypt roundtrip, nonce uniqueness, AAD, tamper detection, malformed payloads, checksum/integrity, loadPsk, known-answer vectors, CryptoProvider adapter
-- `tests/security/tls-config.test.ts` — 12 tests: cert loading, validation, fingerprinting, getAuthenticatedTeam
-- `tests/security/cert-invariant.test.ts` — 11 tests: validateSenderIdentity (from.team === peerCertCN)
-- `tests/acl/acl.test.ts` — 22 tests: matchesPattern, isAllowed send/receive, loadAcl parsing, hot-reload
+- `tests/crypto/crypto.test.ts` -- 40+ tests: key derivation, encrypt/decrypt roundtrip, nonce uniqueness, AAD, tamper detection, malformed payloads, checksum/integrity, loadPsk, known-answer vectors, CryptoProvider adapter
+- `tests/security/tls-config.test.ts` -- 12 tests: cert loading, validation, fingerprinting, getAuthenticatedTeam
+- `tests/security/cert-invariant.test.ts` -- 11 tests: validateSenderIdentity (from.team === peerCertCN)
+- `tests/acl/acl.test.ts` -- 22 tests: matchesPattern, isAllowed send/receive, loadAcl parsing, hot-reload
 
 ### Docs
 
-- `docs/crypto-spec.md` — v1 spec: algorithm choices, key mgmt, encrypt/decrypt protocol, wire format, API
-- `docs/threat-model.md` — 7 threats analyzed (T1-T7), trust boundaries, assets, v2 upgrade path
+- `docs/crypto-spec.md` -- v1 spec: algorithm choices, key mgmt, encrypt/decrypt protocol, wire format, API
+- `docs/threat-model.md` -- 7 threats analyzed (T1-T7), trust boundaries, assets, v2 upgrade path
 
 ### Observations
 
@@ -49,11 +49,11 @@
 
 [PATTERN] Clean separation: CryptoAPI (full interface) → CryptoProvider (Babbage's simplified adapter). Provider serializes EncryptedPayload as JSON Buffer on the wire.
 
-[GOTCHA] AAD in EncryptedPayload is stored as base64 and embedded in the payload itself. On decrypt, AAD is extracted from the payload — the decryptor does NOT need to separately supply the AAD. This is correct for the provider adapter but means the AAD is visible (not encrypted, just authenticated).
+[GOTCHA] AAD in EncryptedPayload is stored as base64 and embedded in the payload itself. On decrypt, AAD is extracted from the payload -- the decryptor does NOT need to separately supply the AAD. This is correct for the provider adapter but means the AAD is visible (not encrypted, just authenticated).
 
-[GOTCHA] `encrypt`/`decrypt` in crypto.ts are `async` but contain no async operations — they're sync under the hood. This is fine for API compatibility but worth noting.
+[GOTCHA] `encrypt`/`decrypt` in crypto.ts are `async` but contain no async operations -- they're sync under the hood. This is fine for API compatibility but worth noting.
 
-[GOTCHA] The threat model notes T2 checksum as "SHA-256 of plaintext body" but the implementation uses HMAC-SHA256 with the integrity key. The spec correctly says HMAC-SHA256. Minor doc inconsistency in threat-model.md T2 section — not a code bug.
+[GOTCHA] The threat model notes T2 checksum as "SHA-256 of plaintext body" but the implementation uses HMAC-SHA256 with the integrity key. The spec correctly says HMAC-SHA256. Minor doc inconsistency in threat-model.md T2 section -- not a code bug.
 
 [DECISION] v1 has no forward secrecy, no per-team keys, no online key rotation. All accepted risks documented in threat model. v2 path: X25519 + NaCl.
 

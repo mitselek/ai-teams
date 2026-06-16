@@ -17,7 +17,7 @@ import { tempSocketPath, cleanupSocket } from '../helpers/net.js';
 import type { Message, CryptoProvider } from '../../src/types.js';
 
 // ---------------------------------------------------------------------------
-// Shared key material — both sender and receiver use the same PSK (symmetric)
+// Shared key material -- both sender and receiver use the same PSK (symmetric)
 // ---------------------------------------------------------------------------
 
 const PSK = Buffer.from('c0ffee'.padEnd(64, '0'), 'hex');
@@ -105,7 +105,7 @@ afterEach(async () => {
 
 describe('end-to-end message flow', () => {
   it('plaintext message sent via CLI arrives decrypted at recipient broker', async () => {
-    // Use a plaintext broker for this test — no crypto
+    // Use a plaintext broker for this test -- no crypto
     const plainReceiver = createTestBroker('plain-receiver', { encrypted: false });
     await plainReceiver.start();
     try {
@@ -145,14 +145,14 @@ describe('end-to-end message flow', () => {
     const tampered: Message = { ...msg, body: 'attacker injected this' };
 
     const client = new UDSClient(receiver.sockPath);
-    // Server rejects with an error ACK — client retries until deadline (UNREACHABLE).
+    // Server rejects with an error ACK -- client retries until deadline (UNREACHABLE).
     // The key invariant is that nothing lands in the inbox despite repeated attempts.
     const err = await client.send(tampered, {
       crypto: CRYPTO,
       maxDurationMs: 2_500,
     }).catch((e: Error) => e);
     expect(err).toBeInstanceOf(Error);
-    // Must never have been delivered — checksum rejection is the gate
+    // Must never have been delivered -- checksum rejection is the gate
     expect(receiver.inbox.list()).toHaveLength(0);
   });
 
@@ -172,7 +172,7 @@ describe('end-to-end message flow', () => {
     const afterFirst = await waitForInbox(receiver.inbox, 1);
     expect(afterFirst).toHaveLength(1);
 
-    // Second delivery of same message — dedup should discard it
+    // Second delivery of same message -- dedup should discard it
     await client.send(msg, { crypto: CRYPTO });
     // Give a moment for any erroneous second write
     await new Promise(r => setTimeout(r, 100));
@@ -213,7 +213,7 @@ describe('end-to-end message flow', () => {
 
   it('MITM: modified ciphertext fails integrity check, not silently decrypted', async () => {
     // Encrypt a valid message payload, then flip a byte in the ciphertext.
-    // The GCM auth tag must reject this — nothing arrives in inbox.
+    // The GCM auth tag must reject this -- nothing arrives in inbox.
     const msg = buildMessage({
       from: { team: 'mitm-sender', agent: 'cli' },
       to: { team: 'receiver', agent: 'broker' },
@@ -234,10 +234,10 @@ describe('end-to-end message flow', () => {
     payload.ciphertext = ciphertextBytes.toString('base64');
     const corruptedBuf = Buffer.from(JSON.stringify(payload), 'utf8');
 
-    // Server's decrypt will fail — verify CRYPTO.decrypt throws
+    // Server's decrypt will fail -- verify CRYPTO.decrypt throws
     await expect(CRYPTO.decrypt(corruptedBuf)).rejects.toThrow(/authentication|tampered|failed/i);
 
-    // Inbox must be empty — nothing delivered
+    // Inbox must be empty -- nothing delivered
     expect(receiver.inbox.list()).toHaveLength(0);
   });
 

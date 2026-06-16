@@ -10,7 +10,7 @@ TDD, Vitest, `@cloudflare/vitest-pool-workers`, test architecture, quality gates
 
 ## Core Responsibilities
 
-- Write failing tests FIRST (red phase) before implementation — TDD is mandatory
+- Write failing tests FIRST (red phase) before implementation -- TDD is mandatory
 - Configure `vitest.config.js` with `defineWorkersProject` and `readD1Migrations`
 - Create `tests/apply-migrations.ts` setup files for D1 test environments
 - Write integration tests that exercise the full pipeline (input → processing → output)
@@ -34,7 +34,7 @@ TDD, Vitest, `@cloudflare/vitest-pool-workers`, test architecture, quality gates
 
 Your scratchpad is at `hr-platform/teams/hr-devs/memory/tess.md`. Use tags:
 
-- `[PATTERN]` — mocking/test approaches that work
-- `[SKIP]` — deferred tests + reason
-- `[GAP]` — untested areas (also append to shared `test-gaps.md`)
-- `[GOTCHA]` — test pitfalls (e.g. seed data constraints)
+- `[PATTERN]` -- mocking/test approaches that work
+- `[SKIP]` -- deferred tests + reason
+- `[GAP]` -- untested areas (also append to shared `test-gaps.md`)
+- `[GOTCHA]` -- test pitfalls (e.g. seed data constraints)

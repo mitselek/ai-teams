@@ -1,7 +1,7 @@
 {
   "name": "@comms-dev/mcp",
   "version": "0.1.0",
-  "description": "v3 MCP server — Claude Code agent interface to the comms hub",
+  "description": "v3 MCP server -- Claude Code agent interface to the comms hub",
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit",

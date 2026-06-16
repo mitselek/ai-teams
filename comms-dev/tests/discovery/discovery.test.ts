@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// Discovery registry tests — R/W correctness, locking, stale cleanup, heartbeat.
+// Discovery registry tests -- R/W correctness, locking, stale cleanup, heartbeat.
 // Tests against src/discovery/registry.ts (RegistryManager).
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -54,7 +54,7 @@ afterEach(() => {
 // Register
 // ---------------------------------------------------------------------------
 
-describe('RegistryManager — register', () => {
+describe('RegistryManager -- register', () => {
   it('registers a new team entry and persists to disk', async () => {
     await manager.register('team-a', makeEntry({ socket: '/shared/comms/team-a.sock' }));
     const reg = manager.read();
@@ -90,7 +90,7 @@ describe('RegistryManager — register', () => {
 // Heartbeat
 // ---------------------------------------------------------------------------
 
-describe('RegistryManager — heartbeat', () => {
+describe('RegistryManager -- heartbeat', () => {
   it('updates heartbeat timestamp for an existing entry', async () => {
     const oldTime = new Date(Date.now() - 10_000).toISOString();
     await manager.register('team-a', makeEntry({ heartbeat: oldTime }));
@@ -119,7 +119,7 @@ describe('RegistryManager — heartbeat', () => {
 // Deregister
 // ---------------------------------------------------------------------------
 
-describe('RegistryManager — deregister', () => {
+describe('RegistryManager -- deregister', () => {
   it('removes a team from the registry', async () => {
     await manager.register('team-a', makeEntry());
     await manager.deregister('team-a');
@@ -145,7 +145,7 @@ describe('RegistryManager — deregister', () => {
 // Read (no-lock)
 // ---------------------------------------------------------------------------
 
-describe('RegistryManager — read', () => {
+describe('RegistryManager -- read', () => {
   it('returns empty teams object when registry does not exist yet', () => {
     const reg = manager.read();
     expect(reg.teams).toEqual({});
@@ -168,7 +168,7 @@ describe('RegistryManager — read', () => {
 // Stale cleanup
 // ---------------------------------------------------------------------------
 
-describe('RegistryManager — cleanStale', () => {
+describe('RegistryManager -- cleanStale', () => {
   it('removes entries whose heartbeat is older than the threshold', async () => {
     await manager.register('stale-team', makeEntry({
       heartbeat: staleHeartbeat(130_000), // 130s ago > 120s threshold
@@ -212,7 +212,7 @@ describe('RegistryManager — cleanStale', () => {
   });
 
   it('entry exactly at threshold boundary is NOT removed (> not >=)', async () => {
-    // heartbeat exactly 120_000ms ago — age === threshold, not greater
+    // heartbeat exactly 120_000ms ago -- age === threshold, not greater
     const entry = makeEntry({ heartbeat: staleHeartbeat(120_000) });
     await manager.register('boundary-team', entry);
     await new Promise((r) => setTimeout(r, 5)); // let a few ms pass to exceed threshold
@@ -228,7 +228,7 @@ describe('RegistryManager — cleanStale', () => {
 // Locking
 // ---------------------------------------------------------------------------
 
-describe('RegistryManager — locking', () => {
+describe('RegistryManager -- locking', () => {
   it('lock file is removed after a successful operation', async () => {
     await manager.register('team-a', makeEntry());
     expect(fs.existsSync(registryPath + '.lock')).toBe(false);

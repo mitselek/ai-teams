@@ -1,37 +1,37 @@
-# Team Health Report — 2026-03-19 (v7)
+# Team Health Report -- 2026-03-19 (v7)
 
 (*RC-DEV:Medici*)
 
 ## Summary
 
 - **13 recommendations total**
-- 8 `[STALE]` — common-prompt duplicates + old reviews
-- 3 `[STALE]` — [GAP] block in Tess duplicates test-gaps.md
-- 1 `[STALE]` — Finn entry outdated (issue #331 now exists)
-- 1 `[STALE]` — test-gaps.md entry for fixed bug still says UNFILED
+- 8 `[STALE]` -- common-prompt duplicates + old reviews
+- 3 `[STALE]` -- [GAP] block in Tess duplicates test-gaps.md
+- 1 `[STALE]` -- Finn entry outdated (issue #331 now exists)
+- 1 `[STALE]` -- test-gaps.md entry for fixed bug still says UNFILED
 
 ---
 
 ## Verification Results
 
-### SENDING Stuck Bug — Issue #331 ✅ Filed
+### SENDING Stuck Bug -- Issue #331 ✅ Filed
 
 - **Source (`annual/management/finished/+page.server.ts:180`):** `await Promise.all(promises)` is still present. Bug NOT fixed in code.
 - **test-gaps.md line 21:** Correctly says "GitHub issue #331, labeled bug+backlog (deferred to next year)". ✅
-- **Finn scratchpad:** Still says "no GitHub issue yet" — STALE. See rec #1.
+- **Finn scratchpad:** Still says "no GitHub issue yet" -- STALE. See rec #1.
 
-### `unblockExitConversation` deleted_at — Bug FIXED ✅
+### `unblockExitConversation` deleted_at -- Bug FIXED ✅
 
-- **Source (`exit-conversation.ts:133`):** `SET exit_blocked = 0, deleted_at = NULL` — `deleted_at` IS cleared on unblock. Bug is fixed.
-- **test-gaps.md line 17:** Still says UNFILED, describes bug as present — needs RESOLVED. See rec #2.
+- **Source (`exit-conversation.ts:133`):** `SET exit_blocked = 0, deleted_at = NULL` -- `deleted_at` IS cleared on unblock. Bug is fixed.
+- **test-gaps.md line 17:** Still says UNFILED, describes bug as present -- needs RESOLVED. See rec #2.
 
 ---
 
 ## Recommendations
 
-### [STALE] #1 — Finn: SENDING bug GitHub issue status outdated
+### [STALE] #1 -- Finn: SENDING bug GitHub issue status outdated
 
-**Source:** `memory/finn.md` — `[LEARNED] 2026-03-09 — SENDING status stuck bug` ends with "Tracked in test-gaps.md as UNFILED, no GitHub issue yet."
+**Source:** `memory/finn.md` -- `[LEARNED] 2026-03-09 -- SENDING status stuck bug` ends with "Tracked in test-gaps.md as UNFILED, no GitHub issue yet."
 
 **Recommendation:** Update last sentence to: "GitHub issue #331 filed, labeled bug+backlog, deferred to next year."
 
@@ -39,43 +39,43 @@
 
 ---
 
-### [STALE] #2 — test-gaps.md: `unblockExitConversation deleted_at`
+### [STALE] #2 -- test-gaps.md: `unblockExitConversation deleted_at`
 
-**Source:** `docs/test-gaps.md` line 17 — entry says UNFILED, describes bug as present.
+**Source:** `docs/test-gaps.md` line 17 -- entry says UNFILED, describes bug as present.
 
 **Recommendation:** Change status to RESOLVED.
 
-**Rationale:** Source verified — `exit-conversation.ts:133`: `SET exit_blocked = 0, deleted_at = NULL, updated_at = ...`. The bug (deleted_at not cleared on unblock) is fixed. This was noted in v6 report rec #13 but never actioned on test-gaps.md.
+**Rationale:** Source verified -- `exit-conversation.ts:133`: `SET exit_blocked = 0, deleted_at = NULL, updated_at = ...`. The bug (deleted_at not cleared on unblock) is fixed. This was noted in v6 report rec #13 but never actioned on test-gaps.md.
 
 ---
 
-### [STALE] #3 — Sven: overflow-x-auto blocks sticky (duplicate of common-prompt)
+### [STALE] #3 -- Sven: overflow-x-auto blocks sticky (duplicate of common-prompt)
 
-**Source:** `memory/sven.md` — `[GOTCHA] 2026-03-09 — overflow-x-auto Blocks position: sticky`
+**Source:** `memory/sven.md` -- `[GOTCHA] 2026-03-09 -- overflow-x-auto Blocks position: sticky`
 
 **Recommendation:** Remove entry. Already in `common-prompt.md` line 199.
 
 ---
 
-### [STALE] #4 — Tess: multi-statement prepare().run() (duplicate of common-prompt)
+### [STALE] #4 -- Tess: multi-statement prepare().run() (duplicate of common-prompt)
 
-**Source:** `memory/tess.md` — `[GOTCHA] 2026-03-12 — multi-statement prepare().run() only executes first statement`
+**Source:** `memory/tess.md` -- `[GOTCHA] 2026-03-12 -- multi-statement prepare().run() only executes first statement`
 
 **Recommendation:** Remove entry. Already in `common-prompt.md` line 200.
 
 ---
 
-### [STALE] #5 — Marcus: SvelteKit export rules DECISION (duplicate of common-prompt)
+### [STALE] #5 -- Marcus: SvelteKit export rules DECISION (duplicate of common-prompt)
 
-**Source:** `memory/marcus.md` — `[DECISION] 2026-03-10 — SvelteKit export rules`
+**Source:** `memory/marcus.md` -- `[DECISION] 2026-03-10 -- SvelteKit export rules`
 
 **Recommendation:** Remove entry. Already in `common-prompt.md` line 201.
 
 ---
 
-### [STALE] #6 — Marcus: two sub-bullets in test validation patterns (duplicate of common-prompt)
+### [STALE] #6 -- Marcus: two sub-bullets in test validation patterns (duplicate of common-prompt)
 
-**Source:** `memory/marcus.md` — `[LEARNED] 2026-03-13 — Test validation patterns`, bullets:
+**Source:** `memory/marcus.md` -- `[LEARNED] 2026-03-13 -- Test validation patterns`, bullets:
 - "D1 multi-statement prepare()..." → `common-prompt.md` line 200
 - "Vite `?raw` imports..." → `common-prompt.md` line 202
 
@@ -83,27 +83,27 @@
 
 ---
 
-### [STALE] #7 — Marcus: session review summary (22 entries)
+### [STALE] #7 -- Marcus: session review summary (22 entries)
 
-**Source:** `memory/marcus.md` — `[REVIEW] 2026-03-12/13 — Session summary (22 reviews)`
+**Source:** `memory/marcus.md` -- `[REVIEW] 2026-03-12/13 -- Session summary (22 reviews)`
 
 **Recommendation:** Remove the entire review table. All 22 PRs are merged, all >2 weeks old, nothing actionable remains.
 
-**Rationale:** Per audit guidelines: "Old PR review entries (>2 weeks, merged): safe to prune." Keep the [LEARNED] sections below the table — they contain valid ongoing patterns.
+**Rationale:** Per audit guidelines: "Old PR review entries (>2 weeks, merged): safe to prune." Keep the [LEARNED] sections below the table -- they contain valid ongoing patterns.
 
 ---
 
-### [STALE] #8 — Sven: PR #245 review entry
+### [STALE] #8 -- Sven: PR #245 review entry
 
-**Source:** `memory/sven.md` — `[REVIEW] 2026-03-11 — PR #245: Parim praktikant scoring (#235)`
+**Source:** `memory/sven.md` -- `[REVIEW] 2026-03-11 -- PR #245: Parim praktikant scoring (#235)`
 
 **Recommendation:** Remove entry. PR merged, all findings integrated.
 
 ---
 
-### [STALE] #9–#11 — Tess: [GAP] notification entries duplicated in test-gaps.md
+### [STALE] #9–#11 -- Tess: [GAP] notification entries duplicated in test-gaps.md
 
-**Source:** `memory/tess.md` — `[GAP] 2026-03-13 — Notification system coverage gaps (#294 audit)` block (5 gaps).
+**Source:** `memory/tess.md` -- `[GAP] 2026-03-13 -- Notification system coverage gaps (#294 audit)` block (5 gaps).
 
 **Recommendation:** Remove entire [GAP] block from Tess's scratchpad.
 

@@ -1,45 +1,45 @@
 // (*CD:Kerckhoffs*)
-// Story/35: E2E integration test — MCP spoke ↔ hub ↔ MCP spoke.
+// Story/35: E2E integration test -- MCP spoke ↔ hub ↔ MCP spoke.
 //
 // Capstone proof that v3 works end-to-end: real hub, real TLS, real E2E crypto,
 // real SSE subscriptions, all running in-process.
 //
 // Acceptance criteria:
 //
-//   AC1 — spoke A sends → spoke B receives (correct from/to envelope):
+//   AC1 -- spoke A sends → spoke B receives (correct from/to envelope):
 //     Given: hub running; both spokes subscribed; B's inbox empty
 //     When:  A calls comms_send({ to: 'team-b', body: 'hello from A' })
 //     Then:  B's inbox receives a message with:
 //              body === 'hello from A' (decrypted)
 //              from.team === 'team-a', to.team === 'team-b'
 //
-//   AC2 — bidirectional (B → A):
+//   AC2 -- bidirectional (B → A):
 //     Given: hub running; both spokes subscribed
 //     When:  B calls comms_send({ to: 'team-a', body: 'reply from B' })
 //     Then:  A's inbox receives the message with body === 'reply from B'
 //
-//   AC3 — hub logs contain no plaintext body:
+//   AC3 -- hub logs contain no plaintext body:
 //     Given: hub configured with a captured log stream
 //     When:  A sends a message with a distinctive plaintext body
 //     Then:  the captured log output does NOT contain the plaintext string
 //            (hub is crypto-blind; body is forwarded as opaque ciphertext)
 //
-//   AC4 — offline queue: send while B disconnected, reconnect, delivered:
+//   AC4 -- offline queue: send while B disconnected, reconnect, delivered:
 //     Given: B's subscriber is stopped (B is offline)
 //     When:  A sends a message to B (queued); B's subscriber restarts
 //     Then:  the queued message arrives in B's inbox after reconnect
 //
-//   AC5 — forged signature rejected at hub:
+//   AC5 -- forged signature rejected at hub:
 //     Given: hub configured with team-a's Ed25519 sign_pub
 //     When:  a message is POSTed using team-a's mTLS cert but signed with a different key
 //     Then:  hub returns HTTP 403 (Invalid signature)
 //
-//   AC6 — runs under pnpm test in < 30s:
+//   AC6 -- runs under pnpm test in < 30s:
 //     Given: standard test environment
 //     When:  the test suite runs
 //     Then:  all tests complete within the per-test timeout budget
 //
-//   AC7 — clean teardown (no orphaned handles):
+//   AC7 -- clean teardown (no orphaned handles):
 //     Given: tests are complete
 //     When:  afterAll cleanup runs
 //     Then:  hub closed; subscribers stopped; temp dir removed; no Node.js handle leaks
@@ -259,7 +259,7 @@ beforeAll(async () => {
   writeFileSync(bSignKeyPath, bSign.privateKey);
   writeFileSync(bEncKeyPath, bEnc.privateKey);
 
-  // Hub — capture logs via PassThrough stream to verify AC3
+  // Hub -- capture logs via PassThrough stream to verify AC3
   const logStream = new PassThrough();
   logStream.on('data', (chunk: Buffer | string) => {
     hubLogChunks.push(typeof chunk === 'string' ? chunk : chunk.toString('utf-8'));
@@ -333,16 +333,16 @@ beforeAll(async () => {
 }, 20000);
 
 afterAll(async () => {
-  // AC7 — clean teardown
+  // AC7 -- clean teardown
   aMcp?.subscriber.stop();
   bMcp?.subscriber.stop();
   await hub?.close?.();
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — A → B ────────────────────────────────────────────────────────────────
+// ── AC1 -- A → B ────────────────────────────────────────────────────────────────
 
-describe('AC1 — spoke A sends, spoke B receives with correct envelope', () => {
+describe('AC1 -- spoke A sends, spoke B receives with correct envelope', () => {
   it('B inbox contains decrypted message with from.team=team-a, to.team=team-b', async () => {
     const beforeCount = bMcp.inbox.messages.length;
     const distinctBody = `e2e-ac1-${randomUUID()}`;
@@ -358,9 +358,9 @@ describe('AC1 — spoke A sends, spoke B receives with correct envelope', () => 
   }, 10000);
 });
 
-// ── AC2 — B → A (bidirectional) ───────────────────────────────────────────────
+// ── AC2 -- B → A (bidirectional) ───────────────────────────────────────────────
 
-describe('AC2 — bidirectional: B sends, A receives', () => {
+describe('AC2 -- bidirectional: B sends, A receives', () => {
   it('A inbox contains decrypted message from B', async () => {
     const beforeCount = aMcp.inbox.messages.length;
     const distinctBody = `e2e-ac2-${randomUUID()}`;
@@ -376,9 +376,9 @@ describe('AC2 — bidirectional: B sends, A receives', () => {
   }, 10000);
 });
 
-// ── AC3 — hub logs contain no plaintext body ───────────────────────────────────
+// ── AC3 -- hub logs contain no plaintext body ───────────────────────────────────
 
-describe('AC3 — hub logs contain no plaintext (hub is crypto-blind)', () => {
+describe('AC3 -- hub logs contain no plaintext (hub is crypto-blind)', () => {
   it('distinctive plaintext does not appear in captured hub log output', async () => {
     // Flush any prior log activity
     await new Promise<void>((r) => setTimeout(r, 50));
@@ -400,18 +400,18 @@ describe('AC3 — hub logs contain no plaintext (hub is crypto-blind)', () => {
   }, 10000);
 });
 
-// ── AC4 — offline queue ────────────────────────────────────────────────────────
+// ── AC4 -- offline queue ────────────────────────────────────────────────────────
 
-describe('AC4 — offline queue: message delivered after B reconnects', () => {
+describe('AC4 -- offline queue: message delivered after B reconnects', () => {
   it('queued message arrives in B inbox when subscriber restarts', async () => {
-    // Stop B's subscriber — B goes offline
+    // Stop B's subscriber -- B goes offline
     bMcp.subscriber.stop();
     await waitUntil(() => !bMcp.subscriber.connected, 2000);
 
     const beforeCount = bMcp.inbox.messages.length;
     const queuedBody = `e2e-ac4-queued-${randomUUID()}`;
 
-    // A sends while B is offline — should queue
+    // A sends while B is offline -- should queue
     const sendResult = await SendTool.execute({ to: TEAM_B, body: queuedBody }, aDeps);
     const parsed = JSON.parse(
       (sendResult as { content: [{ type: 'text'; text: string }] }).content[0].text,
@@ -419,7 +419,7 @@ describe('AC4 — offline queue: message delivered after B reconnects', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.queued).toBe(true);
 
-    // Restart B's subscriber — hub drains queue on connect
+    // Restart B's subscriber -- hub drains queue on connect
     bMcp.subscriber.start();
     await waitUntil(() => bMcp.subscriber.connected, 4000);
 
@@ -431,9 +431,9 @@ describe('AC4 — offline queue: message delivered after B reconnects', () => {
   }, 15000);
 });
 
-// ── AC5 — forged signature rejected at hub ─────────────────────────────────────
+// ── AC5 -- forged signature rejected at hub ─────────────────────────────────────
 
-describe('AC5 — forged Ed25519 signature rejected at hub with HTTP 403', () => {
+describe('AC5 -- forged Ed25519 signature rejected at hub with HTTP 403', () => {
   it('message signed with wrong key returns 403 from hub', async () => {
     // Generate a random Ed25519 key NOT registered with the hub
     const wrongSign = generateKeyPairSync('ed25519', {
@@ -442,7 +442,7 @@ describe('AC5 — forged Ed25519 signature rejected at hub with HTTP 403', () =>
     });
 
     const msgId = `forged-${randomUUID()}`;
-    // Body can be anything — use a simple plaintext for the forged attempt
+    // Body can be anything -- use a simple plaintext for the forged attempt
     const encBody = JSON.stringify({
       iv: 'AAAAAAAAAAAAAAAA',
       ciphertext: 'FAKE',
@@ -481,7 +481,7 @@ describe('AC5 — forged Ed25519 signature rejected at hub with HTTP 403', () =>
       signature: forgedSig,
     };
 
-    // POST using team-a's valid TLS cert — the signature itself is forged
+    // POST using team-a's valid TLS cert -- the signature itself is forged
     const result = await httpsPost(hubPort, caCrt, teamACert, forgedMsg);
     expect(result.status).toBe(403);
     expect(JSON.parse(result.body)).toMatchObject({ error: expect.stringContaining('signature') });

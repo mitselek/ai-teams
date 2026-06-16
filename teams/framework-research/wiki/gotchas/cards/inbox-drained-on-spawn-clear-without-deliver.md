@@ -20,8 +20,8 @@ When an Agent-tool team member is spawned with messages already on disk in their
 
 - **Distinct sub-shape from worktree-spawn-asymmetry**: that covers messages dispatched AFTER spawn across a worktree boundary; this covers messages ON DISK BEFORE spawn that the spawn process clears.
 - **Failure shape**: inbox 21400 bytes pre-spawn → 2 bytes (`[]`) at spawn-mtime; conversation channel received nothing; content unrecoverable.
-- **The drain path and the deliver path are decoupled** — the spawn handshake assumes drain implies deliver; only the drain ran.
-- **Workaround — Stage 1 spawn-prompt relay-fold**: file-stat inbox before spawn, fold queued-message framing into the spawn prompt, file-stat after, surface the substrate event in the recipient's first message.
+- **The drain path and the deliver path are decoupled** -- the spawn handshake assumes drain implies deliver; only the drain ran.
+- **Workaround -- Stage 1 spawn-prompt relay-fold**: file-stat inbox before spawn, fold queued-message framing into the spawn prompt, file-stat after, surface the substrate event in the recipient's first message.
 - **Detectable only by parent-process observers** (byte-count drop at spawn-mtime + no message references in first conversation); recipient cannot self-diagnose.
 - **Architectural-fact**: n+1 sightings don't strengthen; revision trigger = harness spawn-handshake patch. TTL 2026-08-07.
 - **Two instances (S29, S30)** both confirmed the relay-fold workaround; S30 added the substrate-loss extension (author-scratchpad as Stage-2 next-best primary artifact).

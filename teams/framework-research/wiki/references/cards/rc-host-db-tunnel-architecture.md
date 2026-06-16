@@ -1,5 +1,5 @@
 ---
-title: "RC Host — SSH Keys + DB Tunnel Architecture"
+title: "RC Host -- SSH Keys + DB Tunnel Architecture"
 directory: references
 status: active
 confidence: high
@@ -20,7 +20,7 @@ Operational reference (not a pattern): the workaround architecture giving the ap
 
 - **Two targets, two keys on the same IP**: RC host bare metal (`~/.ssh/id_ed25519`, dev@:22, docker rights) vs apex-research container (`~/.ssh/id_ed25519_apex`, ai-teams@:2222). Don't cross the keys.
 - **Reverse SSH tunnel shape**: Windows operator runs `open-db-tunnels.sh`, connects via default key to dev@RC, opens reverse ports on RC loopback (127.0.0.1:11521→vjsdbtest:1521, :11522→vjsdbtest2:1521). The host-networked container reaches them as localhost.
-- **Workstation dependency**: if the operator's workstation goes offline or the script isn't running, the tunnel closes — a workaround, not production. (windows-user-context-persistent-bridge addresses persistence.)
+- **Workstation dependency**: if the operator's workstation goes offline or the script isn't running, the tunnel closes -- a workaround, not production. (windows-user-context-persistent-bridge addresses persistence.)
 - **Why a reference, not a pattern**: one working setup, one DB pair, one RC host; transplantable in shape but installation-local in specifics.
 - **TTL 2026-10-24**: coupled to apex-research migration timeline; re-verify on script change, WARP DNS fix, production cutover, or expiry.
 

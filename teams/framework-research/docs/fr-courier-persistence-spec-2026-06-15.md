@@ -13,24 +13,24 @@ proven with apex in S52). No admin rights required.
 > target" memory. PO made the call explicitly (2026-06-15). Mechanism mirrors the
 > proven `ApexResearch-DBTunnels` Scheduled Task pattern.
 
-## Architecture — 3-part DB-tunnel template
+## Architecture -- 3-part DB-tunnel template
 
 All files live in `teams/framework-research/poc/ghost-bridge/`.
 
-1. **Supervisor** — `fr-courier-supervisor.sh`
+1. **Supervisor** -- `fr-courier-supervisor.sh`
    - `while true` loop. Per iteration: pre-clean any stale `fr-courier-daemon.py`
      (`pkill -f`), run `python fr-courier-daemon.py --config fr-courier.config.json`,
      log exit, `sleep` backoff, repeat.
    - Logs to `~/.claude/logs/fr-courier-supervisor.log`.
    - Analog of `apex .claude/bin/autossh-db-tunnels.sh`.
 
-2. **Hidden launcher** — `run-courier-hidden.vbs`
+2. **Hidden launcher** -- `run-courier-hidden.vbs`
    - `WshShell.Run "<git-bash> -l -c 'exec <supervisor.sh>'", 0, True`
    - `style=0` hidden (no console flash); `wait=True` keeps wscript alive for the
      supervisor's lifetime so the task's single-instance guard detects it.
    - Analog of `apex run-tunnel-hidden.vbs`.
 
-3. **Task registration** — `register-courier-task.ps1`
+3. **Task registration** -- `register-courier-task.ps1`
    - Registers user-context task **`FrameworkResearch-Courier`**.
    - Triggers: at-logon (`-AtLogOn -User $env:USERNAME`) + power-resume
      (Power-Troubleshooter EventID 1, via CIM `MSFT_TaskEventTrigger`).
@@ -39,7 +39,7 @@ All files live in `teams/framework-research/poc/ghost-bridge/`.
    - Principal: `LogonType=Interactive`, `RunLevel=Limited` (no admin).
    - Analog of `apex register-tunnel-task.ps1`.
 
-## Single-instance — three layers
+## Single-instance -- three layers
 
 1. Task `MultipleInstances=IgnoreNew` (VBS `wait=True` exposes the running instance).
 2. Supervisor `pkill` pre-clean before each daemon launch.

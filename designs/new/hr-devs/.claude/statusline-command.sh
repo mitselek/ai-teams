@@ -10,7 +10,7 @@
 #   echo "PASS:42 FAIL:0" > /tmp/hr-devs-test-status.txt
 #
 # Requires: jq (installed in base image), git
-# Graceful degradation: all project-specific info is optional — no hard failures.
+# Graceful degradation: all project-specific info is optional -- no hard failures.
 
 input=$(cat)
 
@@ -108,7 +108,7 @@ esac
 
 # ── npm test summary ──────────────────────────────────────────────────────────
 # Read cached test results from /tmp (written by agents after npm test runs).
-# Does NOT run tests live — that would block every status update.
+# Does NOT run tests live -- that would block every status update.
 # Agents write: echo "PASS:42 FAIL:0" > /tmp/hr-devs-test-status.txt
 TEST_STATUS=""
 TEST_FILE="/tmp/hr-devs-test-status.txt"

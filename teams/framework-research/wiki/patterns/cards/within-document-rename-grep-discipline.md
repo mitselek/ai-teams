@@ -1,5 +1,5 @@
 ---
-title: "Within-Document Field Rename Hygiene — Grep Before Editing"
+title: "Within-Document Field Rename Hygiene -- Grep Before Editing"
 directory: patterns
 status: active
 confidence: high
@@ -18,7 +18,7 @@ When you rename a field, identifier, or schema element inside a single document,
 ## Key ideas
 
 - **The failure is silent and delayed**: the document still parses, the prose still reads; the dangling reference only matters when someone tries to act on it, by which time the change feels finished.
-- **Three-step discipline**: grep the whole document (case-insensitive + plural variants), edit all occurrences in one pass (references first, declaration last — visible inconsistency beats invisible), re-grep for zero hits.
+- **Three-step discipline**: grep the whole document (case-insensitive + plural variants), edit all occurrences in one pass (references first, declaration last -- visible inconsistency beats invisible), re-grep for zero hits.
 - **Not just find-and-replace**: English-plural collisions (`source-agent` → `source-agents` coincides with English plural), code-block-vs-prose contexts, cross-references to the declaration that don't contain the name.
 - **File-level version of pass1-pass2-rename-separation**: same root-cause family, simpler-but-more-frequent scope.
 - **Anti-patterns**: edit-then-grep (order matters), trust-the-schema-block-alone, plural-collision-blindness.

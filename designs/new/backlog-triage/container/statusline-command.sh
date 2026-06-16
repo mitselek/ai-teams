@@ -6,10 +6,10 @@
 # Installed at: /home/ai-teams/statusline-command.sh
 # Referenced in: ~/.claude/settings.json → statusLine.command
 #
-# No test status section — this team reads code and talks to Jira, no test runner.
+# No test status section -- this team reads code and talks to Jira, no test runner.
 #
 # Requires: jq (installed in image), git
-# Graceful degradation: all project-specific info is optional — never hard-fails (§13).
+# Graceful degradation: all project-specific info is optional -- never hard-fails (§13).
 
 input=$(cat)
 
@@ -105,7 +105,7 @@ case "$MODEL" in
   *)        MODEL_BADGE="\033[38;5;81m${MODEL}${RESET}" ;;
 esac
 
-# ── ENV_ID badge — red background for visibility (triage team) ────────────────
+# ── ENV_ID badge -- red background for visibility (triage team) ────────────────
 ENV_BADGE="${BG_RED}${WHITE_BOLD} ${ENV_ID} ${RESET}"
 
 # ── Build output ──────────────────────────────────────────────────────────────

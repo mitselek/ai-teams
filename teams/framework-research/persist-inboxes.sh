@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Persist inboxes from runtime to repo, pruning to last 100 messages
+# (*FR:Volta*) -- Persist inboxes from runtime to repo, pruning to last 100 messages
 #
 # Usage:
 #   persist-inboxes.sh           # persist ALL inboxes (team-lead shutdown)
@@ -15,7 +15,7 @@ AGENT_NAME="${1:-}"
 
 # If no runtime inboxes dir, nothing to persist
 if [ ! -d "$RUNTIME_INBOXES" ]; then
-  echo "No runtime inboxes found at $RUNTIME_INBOXES — nothing to persist."
+  echo "No runtime inboxes found at $RUNTIME_INBOXES -- nothing to persist."
   exit 0
 fi
 
@@ -53,7 +53,7 @@ for inbox_file in "$RUNTIME_INBOXES"/*.json; do
   fi
 
   if ! jq '.[-100:]' "$inbox_file" > "$REPO_INBOXES/$filename"; then
-    echo "WARN: jq failed on $filename — skipping" >&2
+    echo "WARN: jq failed on $filename -- skipping" >&2
     rm -f "$REPO_INBOXES/$filename"
     SKIPPED=$((SKIPPED + 1))
     continue
@@ -63,7 +63,7 @@ for inbox_file in "$RUNTIME_INBOXES"/*.json; do
 done
 
 if [ "$PERSISTED" -eq 0 ] && [ "$SKIPPED" -eq 0 ]; then
-  echo "Runtime inboxes dir exists but contains no .json files — nothing to persist."
+  echo "Runtime inboxes dir exists but contains no .json files -- nothing to persist."
   exit 0
 fi
 

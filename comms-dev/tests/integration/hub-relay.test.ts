@@ -11,14 +11,14 @@
 //   team-b (role:'team', defaultPeer:'relay')
 //
 // Test cases:
-//   TC-H01 — all 3 daemons start and tunnels connect
-//   TC-H02 — team-a → team-b via hub: message lands in team-b inbox
-//   TC-H03 — team-b → team-a via hub: message lands in team-a inbox
-//   TC-H04 — forwarded message has correct from/to fields (both directions)
-//   TC-H05 — inbound-only peer: hub has NO outbound config for team-b;
+//   TC-H01 -- all 3 daemons start and tunnels connect
+//   TC-H02 -- team-a → team-b via hub: message lands in team-b inbox
+//   TC-H03 -- team-b → team-a via hub: message lands in team-a inbox
+//   TC-H04 -- forwarded message has correct from/to fields (both directions)
+//   TC-H05 -- inbound-only peer: hub has NO outbound config for team-b;
 //             team-b connects inbound; hub forwards down the inbound connection
 //
-// No E2E crypto keys — plain mTLS hub relay. v2 E2E hub relay already covered
+// No E2E crypto keys -- plain mTLS hub relay. v2 E2E hub relay already covered
 // in v2-crypto-daemon.test.ts scenario 5. This test focuses on the routing path.
 //
 // Spec: security-report.md HUB-7, cross-container-test-matrix.md hub topology
@@ -162,7 +162,7 @@ beforeAll(async () => {
 
   writeFileSync(join(aDir, 'acl.json'), JSON.stringify(ACL_A));
   writeFileSync(join(bDir, 'acl.json'), JSON.stringify(ACL_B));
-  // relay (hub role) has no ACL — forwards all traffic
+  // relay (hub role) has no ACL -- forwards all traffic
 
   // Pre-assign all 3 ports
   const [aPort, bPort, relayPort] = await Promise.all([
@@ -231,7 +231,7 @@ afterAll(async () => {
 
 // ── TC-H01: all 3 daemons start and tunnels connect ──────────────────────────
 
-describe('Hub relay — TC-H01: all 3 daemons start and tunnels connect', () => {
+describe('Hub relay -- TC-H01: all 3 daemons start and tunnels connect', () => {
 
   it('team-a daemon is ready after start', () => {
     expect(aDaemon.isReady()).toBe(true);
@@ -270,7 +270,7 @@ describe('Hub relay — TC-H01: all 3 daemons start and tunnels connect', () => 
 
 // ── TC-H02: team-a → team-b via hub ──────────────────────────────────────────
 
-describe('Hub relay — TC-H02: team-a → team-b message delivery via hub', () => {
+describe('Hub relay -- TC-H02: team-a → team-b message delivery via hub', () => {
 
   it('sendMessage returns OK (team-a → team-b)', async () => {
     const msg = makeMsg(TEAM_A, 'agent-a', TEAM_B, 'agent-b', 'TC-H02: ping via hub');
@@ -288,7 +288,7 @@ describe('Hub relay — TC-H02: team-a → team-b message delivery via hub', () 
 
 // ── TC-H03: team-b → team-a via hub (reverse) ────────────────────────────────
 
-describe('Hub relay — TC-H03: team-b → team-a message delivery via hub (reverse)', () => {
+describe('Hub relay -- TC-H03: team-b → team-a message delivery via hub (reverse)', () => {
 
   it('sendMessage returns OK (team-b → team-a)', async () => {
     const msg = makeMsg(TEAM_B, 'agent-b', TEAM_A, 'agent-a', 'TC-H03: reverse ping');
@@ -306,7 +306,7 @@ describe('Hub relay — TC-H03: team-b → team-a message delivery via hub (reve
 
 // ── TC-H04: forwarded messages have correct from/to fields ───────────────────
 
-describe('Hub relay — TC-H04: forwarded messages preserve correct from/to fields', () => {
+describe('Hub relay -- TC-H04: forwarded messages preserve correct from/to fields', () => {
 
   it('team-a → team-b: from.team=team-a, to.team=team-b preserved through hub', async () => {
     const body = 'TC-H04: field check A→B';
@@ -349,7 +349,7 @@ describe('Hub relay — TC-H04: forwarded messages preserve correct from/to fiel
 // to inbound-only peers by checking inboundSockets map when no outbound tunnel
 // exists. connectedPeers() includes both outbound tunnels and inbound sockets.
 
-describe('Hub relay — TC-H05: inbound-only peer forwarding', () => {
+describe('Hub relay -- TC-H05: inbound-only peer forwarding', () => {
 
   const TEAM_A5  = 'team-a5';
   const TEAM_B5  = 'team-b5';
@@ -484,11 +484,11 @@ describe('Hub relay — TC-H05: inbound-only peer forwarding', () => {
     // Sanity check: this is the scenario under test
     // relay's static peers map does not include team-b5
     // (we can't directly inspect peers map, but we verify by checking
-    //  that the hub was constructed without it — structural guarantee from setup)
-    expect(true).toBe(true); // setup ensures this — documented here for clarity
+    //  that the hub was constructed without it -- structural guarantee from setup)
+    expect(true).toBe(true); // setup ensures this -- documented here for clarity
   });
 
-  it('team-a5 sends to team-b5 via hub — message lands in team-b5 inbox', async () => {
+  it('team-a5 sends to team-b5 via hub -- message lands in team-b5 inbox', async () => {
     // RED: hub currently cannot route to team-b5 (not in static peers map).
     // Expected fix: hub routes to inbound connections when no static peer exists.
     const body = 'TC-H05: inbound-only delivery';

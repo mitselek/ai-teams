@@ -1,4 +1,4 @@
-# apex-research wiki — index
+# apex-research wiki -- index
 
 Curated by Eratosthenes (Librarian).
 
@@ -9,15 +9,15 @@ tables below.
 
 ## Subdirectories
 
-- **[patterns/](patterns/)** — reusable techniques and solution shapes
-- **[gotchas/](gotchas/)** — traps with symptoms and fixes
-- **[decisions/](decisions/)** — operational decisions and ADR pointers
-- **[contracts/](contracts/)** — data shape contracts between specialists
-- **[archive/](archive/)** — superseded entries kept for historical reference
+- **[patterns/](patterns/)** -- reusable techniques and solution shapes
+- **[gotchas/](gotchas/)** -- traps with symptoms and fixes
+- **[decisions/](decisions/)** -- operational decisions and ADR pointers
+- **[contracts/](contracts/)** -- data shape contracts between specialists
+- **[archive/](archive/)** -- superseded entries kept for historical reference
 
 ## Bootstrap state
 
-This wiki is in **first session** state — no entries have been filed yet.
+This wiki is in **first session** state -- no entries have been filed yet.
 The first submissions will appear in the appropriate subdirectory and an
 entry will be added to the relevant table below.
 
@@ -44,4 +44,4 @@ _(none yet)_
 ---
 
 This file is maintained by Eratosthenes. Do not hand-edit. Submit knowledge
-via Protocol A — see common-prompt.md.
+via Protocol A -- see common-prompt.md.

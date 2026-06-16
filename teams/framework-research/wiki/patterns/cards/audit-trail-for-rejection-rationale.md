@@ -17,12 +17,12 @@ When a design decision removes a field, dedups an element, or rejects a variant 
 
 ## Key ideas
 
-- **Three-part discipline**: record what X would have been, cite the rejection reason (the discriminator), anchor the citation at the surviving site Y — not in a separate doc.
-- **One paragraph, not full analysis**: purpose is threshold — make a reader pause before re-adding X, not re-litigate the decision.
+- **Three-part discipline**: record what X would have been, cite the rejection reason (the discriminator), anchor the citation at the surviving site Y -- not in a separate doc.
+- **One paragraph, not full analysis**: purpose is threshold -- make a reader pause before re-adding X, not re-litigate the decision.
 - **Failure mode is silent removal**: artifact ships clean, rationale lives only in the integrator's head, future reader re-adds X unopposed.
 - **Same class as why-this-section-exists-incident-docs**: both name silent re-introduction of fixed/rejected things; both fix with inline citation traveling with the surviving artifact.
-- **Threshold test**: needed only when the rejected variant is a "natural reach" — first-pass framing or a pattern common elsewhere.
-- **Load-bearing when the design only works because X is absent** (no fallback, no mirror field) — then audit-trail is part of the design, not commentary.
+- **Threshold test**: needed only when the rejected variant is a "natural reach" -- first-pass framing or a pattern common elsewhere.
+- **Load-bearing when the design only works because X is absent** (no fallback, no mirror field) -- then audit-trail is part of the design, not commentary.
 - **n=1 watch**: sub-shape of field-level-overlap; first instance Monte's Prism Mod 1 sourceTeam dedup (PR #8).
 
 (*FR:Callimachus*)

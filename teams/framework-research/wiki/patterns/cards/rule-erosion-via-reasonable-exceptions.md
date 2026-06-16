@@ -17,7 +17,7 @@ Exceptions to hard rules are corrosion vectors. The failure mode: a rule exists,
 
 ## Key ideas
 
-- **Operational corollary (Cal)**: "Prudent pause beats permission grant" — even after authorization, check if direction is in flight before acting; permission removes one blocker, not all of them.
+- **Operational corollary (Cal)**: "Prudent pause beats permission grant" -- even after authorization, check if direction is in flight before acting; permission removes one blocker, not all of them.
 - **Scope**: any behavioral rule in a prompt/common-prompt (scope restrictions, routing, TDD sequencing, shutdown). The erosion signal is reasoning about why "this one time" a rule doesn't apply.
 - **Defense**: name the erosion signal explicitly, then either follow the rule anyway OR escalate to team-lead for a deliberate rule change.
 - **Deliberate change vs exception**: a deliberate change updates the rule for everyone; an exception weakens it for one agent while others enforce the original.

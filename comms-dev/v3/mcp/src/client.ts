@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// HubClient — mTLS HTTPS client for the v3 hub REST API.
+// HubClient -- mTLS HTTPS client for the v3 hub REST API.
 
 import * as https from 'node:https';
 import { createHash } from 'node:crypto';

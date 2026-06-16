@@ -1,8 +1,8 @@
-# ghost-bridge — team-lead cross-host comms daemon (v1)
+# ghost-bridge -- team-lead cross-host comms daemon (v1)
 
-> **[DECOMMISSIONED 2026-06-15 — SUPERSEDED BY stationmaster]**
+> **[DECOMMISSIONED 2026-06-15 -- SUPERSEDED BY stationmaster]**
 > The ghost-bridge v2 daemon is decommissioned. Its single-process-per-pair design was a no-supervisor SPOF: on the dev box the daemon died (stale PID 36772) and the FR⇄apex route went dark with no automatic recovery, while its read-flag-flip-on-forward + re-forward-on-restart caused the 5x/8x/4x duplicate-delivery bursts (2026-06-10 dupe-root-cause exchange; old registered outbox name = 4x vs fresh never-registered name = 1x controlled comparison). Those failure modes are exactly what motivated the **stationmaster** post-office hub (SSH-forced-command + durable custody + delete-on-collect + at-least-once-with-dedup). See `stationmaster-protocol.md`, `stationmaster-onboarding.md`, `stationmaster-courier.py`.
-> At decommission: PID 36772 was already dead; v2 carried **no live traffic** — `fr-apex` was already migrated to stationmaster grants (no-op), and `fr-hr-devs` had only a week-old read test-ping inbound + a never-created outbox (`fr-hr-devs` deferred until hr-devs onboards as a hub customer). The config/scripts below are retained as the v2 record and the "why we built the hub" artifact; the runtime pidfile was removed.
+> At decommission: PID 36772 was already dead; v2 carried **no live traffic** -- `fr-apex` was already migrated to stationmaster grants (no-op), and `fr-hr-devs` had only a week-old read test-ping inbound + a never-created outbox (`fr-hr-devs` deferred until hr-devs onboards as a hub customer). The config/scripts below are retained as the v2 record and the "why we built the hub" artifact; the runtime pidfile was removed.
 > (*FR:Herald*)
 
 Sketch-grade reference implementation of `SPEC.md` (this directory). Generalizes the S31 RFC #66 PoC (`../ghost-member-cli/ghost-chat.py`) into a long-running daemon that bridges Aen (FR team-lead) <-> Schliemann (apex-research team-lead).
@@ -27,7 +27,7 @@ One pair per process (v1 scope). Outbound forwards FR-local outbox -> remote inb
 1. **`~/bin/rc-deployments.json`** with an `apex-research` deployment entry. Same registry the PoC uses.
 2. **SSH key + auth** pre-configured for the user invoking the daemon. The PoC's existing setup is reused.
 3. **Python 3.7+** on the FR host (the daemon's host). `python3` preferred; `python` accepted as fallback.
-4. **Apex-side prerequisites** per SPEC § Apex-side prerequisites — `fr-lead-ghost` member entry in apex's `roster.json`, then a fresh apex session so apex's harness creates `inboxes/fr-lead-ghost.json`.
+4. **Apex-side prerequisites** per SPEC § Apex-side prerequisites -- `fr-lead-ghost` member entry in apex's `roster.json`, then a fresh apex session so apex's harness creates `inboxes/fr-lead-ghost.json`.
 5. **FR-side roster entry** for `apex-lead-ghost` per SPEC § Components. Restart FR's session so the harness creates `$HOME/.claude/teams/framework-research/inboxes/apex-lead-ghost.json`.
 
 ## Install
@@ -161,7 +161,7 @@ grep -E "ERROR|WARN" ghost-bridge.log  # all anomalies
 
 ## Windows local-dev caveats
 
-Validated end-to-end on 2026-05-14 with FR on Windows-Git-Bash + apex on Linux container. The daemon's data plane works correctly; setup + control plane each have known substrate frictions on this combination. These are **local-dev only**, not framework findings — Linux deploy substrate behaves as designed.
+Validated end-to-end on 2026-05-14 with FR on Windows-Git-Bash + apex on Linux container. The daemon's data plane works correctly; setup + control plane each have known substrate frictions on this combination. These are **local-dev only**, not framework findings -- Linux deploy substrate behaves as designed.
 
 ### SSH-key setup gotchas (setup-time)
 
@@ -169,7 +169,7 @@ Both surface as `Permission denied (publickey)` despite the key apparently being
 
 1. **PowerShell empty-passphrase trap.** `ssh-keygen -N '""'` (the natural-looking PowerShell quoting) creates a passphrase-protected key with literal `""` as the passphrase, not an empty-passphrase key. Use `ssh-keygen -N ''` instead. Diagnostic via `ssh -vv`: `Server accepts key` immediately followed by `Permission denied (publickey)` fingerprints this (privkey-load-failed, distinct from key-not-in-authorized_keys). Recovery: `ssh-keygen -p -P '""' -N '' -f <keyfile>`.
 
-2. **CRLF in `.pub` file.** Windows `ssh-keygen` writes `\r\n` line endings; sshd's `authorized_keys` parser does not tolerate trailing `\r`. If the pubkey is copy-pasted via Notepad / PowerShell / a gist / etc., `Permission denied (publickey)` results — and the fingerprint matches, making this counter-intuitive. Recovery on the remote side: `sed -i 's/\r$//' ~/.ssh/authorized_keys`.
+2. **CRLF in `.pub` file.** Windows `ssh-keygen` writes `\r\n` line endings; sshd's `authorized_keys` parser does not tolerate trailing `\r`. If the pubkey is copy-pasted via Notepad / PowerShell / a gist / etc., `Permission denied (publickey)` results -- and the fingerprint matches, making this counter-intuitive. Recovery on the remote side: `sed -i 's/\r$//' ~/.ssh/authorized_keys`.
 
 ### Daemon-runtime frictions (Git-Bash-specific)
 
@@ -178,7 +178,7 @@ Both surface as `Permission denied (publickey)` despite the key apparently being
    ps -ef | grep '[g]host-bridge.py' | awk '{print $2}' | xargs -r kill -TERM
    ```
 
-4. **SIGTERM via MSYS doesn't run Python's `finally`.** The graceful-shutdown log line (`ghost-bridge stopping — cycles=N forwarded=N received=N`) doesn't get written. The process IS terminated; just no closing log. Last line of `ghost-bridge.log` will be the most recent message event, not a shutdown summary.
+4. **SIGTERM via MSYS doesn't run Python's `finally`.** The graceful-shutdown log line (`ghost-bridge stopping -- cycles=N forwarded=N received=N`) doesn't get written. The process IS terminated; just no closing log. Last line of `ghost-bridge.log` will be the most recent message event, not a shutdown summary.
 
 All four behave correctly on Linux/Ubuntu substrate (the framework's target deploy environment).
 
@@ -195,10 +195,10 @@ Inherited from `SPEC.md § Known limitations`:
 
 ## Architecture notes (cross-reference to SPEC)
 
-- Reuses `APPEND_INBOX_SCRIPT` and `FETCH_AND_MARK_READ_SCRIPT` from `../ghost-member-cli/ghost-chat.py` verbatim — SF-4 substrate-validated.
+- Reuses `APPEND_INBOX_SCRIPT` and `FETCH_AND_MARK_READ_SCRIPT` from `../ghost-member-cli/ghost-chat.py` verbatim -- SF-4 substrate-validated.
 - No `color` field on forwarded envelopes (SF-3 contract).
 - FR-local file ops use plain `open()` / `json.load`/`json.dump` (SPEC § Substrate invariants accepts Known limitation #2 for v1).
-- Path resolution uses `pathlib.Path.home()` — works on Windows + POSIX.
+- Path resolution uses `pathlib.Path.home()` -- works on Windows + POSIX.
 - Empty / missing remote inbox file: skip with one log line, retry next cycle (SPEC § Open decisions #2).
 - Log rotation: truncate at every daemon start (SPEC § Open decisions #1).
 - PID file location: script-adjacent (SPEC § Open decisions #3).

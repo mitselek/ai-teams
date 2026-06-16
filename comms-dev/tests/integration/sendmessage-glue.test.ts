@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// TDD — RED phase. Tests for the SendMessage integration glue.
+// TDD -- RED phase. Tests for the SendMessage integration glue.
 //
 // Contract: InboxWatcher polls the file-based inbox and surfaces each new
 // message to a handler (the agent framework's SendMessage bridge).
@@ -15,7 +15,7 @@ import path from 'path';
 import { buildMessage } from '../../src/broker/message-builder.js';
 import type { Message } from '../../src/types.js';
 
-// The module under test — does not exist yet (RED).
+// The module under test -- does not exist yet (RED).
 // Babbage will implement it at src/integration/inbox-watcher.ts
 import { InboxWatcher } from '../../src/integration/inbox-watcher.js';
 
@@ -58,7 +58,7 @@ afterEach(() => {
 // Construction
 // ---------------------------------------------------------------------------
 
-describe('InboxWatcher — construction', () => {
+describe('InboxWatcher -- construction', () => {
   it('constructs without throwing', () => {
     expect(() => new InboxWatcher({
       teamName: 'comms-dev',
@@ -83,7 +83,7 @@ describe('InboxWatcher — construction', () => {
 // Polling and dispatch
 // ---------------------------------------------------------------------------
 
-describe('InboxWatcher — polling and dispatch', () => {
+describe('InboxWatcher -- polling and dispatch', () => {
   it('calls onMessage with the parsed Message when a file appears in inbox', async () => {
     const received: Message[] = [];
     const watcher = new InboxWatcher({
@@ -194,7 +194,7 @@ describe('InboxWatcher — polling and dispatch', () => {
 // Lifecycle
 // ---------------------------------------------------------------------------
 
-describe('InboxWatcher — lifecycle', () => {
+describe('InboxWatcher -- lifecycle', () => {
   it('stop() prevents further dispatch after being called', async () => {
     const received: Message[] = [];
     const watcher = new InboxWatcher({
@@ -235,7 +235,7 @@ describe('InboxWatcher — lifecycle', () => {
   });
 
   it('works when inbox directory does not exist yet at start()', async () => {
-    // inboxDir hasn't been created — watcher should handle gracefully
+    // inboxDir hasn't been created -- watcher should handle gracefully
     const received: Message[] = [];
     const watcher = new InboxWatcher({
       teamName: 'comms-dev',
@@ -260,8 +260,8 @@ describe('InboxWatcher — lifecycle', () => {
 // Error handling
 // ---------------------------------------------------------------------------
 
-describe('InboxWatcher — error handling', () => {
-  it('does not crash if onMessage handler throws — continues polling', async () => {
+describe('InboxWatcher -- error handling', () => {
+  it('does not crash if onMessage handler throws -- continues polling', async () => {
     // When onMessage throws, the file is LEFT in place for retry.
     // The watcher must not crash and must process subsequent messages.
     let callCount = 0;
@@ -282,7 +282,7 @@ describe('InboxWatcher — error handling', () => {
       writeInboxFile(inboxDir, makeMessage('retried after throw'));
       await new Promise(r => setTimeout(r, 200)); // enough for retry to succeed
 
-      // Message was retried — now dispatched successfully on second attempt
+      // Message was retried -- now dispatched successfully on second attempt
       expect(callCount).toBeGreaterThanOrEqual(2);
       expect(received).toHaveLength(1);
       expect(received[0].body).toBe('retried after throw');
@@ -291,7 +291,7 @@ describe('InboxWatcher — error handling', () => {
     }
   });
 
-  it('file survives when onMessage throws — not lost on transient failure', async () => {
+  it('file survives when onMessage throws -- not lost on transient failure', async () => {
     let threw = false;
     const received: Message[] = [];
     const msg = makeMessage('survives failure');

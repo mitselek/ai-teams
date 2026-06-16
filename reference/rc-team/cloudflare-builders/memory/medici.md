@@ -1,14 +1,14 @@
-# Medici — Health Checker Scratchpad
+# Medici -- Health Checker Scratchpad
 
-## [LEARNED] 2026-03-10 — Audit v4 (this session)
+## [LEARNED] 2026-03-10 -- Audit v4 (this session)
 
 Actions taken: 14 total (8 prunes, 3 crosspolls, 2 fixes, 1 prompt correction). All scratchpads now within 100-line limit. See health-report.md for full detail.
 
-Key fix: finn prompt used `$FIGMA_PAT` without braces — corrected to `${FIGMA_PAT}` and added `/v1/me` unreliability warning. Finn's scratchpad discovered this, prompt contradicted it.
+Key fix: finn prompt used `$FIGMA_PAT` without braces -- corrected to `${FIGMA_PAT}` and added `/v1/me` unreliability warning. Finn's scratchpad discovered this, prompt contradicted it.
 
-## [LEARNED] 2026-03-10 — Audit v3 findings (previous session)
+## [LEARNED] 2026-03-10 -- Audit v3 findings (previous session)
 
-PATH VEAD PARANDATUD — eelmise auditi (2026-03-09) põhileid lahendatud. Kõik 9 agendi prompti viitavad nüüd korrektsele `dev-toolkit/teams/cloudflare-builders/memory/<name>.md` rajale.
+PATH VEAD PARANDATUD -- eelmise auditi (2026-03-09) põhileid lahendatud. Kõik 9 agendi prompti viitavad nüüd korrektsele `dev-toolkit/teams/cloudflare-builders/memory/<name>.md` rajale.
 
 ## [PATTERN] Recurring duplicate sources
 
@@ -16,11 +16,11 @@ Three gotchas (gray-matter, $app/paths, .env quoting) were independently discove
 
 ## [PATTERN] CROSSPOLL priority
 
-Bugs (not just knowledge) should go to test-gaps.md or GitHub issues — not stay only in scratchpads. Confirmed bugs that lack GitHub issues are the highest-value audit finding.
+Bugs (not just knowledge) should go to test-gaps.md or GitHub issues -- not stay only in scratchpads. Confirmed bugs that lack GitHub issues are the highest-value audit finding.
 
 ## [GOTCHA] medici has no prompt file
 
-`prompts/medici.md` does not exist — medici receives its prompt via teammate message from team-lead each session. This is by design (or an oversight). Instructions received inline.
+`prompts/medici.md` does not exist -- medici receives its prompt via teammate message from team-lead each session. This is by design (or an oversight). Instructions received inline.
 
 ## [PATTERN] Audit cadence findings
 

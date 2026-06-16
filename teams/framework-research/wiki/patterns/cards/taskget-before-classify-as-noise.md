@@ -18,10 +18,10 @@ Self-routed `task_assignment` envelopes carry a short description at the envelop
 
 ## Key ideas
 
-- **The envelope is metadata about a task; the task body is the task** — treating the envelope as the task is the failure mode.
+- **The envelope is metadata about a task; the task body is the task** -- treating the envelope as the task is the failure mode.
 - **Two noise sub-shapes, both caught by the same rule**: spawn-handshake task-assignment (scope hidden behind a thin envelope, status pending/in_progress) and internal-routing echo of own TaskCreate (completed-work echoed as new, `assignedBy` = own name).
-- **n=5 cumulative**: Brunel S31 spawn (original discovery) + Cal S33+ batch self-instantiation (4 echoes across one ~70-min window — stable harness emission, not a one-off).
-- **Structural sibling to relay-to-primary-artifact-fidelity** — envelope is the relay, TaskGet-resolved body is the primary artifact; this is the harness-specific specialization.
+- **n=5 cumulative**: Brunel S31 spawn (original discovery) + Cal S33+ batch self-instantiation (4 echoes across one ~70-min window -- stable harness emission, not a one-off).
+- **Structural sibling to relay-to-primary-artifact-fidelity** -- envelope is the relay, TaskGet-resolved body is the primary artifact; this is the harness-specific specialization.
 - **The rule is cheap** (one tool call, bounded, non-destructive); the cost of skipping it is high (Brunel's misclassification → Stage 1 fold-error → Stage 2 ack-without-supersede).
 - **Architectural-fact half** (harness emits envelopes) doesn't gain from n+1; **discipline half** (TaskGet before classify) does.
 - **Sketch-grade pending cross-team/cross-substrate confirmation** (all 5 instances within FR).

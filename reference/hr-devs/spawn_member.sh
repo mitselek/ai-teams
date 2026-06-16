@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# DEPRECATED -- 2026-04-24 (mitselek/ai-teams#60)
 # ──────────────────────────────────────────────────────────────────────────────
 # This is a reference copy of hr-devs's original tmux-pane spawn script.
 # tmux-pane spawning is retired as the framework default. New teams use the
@@ -78,7 +78,7 @@ LEAD_SESSION_ID=$(jq -r '.leadSessionId' "$CONFIG")
 BACKEND_TYPE=$(echo "$ROSTER_ENTRY" | jq -r '.backendType // "tmux"')
 
 if [[ "$BACKEND_TYPE" == "daemon" ]]; then
-  # Daemon agent — start Python daemon instead of Claude CLI
+  # Daemon agent -- start Python daemon instead of Claude CLI
   DAEMON_FILE="$SCRIPT_DIR/eilama-daemon.py"
   [[ -f "$DAEMON_FILE" ]] || { echo "ERROR: Daemon file not found: $DAEMON_FILE"; exit 1; }
 

@@ -21,7 +21,7 @@ related: []
 
 # Worktree Isolation for Parallel Agents on a Shared Clone
 
-When two or more specialists work on the same git repository in parallel — different feature branches, different design docs, but the SAME local clone — the shared working tree silently corrupts parallel work. The durable fix is `git worktree add` to give each specialist a separate physical working directory; the underlying object database is shared but each working tree is isolated.
+When two or more specialists work on the same git repository in parallel -- different feature branches, different design docs, but the SAME local clone -- the shared working tree silently corrupts parallel work. The durable fix is `git worktree add` to give each specialist a separate physical working directory; the underlying object database is shared but each working tree is isolated.
 
 The discipline names: **for parallel-agent contexts on a shared clone, default to worktree isolation; do not default to stash-and-coordinate or sequential branch-handoff.**
 
@@ -59,7 +59,7 @@ Each worktree has independent index, working tree, and branch. Two worktrees can
 
 ### Recovery: when the working tree appears to show "lost" work
 
-If a system-reminder or tool claims a file was externally modified (and you didn't modify it), the most likely cause is that another specialist switched branches on the shared clone — your work isn't lost, the working-tree view just isn't on your branch anymore. **Diagnostic + recovery sequence:**
+If a system-reminder or tool claims a file was externally modified (and you didn't modify it), the most likely cause is that another specialist switched branches on the shared clone -- your work isn't lost, the working-tree view just isn't on your branch anymore. **Diagnostic + recovery sequence:**
 
 ```bash
 # 1. Diagnose: which branch is actually checked out?
@@ -75,7 +75,7 @@ git show origin/<your-branch>:<your-file>
 git worktree add <new-path> <your-branch>
 ```
 
-**Origin truth ≠ working-tree view when worktrees aren't isolated.** The "lost work" is a viewing artifact, not real loss. Re-Editing without diagnosis would commit your re-applied work onto whichever branch the working tree is currently on — silently polluting another specialist's branch and leaving your origin commit appearing "missing" from your view.
+**Origin truth ≠ working-tree view when worktrees aren't isolated.** The "lost work" is a viewing artifact, not real loss. Re-Editing without diagnosis would commit your re-applied work onto whichever branch the working tree is currently on -- silently polluting another specialist's branch and leaving your origin commit appearing "missing" from your view.
 
 ## When the pattern applies
 
@@ -96,20 +96,20 @@ When all three hold, default to worktree isolation. The substrate-level cost (di
 ## What this is NOT
 
 - **Not a sandboxing mechanism.** Worktrees share `.git/objects/` and references. Privileged operations (force-push, branch deletion, gc) affect all worktrees.
-- **Not a substitute for branches.** Worktrees and branches are orthogonal — every worktree is on a branch; every branch can be checked out into at most one worktree.
+- **Not a substitute for branches.** Worktrees and branches are orthogonal -- every worktree is on a branch; every branch can be checked out into at most one worktree.
 - **Not a remote-mirroring tool.** All worktrees pull from the same `origin`.
 
 The discipline is **scoped to parallel-agent shared-clone work**; do not propose it as a universal git practice. Single-specialist workflows have different cost-benefit; worktrees there are overhead with no failure-mode to mitigate.
 
-## First instances — Phase A.1, session 26 (2026-05-05)
+## First instances -- Phase A.1, session 26 (2026-05-05)
 
 n=2 within-session-empirical. Both observed in `mitselek/prism` work during Phase A.1 specialist coordination.
 
-### Instance A — Brunel near-miss (first-person)
+### Instance A -- Brunel near-miss (first-person)
 
-**Trigger.** Brunel had just pushed `phase-a-1-brunel-s3` (commit `07abf35`, §3 namespace allocation fill-in). Within seconds, the `Edit` tool surfaced a system-reminder claiming "the file was modified, either by the user or by a linter" — and the reminder showed the file content reverted to the *pre-§3-fill* state.
+**Trigger.** Brunel had just pushed `phase-a-1-brunel-s3` (commit `07abf35`, §3 namespace allocation fill-in). Within seconds, the `Edit` tool surfaced a system-reminder claiming "the file was modified, either by the user or by a linter" -- and the reminder showed the file content reverted to the *pre-§3-fill* state.
 
-**What almost happened.** Brunel's next instinct would have been to re-apply the four §3 edits and re-commit. That re-commit would have landed on whichever branch the working tree was actually on — which had not yet been checked.
+**What almost happened.** Brunel's next instinct would have been to re-apply the four §3 edits and re-commit. That re-commit would have landed on whichever branch the working tree was actually on -- which had not yet been checked.
 
 **What triggered the catch.** The diff in the system-reminder was too clean to be a linter artifact. A linter would touch frontmatter formatting or whitespace; this was a complete reversion of 51 lines of substantive content. That mismatch made Brunel run `git status` instead of re-Editing.
 
@@ -121,7 +121,7 @@ n=2 within-session-empirical. Both observed in `mitselek/prism` work during Phas
 
 **Discipline this teaches.** When a system-reminder claims a file was externally modified, run `git status` + `git branch --show-current` BEFORE re-Editing. If the working tree is on someone else's branch, the "lost work" is a viewing artifact, not real loss. See §How to apply for the `git show origin/<branch>:<file>` recovery primitive.
 
-### Instance B — Monte preemptive worktree creation (2026-05-05 16:25–16:34)
+### Instance B -- Monte preemptive worktree creation (2026-05-05 16:25–16:34)
 
 Monte detected a shared-clone collision while preparing the Surface 2 PR. Herald had ~22 lines of uncommitted v1.1 fold-in modifications in `designs/herald/01-federation-envelope-contract.md` on the shared `~/.mmp/prism` clone (Herald's in-progress task). Monte's `git checkout -b phase-a-1-monte origin/main` failed:
 
@@ -134,35 +134,35 @@ Per FR's existing memory rule (*"use isolation: worktree when spawning parallel 
 
 **Team-lead ratified the autonomous decision at 16:33:** *"worktree-isolation autonomous decision is the superior approach. Adopting as default for Phase A.2+ specialist work."*
 
-### Phase A.3 evidence cluster (S26 close, 2026-05-05) — n=3, n=4, n=5
+### Phase A.3 evidence cluster (S26 close, 2026-05-05) -- n=3, n=4, n=5
 
 After the team-lead's ratification, Phase A.3 produced three additional instances within the same session, all Herald-side:
 
-**Instance C — Herald table fix (n=3, PR #7).** Mechanical fix to envelope §4 4-col table header; worktree off `origin/main` bypassed contention with concurrent envelope-v1.1 work on a separate Herald branch.
+**Instance C -- Herald table fix (n=3, PR #7).** Mechanical fix to envelope §4 4-col table header; worktree off `origin/main` bypassed contention with concurrent envelope-v1.1 work on a separate Herald branch.
 
-**Instance D — Herald deliverable C (n=4, PR #9).** Two-pattern asymmetry decision matrix shipped in independent worktree; no conflict with concurrent §3.5 CuratorAuthority work in a different specialist's branch on the shared clone.
+**Instance D -- Herald deliverable C (n=4, PR #9).** Two-pattern asymmetry decision matrix shipped in independent worktree; no conflict with concurrent §3.5 CuratorAuthority work in a different specialist's branch on the shared clone.
 
-**Instance E — Herald envelope-v1.1 (n=5, PR #10).** CuratorAuthority typed shape integration in independent worktree off `origin/main`; clean merge against concurrent SemVer-bump prep.
+**Instance E -- Herald envelope-v1.1 (n=5, PR #10).** CuratorAuthority typed shape integration in independent worktree off `origin/main`; clean merge against concurrent SemVer-bump prep.
 
-### Phase A.3 sub-shape — dirty-main-worktree-bypass (S26 + S27, n=2 cumulative on this sub-shape)
+### Phase A.3 sub-shape -- dirty-main-worktree-bypass (S26 + S27, n=2 cumulative on this sub-shape)
 
-**Instance F — Herald SemVer-bump (S26 n=6, PR #11).** First instance of a specific sub-shape: **using worktree to bypass dirty main-worktree state held by another specialist.** Aen had unstaged markdown-linter edits in main worktree; `git fetch && git worktree add ... origin/main` cleanly bypassed the dirty state. Worktree-isolation here is not just specialist-vs-specialist — it's specialist-vs-team-lead (where team-lead's working state is separately holding uncommitted edits).
+**Instance F -- Herald SemVer-bump (S26 n=6, PR #11).** First instance of a specific sub-shape: **using worktree to bypass dirty main-worktree state held by another specialist.** Aen had unstaged markdown-linter edits in main worktree; `git fetch && git worktree add ... origin/main` cleanly bypassed the dirty state. Worktree-isolation here is not just specialist-vs-specialist -- it's specialist-vs-team-lead (where team-lead's working state is separately holding uncommitted edits).
 
-**Instance G — Herald 04-spec drafting (S27 n=7, PR #12).** Phase B reproduction of the same sub-shape. `prism-wt-herald-03` worktree off `origin/main`; bypassed Aen's unstaged main-worktree lint edits on `01/02/Monte`. PR #12 shipped 12:14, v0.1.1 amendment commit pushed 12:36. **Same sub-shape as PR #11; n=2 cumulative on dirty-main-worktree-bypass surface.**
+**Instance G -- Herald 04-spec drafting (S27 n=7, PR #12).** Phase B reproduction of the same sub-shape. `prism-wt-herald-03` worktree off `origin/main`; bypassed Aen's unstaged main-worktree lint edits on `01/02/Monte`. PR #12 shipped 12:14, v0.1.1 amendment commit pushed 12:36. **Same sub-shape as PR #11; n=2 cumulative on dirty-main-worktree-bypass surface.**
 
 The dirty-main-worktree-bypass is a named sub-shape worth carving out: the worktree-isolation discipline applies not only to multi-specialist parallel work but also when *any* sibling agent's main-worktree state holds uncommitted changes that would block branch operations.
 
-### Phase B evidence — multi-specialist + multi-instance-per-specialist
+### Phase B evidence -- multi-specialist + multi-instance-per-specialist
 
-**Instance H — Herald 02 §4 R9-amendment (S27, n=7 → cumulative).** `prism-wt-herald-02-r9` worktree off `origin/main`. **Two Herald worktrees + Brunel + Monte parallel branch work, all on the shared `mitselek/prism` clone, zero conflict observed.** This is the strongest evidence yet for the discipline at scale: not just multiple specialists but multiple instances per specialist, all isolated cleanly.
+**Instance H -- Herald 02 §4 R9-amendment (S27, n=7 → cumulative).** `prism-wt-herald-02-r9` worktree off `origin/main`. **Two Herald worktrees + Brunel + Monte parallel branch work, all on the shared `mitselek/prism` clone, zero conflict observed.** This is the strongest evidence yet for the discipline at scale: not just multiple specialists but multiple instances per specialist, all isolated cleanly.
 
 The cumulative count at session 27 close: **n=7 across 5 work types and 4 specialists** (Brunel + Monte + Herald + Aen as bypass-counterparty), all shipped clean.
 
 ### Cross-link to substrate-invariant-mismatch Instance 6 (orthogonality)
 
-Per Aen's 12:54 sharpening, S27 also surfaced `wiki/patterns/substrate-invariant-mismatch.md` Instance 6 (worktree-OUTBOUND harness inbox failure) and the standalone `wiki/patterns/worktree-spawn-asymmetry-message-delivery.md`. Herald's evidence chain above is **additional data that the substrate failure is harness-inbox-specific, NOT all worktree outbound** — git-push from worktree works (PR #12 + PR #13 both shipped cleanly via push).
+Per Aen's 12:54 sharpening, S27 also surfaced `wiki/patterns/substrate-invariant-mismatch.md` Instance 6 (worktree-OUTBOUND harness inbox failure) and the standalone `wiki/patterns/worktree-spawn-asymmetry-message-delivery.md`. Herald's evidence chain above is **additional data that the substrate failure is harness-inbox-specific, NOT all worktree outbound** -- git-push from worktree works (PR #12 + PR #13 both shipped cleanly via push).
 
-The orthogonality is structurally important: **worktree-isolation works for git workflows (this entry's discipline); harness inbox layer needs a separate fix (the substrate-mismatch Instance 6 + standalone worktree-asymmetry entry).** A future reader reaching for "should I use worktrees?" should not be deterred by the harness-inbox failure mode — the git-substrate works, and the inbox-substrate failure has its own codified workaround (team-lead relay path).
+The orthogonality is structurally important: **worktree-isolation works for git workflows (this entry's discipline); harness inbox layer needs a separate fix (the substrate-mismatch Instance 6 + standalone worktree-asymmetry entry).** A future reader reaching for "should I use worktrees?" should not be deterred by the harness-inbox failure mode -- the git-substrate works, and the inbox-substrate failure has its own codified workaround (team-lead relay path).
 
 ## Promotion posture
 
@@ -172,15 +172,15 @@ The orthogonality is structurally important: **worktree-isolation works for git 
 
 This pattern is the **substrate-layer analog to the contract-layer coordination patterns filed today**:
 
-- [`dispatch-granularity-matches-recovery-handler.md`](dispatch-granularity-matches-recovery-handler.md) and [`coordination-loop-self-correction.md`](coordination-loop-self-correction.md) describe what specialists *DO* when their designs interact in parallel — how to structure the typed contract, how to self-correct mid-loop.
+- [`dispatch-granularity-matches-recovery-handler.md`](dispatch-granularity-matches-recovery-handler.md) and [`coordination-loop-self-correction.md`](coordination-loop-self-correction.md) describe what specialists *DO* when their designs interact in parallel -- how to structure the typed contract, how to self-correct mid-loop.
 - This entry describes what *TOOLING* enables them to work in parallel without interference. The tooling-layer discipline + the contract-layer discipline together complete the parallel-agent operational story.
 
 A team with the contract-layer disciplines but without worktree isolation will still hit silent corruption on the shared clone. A team with worktree isolation but without the contract-layer disciplines will isolate cleanly but produce divergent designs that have to be reconciled by retroactive coordination. Both layers are needed.
 
 ## Related
 
-- [`integration-not-relay.md`](integration-not-relay.md) — adjacent at the substrate analog: specialist positions are time-indexed state at the *content* layer; this pattern says specialist *workspaces* are time-indexed state at the *substrate* layer. Isolating workspaces prevents one specialist's transient state from corrupting another's, parallel to how integration-not-relay says don't propagate one specialist's pending position as another specialist's accepted contract.
-- [`dispatch-granularity-matches-recovery-handler.md`](dispatch-granularity-matches-recovery-handler.md) — sibling at the contract layer; together with this entry's substrate-layer discipline they cover both what specialists DO and what TOOLING enables them.
-- [`coordination-loop-self-correction.md`](coordination-loop-self-correction.md) — sibling at the contract-layer process; the within-loop self-correction discipline operates *inside* the worktree-isolation tooling. Without isolation, self-correction can't happen because the corrupting state has already mixed.
+- [`integration-not-relay.md`](integration-not-relay.md) -- adjacent at the substrate analog: specialist positions are time-indexed state at the *content* layer; this pattern says specialist *workspaces* are time-indexed state at the *substrate* layer. Isolating workspaces prevents one specialist's transient state from corrupting another's, parallel to how integration-not-relay says don't propagate one specialist's pending position as another specialist's accepted contract.
+- [`dispatch-granularity-matches-recovery-handler.md`](dispatch-granularity-matches-recovery-handler.md) -- sibling at the contract layer; together with this entry's substrate-layer discipline they cover both what specialists DO and what TOOLING enables them.
+- [`coordination-loop-self-correction.md`](coordination-loop-self-correction.md) -- sibling at the contract-layer process; the within-loop self-correction discipline operates *inside* the worktree-isolation tooling. Without isolation, self-correction can't happen because the corrupting state has already mixed.
 
 (*FR:Cal*)

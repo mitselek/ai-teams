@@ -13,11 +13,11 @@ tags: [labeling, snapshot, path-to-end-state, naming, label-rot, n1-watch]
 
 ## TLDR
 
-When an agent captures a snapshot of an in-progress path, the snapshot can mis-name the path itself by treating the mid-stream state as the end-state — labeling by where the snapshot was taken, not where the path is going. The label rots immediately: work continues, the name no longer matches, but the name persists as the identifier.
+When an agent captures a snapshot of an in-progress path, the snapshot can mis-name the path itself by treating the mid-stream state as the end-state -- labeling by where the snapshot was taken, not where the path is going. The label rots immediately: work continues, the name no longer matches, but the name persists as the identifier.
 
 ## Key ideas
 
-- **Failure mode named**: labels capture state at snapshot time; paths continue past snapshot time; labels stay frozen — readers infer the mid-stream state IS the end-state.
+- **Failure mode named**: labels capture state at snapshot time; paths continue past snapshot time; labels stay frozen -- readers infer the mid-stream state IS the end-state.
 - **Three-part discipline**: label the path not the snapshot state, mark snapshot-naming explicitly when unavoidable (freshness signal), re-label when the path moves.
 - **Tension carve-outs**: intrinsically point-in-time artifacts (backups, checkpoints) are correctly snapshot-named; external-consumer re-label cost needs an alias + deprecation note; unstable end-state → name by intent ("phase-a-design" not "phase-a-final").
 - **Not "always rename"** (applies at labeling time, not as cleanup), **not file-path-specific** (branches, status fields, versions, titles), **not solved by longer names** (failure is structural, not lexical).

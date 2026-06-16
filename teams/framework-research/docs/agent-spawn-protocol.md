@@ -1,16 +1,16 @@
 ---
-title: Subagent Fallback Protocol — Framework
+title: Subagent Fallback Protocol -- Framework
 doc_id: subagent-fallback-framework
 authors: [herald, schliemann]
 version: 2.0.0
 last_updated: 2026-04-24
-supersedes: apex-research v1.0.0 (framing only — operational rules carried forward verbatim)
+supersedes: apex-research v1.0.0 (framing only -- operational rules carried forward verbatim)
 tags: [operations, fallback, subagent, team, agent-tool]
 ---
 
-# Subagent Fallback Protocol — Framework
+# Subagent Fallback Protocol -- Framework
 
-The framework's default spawn mode is the **persistent Agent-tool teammate** (Agent tool with `team_name` + `name` parameters — see issue #60). When a persistent teammate is overkill or impractical, run a **one-shot Agent-tool subagent** (Agent tool with no `team_name`) instead.
+The framework's default spawn mode is the **persistent Agent-tool teammate** (Agent tool with `team_name` + `name` parameters -- see issue #60). When a persistent teammate is overkill or impractical, run a **one-shot Agent-tool subagent** (Agent tool with no `team_name`) instead.
 
 Both modes use the same Agent tool. The discriminator is two parameters:
 
@@ -25,18 +25,18 @@ This document specifies the one-shot subagent fallback mode.
 
 - **Small one-shot tasks** where persistent-teammate overhead (config.json registration, scratchpad bootstrap, intro message round-trip) is disproportionate to the work.
 - **Auto-mode / focus sessions** with clear single-track work and no need for cross-agent coordination mid-task.
-- **Diagnosing instability** — narrows whether a bug is in the persistent-teammate infrastructure (inbox routing, dual-hub, scratchpad growth) vs the work itself.
+- **Diagnosing instability** -- narrows whether a bug is in the persistent-teammate infrastructure (inbox routing, dual-hub, scratchpad growth) vs the work itself.
 - **Surge work** where the persistent team is at capacity and the surge task has no continuity dependency.
 
 The fallback is NOT a default. The default is the persistent Agent-tool teammate. Use the fallback only when one of the above triggers applies.
 
 ## Protocol
 
-1. **Sequential, never parallel.** Subagent work blocks the parent's context until the agent returns. Even two "independent" subagents must run one at a time. (This is a property of the Agent-tool runtime, not a discipline rule — but worth stating because callers reach for parallelism by reflex.)
+1. **Sequential, never parallel.** Subagent work blocks the parent's context until the agent returns. Even two "independent" subagents must run one at a time. (This is a property of the Agent-tool runtime, not a discipline rule -- but worth stating because callers reach for parallelism by reflex.)
 2. **GH issue is the brief.** The subagent prompt should point at `gh issue view NNN`, not restate the issue body. Same handoff discipline as persistent teammates. Keeps the issue as the single source of truth.
-3. **Scratchpad update before signoff** is mandatory. The subagent must append `[CHECKPOINT] / [LEARNED] / [DEFERRED] / [WARNING]` entries to their own scratchpad at `teams/<team>/memory/<name>.md` **before** returning their final report. Their context dies with the return — anything not written is lost.
-4. **Knowledge submissions** — if the subagent discovers a wiki-worthy pattern/gotcha, they write a Protocol A draft to `/tmp/knowledge-submission-<slug>.md` and mention it in their report. Parent (team-lead or whichever persistent agent dispatched) relays it to the librarian (live if up, or directly into the wiki dir if running fully fallback team-wide).
-5. **Directory ownership still applies.** Whatever per-agent directory partition the team uses (e.g., apex-research's `inventory/`, `shared/`, `dashboard/`, `specs/`+`decisions/`, `wiki/`) survives the fallback — subagent briefs must respect it.
+3. **Scratchpad update before signoff** is mandatory. The subagent must append `[CHECKPOINT] / [LEARNED] / [DEFERRED] / [WARNING]` entries to their own scratchpad at `teams/<team>/memory/<name>.md` **before** returning their final report. Their context dies with the return -- anything not written is lost.
+4. **Knowledge submissions** -- if the subagent discovers a wiki-worthy pattern/gotcha, they write a Protocol A draft to `/tmp/knowledge-submission-<slug>.md` and mention it in their report. Parent (team-lead or whichever persistent agent dispatched) relays it to the librarian (live if up, or directly into the wiki dir if running fully fallback team-wide).
+5. **Directory ownership still applies.** Whatever per-agent directory partition the team uses (e.g., apex-research's `inventory/`, `shared/`, `dashboard/`, `specs/`+`decisions/`, `wiki/`) survives the fallback -- subagent briefs must respect it.
 6. **Commit + push before returning.** Same rule as persistent teammates. No uncommitted work in the subagent's sandbox. Without this, the next session has no record the work happened.
 
 ## Prompt template
@@ -90,7 +90,7 @@ Return a concise closing report: what you shipped, what was deferred,
 | Zero inbox overhead | Direct Protocol A/B routing to the librarian |
 | Parent-context visibility of agent work | Parallel work (sequential only) |
 | No persistent registration to clean up afterwards | Persistent scratchpad-growth context |
-| Single failure surface (Agent tool only — no inbox path) | Multi-step continuity within one session |
+| Single failure surface (Agent tool only -- no inbox path) | Multi-step continuity within one session |
 
 ## Known limitations
 
@@ -107,22 +107,22 @@ Return a concise closing report: what you shipped, what was deferred,
 - Cross-agent coordination expected mid-task (peer DMs, mid-flight protocol exchanges).
 - User explicitly asks for a persistent teammate.
 
-## Caveat — session lifetime (load-bearing)
+## Caveat -- session lifetime (load-bearing)
 
 Persistent Agent-tool teammates live inside the parent team-lead Claude Code process. **If the parent session dies, the teammates die too.** Under the retired tmux-pane mode, each pane was its own `claude` CLI and could outlive the team-lead session. Apex-research's session-19 reasoning (issue #60): "non-blocking for us; environment is stable and sessions are trending shorter." Other teams should weigh their own session-lifetime profile before adopting persistent Agent-tool teammates as their default.
 
-The fallback subagent does not have this concern — it returns within a single tool call and is gone before the parent session ends.
+The fallback subagent does not have this concern -- it returns within a single tool call and is gone before the parent session ends.
 
 ## Housekeeping after a fallback session
 
-1. **Save scratchpads** — subagent scratchpad updates are already on disk (they wrote directly), so no separate persist step. Verify with `git status teams/<team>/memory/`.
-2. **Relay pending knowledge submissions** — any `/tmp/knowledge-submission-*.md` files, routed to the wiki by parent or a next-session librarian subagent.
+1. **Save scratchpads** -- subagent scratchpad updates are already on disk (they wrote directly), so no separate persist step. Verify with `git status teams/<team>/memory/`.
+2. **Relay pending knowledge submissions** -- any `/tmp/knowledge-submission-*.md` files, routed to the wiki by parent or a next-session librarian subagent.
 3. **Commit + push** the session's artefacts the same way persistent-teammate sessions do.
-4. **No inbox to persist** — subagents had no inboxes. Persistent-team runtime dir `$HOME/.claude/teams/<team>/` can be cleaned (`rm -rf`) since it is ephemeral by platform design.
+4. **No inbox to persist** -- subagents had no inboxes. Persistent-team runtime dir `$HOME/.claude/teams/<team>/` can be cleaned (`rm -rf`) since it is ephemeral by platform design.
 
 ## Provenance
 
-- v1.0.0 (apex-research, 2026-04-23, Schliemann) — original framing as "persistent-tmux-pane teammate vs one-shot Agent-tool subagent."
-- v2.0.0 (framework, 2026-04-24, Herald + Schliemann) — reframed for issue #60: tmux-pane mode retired; both modes now use the Agent tool, distinguished by `team_name` + `name` parameters. Operational rules (1)–(6) carried forward verbatim.
+- v1.0.0 (apex-research, 2026-04-23, Schliemann) -- original framing as "persistent-tmux-pane teammate vs one-shot Agent-tool subagent."
+- v2.0.0 (framework, 2026-04-24, Herald + Schliemann) -- reframed for issue #60: tmux-pane mode retired; both modes now use the Agent tool, distinguished by `team_name` + `name` parameters. Operational rules (1)–(6) carried forward verbatim.
 
 (*FR:Herald*)

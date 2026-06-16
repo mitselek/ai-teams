@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Aen via coding-subagent*) — Stop ghost-bridge.py.
+# (*FR:Aen via coding-subagent*) -- Stop ghost-bridge.py.
 #
 # Reads PID file, sends SIGTERM, waits up to 5s, falls back to SIGKILL.
 # Removes PID file when done.
@@ -9,19 +9,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PID_FILE="$SCRIPT_DIR/ghost-bridge.pid"
 
 if [ ! -f "$PID_FILE" ]; then
-  echo "No PID file at $PID_FILE — nothing to stop."
+  echo "No PID file at $PID_FILE -- nothing to stop."
   exit 0
 fi
 
 PID="$(cat "$PID_FILE" 2>/dev/null || echo "")"
 if [ -z "$PID" ]; then
-  echo "PID file empty — removing and exiting."
+  echo "PID file empty -- removing and exiting."
   rm -f "$PID_FILE"
   exit 0
 fi
 
 if ! kill -0 "$PID" 2>/dev/null; then
-  echo "PID $PID not alive — removing stale PID file."
+  echo "PID $PID not alive -- removing stale PID file."
   rm -f "$PID_FILE"
   exit 0
 fi
@@ -43,12 +43,12 @@ while [ $WAITED -lt $DEADLINE ]; do
   WAITED=$((WAITED + 1))
 done
 
-echo "SIGTERM grace period elapsed — sending SIGKILL to PID $PID."
+echo "SIGTERM grace period elapsed -- sending SIGKILL to PID $PID."
 kill -KILL "$PID" 2>/dev/null || true
 sleep 0.5
 
 if kill -0 "$PID" 2>/dev/null; then
-  echo "WARN: PID $PID still alive after SIGKILL — manual cleanup needed." >&2
+  echo "WARN: PID $PID still alive after SIGKILL -- manual cleanup needed." >&2
   exit 1
 fi
 

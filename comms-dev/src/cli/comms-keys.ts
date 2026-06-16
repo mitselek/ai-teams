@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms-keys — certificate inspection CLI for the cross-team relay daemon.
+// comms-keys -- certificate inspection CLI for the cross-team relay daemon.
 // Spec: #17 §3
 //
 // Commands:
@@ -10,7 +10,7 @@
 // Read-only. Never writes. Key generation is out of scope (pre-provisioned).
 //
 // Environment:
-//   COMMS_KEYS_DIR   — default /run/secrets/comms
+//   COMMS_KEYS_DIR   -- default /run/secrets/comms
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, basename } from 'node:path';
@@ -56,7 +56,7 @@ function parseCert(pemOrBuffer: string | Buffer, context: string): X509Certifica
     return new X509Certificate(pemOrBuffer);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
-    const e = new Error(`Invalid certificate: ${context} — ${detail}`);
+    const e = new Error(`Invalid certificate: ${context} -- ${detail}`);
     (e as NodeJS.ErrnoException).code = 'INVALID_CERT';
     throw e;
   }
@@ -261,7 +261,7 @@ async function main(): Promise<void> {
       if (result.valid) {
         console.log(`OK: ${result.peer} (CN=${result.cn})`);
       } else {
-        console.error(`FAIL: ${result.peer} — ${result.code}`);
+        console.error(`FAIL: ${result.peer} -- ${result.code}`);
         if (result.code === 'CN_MISMATCH') {
           console.error(`  Expected CN: ${result.expected_cn}`);
           console.error(`  Actual CN:   ${result.actual_cn}`);

@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms_inbox — return unread messages from the local inbox buffer.
+// comms_inbox -- return unread messages from the local inbox buffer.
 
 import { z } from 'zod';
 import type { HubClient } from '../client.js';

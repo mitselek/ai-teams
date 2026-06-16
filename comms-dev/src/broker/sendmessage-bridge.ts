@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// SendMessage integration glue — bridges incoming inter-team messages from the
+// SendMessage integration glue -- bridges incoming inter-team messages from the
 // broker's file-based inbox into the agent framework's SendMessage inbox mechanism.
 //
 // The broker writes each incoming message as <message-id>.json to:
@@ -19,7 +19,7 @@
 // SendMessageBridge and `comms-watch --consume` both poll and delete files from
 // the same inbox directory. Running both simultaneously causes a race that silently
 // drops messages. Run EITHER the broker (with this bridge) OR comms-watch --consume
-// — never both. comms-watch without --consume (read-only) is safe alongside the broker.
+// -- never both. comms-watch without --consume (read-only) is safe alongside the broker.
 
 import fs from 'fs';
 import path from 'path';
@@ -104,7 +104,7 @@ export class SendMessageBridge {
         .filter(f => f.includes('-'))
         .map(f => path.join(this.opts.brokerInboxDir, f));
     } catch {
-      return; // Directory doesn't exist yet — wait
+      return; // Directory doesn't exist yet -- wait
     }
 
     for (const filePath of files) {
@@ -122,7 +122,7 @@ export class SendMessageBridge {
         const parsed = JSON.parse(raw);
         // Validate it looks like a Message envelope (not an agent inbox array)
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !parsed.id || !parsed.to || !parsed.from) {
-          continue; // Not a message envelope — skip
+          continue; // Not a message envelope -- skip
         }
         message = parsed as Message;
       } catch {
@@ -131,7 +131,7 @@ export class SendMessageBridge {
 
       try {
         await this.deliver(message);
-        // Consume the broker inbox file — it's been handed off to the framework
+        // Consume the broker inbox file -- it's been handed off to the framework
         fs.unlinkSync(filePath);
         this.seen.delete(filePath); // Allow re-delivery if broker re-queues
       } catch (err) {
@@ -140,7 +140,7 @@ export class SendMessageBridge {
     }
   }
 
-  /** Call onError without letting it propagate — bridge errors must never crash the broker. */
+  /** Call onError without letting it propagate -- bridge errors must never crash the broker. */
   private safeError(msg: string, err: unknown): void {
     const combined = new Error(`${msg} ${err instanceof Error ? err.message : String(err)}`);
     try {
@@ -151,7 +151,7 @@ export class SendMessageBridge {
   }
 
   private async deliver(message: Message): Promise<void> {
-    // Determine target agent — default to team-lead for unknown agents
+    // Determine target agent -- default to team-lead for unknown agents
     const targetAgent = message.to.agent || DEFAULT_AGENT;
     const agentInboxPath = path.join(this.opts.frameworkInboxDir, `${targetAgent}.json`);
 
@@ -175,12 +175,12 @@ export class SendMessageBridge {
       const raw = fs.readFileSync(agentInboxPath, 'utf8');
       inbox = JSON.parse(raw) as InboxEntry[];
     } catch {
-      // File doesn't exist or is malformed — start fresh
+      // File doesn't exist or is malformed -- start fresh
     }
 
     inbox.push(entry);
 
-    // Atomic write — tmp + rename to avoid partial reads by the framework
+    // Atomic write -- tmp + rename to avoid partial reads by the framework
     const tmpPath = agentInboxPath + '.tmp';
     fs.mkdirSync(path.dirname(agentInboxPath), { recursive: true });
     fs.writeFileSync(tmpPath, JSON.stringify(inbox, null, 2), 'utf8');
@@ -217,10 +217,10 @@ function buildSummary(msg: Message): string {
 // ── Standalone runner ─────────────────────────────────────────────────────────
 // Can be run directly: tsx src/broker/sendmessage-bridge.ts
 // Environment:
-//   COMMS_TEAM_NAME    — required
-//   COMMS_INBOX_DIR    — broker file inbox (default: ~/.claude/teams/<team>/inboxes)
-//   COMMS_FW_INBOX_DIR — framework inbox dir (default: ~/.claude/teams/<team>/inboxes)
-//                        (same dir — broker writes msg-<uuid>.json, framework reads <agent>.json)
+//   COMMS_TEAM_NAME    -- required
+//   COMMS_INBOX_DIR    -- broker file inbox (default: ~/.claude/teams/<team>/inboxes)
+//   COMMS_FW_INBOX_DIR -- framework inbox dir (default: ~/.claude/teams/<team>/inboxes)
+//                        (same dir -- broker writes msg-<uuid>.json, framework reads <agent>.json)
 
 if (process.argv[1] && process.argv[1].includes('sendmessage-bridge')) {
   const teamName = process.env['COMMS_TEAM_NAME'];

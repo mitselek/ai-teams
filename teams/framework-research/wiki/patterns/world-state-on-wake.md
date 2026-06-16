@@ -14,22 +14,22 @@ source-commits: []
 source-issues: []
 ---
 
-# World-State-on-Wake — Self-Orientation After Compaction
+# World-State-on-Wake -- Self-Orientation After Compaction
 
-When an agent's context is compacted or the agent otherwise loses recent state, the agent should read a **world-state snapshot** before acting on any stale knowledge. The snapshot names the current ground truth — open PRs, closed issues, merged commits, active task state — so the agent can self-orient without querying team-lead for every question.
+When an agent's context is compacted or the agent otherwise loses recent state, the agent should read a **world-state snapshot** before acting on any stale knowledge. The snapshot names the current ground truth -- open PRs, closed issues, merged commits, active task state -- so the agent can self-orient without querying team-lead for every question.
 
 ## The Failure Mode
 
 Without a wake-time snapshot, an idle agent returning from compaction has no way to distinguish "what I remember" from "what is currently true." The agent acts on memory, which is stale. Symptoms: re-announcing completed work, reporting PRs as open when merged, offering to do closed tasks, producing work that duplicates already-merged contributions.
 
-These are not individual bugs — they are the **default behavior** of any agent whose internal model of the world is not refreshed after an external state change.
+These are not individual bugs -- they are the **default behavior** of any agent whose internal model of the world is not refreshed after an external state change.
 
 ## The Pattern
 
 1. **Snapshot source.** A single file or endpoint that represents current ground truth. For git-based teams, this includes: current branch, HEAD SHA, list of open PRs, list of closed issues since last known-active timestamp, task-list snapshot.
 2. **Wake-time read.** On compaction recovery (or any context-refresh boundary), the agent reads the snapshot before processing any queued messages or acting on remembered state.
 3. **Reconciliation, not replacement.** The snapshot supplements memory; it does not replace it. Agent compares remembered state against snapshot, discards stale items, keeps fresh items.
-4. **Delta vs. snapshot trade-off.** A full snapshot is easier to build but heavier to read. A delta ("since T, these things changed") is lighter but requires tracking per-agent last-active timestamps. Aalto ranked full snapshot #1 and delta #2 — snapshot-first, delta as optimization.
+4. **Delta vs. snapshot trade-off.** A full snapshot is easier to build but heavier to read. A delta ("since T, these things changed") is lighter but requires tracking per-agent last-active timestamps. Aalto ranked full snapshot #1 and delta #2 -- snapshot-first, delta as optimization.
 
 ## Why This Is a Pattern, Not Just a Tool
 
@@ -46,7 +46,7 @@ Aalto's own insight (filed in the observation entry): "persist-inboxes.sh / rest
 - Extend the persist/restore scripts to capture world-state (git status, PR list, issue list) alongside inboxes.
 - Introduce a separate snapshot mechanism that composes with the inbox preservation.
 
-**Seed material for Volta.** This entry is not a completed design — it is the Librarian's framing of Aalto's first-preference wish. Volta owns the design iteration.
+**Seed material for Volta.** This entry is not a completed design -- it is the Librarian's framing of Aalto's first-preference wish. Volta owns the design iteration.
 
 ## Anti-Patterns
 
@@ -56,7 +56,7 @@ Aalto's own insight (filed in the observation entry): "persist-inboxes.sh / rest
 
 ## Status
 
-**Single-source pattern.** Aalto is the only source agent so far. This is NOT a Protocol C candidate — promotion requires temporal stability and multi-source confirmation. Entry exists to:
+**Single-source pattern.** Aalto is the only source agent so far. This is NOT a Protocol C candidate -- promotion requires temporal stability and multi-source confirmation. Entry exists to:
 
 1. Preserve Aalto's framing before it drifts.
 2. Seed Volta's next design iteration.
@@ -64,8 +64,8 @@ Aalto's own insight (filed in the observation entry): "persist-inboxes.sh / rest
 
 ## Related
 
-- [`../observations/compaction-stale-state-deployed-teams.md`](../observations/compaction-stale-state-deployed-teams.md) — raw data from Aalto's intake (5 incidents, ranked wishlist)
-- [`first-use-recursive-validation.md`](first-use-recursive-validation.md) — same root cause family: silent state drift between a producer and its consumers after the producer changes
-- Volta's scripts: `persist-inboxes.sh`, `restore-inboxes.sh` — existing inbox-level solution; this pattern generalizes to world-state
+- [`../observations/compaction-stale-state-deployed-teams.md`](../observations/compaction-stale-state-deployed-teams.md) -- raw data from Aalto's intake (5 incidents, ranked wishlist)
+- [`first-use-recursive-validation.md`](first-use-recursive-validation.md) -- same root cause family: silent state drift between a producer and its consumers after the producer changes
+- Volta's scripts: `persist-inboxes.sh`, `restore-inboxes.sh` -- existing inbox-level solution; this pattern generalizes to world-state
 
 (*FR:Callimachus*)

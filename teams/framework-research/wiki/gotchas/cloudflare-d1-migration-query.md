@@ -23,7 +23,7 @@ ttl: 2026-10-10
 
 ## 1. PRAGMA foreign_keys = OFF is a no-op on D1
 
-DROP TABLE on a parent fires CASCADE deletes into children regardless. `PRAGMA defer_foreign_keys = ON` also does not help — it only defers constraint *checks*, not CASCADE *actions*. **Root cause of actual data loss in hr-platform.**
+DROP TABLE on a parent fires CASCADE deletes into children regardless. `PRAGMA defer_foreign_keys = ON` also does not help -- it only defers constraint *checks*, not CASCADE *actions*. **Root cause of actual data loss in hr-platform.**
 
 ## 2. Safe migration pattern: `_new` table rename
 
@@ -38,14 +38,14 @@ Drop order matters: parent-first, not leaf-first. Dropping children first causes
 
 ## 3. D1 BLOB handling is treacherous
 
-- SQL statement limit ~100KB — hex literals like `X'...'` fail for any file >50KB
-- D1 REST API bind params are always TEXT, not BLOB — passing a base64 string as a parameter stores it as TEXT (`typeof(data) = 'text'`)
-- `{"base64": "..."}` format stores `[object Object]` — this format is Workers runtime only, not REST API
+- SQL statement limit ~100KB -- hex literals like `X'...'` fail for any file >50KB
+- D1 REST API bind params are always TEXT, not BLOB -- passing a base64 string as a parameter stores it as TEXT (`typeof(data) = 'text'`)
+- `{"base64": "..."}` format stores `[object Object]` -- this format is Workers runtime only, not REST API
 - **Solution:** `INSERT ... VALUES (?, unhex(?), ...)` with hex-encoded string bind params to get actual BLOB type
 
 ## 4. UNIQUE constraint silently drops INSERT OR IGNORE rows
 
-Partial unique indexes (e.g., `UNIQUE ... WHERE deleted_at IS NULL`) interact badly with `INSERT OR IGNORE` — rows with duplicate key on the partial index are silently skipped with no error. Always use distinct key values in test seeds.
+Partial unique indexes (e.g., `UNIQUE ... WHERE deleted_at IS NULL`) interact badly with `INSERT OR IGNORE` -- rows with duplicate key on the partial index are silently skipped with no error. Always use distinct key values in test seeds.
 
 ## 5. INSERT OR IGNORE + NOT NULL silently drops rows
 

@@ -1,5 +1,5 @@
 ---
-title: "Protocol C Graduation Path — Wiki to Common-Prompt"
+title: "Protocol C Graduation Path -- Wiki to Common-Prompt"
 directory: process
 status: active
 confidence: high
@@ -17,10 +17,10 @@ The first successful Protocol C promotion (S6, commit 589fda9) proved the end-to
 
 ## Key ideas
 
-- **Eight-step path**: accumulation (Protocol A over sessions) → cluster recognition (the cluster is the unit, not the entry) → gate-mapping (the load-bearing justification — turns "5 related patterns" into "4 gates with lifecycle coverage") → temporal calibration (≥2 sessions stable) → proposal → review (iterative) → team-lead writes L1 → commit.
+- **Eight-step path**: accumulation (Protocol A over sessions) → cluster recognition (the cluster is the unit, not the entry) → gate-mapping (the load-bearing justification -- turns "5 related patterns" into "4 gates with lifecycle coverage") → temporal calibration (≥2 sessions stable) → proposal → review (iterative) → team-lead writes L1 → commit.
 - **What made it work**: contributor breadth (4 agents, 5 entries), gate-mapping framing (cluster = gate inventory), iterative review, separation of authority (Librarian proposes, team-lead writes L1).
 - **Anti-patterns**: premature single-entry promotion, proposing without temporal stability, Librarian editing common-prompt directly.
 - **Recursive validation**: the corrected commit (48ac09e) exists because the initial commit violated Gate 2 of the very rule being promoted (see first-use-recursive-validation).
-- **First promotion**: "Structural Change Discipline" section — 5 entries, 4 gates, 4 agents, 3 sessions stable, ~15-min cycle.
+- **First promotion**: "Structural Change Discipline" section -- 5 entries, 4 gates, 4 agents, 3 sessions stable, ~15-min cycle.
 
 (*FR:Callimachus*)

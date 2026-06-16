@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// RED tests for TunnelManager — persistent peer connections, reconnect on drop,
+// RED tests for TunnelManager -- persistent peer connections, reconnect on drop,
 // message queuing during reconnect, queue overflow, heartbeat.
 // Spec: #16 §3.4, #18 Phase 2.2
 
@@ -131,9 +131,9 @@ function startPeerServer(
   });
 }
 
-// ── TunnelManager — basic connectivity ───────────────────────────────────────
+// ── TunnelManager -- basic connectivity ───────────────────────────────────────
 
-describe('TunnelManager — basic connectivity', () => {
+describe('TunnelManager -- basic connectivity', () => {
 
   it('constructs without error', async () => {
     const config = await loadDaemonCrypto({
@@ -161,9 +161,9 @@ describe('TunnelManager — basic connectivity', () => {
   });
 });
 
-// ── TunnelManager — connected peer ────────────────────────────────────────────
+// ── TunnelManager -- connected peer ────────────────────────────────────────────
 
-describe('TunnelManager — message delivery to connected peer', () => {
+describe('TunnelManager -- message delivery to connected peer', () => {
 
   it('sends a message and receives ACK', async () => {
     const received: Message[] = [];
@@ -207,9 +207,9 @@ describe('TunnelManager — message delivery to connected peer', () => {
   });
 });
 
-// ── TunnelManager — message queuing during reconnect ─────────────────────────
+// ── TunnelManager -- message queuing during reconnect ─────────────────────────
 
-describe('TunnelManager — queuing during disconnect', () => {
+describe('TunnelManager -- queuing during disconnect', () => {
 
   it('queues messages when peer is down and delivers after reconnect', async () => {
     const received: Message[] = [];
@@ -245,14 +245,14 @@ describe('TunnelManager — queuing during disconnect', () => {
       if (m.type !== 'heartbeat') received.push(m);
     });
     // Update manager with new port (or restart sends to same port in real usage)
-    // For this test, the peer reconnects to the original port — use same port via re-listen
+    // For this test, the peer reconnects to the original port -- use same port via re-listen
     // This tests that queued message is delivered after tunnel is re-established
 
     const result = await sendPromise;
     await closeNew();
     await manager.stop();
 
-    // Either delivered (OK) or queued (QUEUED) — either is acceptable before reconnect
+    // Either delivered (OK) or queued (QUEUED) -- either is acceptable before reconnect
     expect(['OK', 'QUEUED', 'PEER_UNAVAILABLE']).toContain(result);
   });
 
@@ -307,9 +307,9 @@ describe('TunnelManager — queuing during disconnect', () => {
   });
 });
 
-// ── TunnelManager — heartbeat ─────────────────────────────────────────────────
+// ── TunnelManager -- heartbeat ─────────────────────────────────────────────────
 
-describe('TunnelManager — heartbeat', () => {
+describe('TunnelManager -- heartbeat', () => {
 
   it('sends heartbeat frames (type: heartbeat) periodically', async () => {
     const received: Message[] = [];
@@ -359,7 +359,7 @@ describe('TunnelManager — heartbeat', () => {
     // Let 10+ heartbeats send
     await new Promise(r => setTimeout(r, 600));
 
-    // Send a real message — should not be rejected as duplicate of any heartbeat
+    // Send a real message -- should not be rejected as duplicate of any heartbeat
     const msg = makeMessage('framework-research', 'msg-after-heartbeats');
     const result = await manager.send('framework-research', msg);
 

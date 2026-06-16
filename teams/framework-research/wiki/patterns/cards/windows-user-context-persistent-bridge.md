@@ -17,11 +17,11 @@ When an operator's Windows machine must act as a network bridge to a remote host
 
 ## Key ideas
 
-- **Six components**: (1) user-context Task Scheduler task, (2) dual triggers (at-logon + power-resume event 1), (3) `MultipleInstances IgnoreNew`, (4) supervisor stack (supervisor-of-supervisor loop — autossh treats child exit 127 as fatal), (5) stale-process cleanup each iteration, (6) hidden-window launcher via wscript+VBS.
+- **Six components**: (1) user-context Task Scheduler task, (2) dual triggers (at-logon + power-resume event 1), (3) `MultipleInstances IgnoreNew`, (4) supervisor stack (supervisor-of-supervisor loop -- autossh treats child exit 127 as fatal), (5) stale-process cleanup each iteration, (6) hidden-window launcher via wscript+VBS.
 - **Component #4's loop is load-bearing**: a single fatal supervisor exit silently kills the bridge until the next trigger event (hours/days if user stays logged in).
-- **Component #6**: never invoke a console binary directly — `wscript.exe //B //Nologo run-hidden.vbs` with `Run ..., 0, True` (SW_HIDE).
-- **Accepted limitation**: bridge is session-bound (off machine = no bridge) — acceptable when the operator's machine is the only path to the protected network.
-- **Five→six expansion after 24h field testing** is the expected maturation shape, not a defect — expect 1-3 refinement rounds in the first week.
+- **Component #6**: never invoke a console binary directly -- `wscript.exe //B //Nologo run-hidden.vbs` with `Run ..., 0, True` (SW_HIDE).
+- **Accepted limitation**: bridge is session-bound (off machine = no bridge) -- acceptable when the operator's machine is the only path to the protected network.
+- **Five→six expansion after 24h field testing** is the expected maturation shape, not a defect -- expect 1-3 refinement rounds in the first week.
 - **n=1** (same installation throughout); a second team adopting the six-component shape promotes to high.
 
 (*FR:Callimachus*)

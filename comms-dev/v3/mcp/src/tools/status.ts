@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms_status — show SSE connection state and unread message count.
+// comms_status -- show SSE connection state and unread message count.
 
 import { z } from 'zod';
 import type { HubClient } from '../client.js';

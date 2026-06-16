@@ -34,7 +34,7 @@
 
 ### Well-covered (P0)
 - AES-256-GCM encrypt/decrypt: happy path, empty, max-size, binary, nonce uniqueness
-- Vigenere known-answer vectors: HKDF derivation, HMAC-SHA256 — all pinned
+- Vigenere known-answer vectors: HKDF derivation, HMAC-SHA256 -- all pinned
 - Tamper detection: ciphertext, IV, auth tag, AAD transplant, wrong key
 - Message integrity: checksum covers from/to fields (stableStringify fix from issue #2)
 - Replay prevention: dedup by message ID + timestamp window (300s)
@@ -48,7 +48,7 @@
 - DaemonV2: startup, delivery, ACL enforcement, SIGHUP, state reporting
 
 ### Gaps to note
-[GOTCHA] vitest.config.ts excludes `src/cli/**` from coverage — CLI modules
+[GOTCHA] vitest.config.ts excludes `src/cli/**` from coverage -- CLI modules
 are tested via tests/cli/ but not tracked in coverage report. Acceptable since
 CLI tests are integration-level, but coverage threshold applies to non-CLI src only.
 
@@ -58,7 +58,7 @@ via Node.js openssl). Low-priority for current threat model.
 
 ## Key Architectural Facts
 - TDD enforced: tests define contract, implementers make them green
-- Checksum: stableStringify (recursive key sort) — bug fix tracked in GitHub Issue #2
+- Checksum: stableStringify (recursive key sort) -- bug fix tracked in GitHub Issue #2
 - PSK: hex-encoded, min 64 chars (32 bytes). Loaded via loadPsk().
 - Key derivation: HKDF, context 'comms-v1', produces separate encryptionKey + integrityKey
 - IV: 12 bytes (96-bit GCM standard), random per message
@@ -68,13 +68,13 @@ via Node.js openssl). Low-priority for current threat model.
 - Dedup: MessageStore by message ID, 5-minute TTL
 
 ## Write Scope
-- `comms-dev/tests/` — all test files
-- `comms-dev/vitest.config.ts` — test config
-- `comms-dev/.github/` — CI pipeline
-- `comms-dev/docs/security-report.md` — security findings
+- `comms-dev/tests/` -- all test files
+- `comms-dev/vitest.config.ts` -- test config
+- `comms-dev/.github/` -- CI pipeline
+- `comms-dev/docs/security-report.md` -- security findings
 - This scratchpad
 
 ## Do NOT touch
-- `comms-dev/src/` — report bugs to babbage/vigenere via SendMessage
+- `comms-dev/src/` -- report bugs to babbage/vigenere via SendMessage
 - Team config, roster, prompts
 - Git (team-lead handles)

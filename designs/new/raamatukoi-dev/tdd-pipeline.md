@@ -1,4 +1,4 @@
-# XP Development Pipeline — raamatukoi-dev
+# XP Development Pipeline -- raamatukoi-dev
 
 The full RED → GREEN → REFACTOR pipeline protocol for this team. Every agent must read this on startup.
 
@@ -47,7 +47,7 @@ RED (Jikji or Babbage) receives the TEST_SPEC:
 
 GREEN (Aldus or Hypatia) receives the failing test:
 
-1. Writes the **minimum** code to make the test pass — no optimization, no generalization
+1. Writes the **minimum** code to make the test pass -- no optimization, no generalization
 2. Runs **all** tests (not just the new one)
 3. Commits the implementation
 4. Sends GREEN_HANDOFF to PURPLE with honest implementation notes
@@ -57,9 +57,9 @@ GREEN (Aldus or Hypatia) receives the failing test:
 PURPLE (Erasmus or Khwarizmi) receives the GREEN_HANDOFF:
 
 1. Reads GREEN's implementation notes (the map of shortcuts)
-2. Runs all tests — confirms they pass before starting
+2. Runs all tests -- confirms they pass before starting
 3. Refactors: extracts, renames, deduplicates, restructures
-4. Runs all tests again — confirms they still pass
+4. Runs all tests again -- confirms they still pass
 5. Sends PURPLE_VERDICT: ACCEPT or REJECT
 
 **On ACCEPT:**
@@ -92,10 +92,10 @@ Cassiodorus receives CYCLE_COMPLETE:
 ```markdown
 ## Test Spec
 - Story: <story-id>
-- Test case: <N of M> — <one-line description>
+- Test case: <N of M> -- <one-line description>
 - Preconditions: <what must be true before this test>
 - Expected behavior: <what the test asserts>
-- Constraints: <boundaries — e.g., "do not modify existing API surface">
+- Constraints: <boundaries -- e.g., "do not modify existing API surface">
 
 ### Acceptance criteria
 <specific, testable conditions from the story>
@@ -113,7 +113,7 @@ Cassiodorus receives CYCLE_COMPLETE:
 - Commit: <sha>
 ```
 
-**Implementation notes are mandatory and must be honest.** "I duplicated the validation from X because extracting it would change the interface" is useful. An empty notes field is not acceptable — PURPLE needs context.
+**Implementation notes are mandatory and must be honest.** "I duplicated the validation from X because extracting it would change the interface" is useful. An empty notes field is not acceptable -- PURPLE needs context.
 
 ### PURPLE_VERDICT (PURPLE → GREEN or ARCHITECT)
 
@@ -132,7 +132,7 @@ Cassiodorus receives CYCLE_COMPLETE:
 <specific structural issue that cannot be refactored without reimplementation>
 
 ### Guidance for GREEN (if REJECT)
-<concrete direction — not "make it better" but "extract the validation into a shared function at X, then call it from both Y and Z">
+<concrete direction -- not "make it better" but "extract the validation into a shared function at X, then call it from both Y and Z">
 
 ### Escalation (if rejection_count >= 3)
 <full rejection chain summary for ARCHITECT>
@@ -144,10 +144,10 @@ Cassiodorus receives CYCLE_COMPLETE:
 ```markdown
 ## Cycle Complete
 - Story: <story-id>
-- Test case: <N of M> — DONE
+- Test case: <N of M> -- DONE
 - Total cycles: <how many GREEN→PURPLE round-trips>
 - Final commit: <sha>
-- Quality notes: <structural observations for ARCHITECT — e.g., "growing coupling between modules X and Y across test cases 3-5">
+- Quality notes: <structural observations for ARCHITECT -- e.g., "growing coupling between modules X and Y across test cases 3-5">
 
 ### Ready for next test case: YES | NO (explain)
 ```
@@ -160,11 +160,11 @@ PURPLE has veto power over GREEN's implementation. Rejections escalate:
 
 | Consecutive PURPLE rejections | Action |
 |---|---|
-| 1 | Normal — PURPLE sends rejection with specific guidance to GREEN |
-| 2 | Warning — PURPLE includes summary of both rejections, asks GREEN to address the structural *pattern*, not just the symptom |
-| 3 | Escalation — PURPLE sends full rejection chain to ARCHITECT (Cassiodorus). ARCHITECT decides: (a) rewrite test plan item, (b) split into smaller steps, or (c) override PURPLE and accept with documented tech debt marker |
+| 1 | Normal -- PURPLE sends rejection with specific guidance to GREEN |
+| 2 | Warning -- PURPLE includes summary of both rejections, asks GREEN to address the structural *pattern*, not just the symptom |
+| 3 | Escalation -- PURPLE sends full rejection chain to ARCHITECT (Cassiodorus). ARCHITECT decides: (a) rewrite test plan item, (b) split into smaller steps, or (c) override PURPLE and accept with documented tech debt marker |
 
-Three strikes is not punishment — it is an authority boundary signal. It means the problem is beyond PURPLE's scope (structural improvement) and has entered ARCHITECT's scope (decomposition correctness).
+Three strikes is not punishment -- it is an authority boundary signal. It means the problem is beyond PURPLE's scope (structural improvement) and has entered ARCHITECT's scope (decomposition correctness).
 
 ---
 
@@ -228,7 +228,7 @@ Next session's PURPLE queries Bodley for `[DEFERRED-REFACTOR]` entries and picks
 
 ### Staleness Detection
 
-When PURPLE refactors files that are referenced in Bodley's wiki entries (e.g., renamed a function that appears in `docs/integration/directo/field-mappings.md`), PURPLE flags the affected entry for Bodley to verify. This is a notification, not a demand — Bodley verifies and updates at its own pace.
+When PURPLE refactors files that are referenced in Bodley's wiki entries (e.g., renamed a function that appears in `docs/integration/directo/field-mappings.md`), PURPLE flags the affected entry for Bodley to verify. This is a notification, not a demand -- Bodley verifies and updates at its own pace.
 
 ---
 
@@ -241,4 +241,4 @@ During Phase 1 (test framework setup, CI pipeline creation), the XP cycle adapts
 - **GREEN** configures the runner, makes the test pass, creates CI workflow
 - **PURPLE** refactors the infrastructure for clean patterns (test directory structure, CI workflow organization, fixture patterns)
 
-This is the same cycle — ARCHITECT → RED → GREEN → PURPLE — applied to infrastructure instead of features. The XP discipline applies even when building the quality infrastructure itself.
+This is the same cycle -- ARCHITECT → RED → GREEN → PURPLE -- applied to infrastructure instead of features. The XP discipline applies even when building the quality infrastructure itself.

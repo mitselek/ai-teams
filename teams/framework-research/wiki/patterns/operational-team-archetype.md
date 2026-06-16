@@ -16,12 +16,12 @@ source-issues: []
 
 # Operational team archetype
 
-A new team archetype distinct from research, development, and XP-pipeline teams. Recognized by four co-occurring characteristics — any one alone does not constitute the archetype, but the cluster does.
+A new team archetype distinct from research, development, and XP-pipeline teams. Recognized by four co-occurring characteristics -- any one alone does not constitute the archetype, but the cluster does.
 
 ## The four characteristics
 
 1. **No TDD pipeline.** No RED / GREEN / PURPLE roles. The team does not produce code that needs test-gated landing.
-2. **Succession-framing as first-class concern.** Every artifact is designed for *the next holder of the role*, not the current one. Documentation, processes, decisions are all written with role-handoff in mind from day one — not retrofitted at handoff time.
+2. **Succession-framing as first-class concern.** Every artifact is designed for *the next holder of the role*, not the current one. Documentation, processes, decisions are all written with role-handoff in mind from day one -- not retrofitted at handoff time.
 3. **Low-volume cadence.** 1-3 sessions per week, not daily. The team accumulates work in punctuated bursts, with quiescent periods between.
 4. **Persistent roster, episodic sessions.** The team is long-running (multi-month, potentially multi-year) but session activity is sparse. Roster stability is the load-bearing property; session frequency is not.
 
@@ -29,7 +29,7 @@ The archetype is recognized as a cluster: the four together describe a coherent 
 
 ## Mission framing pattern
 
-Operational teams characteristically frame their mission as **"load-shed [primary stakeholder] via [PO] as liaison, succession-readiness baked in"** — not as "help [PO] organise." The shift from supporting-the-current-holder to preparing-for-the-next-holder is the defining mission orientation.
+Operational teams characteristically frame their mission as **"load-shed [primary stakeholder] via [PO] as liaison, succession-readiness baked in"** -- not as "help [PO] organise." The shift from supporting-the-current-holder to preparing-for-the-next-holder is the defining mission orientation.
 
 This framing has two practical consequences:
 
@@ -38,9 +38,9 @@ This framing has two practical consequences:
 
 ## First instance
 
-`mitselek/Haapsalu-Suvekool` esl-suvekool team — Tobi, Lyyd, Saar, Tamp. Four-character roster, all opus-4-7. Designed by Celes, deployed 2026-05-01 to 2026-05-02.
+`mitselek/Haapsalu-Suvekool` esl-suvekool team -- Tobi, Lyyd, Saar, Tamp. Four-character roster, all opus-4-7. Designed by Celes, deployed 2026-05-01 to 2026-05-02.
 
-PO-locked mission framing: load-shed primary stakeholder (announced board departure ~Jan-Apr 2027) via PO as liaison; every artifact designed for the next holder of the role. The four-characteristic cluster surfaced empirically during Celes's design pass — the team does not fit research, does not fit development, does not fit XP-pipeline, and the differences are not "missing parts" of those archetypes but a different shape entirely.
+PO-locked mission framing: load-shed primary stakeholder (announced board departure ~Jan-Apr 2027) via PO as liaison; every artifact designed for the next holder of the role. The four-characteristic cluster surfaced empirically during Celes's design pass -- the team does not fit research, does not fit development, does not fit XP-pipeline, and the differences are not "missing parts" of those archetypes but a different shape entirely.
 
 ## Why the archetype matters
 
@@ -62,12 +62,12 @@ Until n=2, the archetype is a candidate, not a confirmed addition to the taxonom
 
 ## Confidence
 
-Speculative — single-instance archetype claim. The team-shape cluster is internally coherent but has not been independently rediscovered.
+Speculative -- single-instance archetype claim. The team-shape cluster is internally coherent but has not been independently rediscovered.
 
 ## Related
 
-- [`multi-repo-xp-composition.md`](multi-repo-xp-composition.md) — sibling pattern at team-shape level (XP archetype with composition variation)
-- [`cathedral-trigger-quality-teams.md`](cathedral-trigger-quality-teams.md) — sibling pattern for a different archetype-trigger condition
-- [`model-tiering-by-consequence.md`](model-tiering-by-consequence.md) — references team archetypes; operational-team archetype is not yet listed in its archetype-cost table (would require model-tier review on n=2)
+- [`multi-repo-xp-composition.md`](multi-repo-xp-composition.md) -- sibling pattern at team-shape level (XP archetype with composition variation)
+- [`cathedral-trigger-quality-teams.md`](cathedral-trigger-quality-teams.md) -- sibling pattern for a different archetype-trigger condition
+- [`model-tiering-by-consequence.md`](model-tiering-by-consequence.md) -- references team archetypes; operational-team archetype is not yet listed in its archetype-cost table (would require model-tier review on n=2)
 
 (*FR:Callimachus*)

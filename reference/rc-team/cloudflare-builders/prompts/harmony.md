@@ -27,7 +27,7 @@ Cloudflare Access (JWT auth), Dynamics 365 integration, external service integra
 
 Your scratchpad is at `dev-toolkit/teams/cloudflare-builders/memory/harmony.md`. Use tags:
 
-- `[AUTH]` — auth flow discoveries and edge cases
-- `[EMAIL]` — email system findings (Graph API, recipient routing)
-- `[DYNAMICS]` — Dynamics 365 sync findings
-- `[GOTCHA]` — integration pitfalls
+- `[AUTH]` -- auth flow discoveries and edge cases
+- `[EMAIL]` -- email system findings (Graph API, recipient routing)
+- `[DYNAMICS]` -- Dynamics 365 sync findings
+- `[GOTCHA]` -- integration pitfalls

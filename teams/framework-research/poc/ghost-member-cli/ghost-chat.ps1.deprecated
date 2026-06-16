@@ -72,12 +72,12 @@ $sshPort = $apex["port"]
 $sshUser = $apex["user"]
 $sshKey = ($apex["key"] -replace '~', $env:USERPROFILE)
 
-# Remote paths — apex container layout (verified via probe 2026-05-12)
+# Remote paths -- apex container layout (verified via probe 2026-05-12)
 $remoteTeamDir = "~/.claude/teams/apex-research"
 $remoteConfig = "$remoteTeamDir/config.json"
 $remoteOwnInbox = "$remoteTeamDir/inboxes/$Name.json"
 
-# Watch poll interval (seconds) — 2s matches RFC <3s same-host baseline conservatively
+# Watch poll interval (seconds) -- 2s matches RFC <3s same-host baseline conservatively
 $watchInterval = 2
 
 # === ssh wrapper ===
@@ -86,7 +86,7 @@ function Invoke-Ssh {
     param([Parameter(Mandatory)][string]$RemoteCommand)
     # `-n` redirects stdin from /dev/null so ssh cannot consume the user's console
     # keystrokes while it runs. Without this, fast typing during a poll's ssh call
-    # gets eaten by ssh — surfaced as the input-splitting Bug E. Belt-and-braces:
+    # gets eaten by ssh -- surfaced as the input-splitting Bug E. Belt-and-braces:
     # also pipe '' to ensure no upstream PS pipeline can feed bytes either.
     $sshArgs = @("-n", "-i", $sshKey, "-p", "$sshPort", "-o", "StrictHostKeyChecking=accept-new", "$sshUser@$sshHost", $RemoteCommand)
     return ('' | & ssh @sshArgs)
@@ -96,7 +96,7 @@ function Invoke-Ssh {
 
 function Invoke-SshBase64Cmd {
     # Two-layer gotcha when invoking remote bash from Windows PowerShell:
-    #  Layer 1 (PS source parsing): `\"` inside `"..."` is NOT an escape — PS treats
+    #  Layer 1 (PS source parsing): `\"` inside `"..."` is NOT an escape -- PS treats
     #          the inner `"` as a string terminator. Mitigation: use SINGLE-quoted
     #          PS strings (no interpolation, no escape processing).
     #  Layer 2 (OpenSSH-Win32 → remote bash transport): backslashes in the remote
@@ -113,7 +113,7 @@ function Invoke-SshBase64Cmd {
 function Cmd-List {
     Write-Host ""
     Write-Host "Members of apex-research:" -ForegroundColor Cyan
-    # Single-quoted PS string — passes `\(`, `\"`, `"-"` verbatim to b64-encoder.
+    # Single-quoted PS string -- passes `\(`, `\"`, `"-"` verbatim to b64-encoder.
     # $remoteConfig is interpolated via concatenation (single-quoted strings don't expand).
     $script = 'jq -r ''.members[] | "\(.name) :: agentType=\(.agentType // "-") backendType=\(.backendType // "-")"'' ' + $remoteConfig
     $out = Invoke-SshBase64Cmd $script
@@ -147,7 +147,7 @@ function Send-Line {
 
     # Build message JSON (canonical schema verified from apex inbox empirical observation)
     $ts = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-    # Omit `color` field — let apex harness apply the registered color for this ghost.
+    # Omit `color` field -- let apex harness apply the registered color for this ghost.
     # Including a per-message color override caused F3 cosmetic-anomaly during PoC:
     # apex displayed our self-asserted color (green) instead of registered (red).
     $msg = @{
@@ -163,7 +163,7 @@ function Send-Line {
     # conflict (the heredoc would consume stdin; we have no second stdin channel).
     # b64-pass also dodges the OpenSSH-Win32 backslash-stripping Layer-2 gotcha.
     # The python b64-decodes the embedded msg JSON, then performs O_RDWR|O_CREAT +
-    # fcntl.flock(LOCK_EX) read-modify-write under the lock — process-level atomic.
+    # fcntl.flock(LOCK_EX) read-modify-write under the lock -- process-level atomic.
     $msgB64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($msg))
     $remoteScript = @'
 python3 <<PYEOF
@@ -226,7 +226,7 @@ function Show-Message {
 function Mark-MessagesRead {
     # Updates inbox file in place: sets read=true on messages whose timestamp is
     # in $Timestamps. Uses same single-ssh+python+fcntl.flock primitive as Send-Line
-    # for atomic read-modify-write semantics. Idempotent — already-read messages stay
+    # for atomic read-modify-write semantics. Idempotent -- already-read messages stay
     # read; unmatched timestamps are no-ops.
     #
     # External-CLI members must replicate the harness-side read-flag contract:
@@ -267,7 +267,7 @@ PYEOF
 function Poll-Inbox {
     # Returns $true iff at least one message was displayed this poll. Caller uses
     # the return to decide whether to emit a separator newline and redraw the
-    # prompt — silent no-op on empty polls prevents the per-tick blank-line drift.
+    # prompt -- silent no-op on empty polls prevents the per-tick blank-line drift.
     # Side effect: marks displayed messages read=true on apex side (Bug C contract).
     $remoteCmd = "if [ -f $remoteOwnInbox ]; then jq -c '.[]' $remoteOwnInbox 2>/dev/null; fi"
     $allLines = @(Invoke-SshBase64Cmd $remoteCmd)
@@ -338,7 +338,7 @@ if ($members -notcontains $Name) {
 # === Main loop ===
 #
 # Non-blocking input + interleaved polling. The previous version used Read-Host
-# which BLOCKED until Enter — so the 2s watch interval never actually fired while
+# which BLOCKED until Enter -- so the 2s watch interval never actually fired while
 # the user was idle waiting at a prompt. ReadKey(NoEcho,IncludeKeyDown) returns
 # immediately; KeyAvailable guards it. We poll keys + poll inbox in the same loop,
 # only sleeping briefly when neither has work, so inbox arrivals during typing
@@ -347,7 +347,7 @@ if ($members -notcontains $Name) {
 # Buffer is local to the loop and echoed manually (we suppress ReadKey's echo to
 # control how new-inbox-message redraws interact with the in-progress input).
 
-# Establish watch baseline. Cast to [void] — Poll-Inbox returns $true/$false and
+# Establish watch baseline. Cast to [void] -- Poll-Inbox returns $true/$false and
 # without the cast PowerShell prints "True" to the console as a value-leak.
 [void](Poll-Inbox)
 

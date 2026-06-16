@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// UDS server integration tests — connection handling, message validation,
+// UDS server integration tests -- connection handling, message validation,
 // ACK delivery, oversized message rejection, and connection drop behaviour.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -87,7 +87,7 @@ afterEach(async () => {
 // Connection and basic delivery
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — connection and delivery', () => {
+describe('UDSServer -- connection and delivery', () => {
   it('accepts a client connection and receives a valid message', async () => {
     const sock = await connectTo(sockPath);
     const msg = makeValidMessage();
@@ -142,7 +142,7 @@ describe('UDSServer — connection and delivery', () => {
 // Message validation
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — message validation', () => {
+describe('UDSServer -- message validation', () => {
   it('sends ACK with status=error for message with bad checksum', async () => {
     const sock = await connectTo(sockPath);
     const msg = makeValidMessage();
@@ -196,7 +196,7 @@ describe('UDSServer — message validation', () => {
     const sock = await connectTo(sockPath);
     const msg = makeValidMessage({ body: 'original' });
     const tampered = { ...msg, body: 'attacker modified this' };
-    // checksum still matches original — mismatch detected
+    // checksum still matches original -- mismatch detected
     await sendAndReceive(sock, encodeFrame(tampered));
     expect(received).toHaveLength(0);
     sock.destroy();
@@ -220,7 +220,7 @@ describe('UDSServer — message validation', () => {
     const sock = await connectTo(sockPath);
     const msg = makeValidMessage({ from: { team: 'team-a', agent: 'alice' } });
     const spoofed = { ...msg, from: { team: 'team-evil', agent: 'attacker' } };
-    // checksum was computed over original from — now mismatches
+    // checksum was computed over original from -- now mismatches
     const ack = await sendAndReceive(sock, encodeFrame(spoofed)) as { type: string; body: string };
     const ackBody = JSON.parse(ack.body) as AckBody;
     expect(ackBody.status).toBe('error');
@@ -234,7 +234,7 @@ describe('UDSServer — message validation', () => {
 // HMAC-SHA256 checksum (production mode)
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — HMAC production mode', () => {
+describe('UDSServer -- HMAC production mode', () => {
   let hmacServer: UDSServer;
   let hmacSockPath: string;
   const hmacReceived: Message[] = [];
@@ -271,7 +271,7 @@ describe('UDSServer — HMAC production mode', () => {
 
   it('rejects message with plain SHA-256 checksum when HMAC key configured', async () => {
     const sock = await connectTo(hmacSockPath);
-    // Build without integrityKey — gets plain SHA-256 checksum
+    // Build without integrityKey -- gets plain SHA-256 checksum
     const msg = buildMessage({
       from: { team: 'sender', agent: 'a' }, to: { team: 'receiver', agent: 'b' },
       type: 'query', body: 'plain sha256 rejected',
@@ -317,11 +317,11 @@ describe('UDSServer — HMAC production mode', () => {
 // Timestamp replay defense
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — timestamp replay defense', () => {
+describe('UDSServer -- timestamp replay defense', () => {
   it('rejects message with timestamp older than 300s', async () => {
     const sock = await connectTo(sockPath);
     const staleTime = new Date(Date.now() - 301_000).toISOString();
-    // Build a message with stale timestamp — need to recompute checksum with that timestamp
+    // Build a message with stale timestamp -- need to recompute checksum with that timestamp
     const draft = {
       version: '1' as const, id: `msg-stale-${Date.now()}`, timestamp: staleTime,
       from: { team: 'sender', agent: 'a' }, to: { team: 'receiver', agent: 'b' },
@@ -340,7 +340,7 @@ describe('UDSServer — timestamp replay defense', () => {
 
   it('accepts message with timestamp within 300s window', async () => {
     const sock = await connectTo(sockPath);
-    // 299s ago — should be accepted
+    // 299s ago -- should be accepted
     const recentTime = new Date(Date.now() - 299_000).toISOString();
     const draft = {
       version: '1' as const, id: `msg-recent-${Date.now()}`, timestamp: recentTime,
@@ -364,12 +364,12 @@ describe('UDSServer — timestamp replay defense', () => {
     const { checksum: _, ...rest } = msg;
     const futureTs = new Date(Date.now() + 3_600_000).toISOString(); // 1hr future
     const draft = { ...rest, timestamp: futureTs };
-    // Future message: age is negative — should be treated as within window (not too old)
+    // Future message: age is negative -- should be treated as within window (not too old)
     // This tests that we don't crash on negative age
     const checksum = computeChecksum(draft);
     const futureMsg: Message = { ...draft, checksum };
     const ack = await sendAndReceive(sock, encodeFrame(futureMsg)) as { type: string; body: string };
-    // Future timestamps pass the "too old" check — they are within the window
+    // Future timestamps pass the "too old" check -- they are within the window
     expect(typeof ack).toBe('object');
     sock.destroy();
   });
@@ -404,7 +404,7 @@ describe('UDSServer — timestamp replay defense', () => {
 // Oversized message handling
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — oversized message rejection', () => {
+describe('UDSServer -- oversized message rejection', () => {
   it('closes connection on oversized frame header (declared size > maxSize)', async () => {
     const sock = await connectTo(sockPath);
     const header = Buffer.allocUnsafe(4);
@@ -424,7 +424,7 @@ describe('UDSServer — oversized message rejection', () => {
 // Connection drop
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — connection drop handling', () => {
+describe('UDSServer -- connection drop handling', () => {
   it('survives client disconnect without crashing', async () => {
     const sock = await connectTo(sockPath);
     sock.destroy();
@@ -456,7 +456,7 @@ describe('UDSServer — connection drop handling', () => {
 // UDSClient integration (send → server → ACK)
 // ---------------------------------------------------------------------------
 
-describe('UDSClient — send and ACK', () => {
+describe('UDSClient -- send and ACK', () => {
   it('send() resolves on first attempt when server is ready', async () => {
     const { UDSClient } = await import('../../src/transport/client.js');
     const client = new UDSClient(sockPath);
@@ -526,7 +526,7 @@ describe('UDSClient — send and ACK', () => {
 // Socket lifecycle
 // ---------------------------------------------------------------------------
 
-describe('UDSServer — socket lifecycle', () => {
+describe('UDSServer -- socket lifecycle', () => {
   it('removes stale socket file on listen() (crash recovery)', async () => {
     const fs = await import('node:fs');
     expect(fs.existsSync(sockPath)).toBe(true);

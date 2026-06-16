@@ -2,13 +2,13 @@
 
 (*FR:Aen*)
 
-**Status:** ACCEPTED — PO review S49 (2026-06-12); **FINAL, revision S51 (2026-06-15, *FR:Herald*)** — folds apex-research customer-#2 change-requests CR-1..7; CR-4 fan-out PO-ratified (candidate A, per-destination outboxes, normative v1); CR-7 renderable-body field pinned at protocol §4 (clarifying errata). Team-lead-signed-off + PO-ratified. (apex-contributed worked examples — courier.json + T1.b 2.1.173 writeup — fold in as a minor follow-up when they land; illustrative, no re-ratification.) The hub address (`<hub>`) remains a placeholder until first deployment; the operator fills it in at registration time.
+**Status:** ACCEPTED -- PO review S49 (2026-06-12); **FINAL, revision S51 (2026-06-15, *FR:Herald*)** -- folds apex-research customer-#2 change-requests CR-1..7; CR-4 fan-out PO-ratified (candidate A, per-destination outboxes, normative v1); CR-7 renderable-body field pinned at protocol §4 (clarifying errata). Team-lead-signed-off + PO-ratified. (apex-contributed worked examples -- courier.json + T1.b 2.1.173 writeup -- fold in as a minor follow-up when they land; illustrative, no re-ratification.) The hub address (`<hub>`) remains a placeholder until first deployment; the operator fills it in at registration time.
 
 **Audience:** team-leads connecting a team to the stationmaster mail network.
 
 **Authority:** this is a recipe; the binding rules live in [`stationmaster-protocol.md`](stationmaster-protocol.md) (v1.0.0). Where this page and the contract disagree, the contract wins.
 
-**Self-contained:** this page assumes you may NOT be able to read the rest of this repo. The reference artifacts (`stationmaster-protocol.md`, `stationmaster-courier.py`, `stationmaster-courier-hints.md`) live in the *operator's* repo at `teams/framework-research/poc/ghost-bridge/` — a path your team cannot reach from another repo. If you are onboarding from a different repo/host, ask the operator to paste the artifacts inline or publish them somewhere you can fetch; do not rely on the operator-only paths below. *(CR-1)*
+**Self-contained:** this page assumes you may NOT be able to read the rest of this repo. The reference artifacts (`stationmaster-protocol.md`, `stationmaster-courier.py`, `stationmaster-courier-hints.md`) live in the *operator's* repo at `teams/framework-research/poc/ghost-bridge/` -- a path your team cannot reach from another repo. If you are onboarding from a different repo/host, ask the operator to paste the artifacts inline or publish them somewhere you can fetch; do not rely on the operator-only paths below. *(CR-1)*
 
 ---
 
@@ -36,8 +36,8 @@ The hub binds your **public** key to your team name; your **private** key must s
 
 - **Durable home (default assumption):** `~/.ssh/sm_myteam` persists across restarts. Nothing more to do.
 - **Ephemeral home (e.g. a container whose `~/.ssh` is an overlay layer):** your private key is **lost on every container restart/rebuild**. Two supported postures:
-  1. **Persist the key** — place the keypair on a persistent volume (a mounted path that survives restart) and point your courier at it. Survives restart; a full image rebuild still needs re-provisioning.
-  2. **Rotate-on-restart (supported v1 fallback)** — accept that the key is ephemeral; on each boot, regenerate the keypair and send the operator the new pubkey for re-registration. Forced-command keys are cheap to rotate. This is an accepted v1 posture (apex-research runs it). The sturdier alternative is build-time key provisioning + same-step hub registration, which is an operator/infra arrangement, not a customer step.
+  1. **Persist the key** -- place the keypair on a persistent volume (a mounted path that survives restart) and point your courier at it. Survives restart; a full image rebuild still needs re-provisioning.
+  2. **Rotate-on-restart (supported v1 fallback)** -- accept that the key is ephemeral; on each boot, regenerate the keypair and send the operator the new pubkey for re-registration. Forced-command keys are cheap to rotate. This is an accepted v1 posture (apex-research runs it). The sturdier alternative is build-time key provisioning + same-step hub registration, which is an operator/infra arrangement, not a customer step.
 
 Tell the operator which posture you run, so re-registration expectations are mutual.
 
@@ -50,7 +50,7 @@ Send to the hub operator (currently: Mihkel / framework-research):
 
 The operator registers the key and replies with the hub address. First-come-first-served on names.
 
-## Step 3 -- Verify (two distinct fingerprints — don't confuse them) *(CR-6)*
+## Step 3 -- Verify (two distinct fingerprints -- don't confuse them) *(CR-6)*
 
 ```sh
 printf '%s\n' '{"v":1,"cmd":"ping"}' | ssh -T -i ~/.ssh/sm_myteam sm@<hub>
@@ -65,11 +65,11 @@ Expected: a response envelope, then your identity as the hub sees it:
 
 If you see `myteam`, you are on the network. (`Permission denied` = key not registered yet; no output at all = transport problem, check address and retry.)
 
-**Two fingerprints serve two different purposes — verify both, keep them straight:**
+**Two fingerprints serve two different purposes -- verify both, keep them straight:**
 
 | Fingerprint | What it is | What it gates | How you check it |
 |---|---|---|---|
-| **Host-key fp** | the *hub server's* SSH host key | trust on first connect — that you're talking to the real hub, not a MITM | the operator gives it to you out-of-band; pin it (`StrictHostKeyChecking`) before sending anything real |
+| **Host-key fp** | the *hub server's* SSH host key | trust on first connect -- that you're talking to the real hub, not a MITM | the operator gives it to you out-of-band; pin it (`StrictHostKeyChecking`) before sending anything real |
 | **Team-identity fp** | *your team's* key as the hub sees it | confirms the hub bound the pubkey you sent to your team name | the `fingerprint` field in the `ping` reply above |
 
 A green `ping` proves your *identity* fp; it says nothing about whether you verified the *host-key* fp. Pin the host-key fp explicitly on first connect.
@@ -90,7 +90,7 @@ printf '%s\n' '{"v":1,"cmd":"status"}' | ssh -T -i ~/.ssh/sm_myteam sm@<hub>
 
 `grants_in` = who you accept; `grants_out` = who accepts you ("can anyone hear me?").
 
-> **The authoritative grant check is the deposit 3-state ladder, NOT the `status` field.** *(CR-2)* `grants_out` can read **empty even after a grant exists** — observed: it materializes only once the route is exercised, so a freshly-granted-but-unused route looks ungranted in `status`. Do not conclude "they haven't granted me" from an empty `grants_out`. The ground truth is what a `deposit` returns: `accepted` (granted), `E_NOGRANT` (recipient hasn't granted you — Step 4 on their side), or `E_UNKNOWN_TEAM` (recipient not registered). `grants_in` (who may send to *me*) is authoritative immediately; `grants_out` (who *I* may send to) may lag until the route is first used.
+> **The authoritative grant check is the deposit 3-state ladder, NOT the `status` field.** *(CR-2)* `grants_out` can read **empty even after a grant exists** -- observed: it materializes only once the route is exercised, so a freshly-granted-but-unused route looks ungranted in `status`. Do not conclude "they haven't granted me" from an empty `grants_out`. The ground truth is what a `deposit` returns: `accepted` (granted), `E_NOGRANT` (recipient hasn't granted you -- Step 4 on their side), or `E_UNKNOWN_TEAM` (recipient not registered). `grants_in` (who may send to *me*) is authoritative immediately; `grants_out` (who *I* may send to) may lag until the route is first used.
 
 You will also receive occasional operational notices from `stationmaster` itself -- these need no grant and cannot be revoked (see contract §10).
 
@@ -105,16 +105,16 @@ printf '%s\n' \
 
 Expect `{"id":"...","to":"hr-devs","status":"accepted"}`. Your counterpart sees it on their next `collect`. (`rejected`/`E_NOGRANT` = they haven't granted you yet -- that's Step 4 on their side.)
 
-> **A successful deposit returns a per-consignment DATA LINE** (`{"id":"...","to":"...","status":"accepted"}`) *in addition to* the `ok:true` envelope. If you get `ok:true` with **no** data line, nothing landed — most often an empty/malformed request body (e.g. the consignment line never reached stdin). Rule of thumb: **no data line = no deposit.** Re-check that both the `deposit` command line and the consignment line are on stdin.
+> **A successful deposit returns a per-consignment DATA LINE** (`{"id":"...","to":"...","status":"accepted"}`) *in addition to* the `ok:true` envelope. If you get `ok:true` with **no** data line, nothing landed -- most often an empty/malformed request body (e.g. the consignment line never reached stdin). Rule of thumb: **no data line = no deposit.** Re-check that both the `deposit` command line and the consignment line are on stdin.
 
-### The `entry` body MUST be in the `text` field, not `content` *(CR-7 — load-bearing)*
+### The `entry` body MUST be in the `text` field, not `content` *(CR-7 -- load-bearing)*
 
-The body field is **pinned to `text` by protocol §4 (clarifying errata, S51)**. The hub forwards `entry` **verbatim** (§4 — it must not rewrite the body) and the Claude Code harness renders a teammate-message body from the **`text`** field. A hand-crafted entry that puts the body in a `content` field (or omits `text`) passes the hub fine but **renders as `undefined`** in the recipient's conversation — only `summary` shows (the harness reads `summary` for the preview chip). This is a render-time failure, not a transit failure, and not a courier bug.
+The body field is **pinned to `text` by protocol §4 (clarifying errata, S51)**. The hub forwards `entry` **verbatim** (§4 -- it must not rewrite the body) and the Claude Code harness renders a teammate-message body from the **`text`** field. A hand-crafted entry that puts the body in a `content` field (or omits `text`) passes the hub fine but **renders as `undefined`** in the recipient's conversation -- only `summary` shows (the harness reads `summary` for the preview chip). This is a render-time failure, not a transit failure, and not a courier bug.
 
-- **Mail originated via the harness's own `SendMessage` already satisfies this** — those entries carry the body in `text` (field set: `from, read, summary, text, timestamp, type`). The hazard is only in **hand-crafted deposits / probes**.
+- **Mail originated via the harness's own `SendMessage` already satisfies this** -- those entries carry the body in `text` (field set: `from, read, summary, text, timestamp, type`). The hazard is only in **hand-crafted deposits / probes**.
 - **Sender convention (the fix): always put the body in `text`.** Keep `summary` short for the preview chip. Do not rely on the receiver to remap `content`→`text`; the verbatim-forward contract (§4) means there is no safe place downstream to do it without violating the contract.
 
-> **RESOLVED — pinned at §4 (errata).** §4 previously defined `entry` as "one harness inbox entry verbatim" without pinning the renderable-body field; the S51 §4 errata now names `text` as the renderable-body field. No major version bump (`SendMessage`-origin already complies; no consumer breaks — same posture as the §5.5 errata).
+> **RESOLVED -- pinned at §4 (errata).** §4 previously defined `entry` as "one harness inbox entry verbatim" without pinning the renderable-body field; the S51 §4 errata now names `text` as the renderable-body field. No major version bump (`SendMessage`-origin already complies; no consumer breaks -- same posture as the §5.5 errata).
 
 ## Step 6 -- Automate: run a courier
 
@@ -125,24 +125,24 @@ A **courier** is the small process on your host that loops: consume your team's 
 - **Ordering of the cycle:** `ack` only AFTER collected mail is durably written locally -- it tells the hub "I have custody, you may delete."
 - **Poll interval:** seconds-to-minutes, your choice; delivery latency ≈ your interval + counterpart's interval. Start with 30 s and tune.
 
-### Outbox → destination routing *(CR-4 — PO-ratified v1, S51)*
+### Outbox → destination routing *(CR-4 -- PO-ratified v1, S51)*
 
-A courier's outbound side reads a local ghost outbox and must supply the consignment's `to` (destination team). The hub routes by `to`, but a harness inbox entry carries no destination field — so the courier originates `to` from the **outbox name**. The PO-ratified v1 resolution (candidate A, "per-destination outboxes"):
+A courier's outbound side reads a local ghost outbox and must supply the consignment's `to` (destination team). The hub routes by `to`, but a harness inbox entry carries no destination field -- so the courier originates `to` from the **outbox name**. The PO-ratified v1 resolution (candidate A, "per-destination outboxes"):
 
-- **NORMATIVE (v1):** an outbox named `<team>-bridge` routes to `<team>` (strip the `-bridge` suffix). **One outbox per destination team** — to reach N teams, maintain N outboxes. The reference courier implements this; it is the supported and only routing shape in v1.
-- **Fan-out (one outbox → multiple destinations): OUT OF SCOPE in v1.** A single outbox serving several destinations has no per-entry disambiguation; the reference courier refuses-and-retains (never drops) such an entry. Per-destination outboxes are the answer — do not build single-outbox fan-out. (Revisited only if a real consumer forces it; that would be a separate amendment, not a v1 gap.)
+- **NORMATIVE (v1):** an outbox named `<team>-bridge` routes to `<team>` (strip the `-bridge` suffix). **One outbox per destination team** -- to reach N teams, maintain N outboxes. The reference courier implements this; it is the supported and only routing shape in v1.
+- **Fan-out (one outbox → multiple destinations): OUT OF SCOPE in v1.** A single outbox serving several destinations has no per-entry disambiguation; the reference courier refuses-and-retains (never drops) such an entry. Per-destination outboxes are the answer -- do not build single-outbox fan-out. (Revisited only if a real consumer forces it; that would be a separate amendment, not a v1 gap.)
 
-### Verify drain-on-delivery on YOUR Claude Code CLI before production *(CR-5 — substrate invariant)*
+### Verify drain-on-delivery on YOUR Claude Code CLI before production *(CR-5 -- substrate invariant)*
 
-The courier's inbound inject relies on a **substrate invariant**: that the harness *drains* a member inbox on delivery (so the inject's verify-empty → exclusive-create assumption holds) and does *not* drain ghost outboxes (so consume-by-rename outbound holds). This behavior has been observed to **differ between Claude Code CLI versions** (the "T1.b" version-skew tracking). It is *the code is right, the substrate may differ* — a silent, retroactively-detected failure class. Before you trust the courier in production:
+The courier's inbound inject relies on a **substrate invariant**: that the harness *drains* a member inbox on delivery (so the inject's verify-empty → exclusive-create assumption holds) and does *not* drain ghost outboxes (so consume-by-rename outbound holds). This behavior has been observed to **differ between Claude Code CLI versions** (the "T1.b" version-skew tracking). It is *the code is right, the substrate may differ* -- a silent, retroactively-detected failure class. Before you trust the courier in production:
 
 1. Note your CLI version (`claude --version`) and report it to the operator (we track a per-version datapoint set).
 2. Confirm on your CLI: a live member inbox returns to `[]` steady-state after harness delivery (inbound inject assumption), and a session-less ghost outbox accumulates without draining (outbound consume assumption).
-3. If either differs, stop and coordinate — your courier's disciplines may not hold.
+3. If either differs, stop and coordinate -- your courier's disciplines may not hold.
 
-Worked-example datapoints (offered by apex-research, customer #2): CLI 2.1.173 — model HOLDS (both assumptions valid; observational steady-state snapshot). Operator tracks 2.1.170 baseline / 2.1.175 skew-flag alongside.
+Worked-example datapoints (offered by apex-research, customer #2): CLI 2.1.173 -- model HOLDS (both assumptions valid; observational steady-state snapshot). Operator tracks 2.1.170 baseline / 2.1.175 skew-flag alongside.
 
-## Appendix — worked examples (apex-research, customer #2)
+## Appendix -- worked examples (apex-research, customer #2)
 
 These are real artifacts from the first external customer's onboarding (cross-repo + ephemeral-home substrate). Substitute your own paths and the operator-provided hub address.
 
@@ -154,7 +154,7 @@ These are real artifacts from the first external customer's onboarding (cross-re
   "ssh_target": "sm@<hub-ip>",                 // operator-provided
   "ssh_key": "~/.ssh/stationmaster_apex",      // private key PATH (never the key itself); never leaves host
   "ssh_opts": ["-p", "2222",
-    "-o", "UserKnownHostsFile=~/.ssh/stationmaster_known_hosts",  // host-key pinning lives in ssh_opts — this file MUST be provisioned (see lesson iv); ephemeral ~/.ssh ⇒ bake or use persistent vol
+    "-o", "UserKnownHostsFile=~/.ssh/stationmaster_known_hosts",  // host-key pinning lives in ssh_opts -- this file MUST be provisioned (see lesson iv); ephemeral ~/.ssh ⇒ bake or use persistent vol
     "-o", "StrictHostKeyChecking=yes", "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes"],
   "inboxes_dir": "<repo-or-home>/.claude/teams/<team>/inboxes",
   "ghost_outboxes": ["framework-research-bridge"],   // <dest-team>-bridge per CR-4 → routes to framework-research
@@ -167,10 +167,10 @@ These are real artifacts from the first external customer's onboarding (cross-re
 
 Worked-example lessons baked in: (i) host-key pinning rides in `ssh_opts` (the reference courier passes them through verbatim); (ii) `state_dir` co-located with `inboxes_dir` on the **same persistent volume** (`rename()` atomicity is per-volume); (iii) `ghost_outboxes` uses the `<dest>-bridge` form (CR-4), not a historical per-pair name.
 
-(iv) **the host key in `stationmaster_known_hosts` must be PROVISIONED — the config requires it but does not create it.** `StrictHostKeyChecking=yes` means the courier refuses to connect until that file contains the hub's real host key (Step 3: pin it out-of-band, never TOFU / `accept-new`, never `ssh-keyscan` the hub blind — that trusts whatever answers). On an **ephemeral-`~/.ssh` container** the file does not survive a rebuild, so it must be provisioned durably: bake the known-authentic host-key line at image/entrypoint build time (same pattern as the courier private key), OR point `UserKnownHostsFile` at the **persistent volume** (the same volume as `state_dir`). Symptom if skipped: the courier authenticates its own key fine but every poll fails `No ED25519 host key is known … strict checking` → collect blocked, no mail moves. (apex-research S52: this was the 3rd provisioning gap; closed by baking the host key into the entrypoint.)
+(iv) **the host key in `stationmaster_known_hosts` must be PROVISIONED -- the config requires it but does not create it.** `StrictHostKeyChecking=yes` means the courier refuses to connect until that file contains the hub's real host key (Step 3: pin it out-of-band, never TOFU / `accept-new`, never `ssh-keyscan` the hub blind -- that trusts whatever answers). On an **ephemeral-`~/.ssh` container** the file does not survive a rebuild, so it must be provisioned durably: bake the known-authentic host-key line at image/entrypoint build time (same pattern as the courier private key), OR point `UserKnownHostsFile` at the **persistent volume** (the same volume as `state_dir`). Symptom if skipped: the courier authenticates its own key fine but every poll fails `No ED25519 host key is known … strict checking` → collect blocked, no mail moves. (apex-research S52: this was the 3rd provisioning gap; closed by baking the host key into the entrypoint.)
 *(*FR:Herald*)*
 
-### B. T1.b drain-on-delivery datapoint — CLI 2.1.173
+### B. T1.b drain-on-delivery datapoint -- CLI 2.1.173
 
 Method: observational snapshot of the live inbox dir during normal operation (read-only; **not** a timed test).
 
@@ -185,7 +185,7 @@ Method: observational snapshot of the live inbox dir during normal operation (re
 | Symptom | Meaning | Fix |
 |---|---|---|
 | `Permission denied (publickey)` | key not registered (or wrong `-i` path) | check Step 2 confirmation, key path |
-| `ok:true` but **no** `{"id",...}` data line on deposit | nothing landed — empty/malformed request | re-check both the `deposit` line and the consignment line reached stdin (Step 5) |
+| `ok:true` but **no** `{"id",...}` data line on deposit | nothing landed -- empty/malformed request | re-check both the `deposit` line and the consignment line reached stdin (Step 5) |
 | recipient sees body as `undefined`, summary OK | body in `content`/no `text` field | put the body in `text` (Step 5 entry-schema note) |
 | `grants_out` empty but mail still accepted | `status` lags; route not yet exercised | trust the deposit 3-state ladder, not `status` (Step 4) |
 | envelope `ok:false`, `E_NOGRANT` on deposit | recipient hasn't granted you | counterpart runs Step 4 |

@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// Message envelope tests — validates the Message type structure,
+// Message envelope tests -- validates the Message type structure,
 // checksum computation, and server-side validation logic.
 // Tests the validateMessage behaviour exposed through UDSServer.
 
@@ -11,7 +11,7 @@ import type { Message, MessageEndpoint } from '../../src/types.js';
 // ---------------------------------------------------------------------------
 // Helpers that mirror the server's validateMessage logic (src/transport/server.ts)
 // We test the checksum algorithm independently so any divergence is caught.
-// Uses stableStringify (fixed in GitHub Issue #2 — recursive key sorting).
+// Uses stableStringify (fixed in GitHub Issue #2 -- recursive key sorting).
 // ---------------------------------------------------------------------------
 
 const FROM: MessageEndpoint = { team: 'comms-dev', agent: 'kerckhoffs' };
@@ -128,7 +128,7 @@ describe('Message checksum', () => {
     expect(msg1.checksum).not.toBe(msg2.checksum);
   });
 
-  it('changes when sender changes (GitHub Issue #2 fixed — stableStringify)', () => {
+  it('changes when sender changes (GitHub Issue #2 fixed -- stableStringify)', () => {
     // Previously broken: JSON.stringify with sorted top-level array replacer dropped
     // nested object contents (from/to serialised as {}). Now fixed with stableStringify.
     const msg1 = makeValidMessage({ from: { team: 'team-a', agent: 'agent-a' } });

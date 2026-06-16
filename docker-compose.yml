@@ -1,4 +1,4 @@
-# Claude Code Agent Team — Docker Compose — Full Isolation (*FR:Brunel*)
+# Claude Code Agent Team -- Docker Compose -- Full Isolation (*FR:Brunel*)
 #
 # Usage:
 #   ./session-start.sh framework-research   # start framework-research team
@@ -20,7 +20,7 @@
 #   Each team has a broker-<team> sidecar that owns the team's UDS socket.
 #   The Claude container depends_on the broker being healthy (socket exists).
 #   Broker uses per-team inbox volume for message persistence across broker restarts.
-#   TLS-PSK via Docker secrets (comms-psk) — shared symmetric key, 256-bit.
+#   TLS-PSK via Docker secrets (comms-psk) -- shared symmetric key, 256-bit.
 #   NOTE: broker image is a placeholder (comms-dev team delivers the implementation).
 
 x-broker-base: &broker-base
@@ -48,7 +48,7 @@ x-team-base: &team-base
     - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
     - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
   volumes:
-    # Repo: shared between both teams — same codebase, pulled once per session
+    # Repo: shared between both teams -- same codebase, pulled once per session
     - repo-data:/home/ai-teams/workspace
     # Inter-team comms: Unix domain sockets at /shared/comms/
     - comms:/shared/comms
@@ -151,7 +151,7 @@ volumes:
   cd-claude-home:
     name: ai-teams_cd-claude-home
 
-  # Shared repo — both teams read/write the same clone
+  # Shared repo -- both teams read/write the same clone
   # Wipe to force re-clone: docker volume rm ai-teams_repo-data
   repo-data:
     name: ai-teams_repo-data
@@ -161,7 +161,7 @@ volumes:
   comms:
     name: ai-teams_comms
 
-  # Per-team broker inbox — persists queued messages across broker restarts
+  # Per-team broker inbox -- persists queued messages across broker restarts
   # Owned by broker sidecar; not mounted in Claude container
   fr-broker-inbox:
     name: ai-teams_fr-broker-inbox

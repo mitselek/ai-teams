@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ghost-chat — RFC #66 cross-host PoC, Python port.
+"""ghost-chat -- RFC #66 cross-host PoC, Python port.
 
 Single-file sketch-grade CLI for cross-host chat into a remote AI team via SSH.
 Replaces ~/bin/ghost-chat.ps1; same architecture, host-quirks gone.
@@ -21,7 +21,7 @@ Usage:
 or:
     python ghost-chat.py <ghost_name> [<teammate>]   # positional fallback
 
-(*FR:Brunel*) 2026-05-12 S31 — sketch grade, NOT for production.
+(*FR:Brunel*) 2026-05-12 S31 -- sketch grade, NOT for production.
 """
 
 from __future__ import annotations
@@ -79,7 +79,7 @@ def load_ssh_config() -> dict:
 
 # === SSH wrapper ===
 #
-# stdin=DEVNULL is load-bearing — without it, the child ssh process can swallow
+# stdin=DEVNULL is load-bearing -- without it, the child ssh process can swallow
 # bytes from our parent's stdin, breaking the watcher thread's interaction with
 # the input loop. PoC Bug-D/E candidates trace partly to this issue when
 # subprocess hasn't been shielded.
@@ -189,7 +189,7 @@ console_lock = threading.Lock()
 
 
 def write(text: str = "", end: str = "\n", flush: bool = True) -> None:
-    """Console write under lock — watcher and main loop both write."""
+    """Console write under lock -- watcher and main loop both write."""
     with console_lock:
         sys.stdout.write(text + end)
         if flush:
@@ -284,7 +284,7 @@ def fetch_members(cfg: dict) -> tuple[list[str], str | None]:
 def send_line(cfg: dict, name: str, target: str, body: str) -> None:
     if not body:
         return
-    # Build envelope. Omit `color` field — SF-3 contract: let apex apply the
+    # Build envelope. Omit `color` field -- SF-3 contract: let apex apply the
     # registered-color. Including a per-message color override caused the
     # cosmetic-anomaly observed in PoC.
     now = datetime.now(timezone.utc)
@@ -477,7 +477,7 @@ def run_list_mode(cfg: dict, name: str, current_target: str) -> str | None:
                 sys.stdout.write(f"\033[{len(members) + 1}A")
                 sys.stdout.flush()
                 return None
-            # Ignore other keys while modal — sketch-grade.
+            # Ignore other keys while modal -- sketch-grade.
     finally:
         console_lock.release()
 
@@ -485,7 +485,7 @@ def run_list_mode(cfg: dict, name: str, current_target: str) -> str | None:
 # === Main loop ===
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="ghost-chat — RFC #66 cross-host PoC")
+    parser = argparse.ArgumentParser(description="ghost-chat -- RFC #66 cross-host PoC")
     parser.add_argument("--name", "-n", help="ghost name registered on apex side")
     parser.add_argument("--target", "-t", default="", help="initial send target")
     parser.add_argument("posname", nargs="?", help="positional ghost name (fallback)")
@@ -500,11 +500,11 @@ def main() -> int:
     cfg = load_ssh_config()
 
     write()
-    write(f"{C_CYAN}ghost-chat PoC — RFC #66 cross-host verification (Python){C_RESET}")
+    write(f"{C_CYAN}ghost-chat PoC -- RFC #66 cross-host verification (Python){C_RESET}")
     write(f"  {C_GRAY}ghost name : {name}{C_RESET}")
     write(f"  {C_GRAY}apex ssh   : {cfg['user']}@{cfg['host']}:{cfg['port']}{C_RESET}")
     write(f"  {C_GRAY}own inbox  : {remote_own_inbox(name)}{C_RESET}")
-    target_disp = target if target else "(unset — press Down to pick)"
+    target_disp = target if target else "(unset -- press Down to pick)"
     write(f"  {C_GRAY}target     : {target_disp}{C_RESET}")
     write()
     write(f"{C_GRAY}Down=pick target  Enter=send  /exit=quit{C_RESET}")
@@ -519,7 +519,7 @@ def main() -> int:
             write(f"{C_YELLOW}WARNING: '{name}' NOT in apex members[]. F1 not satisfied.{C_RESET}")
             write(f"{C_YELLOW}  Ask apex team-lead to register before sends (RFC #66 one-sided ACL).{C_RESET}")
     else:
-        write(f"{C_RED}F1 check FAILED — {err}{C_RESET}")
+        write(f"{C_RED}F1 check FAILED -- {err}{C_RESET}")
     write()
 
     # State held in mutable cell so the watcher callback can read target without
@@ -528,7 +528,7 @@ def main() -> int:
 
     def on_new_messages(msgs: list[dict]) -> None:
         # Called from watcher thread. Acquire console_lock implicitly via write helpers.
-        # We don't redraw the prompt here — let the next user keypress trigger redraw,
+        # We don't redraw the prompt here -- let the next user keypress trigger redraw,
         # or the input loop's idle tick will redraw after WATCH_INTERVAL_S.
         with console_lock:
             sys.stdout.write("\r\033[K")  # carriage-return + ANSI erase-to-end-of-line
@@ -594,7 +594,7 @@ def main() -> int:
                 break
 
             elif key in ("UP", "LEFT", "RIGHT", "ESC", ""):
-                # Swallow — no semantics outside list-mode. Sketch grade.
+                # Swallow -- no semantics outside list-mode. Sketch grade.
                 pass
 
             elif key == "TAB" or (len(key) == 1 and key.isprintable()):

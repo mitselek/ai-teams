@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// File-based inbox delivery — writes incoming inter-team messages as JSON files
+// File-based inbox delivery -- writes incoming inter-team messages as JSON files
 // to ~/.claude/teams/<team-name>/inboxes/, one file per message, named by message ID.
 // This is consistent with how the agent framework already handles inboxes.
 // Receiving agents poll this directory for new files.
@@ -65,7 +65,7 @@ export class InboxDelivery {
     try {
       fs.unlinkSync(filePath);
     } catch {
-      // Already removed — non-fatal
+      // Already removed -- non-fatal
     }
   }
 

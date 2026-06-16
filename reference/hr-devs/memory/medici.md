@@ -1,6 +1,6 @@
-# Medici — Health Checker Scratchpad
+# Medici -- Health Checker Scratchpad
 
-## [LEARNED] 2026-03-13 — Team relocated to hr-devs
+## [LEARNED] 2026-03-13 -- Team relocated to hr-devs
 
 Team forked from dev-toolkit/cloudflare-builders to hr-platform/teams/hr-devs/. All prompts, scratchpads, and shared docs now live under hr-devs. Three agents trimmed (alex, piper, harmony). Medici now has its own prompt file at prompts/medici.md.
 
@@ -10,7 +10,7 @@ Three gotchas (gray-matter, $app/paths, .env quoting) were independently discove
 
 ## [PATTERN] CROSSPOLL priority
 
-Bugs (not just knowledge) should go to test-gaps.md or GitHub issues — not stay only in scratchpads. Confirmed bugs that lack GitHub issues are the highest-value audit finding.
+Bugs (not just knowledge) should go to test-gaps.md or GitHub issues -- not stay only in scratchpads. Confirmed bugs that lack GitHub issues are the highest-value audit finding.
 
 ## [PATTERN] Audit cadence findings
 

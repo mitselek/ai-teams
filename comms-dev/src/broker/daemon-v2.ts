@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// DaemonV2 — wires TlsServer, TunnelManager, AclManager, MessageStore, and
+// DaemonV2 -- wires TlsServer, TunnelManager, AclManager, MessageStore, and
 // InboxDelivery together into the cross-team messaging daemon.
 // Also exposes a local UDS JSON command socket for agent tools (CrossTeamSend, CLI).
 // Spec: #16 §5–§7, #18 Phase 3–4
@@ -53,7 +53,7 @@ export interface DaemonV2Options {
   /**
    * Default hub peer name for routing messages to teams not in the direct peers map.
    * When set, sendMessage(msg) for unknown destinations routes via this peer (the relay).
-   * Example: 'relay' — cd sends to fr via relay without a direct fr→cd cert pin.
+   * Example: 'relay' -- cd sends to fr via relay without a direct fr→cd cert pin.
    */
   defaultPeer?: string;
 }
@@ -138,7 +138,7 @@ export class DaemonV2 {
       peersDir: join(keysDir, 'peers'),
     });
 
-    // Hub mode skips ACL — it forwards based on routing metadata only.
+    // Hub mode skips ACL -- it forwards based on routing metadata only.
     // Team mode loads ACL (throws if acl.json missing or malformed).
     if (this.opts.role !== 'hub') {
       this.aclPath = join(keysDir, 'acl.json');
@@ -327,7 +327,7 @@ export class DaemonV2 {
   }
 
   /**
-   * Send a message bypassing local ACL — for testing forgery detection.
+   * Send a message bypassing local ACL -- for testing forgery detection.
    * Returns FORGERY_REJECTED if remote closes connection due to from.team mismatch.
    */
   async sendMessageRaw(msg: Message): Promise<'FORGERY_REJECTED' | 'OK' | 'PEER_UNAVAILABLE'> {
@@ -513,13 +513,13 @@ export class DaemonV2 {
     }
 
     // v2: verify Ed25519 signature and E2E decrypt body.
-    // Drop messages that fail verification — they may be forgeries relayed via hub.
+    // Drop messages that fail verification -- they may be forgeries relayed via hub.
     const possibleSigned = msg as Partial<SignedMessage>;
     if (this.cryptoV2 && possibleSigned.signature) {
       const valid = this.cryptoV2.verifySignature(possibleSigned as SignedMessage);
       if (!valid) {
         console.warn(
-          `[daemon] Signature verification failed for msg ${msg.id} from ${msg.from.team}/${msg.from.agent} — dropping`,
+          `[daemon] Signature verification failed for msg ${msg.id} from ${msg.from.team}/${msg.from.agent} -- dropping`,
         );
         return;
       }
@@ -567,9 +567,9 @@ export class DaemonV2 {
     // v2 TODO: hold ACK until destination ACKs (async ACK chain).
     this.tunnelManager.send(msg.to.team, msg).then((result) => {
       if (result === 'PEER_UNKNOWN') {
-        console.error(`[hub] Forward failed — unknown destination team: ${msg.to.team} (msg ${msg.id})`);
+        console.error(`[hub] Forward failed -- unknown destination team: ${msg.to.team} (msg ${msg.id})`);
       } else if (result === 'PEER_UNAVAILABLE') {
-        console.warn(`[hub] Forward queued/failed — ${msg.to.team} unavailable (msg ${msg.id})`);
+        console.warn(`[hub] Forward queued/failed -- ${msg.to.team} unavailable (msg ${msg.id})`);
       }
     }).catch((err) => {
       console.error(`[hub] Forward error to ${msg.to.team} (msg ${msg.id}):`, err);

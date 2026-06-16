@@ -13,7 +13,7 @@ tags: [no-future-proofing, yagni, no-pre-allocation, no-fallback-chains, design-
 
 ## TLDR
 
-Don't add features, surfaces, abstractions, allocations, or fallbacks for scenarios that have not happened. Design from observed need, not anticipated need. When uncertain whether a future requirement will materialize, defer the design decision until it actually surfaces — the design space will be smaller, constraints clearer, and the cost of being wrong lower.
+Don't add features, surfaces, abstractions, allocations, or fallbacks for scenarios that have not happened. Design from observed need, not anticipated need. When uncertain whether a future requirement will materialize, defer the design decision until it actually surfaces -- the design space will be smaller, constraints clearer, and the cost of being wrong lower.
 
 ## Key ideas
 

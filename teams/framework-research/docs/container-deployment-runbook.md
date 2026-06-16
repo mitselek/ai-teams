@@ -1,4 +1,4 @@
-# Container Deployment Runbook — WARP-Protected Hosts
+# Container Deployment Runbook -- WARP-Protected Hosts
 
 Reusable checklist for deploying Claude Code agent team containers on corporate hosts running Cloudflare WARP. Extracted from apex-research deployment on RC server (2026-03-17, session R8).
 
@@ -31,9 +31,9 @@ ls /usr/local/share/ca-certificates/managed-warp*
 
 **Symptom:** Containers can't resolve hostnames. `apt-get update` hangs or returns `Temporary failure resolving`.
 
-**Cause:** WARP rewrites `/etc/resolv.conf` to `127.0.2.2` / `127.0.2.3` (local WARP DNS). Docker copies this into containers, but the WARP DNS listener only binds to the host network namespace — containers on the bridge network can't reach it.
+**Cause:** WARP rewrites `/etc/resolv.conf` to `127.0.2.2` / `127.0.2.3` (local WARP DNS). Docker copies this into containers, but the WARP DNS listener only binds to the host network namespace -- containers on the bridge network can't reach it.
 
-**Fix (daemon.json — applies to all containers):**
+**Fix (daemon.json -- applies to all containers):**
 
 ```bash
 # /etc/docker/daemon.json
@@ -46,7 +46,7 @@ ls /usr/local/share/ca-certificates/managed-warp*
 sudo systemctl restart docker
 ```
 
-**Fix (per-container — if daemon.json isn't enough):**
+**Fix (per-container -- if daemon.json isn't enough):**
 
 ```yaml
 # docker-compose.yml
@@ -57,7 +57,7 @@ services:
 
 **Verify:** `docker run --rm ubuntu:24.04 apt-get update` succeeds.
 
-**Note:** `network_mode: host` is the nuclear option — the container shares the host's full network stack. Use it when bridge DNS fixes aren't sufficient (WARP + corporate firewall combo).
+**Note:** `network_mode: host` is the nuclear option -- the container shares the host's full network stack. Use it when bridge DNS fixes aren't sufficient (WARP + corporate firewall combo).
 
 ---
 
@@ -67,7 +67,7 @@ services:
 
 **Cause:** Cloudflare WARP Gateway re-signs HTTPS traffic with a corporate CA. The container doesn't trust this CA.
 
-**Fix — Three layers needed:**
+**Fix -- Three layers needed:**
 
 ### Layer 1: Bind-mount the CA cert
 
@@ -77,7 +77,7 @@ volumes:
   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
 ```
 
-**WARNING:** Do NOT mount to `/etc/ssl/certs/` — `update-ca-certificates` creates symlinks there and will fail with "Device or resource busy" if a bind mount occupies the target path.
+**WARNING:** Do NOT mount to `/etc/ssl/certs/` -- `update-ca-certificates` creates symlinks there and will fail with "Device or resource busy" if a bind mount occupies the target path.
 
 ### Layer 2: System CA store (curl, pip, git)
 
@@ -114,7 +114,7 @@ During `docker build`, WARP intercepts HTTPS from build steps. For downloads tha
 RUN curl --insecure -fsSL https://example.com/file.tar.gz -o /tmp/file.tar.gz
 ```
 
-This is acceptable at build time only — the downloaded artifact should be verified by other means (checksum, known filename).
+This is acceptable at build time only -- the downloaded artifact should be verified by other means (checksum, known filename).
 
 **Verify:**
 
@@ -153,7 +153,7 @@ for var in "${!SHELL_VARS[@]}"; do
 done
 ```
 
-Use `sed -i` to delete-then-append (not just append) — prevents duplicates on restart.
+Use `sed -i` to delete-then-append (not just append) -- prevents duplicates on restart.
 
 ---
 
@@ -161,7 +161,7 @@ Use `sed -i` to delete-then-append (not just append) — prevents duplicates on 
 
 **Symptom:** `Permission denied (publickey)` even though the key is correct, permissions are right, and sshd config looks fine.
 
-**Cause:** `useradd` creates accounts with a locked password (`!` in `/etc/shadow`). With `UsePAM no` in sshd_config, OpenSSH rejects locked accounts entirely — the key is never checked. Debug log shows: `User michelek not allowed because account is locked`.
+**Cause:** `useradd` creates accounts with a locked password (`!` in `/etc/shadow`). With `UsePAM no` in sshd_config, OpenSSH rejects locked accounts entirely -- the key is never checked. Debug log shows: `User michelek not allowed because account is locked`.
 
 **Fix:**
 
@@ -203,7 +203,7 @@ fi
 
 **Cause:** Ubuntu noble ships Node.js 18 in the main repo. NodeSource setup script fails behind WARP (SSL interception).
 
-**Fix — Direct binary install:**
+**Fix -- Direct binary install:**
 
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
@@ -217,7 +217,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 **Notes:**
 
-- Use `.tar.gz` not `.tar.xz` — base image may not have `xz`.
+- Use `.tar.gz` not `.tar.xz` -- base image may not have `xz`.
 - `--insecure` needed for WARP TLS interception at build time.
 - This overwrites the apt-installed Node.js 18 in `/usr/local/`.
 
@@ -236,7 +236,7 @@ RUN rm -f /etc/apt/sources.list.d/github-cli.list \
     && rm -f /usr/share/keyrings/githubcli-archive-keyring.gpg
 ```
 
-`gh` is already installed — the apt source is only needed during the base image build.
+`gh` is already installed -- the apt source is only needed during the base image build.
 
 ---
 
@@ -246,16 +246,16 @@ RUN rm -f /etc/apt/sources.list.d/github-cli.list \
 
 **Cause:** Claude Code on the host uses OAuth authentication via `claude login`, storing tokens in `~/.claude/.credentials.json`. There is no `ANTHROPIC_API_KEY`.
 
-**Fix — Copy OAuth credentials into container:**
+**Fix -- Copy OAuth credentials into container:**
 
 ```bash
 docker cp ~/.claude/.credentials.json mycontainer:/home/ai-teams/.claude/.credentials.json
 docker exec mycontainer chown 1000:1000 /home/ai-teams/.claude/.credentials.json
 ```
 
-**Persistence:** The file lives in the `~/.claude/` named volume — survives container restarts. Does NOT survive `docker compose down -v` (volume wipe).
+**Persistence:** The file lives in the `~/.claude/` named volume -- survives container restarts. Does NOT survive `docker compose down -v` (volume wipe).
 
-**Alternative:** If you have an API key, set `ANTHROPIC_API_KEY` in `.env` — it takes precedence over OAuth credentials.
+**Alternative:** If you have an API key, set `ANTHROPIC_API_KEY` in `.env` -- it takes precedence over OAuth credentials.
 
 ---
 
@@ -275,8 +275,8 @@ docker exec mycontainer chown 1000:1000 /home/ai-teams/.claude/.credentials.json
 }
 ```
 
-- `bypassPermissions` — autonomous team, no interactive approval needed
-- `includeCoAuthoredBy: false` — don't add co-author trailer to commits
+- `bypassPermissions` -- autonomous team, no interactive approval needed
+- `includeCoAuthoredBy: false` -- don't add co-author trailer to commits
 - Agent teams env var enables the experimental team features
 
 **Entrypoint pattern:** Write settings only if file doesn't exist (preserve PO customizations):
@@ -294,7 +294,7 @@ fi
 
 ## §10. SSH Port Conflict with network_mode: host
 
-**Symptom:** Container sshd can't bind to port 22 — host sshd already uses it.
+**Symptom:** Container sshd can't bind to port 22 -- host sshd already uses it.
 
 **Fix:** Configure container sshd on a different port (e.g., 2222):
 
@@ -346,11 +346,11 @@ chmod -R a-w,a+rX "$SOURCE_DATA"
 
 **Symptom:** Claude Code fails with `SELF_SIGNED_CERT_IN_CHAIN` even though `update-ca-certificates` ran in the entrypoint and curl/git work fine.
 
-**Cause:** Node.js does NOT use the system CA store (`/etc/ssl/certs/`). It has its own bundled CA bundle. `update-ca-certificates` adds the WARP cert to the system store, which fixes curl, pip, and git — but Node.js (and therefore Claude Code) is unaffected. It needs to be told about the cert explicitly via `NODE_EXTRA_CA_CERTS`.
+**Cause:** Node.js does NOT use the system CA store (`/etc/ssl/certs/`). It has its own bundled CA bundle. `update-ca-certificates` adds the WARP cert to the system store, which fixes curl, pip, and git -- but Node.js (and therefore Claude Code) is unaffected. It needs to be told about the cert explicitly via `NODE_EXTRA_CA_CERTS`.
 
-This is a separate problem from §2 (WARP TLS interception for system tools). Both fixes are required on WARP hosts — §2 covers apt/curl/git, §12 covers Node.js/Claude Code.
+This is a separate problem from §2 (WARP TLS interception for system tools). Both fixes are required on WARP hosts -- §2 covers apt/curl/git, §12 covers Node.js/Claude Code.
 
-**Fix — Three parts:**
+**Fix -- Three parts:**
 
 ### Part 1: Bind-mount the cert (docker-compose.yml)
 
@@ -359,7 +359,7 @@ volumes:
   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
 ```
 
-Mount to `/opt/` — **NOT** to `/etc/ssl/certs/`. The `update-ca-certificates` tool creates symlinks in `/etc/ssl/certs/` and fails with "Device or resource busy" if a bind-mount already occupies a target path there.
+Mount to `/opt/` -- **NOT** to `/etc/ssl/certs/`. The `update-ca-certificates` tool creates symlinks in `/etc/ssl/certs/` and fails with "Device or resource busy" if a bind-mount already occupies a target path there.
 
 ### Part 2: Set NODE_EXTRA_CA_CERTS (docker-compose.yml environment)
 
@@ -368,7 +368,7 @@ environment:
   - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
 ```
 
-Hardcode this value — do not rely on the host env var being set. If `NODE_EXTRA_CA_CERTS` is empty or unset, Claude Code silently falls back to the bundled CA bundle and fails against WARP.
+Hardcode this value -- do not rely on the host env var being set. If `NODE_EXTRA_CA_CERTS` is empty or unset, Claude Code silently falls back to the bundled CA bundle and fails against WARP.
 
 ### Part 3: Persist to .bashrc (entrypoint)
 
@@ -392,7 +392,7 @@ docker exec <container> bash -c 'node -e "fetch(\"https://api.anthropic.com\").t
 
 ---
 
-## §13. Statusline Script in Containerised Teams — MANDATORY
+## §13. Statusline Script in Containerised Teams -- MANDATORY
 
 > **Checklist item:** Every new team container MUST have statusline configured before handoff to the team.
 > Use §20 (Statusline Deployment Checklist) to verify. Missing statusline = incomplete deployment.
@@ -417,16 +417,16 @@ Keep `statusline-command.sh` in the project repo (e.g., `.claude/statusline-comm
 }
 ```
 
-The path must be the in-container absolute path. On local dev (non-containerised), the path must be adjusted to wherever the repo is checked out — or use a relative path via `$(git rev-parse --show-toplevel)/.claude/statusline-command.sh` if your shell supports it.
+The path must be the in-container absolute path. On local dev (non-containerised), the path must be adjusted to wherever the repo is checked out -- or use a relative path via `$(git rev-parse --show-toplevel)/.claude/statusline-command.sh` if your shell supports it.
 
 **3. The script must never hard-fail.**
 Claude Code suppresses the statusline if the script exits non-zero or produces no output. Every external tool call must be guarded:
 
 ```bash
-# BAD — fails if pnpm not installed
+# BAD -- fails if pnpm not installed
 TESTS=$(pnpm test --reporter=json 2>&1 | jq '.numPassedTests')
 
-# GOOD — graceful: no output if unavailable
+# GOOD -- graceful: no output if unavailable
 TESTS=""
 if command -v pnpm >/dev/null 2>&1; then
   TESTS=$(pnpm test --reporter=json 2>&1 | jq -r '.numPassedTests // ""' 2>/dev/null || true)
@@ -469,9 +469,9 @@ docker exec -u ai-teams <container> bash -c \
 
 **Symptom:** Agents are denied tool calls they need, or Claude prompts for permission on every action despite `bypassPermissions`.
 
-**Cause:** `settings.json` with only `"defaultMode": "bypassPermissions"` or `"defaultMode": "default"` does not grant specific tool access. Without an explicit `allow` list, the result is either constant prompting (default) or blanket bypass with no per-tool control (bypassPermissions — only appropriate for fully autonomous, trusted containers).
+**Cause:** `settings.json` with only `"defaultMode": "bypassPermissions"` or `"defaultMode": "default"` does not grant specific tool access. Without an explicit `allow` list, the result is either constant prompting (default) or blanket bypass with no per-tool control (bypassPermissions -- only appropriate for fully autonomous, trusted containers).
 
-**Fix — use `default` mode with an explicit allow list:**
+**Fix -- use `default` mode with an explicit allow list:**
 
 ```json
 {
@@ -499,8 +499,8 @@ docker exec -u ai-teams <container> bash -c \
 
 **Rules:**
 
-- `"Bash(*)"` — allow all shell commands. Narrow to specific patterns (e.g. `"Bash(git *)"`) for higher-trust environments.
-- `"WebFetch(domain:...)"` — one entry per domain the agents need to reach. Required for external API calls (Entu, GitHub, Anthropic docs, etc.).
+- `"Bash(*)"` -- allow all shell commands. Narrow to specific patterns (e.g. `"Bash(git *)"`) for higher-trust environments.
+- `"WebFetch(domain:...)"` -- one entry per domain the agents need to reach. Required for external API calls (Entu, GitHub, Anthropic docs, etc.).
 - `deny` list takes precedence over `allow`. Use it to block specific tools (e.g. `"mcp__jira__jira_update_issue"` for read-only Jira access).
 - `bypassPermissions` is appropriate ONLY for fully automated pipelines where no human oversight is possible. For interactive agent teams accessed via SSH, use `default` + allow list.
 
@@ -568,15 +568,15 @@ tmux list-sessions   # check what name the entrypoint actually created
 
 **Cause:** `tmux send-keys -t <pane> "cd /some/dir && clear" Enter` injects keystrokes into the running Claude process. Claude receives the text as input, which disrupts its state. The subsequent `split-window` targeting that pane then fails because the pane is in an inconsistent state.
 
-**Fix:** Never use `send-keys` to set the working directory. Use `-c <dir>` on `split-window` instead — it sets the starting directory for the new pane without touching any existing process.
+**Fix:** Never use `send-keys` to set the working directory. Use `-c <dir>` on `split-window` instead -- it sets the starting directory for the new pane without touching any existing process.
 
 ```bash
-# BAD — interferes with running Claude
+# BAD -- interferes with running Claude
 PANE_SAAVEDRA=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | head -1)
 tmux send-keys -t "$PANE_SAAVEDRA" "cd /home/ai-teams/workspace && clear" Enter
 tmux split-window -t "$PANE_SAAVEDRA" -h -p 80   # may fail: size missing
 
-# GOOD — -c sets cwd for the NEW pane, leaves existing pane untouched
+# GOOD -- -c sets cwd for the NEW pane, leaves existing pane untouched
 PANE_SAAVEDRA=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | head -1)
 tmux split-window -t "$PANE_SAAVEDRA" -h -p 80 -c "/home/ai-teams/workspace"
 ```
@@ -591,16 +591,16 @@ tmux split-window -t "$PANE_SAAVEDRA" -h -p 80 -c "/home/ai-teams/workspace"
 
 **Cause:** `tmux split-window -p <percent>` requires an attached client to resolve the percentage into pixel dimensions. When the caller is a subprocess (Claude Bash tool, external SSH) rather than the terminal session itself, tmux cannot determine the client dimensions and aborts.
 
-This is a separate issue from §16 (send-keys keyinjection). `split-window` does NOT inject keystrokes — it creates a new pane. The session attachment state is what matters.
+This is a separate issue from §16 (send-keys keyinjection). `split-window` does NOT inject keystrokes -- it creates a new pane. The session attachment state is what matters.
 
 **Fix:** Replace `-p <percent>` with `-l <columns/rows>` (absolute size). tmux can always compute absolute sizes without a client.
 
 ```bash
-# BAD — fails with "size missing" from Bash tool subprocess
+# BAD -- fails with "size missing" from Bash tool subprocess
 tmux split-window -t "$PANE_SAAVEDRA" -h -p 80 -c "$WORK_DIR"
 PANE_DATA_COL=$(tmux list-panes -t "$SESSION" -F '#{pane_id}' | tail -1)   # also fragile
 
-# GOOD — works from any context including Claude's Bash tool
+# GOOD -- works from any context including Claude's Bash tool
 TOTAL_W=$(tmux display-message -t "$SESSION" -p '#{window_width}')
 TOTAL_H=$(tmux display-message -t "$SESSION" -p '#{window_height}')
 RIGHT_W=$((TOTAL_W * 80 / 100))
@@ -609,18 +609,18 @@ PANE_DATA_COL=$(tmux split-window -t "$PANE_SAAVEDRA" -d -h -l $RIGHT_W -c "$WOR
 
 Additional flags:
 
-- `-d` — detached: keeps focus on the current pane (Saavedra stays active)
-- `-P -F '#{pane_id}'` — prints the new pane ID to stdout; eliminates fragile `tail -1` pane tracking
-- `tmux display-message -t "$SESSION" -p '#{window_width}'` — reads dimensions from the session, not from a client; works without attachment
+- `-d` -- detached: keeps focus on the current pane (Saavedra stays active)
+- `-P -F '#{pane_id}'` -- prints the new pane ID to stdout; eliminates fragile `tail -1` pane tracking
+- `tmux display-message -t "$SESSION" -p '#{window_width}'` -- reads dimensions from the session, not from a client; works without attachment
 
-**Implication for startup procedure:** With this fix, `apply-layout.sh` is safe to call from any context — `.bashrc`, entrypoint, Claude Bash tool, or external SSH. This enables the zero-friction startup pattern described in §18.
+**Implication for startup procedure:** With this fix, `apply-layout.sh` is safe to call from any context -- `.bashrc`, entrypoint, Claude Bash tool, or external SSH. This enables the zero-friction startup pattern described in §18.
 
 **Verify:**
 
 ```bash
 # From external SSH (simulates Bash tool subprocess context):
 ssh -p <port> ai-teams@host "bash ~/workspace/<team-repo>/teams/<team>/apply-layout.sh <session>"
-# Should print pane IDs and succeed — no "size missing"
+# Should print pane IDs and succeed -- no "size missing"
 tmux list-panes -t <session>  # should show expected pane count
 ```
 
@@ -633,7 +633,7 @@ tmux list-panes -t <session>  # should show expected pane count
 **Pattern:** `.bashrc` auto-tmux block handles the full first-session bootstrap. No manual steps required.
 
 ```bash
-# In entrypoint — always rewrite .bashrc auto-tmux block:
+# In entrypoint -- always rewrite .bashrc auto-tmux block:
 sed -i '/^# auto-tmux:/,/^fi$/{d}' "${BASHRC}"
 cat >> "${BASHRC}" << 'AUTOTMUX_EOF'
 # auto-tmux: attach or create session on SSH login
@@ -642,12 +642,12 @@ if [ -z "$TMUX" ] && [ -n "$SSH_CONNECTION" ]; then
     TMUX_SESSION="<team>"
     LAYOUT_SCRIPT="$HOME/workspace/<team-repo>/teams/<team>/apply-layout.sh"
     if ! tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
-        # Path 1: fresh session — build layout, start claude
+        # Path 1: fresh session -- build layout, start claude
         tmux new-session -d -s "$TMUX_SESSION"
         bash "$LAYOUT_SCRIPT" "$TMUX_SESSION"
         tmux send-keys -t "$TMUX_SESSION" "claude" Enter
     fi
-    # Path 2 + 3: session exists (detached or attached) — just attach
+    # Path 2 + 3: session exists (detached or attached) -- just attach
     exec tmux -u attach-session -t "$TMUX_SESSION"
 fi
 AUTOTMUX_EOF
@@ -661,7 +661,7 @@ AUTOTMUX_EOF
 | Session exists, detached | Straight to `exec attach-session` |
 | Session exists, attached | Straight to `exec attach-session` (opens second client) |
 
-**`apply-layout.sh` idempotency:** Only call from `.bashrc` (path 1). If the team lead needs to re-run layout manually from inside Claude, `apply-layout.sh` is safe to call from the Bash tool (uses `-l` absolute sizes — see §17).
+**`apply-layout.sh` idempotency:** Only call from `.bashrc` (path 1). If the team lead needs to re-run layout manually from inside Claude, `apply-layout.sh` is safe to call from the Bash tool (uses `-l` absolute sizes -- see §17).
 
 **`start-team.sh` idempotency:** Make it conditional on the pane env file:
 
@@ -689,7 +689,7 @@ SSH → [auto: panes created + labeled, claude starts] → "hello"
 
 ## §19. Pane Labels for Agent Teams
 
-**Goal:** When a PO attaches to a tmux session, each pane shows the agent's name in the border — no need to guess which pane ID maps to which agent.
+**Goal:** When a PO attaches to a tmux session, each pane shows the agent's name in the border -- no need to guess which pane ID maps to which agent.
 
 **Pattern:** In `apply-layout.sh`, after all panes are created and before writing the env file:
 
@@ -700,7 +700,7 @@ tmux select-pane -t "$PANE_AGENT1"  -T "agent1"
 tmux select-pane -t "$PANE_AGENT2"  -T "agent2"
 # ... one line per agent
 
-# Show labels in pane borders — scoped to this session only
+# Show labels in pane borders -- scoped to this session only
 tmux set-option -t "$TMUX_SESSION" pane-border-format " #{pane_title} "
 tmux set-option -t "$TMUX_SESSION" pane-border-status top
 ```
@@ -709,7 +709,7 @@ tmux set-option -t "$TMUX_SESSION" pane-border-status top
 
 - `select-pane -T` sets the pane title. Persists for the session lifetime.
 - `pane-border-status top` shows a border line above each pane with the title.
-- Use `-t "$TMUX_SESSION"` on `set-option` **without** `-g` — scopes to this session only. Using `-g` changes the global tmux server config, affecting all sessions on the host.
+- Use `-t "$TMUX_SESSION"` on `set-option` **without** `-g` -- scopes to this session only. Using `-g` changes the global tmux server config, affecting all sessions on the host.
 - Add a corresponding note in `startup.md` so agents know pane labels exist without having to discover them visually.
 
 **Result:** PO attaches and sees:
@@ -726,7 +726,7 @@ tmux set-option -t "$TMUX_SESSION" pane-border-status top
 
 ---
 
-## §20. Statusline Deployment Checklist — MANDATORY FOR EVERY NEW CONTAINER
+## §20. Statusline Deployment Checklist -- MANDATORY FOR EVERY NEW CONTAINER
 
 Run this checklist before marking a container deployment complete. All three items are required.
 
@@ -742,7 +742,7 @@ ls -la ~/workspace/<team-repo>/.claude/statusline-command.sh
 
 If missing, copy from an existing team. The apex-research container has the canonical script at
 `/home/ai-teams/workspace/entu-research/.claude/statusline-command.sh` (also committed to `entu/research`
-after the 2026-03-20 live fix). The script must be committed and pushed — container rebuilds clone fresh.
+after the 2026-03-20 live fix). The script must be committed and pushed -- container rebuilds clone fresh.
 
 ### Item 2: settings.json has statusLine entry
 
@@ -780,7 +780,7 @@ Use 2–10 chars, A-Z0-9 and hyphen only. If missing, add to the entrypoint's `S
 export CLAUDE_ENV_ID=$(grep 'CLAUDE_ENV_ID' ~/.bashrc | cut -d= -f2)
 echo '{"model":{"display_name":"Claude Sonnet 4.6"},"workspace":{"current_dir":"/home/ai-teams/workspace"},"context_window":{"remaining_percentage":80},"cost":{"total_cost_usd":0.05},"session_id":"smoke-test"}' \
   | bash ~/workspace/<team-repo>/.claude/statusline-command.sh
-# Must print a colored statusline with the CLAUDE_ENV_ID badge — not an error
+# Must print a colored statusline with the CLAUDE_ENV_ID badge -- not an error
 ```
 
 ### What to do if statusline was missed (live fix, no rebuild)
@@ -825,11 +825,11 @@ Step 6:  Python venv setup (first run only)
 Step 7:  SSH key installation + start sshd
 Step 8:  Runtime validation gates (Python, Node.js, Claude, repos)
 Step 9:  Persist env vars to .bashrc
-         → CLAUDE_ENV_ID MANDATORY (for statusline — see §20)
+         → CLAUDE_ENV_ID MANDATORY (for statusline -- see §20)
 Step 9b: Git attribution
 Step 9c: Claude settings.json (first run only)
          → statusLine entry MANDATORY (see §13 / §20)
-Step 9d: statusline-command.sh in repo — committed and pushed (see §20)
+Step 9d: statusline-command.sh in repo -- committed and pushed (see §20)
 Step 10: exec gosu ai-teams "$@"
 ```
 
@@ -837,7 +837,7 @@ Every step is idempotent. Safe to restart.
 
 ---
 
-## §21. spawn_member.sh — Operator Reference
+## §21. spawn_member.sh -- Operator Reference
 
 **Context:** After SSHing into a container and completing TeamCreate, the PO spawns agents using `spawn_member.sh`. This section documents the argument order and session name so operators don't have to read the script.
 
@@ -855,7 +855,7 @@ spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
 
 ### Session name convention
 
-The tmux session name is the team's **short identifier, lowercase** — NOT the full team name:
+The tmux session name is the team's **short identifier, lowercase** -- NOT the full team name:
 
 | Team directory | Session name |
 |---|---|
@@ -907,13 +907,13 @@ The pane env file is written by `apply-layout.sh` to `/tmp/<session>-panes.env` 
 **Fix:** Print the pane map only in `apply-layout.sh` (the source of truth). `start-team.sh` should only print a completion summary, not re-echo the IDs.
 
 ```bash
-# apply-layout.sh — print pane IDs here (once)
+# apply-layout.sh -- print pane IDs here (once)
 echo "  codd     → $PANE_CODD"
 echo "  hopper   → $PANE_HOPPER"
 # ...
 echo "[apply-layout] Done. Pane IDs written to $PANE_ENV"
 
-# start-team.sh — do NOT repeat the pane map
+# start-team.sh -- do NOT repeat the pane map
 echo "[start-team] Done. All 4 agents spawned."
 echo "Panes are labeled in the tmux borders. Wait for intro messages."
 ```
@@ -926,16 +926,16 @@ echo "Panes are labeled in the tmux borders. Wait for intro messages."
 
 **Symptom:** After running `apply-layout.sh`, other tmux sessions on the same host unexpectedly show pane borders with agent name labels.
 
-**Cause:** `tmux set-option -t "$SESSION" -g pane-border-format " #{pane_title} "` — the `-g` flag overrides the session scope and sets the option globally on the tmux server, affecting all sessions.
+**Cause:** `tmux set-option -t "$SESSION" -g pane-border-format " #{pane_title} "` -- the `-g` flag overrides the session scope and sets the option globally on the tmux server, affecting all sessions.
 
 **Fix:** Remove `-g`. Session-scoped `set-option` does not need it:
 
 ```bash
-# BAD — sets globally, affects all sessions on the host
+# BAD -- sets globally, affects all sessions on the host
 tmux set-option -t "$TMUX_SESSION" -g pane-border-format " #{pane_title} "
 tmux set-option -t "$TMUX_SESSION" -g pane-border-status top
 
-# GOOD — scoped to this session only
+# GOOD -- scoped to this session only
 tmux set-option -t "$TMUX_SESSION" pane-border-format " #{pane_title} "
 tmux set-option -t "$TMUX_SESSION" pane-border-status top
 ```

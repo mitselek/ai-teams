@@ -1,44 +1,44 @@
 // (*CD:Kerckhoffs*)
-// RED tests for story/30: GET /api/subscribe — SSE message delivery.
+// RED tests for story/30: GET /api/subscribe -- SSE message delivery.
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — correct SSE headers + event id field:
+//   AC1 -- correct SSE headers + event id field:
 //     Given: team-b subscribes via GET /api/subscribe
 //     When:  hub sends a message to team-b
 //     Then:  response has Content-Type: text/event-stream, Cache-Control: no-cache;
 //            each SSE event includes an `id:` field
 //
-//   AC2 — delivery within 100ms:
+//   AC2 -- delivery within 100ms:
 //     Given: team-b has active SSE subscription
 //     When:  team-a POSTs a message to team-b (t0)
 //     Then:  SSE event arrives at team-b within 100ms of t0
 //
-//   AC3 — fan-out to two concurrent subscribers:
+//   AC3 -- fan-out to two concurrent subscribers:
 //     Given: team-b has TWO concurrent SSE connections
 //     When:  team-a sends one message
 //     Then:  BOTH connections receive the event
 //
-//   AC4 — Last-Event-ID replay on reconnect:
+//   AC4 -- Last-Event-ID replay on reconnect:
 //     Given: team-b subscribed, received events (noted last SSE id), then disconnected;
 //            team-a sends M2 while team-b is offline
 //     When:  team-b reconnects with `Last-Event-ID: <lastId>` header
 //     Then:  M2 replayed; M1 (already seen) NOT re-delivered
 //
-//   AC5 — offline queue drained on subscribe:
+//   AC5 -- offline queue drained on subscribe:
 //     Given: team-c has no active subscription;
 //            team-a sends a message to team-c (queued)
 //     When:  team-c opens SSE subscription
 //     Then:  queued message arrives on the new SSE connection
 //
-//   AC6 — disconnect unregisters subscriber:
+//   AC6 -- disconnect unregisters subscriber:
 //     Given: team-b has active SSE subscription
 //     When:  team-b disconnects, then team-a sends another message
 //     Then:  no event received (subscriber is gone); hub returns queued: true
 //
 // RED state:
-//   - AC1 (id: field): current impl sends `data:` only — no `id:` line → RED
-//   - AC4 (Last-Event-ID): not implemented — hub has no per-team event buffer → RED
+//   - AC1 (id: field): current impl sends `data:` only -- no `id:` line → RED
+//   - AC4 (Last-Event-ID): not implemented -- hub has no per-team event buffer → RED
 //   AC2, AC3, AC5, AC6 may already be GREEN from story/29 implementation.
 //
 // Ref: https://github.com/mitselek/ai-teams/issues/30
@@ -328,13 +328,13 @@ afterAll(async () => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — SSE response headers ────────────────────────────────────────────────
+// ── AC1 -- SSE response headers ────────────────────────────────────────────────
 //
-// Headers are verified after receiving the first SSE event — Fastify flushes
+// Headers are verified after receiving the first SSE event -- Fastify flushes
 // response headers on first stream write, so awaiting an event guarantees
 // headers have arrived at the client.
 
-describe('AC1 — SSE response headers', () => {
+describe('AC1 -- SSE response headers', () => {
   it('response has Content-Type: text/event-stream', async () => {
     const sub = openSSE(hubPort, caCrt, teamBCert);
     await settle(100);
@@ -356,9 +356,9 @@ describe('AC1 — SSE response headers', () => {
   });
 });
 
-// ── AC2 — Delivery within 100ms ───────────────────────────────────────────────
+// ── AC2 -- Delivery within 100ms ───────────────────────────────────────────────
 
-describe('AC2 — delivery within 100ms', () => {
+describe('AC2 -- delivery within 100ms', () => {
   it('SSE event arrives within 100ms of POST /api/send', async () => {
     const sub = openSSE(hubPort, caCrt, teamBCert);
     await settle(100); // allow TLS + subscribe registration before timing
@@ -375,9 +375,9 @@ describe('AC2 — delivery within 100ms', () => {
   });
 });
 
-// ── AC3 — Fan-out to two concurrent subscribers ───────────────────────────────
+// ── AC3 -- Fan-out to two concurrent subscribers ───────────────────────────────
 
-describe('AC3 — fan-out to two concurrent SSE connections', () => {
+describe('AC3 -- fan-out to two concurrent SSE connections', () => {
   it('both connections for team-b receive the same message', async () => {
     const sub1 = openSSE(hubPort, caCrt, teamBCert);
     const sub2 = openSSE(hubPort, caCrt, teamBCert);
@@ -398,11 +398,11 @@ describe('AC3 — fan-out to two concurrent SSE connections', () => {
   });
 });
 
-// ── AC4 — Last-Event-ID replay on reconnect ───────────────────────────────────
+// ── AC4 -- Last-Event-ID replay on reconnect ───────────────────────────────────
 
-describe('AC4 — Last-Event-ID replay on reconnect', () => {
+describe('AC4 -- Last-Event-ID replay on reconnect', () => {
   it('each SSE event carries an id: field (prerequisite for Last-Event-ID)', async () => {
-    // RED: current impl sends `data: <JSON>\n\n` — no `id:` line
+    // RED: current impl sends `data: <JSON>\n\n` -- no `id:` line
     const sub = openSSE(hubPort, caCrt, teamBCert);
     await settle(100);
     const msg = makeMsg('team-a', 'team-b', 'ac4-id-field-check');
@@ -432,7 +432,7 @@ describe('AC4 — Last-Event-ID replay on reconnect', () => {
     sub1.close();
     await settle(50);
 
-    // 3. Send M2 while team-b is offline — goes to queue
+    // 3. Send M2 while team-b is offline -- goes to queue
     const msgM2 = makeMsg('team-a', 'team-b', 'last-event-id-M2');
     const sendRes = await httpsPost(hubPort, caCrt, teamACert, msgM2);
     expect(JSON.parse(sendRes.body).queued).toBe(true);
@@ -452,16 +452,16 @@ describe('AC4 — Last-Event-ID replay on reconnect', () => {
   });
 });
 
-// ── AC5 — Offline queue drained on subscribe ──────────────────────────────────
+// ── AC5 -- Offline queue drained on subscribe ──────────────────────────────────
 
-describe('AC5 — offline queue drained when subscriber connects', () => {
+describe('AC5 -- offline queue drained when subscriber connects', () => {
   it('queued message is delivered to team-c once it subscribes', async () => {
     // Send to team-c while it has no subscriber
     const msg = makeMsg('team-a', 'team-c', 'ac5-offline-drain');
     const res = await httpsPost(hubPort, caCrt, teamACert, msg);
     expect(JSON.parse(res.body).queued).toBe(true);
 
-    // Now team-c subscribes — should receive the queued message
+    // Now team-c subscribes -- should receive the queued message
     const sub = openSSE(hubPort, caCrt, teamCCert);
 
     const event = await sub.waitFor((e) => (e.data as { id?: string })?.id === msg.id);
@@ -471,9 +471,9 @@ describe('AC5 — offline queue drained when subscriber connects', () => {
   });
 });
 
-// ── AC6 — Disconnect unregisters subscriber ───────────────────────────────────
+// ── AC6 -- Disconnect unregisters subscriber ───────────────────────────────────
 
-describe('AC6 — disconnect unregisters subscriber', () => {
+describe('AC6 -- disconnect unregisters subscriber', () => {
   it('message sent after subscriber disconnects is queued, not pushed to closed stream', async () => {
     // Use team-c (no other active connections in this test suite)
     const sub = openSSE(hubPort, caCrt, teamCCert);
@@ -483,7 +483,7 @@ describe('AC6 — disconnect unregisters subscriber', () => {
     sub.close();
     await settle(80); // allow close event to propagate through hub
 
-    // Send a message — team-c is now offline, should be queued
+    // Send a message -- team-c is now offline, should be queued
     const msg = makeMsg('team-a', 'team-c', 'ac6-post-disconnect');
     const res = await httpsPost(hubPort, caCrt, teamACert, msg);
 

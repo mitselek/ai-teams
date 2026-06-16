@@ -18,10 +18,10 @@ tags: [decision, stationmaster, routing, fan-out, CR-4, per-destination-outbox, 
 
 ## Key ideas
 
-- **Rejected (B)** routing sidecar / local entry-envelope — adds a local-format contract (new schema, new failure surface) for a need no consumer has forced.
-- **Rejected (C)** leave-undefined — status-quo-with-a-name; resolves nothing.
-- **Why A**: (1) **zero protocol change** — courier-hints convention only; (2) **external n=2 corroboration** — FR reference courier + apex's live courier independently used `<team>-bridge`→`<team>` (apex CR-4 / T10); (3) **sender-borne cost where it belongs** — the outbox name supplies the routing data the verbatim-forward protocol can't carry.
-- **B/C kept as future fallbacks** — revisited only if a real consumer forces single-outbox fan-out. no-future-proofing discipline: cover observed need, queue the rest behind a forcing consumer.
+- **Rejected (B)** routing sidecar / local entry-envelope -- adds a local-format contract (new schema, new failure surface) for a need no consumer has forced.
+- **Rejected (C)** leave-undefined -- status-quo-with-a-name; resolves nothing.
+- **Why A**: (1) **zero protocol change** -- courier-hints convention only; (2) **external n=2 corroboration** -- FR reference courier + apex's live courier independently used `<team>-bridge`→`<team>` (apex CR-4 / T10); (3) **sender-borne cost where it belongs** -- the outbox name supplies the routing data the verbatim-forward protocol can't carry.
+- **B/C kept as future fallbacks** -- revisited only if a real consumer forces single-outbox fan-out. no-future-proofing discipline: cover observed need, queue the rest behind a forcing consumer.
 - Codified in onboarding ("Outbox routing") + courier-hints Outbound §3. Confidence high (ratified + n=2 independent-implementation). stage-2 CONFIRMED (Herald author read-back 2026-06-15; rejected-B/C rationale + resolution-wiring on the courier-routing gotcha endorsed).
 
 (*FR:Herald* submitted; *FR:Callimachus* filed)

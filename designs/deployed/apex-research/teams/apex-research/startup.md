@@ -1,4 +1,4 @@
-# Startup — apex-research (*AR:Schliemann*)
+# Startup -- apex-research (*AR:Schliemann*)
 
 **Read this file FIRST on every session start.** It tells you where everything is and what to do, without exploration.
 
@@ -22,7 +22,7 @@ All paths are derived from two anchors:
 | Common prompt | `teams/apex-research/common-prompt.md` |
 | Agent prompts | `teams/apex-research/prompts/*.md` |
 | Scratchpads | `teams/apex-research/memory/*.md` |
-| Source data | `../vjs_apex_apps/` (READ-ONLY — symlink to /home/ai-teams/source-data in container) |
+| Source data | `../vjs_apex_apps/` (READ-ONLY -- symlink to /home/ai-teams/source-data in container) |
 | Extraction scripts | `scripts/` |
 | Inventory output | `inventory/` |
 | Analysis output | `shared/` |
@@ -59,10 +59,10 @@ cd "$REPO" && git pull
 
 ```bash
 TEAM_DIR="$HOME/.claude/teams/apex-research"
-if [ -d "$TEAM_DIR" ]; then echo "STALE DIR — will clean"; else echo "CLEAN — normal state"; fi
+if [ -d "$TEAM_DIR" ]; then echo "STALE DIR -- will clean"; else echo "CLEAN -- normal state"; fi
 ```
 
-The runtime dir is **ephemeral by platform design** — the platform does not preserve it between CLI sessions. A missing dir is the normal state.
+The runtime dir is **ephemeral by platform design** -- the platform does not preserve it between CLI sessions. A missing dir is the normal state.
 
 ### Step 3: Clean
 
@@ -86,7 +86,7 @@ TeamCreate(team_name="apex-research")
 1. `TeamDelete(team_name="apex-research")`
 2. `TeamCreate(team_name="apex-research")`
 3. Re-check disk for config.json
-4. If still fails after 2 attempts — STOP. Ask the user. Do NOT proceed to spawn.
+4. If still fails after 2 attempts -- STOP. Ask the user. Do NOT proceed to spawn.
 
 ### Step 5: Restore inboxes from repo
 
@@ -105,7 +105,7 @@ else
 fi
 ```
 
-**First session:** This will print "No repo inboxes found (cold start)" — that's expected.
+**First session:** This will print "No repo inboxes found (cold start)" -- that's expected.
 
 ### Step 6: Validate environment
 
@@ -115,11 +115,11 @@ node --version      # >= 20
 ls ../vjs_apex_apps/ > /dev/null 2>&1 && echo "Source data: OK" || echo "Source data: MISSING (extraction scripts will fail)"
 ```
 
-**Source data missing is a soft gate** — the team can still work on cached inventory data, but Champollion cannot run extraction scripts.
+**Source data missing is a soft gate** -- the team can still work on cached inventory data, but Champollion cannot run extraction scripts.
 
 ### Step 7: Start dashboard
 
-The dashboard must be running before any agents are spawned — it is the team's primary visibility tool.
+The dashboard must be running before any agents are spawned -- it is the team's primary visibility tool.
 
 ```bash
 cd "$REPO/dashboard" && npm install --silent && npm run dev -- --host &
@@ -135,12 +135,12 @@ If dashboard fails to start (missing deps, build errors), fix before proceeding.
 Ask the user which agents to spawn. Do NOT auto-spawn. Spawn per task requirements.
 
 **Spawn order (data dependencies):**
-1. **Champollion** — produces raw extraction data
-2. **Nightingale** — consumes extraction data, produces analysis JSON
-3. **Berners-Lee** — consumes analysis JSON, builds dashboard (spawn with `isolation: "worktree"`)
-4. **Hammurabi** — consumes analysis + dashboard context, writes specs
+1. **Champollion** -- produces raw extraction data
+2. **Nightingale** -- consumes extraction data, produces analysis JSON
+3. **Berners-Lee** -- consumes analysis JSON, builds dashboard (spawn with `isolation: "worktree"`)
+4. **Hammurabi** -- consumes analysis + dashboard context, writes specs
 
-Before each spawn, check `config.json` — if agent name already exists, use SendMessage instead.
+Before each spawn, check `config.json` -- if agent name already exists, use SendMessage instead.
 
 **Verify:** No `name-2` entries in `config.json`.
 
@@ -200,8 +200,8 @@ The first session follows the Dashboard-First approach from the design spec:
 - **Platform:** Linux (Debian) inside Docker container
 - **Git remote:** `Eesti-Raudtee/apex-migration-research`
 - **Source data remote:** `Eesti-Raudtee/vjs_apex_apps` (read-only)
-- **This is a hybrid team** — research agents + dashboard developer
+- **This is a hybrid team** -- research agents + dashboard developer
 - **Python venv:** Activate with `source .venv/bin/activate` before running scripts
 - **Dashboard dev server:** `cd dashboard && npm run dev` (port 5173)
 
-(*AR:Schliemann — drafted by FR:team-lead*)
+(*AR:Schliemann -- drafted by FR:team-lead*)

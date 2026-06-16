@@ -32,14 +32,14 @@ Azure Arc integration with Defender/Sentinel. May need lighter policy group for 
 ```
 10.100.136.160/29
 ├── .161  gateway
-├── .162  main host — Docker, all team containers, master dashboard (:5173)
+├── .162  main host -- Docker, all team containers, master dashboard (:5173)
 │         ├── apex-research     (SSH :2222)
 │         ├── polyphony-dev     (SSH :2223)
 │         ├── entu-research     (SSH :2224)
 │         ├── hr-devs           (SSH :2225)
 │         ├── backlog-triage    (SSH :2226)
 │         └── master-dashboard  (:5173, aggregates all team dashboards)
-├── .163  comms-dev — comms hub / chat server for inter-team communication
+├── .163  comms-dev -- comms hub / chat server for inter-team communication
 │         └── separate IP because comms-dev serves all other teams
 ├── .164  (reserve)
 ├── .165  (reserve)
@@ -48,8 +48,8 @@ Azure Arc integration with Defender/Sentinel. May need lighter policy group for 
 
 ### Design Rationale
 
-- **All teams share one Docker host** (.162) — containers use internal networking, only the host IP is exposed.
-- **comms-dev gets a dedicated IP** (.163) — the comms hub handles inter-team message routing and must be reachable as a distinct network identity, not just another container behind the main host.
+- **All teams share one Docker host** (.162) -- containers use internal networking, only the host IP is exposed.
+- **comms-dev gets a dedicated IP** (.163) -- the comms hub handles inter-team message routing and must be reachable as a distinct network identity, not just another container behind the main host.
 - **Master dashboard** on port 5173 replaces per-team dashboard ports (5173, 5175, 5176, 5177).
 - **3 reserve IPs** for future needs (dedicated build server, monitoring, etc.).
 
@@ -65,6 +65,6 @@ The RC server (dev@100.96.54.170 via Tailscale) is the interim host. When PROD-L
 
 ## IT Ticket History
 
-- **2026-03-18** — Mihkel submitted request (Ubuntu 24.04 originally)
-- **2026-03-19** — Roland (IT): asked about Ubuntu licensing, Azure Arc, Defender. Mihkel confirmed Debian is fine.
-- **2026-03-23** — Ain Simsalu: network allocated (PROD-LLM, VLAN 1320, 10.100.136.160/29). Roland: requested port 5173 open.
+- **2026-03-18** -- Mihkel submitted request (Ubuntu 24.04 originally)
+- **2026-03-19** -- Roland (IT): asked about Ubuntu licensing, Azure Arc, Defender. Mihkel confirmed Debian is fine.
+- **2026-03-23** -- Ain Simsalu: network allocated (PROD-LLM, VLAN 1320, 10.100.136.160/29). Roland: requested port 5173 open.

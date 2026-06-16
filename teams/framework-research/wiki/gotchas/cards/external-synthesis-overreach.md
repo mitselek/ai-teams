@@ -18,7 +18,7 @@ When an outsider synthesizes team work, three failure modes degrade quality. All
 ## Key ideas
 
 - **1. Premature escalation**: conditional proposals promoted to unconditional recommendations (Montesquieu's "audit independence IF multi-provider" → an active "Recommendation").
-- **2. Hypothetical treated as confirmed**: speculative future scenarios become confirmed capability gaps with deployment targets (Finn's hypothetical visual QA → "deploy a visual QA agent on uikit-dev"). Note: FR's own Round 2 pushback contained a factual error (claiming uikit-dev didn't exist) — illustrating the gotcha recursively.
+- **2. Hypothetical treated as confirmed**: speculative future scenarios become confirmed capability gaps with deployment targets (Finn's hypothetical visual QA → "deploy a visual QA agent on uikit-dev"). Note: FR's own Round 2 pushback contained a factual error (claiming uikit-dev didn't exist) -- illustrating the gotcha recursively.
 - **3. Nuance flattening**: distinct specialist concerns merged into one category (Cal's classification-quality + Celes's behavioral-compliance → one "Knowledge Compatibility Barrier").
 - **Verification checklist for external reviews**: conditionals not promoted, hypotheticals not confirmed, specialist distinctions preserved.
 

@@ -13,7 +13,7 @@ tags: [surfacing, cost-asymmetry, stale-context, surface-dont-bridge, false-posi
 
 ## TLDR
 
-The "surface, don't bridge" discipline has a load-bearing caveat: surfaces have cost too, and the cost is asymmetric across stale-context conditions. When the surfacer's context is stale, surfacing a false-positive contradiction costs recipients disproportionately — and recipients pay regardless of whether the surface was real.
+The "surface, don't bridge" discipline has a load-bearing caveat: surfaces have cost too, and the cost is asymmetric across stale-context conditions. When the surfacer's context is stale, surfacing a false-positive contradiction costs recipients disproportionately -- and recipients pay regardless of whether the surface was real.
 
 ## Key ideas
 

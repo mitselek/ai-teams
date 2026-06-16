@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// Transport framing tests — tests against src/transport/framing.ts directly.
+// Transport framing tests -- tests against src/transport/framing.ts directly.
 // Covers encodeFrame, FrameDecoder (stateful stream decoder), size limits,
 // fragmented delivery, malformed JSON, and oversized message rejection.
 
@@ -47,7 +47,7 @@ describe('encodeFrame', () => {
 
   it('accepts payload of exactly maxSize bytes (boundary)', () => {
     // Build a JSON string that is exactly MAX_MESSAGE_SIZE bytes
-    // Smallest JSON wrapper: {"b":"..."} — 6 overhead bytes
+    // Smallest JSON wrapper: {"b":"..."} -- 6 overhead bytes
     const overhead = Buffer.from('{"b":""}', 'utf8').byteLength; // 8 bytes
     const fillLen = MAX_MESSAGE_SIZE - overhead;
     const msg = { b: 'x'.repeat(fillLen) };
@@ -64,10 +64,10 @@ describe('encodeFrame', () => {
 });
 
 // ---------------------------------------------------------------------------
-// FrameDecoder — basic delivery
+// FrameDecoder -- basic delivery
 // ---------------------------------------------------------------------------
 
-describe('FrameDecoder — single frame delivery', () => {
+describe('FrameDecoder -- single frame delivery', () => {
   it('calls onMessage exactly once with the parsed payload', () => {
     const onMessage = vi.fn();
     const decoder = new FrameDecoder(MAX_MESSAGE_SIZE, onMessage);
@@ -93,10 +93,10 @@ describe('FrameDecoder — single frame delivery', () => {
 });
 
 // ---------------------------------------------------------------------------
-// FrameDecoder — multi-frame and fragmented delivery
+// FrameDecoder -- multi-frame and fragmented delivery
 // ---------------------------------------------------------------------------
 
-describe('FrameDecoder — multi-frame delivery', () => {
+describe('FrameDecoder -- multi-frame delivery', () => {
   it('decodes two frames delivered in one push', () => {
     const received: unknown[] = [];
     const decoder = new FrameDecoder(MAX_MESSAGE_SIZE, (m) => received.push(m));
@@ -166,10 +166,10 @@ describe('FrameDecoder — multi-frame delivery', () => {
 });
 
 // ---------------------------------------------------------------------------
-// FrameDecoder — error cases
+// FrameDecoder -- error cases
 // ---------------------------------------------------------------------------
 
-describe('FrameDecoder — oversized message rejection', () => {
+describe('FrameDecoder -- oversized message rejection', () => {
   it('throws when declared payload length exceeds maxSize', () => {
     const decoder = new FrameDecoder(100, () => {});
     const header = Buffer.allocUnsafe(4);
@@ -196,7 +196,7 @@ describe('FrameDecoder — oversized message rejection', () => {
   }, 10000);
 });
 
-describe('FrameDecoder — malformed JSON handling', () => {
+describe('FrameDecoder -- malformed JSON handling', () => {
   it('skips a frame with malformed JSON and continues processing next frame', () => {
     const received: unknown[] = [];
     const decoder = new FrameDecoder(MAX_MESSAGE_SIZE, (m) => received.push(m));
@@ -210,7 +210,7 @@ describe('FrameDecoder — malformed JSON handling', () => {
     // Good frame after the bad one
     const goodFrame = encodeFrame({ id: 'after-bad' });
 
-    // Should not throw — malformed JSON is skipped per spec comment in framing.ts
+    // Should not throw -- malformed JSON is skipped per spec comment in framing.ts
     expect(() => decoder.push(Buffer.concat([badFrame, goodFrame]))).not.toThrow();
     // The good frame after the bad one should still be delivered
     expect(received).toHaveLength(1);

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Restore inboxes from repo to runtime, pruning stale shutdown messages
+# (*FR:Volta*) -- Restore inboxes from repo to runtime, pruning stale shutdown messages
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,14 +25,14 @@ fi
 
 # If no repo inboxes, nothing to restore
 if [ ! -d "$REPO_INBOXES" ]; then
-  echo "No repo inboxes found at $REPO_INBOXES — cold start, nothing to restore."
+  echo "No repo inboxes found at $REPO_INBOXES -- cold start, nothing to restore."
   exit 0
 fi
 
 # Count source files
 SOURCE_COUNT=$(find "$REPO_INBOXES" -maxdepth 1 -name '*.json' -type f | wc -l)
 if [ "$SOURCE_COUNT" -eq 0 ]; then
-  echo "Repo inboxes dir exists but contains no .json files — nothing to restore."
+  echo "Repo inboxes dir exists but contains no .json files -- nothing to restore."
   exit 0
 fi
 
@@ -50,11 +50,11 @@ for inbox_file in "$REPO_INBOXES"/*.json; do
   RESTORED=$((RESTORED + 1))
 done
 
-# Verification — tolerate dest > source (Step 2c ghost-restore may pre-create
+# Verification -- tolerate dest > source (Step 2c ghost-restore may pre-create
 # inbox files for ghost members not present in repo), reject dest < source.
 DEST_COUNT=$(find "$RUNTIME_INBOXES" -maxdepth 1 -name '*.json' -type f | wc -l)
 if [ "$RESTORED" -ne "$SOURCE_COUNT" ] || [ "$DEST_COUNT" -lt "$SOURCE_COUNT" ]; then
-  echo "ERROR: Count mismatch — source=$SOURCE_COUNT restored=$RESTORED dest=$DEST_COUNT" >&2
+  echo "ERROR: Count mismatch -- source=$SOURCE_COUNT restored=$RESTORED dest=$DEST_COUNT" >&2
   exit 1
 fi
 

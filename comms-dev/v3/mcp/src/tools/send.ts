@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms_send — send a message to a team via the hub.
+// comms_send -- send a message to a team via the hub.
 
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';

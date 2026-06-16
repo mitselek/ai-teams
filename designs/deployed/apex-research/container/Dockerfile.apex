@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-# apex-research Container — Python + Node.js + SSH (*FR:Brunel*)
+# apex-research Container -- Python + Node.js + SSH (*FR:Brunel*)
 #
 # Extends ai-teams-claude:latest (ubuntu 24.04, nodejs, npm, git, gh, gosu, claude)
 # with Python 3.11 (extraction scripts) and OpenSSH server (PO access).
@@ -16,7 +16,7 @@ FROM ai-teams-claude:latest
 
 # ── Fix inherited apt sources ──────────────────────────────────────────────────
 # Base image adds GitHub CLI apt repo with a key that may go stale.
-# Remove it — gh is already installed, we don't need the apt source anymore.
+# Remove it -- gh is already installed, we don't need the apt source anymore.
 RUN rm -f /etc/apt/sources.list.d/github-cli.list \
     && rm -f /usr/share/keyrings/githubcli-archive-keyring.gpg
 
@@ -97,13 +97,13 @@ RUN usermod -p '*' ai-teams \
 
 # ── Build-time courier key seed (approach b) (*FR:Brunel*) ──────────────────────
 # The courier's OUTBOUND SSH key (to the FR stationmaster hub) is injected as a
-# BuildKit secret (NOT an ARG/layer — no leak into image history). It lands on the
+# BuildKit secret (NOT an ARG/layer -- no leak into image history). It lands on the
 # IMAGE filesystem at a seed path. The entrypoint (Step 7b) copies it into the
-# ephemeral ~/.ssh on every start (~/.ssh is the containerd overlay — does NOT
+# ephemeral ~/.ssh on every start (~/.ssh is the containerd overlay -- does NOT
 # survive a rebuild). Key generated ONCE off-build by FR (the hub operator), so
 # the same key is injected every build => no hub-side registration churn.
 # Seed filename = stationmaster_apex, matching the name the live courier.json
-# already dials (~/.ssh/stationmaster_apex) — no courier.json edit needed.
+# already dials (~/.ssh/stationmaster_apex) -- no courier.json edit needed.
 # Build: DOCKER_BUILDKIT=1 docker build --secret id=courier_key,src=./stationmaster_apex ...
 RUN --mount=type=secret,id=courier_key \
     install -d -m 700 -o ai-teams -g ai-teams /home/ai-teams/.ssh-seed \
@@ -116,7 +116,7 @@ RUN --mount=type=secret,id=courier_key \
 RUN gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5
 
 # ── PO user for SSH access ──────────────────────────────────────────────────────
-# Separate from ai-teams (uid=1000) — PO gets a login shell for inspection,
+# Separate from ai-teams (uid=1000) -- PO gets a login shell for inspection,
 # ai-teams runs Claude. michelek is in ai-teams group for workspace read access
 # and has passwordless sudo for full container inspection.
 RUN useradd -m -s /bin/bash michelek \

@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// UDS server — the listening side of a team's broker socket.
+// UDS server -- the listening side of a team's broker socket.
 // Accepts incoming connections, decodes length-prefixed frames,
 // optionally decrypts, validates messages (including HMAC checksum), sends ACKs,
 // and hands messages to the broker via callback.
@@ -57,7 +57,7 @@ export class UDSServer {
     try {
       fs.unlinkSync(this.socketPath);
     } catch {
-      // File didn't exist — that's fine
+      // File didn't exist -- that's fine
     }
 
     return new Promise((resolve, reject) => {
@@ -66,7 +66,7 @@ export class UDSServer {
         try {
           fs.chmodSync(this.socketPath, 0o666);
         } catch {
-          // Non-fatal — may already have correct permissions
+          // Non-fatal -- may already have correct permissions
         }
         console.log(`[uds-server] Listening on ${this.socketPath}`);
         resolve();
@@ -82,7 +82,7 @@ export class UDSServer {
   }
 
   private handleConnection(socket: net.Socket): void {
-    // Raw byte accumulator — we decode frames manually so we can decrypt
+    // Raw byte accumulator -- we decode frames manually so we can decrypt
     // the payload before JSON parsing (FrameDecoder assumes plaintext JSON).
     //
     // Race condition fix (Volta review): pause the socket while drainBuffer is
@@ -117,7 +117,7 @@ export class UDSServer {
       }
 
       const totalLength = FRAME_HEADER_SIZE + payloadLength;
-      if (buffer.byteLength < totalLength) break; // incomplete frame — wait for more data
+      if (buffer.byteLength < totalLength) break; // incomplete frame -- wait for more data
 
       const rawPayload = buffer.slice(FRAME_HEADER_SIZE, totalLength);
       buffer = buffer.slice(totalLength);
@@ -180,7 +180,7 @@ export class UDSServer {
 
     if (msg['version'] !== '1') throw new Error(`Unsupported version: ${msg['version']}`);
 
-    // Reject messages with timestamps older than 300s — defense-in-depth against replay attacks.
+    // Reject messages with timestamps older than 300s -- defense-in-depth against replay attacks.
     // The dedup store (MessageStore) is the primary replay defense; this is secondary.
     // Threat model spec: messages > 300s old are rejected regardless of valid checksum.
     const timestamp = msg['timestamp'];
@@ -188,20 +188,20 @@ export class UDSServer {
     const msgAge = Date.now() - Date.parse(timestamp);
     if (isNaN(msgAge)) throw new Error(`Invalid timestamp format: ${timestamp}`);
     if (msgAge > 300_000) {
-      throw new Error(`Message too old: ${Math.round(msgAge / 1000)}s (max 300s) — possible replay`);
+      throw new Error(`Message too old: ${Math.round(msgAge / 1000)}s (max 300s) -- possible replay`);
     }
 
-    // Verify checksum over stableStringify(rest) — recursive key sorting ensures
+    // Verify checksum over stableStringify(rest) -- recursive key sorting ensures
     // nested objects (from, to) are fully included. See Issue #2.
     const { checksum, ...rest } = msg;
     const canonical = Buffer.from(stableStringify(rest), 'utf8');
 
     let valid: boolean;
     if (this.integrityKey) {
-      // Production: HMAC-SHA256 — authenticated, prevents forgery by parties without the key
+      // Production: HMAC-SHA256 -- authenticated, prevents forgery by parties without the key
       valid = verifyIntegrity(this.integrityKey, canonical, checksum as string);
     } else {
-      // Dev/plaintext mode: plain SHA-256 — integrity only, no authentication
+      // Dev/plaintext mode: plain SHA-256 -- integrity only, no authentication
       const expected = 'sha256:' + createHash('sha256').update(canonical).digest('hex');
       valid = checksum === expected;
     }

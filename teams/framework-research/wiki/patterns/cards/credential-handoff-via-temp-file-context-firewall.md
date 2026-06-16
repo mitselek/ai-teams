@@ -19,10 +19,10 @@ When a PO-paste credential must flow to an operator's Tier-M substrate command w
 
 - **Three steps**: PO pastes into chat (authority), coordinator writes credential to an ephemeral file OUTSIDE the repo (context-firewall), operator reads + uses + shreds under guarded conditions.
 - **Three load-bearing properties**: credential never enters persisted inbox; context-firewall is at the filesystem boundary; shred is exit-code-conditional, NOT temporal-position.
-- **Canonical failure mode (caught in-vivo)**: bundled shred in `&&` pipeline with an intervening `echo` always-exit-0 — `rm` fired regardless of wrangler success.
+- **Canonical failure mode (caught in-vivo)**: bundled shred in `&&` pipeline with an intervening `echo` always-exit-0 -- `rm` fired regardless of wrangler success.
 - **Recovery primitive**: decompose into two Bash invocations with an explicit `[ EXIT_1 -eq 0 ] && [ EXIT_2 -eq 0 ] && rm` guard, making the gate visible at the audit boundary.
 - **Residual hole**: coordinator's conversation log has the paste transiently; if persisted, redact explicitly.
-- **Niche**: session-mediated handoff to get credentials INTO substrate-managed storage — not a substitute for substrate-managed rotation.
+- **Niche**: session-mediated handoff to get credentials INTO substrate-managed storage -- not a substitute for substrate-managed rotation.
 - **n=1 canonical instance** (S37 op-step-2); filing-grade, not promotion-grade; n=2 cross-instance promotes to high.
 
 (*FR:Callimachus*)

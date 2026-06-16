@@ -22,26 +22,26 @@ related:
 
 # Cross-Host Atomic Inbox-Write Primitive: Single-SSH + Python + `fcntl.flock`
 
-**Reusable transport primitive** (RFC #66 cross-host PoC, Brunel S31 2026-05-12, cross-implementation verified PowerShell + Python): a single `ssh` invocation with remote `python3 -c "..."` that reads the message body from stdin, acquires `fcntl.flock(LOCK_EX)` on the target inbox file, appends to the JSON array, releases the lock, and exits — is **process-level atomic from the sender's perspective**. Reusable for any cross-host write into a known-shape JSON-array file on a substrate where `fcntl.flock` is available (POSIX systems — the deployment-target family).
+**Reusable transport primitive** (RFC #66 cross-host PoC, Brunel S31 2026-05-12, cross-implementation verified PowerShell + Python): a single `ssh` invocation with remote `python3 -c "..."` that reads the message body from stdin, acquires `fcntl.flock(LOCK_EX)` on the target inbox file, appends to the JSON array, releases the lock, and exits -- is **process-level atomic from the sender's perspective**. Reusable for any cross-host write into a known-shape JSON-array file on a substrate where `fcntl.flock` is available (POSIX systems -- the deployment-target family).
 
 The primitive composes three substrate properties:
 
-1. **Single-ssh round-trip** — one network operation, one remote process; no half-finished state if the network drops mid-call.
-2. **Remote `python3 -c`** — no temp script files on remote; the entire write logic ships in-band on the ssh command line.
-3. **`fcntl.flock(LOCK_EX)`** — exclusive lock on the inbox file across the read-then-append-then-write critical section; concurrent writers serialize cleanly.
+1. **Single-ssh round-trip** -- one network operation, one remote process; no half-finished state if the network drops mid-call.
+2. **Remote `python3 -c`** -- no temp script files on remote; the entire write logic ships in-band on the ssh command line.
+3. **`fcntl.flock(LOCK_EX)`** -- exclusive lock on the inbox file across the read-then-append-then-write critical section; concurrent writers serialize cleanly.
 
 The combination is the contract: any one of the three alone is insufficient (multiple-ssh fragments lose atomicity; ssh + remote temp-script adds filesystem state; ssh + python without flock races on concurrent writers).
 
-## Empirical basis — cross-implementation parity
+## Empirical basis -- cross-implementation parity
 
 The primitive was implemented in two distinct client languages against the same remote substrate (apex-research Linux/Docker), both with identical observable semantics:
 
-**Instance 1 — PowerShell client** (`~/bin/ghost-chat.ps1.deprecated`, S31 first-iteration):
+**Instance 1 -- PowerShell client** (`~/bin/ghost-chat.ps1.deprecated`, S31 first-iteration):
 
 - PowerShell-host `ssh` invocation; remote `python3 -c "..."` reads stdin; flock + JSON-array append.
 - Outbound latency: **657-687ms median** (within RFC #66's <3s budget).
 
-**Instance 2 — Python client** (`~/bin/ghost-chat.py`, S31 canonical rewrite):
+**Instance 2 -- Python client** (`~/bin/ghost-chat.py`, S31 canonical rewrite):
 
 - Python-host `subprocess.run` with ssh; remote `python3 -c "..."` reads stdin; flock + JSON-array append.
 - Outbound latency: **741-854ms median** (PowerShell parity, both <RFC 3s budget).
@@ -66,9 +66,9 @@ This is the load-bearing structural move from Brunel's S31 16:51 [LEARNED-STRONG
 
 1. **Sender-side atomic write.** From the local CLI's perspective, the inbox-file mutation either fully happens or the ssh call returns an error. No partial JSON state on remote.
 
-2. **Concurrent-writer serialization.** Two senders calling the primitive simultaneously serialize via `LOCK_EX`; the second sender blocks until the first releases. JSON array order matches lock-acquisition order, not call-issuance order — but no message is lost or corrupted.
+2. **Concurrent-writer serialization.** Two senders calling the primitive simultaneously serialize via `LOCK_EX`; the second sender blocks until the first releases. JSON array order matches lock-acquisition order, not call-issuance order -- but no message is lost or corrupted.
 
-3. **Network-failure visibility.** If the network drops before the ssh call returns success, the local CLI sees a non-zero exit; the remote either fully wrote or did not. The local CLI MUST treat non-zero exit as "write status unknown" and decide retry semantics (idempotency depends on the message-shape contract above this primitive — if messages carry a unique ID, retry-with-dedup is possible).
+3. **Network-failure visibility.** If the network drops before the ssh call returns success, the local CLI sees a non-zero exit; the remote either fully wrote or did not. The local CLI MUST treat non-zero exit as "write status unknown" and decide retry semantics (idempotency depends on the message-shape contract above this primitive -- if messages carry a unique ID, retry-with-dedup is possible).
 
 4. **Substrate independence of message shape.** The primitive is JSON-array-append; the message shape inside the array is consumer-defined. Any JSON-array file on the remote with `fcntl.flock`-safe storage is a valid write target.
 
@@ -76,7 +76,7 @@ This is the load-bearing structural move from Brunel's S31 16:51 [LEARNED-STRONG
 
 - **Not a message-delivery guarantee at the harness layer.** Writing to an inbox file is necessary for the wake mechanism ([`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md)) to fire, but the recipient's consumption is a separate concern. See `inbox-drained-on-spawn-clear-without-deliver.md` for a substrate failure mode where the file-write succeeds but the harness drains without delivery.
 
-- **Not read-side coverage.** The primitive is write-only. A separate primitive (or extension) is needed for the read-and-mark-read-atomically path that external CLIs reading from the inbox must follow — see the upstream/downstream sibling pattern [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) for the consumer-side contract that rides on top of this primitive.
+- **Not read-side coverage.** The primitive is write-only. A separate primitive (or extension) is needed for the read-and-mark-read-atomically path that external CLIs reading from the inbox must follow -- see the upstream/downstream sibling pattern [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) for the consumer-side contract that rides on top of this primitive.
 
 - **Not encryption or auth.** SSH provides transport-layer confidentiality and authentication; the primitive does not add application-layer encryption. The `members[]` ACL ([`references/inbox-slot-vs-members-validation-asymmetry.md`](../references/inbox-slot-vs-members-validation-asymmetry.md)) is the only application-layer authority check.
 
@@ -100,7 +100,7 @@ This is **architectural-fact at the primitive-composition level**. The three com
 
 2. **Latency-budget reference.** 657-854ms median across two implementations sets an empirical reference for "ssh + python3 + flock + single-message append" on the apex-research substrate. New clients can compare against this baseline; substantial regression (e.g., 3-5s) suggests substrate degradation (network path, remote load) rather than client bug.
 
-3. **Library-team architecture composes cleanly.** Per S31 PO decision 2026-05-12 (library team specification), a central-library team's cross-team interface could adopt this primitive for any per-team Cal that writes to the library team's inbox — same substrate, same primitive, no transport redesign.
+3. **Library-team architecture composes cleanly.** Per S31 PO decision 2026-05-12 (library team specification), a central-library team's cross-team interface could adopt this primitive for any per-team Cal that writes to the library team's inbox -- same substrate, same primitive, no transport redesign.
 
 ## Promotion posture
 
@@ -110,16 +110,16 @@ This is **architectural-fact at the primitive-composition level**. The three com
 
 ## Related
 
-- [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) — **upstream/downstream sibling.** This entry covers the write-side primitive; the sibling covers the consumer-side contract for marking messages as read. The two compose: writers use this primitive; readers use the sibling's discipline. Both are required for a substrate-correct external-CLI implementation.
-- [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-member-as-universal-integration-surface.md) — the broader abstraction this primitive serves. Ghost-bridge daemons + external CLIs are the consumer set for this primitive.
-- [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) — substrate-property foundation. The wake mechanism fires on file-write; this primitive is one way to produce that file-write atomically from a remote host.
-- [`references/inbox-slot-vs-members-validation-asymmetry.md`](../references/inbox-slot-vs-members-validation-asymmetry.md) — ACL substrate property. This primitive writes to inbox files; the `members[]` ACL governs whether dispatch is valid in the first place. The primitive does not validate ACL; the calling daemon must.
-- [`patterns/agenttype-vs-backendtype-separation.md`](agenttype-vs-backendtype-separation.md) — S33+ sibling; substrate-shape finding from the same S31 PoC.
-- [`patterns/per-message-color-overrides-registered-default.md`](per-message-color-overrides-registered-default.md) — S33+ sibling; display-precedence finding from the same S31 PoC.
+- [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) -- **upstream/downstream sibling.** This entry covers the write-side primitive; the sibling covers the consumer-side contract for marking messages as read. The two compose: writers use this primitive; readers use the sibling's discipline. Both are required for a substrate-correct external-CLI implementation.
+- [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-member-as-universal-integration-surface.md) -- the broader abstraction this primitive serves. Ghost-bridge daemons + external CLIs are the consumer set for this primitive.
+- [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) -- substrate-property foundation. The wake mechanism fires on file-write; this primitive is one way to produce that file-write atomically from a remote host.
+- [`references/inbox-slot-vs-members-validation-asymmetry.md`](../references/inbox-slot-vs-members-validation-asymmetry.md) -- ACL substrate property. This primitive writes to inbox files; the `members[]` ACL governs whether dispatch is valid in the first place. The primitive does not validate ACL; the calling daemon must.
+- [`patterns/agenttype-vs-backendtype-separation.md`](agenttype-vs-backendtype-separation.md) -- S33+ sibling; substrate-shape finding from the same S31 PoC.
+- [`patterns/per-message-color-overrides-registered-default.md`](per-message-color-overrides-registered-default.md) -- S33+ sibling; display-precedence finding from the same S31 PoC.
 
 ## Source
 
-- Brunel S31 RFC #66 cross-host PoC, 2026-05-12. PoC artifacts `~/bin/ghost-chat.ps1.deprecated` + `~/bin/ghost-chat.py` (both **user-shipped per S31 16:53 PROVENANCE-CORRECTION** — Brunel's role was coordinator/spec/diagnosis/substrate-property identification, NOT implementer). Cross-implementation parity argument is Brunel's S31 16:51 [LEARNED-STRONG] reusable pattern.
+- Brunel S31 RFC #66 cross-host PoC, 2026-05-12. PoC artifacts `~/bin/ghost-chat.ps1.deprecated` + `~/bin/ghost-chat.py` (both **user-shipped per S31 16:53 PROVENANCE-CORRECTION** -- Brunel's role was coordinator/spec/diagnosis/substrate-property identification, NOT implementer). Cross-implementation parity argument is Brunel's S31 16:51 [LEARNED-STRONG] reusable pattern.
 - Latency measurements: PowerShell 657-687ms, Python 741-854ms (S31 scratchpad CHECKPOINT 16:48 + DECISION 16:28).
 - RFC #66 thread, <3s budget reference. <https://github.com/mitselek/ai-teams/issues/66>
 

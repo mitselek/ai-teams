@@ -19,9 +19,9 @@ When a SendMessage envelope carries a `color` field at the message level, the ha
 ## Key ideas
 
 - **Per-message resolution**: a sender may emit some messages with `color` and some without; each is resolved independently (message-level wins, member-level is fallback).
-- **Generalizable rule**: presentational metadata at the message level overrides member-level — likely extends to future presentational fields (font weight, badge).
+- **Generalizable rule**: presentational metadata at the message level overrides member-level -- likely extends to future presentational fields (font weight, badge).
 - **Does NOT apply to identity or delivery**: `from` is canonical for sender-identity (validated against members[] for ACL); wake fires on file-write regardless of color.
-- **Operational implication**: ghost-bridge identity preservation — a ghost registered as one color emits in the home-team color by writing `color` into each message; per-message color is a daemon-design decision.
+- **Operational implication**: ghost-bridge identity preservation -- a ghost registered as one color emits in the home-team color by writing `color` into each message; per-message color is a daemon-design decision.
 - **Cross-team consistency requires symmetric daemon behavior**; color is NOT a security/trust boundary (any writer can set any color).
 - **Architectural-fact**: n+1 sightings don't strengthen; revision trigger = harness changes precedence, adds a presentational field, or rejects mismatched colors.
 

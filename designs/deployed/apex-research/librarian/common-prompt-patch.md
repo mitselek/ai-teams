@@ -1,8 +1,8 @@
-# common-prompt.md patch — add Librarian role and Dual-Hub Routing
+# common-prompt.md patch -- add Librarian role and Dual-Hub Routing
 
 **Target file (in apex-research repo):** `teams/apex-research/common-prompt.md`
 
-**Author:** (*FR:Brunel*) — drafted 2026-04-13
+**Author:** (*FR:Brunel*) -- drafted 2026-04-13
 
 This patch adds Eratosthenes (Librarian) to the apex-research team and introduces
 the dual-hub routing model (work hub = team-lead, knowledge hub = Librarian).
@@ -11,7 +11,7 @@ All changes are additive. No existing content is deleted or semantically altered
 
 ---
 
-## Change 1 — Team section: update members list
+## Change 1 -- Team section: update members list
 
 ### Before (line 6)
 
@@ -27,7 +27,7 @@ All changes are additive. No existing content is deleted or semantically altered
 
 ---
 
-## Change 2 — Directory Ownership table: add `wiki/` row
+## Change 2 -- Directory Ownership table: add `wiki/` row
 
 ### Before (insert after the existing `dashboard/data/agents.json` row)
 
@@ -44,7 +44,7 @@ All changes are additive. No existing content is deleted or semantically altered
 
 ---
 
-## Change 3 — New section: "Dual-Hub Routing (Work + Knowledge)"
+## Change 3 -- New section: "Dual-Hub Routing (Work + Knowledge)"
 
 Insert this new section **after** the existing "Communication Rule" section
 (which ends with the "MANDATORY: After completing any task..." line) and
@@ -56,9 +56,9 @@ Insert this new section **after** the existing "Communication Rule" section
 This team has two communication hubs:
 
 - **Team-lead (work hub):** Task assignments, work reports, status updates, blockers, coordination between specialists. All work communication routes through team-lead as before.
-- **Eratosthenes (knowledge hub):** Team-wide knowledge — patterns, gotchas, decisions, and contracts that outlive a single session. When you discover something worth keeping, submit it to Eratosthenes. When you need to look up accumulated team knowledge, query Eratosthenes.
+- **Eratosthenes (knowledge hub):** Team-wide knowledge -- patterns, gotchas, decisions, and contracts that outlive a single session. When you discover something worth keeping, submit it to Eratosthenes. When you need to look up accumulated team knowledge, query Eratosthenes.
 
-**Knowledge submissions go directly to Eratosthenes, NOT through team-lead.** Work reports go to team-lead as before. These are separate reporting lines — do not double-route.
+**Knowledge submissions go directly to Eratosthenes, NOT through team-lead.** Work reports go to team-lead as before. These are separate reporting lines -- do not double-route.
 
 ### What goes to Eratosthenes vs. team-lead
 
@@ -86,7 +86,7 @@ Send Eratosthenes a message with this shape:
 <the discovery, in enough context to be useful>
 
 ### Evidence
-<where observed — file paths, commit SHAs, issue numbers, session context>
+<where observed -- file paths, commit SHAs, issue numbers, session context>
 ```
 
 Eratosthenes will acknowledge in the same message window, curate into the wiki, and confirm the canonical path.
@@ -125,12 +125,12 @@ If the answer is `not-documented` or `partial`, Eratosthenes will ask you to sub
 - Does not audit work quality (Medici's domain, remote from framework-research)
 - Does not write code, specs, or inventory data
 - Does not assign tasks or arbitrate between specialists (team-lead's domain)
-- Does not re-read running agents' scratchpads — relies on submissions
+- Does not re-read running agents' scratchpads -- relies on submissions
 ```
 
 ---
 
-## Change 4 — Scratchpad tags: add `[SUBMITTED]`
+## Change 4 -- Scratchpad tags: add `[SUBMITTED]`
 
 ### Before (in the "Team Memory" → "Personal Scratchpads" block)
 
@@ -143,12 +143,12 @@ Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA
 ```markdown
 Tags: `[DECISION]`, `[PATTERN]`, `[WIP]`, `[CHECKPOINT]`, `[DEFERRED]`, `[GOTCHA]`, `[LEARNED]`, `[SUBMITTED]`
 
-Use `[SUBMITTED]` to mark entries you have already sent to Eratosthenes via Protocol A — so you don't double-submit on a later session.
+Use `[SUBMITTED]` to mark entries you have already sent to Eratosthenes via Protocol A -- so you don't double-submit on a later session.
 ```
 
 ---
 
-## Change 5 — Quality Audits section: clarify Librarian is not an auditor
+## Change 5 -- Quality Audits section: clarify Librarian is not an auditor
 
 ### Before
 
@@ -165,17 +165,17 @@ Quality audits are performed by framework-research Medici remotely (not a member
 
 Quality audits are performed by framework-research Medici remotely (not a member of this team). Medici checks consistency between inventory data, analysis output, specs, and dashboard. Findings are reported to Schliemann via cross-team message.
 
-**Eratosthenes (our internal librarian) is NOT an auditor.** Eratosthenes curates the knowledge wiki — captures patterns, gotchas, decisions, contracts as they emerge. Quality judgement of work artifacts remains Medici's domain. If Eratosthenes spots a quality issue while curating, he flags it to Schliemann, not to the author directly.
+**Eratosthenes (our internal librarian) is NOT an auditor.** Eratosthenes curates the knowledge wiki -- captures patterns, gotchas, decisions, contracts as they emerge. Quality judgement of work artifacts remains Medici's domain. If Eratosthenes spots a quality issue while curating, he flags it to Schliemann, not to the author directly.
 ```
 
 ---
 
 ## Notes for reviewers
 
-- **Wiki subdirs are universal set only:** `patterns/`, `gotchas/`, `decisions/`, `contracts/`, `archive/`. Domain-specific subdirs (observations/, process/, findings/) are deferred — apex-research proposes their own after first use.
-- **Protocol A/B shapes match `prompts/eratosthenes.md` exactly** — verbose `## Knowledge Submission` / `## Knowledge Query` shapes, not the terser bracket-tag shapes I drafted initially. The verbose shapes carry fields that Eratosthenes's classification logic depends on (Scope, Urgency, Related, Confidence, Evidence) — sending the terse form would silently fail downstream classification. Field shape contract is enforced at the type level in `types/t09-protocols.ts` (framework-research) and must match across both copies.
+- **Wiki subdirs are universal set only:** `patterns/`, `gotchas/`, `decisions/`, `contracts/`, `archive/`. Domain-specific subdirs (observations/, process/, findings/) are deferred -- apex-research proposes their own after first use.
+- **Protocol A/B shapes match `prompts/eratosthenes.md` exactly** -- verbose `## Knowledge Submission` / `## Knowledge Query` shapes, not the terser bracket-tag shapes I drafted initially. The verbose shapes carry fields that Eratosthenes's classification logic depends on (Scope, Urgency, Related, Confidence, Evidence) -- sending the terse form would silently fail downstream classification. Field shape contract is enforced at the type level in `types/t09-protocols.ts` (framework-research) and must match across both copies.
 - **Double-routing warning is explicit** because this is the most common dual-hub mistake: agents send work-style status to the knowledge hub or submit patterns to the work hub.
-- **[SUBMITTED] tag** prevents re-submission loops across sessions — the scratchpad survives, so without the tag an agent might re-send the same pattern on next wake.
-- **The "What goes to Eratosthenes vs. team-lead" table is co-located in `prompts/eratosthenes.md` by design.** The same content lives in two places — common-prompt (which all 6 specialists read at startup) and Eratosthenes's prompt (which is loaded once into his system context and stays there). That's intentional reinforcement, not duplication: specialists never read Eratosthenes's prompt, and Eratosthenes won't re-read common-prompt every message. If the examples ever update, both copies must update together. Do NOT consolidate this on DRY grounds — both copies are load-bearing in different ways.
+- **[SUBMITTED] tag** prevents re-submission loops across sessions -- the scratchpad survives, so without the tag an agent might re-send the same pattern on next wake.
+- **The "What goes to Eratosthenes vs. team-lead" table is co-located in `prompts/eratosthenes.md` by design.** The same content lives in two places -- common-prompt (which all 6 specialists read at startup) and Eratosthenes's prompt (which is loaded once into his system context and stays there). That's intentional reinforcement, not duplication: specialists never read Eratosthenes's prompt, and Eratosthenes won't re-read common-prompt every message. If the examples ever update, both copies must update together. Do NOT consolidate this on DRY grounds -- both copies are load-bearing in different ways.
 
 (*FR:Brunel*)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# start-team.sh — One-shot startup for backlog-triage team
+# start-team.sh -- One-shot startup for backlog-triage team
 #
 # Usage: start-team.sh [tmux-session]
 #
@@ -10,7 +10,7 @@ set -euo pipefail
 #   - TeamCreate("backlog-triage") has already been called.
 #
 # This script:
-#   1. Creates pane layout if not already done (idempotent — skips if
+#   1. Creates pane layout if not already done (idempotent -- skips if
 #      /tmp/backlog-triage-panes.env already exists from .bashrc startup hook)
 #   2. Spawns all 3 specialist agents into their assigned panes
 #
@@ -18,7 +18,7 @@ set -euo pipefail
 # messages before assigning work.
 #
 # Agent assignment:
-#   Left column (30%)        : team-lead (YOU — already here, not spawned)
+#   Left column (30%)        : team-lead (YOU -- already here, not spawned)
 #   Right column top (33%)   : archivist (Hypatia)
 #   Right column mid  (33%)  : forensic  (Vidocq)
 #   Right column bot  (33%)  : consul    (Portia)
@@ -32,7 +32,7 @@ echo ""
 
 # Step 1: Create pane layout (skip if already done by .bashrc startup hook)
 if [ -f "$PANE_ENV" ]; then
-    echo "[start-team] Step 1/2: Pane layout already exists ($PANE_ENV) — skipping apply-layout.sh"
+    echo "[start-team] Step 1/2: Pane layout already exists ($PANE_ENV) -- skipping apply-layout.sh"
 else
     echo "[start-team] Step 1/2: Creating pane layout..."
     bash "$SCRIPT_DIR/apply-layout.sh" "$TMUX_SESSION"

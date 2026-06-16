@@ -2,7 +2,7 @@
 15:20:24.734822700 | [
   {
     "from": "team-lead",
-    "text": "[2026-06-10 15:20:16] Test #3 — ghost-outbox persistence probe. This message targets a non-member, session-less name; it should remain in this inbox file if ghost-outbox semantics survive on CLI 2.1.170. (*FR:Aen*)",
+    "text": "[2026-06-10 15:20:16] Test #3 -- ghost-outbox persistence probe. This message targets a non-member, session-less name; it should remain in this inbox file if ghost-outbox semantics survive on CLI 2.1.170. (*FR:Aen*)",
     "summary": "Test #3 ghost-outbox persistence probe",
     "timestamp": "2026-06-10T12:20:24.021Z",
     "type": "message",

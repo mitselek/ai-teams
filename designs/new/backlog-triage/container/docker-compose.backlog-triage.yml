@@ -1,6 +1,6 @@
 # docker-compose.backlog-triage.yml (*FR:Brunel*)
 #
-# backlog-triage team container — Jira/GitHub cross-reference agent team.
+# backlog-triage team container -- Jira/GitHub cross-reference agent team.
 #
 # This team reads code and talks to Jira. No Cloudflare, no Wrangler, no Dynamics.
 # Simpler than hr-devs: only SSH port, two named volumes, fewer env vars.
@@ -16,18 +16,18 @@
 #   $HOME:      /home/ai-teams/
 #   ~/.claude/: /home/ai-teams/.claude     → bt-claude-home (Claude state)
 #   Workspace:  /home/ai-teams/workspace   → bt-repo (named volume)
-#     ├── hr-platform/   — read target (Eesti-Raudtee/hr-platform)
-#     └── dev-toolkit/   — Jira MCP server source (Eesti-Raudtee/dev-toolkit)
+#     ├── hr-platform/   -- read target (Eesti-Raudtee/hr-platform)
+#     └── dev-toolkit/   -- Jira MCP server source (Eesti-Raudtee/dev-toolkit)
 #
-# Ports (network_mode: host — binds directly on host, no mapping):
-#   2226  — SSH (ai-teams user, pubkey auth, auto-tmux on login)
+# Ports (network_mode: host -- binds directly on host, no mapping):
+#   2226  -- SSH (ai-teams user, pubkey auth, auto-tmux on login)
 #
 # Port allocation on RC server (100.96.54.170):
-#   2222  — apex-research   (live)
-#   2223  — polyphony-dev   (live)
-#   2224  — entu-research   (live)
-#   2225  — hr-devs         (live)
-#   2226  — backlog-triage  (this file)
+#   2222  -- apex-research   (live)
+#   2223  -- polyphony-dev   (live)
+#   2224  -- entu-research   (live)
+#   2225  -- hr-devs         (live)
+#   2226  -- backlog-triage  (this file)
 #
 # Connect: ssh -i ~/.ssh/id_ed25519_backlog_triage -p 2226 ai-teams@100.96.54.170
 
@@ -37,7 +37,7 @@ services:
       context: .
       dockerfile: Dockerfile.backlog-triage
       # network: host required on WARP-protected hosts (RC server).
-      # Without this, Docker build runs on bridge network — not routed through WARP,
+      # Without this, Docker build runs on bridge network -- not routed through WARP,
       # so apt-get and curl downloads fail with TLS errors.
       network: host
     image: backlog-triage-claude:latest
@@ -53,7 +53,7 @@ services:
       - LANG=en_US.UTF-8
       - LC_ALL=en_US.UTF-8
 
-      # Repo URLs — override to point at a fork or mirror.
+      # Repo URLs -- override to point at a fork or mirror.
       - REPO_URL=${REPO_URL:-https://github.com/Eesti-Raudtee/hr-platform.git}
       - TOOLKIT_URL=${TOOLKIT_URL:-https://github.com/Eesti-Raudtee/dev-toolkit.git}
 
@@ -68,7 +68,7 @@ services:
       # Enables multi-agent team coordination (TeamCreate, SendMessage, etc.)
       - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
-      # Team identity — used in git commits and log attribution.
+      # Team identity -- used in git commits and log attribution.
       - TEAM_NAME=${TEAM_NAME:-backlog-triage}
       - GIT_USER_NAME=${GIT_USER_NAME:-backlog-triage}
       - GIT_USER_EMAIL=${GIT_USER_EMAIL:-mihkel.putrinsh@evr.ee}
@@ -78,7 +78,7 @@ services:
       - SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-}
       - SSH_PUBLIC_KEY_2=${SSH_PUBLIC_KEY_2:-}
 
-      # Atlassian — required for Jira MCP server.
+      # Atlassian -- required for Jira MCP server.
       # Used by entrypoint validation and written into mcp.json.
       - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-https://eestiraudtee.atlassian.net}
       - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL}
@@ -97,7 +97,7 @@ services:
       - https_proxy=${HTTPS_PROXY:-}
 
     volumes:
-      # Claude auto-memory, OAuth credentials, MCP config — isolated to backlog-triage.
+      # Claude auto-memory, OAuth credentials, MCP config -- isolated to backlog-triage.
       # Survives container restarts; wipe with: docker volume rm bt_bt-claude-home
       - bt-claude-home:/home/ai-teams/.claude
 
@@ -106,9 +106,9 @@ services:
       # Wipe to force re-clone: docker volume rm bt_bt-repo
       - bt-repo:/home/ai-teams/workspace
 
-      # WARP CA cert — bind-mount from host (read-only).
+      # WARP CA cert -- bind-mount from host (read-only).
       # Required: WARP intercepts HTTPS and re-signs with this corporate CA.
-      # Mount to /opt/ — NOT to /etc/ssl/certs/ (entrypoint copies it to the system store).
+      # Mount to /opt/ -- NOT to /etc/ssl/certs/ (entrypoint copies it to the system store).
       - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
 
     ports:

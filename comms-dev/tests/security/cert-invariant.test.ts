@@ -25,7 +25,7 @@ function makeMessage(overrides: Partial<Message['from']> = {}): Message {
   };
 }
 
-describe('validateSenderIdentity — from.team === peerCertCN invariant', () => {
+describe('validateSenderIdentity -- from.team === peerCertCN invariant', () => {
 
   // ── ACCEPT cases ──────────────────────────────────────────────────────────
 

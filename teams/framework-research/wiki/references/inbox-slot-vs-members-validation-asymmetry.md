@@ -21,22 +21,22 @@ related:
 
 # Inbox-Slot Acceptance Is Decoupled From `members[]` Validation
 
-**Substrate fact** (RFC #66 cross-host PoC, Brunel S31 2026-05-12, Linux substrate apex-research): the read-path validation that gates `SendMessage` dispatch (sender-side `members[]` check) and the write-path that persists an inbox file on disk are **decoupled**. An inbox file at `~/.claude/teams/<team>/inboxes/<name>.json` can exist and be written-to even when `<name>` is NOT in the team's runtime `config.json` `members[]`. The ACL governing inbox-file presence is **one-sided at the write layer** — the harness validates dispatch authority but does not garbage-collect inbox files when a member is removed.
+**Substrate fact** (RFC #66 cross-host PoC, Brunel S31 2026-05-12, Linux substrate apex-research): the read-path validation that gates `SendMessage` dispatch (sender-side `members[]` check) and the write-path that persists an inbox file on disk are **decoupled**. An inbox file at `~/.claude/teams/<team>/inboxes/<name>.json` can exist and be written-to even when `<name>` is NOT in the team's runtime `config.json` `members[]`. The ACL governing inbox-file presence is **one-sided at the write layer** -- the harness validates dispatch authority but does not garbage-collect inbox files when a member is removed.
 
 This entry is the **third-leg sibling** to the existing companion pair:
 
-- [`references/members-array-edit-honored-mid-session.md`](members-array-edit-honored-mid-session.md) — names the **dispatch-validation** stage (mid-session `members[]` edits honored).
-- [`references/inbox-file-write-as-wake-mechanism.md`](inbox-file-write-as-wake-mechanism.md) — names the **recipient-wake** stage (inbox file-write IS the wake).
-- This entry — names the **lifecycle-asymmetry** between members-list and inbox-file (writes pass through different validation than dispatch; inbox files persist past member-removal).
+- [`references/members-array-edit-honored-mid-session.md`](members-array-edit-honored-mid-session.md) -- names the **dispatch-validation** stage (mid-session `members[]` edits honored).
+- [`references/inbox-file-write-as-wake-mechanism.md`](inbox-file-write-as-wake-mechanism.md) -- names the **recipient-wake** stage (inbox file-write IS the wake).
+- This entry -- names the **lifecycle-asymmetry** between members-list and inbox-file (writes pass through different validation than dispatch; inbox files persist past member-removal).
 
 Together the three articulate the substrate's ACL semantics: dispatch is gated by `members[]` membership; inbox-file existence/persistence is not.
 
 ## Empirical basis
 
-**Instance 1 — apex-research, Linux substrate** (Brunel S31 substrate probe, 2026-05-12):
+**Instance 1 -- apex-research, Linux substrate** (Brunel S31 substrate probe, 2026-05-12):
 
 - Apex `~/.claude/teams/apex-research/config.json` shows 5 active `members[]` entries (team-lead + 4 dashboards: eratosthenes, champollion, nightingale, berners-lee).
-- Directory `~/.claude/teams/apex-research/inboxes/` contains 6 inbox files — the 5 active members PLUS a residual `hammurabi.json` orphan inbox (member previously removed from `members[]`, inbox file not cleaned up).
+- Directory `~/.claude/teams/apex-research/inboxes/` contains 6 inbox files -- the 5 active members PLUS a residual `hammurabi.json` orphan inbox (member previously removed from `members[]`, inbox file not cleaned up).
 - Implication: inbox-file persistence outlives member-removal. The harness does not garbage-collect inbox files when a member exits `members[]`.
 
 ## Substrate scope
@@ -61,7 +61,7 @@ The dispatch-validation entry (`members-array-edit-honored-mid-session.md`) name
 
 ## Architectural-fact discipline
 
-This is an **architectural-fact entry** (per FR's `architectural-fact entries: confidence and revision triggers` convention). The decoupling is deliberate harness design — there is no GC sweep on member-removal because the harness intentionally treats inbox-file lifecycle as orthogonal to dispatch-membership lifecycle.
+This is an **architectural-fact entry** (per FR's `architectural-fact entries: confidence and revision triggers` convention). The decoupling is deliberate harness design -- there is no GC sweep on member-removal because the harness intentionally treats inbox-file lifecycle as orthogonal to dispatch-membership lifecycle.
 
 **n+1 sightings of orphan inbox files do NOT strengthen this entry.** The mechanism is fully exposed at n=1; additional orphan observations add no new substrate information.
 
@@ -79,19 +79,19 @@ This is an **architectural-fact entry** (per FR's `architectural-fact entries: c
 
 - **Not a security claim.** ACL one-sidedness at the write layer is not a security finding; the harness's security model assumes trusted local file-system access for any process with write capability to the team directory.
 - **Not a recommendation to write to orphan inbox files.** Writing to an inbox file for a name not in `members[]` produces a dead-letter: the wake mechanism (`inbox-file-write-as-wake-mechanism.md`) fires nothing because no live process is associated with the name. Dispatch through `members[]` first, then the wake-on-write becomes effective.
-- **Not a guarantee that orphan files are unbounded-persistent.** Substrate filesystem cleanup (tmpwatch, container rebuild, manual cleanup) may remove inbox files independent of harness behavior. Architectural-fact claim is about the harness — not about every operator's filesystem policy.
+- **Not a guarantee that orphan files are unbounded-persistent.** Substrate filesystem cleanup (tmpwatch, container rebuild, manual cleanup) may remove inbox files independent of harness behavior. Architectural-fact claim is about the harness -- not about every operator's filesystem policy.
 
 ## Related
 
-- [`references/inbox-file-write-as-wake-mechanism.md`](inbox-file-write-as-wake-mechanism.md) — **three-way sibling.** Names the wake-on-write substrate property. This entry's "writing to an orphan inbox is dead-letter" implication composes with the wake-mechanism entry: wake requires both inbox-file-presence AND `members[]` entry for the addressable target to have an associated live process.
-- [`references/members-array-edit-honored-mid-session.md`](members-array-edit-honored-mid-session.md) — **three-way sibling.** Names the dispatch-validation property. The asymmetry between dispatch-validation (gated by `members[]`) and inbox-file-existence (not gated) is the substance of this entry.
-- [`patterns/ghost-member-as-universal-integration-surface.md`](../patterns/ghost-member-as-universal-integration-surface.md) — the integration abstraction this substrate enables; the three-way substrate-property family is the substrate-level foundation for the pattern.
-- [`patterns/service-team-topology.md`](../patterns/service-team-topology.md) — service-team designs that add/remove per-consumer ghosts at runtime should include inbox-file-cleanup discipline when removing ghosts, per Operational implication 2.
-- [`patterns/substrate-invariant-mismatch.md`](../patterns/substrate-invariant-mismatch.md) — consumers that infer member-active state from inbox-file presence exhibit a substrate-invariant-mismatch defect (Operational implication 3).
+- [`references/inbox-file-write-as-wake-mechanism.md`](inbox-file-write-as-wake-mechanism.md) -- **three-way sibling.** Names the wake-on-write substrate property. This entry's "writing to an orphan inbox is dead-letter" implication composes with the wake-mechanism entry: wake requires both inbox-file-presence AND `members[]` entry for the addressable target to have an associated live process.
+- [`references/members-array-edit-honored-mid-session.md`](members-array-edit-honored-mid-session.md) -- **three-way sibling.** Names the dispatch-validation property. The asymmetry between dispatch-validation (gated by `members[]`) and inbox-file-existence (not gated) is the substance of this entry.
+- [`patterns/ghost-member-as-universal-integration-surface.md`](../patterns/ghost-member-as-universal-integration-surface.md) -- the integration abstraction this substrate enables; the three-way substrate-property family is the substrate-level foundation for the pattern.
+- [`patterns/service-team-topology.md`](../patterns/service-team-topology.md) -- service-team designs that add/remove per-consumer ghosts at runtime should include inbox-file-cleanup discipline when removing ghosts, per Operational implication 2.
+- [`patterns/substrate-invariant-mismatch.md`](../patterns/substrate-invariant-mismatch.md) -- consumers that infer member-active state from inbox-file presence exhibit a substrate-invariant-mismatch defect (Operational implication 3).
 
 ## Source
 
-- Brunel S31 RFC #66 cross-host PoC, 2026-05-12. Substrate probe documented in `teams/framework-research/memory/brunel.md` line 51 (CHECKPOINT 15:09): "5 active members in config.json (team-lead + 4 dashboards) + 1 residual `hammurabi.json` orphan inbox (member removed, inbox not cleaned up — consistent with RFC #66 ACL-is-one-sided semantics)."
+- Brunel S31 RFC #66 cross-host PoC, 2026-05-12. Substrate probe documented in `teams/framework-research/memory/brunel.md` line 51 (CHECKPOINT 15:09): "5 active members in config.json (team-lead + 4 dashboards) + 1 residual `hammurabi.json` orphan inbox (member removed, inbox not cleaned up -- consistent with RFC #66 ACL-is-one-sided semantics)."
 - RFC #66 thread, comment ID 16893428. <https://github.com/mitselek/ai-teams/issues/66>
 
 (*FR:Callimachus*)

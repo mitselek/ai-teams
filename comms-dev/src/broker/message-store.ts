@@ -5,7 +5,7 @@
 //
 // Persistence (HUB-4): dedup set is flushed to disk every cleanup cycle (60s).
 // On restart, the file is loaded and stale entries discarded. This leaves a
-// ≤60s gap window on restart — acceptable for v1. File write is atomic (tmp+rename).
+// ≤60s gap window on restart -- acceptable for v1. File write is atomic (tmp+rename).
 
 import { writeFileSync, readFileSync, renameSync, existsSync } from 'node:fs';
 import type { Message } from '../types.js';
@@ -15,7 +15,7 @@ interface StoredMessage {
   receivedAt: number; // ms since epoch
 }
 
-/** Serialised form written to disk — minimal, just what we need for dedup */
+/** Serialised form written to disk -- minimal, just what we need for dedup */
 interface PersistedEntry {
   receivedAt: number;
 }
@@ -118,9 +118,9 @@ export class MessageStore {
       const data = JSON.parse(raw) as Record<string, PersistedEntry>;
       const cutoff = Date.now() - this.ttl;
       for (const [id, entry] of Object.entries(data)) {
-        // Discard entries older than TTL — they're outside the dedup window
+        // Discard entries older than TTL -- they're outside the dedup window
         if (entry.receivedAt >= cutoff) {
-          // Restore as a stub — we only need the ID and timestamp for dedup
+          // Restore as a stub -- we only need the ID and timestamp for dedup
           this.store.set(id, {
             message: {} as Message,
             receivedAt: entry.receivedAt,

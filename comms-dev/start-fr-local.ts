@@ -1,4 +1,4 @@
-// Local framework-research daemon — connects to hub via SSH tunnel
+// Local framework-research daemon -- connects to hub via SSH tunnel
 // (*FR:Brunel*)
 import { DaemonV2 } from "./src/broker/daemon-v2.js";
 import { join } from "node:path";

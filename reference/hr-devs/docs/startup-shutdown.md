@@ -4,7 +4,7 @@ description: Canonical source of truth for hr-devs team startup, spawn, and shut
 type: reference
 ---
 
-# hr-devs — Startup & Shutdown Procedures
+# hr-devs -- Startup & Shutdown Procedures
 
 **Team location:** `hr-platform/teams/hr-devs/`
 **Spawn script:** `hr-platform/teams/hr-devs/spawn_member.sh`
@@ -31,14 +31,14 @@ fi
 # 2. Kill zombie agent processes
 ~/cleanup-zombies.sh
 
-# 3. Remove stale team directory (required — otherwise TeamCreate generates random name)
+# 3. Remove stale team directory (required -- otherwise TeamCreate generates random name)
 rm -rf ~/.claude/teams/hr-devs
 ```
 
 Then call `TeamCreate(team_name="hr-devs")`.
 
 ```bash
-# 4. Restore inboxes (TeamCreate does NOT create inboxes/ — mkdir first)
+# 4. Restore inboxes (TeamCreate does NOT create inboxes/ -- mkdir first)
 if [ -d /tmp/hr-devs-inboxes-backup ]; then
   mkdir -p ~/.claude/teams/hr-devs/inboxes
   cp -r /tmp/hr-devs-inboxes-backup/* ~/.claude/teams/hr-devs/inboxes/
@@ -67,7 +67,7 @@ Use `spawn_member.sh` (NEVER Agent tool, NEVER raw CLI):
 
 ## Team Configurations
 
-### "full" — story work (full-tdd layout)
+### "full" -- story work (full-tdd layout)
 
 Agents: finn, marcus, tess, sven, dag
 
@@ -77,17 +77,17 @@ Agents: finn, marcus, tess, sven, dag
 3. **Tess + Sven** (parallel)
 4. **Dag** (if needed)
 
-### "full-review" — story work with AC verification
+### "full-review" -- story work with AC verification
 
 Agents: finn, marcus, arvo, tess, sven, dag
 
 **Spawn order:**
 1. **Finn** → wait for report → user confirmation
-2. **Marcus + Arvo** (parallel — code review + AC verification)
+2. **Marcus + Arvo** (parallel -- code review + AC verification)
 3. **Tess + Sven** (parallel)
 4. **Dag** (if needed)
 
-### "lite" — quick fix
+### "lite" -- quick fix
 
 Agents: finn, sven
 
@@ -97,9 +97,9 @@ Agents: finn, sven
 - Layout diagrams and split trees: [`docs/tmux-layouts.md`](tmux-layouts.md)
 - Spawn into pane: `spawn_member.sh --target-pane %XX <agent-name>`
 - `spawn_member.sh` reads roster automatically for model, color, session ID
-- Agent tool ignores roster models — ALWAYS use spawn_member.sh
-- Background spawn DOES NOT WORK — claude CLI requires TTY
-- NEVER spawn duplicates — check config.json first, use SendMessage for existing agents
+- Agent tool ignores roster models -- ALWAYS use spawn_member.sh
+- Background spawn DOES NOT WORK -- claude CLI requires TTY
+- NEVER spawn duplicates -- check config.json first, use SendMessage for existing agents
 
 ## Shutdown
 
@@ -108,10 +108,10 @@ Agents: finn, sven
 3. Wait for confirmation from each agent
 4. Save task list to `hr-platform/teams/hr-devs/memory/task-list-snapshot.md`
 5. Commit and push memory files
-6. Do NOT use TeamDelete — team directory stays for inbox restoration on next startup
+6. Do NOT use TeamDelete -- team directory stays for inbox restoration on next startup
 
 ### Learned gotchas
 
-- Panes close AUTOMATICALLY after shutdown_approved — do NOT call `tmux kill-pane` manually
+- Panes close AUTOMATICALLY after shutdown_approved -- do NOT call `tmux kill-pane` manually
 - Stale inbox messages (`read: true`) do NOT cause problems on re-spawn
 - Always show procedure and ask for confirmation BEFORE acting

@@ -13,12 +13,12 @@ tags: [federation, path-namespace, shared-store, knowledge-store, sovereignty, n
 
 ## TLDR
 
-When multiple teams share a central knowledge store, logical-path namespacing per team inside the shared store IS the federation contract — sufficient in operational practice without a formal cross-team API or replication protocol above it. It collapses "design federation across N team libraries" into "agree on a path convention."
+When multiple teams share a central knowledge store, logical-path namespacing per team inside the shared store IS the federation contract -- sufficient in operational practice without a formal cross-team API or replication protocol above it. It collapses "design federation across N team libraries" into "agree on a path convention."
 
 ## Key ideas
 
-- **The shape**: `Projects/<team>/*`, `Meetings/<team>/<date>`, `Context/<team>/*` — every team owns its `<team>` shard; cross-team queries are URL-shaped `logical_path` filters; convention does the work.
-- **It is NOT**: a federation layer over per-team substrates (one substrate, namespaced), not multi-tenant RLS (orthogonal — RLS protects access, path makes cross-team query intentional/discoverable), not a substitute for shard sovereignty (breach = governance violation, not merge conflict).
+- **The shape**: `Projects/<team>/*`, `Meetings/<team>/<date>`, `Context/<team>/*` -- every team owns its `<team>` shard; cross-team queries are URL-shaped `logical_path` filters; convention does the work.
+- **It is NOT**: a federation layer over per-team substrates (one substrate, namespaced), not multi-tenant RLS (orthogonal -- RLS protects access, path makes cross-team query intentional/discoverable), not a substitute for shard sovereignty (breach = governance violation, not merge conflict).
 - **Three conditions to apply**: central store exists/being built, cross-team query is a real use case, per-team write sovereignty is load-bearing.
 - **Does NOT apply**: hard-isolation requirements, substrate without path-as-first-class, per-team substrates required for compliance.
 - **Costs migrate** to the substrate (must be good) and the per-team-curator governance role; the federation-layer problem-class evaporates.

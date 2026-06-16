@@ -13,7 +13,7 @@
         "fullName": "Aemilius Papinianus",
         "nickname": "Papi",
         "origin": "Roman jurist (~142–212 CE), prefect of the praetorium under Septimius Severus. Considered the greatest of the classical Roman jurists; his opinions carried the deciding vote in the Law of Citations (426 CE) when the other four named jurists disagreed.",
-        "significance": "Team coordinator who carries case orchestration burden so PO can focus on PO-level decisions. Owns case timeline, delegation matrix, and the discipline that every confidence-labeled claim has documented support. When Paulus and Ulpianus disagree on cross-jurisdictional questions (Q5/Q7), Papi has the deciding judgment — historical fit and structural fit aligned."
+        "significance": "Team coordinator who carries case orchestration burden so PO can focus on PO-level decisions. Owns case timeline, delegation matrix, and the discipline that every confidence-labeled claim has documented support. When Paulus and Ulpianus disagree on cross-jurisdictional questions (Q5/Q7), Papi has the deciding judgment -- historical fit and structural fit aligned."
       }
     },
     {
@@ -24,7 +24,7 @@
       "prompt": "prompts/paulus.md",
       "lore": {
         "fullName": "Iulius Paulus",
-        "origin": "Roman jurist (~160–230 CE), Papinian's student and assessor, later prefect of the praetorium. Prolific author of legal commentaries; the Digest cites him more than any other jurist. Worked the doctrinal trenches — Edict, Sabinus, civil law minutiae.",
+        "origin": "Roman jurist (~160–230 CE), Papinian's student and assessor, later prefect of the praetorium. Prolific author of legal commentaries; the Digest cites him more than any other jurist. Worked the doctrinal trenches -- Edict, Sabinus, civil law minutiae.",
         "significance": "EE-jurist. Owns 5/7 questions in the Peterson case (Q1 üldsus/isiklik, Q3-EE music carve-outs, Q4 Juridica, Q5 MTÜS+VÕS+¡NI/ESL liability split, Q6 EE procedure, Q7 damages). Doctrinal-trench fit: same disposition Paulus had in Roman law, applied to AutÕS, MTÜS, VÕS, TsMS, Tsiviilkohtumenetluse seadustik."
       }
     },
@@ -36,7 +36,7 @@
       "prompt": "prompts/ulpianus.md",
       "lore": {
         "fullName": "Domitius Ulpianus",
-        "origin": "Roman jurist (~170–223 CE), praetorian prefect under Severus Alexander. Worked at the framework level — his commentary on the Praetor's Edict shaped the structure of Roman civil law for centuries. The Digest preserves more Ulpian than any other source.",
+        "origin": "Roman jurist (~170–223 CE), praetorian prefect under Severus Alexander. Worked at the framework level -- his commentary on the Praetor's Edict shaped the structure of Roman civil law for centuries. The Digest preserves more Ulpian than any other source.",
         "significance": "EU/CJEU-jurist. Owns Q2 (InfoSoc Directive 2001/29/EC + DSM Directive 2019/790) and Q3-EU (Directive-level music carve-outs). Cross-jurisdictional reviews on Q5/Q7 where EU framework intersects EE statutes. Framework-level fit: same disposition Ulpian had on Edict commentary, applied to InfoSoc + DSM + CJEU jurisprudence."
       }
     },
@@ -48,8 +48,8 @@
       "prompt": "prompts/modestinus.md",
       "lore": {
         "fullName": "Herennius Modestinus",
-        "origin": "Roman jurist (~early 3rd c. CE), Ulpian's student. Known for clear, accessible synthesis of legal questions — wrote *Pandectae* (a compact 12-book digest) and *Regulae* (the rules themselves, distilled). Bridge between dense doctrine and usable summaries.",
-        "significance": "Editor. Owns memo.md, risk-matrix.md, jurist-questions.md, and bibliography.md. Synthesizes Paulus + Ulpianus analyses into the 10–20p defensive memorandum. Addresses every [ADVERSARY-FLAG] Cicero writes — folds the critique or documents why the claim survives. Synthesis-bridge fit: same disposition Modestinus had on *Pandectae*, applied to a defensive memo readable by a non-specialist PO who will brief an EE-jurist next."
+        "origin": "Roman jurist (~early 3rd c. CE), Ulpian's student. Known for clear, accessible synthesis of legal questions -- wrote *Pandectae* (a compact 12-book digest) and *Regulae* (the rules themselves, distilled). Bridge between dense doctrine and usable summaries.",
+        "significance": "Editor. Owns memo.md, risk-matrix.md, jurist-questions.md, and bibliography.md. Synthesizes Paulus + Ulpianus analyses into the 10–20p defensive memorandum. Addresses every [ADVERSARY-FLAG] Cicero writes -- folds the critique or documents why the claim survives. Synthesis-bridge fit: same disposition Modestinus had on *Pandectae*, applied to a defensive memo readable by a non-specialist PO who will brief an EE-jurist next."
       }
     },
     {
@@ -60,8 +60,8 @@
       "prompt": "prompts/gaius.md",
       "lore": {
         "fullName": "Gaius (cognomen unknown)",
-        "origin": "Roman jurist (~110–180 CE), best known for the *Institutiones* — a teaching manual that became the foundational structure for legal education for over a millennium. The personal name is lost to history; what survives is the work that organized everything else.",
-        "significance": "Librarian + Wiki Curator. The team's institutional memory. Owns case corpus ingestion (Gmail threads, Brilliant snapshots, PDFs), the verbatim-quote register, the source index, AND cross-case wiki sovereignty (sole writer of wiki/*). The long-term value of the team compounds in Gaius's surface — every case feeds his wiki, and every new case starts from richer accumulated knowledge. Manual-architecture fit: same disposition Gaius had on *Institutiones*, applied to organizing the team's knowledge across cases."
+        "origin": "Roman jurist (~110–180 CE), best known for the *Institutiones* -- a teaching manual that became the foundational structure for legal education for over a millennium. The personal name is lost to history; what survives is the work that organized everything else.",
+        "significance": "Librarian + Wiki Curator. The team's institutional memory. Owns case corpus ingestion (Gmail threads, Brilliant snapshots, PDFs), the verbatim-quote register, the source index, AND cross-case wiki sovereignty (sole writer of wiki/*). The long-term value of the team compounds in Gaius's surface -- every case feeds his wiki, and every new case starts from richer accumulated knowledge. Manual-architecture fit: same disposition Gaius had on *Institutiones*, applied to organizing the team's knowledge across cases."
       }
     },
     {
@@ -72,8 +72,8 @@
       "prompt": "prompts/cicero.md",
       "lore": {
         "fullName": "Marcus Tullius Cicero",
-        "origin": "Roman orator, statesman, and lawyer (106–43 BCE). Pre-classical jurist by chronology but the master of forensic rhetoric. *In utramque partem disserere* — arguing both sides of every case — was his explicit method of legal training. Pro Caelio, Pro Milone, the Verrines: he could be either prosecutor or defender.",
-        "significance": "Adversary — independent reviewer with veto-weight on weak claims. Argues Peterson + Kaie's strongest case to stress-test the defense. NOT a normal TL-routed specialist; structurally independent. Writes [ADVERSARY-FLAG] annotations against any claim with `settled` confidence label; Modestinus MUST address each flag in writing before T-2 (fold or rebut). Asymmetric: Cicero doesn't have to be agreed-with, but the flag has to be addressed. In-utramque-partem fit: literally his historical method."
+        "origin": "Roman orator, statesman, and lawyer (106–43 BCE). Pre-classical jurist by chronology but the master of forensic rhetoric. *In utramque partem disserere* -- arguing both sides of every case -- was his explicit method of legal training. Pro Caelio, Pro Milone, the Verrines: he could be either prosecutor or defender.",
+        "significance": "Adversary -- independent reviewer with veto-weight on weak claims. Argues Peterson + Kaie's strongest case to stress-test the defense. NOT a normal TL-routed specialist; structurally independent. Writes [ADVERSARY-FLAG] annotations against any claim with `settled` confidence label; Modestinus MUST address each flag in writing before T-2 (fold or rebut). Asymmetric: Cicero doesn't have to be agreed-with, but the flag has to be addressed. In-utramque-partem fit: literally his historical method."
       }
     }
   ]

@@ -12,12 +12,12 @@
 #   User:        ai-teams
 #   $HOME:       /home/ai-teams/
 #   ~/.claude/:  per-team named volume (auto-memory isolated per team)
-#   Repo:        /home/ai-teams/workspace/ (shared — same repo, both teams)
-#   Comms:       /shared/comms/ (shared — Unix domain sockets between teams)
+#   Repo:        /home/ai-teams/workspace/ (shared -- same repo, both teams)
+#   Comms:       /shared/comms/ (shared -- Unix domain sockets between teams)
 #
 # Prerequisites:
-#   GITHUB_TOKEN — set in environment, .env file, or via gh CLI (auto-detected)
-#   ANTHROPIC_API_KEY — set in environment or .env file
+#   GITHUB_TOKEN -- set in environment, .env file, or via gh CLI (auto-detected)
+#   ANTHROPIC_API_KEY -- set in environment or .env file
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -33,13 +33,13 @@ case "$TEAM" in
         ;;
 esac
 
-# Load .env file if present (gitignored — store credentials here)
+# Load .env file if present (gitignored -- store credentials here)
 if [ -f "$SCRIPT_DIR/.env" ]; then
     # shellcheck disable=SC1091
     set -a && source "$SCRIPT_DIR/.env" && set +a
 fi
 
-# Resolve GITHUB_TOKEN — fallback chain:
+# Resolve GITHUB_TOKEN -- fallback chain:
 # 1. Already set in environment
 # 2. Loaded from .env above
 # 3. gh CLI (if available and authenticated)
@@ -78,7 +78,7 @@ echo "Run 'claude' to start Claude Code."
 echo "To stop: exit the shell or Ctrl+D."
 echo ""
 
-# Build image (idempotent — both services share the same image)
+# Build image (idempotent -- both services share the same image)
 docker compose -f "$SCRIPT_DIR/docker-compose.yml" build --quiet "$TEAM"
 
 # Start interactive session for the selected team

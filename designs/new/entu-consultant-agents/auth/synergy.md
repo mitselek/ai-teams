@@ -1,4 +1,4 @@
-# auth/identity — synergy edges
+# auth/identity -- synergy edges
 
 This agent carries only its own handoff edges; the union across all agents is the synergy map in architecture spec §5.
 
@@ -8,6 +8,6 @@ This agent carries only its own handoff edges; the union across all agents is th
 
 ## Shared cross-check step (all agents)
 
-Every claim this agent labels `backed` has passed the **shared docs + OpenAPI cross-check** before earning the label — the Finn-shaped verifier (a claim verified against both the documentation and the current OpenAPI spec). For auth this is especially load-bearing: the **JWT-lifetime claim is contradicted *inside* entu/api itself** (`routes/openapi.get.js` says 48h; `routes/auth/*` say 12h). That is two `contradicts`-stance evidence entries of comparable rung with no code value to settle them → the claim is `disputed`/`[GAP]` and escalates to Argo, never resolved by guessing. The cross-check is exactly what surfaces such disagreements.
+Every claim this agent labels `backed` has passed the **shared docs + OpenAPI cross-check** before earning the label -- the Finn-shaped verifier (a claim verified against both the documentation and the current OpenAPI spec). For auth this is especially load-bearing: the **JWT-lifetime claim is contradicted *inside* entu/api itself** (`routes/openapi.get.js` says 48h; `routes/auth/*` say 12h). That is two `contradicts`-stance evidence entries of comparable rung with no code value to settle them → the claim is `disputed`/`[GAP]` and escalates to Argo, never resolved by guessing. The cross-check is exactly what surfaces such disagreements.
 
 (*FR:Celes*)

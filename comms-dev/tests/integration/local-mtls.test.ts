@@ -2,13 +2,13 @@
 // Local two-daemon mTLS integration test.
 //
 // Local analogue of cross-container acceptance test matrix:
-//   TC-01 — daemon starts, registers, is reachable (proves listen/bind)
-//   TC-03 — comms-dev sends to framework-research, inbox file verified
-//   TC-04 — framework-research sends to comms-dev, inbox file verified
+//   TC-01 -- daemon starts, registers, is reachable (proves listen/bind)
+//   TC-03 -- comms-dev sends to framework-research, inbox file verified
+//   TC-04 -- framework-research sends to comms-dev, inbox file verified
 //
 // No Docker, no shared volume. Two DaemonV2 instances in-process, different
 // localhost ports, different team names, different mTLS keypairs.
-// Entry point: daemon.sendMessage() — direct mTLS/TCP path, no MCP layer.
+// Entry point: daemon.sendMessage() -- direct mTLS/TCP path, no MCP layer.
 //
 // Spec: #16 §5–§7, #18 Phase 3, cross-container-test-matrix.md TC-01/TC-03/TC-04
 
@@ -146,7 +146,7 @@ beforeAll(async () => {
     deadConnectionMs:    120_000,
   });
 
-  // Start both concurrently — tunnels establish in both directions
+  // Start both concurrently -- tunnels establish in both directions
   await Promise.all([cdDaemon.start(), frDaemon.start()]);
 
   // Allow mTLS tunnels to fully establish in both directions
@@ -163,7 +163,7 @@ afterAll(async () => {
 
 // ── TC-01 analogue: daemon ready ──────────────────────────────────────────────
 
-describe('Local mTLS — TC-01 analogue: daemon starts and is reachable', () => {
+describe('Local mTLS -- TC-01 analogue: daemon starts and is reachable', () => {
 
   it('comms-dev daemon is ready after start', () => {
     expect(cdDaemon.isReady()).toBe(true);
@@ -190,7 +190,7 @@ describe('Local mTLS — TC-01 analogue: daemon starts and is reachable', () => 
 
 // ── TC-03 analogue: comms-dev → framework-research ───────────────────────────
 
-describe('Local mTLS — TC-03 analogue: comms-dev → framework-research delivery', () => {
+describe('Local mTLS -- TC-03 analogue: comms-dev → framework-research delivery', () => {
 
   it('sendMessage returns OK', async () => {
     const msg: Message = {
@@ -254,7 +254,7 @@ describe('Local mTLS — TC-03 analogue: comms-dev → framework-research delive
 
 // ── TC-04 analogue: framework-research → comms-dev ───────────────────────────
 
-describe('Local mTLS — TC-04 analogue: framework-research → comms-dev delivery', () => {
+describe('Local mTLS -- TC-04 analogue: framework-research → comms-dev delivery', () => {
 
   it('sendMessage returns OK in reverse direction', async () => {
     const msg: Message = {

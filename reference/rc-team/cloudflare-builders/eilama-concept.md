@@ -1,4 +1,4 @@
-# Eilama — Ollama-Based Agent Concept
+# Eilama -- Ollama-Based Agent Concept
 
 (*RC-DEV:Marcus*)
 
@@ -10,7 +10,7 @@ precise English spec, it outputs TypeScript/SQL/Python boilerplate so Claude age
 their context budget for reasoning tasks.
 
 Eilama is **not** a Claude agent. It is a lightweight Python daemon that watches its inbox,
-calls the ollama REST API, and posts results back to the requester's inbox — behaving exactly
+calls the ollama REST API, and posts results back to the requester's inbox -- behaving exactly
 like any other team member from the outside.
 
 ---
@@ -41,7 +41,7 @@ Eilama handles work that is:
 
 | Task | Reason |
 |---|---|
-| Multi-file analysis | 4K context — can't hold more than ~1 file |
+| Multi-file analysis | 4K context -- can't hold more than ~1 file |
 | Architecture decisions | 13B reasoning depth insufficient |
 | Estonian language | Model has minimal Estonian training data |
 | Security review | Subtle logic errors missed by 13B |
@@ -52,14 +52,14 @@ Eilama handles work that is:
 ### Capacity note
 
 `codellama:13b-instruct` fits in ~8GB VRAM. The RTX 2000 Ada has 16GB, leaving headroom.
-Claude agents run via Anthropic API (cloud) — **no VRAM conflict** between Eilama and Claude
+Claude agents run via Anthropic API (cloud) -- **no VRAM conflict** between Eilama and Claude
 teammates. The "one model at a time" constraint only applies if a second ollama model is added.
 
 ---
 
 ## 3. Integration Recommendation
 
-### Chosen: Option B — Standalone inbox-polling daemon
+### Chosen: Option B -- Standalone inbox-polling daemon
 
 **Rationale over other options:**
 
@@ -172,7 +172,7 @@ constraints: use readonly fields, export named interface EmployeeRecord
 - Keep the entire message under **400 tokens**
 - One task per message (no compound requests)
 - Provide concrete examples (a JSON sample, a function signature, a table name)
-- Do NOT paste large files — paste only the relevant fragment
+- Do NOT paste large files -- paste only the relevant fragment
 
 ### Eilama's response format
 
@@ -192,7 +192,7 @@ Review before use.
 
 ```
 
-Eilama always ends with "Review before use." — a reminder that 13B output needs human check.
+Eilama always ends with "Review before use." -- a reminder that 13B output needs human check.
 
 ---
 

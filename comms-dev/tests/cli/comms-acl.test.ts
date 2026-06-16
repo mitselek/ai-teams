@@ -3,7 +3,7 @@
 // Spec: #17 §1
 //
 // comms-acl reads /run/secrets/comms/acl.json (overridable via COMMS_KEYS_DIR).
-// It is read-only — never writes. Supports JSON output (default) and human output.
+// It is read-only -- never writes. Supports JSON output (default) and human output.
 //
 // Commands under test (logic layer, not CLI binary):
 //   comms-acl list [--agent <name>]
@@ -59,9 +59,9 @@ afterAll(() => {
   rmSync(aclDir, { recursive: true, force: true });
 });
 
-// ── listAcl — no filter ────────────────────────────────────────────────────────
+// ── listAcl -- no filter ────────────────────────────────────────────────────────
 
-describe('listAcl — list all agents', () => {
+describe('listAcl -- list all agents', () => {
 
   it('returns all agents from acl.json', async () => {
     const result = await listAcl({ aclPath });
@@ -108,9 +108,9 @@ describe('listAcl — list all agents', () => {
   });
 });
 
-// ── listAcl — with --agent filter ────────────────────────────────────────────
+// ── listAcl -- with --agent filter ────────────────────────────────────────────
 
-describe('listAcl — filtered by agent', () => {
+describe('listAcl -- filtered by agent', () => {
 
   it('returns only the specified agent when --agent filter is set', async () => {
     const result = await listAcl({ aclPath, agentFilter: 'babbage' });
@@ -132,7 +132,7 @@ describe('listAcl — filtered by agent', () => {
 
 // ── checkAcl ──────────────────────────────────────────────────────────────────
 
-describe('checkAcl — dry-run ACL evaluation', () => {
+describe('checkAcl -- dry-run ACL evaluation', () => {
 
   it('returns allowed=true for permitted send (exact match)', async () => {
     const result = await checkAcl({
@@ -251,7 +251,7 @@ describe('checkAcl — dry-run ACL evaluation', () => {
 
 // ── showAgentAcl ──────────────────────────────────────────────────────────────
 
-describe('showAgentAcl — show one agent\'s full ACL entry', () => {
+describe('showAgentAcl -- show one agent\'s full ACL entry', () => {
 
   it('returns agent name, allowed_to, and allowed_from', async () => {
     const result = await showAgentAcl({ aclPath, agentName: 'babbage' });
@@ -306,7 +306,7 @@ describe('output shapes match spec #17', () => {
   });
 
   it('checkAcl output matches spec JSON shape (denied)', async () => {
-    // Spec: { "allowed": false } — no rule field when denied
+    // Spec: { "allowed": false } -- no rule field when denied
     const result = await checkAcl({
       aclPath,
       from: 'vigenere@comms-dev',

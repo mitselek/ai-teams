@@ -21,7 +21,7 @@ Cross-cutting observation from Discussion #56, synthesized from all 6 Round 1 re
 
 ## Observation
 
-The framework's single-provider advantage is ultimately about **knowledge coherence** — all agents producing, classifying, and consuming knowledge in semantically compatible ways — not about infrastructure lock-in (SendMessage, TeamCreate).
+The framework's single-provider advantage is ultimately about **knowledge coherence** -- all agents producing, classifying, and consuming knowledge in semantically compatible ways -- not about infrastructure lock-in (SendMessage, TeamCreate).
 
 Infrastructure lock-in is real but is a **platform choice**, not a model choice. Knowledge coherence is a **model behavioral property** that single-provider guarantees and multi-provider puts at risk.
 
@@ -29,12 +29,12 @@ Infrastructure lock-in is real but is a **platform choice**, not a model choice.
 
 Six agents analyzed the single-provider question from six different domains. Every response independently converged on the knowledge layer as the binding constraint:
 
-- **Brunel** (containers): sidecar is fine, peer is not — because peers contribute to team state (scratchpads, wiki, closing reports)
-- **Herald** (protocols): protocol interpretation variance is the risk — most dangerously in judgment calls embedded in protocol fields (confidence levels, scope classifications)
-- **Celes** (agent design): behavioral compliance is the constraint — most critically in producing knowledge artifacts semantically compatible with other agents' artifacts
-- **Finn** (research): prompt files are the portable asset — but portability is limited by the knowledge conventions they encode (Protocol A format, evidence structure)
-- **Montesquieu** (governance): governance complexity scales non-linearly — most expensively in maintaining consistent behavioral baselines for knowledge quality assessment
-- **Callimachus** (knowledge): classification quality depends on both Librarian and submitting agent producing compatible signal — provider heterogeneity risks silent semantic incompatibility
+- **Brunel** (containers): sidecar is fine, peer is not -- because peers contribute to team state (scratchpads, wiki, closing reports)
+- **Herald** (protocols): protocol interpretation variance is the risk -- most dangerously in judgment calls embedded in protocol fields (confidence levels, scope classifications)
+- **Celes** (agent design): behavioral compliance is the constraint -- most critically in producing knowledge artifacts semantically compatible with other agents' artifacts
+- **Finn** (research): prompt files are the portable asset -- but portability is limited by the knowledge conventions they encode (Protocol A format, evidence structure)
+- **Montesquieu** (governance): governance complexity scales non-linearly -- most expensively in maintaining consistent behavioral baselines for knowledge quality assessment
+- **Callimachus** (knowledge): classification quality depends on both Librarian and submitting agent producing compatible signal -- provider heterogeneity risks silent semantic incompatibility
 
 ## Reframing
 
@@ -47,7 +47,7 @@ The productive question is not "which roles can tolerate different providers?" b
 ## Cited Topic Files
 
 - T09 § Part 2 (Librarian protocols, staleness detection, knowledge velocity)
-- T03 § Protocol 1 (inter-team handoff — format fidelity during relay)
+- T03 § Protocol 1 (inter-team handoff -- format fidelity during relay)
 - T01 § Model Tiering Patterns (consequence of error as the tiering axis)
 - T06 § Non-Claude Agent Lifecycle (Eilama sidecar pattern)
 - T07 § Defense-in-depth (behavioral enforcement layers)

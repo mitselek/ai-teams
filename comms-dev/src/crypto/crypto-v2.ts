@@ -35,8 +35,8 @@ import type {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const ALGORITHM = 'aes-256-gcm' as const;
-const IV_LENGTH = 12;        // 96 bits — GCM standard nonce size
-const TAG_LENGTH = 16;       // 128 bits — full GCM tag
+const IV_LENGTH = 12;        // 96 bits -- GCM standard nonce size
+const TAG_LENGTH = 16;       // 128 bits -- full GCM tag
 const KEY_LENGTH = 32;       // 256 bits
 const HKDF_HASH = 'sha256';
 const CHECKSUM_PREFIX = 'sha256:';
@@ -172,11 +172,11 @@ export function createCryptoAPIv2(opts: CryptoAPIv2Options): CryptoAPIv2 {
   // If a real PSK is needed for v1 compat, the caller should create a v1 API separately.
   // Here we provide stub v1 methods that throw if called without setup.
   const v1Stub = {
-    encrypt: () => { throw new Error('v1 encrypt not available on CryptoAPIv2 — use e2eEncrypt for hub mode'); },
-    decrypt: () => { throw new Error('v1 decrypt not available on CryptoAPIv2 — use e2eDecrypt for hub mode'); },
+    encrypt: () => { throw new Error('v1 encrypt not available on CryptoAPIv2 -- use e2eEncrypt for hub mode'); },
+    decrypt: () => { throw new Error('v1 decrypt not available on CryptoAPIv2 -- use e2eDecrypt for hub mode'); },
     deriveKey: deriveKeyV1,
-    computeChecksum: () => { throw new Error('v1 computeChecksum not available on CryptoAPIv2 — provide a v1 PSK'); },
-    verifyIntegrity: () => { throw new Error('v1 verifyIntegrity not available on CryptoAPIv2 — provide a v1 PSK'); },
+    computeChecksum: () => { throw new Error('v1 computeChecksum not available on CryptoAPIv2 -- provide a v1 PSK'); },
+    verifyIntegrity: () => { throw new Error('v1 verifyIntegrity not available on CryptoAPIv2 -- provide a v1 PSK'); },
   };
 
   function derivePairwise(peerTeam: string): DerivedKeys {

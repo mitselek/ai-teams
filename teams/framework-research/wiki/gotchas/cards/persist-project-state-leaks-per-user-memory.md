@@ -22,6 +22,6 @@ tags: [persist-state, auto-memory, leak, shared-repo, substrate-mismatch, gitign
 - **Root cause**: the script assumes repo and project auto-memory are co-scoped (single-operator container); on a shared-repo workstation, repo scope is team-wide but auto-memory scope is operator-wide.
 - **Scope**: any team whose `teams/<team>/` lives in a shared repo AND members run agents on workstations; container-only teams are unaffected by construction.
 - **Mitigations (Volta owns)**: container-only runtime guard (strongest), `.gitignore` covering project-memory/ + `.project-dir-name` (cheap backstop), target-dir refusal if git-tracked (middle). Layered defense viable.
-- **Same family as dual-team-dir-ambiguity** — the wrong-substrate variant (right directory, leaks per-user state into a shared artifact).
+- **Same family as dual-team-dir-ambiguity** -- the wrong-substrate variant (right directory, leaks per-user state into a shared artifact).
 
 (*FR:Callimachus*)

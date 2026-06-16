@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// RED tests for daemon-v2 — the component that wires TlsServer, TunnelManager,
+// RED tests for daemon-v2 -- the component that wires TlsServer, TunnelManager,
 // AclManager, MessageStore, and InboxDelivery together.
 // Spec: #16 §5–§7, #18 Phase 3
 //
@@ -138,7 +138,7 @@ function makeFrOptions(port: number, overrides: Partial<DaemonV2Options> = {}): 
 
 // ── 1. Startup ────────────────────────────────────────────────────────────────
 
-describe('DaemonV2 — startup', () => {
+describe('DaemonV2 -- startup', () => {
 
   it('starts and reports ready', async () => {
     const daemon = new DaemonV2(makeCdOptions());
@@ -191,7 +191,7 @@ describe('DaemonV2 — startup', () => {
 
 // ── 2. Message delivery flow ──────────────────────────────────────────────────
 
-describe('DaemonV2 — message delivery (two daemons in-process)', () => {
+describe('DaemonV2 -- message delivery (two daemons in-process)', () => {
 
   let cdDaemon: DaemonV2;
   let frDaemon: DaemonV2;
@@ -248,7 +248,7 @@ describe('DaemonV2 — message delivery (two daemons in-process)', () => {
 
   it('delivers message in the reverse direction (FR→CD)', async () => {
     // FR daemon also connects back to CD
-    // We need FR to know CD's port — update FR daemon peers
+    // We need FR to know CD's port -- update FR daemon peers
     await frDaemon.stop();
     frDaemon = new DaemonV2({
       ...makeFrOptions(cdDaemon.port),
@@ -302,7 +302,7 @@ describe('DaemonV2 — message delivery (two daemons in-process)', () => {
 
 // ── 3. ACL enforcement ────────────────────────────────────────────────────────
 
-describe('DaemonV2 — ACL enforcement', () => {
+describe('DaemonV2 -- ACL enforcement', () => {
 
   let cdDaemon: DaemonV2;
   let frDaemon: DaemonV2;
@@ -330,7 +330,7 @@ describe('DaemonV2 — ACL enforcement', () => {
   });
 
   it('returns ACL_DENIED when sender is not in local allowed_to', async () => {
-    // vigenere is not in BASE_ACL.agents — default deny
+    // vigenere is not in BASE_ACL.agents -- default deny
     const msg = makeMsg('comms-dev', 'vigenere', 'framework-research', 'herald');
     const result = await cdDaemon.sendMessage(msg);
     expect(result).toBe('ACL_DENIED');
@@ -350,7 +350,7 @@ describe('DaemonV2 — ACL enforcement', () => {
     // Send kerckhoffs → herald: local allows, FR must check allowed_from for herald
     const msg = makeMsg('comms-dev', 'kerckhoffs', 'framework-research', 'herald');
     const result = await cdDaemon.sendMessage(msg);
-    // kerckhoffs is in herald.allowed_from per FR_ACL — this should succeed
+    // kerckhoffs is in herald.allowed_from per FR_ACL -- this should succeed
     expect(result).toBe('OK');
   });
 
@@ -368,7 +368,7 @@ describe('DaemonV2 — ACL enforcement', () => {
 
 // ── 4. SIGHUP ACL hot-reload ──────────────────────────────────────────────────
 
-describe('DaemonV2 — SIGHUP ACL hot-reload', () => {
+describe('DaemonV2 -- SIGHUP ACL hot-reload', () => {
 
   it('reloads ACL after SIGHUP and applies new rules', async () => {
     const hotReloadDir = join(tmpdir(), `kerckhoffs-daemon-sighup-${Date.now()}`);
@@ -453,7 +453,7 @@ describe('DaemonV2 — SIGHUP ACL hot-reload', () => {
 
 // ── 5. from.team === peerCertCN at daemon level ───────────────────────────────
 
-describe('DaemonV2 — from.team === peerCertCN enforcement', () => {
+describe('DaemonV2 -- from.team === peerCertCN enforcement', () => {
 
   let cdDaemon: DaemonV2;
   let frDaemon: DaemonV2;
@@ -482,10 +482,10 @@ describe('DaemonV2 — from.team === peerCertCN enforcement', () => {
 
   it('rejects inbound message where from.team does not match tunnel peer cert CN', async () => {
     // Forge: comms-dev tunnel sends a message claiming from.team = "entu-research"
-    // The receiving daemon (FR) must reject this — tunnel is comms-dev, envelope says entu-research
+    // The receiving daemon (FR) must reject this -- tunnel is comms-dev, envelope says entu-research
     const forgedMsg = makeMsg('entu-research', 'hacker', 'framework-research', 'herald');
 
-    // Use daemon's internal inject-for-test path — sends directly over tunnel bypassing local ACL
+    // Use daemon's internal inject-for-test path -- sends directly over tunnel bypassing local ACL
     // (tests the receiving daemon's invariant enforcement, not the sending daemon's ACL)
     const result = await cdDaemon.sendMessageRaw(forgedMsg);
     expect(result).toBe('FORGERY_REJECTED');
@@ -509,7 +509,7 @@ describe('DaemonV2 — from.team === peerCertCN enforcement', () => {
 
 // ── 6. Daemon state reporting ─────────────────────────────────────────────────
 
-describe('DaemonV2 — state reporting', () => {
+describe('DaemonV2 -- state reporting', () => {
 
   it('reports connected peers', async () => {
     const frDaemon = new DaemonV2(makeFrOptions(0));

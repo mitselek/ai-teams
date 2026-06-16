@@ -4,14 +4,14 @@ Where E2E encryption and signing calls go in the v3 hub and MCP server.
 
 ---
 
-## 1. Hub — `/api/send` route (server.ts:309-370)
+## 1. Hub -- `/api/send` route (server.ts:309-370)
 
 ### Current state
 
 The hub already has signature verification at line 324-329:
 
 ```typescript
-// Ed25519 signature verification — only when key is configured AND message carries sig + body_hash
+// Ed25519 signature verification -- only when key is configured AND message carries sig + body_hash
 const fromTeam = (msg.from as { team: string }).team;
 if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash) {
   const sigError = verifySignature(msg, fromTeam);
@@ -26,13 +26,13 @@ if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash) {
    - A replayed message with a tampered signature gets 403, not 409
    - Good ordering.
 
-2. **The body stays opaque.** The hub reads `msg.body` only as a required-field check (`!msg?.body` at line 313). It never parses, decrypts, or modifies the body. The body is forwarded as-is through `writeEvent()` (line 362) and `queue.push()` (line 367). **This is correct — do not change it.**
+2. **The body stays opaque.** The hub reads `msg.body` only as a required-field check (`!msg?.body` at line 313). It never parses, decrypts, or modifies the body. The body is forwarded as-is through `writeEvent()` (line 362) and `queue.push()` (line 367). **This is correct -- do not change it.**
 
 ### What needs attention
 
 **Issue 1: Signature verification is conditional on `signPubKeys` config.**
 
-Currently: `if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash)` — this means unsigned messages pass through silently when `signPubKeys` is configured but the sender isn't in it, or when the message lacks `signature`/`body_hash` fields.
+Currently: `if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash)` -- this means unsigned messages pass through silently when `signPubKeys` is configured but the sender isn't in it, or when the message lacks `signature`/`body_hash` fields.
 
 **Recommendation for Babbage:** Add a strict mode option. When E2E is required:
 
@@ -66,7 +66,7 @@ This prevents a registered peer from sending messages with a forged `from.team` 
 
 **Issue 3: body_hash verification at hub (defense-in-depth).**
 
-The hub CAN verify that `body_hash` matches `SHA-256(msg.body)` without decrypting anything — the body_hash is a hash of the encrypted body, not the plaintext. This catches accidental corruption before routing:
+The hub CAN verify that `body_hash` matches `SHA-256(msg.body)` without decrypting anything -- the body_hash is a hash of the encrypted body, not the plaintext. This catches accidental corruption before routing:
 
 ```typescript
 import { createHash } from 'node:crypto';
@@ -80,13 +80,13 @@ if (msg.body_hash !== expectedHash) {
 
 ---
 
-## 2. Hub — SSE delivery (server.ts:237-306)
+## 2. Hub -- SSE delivery (server.ts:237-306)
 
 ### What's correct
 
 The SSE path is already E2E-clean:
 
-- `writeEvent(stream, sseId, msg)` at line 362 sends the full message object via `JSON.stringify(msg)` — the encrypted body is base64 inside the JSON, forwarded opaquely.
+- `writeEvent(stream, sseId, msg)` at line 362 sends the full message object via `JSON.stringify(msg)` -- the encrypted body is base64 inside the JSON, forwarded opaquely.
 - Queue drain at line 294-298 does the same: `queue.drain(cn)` returns the stored JSON, which is written to the stream as-is.
 - The hub never inspects, modifies, or re-encrypts the body.
 
@@ -96,7 +96,7 @@ The SSE delivery path is correct for E2E. The body is opaque at every stage: POS
 
 ---
 
-## 3. MCP Server — Send Path
+## 3. MCP Server -- Send Path
 
 The MCP server is the spoke-side client. When a Claude Code agent calls `comms_send`, the MCP server must:
 
@@ -164,7 +164,7 @@ function onSSEMessage(event: MessageEvent): void {
   // 1. Verify Ed25519 signature
   if (!crypto.verifySignature(msg)) {
     console.error(`Signature verification failed for message ${msg.id}`);
-    return;  // Drop — tampered or forged
+    return;  // Drop -- tampered or forged
   }
 
   // 2. Parse E2E payload from body
@@ -179,7 +179,7 @@ function onSSEMessage(event: MessageEvent): void {
 }
 ```
 
-**Order matters:** Verify signature FIRST, then decrypt. If signature fails, don't waste cycles decrypting — and don't expose the decryption oracle to unsigned messages.
+**Order matters:** Verify signature FIRST, then decrypt. If signature fails, don't waste cycles decrypting -- and don't expose the decryption oracle to unsigned messages.
 
 ---
 
@@ -225,7 +225,7 @@ Returns decrypted, signature-verified messages only. Failed verification = silen
 | **Hub** `/api/send` | `verifySignature()` | Defense-in-depth: reject forged messages before routing |
 | **Hub** `/api/send` | `body_hash` check | Integrity: detect corruption before routing |
 | **Hub** `/api/send` | CN === `from.team` | Transport binding: prevent identity spoofing |
-| **Hub** SSE delivery | *(none)* | Body is opaque — hub never decrypts |
+| **Hub** SSE delivery | *(none)* | Body is opaque -- hub never decrypts |
 | **MCP** send path | `e2eEncrypt()` | Encrypt plaintext body for receiver |
 | **MCP** send path | `signEnvelope()` | Sign the envelope (with encrypted body) |
 | **MCP** receive path | `verifySignature()` | Authenticate sender before decryption |

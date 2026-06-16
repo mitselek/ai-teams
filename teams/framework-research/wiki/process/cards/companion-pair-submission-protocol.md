@@ -14,7 +14,7 @@ tags: [protocol, companion-pair, submission, cross-link, dedup, apex-research, n
 
 ## TLDR
 
-Some discoveries have two distinct views that belong as cross-linked-but-separate wiki entries — not one bundled entry, not a "see also" footnote. Companion-Pair submission pushes pair-recognition upstream to the submitter so curator decomposition isn't needed post-hoc. (Apex-research calls it "Protocol C"; within FR use the descriptive name — FR's Protocol C slot is taken by Knowledge Promotion.)
+Some discoveries have two distinct views that belong as cross-linked-but-separate wiki entries -- not one bundled entry, not a "see also" footnote. Companion-Pair submission pushes pair-recognition upstream to the submitter so curator decomposition isn't needed post-hoc. (Apex-research calls it "Protocol C"; within FR use the descriptive name -- FR's Protocol C slot is taken by Knowledge Promotion.)
 
 ## Key ideas
 

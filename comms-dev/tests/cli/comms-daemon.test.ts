@@ -3,9 +3,9 @@
 // Spec: #17 §2, #18 Phase 5.3
 //
 // comms-daemon connects to the running daemon via UDS and exposes:
-//   comms-daemon status     — is daemon alive, uptime, version
-//   comms-daemon reload     — trigger ACL hot-reload via daemon
-//   comms-daemon peers      — list connected peer teams + connection state
+//   comms-daemon status     -- is daemon alive, uptime, version
+//   comms-daemon reload     -- trigger ACL hot-reload via daemon
+//   comms-daemon peers      -- list connected peer teams + connection state
 //
 // Tests exercise the logic layer directly (not the CLI binary).
 // A real DaemonV2 is started in a temp dir for integration-level tests.
@@ -141,9 +141,9 @@ async function setupDaemons(): Promise<{
   return { cdDaemon, frDaemon, localSocketDir, cdInbox, frInbox, cleanup };
 }
 
-// ── daemonStatus — success path ───────────────────────────────────────────────
+// ── daemonStatus -- success path ───────────────────────────────────────────────
 
-describe('daemonStatus — daemon running', () => {
+describe('daemonStatus -- daemon running', () => {
 
   it('returns status: running when daemon is up', async () => {
     const { localSocketDir, cleanup } = await setupDaemons();
@@ -189,9 +189,9 @@ describe('daemonStatus — daemon running', () => {
 
 });
 
-// ── daemonStatus — no daemon ──────────────────────────────────────────────────
+// ── daemonStatus -- no daemon ──────────────────────────────────────────────────
 
-describe('daemonStatus — no daemon running', () => {
+describe('daemonStatus -- no daemon running', () => {
 
   it('throws DAEMON_NOT_RUNNING when socket does not exist', async () => {
     const emptyDir = join(tmpdir(), `kerckhoffs-empty-${Date.now()}`);
@@ -217,7 +217,7 @@ describe('daemonStatus — no daemon running', () => {
         const idx = openSockets.indexOf(socket);
         if (idx !== -1) openSockets.splice(idx, 1);
       });
-      // Intentionally never write — client must time out
+      // Intentionally never write -- client must time out
     });
     await new Promise<void>(resolve => hangServer.listen(sockPath, resolve));
     try {
@@ -233,9 +233,9 @@ describe('daemonStatus — no daemon running', () => {
 
 });
 
-// ── daemonReload — success path ───────────────────────────────────────────────
+// ── daemonReload -- success path ───────────────────────────────────────────────
 
-describe('daemonReload — daemon running', () => {
+describe('daemonReload -- daemon running', () => {
 
   it('returns success: true when reload is accepted', async () => {
     const { localSocketDir, cleanup } = await setupDaemons();
@@ -294,9 +294,9 @@ describe('daemonReload — daemon running', () => {
 
 });
 
-// ── daemonReload — no daemon ──────────────────────────────────────────────────
+// ── daemonReload -- no daemon ──────────────────────────────────────────────────
 
-describe('daemonReload — no daemon running', () => {
+describe('daemonReload -- no daemon running', () => {
 
   it('throws DAEMON_NOT_RUNNING when socket does not exist', async () => {
     const emptyDir = join(tmpdir(), `kerckhoffs-empty-reload-${Date.now()}`);
@@ -312,9 +312,9 @@ describe('daemonReload — no daemon running', () => {
 
 });
 
-// ── daemonPeers — success path ────────────────────────────────────────────────
+// ── daemonPeers -- success path ────────────────────────────────────────────────
 
-describe('daemonPeers — daemon running with connected peer', () => {
+describe('daemonPeers -- daemon running with connected peer', () => {
 
   it('returns array of peer entries', async () => {
     const { localSocketDir, cleanup } = await setupDaemons();
@@ -364,7 +364,7 @@ describe('daemonPeers — daemon running with connected peer', () => {
 
 });
 
-describe('daemonPeers — daemon running with no peers', () => {
+describe('daemonPeers -- daemon running with no peers', () => {
 
   it('returns empty peers array when no peers configured', async () => {
     const suffix    = Math.random().toString(36).slice(2);
@@ -394,7 +394,7 @@ describe('daemonPeers — daemon running with no peers', () => {
 
 });
 
-describe('daemonPeers — peer disconnected', () => {
+describe('daemonPeers -- peer disconnected', () => {
 
   it('shows status: disconnected for a peer that went down', async () => {
     const { cdDaemon, frDaemon, localSocketDir, cleanup } = await setupDaemons();
@@ -447,9 +447,9 @@ describe('daemonPeers — peer disconnected', () => {
 
 });
 
-// ── daemonPeers — no daemon ───────────────────────────────────────────────────
+// ── daemonPeers -- no daemon ───────────────────────────────────────────────────
 
-describe('daemonPeers — no daemon running', () => {
+describe('daemonPeers -- no daemon running', () => {
 
   it('throws DAEMON_NOT_RUNNING when socket does not exist', async () => {
     const emptyDir = join(tmpdir(), `kerckhoffs-empty-peers-${Date.now()}`);

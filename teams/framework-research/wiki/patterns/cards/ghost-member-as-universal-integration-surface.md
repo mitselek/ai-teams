@@ -20,8 +20,8 @@ A ghost member is a regular `members[]` entry whose backend is not a Claude agen
 
 - **Clean separation of interface (uniform SendMessage) from mechanism (pluggable transport via a `transport` field)**.
 - **Transport catalog** spans local-fs (~30 LOC existence proof) to e2e-encrypted-wss; `local-fs` is the trivial-case proof.
-- **Substrate requirement**: enabled by inbox-file-write-as-wake-mechanism — anything that produces/consumes inbox JSON becomes a teammate; a process-based wake would break the abstraction.
-- **Broader than inter-team messaging**: read-only subscriptions, webhook receivers, cross-LLM bridges, human-as-ghost (chat.py), library-query ghosts — all the same daemon infrastructure.
+- **Substrate requirement**: enabled by inbox-file-write-as-wake-mechanism -- anything that produces/consumes inbox JSON becomes a teammate; a process-based wake would break the abstraction.
+- **Broader than inter-team messaging**: read-only subscriptions, webhook receivers, cross-LLM bridges, human-as-ghost (chat.py), library-query ghosts -- all the same daemon infrastructure.
 - **Properties that follow**: per-pair policy negotiation, file-protocol bug-class structurally eliminated, trust escalation removed for web users, simplified testing, dynamic membership.
 - **Confidence high** (upgraded 2026-05-14): ghost-bridge v1 daemon (9c5bf83) + n=2 cross-substrate members[] mid-session-edit verification.
 - **Remaining promotion trigger**: a second team independently arriving at the abstraction without RFC #66 cross-pollination.

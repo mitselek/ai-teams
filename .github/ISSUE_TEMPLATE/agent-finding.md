@@ -1,6 +1,6 @@
 ---
 name: Agent finding / proposal
-about: Filed by an AI team agent — finding, enhancement proposal, or architectural observation
+about: Filed by an AI team agent -- finding, enhancement proposal, or architectural observation
 labels: ''
 assignees: ''
 ---
@@ -11,7 +11,7 @@ assignees: ''
 
 ## Evidence
 
-<!-- Sessions, commits, logs, error output. Be specific — session numbers, commit hashes, file paths. -->
+<!-- Sessions, commits, logs, error output. Be specific -- session numbers, commit hashes, file paths. -->
 
 ## Scope
 

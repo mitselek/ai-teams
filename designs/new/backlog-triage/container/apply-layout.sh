@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# apply-layout.sh — Create tmux pane structure for backlog-triage (*FR:Brunel*)
+# apply-layout.sh -- Create tmux pane structure for backlog-triage (*FR:Brunel*)
 #
 # Usage: apply-layout.sh [tmux-session]
 #
@@ -14,7 +14,7 @@ set -euo pipefail
 #   |            | consul     |
 #
 # Split tree:
-#   Window (%0) — initial pane becomes team-lead (left 30%)
+#   Window (%0) -- initial pane becomes team-lead (left 30%)
 #   └── split -h 70% → right_col
 #       ├── archivist (top third of right_col)
 #       ├── split -v → forensic (middle third)
@@ -27,7 +27,7 @@ set -euo pipefail
 #   PANE_CONSUL=%XX
 #
 # Safe to run from Claude's Bash tool or external SSH. Uses -l (absolute sizes)
-# not -p (percent) — tmux requires an attached client to resolve percentages,
+# not -p (percent) -- tmux requires an attached client to resolve percentages,
 # which fails from subprocesses (see runbook §17). Uses -d to keep focus on
 # team-lead's pane, and -P -F '#{pane_id}' to capture pane IDs reliably.
 
@@ -44,7 +44,7 @@ fi
 
 echo "[apply-layout] Creating pipeline layout for session: $TMUX_SESSION"
 
-# Get window dimensions — works without an attached client
+# Get window dimensions -- works without an attached client
 TOTAL_W=$(tmux display-message -t "$TMUX_SESSION" -p '#{window_width}')
 TOTAL_H=$(tmux display-message -t "$TMUX_SESSION" -p '#{window_height}')
 
@@ -52,11 +52,11 @@ TOTAL_H=$(tmux display-message -t "$TMUX_SESSION" -p '#{window_height}')
 PANE_LEAD=$(tmux list-panes -t "$TMUX_SESSION" -F '#{pane_id}' | head -1)
 echo "  team-lead  → $PANE_LEAD (window ${TOTAL_W}x${TOTAL_H})"
 
-# Step 2: Split right 70% — absolute column count, -d keeps focus on team-lead
+# Step 2: Split right 70% -- absolute column count, -d keeps focus on team-lead
 RIGHT_W=$((TOTAL_W * 70 / 100))
 PANE_ARCHIVIST=$(tmux split-window -t "$PANE_LEAD" -d -h -l $RIGHT_W -c "$WORK_DIR" -P -F '#{pane_id}' 'bash --norc -i')
 
-# Step 3: Split right column vertically — archivist takes top third, forensic middle, consul bottom.
+# Step 3: Split right column vertically -- archivist takes top third, forensic middle, consul bottom.
 # Split once to get forensic+consul block (bottom 2/3 → then split again).
 # Easier: split archivist pane in half to get forensic, then split forensic in half to get consul.
 # Each split divides the remaining space, so:
@@ -77,7 +77,7 @@ PANE_FORENSIC=$PANE_FORENSIC
 PANE_CONSUL=$PANE_CONSUL
 EOF
 
-# Label panes with agent names (runbook §19 — no -g, scoped to this session only)
+# Label panes with agent names (runbook §19 -- no -g, scoped to this session only)
 tmux select-pane -t "$PANE_LEAD"      -T "team-lead"
 tmux select-pane -t "$PANE_ARCHIVIST" -T "archivist"
 tmux select-pane -t "$PANE_FORENSIC"  -T "forensic"

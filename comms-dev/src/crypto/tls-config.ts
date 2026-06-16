@@ -82,7 +82,7 @@ export async function loadDaemonCrypto(
   try {
     peerFiles = readdirSync(opts.peersDir).filter((f) => f.endsWith('.crt'));
   } catch {
-    // peers dir doesn't exist or is empty — not fatal
+    // peers dir doesn't exist or is empty -- not fatal
     peerFiles = [];
   }
 
@@ -105,11 +105,11 @@ export async function loadDaemonCrypto(
       peerCerts.set(teamName, peerCertPem);
       peerFingerprints.set(teamName, cert.fingerprint256);
     } catch (err) {
-      // CN mismatch is fatal for that peer — rethrow
+      // CN mismatch is fatal for that peer -- rethrow
       if (err instanceof Error && /CN.*mismatch/i.test(err.message)) {
         throw err;
       }
-      // Invalid cert file — skip with warning
+      // Invalid cert file -- skip with warning
       console.warn(
         `[tls-config] Skipping invalid peer cert ${file}: ${(err as Error).message}`,
       );
@@ -165,7 +165,7 @@ export function validateSenderIdentity(
     };
   }
 
-  // Strict equality — case-sensitive, no normalization
+  // Strict equality -- case-sensitive, no normalization
   if (claimedTeam !== authenticatedTeam) {
     return {
       valid: false,

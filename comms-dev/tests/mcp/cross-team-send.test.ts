@@ -124,9 +124,9 @@ async function setupDaemons(): Promise<{ cdDaemon: DaemonV2; frDaemon: DaemonV2;
   return { cdDaemon, frDaemon, cleanup };
 }
 
-// ── CrossTeamSend — success path ──────────────────────────────────────────────
+// ── CrossTeamSend -- success path ──────────────────────────────────────────────
 
-describe('crossTeamSend — successful delivery', () => {
+describe('crossTeamSend -- successful delivery', () => {
 
   it('returns message_id and delivered_at on success', async () => {
     const { cdDaemon, frDaemon, cleanup } = await setupDaemons();
@@ -181,9 +181,9 @@ describe('crossTeamSend — successful delivery', () => {
   });
 });
 
-// ── CrossTeamSend — parameter validation ─────────────────────────────────────
+// ── CrossTeamSend -- parameter validation ─────────────────────────────────────
 
-describe('crossTeamSend — parameter validation', () => {
+describe('crossTeamSend -- parameter validation', () => {
 
   it('throws INVALID_ADDRESS for malformed to address (no @)', async () => {
     await expect(crossTeamSend(
@@ -220,7 +220,7 @@ describe('crossTeamSend — parameter validation', () => {
     )).rejects.toThrow();
   });
 
-  // Validation happens BEFORE daemon connection — no daemon needed
+  // Validation happens BEFORE daemon connection -- no daemon needed
   it('validates address before attempting daemon connection', async () => {
     // Use a socketDir where no daemon is running
     const emptySocketDir = join(tmpdir(), `kerckhoffs-empty-sockets-${Date.now()}`);
@@ -237,9 +237,9 @@ describe('crossTeamSend — parameter validation', () => {
   });
 });
 
-// ── CrossTeamSend — error codes ───────────────────────────────────────────────
+// ── CrossTeamSend -- error codes ───────────────────────────────────────────────
 
-describe('crossTeamSend — error codes from daemon', () => {
+describe('crossTeamSend -- error codes from daemon', () => {
 
   it('throws ACL_DENIED when local ACL blocks the send', async () => {
     const { cleanup } = await setupDaemons();
@@ -304,14 +304,14 @@ describe('crossTeamSend — error codes from daemon', () => {
     // Use a very short timeout
     await expect(crossTeamSend(
       { to: 'herald@framework-research', body: 'test', fromAgent: 'babbage' },
-      { socketDir, teamName: 'comms-dev', timeoutMs: 100 },  // 100ms — daemon not running
+      { socketDir, teamName: 'comms-dev', timeoutMs: 100 },  // 100ms -- daemon not running
     )).rejects.toMatchObject({ code: 'TIMEOUT' });
   });
 });
 
-// ── CrossTeamSend — optional parameters ──────────────────────────────────────
+// ── CrossTeamSend -- optional parameters ──────────────────────────────────────
 
-describe('crossTeamSend — optional parameters', () => {
+describe('crossTeamSend -- optional parameters', () => {
 
   it('accepts type parameter (defaults to query)', async () => {
     const { cleanup } = await setupDaemons();

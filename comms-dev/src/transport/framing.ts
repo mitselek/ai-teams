@@ -23,7 +23,7 @@ export function encodeFrame(message: unknown, maxSize = MAX_MESSAGE_SIZE): Buffe
 }
 
 /**
- * Stateful frame decoder — handles TCP-style stream fragmentation.
+ * Stateful frame decoder -- handles TCP-style stream fragmentation.
  *
  * Feed chunks of incoming data via `push()`. Each time a complete frame
  * is decoded, the `onMessage` callback is called with the parsed object.
@@ -54,7 +54,7 @@ export class FrameDecoder {
 
       if (payloadLength > this.maxSize) {
         // Spec: reject oversized messages. We can't recover the stream position
-        // reliably so we clear the buffer — connection will likely close.
+        // reliably so we clear the buffer -- connection will likely close.
         this.buffer = Buffer.alloc(0);
         throw new Error(
           `Incoming message too large: ${payloadLength} bytes exceeds limit of ${this.maxSize}`
@@ -62,7 +62,7 @@ export class FrameDecoder {
       }
 
       const totalLength = FRAME_HEADER_SIZE + payloadLength;
-      if (this.buffer.byteLength < totalLength) break; // incomplete frame — wait for more data
+      if (this.buffer.byteLength < totalLength) break; // incomplete frame -- wait for more data
 
       const payload = this.buffer.slice(FRAME_HEADER_SIZE, totalLength);
       this.buffer = this.buffer.slice(totalLength);
@@ -71,7 +71,7 @@ export class FrameDecoder {
       try {
         parsed = JSON.parse(payload.toString('utf8'));
       } catch (err) {
-        // Malformed JSON — log and skip this frame; stream is still recoverable
+        // Malformed JSON -- log and skip this frame; stream is still recoverable
         console.error('[framing] Failed to parse JSON frame:', err);
         continue;
       }

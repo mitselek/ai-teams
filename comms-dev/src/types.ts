@@ -28,10 +28,10 @@ export interface Message {
   priority: MessagePriority;
   reply_to: string | null;
   body: string;       // Markdown-formatted
-  checksum: string;   // "sha256:<hex>" — computed over all other fields
+  checksum: string;   // "sha256:<hex>" -- computed over all other fields
 }
 
-// Message without checksum — used when constructing before signing
+// Message without checksum -- used when constructing before signing
 export type MessageDraft = Omit<Message, 'checksum'>;
 
 // ACK message body content
@@ -47,7 +47,7 @@ export interface RegistryEntry {
   prefix: string;           // Team prefix (e.g. "FR", "CD")
   capabilities: string[];
   registered_at: string;    // ISO 8601
-  heartbeat: string;        // ISO 8601 — updated every 60s
+  heartbeat: string;        // ISO 8601 -- updated every 60s
 }
 
 // Full registry structure
@@ -66,7 +66,7 @@ export interface BrokerConfig {
   staleThreshold: number;     // ms, default 120_000
   maxMessageSize: number;     // bytes, default 1_048_576 (1MB)
   pskFile?: string;     // Path to PSK file (default: /run/secrets/comms-psk)
-  // Crypto is injected after PSK loading — absent means plaintext mode (dev only)
+  // Crypto is injected after PSK loading -- absent means plaintext mode (dev only)
   crypto?: CryptoProvider;
 }
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# apply-layout.sh — Create 7-pane tmux layout for screenwerk-dev
+# apply-layout.sh -- Create 7-pane tmux layout for screenwerk-dev
 #
 # Layout: 3 columns
-#   Left (20%):  Lumiere (team lead) — pane 0
+#   Left (20%):  Lumiere (team lead) -- pane 0
 #   Center (40%): Daguerre (top), Niepce (mid), Talbot (bottom)
 #   Right (40%):  Reynaud (top), Plateau (mid), Melies (bottom)
 #
@@ -22,13 +22,13 @@ fi
 W=$(tmux display -p '#{window_width}' 2>/dev/null || echo 220)
 H=$(tmux display -p '#{window_height}' 2>/dev/null || echo 55)
 
-# Create session with first pane (Lumiere — team lead)
+# Create session with first pane (Lumiere -- team lead)
 tmux -u new-session -d -s "$SESSION" -c "$WORK_DIR" -x "$W" -y "$H"
 
 # Split into 3 columns: left 20%, center 40%, right 40%
 # First split: left (20%) | right (80%)
 tmux split-window -t "$SESSION" -h -l "80%" -c "$WORK_DIR"
-# Split right into center (50%) | right (50%) — each is 40% of total
+# Split right into center (50%) | right (50%) -- each is 40% of total
 tmux split-window -t "$SESSION:.1" -h -l "50%" -c "$WORK_DIR"
 
 # Split center column into 3 rows

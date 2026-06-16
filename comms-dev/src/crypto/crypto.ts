@@ -23,8 +23,8 @@ import type {
 
 // Constants
 const ALGORITHM = 'aes-256-gcm' as const;
-const IV_LENGTH = 12;        // 96 bits — GCM standard nonce size
-const TAG_LENGTH = 16;       // 128 bits — full GCM tag
+const IV_LENGTH = 12;        // 96 bits -- GCM standard nonce size
+const TAG_LENGTH = 16;       // 128 bits -- full GCM tag
 const KEY_LENGTH = 32;       // 256 bits
 const HKDF_HASH = 'sha256';
 const HMAC_HASH = 'sha256';

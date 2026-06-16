@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # (*FR:Aen via coding-subagent*)
-"""ghost-bridge — team-lead-to-team-lead cross-host comms daemon (v2).
+"""ghost-bridge -- team-lead-to-team-lead cross-host comms daemon (v2).
 
 Generalizes the S31 ghost-chat PoC into a long-running daemon shape. Multi-pair
 support (v2): all pairs[] in config are polled each cycle. Outbound forwards
@@ -11,7 +11,7 @@ Primitives (APPEND_INBOX_SCRIPT, FETCH_AND_MARK_READ_SCRIPT, ssh_exec,
 load_ssh_config) are adapted from teams/framework-research/poc/ghost-member-cli/
 ghost-chat.py. SF-4 substrate-validated.
 
-Sketch grade — not production. Python 3.7+ stdlib only.
+Sketch grade -- not production. Python 3.7+ stdlib only.
 
 Usage:
     python ghost-bridge.py [--config ghost-bridge.config.json]
@@ -42,7 +42,7 @@ DEFAULT_WATCH_INTERVAL_S = 2.0
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_CONFIG_PATH = SCRIPT_DIR / "ghost-bridge.config.json"
 
-# Reconfigure stdio to UTF-8 (Python 3.7+) — same rationale as ghost-chat.py.
+# Reconfigure stdio to UTF-8 (Python 3.7+) -- same rationale as ghost-chat.py.
 for stream in (sys.stdout, sys.stderr):
     try:
         stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
@@ -205,7 +205,7 @@ def build_forward_envelope(orig: dict, rewrite_from_to: str) -> dict:
     """Build the forward envelope per SPEC § Sender-identity rewrite.
 
     Copies text/summary/timestamp verbatim; overrides `from`; sets read:false.
-    Does NOT include `color` (SF-3 contract — let recipient harness apply
+    Does NOT include `color` (SF-3 contract -- let recipient harness apply
     registered color).
     """
     return {
@@ -305,7 +305,7 @@ def poll_outbound(cfg: dict, ssh_cfg: dict, log: Logger, missing_logged: dict) -
                 f"outbound: forward FAILED rc={rc} stderr={stderr.strip()[:200]}; "
                 f"leaving read:false for retry"
             )
-            # Don't continue draining on failure — likely transport-wide;
+            # Don't continue draining on failure -- likely transport-wide;
             # try again next poll cycle.
             break
 
@@ -366,7 +366,7 @@ def poll_inbound(cfg: dict, ssh_cfg: dict, log: Logger, missing_logged: dict) ->
         except OSError as exc:
             log.error(
                 f"inbound: local write FAILED for {local_path}: {exc}; "
-                f"message LOST (apex flag already flipped — substrate invariant #4 break)"
+                f"message LOST (apex flag already flipped -- substrate invariant #4 break)"
             )
             # SPEC § Substrate invariants failure mode (4): "inbound message
             # dropped". Acknowledged.
@@ -427,7 +427,7 @@ class Daemon:
 
     def install_signal_handlers(self) -> None:
         def handler(signum, frame):
-            self.log.info(f"signal {signum} received — beginning graceful shutdown")
+            self.log.info(f"signal {signum} received -- beginning graceful shutdown")
             self._stop = True
 
         signal.signal(signal.SIGTERM, handler)
@@ -487,7 +487,7 @@ class Daemon:
 
         finally:
             self.log.info(
-                f"ghost-bridge stopping — cycles={cycle} forwarded={out_total} "
+                f"ghost-bridge stopping -- cycles={cycle} forwarded={out_total} "
                 f"received={in_total}"
             )
             self.remove_pid()
@@ -497,7 +497,7 @@ class Daemon:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="ghost-bridge — multi-pair cross-team comms daemon")
+    parser = argparse.ArgumentParser(description="ghost-bridge -- multi-pair cross-team comms daemon")
     parser.add_argument("--config", "-c", default=str(DEFAULT_CONFIG_PATH),
                         help="path to ghost-bridge.config.json")
     args = parser.parse_args()

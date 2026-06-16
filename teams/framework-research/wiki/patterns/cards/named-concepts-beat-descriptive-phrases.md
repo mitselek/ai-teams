@@ -18,7 +18,7 @@ When the same idea is referenced across multiple artifacts (prompts, wiki entrie
 ## Key ideas
 
 - **Three advantages of named concepts**: citable across artifacts without re-explaining, reusable without ambiguity (the name is the definition's handle), harder to misremember than multi-word prose.
-- **Naming signal**: you find yourself describing something with a multi-word phrase more than once across different contexts — that's the trigger to name it.
+- **Naming signal**: you find yourself describing something with a multi-word phrase more than once across different contexts -- that's the trigger to name it.
 - **Canonical example**: Cal's 5 named concepts in dual-team-dir-ambiguity (Repo team config dir, Runtime team dir, bare path, anchored path, path anchoring) replaced Celes's descriptive phrases; three artifacts aligned friction-free because the names were citable.
 
 (*FR:Callimachus*)

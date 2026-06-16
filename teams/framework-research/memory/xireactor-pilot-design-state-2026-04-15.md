@@ -28,17 +28,17 @@ Frozen record of the 2026-04-15 late-eve design pass that produced 4 docs:
 
 [DECISION] **Simultaneous-discovery protocol** (Monte §3.6). When both librarians independently discover the same cross-cutting pattern: (1) neither intra-tenant entry auto-promotes, (2) fresh `co-owned` entry filed in shared-write with both originals as sources, (3) Tier 3 routing + bootstrap-preamble cross-review with no proposer/reviewer power asymmetry, (4) both originals get `superseded-by` refs but NOT deleted, (5) **durable disagreement is a valid terminal state**. Filing-first has no advantage over filing-second.
 
-[DECISION] **Ownership-transfer ritual: 4-signature** (2 librarians + 2 team-leads countersign; xireactor operator — not a librarian — flips the field). Separation of decision from execution. PO appropriateness TBD at post-pilot review.
+[DECISION] **Ownership-transfer ritual: 4-signature** (2 librarians + 2 team-leads countersign; xireactor operator -- not a librarian -- flips the field). Separation of decision from execution. PO appropriateness TBD at post-pilot review.
 
 [DECISION] **Three-check authority-drift defense (layered):** (a) ownership-transfer ritual (deliberate grabs), (b) shared-read sunset review (accidental accumulation), (c) audit-independent tenant boundary report (structural blind spots, auditor is neither tenant). Multi-mode failure modes need multi-mechanism defenses.
 
-[DECISION] **Cross-review rides wiki #43 bootstrap-preamble channel.** Xireactor `session_init` surfaces pending cross-reviews to the OTHER tenant's librarian at their wake-time read. New payload class (governance, not continuity) on the same mechanism. Generalizes #43 from intra-team continuity to cross-tenant governance state. Validated in #43 amendment "Validation update — 2026-04-15 (Monte's governance pilot design)" — DESIGN-validated, not DEPLOYMENT-validated; upgrade when pilot ships cross-review items empirically.
+[DECISION] **Cross-review rides wiki #43 bootstrap-preamble channel.** Xireactor `session_init` surfaces pending cross-reviews to the OTHER tenant's librarian at their wake-time read. New payload class (governance, not continuity) on the same mechanism. Generalizes #43 from intra-team continuity to cross-tenant governance state. Validated in #43 amendment "Validation update -- 2026-04-15 (Monte's governance pilot design)" -- DESIGN-validated, not DEPLOYMENT-validated; upgrade when pilot ships cross-review items empirically.
 
 [DECISION] **Row-level-only topology (not schema-per-tenant).** Single instance, single DB, RLS via `app.org_id` with three-state ownership column. Monte §7.1.1 self-correction + Brunel §3.2 evidence layer converge independently. Schema-per-tenant rejected: upstream's 21 migrations assume single-schema; forking upstream to test upstream = category-invalid per §1.2.
 
-[DECISION] **Host placement: RC dev server 100.96.54.170, co-located with apex-research.** 3-service footprint ~500 MB baseline on RC (dropped from v0.2's 750 MB after stdio-only collapse). Port 8010 Tailscale-bound (NEVER 0.0.0.0) per host architecture doc. Deploy-day shift: actual port is 8000, not 8010 — updated in `mcp-client-snippets/` post-deploy.
+[DECISION] **Host placement: RC dev server 100.96.54.170, co-located with apex-research.** 3-service footprint ~500 MB baseline on RC (dropped from v0.2's 750 MB after stdio-only collapse). Port 8010 Tailscale-bound (NEVER 0.0.0.0) per host architecture doc. Deploy-day shift: actual port is 8000, not 8010 -- updated in `mcp-client-snippets/` post-deploy.
 
-[DECISION] **Stdio-only MCP transport** — upstream mcp HTTP+OAuth container NOT deployed. Consumers launch upstream `server.py` as stdio subprocess. Path back to HTTP+OAuth documented in Brunel v0.6.3 §3.4 (~1-2h operator work to re-enable).
+[DECISION] **Stdio-only MCP transport** -- upstream mcp HTTP+OAuth container NOT deployed. Consumers launch upstream `server.py` as stdio subprocess. Path back to HTTP+OAuth documented in Brunel v0.6.3 §3.4 (~1-2h operator work to re-enable).
 
 [DECISION] **Upstream discipline: pin `thejeremyhodge/xireactor-brilliant` at a tag.** Do NOT fork. Customization: compose override + bootstrap SQL for tenants + cloudflared ingress + .env template. Opposite of ruth-team (where we own the Dockerfile). If upstream refactors, we bump the tag.
 
@@ -66,18 +66,18 @@ Frozen record of the 2026-04-15 late-eve design pass that produced 4 docs:
 
 Cal drafted three prompt edits but did not apply (Scope Restriction: never edit agent prompts or roster.json):
 
-- §11.5.1 pre-classification zone check (between Protocol A numbered list and Dedup Protocol — zone determines which wiki surface dedup searches)
+- §11.5.1 pre-classification zone check (between Protocol A numbered list and Dedup Protocol -- zone determines which wiki surface dedup searches)
 - §11.5.2 bootstrap-path xireactor session_init read (AFTER scratchpad recency pass, fresh WIP context)
 - §11.5.3 parallel startup.md Step 5.5
 
-**Team-lead applies after PO confirms asymmetric-slice pilot shape.** Eratosthenes-side symmetric edits routed to Schliemann via tmux-direct — queued, STILL NOT FIRED per active NEXT-SESSION-CHORE in team-lead.md.
+**Team-lead applies after PO confirms asymmetric-slice pilot shape.** Eratosthenes-side symmetric edits routed to Schliemann via tmux-direct -- queued, STILL NOT FIRED per active NEXT-SESSION-CHORE in team-lead.md.
 
 Include 2 Monte pattern candidates for Eratosthenes wiki routing (multi-mode-defenses + bootstrap-preamble-as-cross-tenant-channel).
 
-## Herald Q1/Q2 preconditions — outcome (c)/(c)
+## Herald Q1/Q2 preconditions -- outcome (c)/(c)
 
-- **Q1 per-zone staging enablement: outcome (c).** Finn's digest silent on whether tier-assignment routes on `owned_by` or equivalent. Herald v1.1's "SOFT config only via indirect `(source, role)` encoding" was plausible extrapolation, not digest fact. Line 35 lists tier-assignment inputs as `(change_type, sensitivity, source, role)` — zone/tenant/org_id NOT named. Resolves only via source-code walkthrough of xireactor v0.2.0 — target files `api/services/staging.py` + `api/routers/session_init.py` (or equivalents once mapped).
-- **Q2 tenant-scoped session_init: outcome (c), HIGHEST-CONSEQUENCE.** Silent cross-tenant leak breaks wiki #43 bootstrap-preamble channel INVISIBLY (both librarians still see preambles; content is subtly wrong — exact failure mode #43 names). Line 27 (pending Tier 3+ items surface in session_init) doesn't say whether tenant-scoped. Line 29 (`SET LOCAL app.user_id/org_id/role/department per transaction`) establishes per-tenant transaction context exists but doesn't say session_init queries run inside that context. Same walkthrough resolves.
+- **Q1 per-zone staging enablement: outcome (c).** Finn's digest silent on whether tier-assignment routes on `owned_by` or equivalent. Herald v1.1's "SOFT config only via indirect `(source, role)` encoding" was plausible extrapolation, not digest fact. Line 35 lists tier-assignment inputs as `(change_type, sensitivity, source, role)` -- zone/tenant/org_id NOT named. Resolves only via source-code walkthrough of xireactor v0.2.0 -- target files `api/services/staging.py` + `api/routers/session_init.py` (or equivalents once mapped).
+- **Q2 tenant-scoped session_init: outcome (c), HIGHEST-CONSEQUENCE.** Silent cross-tenant leak breaks wiki #43 bootstrap-preamble channel INVISIBLY (both librarians still see preambles; content is subtly wrong -- exact failure mode #43 names). Line 27 (pending Tier 3+ items surface in session_init) doesn't say whether tenant-scoped. Line 29 (`SET LOCAL app.user_id/org_id/role/department per transaction`) establishes per-tenant transaction context exists but doesn't say session_init queries run inside that context. Same walkthrough resolves.
 - **Q3 ownership-transfer wire format: DELIVERABLE confirmed.** Zero code change; comment_type tag convention, 4 typed interfaces as conventions on xireactor's existing comments table. Herald v1.1 Flow C implemented this.
 
 Three possible outcomes per Herald §7: (a) both capabilities exist → pilot proceeds; (b) one/both need xireactor enhancements → PILOT HALTS pending PO cost decision on upstream contribution investment; (c) deeper investigation needed (recursive).
@@ -86,36 +86,36 @@ Three possible outcomes per Herald §7: (a) both capabilities exist → pilot pr
 
 Monte v3 §7.2 classification still based on retracted evidence (Herald self-retracted SOFT/MEDIUM labels in v1.2), needs future-session rework.
 
-## §10 asymmetric-Tier-3 trajectory — seven-step oscillation (canonical #44 example)
+## §10 asymmetric-Tier-3 trajectory -- seven-step oscillation (canonical #44 example)
 
 §10 revision history (7 steps):
 
 1. **v0.1 phantom:** flip Tier 3 flag under Monte's default → nothing fires on intra-tenant writes either way → nothing to compare
 2. **v0.3 self-rejection** by Brunel (correct self-catch)
 3. **v0.4 novel proposal:** deliberately route apex intra-writes through staging (AGAINST Monte §3.2.1 default) → Tier 3 actually fires on apex intra-writes → genuine comparison surface
-4. **v0.5 overbroad withdrawal** citing §1.2 upstream-discipline violation (correct outcome, wrong reason — applied only to option (a) schema-column addition, not to option (c) application-layer short-circuit)
+4. **v0.5 overbroad withdrawal** citing §1.2 upstream-discipline violation (correct outcome, wrong reason -- applied only to option (a) schema-column addition, not to option (c) application-layer short-circuit)
 5. **v0.6.1 PROPOSED restoration** per team-lead 19:51 narrow-retraction clarification (wrong outcome, good intent)
-6. **v0.6.2 over-withdrawal** on option-(a)-only §1.2 grounds (Brunel substrate-specialist authority: ALL three options — including (c) — require schema access to read per-tenant policy)
+6. **v0.6.2 over-withdrawal** on option-(a)-only §1.2 grounds (Brunel substrate-specialist authority: ALL three options -- including (c) -- require schema access to read per-tenant policy)
 7. **v0.6.3 re-restoration** as PROPOSED with option (c) explicitly named as §1.2-compliant
 
 **User's decisive correction:** *"the oscillation between you two was self-inflicted and you ran in circles, Brunel had couple of your self-corrections all the time enqueued and he again self-corrected against your self-corrections. so actually we don't have a clue about which result is correct."*
 
-The honest state: 7 revisions traded framings without either specialist doing the empirical check — *"does option (c) application-layer pre-filter actually require adding a column to xireactor's schema?"* Neither Brunel nor team-lead read xireactor's source. Whatever version is currently in the doc (v0.6.3 PROPOSED) is the latest point in a speculative oscillation, not a resolved landing.
+The honest state: 7 revisions traded framings without either specialist doing the empirical check -- *"does option (c) application-layer pre-filter actually require adding a column to xireactor's schema?"* Neither Brunel nor team-lead read xireactor's source. Whatever version is currently in the doc (v0.6.3 PROPOSED) is the latest point in a speculative oscillation, not a resolved landing.
 
-**§10 §1.2-compliance is itself outcome (c)** — same class as Herald Q1/Q2. Next-session Finn survey scope extended: *"where does xireactor store per-tenant policy, and would adding a per-tenant `staging_policy` flag require a schema change or can it be expressed via existing fields?"*
+**§10 §1.2-compliance is itself outcome (c)** -- same class as Herald Q1/Q2. Next-session Finn survey scope extended: *"where does xireactor store per-tenant policy, and would adding a per-tenant `staging_policy` flag require a schema change or can it be expressed via existing fields?"*
 
 **Gates on §10 adoption (IF walkthrough resolves compliance favorably):**
 
 1. **Apex consent required.** Eratosthenes + Schliemann must opt in; apex is pilot tenant not test subject. §10 forces apex into a governance mode Cal's verdict has argued is a downgrade for librarian-equipped teams. Route: tmux-direct to Schliemann with the §10 proposal IF PO approves.
 2. **PO approval required.** §10 adds a SECOND pilot thesis ("which governance mode fits what team") on top of the first ("does cross-tenant-slice work for librarian-equipped teams"). PO has not seen pilot #2.
 
-**Default if §10 rejected:** pilot runs Monte §3.2.1 symmetric shape — both tenants bypass staging on intra-tenant writes, cross-tenant writes through staging. This is the shape Cal's verdict and Monte §7.5 convergence already support.
+**Default if §10 rejected:** pilot runs Monte §3.2.1 symmetric shape -- both tenants bypass staging on intra-tenant writes, cross-tenant writes through staging. This is the shape Cal's verdict and Monte §7.5 convergence already support.
 
-**Brunel v0.4 §10.3 risks (preserved regardless of outcome):** 3 confounds named honestly — (1) baseline asymmetry, (2) reviewer-model dominates signal (Tier 3 AI = sonnet-4-6), (3) short window for rare-event detection. Signal is compound, not clean.
+**Brunel v0.4 §10.3 risks (preserved regardless of outcome):** 3 confounds named honestly -- (1) baseline asymmetry, (2) reviewer-model dominates signal (Tier 3 AI = sonnet-4-6), (3) short window for rare-event detection. Signal is compound, not clean.
 
 ## Convergence as first-class section (Monte v5 §7.5)
 
-*"The convergence is itself evidence."* Three specialists (Brunel/substrate, Monte/governance, Cal/discipline) independently reached the asymmetric-cross-tenant-only shape from orthogonal starting questions. *"This convergence was not designed"* — the three questions were structurally independent, which is why the convergence is load-bearing rather than just consistent.
+*"The convergence is itself evidence."* Three specialists (Brunel/substrate, Monte/governance, Cal/discipline) independently reached the asymmetric-cross-tenant-only shape from orthogonal starting questions. *"This convergence was not designed"* -- the three questions were structurally independent, which is why the convergence is load-bearing rather than just consistent.
 
 PO-brief lead framing: *"all three architects agree that the full-adoption framing is worse than the asymmetric framing, and they agree for independent reasons."*
 
@@ -124,7 +124,7 @@ Framework-research meta-finding: independent convergence from orthogonal startin
 ## Monte v4 §0.1 three framing principles (non-negotiable in doc scope)
 
 1. **Isolation is the default, not sharing.**
-2. **The `owned_by` invariant** — never auto-flips.
+2. **The `owned_by` invariant** -- never auto-flips.
 3. **Durable disagreement is a valid terminal state; forced consensus is a failure mode.**
 
 *"The three principles are not negotiated in this document. If the PO or a stakeholder wants to reject any of them, that rejection propagates to mechanism-level rework throughout the pilot."*
@@ -134,11 +134,11 @@ Framework-research meta-finding: independent convergence from orthogonal startin
 - No auto-promote on cross-reference threshold
 - No auto-promote on read-count threshold
 
-These are the exact "optimization" surfaces an engineer would reach for first — both would be `owned_by` invariant violations dressed up as features. Named explicitly to close drift paths before someone implements them.
+These are the exact "optimization" surfaces an engineer would reach for first -- both would be `owned_by` invariant violations dressed up as features. Named explicitly to close drift paths before someone implements them.
 
 ## Cal §6.5 empowerment claim (verbatim)
 
-*"NO per-tenant substrate change — FR's 43 entries stay where they are. Asymmetric adoption ADDS a capability without SUBTRACTING any existing one. This is the core empowerment claim."*
+*"NO per-tenant substrate change -- FR's 43 entries stay where they are. Asymmetric adoption ADDS a capability without SUBTRACTING any existing one. This is the core empowerment claim."*
 
 Structural shape: capability added, nothing subtracted, discipline layer preserved. Flow A's unchanged `KnowledgeSubmission` is the technical incarnation.
 
@@ -154,13 +154,13 @@ Cal §7.3: **ownership field is orthogonal to scope field.** scope = who within 
 
 *"Filesystem affordances (grep, git blame, dir-as-contract, hand-authored cross-ref prose) are load-bearing for librarian discipline; free enforcement → prompt enforcement is a regression even when prompt enforcement works."*
 
-Per-primitive fate table (Cal v2 §1.1.1): four enforcement primitives (`ttl`, `revisit-by`, `confidence`, `status='disputed'`) each degrade to prompt-enforcement on JSONB substrate. "At n=4 primitives the regression is a quadruple hit, not a single one." **BUT — none of this matters for the asymmetric pilot because FR's 43 entries stay in markdown.**
+Per-primitive fate table (Cal v2 §1.1.1): four enforcement primitives (`ttl`, `revisit-by`, `confidence`, `status='disputed'`) each degrade to prompt-enforcement on JSONB substrate. "At n=4 primitives the regression is a quadruple hit, not a single one." **BUT -- none of this matters for the asymmetric pilot because FR's 43 entries stay in markdown.**
 
 ## Open design questions (carried forward)
 
-**[OPEN] Cross-tenant URGENT-KNOWLEDGE routing authority.** Monte §2.2 gives Cal read-only to apex shared zones. URGENT-KNOWLEDGE is a routing authority (Protocol C payload class). For pilot v1, Herald default: "goes through team-leads as human escalation, not through librarians." Conservative but ugly. Needs follow-up authority-model doc — its own Monte/Herald pass.
+**[OPEN] Cross-tenant URGENT-KNOWLEDGE routing authority.** Monte §2.2 gives Cal read-only to apex shared zones. URGENT-KNOWLEDGE is a routing authority (Protocol C payload class). For pilot v1, Herald default: "goes through team-leads as human escalation, not through librarians." Conservative but ugly. Needs follow-up authority-model doc -- its own Monte/Herald pass.
 
-**[OPEN] MCP tool availability fallback.** Cal §7.3: when cross-tenant submission fails because MCP tool unavailable, does submission fail closed (clear error) or silently route to authoring tenant (capability preserved, intent lost)? Team-lead + Herald + Cal converged on fail-closed — same shape as URGENT-KNOWLEDGE, matches wiki #42 confidence-floor discipline.
+**[OPEN] MCP tool availability fallback.** Cal §7.3: when cross-tenant submission fails because MCP tool unavailable, does submission fail closed (clear error) or silently route to authoring tenant (capability preserved, intent lost)? Team-lead + Herald + Cal converged on fail-closed -- same shape as URGENT-KNOWLEDGE, matches wiki #42 confidence-floor discipline.
 
 **[OPEN] §9.2 design probes** (deferred to next-session design work):
 
@@ -182,7 +182,7 @@ All stay at n=1, held per Cal's own discipline (n=2 threshold). In Cal's queue:
 - Brunel §1.2 upstream-discipline + two-layer regression defense (n=1, watch for second instance; "piloting a different artifact than the one under evaluation is category-invalid")
 - Degradation-protocols-strictly-weaker (Monte §9.2.2)
 - "Ladder vs answer" scoped to scaffolding-proposals
-- Specialist-authority norm (reject-team-lead-suggestions-with-stated-reason) — candidate for common-prompt amendment, need n=2
+- Specialist-authority norm (reject-team-lead-suggestions-with-stated-reason) -- candidate for common-prompt amendment, need n=2
 
 ## Specialist gate-2-on-self instances (team-health signal)
 

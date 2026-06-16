@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// Broker component tests — message builder, message store (dedup), inbox delivery.
+// Broker component tests -- message builder, message store (dedup), inbox delivery.
 // Tests individual broker modules that don't require a running daemon.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -102,7 +102,7 @@ describe('computeChecksum', () => {
   });
 
   it('buildMessage checksum is verified by server validateMessage logic (stableStringify)', async () => {
-    // Both buildMessage and server now use stableStringify — they should agree.
+    // Both buildMessage and server now use stableStringify -- they should agree.
     const { createHash } = await import('node:crypto');
     const msg = buildMessage({ from: FROM, to: TO, type: 'query', body: 'integration check' });
     const { checksum, ...rest } = msg;
@@ -117,7 +117,7 @@ describe('computeChecksum', () => {
 // HMAC-SHA256 checksum (production mode)
 // ---------------------------------------------------------------------------
 
-describe('computeChecksum — HMAC mode (integrityKey provided)', () => {
+describe('computeChecksum -- HMAC mode (integrityKey provided)', () => {
   it('returns HMAC-SHA256 format (sha256:<hex>) when integrityKey provided', () => {
     const draft = { version: '1' as const, id: 'msg-x', timestamp: 'ts',
       from: FROM, to: TO, type: 'query' as const, priority: 'normal' as const,
@@ -169,10 +169,10 @@ describe('computeChecksum — HMAC mode (integrityKey provided)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// MessageStore — deduplication
+// MessageStore -- deduplication
 // ---------------------------------------------------------------------------
 
-describe('MessageStore — deduplication', () => {
+describe('MessageStore -- deduplication', () => {
   let store: MessageStore;
 
   beforeEach(() => {

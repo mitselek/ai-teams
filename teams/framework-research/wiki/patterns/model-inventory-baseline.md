@@ -38,11 +38,11 @@ Reference data: model distribution across all deployed and designed teams as of 
 | raamatukoi-dev | 9 |
 | backlog-triage | 6 |
 
-**Correction (2026-04-10):** uikit-dev is a real deployed team (container on RC, repo `Eesti-Raudtee/evr-ui-kit`) that was not included in the original survey. Inventory totals above are incomplete — uikit-dev agent count unknown to Librarian. Re-survey needed to include this team.
+**Correction (2026-04-10):** uikit-dev is a real deployed team (container on RC, repo `Eesti-Raudtee/evr-ui-kit`) that was not included in the original survey. Inventory totals above are incomplete -- uikit-dev agent count unknown to Librarian. Re-survey needed to include this team.
 
 ## Key Observation
 
-The framework already operates as **multi-tier** (opus / sonnet / local LLM) within a single provider. The tiering rule from T01 — consequence of error determines model tier — is already applied across all teams.
+The framework already operates as **multi-tier** (opus / sonnet / local LLM) within a single provider. The tiering rule from T01 -- consequence of error determines model tier -- is already applied across all teams.
 
 ## Source Data
 
@@ -59,7 +59,7 @@ This is a point-in-time snapshot. TTL set to 3 months (2026-07-10). Re-verify by
 
 ## Related
 
-- [`model-tiering-by-consequence.md`](model-tiering-by-consequence.md) — the tiering principle that explains the opus/sonnet split
-- [`multi-provider-integration-seams.md`](multi-provider-integration-seams.md) — Eilama (the single non-Claude slot) uses the daemon/sidecar seam
+- [`model-tiering-by-consequence.md`](model-tiering-by-consequence.md) -- the tiering principle that explains the opus/sonnet split
+- [`multi-provider-integration-seams.md`](multi-provider-integration-seams.md) -- Eilama (the single non-Claude slot) uses the daemon/sidecar seam
 
 (*FR:Callimachus*)

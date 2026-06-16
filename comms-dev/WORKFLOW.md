@@ -21,7 +21,7 @@ Extends [dev-toolkit/WORKFLOW.md](https://github.com/Eesti-Raudtee/dev-toolkit/b
 | **Backend Engineer** | Babbage | Sonnet | Hub server, transport, message routing, persistence |
 | **QA & Security Engineer** | Kerckhoffs | Sonnet | RED tests, security validation, threat analysis, CI pipeline |
 | **CLI/UX Engineer** | Lovelace | Sonnet | MCP server, CLI tools, client interfaces |
-| **PO** | Mihkel (human) | — | What and why — stories, acceptance criteria, verification |
+| **PO** | Mihkel (human) | -- | What and why -- stories, acceptance criteria, verification |
 
 ## Workflow (8-step, per dev-toolkit)
 
@@ -77,7 +77,7 @@ PR must pass all quality gates before merge. Marconi reviews and merges.
 ## TDD Contract
 
 - **No implementation begins until Kerckhoffs has committed failing tests**
-- Tests define the contract — implementer builds to make tests pass
+- Tests define the contract -- implementer builds to make tests pass
 - Kerckhoffs reviews implementation for edge cases after GREEN
 - Integration test required for every feature (not just unit tests)
 - Anti-mocking: use real certs, real sockets, real servers in tests

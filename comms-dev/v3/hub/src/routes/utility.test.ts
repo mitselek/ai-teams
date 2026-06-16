@@ -1,39 +1,39 @@
 // (*CD:Kerckhoffs*)
 // RED tests for story/31: GET /api/online, GET /api/status (enhanced), POST /api/register (admin + dedup).
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — online list: connected teams:
+//   AC1 -- online list: connected teams:
 //     Given: hub with team-a, team-b, team-c all with active SSE subscriptions
 //     When:  GET /api/online (authenticated as team-a)
 //     Then:  response lists all 3 with { team, type, status: "connected", since }
 //
-//   AC2 — online list: offline team:
+//   AC2 -- online list: offline team:
 //     Given: team-b opened an SSE subscription then disconnected
 //     When:  GET /api/online
 //     Then:  team-b entry has status: "offline" and lastSeen timestamp
 //
-//   AC3 — /api/status metrics:
+//   AC3 -- /api/status metrics:
 //     Given: running hub with 2 registered peers; 1 message queued for offline team-b
 //     When:  GET /api/status
 //     Then:  response includes { uptime, version, peerCount, queueDepth }
 //
-//   AC4 — /api/register: admin can register:
+//   AC4 -- /api/register: admin can register:
 //     Given: hub with adminTeams: ['team-a']; team-d not yet registered
 //     When:  team-a POSTs { team: 'team-d', cert: <PEM> } to /api/register
 //     Then:  HTTP 201; team-d can subsequently authenticate
 //
-//   AC5 — /api/register: non-admin blocked:
+//   AC5 -- /api/register: non-admin blocked:
 //     Given: hub with adminTeams: ['team-a']; team-b is NOT in adminTeams
 //     When:  team-b POSTs { team: 'team-e', cert: <PEM> } to /api/register
 //     Then:  HTTP 403
 //
-//   AC6 — /api/register: duplicate CN rejected:
+//   AC6 -- /api/register: duplicate CN rejected:
 //     Given: team-a is already in the hub registry
 //     When:  POST /api/register { team: 'team-a', cert: <any PEM> }
 //     Then:  HTTP 409
 //
-//   AC7 — /api/online: rate limited per peer:
+//   AC7 -- /api/online: rate limited per peer:
 //     Given: hub with rateLimit { max: 5, timeWindow: 60_000 }
 //     When:  team-a sends 10 rapid GET /api/online requests
 //     Then:  first 5 return 200; remaining 5 return 429
@@ -245,9 +245,9 @@ afterAll(() => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — GET /api/online: connected teams ────────────────────────────────────
+// ── AC1 -- GET /api/online: connected teams ────────────────────────────────────
 
-describe('AC1 — GET /api/online: all connected teams listed', () => {
+describe('AC1 -- GET /api/online: all connected teams listed', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -316,9 +316,9 @@ describe('AC1 — GET /api/online: all connected teams listed', () => {
   });
 });
 
-// ── AC2 — GET /api/online: disconnected team shows offline ────────────────────
+// ── AC2 -- GET /api/online: disconnected team shows offline ────────────────────
 
-describe('AC2 — GET /api/online: disconnected team shows offline', () => {
+describe('AC2 -- GET /api/online: disconnected team shows offline', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -371,9 +371,9 @@ describe('AC2 — GET /api/online: disconnected team shows offline', () => {
   });
 });
 
-// ── AC3 — GET /api/status: hub metrics ───────────────────────────────────────
+// ── AC3 -- GET /api/status: hub metrics ───────────────────────────────────────
 
-describe('AC3 — GET /api/status: response includes uptime, version, peerCount, queueDepth', () => {
+describe('AC3 -- GET /api/status: response includes uptime, version, peerCount, queueDepth', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -441,9 +441,9 @@ describe('AC3 — GET /api/status: response includes uptime, version, peerCount,
   });
 });
 
-// ── AC4 + AC5 — POST /api/register: admin check ───────────────────────────────
+// ── AC4 + AC5 -- POST /api/register: admin check ───────────────────────────────
 
-describe('AC4 — POST /api/register: admin team can register new peer', () => {
+describe('AC4 -- POST /api/register: admin team can register new peer', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -482,7 +482,7 @@ describe('AC4 — POST /api/register: admin team can register new peer', () => {
   });
 });
 
-describe('AC5 — POST /api/register: non-admin team gets HTTP 403', () => {
+describe('AC5 -- POST /api/register: non-admin team gets HTTP 403', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -515,9 +515,9 @@ describe('AC5 — POST /api/register: non-admin team gets HTTP 403', () => {
   });
 });
 
-// ── AC6 — POST /api/register: duplicate CN rejected ──────────────────────────
+// ── AC6 -- POST /api/register: duplicate CN rejected ──────────────────────────
 
-describe('AC6 — POST /api/register: duplicate CN → HTTP 409', () => {
+describe('AC6 -- POST /api/register: duplicate CN → HTTP 409', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -546,9 +546,9 @@ describe('AC6 — POST /api/register: duplicate CN → HTTP 409', () => {
   });
 });
 
-// ── AC7 — GET /api/online: rate limited per peer ──────────────────────────────
+// ── AC7 -- GET /api/online: rate limited per peer ──────────────────────────────
 
-describe('AC7 — GET /api/online: rate limited per peer (max 5 / 60s)', () => {
+describe('AC7 -- GET /api/online: rate limited per peer (max 5 / 60s)', () => {
   it('given max=5, when team-a sends 10 rapid requests, exactly 5 return 200 and 5 return 429', async () => {
     const rlPort = await getFreePort();
     const rlHub = createHub({

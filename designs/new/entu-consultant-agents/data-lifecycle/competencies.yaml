@@ -1,13 +1,13 @@
-# data-lifecycle — competency slice
-# (*FR:Celes*) — assembled from (*FR:Finn*) harvest (Task #5); schema + sign-off (*FR:Callimachus*).
+# data-lifecycle -- competency slice
+# (*FR:Celes*) -- assembled from (*FR:Finn*) harvest (Task #5); schema + sign-off (*FR:Callimachus*).
 
 # PROVENANCE (architecture spec §2.2; shape per Callimachus sign-off). In production this file is a
-# BUILD ARTIFACT — search_claims(domain="data-lifecycle") materialized from the global index, never
+# BUILD ARTIFACT -- search_claims(domain="data-lifecycle") materialized from the global index, never
 # hand-authored. The machine fields below make the worked-draft state DETECTABLE (not just prose):
 # an auditor or build script reads source-commit:null + generation-status:worked-draft and knows
 # this is the slice it WOULD be, hand-assembled, not a real generated slice.
 generated-from: competency-index/data-lifecycle/
-source-commit: null              # worked-draft — global index store not yet materialized (Argo buy-in pending)
+source-commit: null              # worked-draft -- global index store not yet materialized (Argo buy-in pending)
 generation-status: worked-draft  # vs "generated" in production; resolves to a real SHA once the store lands
 generated-at: 2026-06-06
 source-digest: "teams/framework-research/docs/2026-06-06-data-lifecycle-competency-harvest.md"
@@ -16,16 +16,16 @@ note: >
   hand-authored. Here it is the slice it WOULD be, hand-assembled from Finn's harvest as a worked
   draft; source-commit resolves to a real SHA once the index store lands.
 
-# ROLL-UP (derived from the claim bodies below — a view, not a source; must not drift):
+# ROLL-UP (derived from the claim bodies below -- a view, not a source; must not drift):
 #   18 filed claims = 16 backed + 2 partial (C12 touch-save-recompute, C16 limit-cap → known-gaps G1/G2).
-#   + 2 deferred-as-gaps (G3/G4) NOT filed as claims — filing would over-claim; absence IS the gap.
+#   + 2 deferred-as-gaps (G3/G4) NOT filed as claims -- filing would over-claim; absence IS the gap.
 #   (NB: Finn's harvest prose header says "13 backed / 3 partial"; the actual claim blocks are
-#    16 backed / 2 partial — flagged to Finn + team-lead. This roll-up reflects the true bodies.)
+#    16 backed / 2 partial -- flagged to Finn + team-lead. This roll-up reflects the true bodies.)
 roll-up:
   filed-claims: 18
   backed: 16
   partial: 2
-  deferred-gaps: 2   # G3, G4 — see known-gaps; not filed as claims
+  deferred-gaps: 2   # G3, G4 -- see known-gaps; not filed as claims
 
 domain: data-lifecycle
 
@@ -123,7 +123,7 @@ claims:
       - type: src
         ref: "entu/api: utils/entity.js (setEntity allowlist) + utils/rights.js (getParentRights)"
         stance: confirms
-        excerpt: "_sharing and _inheritrights are separate allowlisted types; getParentRights inherits only _noaccess/_viewer/_expander/_editor/_owner — _sharing absent from the inherit set."
+        excerpt: "_sharing and _inheritrights are separate allowlisted types; getParentRights inherits only _noaccess/_viewer/_expander/_editor/_owner -- _sharing absent from the inherit set."
       - type: probe
         ref: "mitselek/esmuseum-map-app#41 (Pérotin truth table)"
         stance: confirms
@@ -176,7 +176,7 @@ claims:
   - id: inheritrights-type-vs-instance
     claim: >
       Setting _inheritrights (or any system property) on a TYPE entity affects the type
-      entity only — existing and future instances carry their own _inheritrights set at
+      entity only -- existing and future instances carry their own _inheritrights set at
       their creation. Retroactively changing instances requires a per-instance update pass.
     domain: data-lifecycle
     evidence:
@@ -187,7 +187,7 @@ claims:
       - type: src
         ref: "entu/api: utils/entity.js (inheritParentProperties)"
         stance: confirms
-        excerpt: "Create-time inheritance reads PARENT entities, not the TYPE entity, for _inheritrights/_sharing — type->instance does not propagate these at runtime."
+        excerpt: "Create-time inheritance reads PARENT entities, not the TYPE entity, for _inheritrights/_sharing -- type->instance does not propagate these at runtime."
     verification: { method: live-audit, date: 2026-05-21, verifier: pérotin }
     confidence: backed
     last-verified: 2026-06-06
@@ -206,7 +206,7 @@ claims:
       - type: probe
         ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q2, Josquin)"
         stance: confirms
-        excerpt: "member_count_per_section:[{number:0}] and member_count:[{number:50}] — NO _id, vs name:[{_id,string}] which has one."
+        excerpt: "member_count_per_section:[{number:0}] and member_count:[{number:50}] -- NO _id, vs name:[{_id,string}] which has one."
     verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
     confidence: backed
     last-verified: 2026-06-06
@@ -216,7 +216,7 @@ claims:
   - id: formula-values-persisted-not-live
     claim: >
       Despite having no _id, a materialized formula value is PERSISTED on the instance and
-      survives deletion of its source property — it is NOT recomputed on every read. It
+      survives deletion of its source property -- it is NOT recomputed on every read. It
       re-evaluates only on a write to the instance (any non-formula property POST) or a
       formula-expression change on the prop-def.
     domain: data-lifecycle
@@ -235,14 +235,14 @@ claims:
     claim: >
       POSTing a value directly to a formula property returns 200 (a new property _id is
       issued) but the formula immediately re-evaluates against current sources and
-      overwrites the direct value — net effect: direct writes to formula properties are
+      overwrites the direct value -- net effect: direct writes to formula properties are
       silently dropped.
     domain: data-lifecycle
     evidence:
       - type: probe
         ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q5, Josquin)"
         stance: confirms
-        excerpt: "POST name=OverrideName -> 200 + new _id; subsequent GET name=[{string:'Test User'}] — direct write rejected by formula re-eval."
+        excerpt: "POST name=OverrideName -> 200 + new _id; subsequent GET name=[{string:'Test User'}] -- direct write rejected by formula re-eval."
     verification: { method: live-probe, date: 2026-05-20, verifier: josquin }
     confidence: backed
     last-verified: 2026-06-06
@@ -278,7 +278,7 @@ claims:
       - type: probe
         ref: "mvox-dev: docs/migration/findings/phase-b-api-probes-2026-05-20 (Q3, Finn)"
         stance: confirms
-        excerpt: "name.string=Soprano -> 1; name.string=soprano -> 0; name.string=Bas -> 0 (no substring). NFD-encoded chars return 0 — clients must NFC-normalize."
+        excerpt: "name.string=Soprano -> 1; name.string=soprano -> 0; name.string=Bas -> 0 (no substring). NFD-encoded chars return 0 -- clients must NFC-normalize."
       - type: docs
         ref: "entu/www: src/api/query-reference"
         stance: confirms
@@ -333,7 +333,7 @@ claims:
 
   - id: limit-default-100-no-observed-cap
     claim: >
-      The list limit defaults to 100 and Entu does not silently cap it — it echoes the
+      The list limit defaults to 100 and Entu does not silently cap it -- it echoes the
       requested limit. No cap observed up to limit=1000 (mvox verified to 500; esmuseum
       verified 1000 against a separate large account).
     domain: data-lifecycle
@@ -395,11 +395,11 @@ claims:
     status: active
 
 # ---------------------------------------------------------------------------------------------
-# known-gaps — the agent's DECLARED known-unknowns, surfaced in the artifact itself so an
+# known-gaps -- the agent's DECLARED known-unknowns, surfaced in the artifact itself so an
 # integrator sees them at audit-before-hiring time (the whole differentiator), not only in the
 # harvest digest. Two kinds: (a) `partial` claims above whose weak portion is named here; and
 # (b) unknowns deliberately NOT filed as claims (filing would assert what the evidence does not
-# support — absence-of-claim is itself the visible gap, per the citation-backed pattern).
+# support -- absence-of-claim is itself the visible gap, per the citation-backed pattern).
 # Source for all: Finn's harvest digest, Task #5
 #   (teams/framework-research/docs/2026-06-06-data-lifecycle-competency-harvest.md, FLAGGED GAPS).
 # ---------------------------------------------------------------------------------------------
@@ -408,7 +408,7 @@ known-gaps:
     relates-to-claim: touch-save-via-nonformula-post
     kind: partial-claim
     gap: >
-      "Touch-save triggers formula recompute" is inference, not observation — the probe could not
+      "Touch-save triggers formula recompute" is inference, not observation -- the probe could not
       see the recompute end-to-end (dependent formula was broken at probe time). Backed only on
       "POST succeeds + rotates _id"; the recompute step is unverified.
     closes-with: "a fresh post-fix probe (touch-save POST -> read shows recomputed value)"
@@ -417,7 +417,7 @@ known-gaps:
     relates-to-claim: limit-default-100-no-observed-cap
     kind: partial-claim
     gap: >
-      "No limit cap" is probe-only and bounded — observed clean to 1000 on two accounts, no
+      "No limit cap" is probe-only and bounded -- observed clean to 1000 on two accounts, no
       documented ceiling, never stress-tested beyond. Do not rely on >1000 at arbitrary scale.
     closes-with: "a large-N probe (>1000) on a big account, or a maintainer-authoritative ceiling from Argo"
     source: "Finn harvest G2"
@@ -428,19 +428,19 @@ known-gaps:
       How a fresh instance gets its INITIAL _inheritrights when no parent sets it is unresolved:
       the mvox handbook says "born with the type's _inheritrights" but the create-time code
       (inheritParentProperties) reads the PARENT, not the TYPE. A handbook-vs-code contradiction.
-    closes-with: "code-trace of createEntityRecord defaults + a bare-entity create probe — a dispute->Argo candidate"
+    closes-with: "code-trace of createEntityRecord defaults + a bare-entity create probe -- a dispute->Argo candidate"
     source: "Finn harvest G3"
   - id: G4
     relates-to-claim: null   # deliberately NOT a claim
     kind: unfiled-unknown
     gap: >
-      Rate-limiting / 429 behaviour under high concurrency is unconfirmed — only absence-of-
+      Rate-limiting / 429 behaviour under high concurrency is unconfirmed -- only absence-of-
       throttling observed at modest throughput (~8 calls/sec). No positive confirmation; do NOT
       assert "no rate limits" (that would be the exact over-claim the gap-loop guards against).
     closes-with: "a concurrency probe, or a maintainer statement"
     source: "Finn harvest G4"
 
-# Cross-domain material (routed elsewhere — NOT data-lifecycle claims, listed for traceability):
+# Cross-domain material (routed elsewhere -- NOT data-lifecycle claims, listed for traceability):
 #   - JWT 12h-vs-48h contradiction -> auth domain (the canonical disputed/apex worked example).
 #   - DELETE /property does not remove the S3 object (src contradicts openapi desc) -> files/
 #     data-lifecycle author as a src-confirms + openapi-contradicts claim (code-beats-docs example).

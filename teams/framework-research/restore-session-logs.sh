@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Restore session logs from tarball. MANUAL-ONLY.
+# (*FR:Volta*) -- Restore session logs from tarball. MANUAL-ONLY.
 # Prints MANIFEST content before extraction so the operator knows what's in the tarball.
 #
 # Usage:
@@ -23,7 +23,7 @@ TEAM_NAME="$(basename "$SCRIPT_DIR")"
 BACKUP_DIR="${SESSION_BACKUP_DIR:-$HOME/.claude-session-backups/$TEAM_NAME}"
 
 if [ ! -d "$BACKUP_DIR" ]; then
-  echo "No backup dir at $BACKUP_DIR — nothing to restore." >&2
+  echo "No backup dir at $BACKUP_DIR -- nothing to restore." >&2
   exit 1
 fi
 
@@ -43,7 +43,7 @@ fi
 
 # Show MANIFEST before extracting, so operator sees scope before action
 echo "=== MANIFEST ==="
-tar xzOf "$TARBALL" MANIFEST.md 2>/dev/null || echo "(no MANIFEST found — older tarball format)"
+tar xzOf "$TARBALL" MANIFEST.md 2>/dev/null || echo "(no MANIFEST found -- older tarball format)"
 echo "=== end MANIFEST ==="
 echo ""
 

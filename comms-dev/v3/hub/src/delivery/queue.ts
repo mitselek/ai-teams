@@ -9,7 +9,7 @@ const DEFAULT_TTL_MS = 86_400_000; // 24 hours
 
 /**
  * Durable offline queue backed by SQLite (better-sqlite3).
- * All operations are synchronous — safe in Node.js single-threaded loop.
+ * All operations are synchronous -- safe in Node.js single-threaded loop.
  *
  * Schema:
  *   messages (id TEXT PK, team TEXT, payload TEXT, created_at INTEGER)

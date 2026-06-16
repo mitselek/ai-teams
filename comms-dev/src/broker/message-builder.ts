@@ -3,7 +3,7 @@
 //
 // Checksum algorithm:
 //   - With integrityKey: HMAC-SHA256 over stableStringify(draft) using Vigenere's crypto module
-//   - Without integrityKey: plain SHA-256 (dev/plaintext mode only — no authentication)
+//   - Without integrityKey: plain SHA-256 (dev/plaintext mode only -- no authentication)
 //
 // stableStringify ensures nested objects (from, to) are fully included in the hash input.
 // See src/util/stable-stringify.ts and Issue #2 for why JSON.stringify with array replacer fails.
@@ -46,8 +46,8 @@ export function buildMessage(opts: BuildMessageOptions): Message {
 /**
  * Compute the checksum over a MessageDraft (all fields except 'checksum').
  *
- * With integrityKey: HMAC-SHA256 (authenticated — production mode)
- * Without integrityKey: plain SHA-256 (dev/plaintext mode — no auth guarantee)
+ * With integrityKey: HMAC-SHA256 (authenticated -- production mode)
+ * Without integrityKey: plain SHA-256 (dev/plaintext mode -- no auth guarantee)
  *
  * Uses stableStringify for recursive key sorting to ensure nested objects
  * (from, to endpoints) are fully covered by the hash.

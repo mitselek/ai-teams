@@ -1,4 +1,4 @@
-# apex-research — Common Standards
+# apex-research -- Common Standards
 
 ## Team
 
@@ -9,7 +9,7 @@
 ## Workspace
 
 - **Repo:** `Eesti-Raudtee/apex-migration-research` (read-write)
-- **Source data:** `vjs_apex_apps` mounted at `../vjs_apex_apps/` (READ-ONLY — never modify)
+- **Source data:** `vjs_apex_apps` mounted at `../vjs_apex_apps/` (READ-ONLY -- never modify)
 - **Dashboard:** `dashboard/` (SvelteKit + TailwindCSS)
 - **Specs:** `specs/<cluster>/SPEC.md`
 
@@ -25,8 +25,8 @@ All persistent text output must carry the author agent's name in the format `(*A
 
 | Output type | Placement |
 |---|---|
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 | GitHub issue body | At the bottom of the body |
 | Code file | In a comment at the top |
 
@@ -36,7 +36,7 @@ All persistent text output must carry the author agent's name in the format `(*A
 - **User-facing content:** Estonian (when applicable)
 - **Dashboard UI labels:** Estonian with English tooltips
 
-## vjs_apex_apps — READ-ONLY (HARD RULE)
+## vjs_apex_apps -- READ-ONLY (HARD RULE)
 
 The `vjs_apex_apps` repo contains ~14,600 SQL files in APEX split-file format. This is the source data for all analysis.
 
@@ -79,18 +79,18 @@ Champollion (parse) --> inventory/*.md + *.json
 
 These scripts and documents already exist and are the starting point:
 
-- `scripts/extract_app_inventory.py` — generates `inventory/apps.md`
-- `scripts/extract_pages.py` — generates `inventory/fXXX/pages.md`
-- `scripts/extract_lovs.py` — generates LOV inventories + `shared/common-lovs.md`
-- `scripts/data_quality.py` — generates `inventory/data-quality-report.md`
-- `decisions/001-migration-readiness-assessment.md` — ADR-001 (awaiting APEX owner review)
-- `docs/USER_STORIES.md` — 6 epics, ~20 user stories
+- `scripts/extract_app_inventory.py` -- generates `inventory/apps.md`
+- `scripts/extract_pages.py` -- generates `inventory/fXXX/pages.md`
+- `scripts/extract_lovs.py` -- generates LOV inventories + `shared/common-lovs.md`
+- `scripts/data_quality.py` -- generates `inventory/data-quality-report.md`
+- `decisions/001-migration-readiness-assessment.md` -- ADR-001 (awaiting APEX owner review)
+- `docs/USER_STORIES.md` -- 6 epics, ~20 user stories
 
 ## Tech Stack
 
 - **Analysis scripts:** Python 3.11+, pytest, mypy (strict)
 - **Dashboard:** SvelteKit + TailwindCSS + TypeScript (strict)
-- **Deployment:** Local dev server (localhost:5173) — dashboard is internal tooling
+- **Deployment:** Local dev server (localhost:5173) -- dashboard is internal tooling
 
 ## Agent Spawning Rule
 
@@ -98,10 +98,10 @@ Agents MUST be spawned with `run_in_background: true`.
 
 ### Spawn Order (data dependencies)
 
-1. **Champollion** — produces raw extraction data
-2. **Nightingale** — consumes extraction data, produces analysis JSON
-3. **Berners-Lee** — consumes analysis JSON, builds dashboard
-4. **Hammurabi** — consumes analysis + dashboard context, writes specs
+1. **Champollion** -- produces raw extraction data
+2. **Nightingale** -- consumes extraction data, produces analysis JSON
+3. **Berners-Lee** -- consumes analysis JSON, builds dashboard
+4. **Hammurabi** -- consumes analysis + dashboard context, writes specs
 
 ### Trunk-Based Development (ADR-004)
 
@@ -109,10 +109,10 @@ All agents commit directly to `main`. Directory ownership prevents conflicts. CI
 
 ### TDD Pair Protocol (ADR-004)
 
-Dashboard work uses a sequential TDD pair — **never parallel**:
+Dashboard work uses a sequential TDD pair -- **never parallel**:
 
-1. **RED (Nightingale)** — writes failing tests from acceptance criteria
-2. **GREEN (Berners-Lee)** — makes tests pass, refactors
+1. **RED (Nightingale)** -- writes failing tests from acceptance criteria
+2. **GREEN (Berners-Lee)** -- makes tests pass, refactors
 3. RED must complete before GREEN starts. No exceptions.
 
 ## On Startup

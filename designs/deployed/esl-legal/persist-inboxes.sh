@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*ESL-L:Celes — adapted from FR:Volta*) — Persist inboxes from runtime to repo, pruning to last 100 messages
+# (*ESL-L:Celes -- adapted from FR:Volta*) -- Persist inboxes from runtime to repo, pruning to last 100 messages
 #
 # Usage:
 #   persist-inboxes.sh           # persist ALL inboxes (team-lead shutdown)
@@ -19,7 +19,7 @@ AGENT_NAME="${1:-}"
 
 # If no runtime inboxes dir, nothing to persist
 if [ ! -d "$RUNTIME_INBOXES" ]; then
-  echo "No runtime inboxes found at $RUNTIME_INBOXES — nothing to persist."
+  echo "No runtime inboxes found at $RUNTIME_INBOXES -- nothing to persist."
   exit 0
 fi
 
@@ -42,7 +42,7 @@ fi
 # All-inboxes mode: persist everything
 SOURCE_COUNT=$(find "$RUNTIME_INBOXES" -maxdepth 1 -name '*.json' -type f | wc -l)
 if [ "$SOURCE_COUNT" -eq 0 ]; then
-  echo "Runtime inboxes dir exists but contains no .json files — nothing to persist."
+  echo "Runtime inboxes dir exists but contains no .json files -- nothing to persist."
   exit 0
 fi
 
@@ -59,7 +59,7 @@ done
 # Verification
 DEST_COUNT=$(find "$REPO_INBOXES" -maxdepth 1 -name '*.json' -type f | wc -l)
 if [ "$PERSISTED" -ne "$SOURCE_COUNT" ] || [ "$DEST_COUNT" -lt "$SOURCE_COUNT" ]; then
-  echo "ERROR: Count mismatch — source=$SOURCE_COUNT persisted=$PERSISTED dest=$DEST_COUNT" >&2
+  echo "ERROR: Count mismatch -- source=$SOURCE_COUNT persisted=$PERSISTED dest=$DEST_COUNT" >&2
   exit 1
 fi
 

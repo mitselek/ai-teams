@@ -12,7 +12,7 @@ source-issues: []
 
 # XP Cycle Applies to Infrastructure Stories
 
-The ARCHITECT → RED → GREEN → PURPLE cycle is the team's operating protocol for ALL code production, including quality infrastructure setup — not just feature stories.
+The ARCHITECT → RED → GREEN → PURPLE cycle is the team's operating protocol for ALL code production, including quality infrastructure setup -- not just feature stories.
 
 ## Infrastructure Story Flow
 

@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// RED tests for TLS client — outbound mTLS connection, fingerprint verification,
+// RED tests for TLS client -- outbound mTLS connection, fingerprint verification,
 // reconnect with exponential backoff.
 // Spec: #16 §3, #18 Phase 2.2
 
@@ -108,9 +108,9 @@ function startTestTlsServer(
   });
 }
 
-// ── TlsClient — successful connection ────────────────────────────────────────
+// ── TlsClient -- successful connection ────────────────────────────────────────
 
-describe('TlsClient — connect to known peer', () => {
+describe('TlsClient -- connect to known peer', () => {
 
   it('connects successfully to a peer with a pinned cert', async () => {
     const { port, close } = await startTestTlsServer(serverDir, 'framework-research');
@@ -174,9 +174,9 @@ describe('TlsClient — connect to known peer', () => {
   });
 });
 
-// ── TlsClient — cert fingerprint verification ─────────────────────────────────
+// ── TlsClient -- cert fingerprint verification ─────────────────────────────────
 
-describe('TlsClient — fingerprint verification (server cert mismatch)', () => {
+describe('TlsClient -- fingerprint verification (server cert mismatch)', () => {
 
   it('rejects connection to server with unknown cert (not in peers/)', async () => {
     // Rogue server presents cert not pinned by client
@@ -223,9 +223,9 @@ describe('TlsClient — fingerprint verification (server cert mismatch)', () => 
   });
 });
 
-// ── TlsClient — message sending ───────────────────────────────────────────────
+// ── TlsClient -- message sending ───────────────────────────────────────────────
 
-describe('TlsClient — sending framed messages', () => {
+describe('TlsClient -- sending framed messages', () => {
 
   it('sends a framed message over the tunnel', async () => {
     const received: unknown[] = [];
@@ -288,9 +288,9 @@ describe('TlsClient — sending framed messages', () => {
   });
 });
 
-// ── TlsClient — reconnect with backoff ────────────────────────────────────────
+// ── TlsClient -- reconnect with backoff ────────────────────────────────────────
 
-describe('TlsClient — reconnect on connection drop', () => {
+describe('TlsClient -- reconnect on connection drop', () => {
 
   it('emits disconnect event when server closes connection', async () => {
     const { port, close } = await startTestTlsServer(serverDir, 'framework-research');
@@ -318,7 +318,7 @@ describe('TlsClient — reconnect on connection drop', () => {
   });
 
   it('backoff starts at 1s and doubles on each retry (capped at 60s)', () => {
-    // Test the backoff calculation directly — no actual network needed
+    // Test the backoff calculation directly -- no actual network needed
     const config = { key: Buffer.alloc(0), cert: Buffer.alloc(0), peerCerts: new Map(), peerFingerprints: new Map() };
     const client = new TlsClient({
       config: config as any,

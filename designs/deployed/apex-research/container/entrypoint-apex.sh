@@ -11,14 +11,14 @@
 # 7. Drop privileges and exec
 #
 # Required env vars:
-#   GITHUB_TOKEN      — PAT with read access to both repos (same org)
-#   ANTHROPIC_API_KEY — Claude Code CLI
-#   SSH_PUBLIC_KEY    — PO's public key for SSH access
+#   GITHUB_TOKEN      -- PAT with read access to both repos (same org)
+#   ANTHROPIC_API_KEY -- Claude Code CLI
+#   SSH_PUBLIC_KEY    -- PO's public key for SSH access
 #
 # Optional env vars:
-#   REPO_URL          — research repo URL (default: Eesti-Raudtee/apex-migration-research)
-#   SOURCE_REPO_URL   — source data repo URL (default: Eesti-Raudtee/vjs_apex_apps)
-#   TEAM_NAME         — team name (default: apex-research)
+#   REPO_URL          -- research repo URL (default: Eesti-Raudtee/apex-migration-research)
+#   SOURCE_REPO_URL   -- source data repo URL (default: Eesti-Raudtee/vjs_apex_apps)
+#   TEAM_NAME         -- team name (default: apex-research)
 set -e
 
 CONTAINER_USER="ai-teams"
@@ -42,20 +42,20 @@ clone_or_pull() {
     auth_url=$(echo "$repo_url" | sed "s|https://|https://${GITHUB_TOKEN}@|")
 
     if [ -d "${target_dir}/.git" ]; then
-        echo "[entrypoint] ${target_dir} exists — running git pull..."
+        echo "[entrypoint] ${target_dir} exists -- running git pull..."
         gosu "${CONTAINER_USER}" git -C "${target_dir}" remote set-url origin "${auth_url}"
         gosu "${CONTAINER_USER}" git -C "${target_dir}" pull --ff-only || {
             echo "[entrypoint] WARNING: git pull failed for ${target_dir} (non-fast-forward or network). Using existing state."
         }
     else
-        echo "[entrypoint] First run — cloning ${repo_url} to ${target_dir}..."
+        echo "[entrypoint] First run -- cloning ${repo_url} to ${target_dir}..."
         mkdir -p "${target_dir}"
         chown "${CONTAINER_UID}:${CONTAINER_GID}" "${target_dir}"
         gosu "${CONTAINER_USER}" git clone "${auth_url}" "${target_dir}"
     fi
 }
 
-# supervise <name> <command...>  — relaunch the service whenever it exits.
+# supervise <name> <command...>  -- relaunch the service whenever it exits.
 # Mirrors the sshd background-launch precedent (Step 7) but with a restart loop.
 # Runs as the ai-teams user via gosu; backgrounded so PID 1 stays bash and reaps it.
 supervise() {
@@ -98,7 +98,7 @@ fi
 
 # ── Step 1: Fix volume ownership ────────────────────────────────────────────────
 # Docker creates named volumes owned by root. Fix on every start.
-# SOURCE_DATA excluded — its ownership is managed by step 4 (locked to root after clone).
+# SOURCE_DATA excluded -- its ownership is managed by step 4 (locked to root after clone).
 for DIR in "$CLAUDE_DIR" "$WORKSPACE"; do
     if [ -d "$DIR" ]; then
         OWNER=$(stat -c '%u' "$DIR")
@@ -134,7 +134,7 @@ if [ -d "${SOURCE_DATA}/.git" ]; then
 elif [ -z "$(ls -A "${SOURCE_DATA}" 2>/dev/null)" ]; then
     clone_or_pull "$SOURCE_REPO_URL" "$SOURCE_DATA"
 else
-    echo "[entrypoint] source-data has content but no .git — using as-is."
+    echo "[entrypoint] source-data has content but no .git -- using as-is."
 fi
 
 # Lock down source-data: owned by root, read+execute only for others.
@@ -194,7 +194,7 @@ fi
 # volume, generate-if-absent): keep the host keys on the PERSISTENT volume
 # (~/.claude, st_dev 65024), generate once on first boot, and copy them into
 # /etc/ssh BEFORE sshd starts (Step 7). Stable identity across all future rebuilds.
-# SECURITY: the host PRIVATE keys live ONLY here on the persistent volume — never
+# SECURITY: the host PRIVATE keys live ONLY here on the persistent volume -- never
 # baked into an image layer. Dir is root:root 700 so the agent (uid 1000) can't
 # read them, even though it's under the ai-teams home volume.
 HOSTKEY_DIR="/home/ai-teams/.claude/ssh-host-keys"
@@ -241,7 +241,7 @@ if [ "$KEY_COUNT" -gt 0 ]; then
     /usr/sbin/sshd -p 2222
     echo "[entrypoint] sshd started on port 2222."
 else
-    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set — SSH access disabled."
+    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set -- SSH access disabled."
 fi
 
 # ── Step 7b: Seed courier key into ephemeral ~/.ssh (*FR:Brunel*) ────────────────
@@ -249,7 +249,7 @@ fi
 # source is the build-baked seed on the image FS (Dockerfile build-secret RUN).
 # Copy once per start; same key every build (seed generated once) => no hub-side churn.
 # Key filename matches the name the live courier.json already dials (~/.ssh/stationmaster_apex)
-# so no courier.json edit is needed — the hub registers by pubkey content, not filename.
+# so no courier.json edit is needed -- the hub registers by pubkey content, not filename.
 if [ -f /home/ai-teams/.ssh-seed/stationmaster_apex ] && [ ! -f /home/ai-teams/.ssh/stationmaster_apex ]; then
     install -d -m 700 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh
     install -m 600 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh-seed/stationmaster_apex \
@@ -263,7 +263,7 @@ fi
 # NOT survive rebuild), so the known_hosts must be re-provisioned each start or the
 # courier can't TRUST the hub → collect leg fails (ssh rc=255, "No ED25519 host key
 # is known"). The host PUBLIC key is not secret, so we PIN it inline here (NOT a
-# blind ssh-keyscan — that would defeat StrictHostKeyChecking). This key is verified:
+# blind ssh-keyscan -- that would defeat StrictHostKeyChecking). This key is verified:
 # SHA256:CNcFjOxr8vREOueOS8nxJN8W3LaQHet62du+PHyK13U for [10.100.136.162]:2222.
 # To rotate: update this line if the hub's host key changes (it persists on the
 # hub's state volume, so it's stable across hub restarts).
@@ -285,7 +285,7 @@ PYTHON_VERSION=$(python3 --version 2>&1 | grep -oP '\d+\.\d+')
 PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
 PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
 if [ "$PYTHON_MAJOR" -lt 3 ] || { [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 11 ]; }; then
-    echo "  FAIL: Python ${PYTHON_VERSION} < 3.11 — aborting." >&2
+    echo "  FAIL: Python ${PYTHON_VERSION} < 3.11 -- aborting." >&2
     exit 1
 fi
 echo "  OK: Python ${PYTHON_VERSION}"
@@ -293,14 +293,14 @@ echo "  OK: Python ${PYTHON_VERSION}"
 # Node.js version check (hard gate: 20+)
 NODE_VERSION=$(node --version 2>&1 | grep -oP '\d+' | head -1)
 if [ "$NODE_VERSION" -lt 20 ]; then
-    echo "  FAIL: Node.js v${NODE_VERSION} < 20 — aborting." >&2
+    echo "  FAIL: Node.js v${NODE_VERSION} < 20 -- aborting." >&2
     exit 1
 fi
 echo "  OK: Node.js v${NODE_VERSION}"
 
 # Claude check (hard gate)
 if ! command -v claude >/dev/null 2>&1; then
-    echo "  FAIL: claude not found — aborting." >&2
+    echo "  FAIL: claude not found -- aborting." >&2
     exit 1
 fi
 echo "  OK: claude available"
@@ -309,14 +309,14 @@ echo "  OK: claude available"
 if [ -d "${WORKSPACE}/.git" ]; then
     echo "  OK: apex-migration-research repo"
 else
-    echo "  FAIL: workspace has no .git — aborting." >&2
+    echo "  FAIL: workspace has no .git -- aborting." >&2
     exit 1
 fi
 
 if [ -d "${SOURCE_DATA}/.git" ] || [ -d "${SOURCE_DATA}/db" ]; then
     echo "  OK: vjs_apex_apps source data"
 else
-    echo "  WARN: vjs_apex_apps not available — cached inventory still usable."
+    echo "  WARN: vjs_apex_apps not available -- cached inventory still usable."
 fi
 
 # Oracle dev-DB tunnel check (soft: container starts regardless).
@@ -325,7 +325,7 @@ fi
 if command -v nc >/dev/null 2>&1 && nc -z -w3 127.0.0.1 11521 2>/dev/null; then
     echo "  OK: DB tunnel up (127.0.0.1:11521 -> VJSDBTEST)"
 else
-    echo "  WARN: DB tunnel down — run 'bash .claude/bin/open-db-tunnels.sh' on your Windows machine"
+    echo "  WARN: DB tunnel down -- run 'bash .claude/bin/open-db-tunnels.sh' on your Windows machine"
 fi
 
 echo "[entrypoint] All gates passed. Starting..."
@@ -368,7 +368,7 @@ if ! grep -q 'aliases.sh' "$BASHRC" 2>/dev/null; then
 fi
 
 # ── Step 9a2: tmux config ────────────────────────────────────────────────────
-# .tmux.conf is on container filesystem — recreate on every start.
+# .tmux.conf is on container filesystem -- recreate on every start.
 for user_home in "${HOME_DIR}" /home/michelek; do
     cat > "${user_home}/.tmux.conf" << 'TMUX_EOF'
 set -g default-terminal "tmux-256color"
@@ -395,7 +395,7 @@ gosu "${CONTAINER_USER}" git config --global user.email "mihkel.putrinsh@evr.ee"
 
 # ── Step 9c: Claude settings ─────────────────────────────────────────────────
 # Pre-configure permission allow-list and model if settings.json doesn't exist yet.
-# If it exists (persisted in volume), don't overwrite — PO may have customized it.
+# If it exists (persisted in volume), don't overwrite -- PO may have customized it.
 SETTINGS_FILE="${CLAUDE_DIR}/settings.json"
 if [ ! -f "$SETTINGS_FILE" ]; then
     cat > "$SETTINGS_FILE" << 'SETTINGS_EOF'
@@ -464,18 +464,18 @@ fi
 # ── Step 9e: Supervise long-lived services (dashboard + courier) (*FR:Brunel*) ──
 # Previously launched session-side (startup.md 4e/5); did NOT survive a container
 # restart. Supervised here so they come up on every boot and relaunch on exit.
-# Backgrounded — PID 1 stays bash (mirrors the sshd Step 7 precedent).
+# Backgrounded -- PID 1 stays bash (mirrors the sshd Step 7 precedent).
 # Single-owner: apex drops the session-side launches as part of the cutover.
 supervise dashboard 'cd /home/ai-teams/workspace/dashboard && npx vite --host 0.0.0.0 --port 5173'
 
-# Courier config path: in-container-confirmed (Hopper find-sweep, S52) — single
+# Courier config path: in-container-confirmed (Hopper find-sweep, S52) -- single
 # file, no alternates. Overridable via COURIER_CONFIG env. The guard below still
 # degrades gracefully (loud warn, no crash-loop) if the script/config goes missing.
 COURIER_SCRIPT="/home/ai-teams/workspace/teams/apex-research/stationmaster/stationmaster-courier.reference.py"
 COURIER_CONFIG="${COURIER_CONFIG:-/home/ai-teams/workspace/teams/apex-research/stationmaster/courier.json}"
 
 # Pre-create the courier inboxes_dir (boot-order fix, *FR:Brunel* S52).
-# The supervised courier now launches at container BOOT — earlier than apex's
+# The supervised courier now launches at container BOOT -- earlier than apex's
 # agent session, which previously created this dir. The courier's validate_startup
 # requires inboxes_dir to EXIST (files auto-create inside it, but the DIR must be
 # present) and to be on the SAME VOLUME as state_dir. Both live under ~/.claude
@@ -495,7 +495,7 @@ install -d -m 755 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" "${COURIER_INBOXES
 # BEFORE the supervised courier launches, so any lock present here is necessarily
 # a prior-container artifact (no live courier can hold it yet) = stale by
 # definition. Same boot-setup class as the inboxes_dir pre-create above.
-# (The durable general fix — a container-instance discriminator in the lock —
+# (The durable general fix -- a container-instance discriminator in the lock —
 # is Herald's courier.reference.py follow-up; this closes the apex case now.)
 COURIER_LOCK="/home/ai-teams/.claude/teams/apex-research/stationmaster-state/courier.lock"
 rm -f "${COURIER_LOCK}"
@@ -503,7 +503,7 @@ rm -f "${COURIER_LOCK}"
 if [ -f "${COURIER_SCRIPT}" ] && [ -f "${COURIER_CONFIG}" ]; then
     supervise courier "python3 ${COURIER_SCRIPT} --config ${COURIER_CONFIG}"
 else
-    echo "[entrypoint] WARNING: courier NOT supervised — script or config missing (${COURIER_SCRIPT} / ${COURIER_CONFIG})."
+    echo "[entrypoint] WARNING: courier NOT supervised -- script or config missing (${COURIER_SCRIPT} / ${COURIER_CONFIG})."
 fi
 
 # ── Step 10: Drop privileges and exec ──────────────────────────────────────────

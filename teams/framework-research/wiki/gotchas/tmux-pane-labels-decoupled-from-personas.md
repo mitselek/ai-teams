@@ -22,7 +22,7 @@ source-issues: []
 
 ## The Problem
 
-uikit-dev tmux pane labels display **agent role IDs** from the layout config (`@component-dev-1`, `@component-dev-2`, `@docs-gallery`, `@qa-a11y`) instead of the **human-friendly persona names** from the roster (Eames, Rams, Tschichold, Braille). Message routing is unaffected — this is pure presentation-layer decoupling.
+uikit-dev tmux pane labels display **agent role IDs** from the layout config (`@component-dev-1`, `@component-dev-2`, `@docs-gallery`, `@qa-a11y`) instead of the **human-friendly persona names** from the roster (Eames, Rams, Tschichold, Braille). Message routing is unaffected -- this is pure presentation-layer decoupling.
 
 ## Mapping (uikit-dev, 2026-04-14)
 
@@ -35,11 +35,11 @@ uikit-dev tmux pane labels display **agent role IDs** from the layout config (`@
 
 ## Cost
 
-Message routing is correct — the defect is **cognitive**, not functional. New sessions require mentally holding a role-to-persona mapping before pane labels become meaningful. Aalto had to construct and share the mapping table himself to make sense of his own team layout.
+Message routing is correct -- the defect is **cognitive**, not functional. New sessions require mentally holding a role-to-persona mapping before pane labels become meaningful. Aalto had to construct and share the mapping table himself to make sense of his own team layout.
 
 Per Aalto's own framing:
 
-> "Not something I control — that's in the apply-layout.sh / tmux config. FR team (Brunel specifically) might want to adjust the pane titles if it's confusing. But functionally everything routes correctly."
+> "Not something I control -- that's in the apply-layout.sh / tmux config. FR team (Brunel specifically) might want to adjust the pane titles if it's confusing. But functionally everything routes correctly."
 
 ## Root Cause (Suspected)
 
@@ -49,7 +49,7 @@ Canonical source of the defect not yet confirmed. Likely in `apply-layout.sh` in
 
 ## Scope Uncertainty
 
-This is confirmed for uikit-dev. Fleet-wide scope is **unknown as of filing** — Brunel's investigation will clarify whether:
+This is confirmed for uikit-dev. Fleet-wide scope is **unknown as of filing** -- Brunel's investigation will clarify whether:
 
 - Other teams inherit the same `apply-layout.sh` and show the same defect
 - Other teams have different layout scripts and are unaffected
@@ -68,7 +68,7 @@ Aalto did not express preference; he just wants the pane labels to be readable. 
 
 ## Cross-References
 
-- **Same source, different defect class:** `wiki/observations/compaction-stale-state-deployed-teams.md` (same team, same submitter, same intake method — first externally-sourced submission. This is the third external entry from Aalto in 2 days and the pattern of external intake via tmux-direct is now repeatable).
+- **Same source, different defect class:** `wiki/observations/compaction-stale-state-deployed-teams.md` (same team, same submitter, same intake method -- first externally-sourced submission. This is the third external entry from Aalto in 2 days and the pattern of external intake via tmux-direct is now repeatable).
 - **Potential pattern abstraction:** If a second instance of identifier-to-persona decoupling surfaces (e.g., in a dashboard, bug tracker, or status page), promote to `wiki/patterns/identifier-to-persona-mapping-discipline.md` and cross-reference back here. One data point is a gotcha; two is a pattern. Watch for the second instance.
 
 ## External Intake Accounting

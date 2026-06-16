@@ -73,7 +73,7 @@ fi
 # Persist state (atomic write)
 echo "${LEFT}:${BASELINE}" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
 
-# Context bar (compact, 8 chars) — shows remaining usable context
+# Context bar (compact, 8 chars) -- shows remaining usable context
 # Auto-compact triggers at ~16% remaining, so 16% = empty, 100% = full
 # Baseline adapts after each compaction instead of assuming 100%
 BAR_WIDTH=8

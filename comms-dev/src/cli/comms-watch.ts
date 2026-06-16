@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// comms-watch — watch the local team's inbox for incoming inter-team messages.
+// comms-watch -- watch the local team's inbox for incoming inter-team messages.
 // Monitors ~/.claude/teams/<team-name>/inboxes/ for new JSON files and prints
 // each message as it arrives. Behaves like `tail -f` for the inbox.
 //
@@ -13,10 +13,10 @@
 //   --base-dir <path>   Override ~/.claude/teams base directory
 //
 // Required environment:
-//   COMMS_TEAM_NAME   — team whose inbox to watch
+//   COMMS_TEAM_NAME   -- team whose inbox to watch
 //
 // comms-watch is read-only and safe to run alongside the broker at all times.
-// SendMessageBridge is the sole inbox consumer — it deletes files after delivery.
+// SendMessageBridge is the sole inbox consumer -- it deletes files after delivery.
 
 import fs from 'fs';
 import path from 'path';
@@ -52,7 +52,7 @@ async function main(): Promise<void> {
   // Track already-seen files so we only print new arrivals
   const seen = new Set<string>();
 
-  // First pass — print existing messages
+  // First pass -- print existing messages
   const existing = listMessages(inboxDir);
   if (existing.length === 0) {
     console.error('[comms-watch] No existing messages.');

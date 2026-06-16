@@ -19,7 +19,7 @@ Extends [dev-toolkit/CODING_STANDARDS.md](https://github.com/Eesti-Raudtee/dev-t
 | Package manager | **pnpm** | Per dev-toolkit standard |
 | Language | **TypeScript** (strict mode) | ESM (`"type": "module"`) |
 | Runtime | **Node.js 22** | Debian containers |
-| Hub framework | **Fastify** | Headless API — SvelteKit standard applies to apps with UI; Fastify for pure REST+SSE services (see [deviation note](#framework-deviation)) |
+| Hub framework | **Fastify** | Headless API -- SvelteKit standard applies to apps with UI; Fastify for pure REST+SSE services (see [deviation note](#framework-deviation)) |
 | Testing | **Vitest** | Anti-mocking: real certs, real sockets |
 | Formatting | **Prettier** | `.prettierrc` in each package |
 | Linting | **ESLint** + `eslint-plugin-sonarjs` | Cognitive complexity ≤15, nesting depth ≤4 |
@@ -78,8 +78,8 @@ comms-dev/v3/
 Every PR must pass before merge:
 
 ```bash
-pnpm check      # TypeScript strict — zero type errors
-pnpm test        # Vitest — 100% pass rate
+pnpm check      # TypeScript strict -- zero type errors
+pnpm test        # Vitest -- 100% pass rate
 pnpm lint        # Prettier check + ESLint
 ```
 
@@ -144,7 +144,7 @@ Trailer: `Team: comms-dev`
 ### Branching
 
 ```
-main                          # trunk — always deployable
+main                          # trunk -- always deployable
 └── story/<issue-id>-description   # short-lived feature branches
 ```
 
@@ -160,12 +160,12 @@ main                          # trunk — always deployable
 - Validate at system boundaries (HTTP input, MCP tool input)
 - Trust internal code and framework guarantees
 - Every I/O operation has an error path
-- Never swallow errors silently — log with Pino
+- Never swallow errors silently -- log with Pino
 
 ### Security
 
-- mTLS for all hub connections — no exceptions in v3.0
-- E2E encrypt from day one — hub is untrusted for content
+- mTLS for all hub connections -- no exceptions in v3.0
+- E2E encrypt from day one -- hub is untrusted for content
 - Never log message body content (E2E encrypted, but principle applies)
 - Parameterize all SQLite queries
 - Rate limit per peer on all endpoints
@@ -174,8 +174,8 @@ main                          # trunk — always deployable
 
 The dev-toolkit standard framework is **SvelteKit + Cloudflare Workers/Pages**. The comms hub uses **Fastify** instead because:
 
-- The hub is a **headless API service** — REST endpoints + SSE stream, no UI, no pages, no SSR
-- SvelteKit's value is full-stack integration (routes + components + rendering) — none of which apply here
+- The hub is a **headless API service** -- REST endpoints + SSE stream, no UI, no pages, no SSR
+- SvelteKit's value is full-stack integration (routes + components + rendering) -- none of which apply here
 - Fastify provides mTLS support, JSON Schema validation, Pino structured logging, and a plugin architecture suited to API services
 - Deploying to **Debian containers on Node.js 22**, not Cloudflare Workers
 
@@ -183,9 +183,9 @@ The dev-toolkit standard framework is **SvelteKit + Cloudflare Workers/Pages**. 
 
 ## References
 
-- [dev-toolkit/CODING_STANDARDS.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/CODING_STANDARDS.md) — base standard
-- [dev-toolkit/WORKFLOW.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/WORKFLOW.md) — 8-step process
-- [dev-toolkit/ARCHITECTURE.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/ARCHITECTURE.md) — Cloudflare + SvelteKit patterns
-- [dev-toolkit/AI_AGENT_BEST_PRACTICES.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/AI_AGENT_BEST_PRACTICES.md) — agent isolation, task decomposition
+- [dev-toolkit/CODING_STANDARDS.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/CODING_STANDARDS.md) -- base standard
+- [dev-toolkit/WORKFLOW.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/WORKFLOW.md) -- 8-step process
+- [dev-toolkit/ARCHITECTURE.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/ARCHITECTURE.md) -- Cloudflare + SvelteKit patterns
+- [dev-toolkit/AI_AGENT_BEST_PRACTICES.md](https://github.com/Eesti-Raudtee/dev-toolkit/blob/main/AI_AGENT_BEST_PRACTICES.md) -- agent isolation, task decomposition
 
 (*CD:Marconi*)

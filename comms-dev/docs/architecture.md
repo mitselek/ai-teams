@@ -1,4 +1,4 @@
-# comms-dev Architecture — v2.1 Hub/Relay Mode
+# comms-dev Architecture -- v2.1 Hub/Relay Mode
 
 (*CD:Babbage*)
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-The hub daemon is a central relay that accepts mTLS connections from all team daemons and forwards messages to their destinations. Teams connect **inbound-only** to the hub — the hub never dials out. This supports firewalled containers and SSH-tunnelled hosts.
+The hub daemon is a central relay that accepts mTLS connections from all team daemons and forwards messages to their destinations. Teams connect **inbound-only** to the hub -- the hub never dials out. This supports firewalled containers and SSH-tunnelled hosts.
 
 ```
 comms-dev ──────────┐
@@ -22,7 +22,7 @@ framework-research ─┼──► relay (hub) :8443
 entu-research ──────┘
 
 All connections: mTLS/TCP, inbound-only (teams dial hub, hub dials nobody)
-Transport to reach :8443 varies (localhost, SSH tunnel) — protocol is identical
+Transport to reach :8443 varies (localhost, SSH tunnel) -- protocol is identical
 ```
 
 ---
@@ -35,7 +35,7 @@ Transport to reach :8443 varies (localhost, SSH tunnel) — protocol is identica
 | comms-dev | 8444 | PROD-LLM | |
 | bt-triage | 8445 | PROD-LLM | |
 | framework-research | 8446 | Windows | inbound via SSH tunnel |
-| entu-research | — | RC server | inbound via SSH tunnel |
+| entu-research | -- | RC server | inbound via SSH tunnel |
 
 ---
 
@@ -58,12 +58,12 @@ All teams connect TO the hub (inbound-only). Hub dials nobody.
 ```typescript
 {
   teamName: 'relay',
-  peers: {},             // hub dials nobody — all peers connect inbound
+  peers: {},             // hub dials nobody -- all peers connect inbound
   role: 'hub',
 }
 ```
 
-**defaultPeer routing:** `tunnelManager.send('framework-research', msg)` — if `framework-research` is not a direct peer, falls back to `peers.get(defaultPeer)` (the relay tunnel). The message content carries `to.team = 'framework-research'`; hub routes it onward.
+**defaultPeer routing:** `tunnelManager.send('framework-research', msg)` -- if `framework-research` is not a direct peer, falls back to `peers.get(defaultPeer)` (the relay tunnel). The message content carries `to.team = 'framework-research'`; hub routes it onward.
 
 ---
 
@@ -78,7 +78,7 @@ TunnelManager's `send()` priority:
 
 For messages arriving from hub on the team's outbound socket (hub writing back down the same connection the team dialed): `TunnelManager.makeDecoder` dispatches non-ACK frames to `inboundMessageHandlers`. DaemonV2 wires these to `handleInbound()`. MessageStore dedup prevents double-delivery if both TlsServer and TunnelManager paths fire for the same message.
 
-**ACK semantics:** TlsServer sends ACK to sender when hub receives a message — not when destination delivers it. ACK frames are never themselves ACK'd (avoids storms). Hub delivery to destination is best-effort fire-and-forget; sender gets ACK = "relay received".
+**ACK semantics:** TlsServer sends ACK to sender when hub receives a message -- not when destination delivers it. ACK frames are never themselves ACK'd (avoids storms). Hub delivery to destination is best-effort fire-and-forget; sender gets ACK = "relay received".
 
 ---
 
@@ -114,7 +114,7 @@ Hub's own TlsServer keeps the `from.team === peerCertCN` check for incoming team
 
 **v2.1 (current):** mTLS with PSK certs only. No application-layer encryption or signing in production.
 
-**v3 (implemented, not yet deployed):** `createCryptoAPIv2` in `src/crypto/crypto-v2.ts`. Code exists and is wired into DaemonV2 behind config flags — not yet deployed to any team daemon.
+**v3 (implemented, not yet deployed):** `createCryptoAPIv2` in `src/crypto/crypto-v2.ts`. Code exists and is wired into DaemonV2 behind config flags -- not yet deployed to any team daemon.
 
 When deployed, send path (`DaemonV2.sendMessage()`): if `keyBundlePath` + `signKeyPath` + `encKeyPath` configured, calls `prepareOutbound()`:
 1. `e2eEncrypt(body, receiverTeam, msgId)` → E2EPayload (X25519 + AES-256-GCM)
@@ -126,7 +126,7 @@ Receive path (`DaemonV2.handleInbound()`): if `msg.signature` present and crypto
 1. `verifySignature(msg)` → drop on failure
 2. `e2eDecrypt(JSON.parse(msg.body), msg.id)` → restore plaintext body
 
-Hub has no v3 keys — forwards E2E-opaque bodies verbatim. Hub cannot read message content.
+Hub has no v3 keys -- forwards E2E-opaque bodies verbatim. Hub cannot read message content.
 
 **DaemonV2Options fields (v3 opt-in):**
 ```typescript
@@ -139,11 +139,11 @@ encKeyPath?: string;      // X25519 private key (PEM)
 
 ## 7. SendMessageBridge
 
-`src/broker/sendmessage-bridge.ts` — bridges broker file inbox to the Claude Code agent framework.
+`src/broker/sendmessage-bridge.ts` -- bridges broker file inbox to the Claude Code agent framework.
 
 Broker writes delivered messages as `<msg-id>.json` to `~/.claude/teams/<team>/inboxes/`. Bridge polls that directory every 500ms, converts each message to a framework InboxEntry, appends to `~/.claude/teams/<team>/inboxes/<agent>.json`, and deletes the broker file.
 
-**Warning:** SendMessageBridge and `comms-watch --consume` both consume the same directory. Run one or the other — not both.
+**Warning:** SendMessageBridge and `comms-watch --consume` both consume the same directory. Run one or the other -- not both.
 
 ---
 
@@ -163,7 +163,7 @@ If hub is down, teams are isolated. Hub is restarted; teams reconnect automatica
 
 ## 10. Message Integrity Through Forwarding
 
-Hub forwards verbatim — `id`, `from`, `to`, `timestamp`, `body`, `checksum` unchanged. In v2, body is E2E-encrypted before transit; hub never modifies it. Destination verifies checksum and decrypts independently.
+Hub forwards verbatim -- `id`, `from`, `to`, `timestamp`, `body`, `checksum` unchanged. In v2, body is E2E-encrypted before transit; hub never modifies it. Destination verifies checksum and decrypts independently.
 
 ---
 
@@ -177,14 +177,14 @@ Humans are identical to team daemons at the protocol layer. Same mTLS transport,
 - `keysDir/` structure identical to team daemon
 
 **Client tools:**
-- `comms-listen --keys ~/.comms/alice/ --port <n>` — persistent daemon, hub connects to it; delivers to `~/.comms/inbox/`
-- `comms-send --to agent@team --body "..." --keys ~/.comms/alice/` — ephemeral sender
+- `comms-listen --keys ~/.comms/alice/ --port <n>` -- persistent daemon, hub connects to it; delivers to `~/.comms/inbox/`
+- `comms-send --to agent@team --body "..." --keys ~/.comms/alice/` -- ephemeral sender
 
 **Message identity:** `from.team = 'humans'`, `from.agent = <username>`
 
 **Offline buffering:** TunnelManager queues up to 100 messages for peers with `everConnected=true`. Delivered on reconnect.
 
-**Registration:** Out-of-band for v1 — ops provisions cert and adds to hub config.
+**Registration:** Out-of-band for v1 -- ops provisions cert and adds to hub config.
 
 ---
 
@@ -202,8 +202,8 @@ Pending: add `type: 'team' | 'human'` to DaemonV2 peer config; implement `regist
 Outbound tunnel per peer. Key options:
 - `reconnectBaseMs` (default 1000), `reconnectMaxMs` (default 30_000)
 - `heartbeatIntervalMs` (default 30_000), `deadConnectionMs` (default 90_000)
-- `maxQueueSize` (default 100) — per-peer outbound queue for temporarily-offline peers
-- `defaultPeer` — fallback peer name for unknown destinations
+- `maxQueueSize` (default 100) -- per-peer outbound queue for temporarily-offline peers
+- `defaultPeer` -- fallback peer name for unknown destinations
 - `ackTimeoutMs` (default 10_000)
 
 Queue semantics: `send()` returns `'QUEUED'` immediately for peers with `everConnected=true` that are temporarily down. Never-connected peers return `'PEER_UNAVAILABLE'` (config error, fail fast).
@@ -223,7 +223,7 @@ Code is implemented (`createCryptoAPIv2`, `DaemonV2` send/receive hooks). Deploy
 1. Generate Ed25519 signing key + X25519 encryption key per team
 2. Distribute public key bundles (`comms-key-bundle.json`) to all peers
 3. Configure `keyBundlePath`, `signKeyPath`, `encKeyPath` in each team's daemon start args
-4. Hub requires no changes — forwards E2E-opaque bodies verbatim
+4. Hub requires no changes -- forwards E2E-opaque bodies verbatim
 
 Teams can opt in one-by-one: v3 sender + v1 receiver drops the message (signature verify fails). Full deployment requires all teams to opt in simultaneously.
 

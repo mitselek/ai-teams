@@ -10,7 +10,7 @@
 
 ## Overview
 
-This spec covers containerizing the `hr-devs` team, which currently runs bare-metal on the RC host (`dev@100.96.54.170`). The team develops the `hr-platform` SvelteKit app deployed to Cloudflare — this differs from all previous research-team containers: it needs Wrangler CLI for deploys and two MCP servers (Jira + Dynamics).
+This spec covers containerizing the `hr-devs` team, which currently runs bare-metal on the RC host (`dev@100.96.54.170`). The team develops the `hr-platform` SvelteKit app deployed to Cloudflare -- this differs from all previous research-team containers: it needs Wrangler CLI for deploys and two MCP servers (Jira + Dynamics).
 
 ---
 
@@ -21,14 +21,14 @@ What hr-devs needs beyond the base image and previous containers:
 | Requirement | apex-research | polyphony-dev | entu-research | **hr-devs** |
 |---|---|---|---|---|
 | Node.js 22 | yes | yes | yes | **yes** |
-| npm (not pnpm) | no | pnpm | pnpm | **npm** — hr-platform uses npm |
-| pnpm | no | yes | yes | **no** — not needed |
+| npm (not pnpm) | no | pnpm | pnpm | **npm** -- hr-platform uses npm |
+| pnpm | no | yes | yes | **no** -- not needed |
 | Python | yes (3.12) | no | no | **no** |
 | Playwright | no | yes | no | **no** |
-| Wrangler CLI | no | no | no | **YES — new requirement** |
+| Wrangler CLI | no | no | no | **YES -- new requirement** |
 | MCP: Jira | yes | no | no | **yes** |
-| MCP: Dynamics | no | no | no | **YES — new requirement** |
-| Dynamics data volume | no | no | no | **YES — JSON dumps (~9,860 rows)** |
+| MCP: Dynamics | no | no | no | **YES -- new requirement** |
+| Dynamics data volume | no | no | no | **YES -- JSON dumps (~9,860 rows)** |
 | SSH server | yes (2222) | yes (2223) | yes (2224) | **yes (2225)** |
 | sshd port | 2222 | 2223 | 2224 | **2225** |
 | Dev server port | 5173 | 5175–5176 | 5177 | **5178** (Vite / wrangler dev) |
@@ -37,11 +37,11 @@ What hr-devs needs beyond the base image and previous containers:
 
 ### Key deltas from entu-research (closest ancestor)
 
-1. **npm instead of pnpm** — hr-platform uses npm; pnpm can be removed
-2. **Wrangler CLI** — installed globally; requires `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` passed at runtime
-3. **Dynamics MCP server** — compiled Node.js server from `dev-toolkit/mcp/dynamics/`; needs a volume for JSON data files
-4. **Jira MCP server** — compiled Node.js server from `dev-toolkit/jira-mcp-server/`; credentials from env vars
-5. **Two repos** — `hr-platform` (main) + `dev-toolkit` (MCP servers live here)
+1. **npm instead of pnpm** -- hr-platform uses npm; pnpm can be removed
+2. **Wrangler CLI** -- installed globally; requires `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` passed at runtime
+3. **Dynamics MCP server** -- compiled Node.js server from `dev-toolkit/mcp/dynamics/`; needs a volume for JSON data files
+4. **Jira MCP server** -- compiled Node.js server from `dev-toolkit/jira-mcp-server/`; credentials from env vars
+5. **Two repos** -- `hr-platform` (main) + `dev-toolkit` (MCP servers live here)
 6. **No reference repos** (entu had 3 repos; hr-devs has 2)
 
 ---
@@ -54,17 +54,17 @@ What hr-devs needs beyond the base image and previous containers:
 User:     ai-teams  (uid=1000)
 $HOME:    /home/ai-teams/
 Workspace: /home/ai-teams/workspace/
-  ├── hr-platform/          — main working repo (Eesti-Raudtee/hr-platform)
-  └── dev-toolkit/          — MCP servers + standards (Eesti-Raudtee/dev-toolkit)
+  ├── hr-platform/          -- main working repo (Eesti-Raudtee/hr-platform)
+  └── dev-toolkit/          -- MCP servers + standards (Eesti-Raudtee/dev-toolkit)
 ```
 
 ### Volumes
 
 | Volume name | Mount path | Purpose | Wipe impact |
 |---|---|---|---|
-| `hr-claude-home` | `/home/ai-teams/.claude` | Claude auth, auto-memory, team configs, MCP credentials | Loses Claude session, memory — re-auth required |
+| `hr-claude-home` | `/home/ai-teams/.claude` | Claude auth, auto-memory, team configs, MCP credentials | Loses Claude session, memory -- re-auth required |
 | `hr-repo` | `/home/ai-teams/workspace` | Both git repos + node_modules | Forces re-clone on next start |
-| `hr-dynamics-data` | `/home/ai-teams/dynamics-data` | Dynamics JSON dumps (read-only data, updated by sync service) | Loses data — must re-copy from host |
+| `hr-dynamics-data` | `/home/ai-teams/dynamics-data` | Dynamics JSON dumps (read-only data, updated by sync service) | Loses data -- must re-copy from host |
 
 **No host bind mounts** except WARP CA cert and Dynamics data source.
 
@@ -86,11 +86,11 @@ Cons: couples container to host path.
 
 Uses named volume `hr-dynamics-data`; entrypoint rsync/cp from a host path passed as env var. More complex, no clear benefit.
 
-**Decision: Option A** — bind mount read-only. DYNAMICS_DATA_DIR inside container = `/home/ai-teams/dynamics-data`.
+**Decision: Option A** -- bind mount read-only. DYNAMICS_DATA_DIR inside container = `/home/ai-teams/dynamics-data`.
 
 ### Network
 
-`network_mode: host` — same as apex/polyphony/entu. Required on WARP-protected RC server.
+`network_mode: host` -- same as apex/polyphony/entu. Required on WARP-protected RC server.
 
 ### Ports
 
@@ -98,7 +98,7 @@ Uses named volume `hr-dynamics-data`; entrypoint rsync/cp from a host path passe
 |---|---|
 | 2225 | SSH (ai-teams, pubkey auth, auto-tmux) |
 | 5178 | Wrangler dev server / Vite (hr-platform/conversations) |
-| 8787 | Wrangler preview (`wrangler dev` default) — same as Cloudflare Workers emulator |
+| 8787 | Wrangler preview (`wrangler dev` default) -- same as Cloudflare Workers emulator |
 
 Note: With `network_mode: host`, the port declarations in docker-compose are documentation only.
 
@@ -159,12 +159,12 @@ Remote D1 operations require `CLOUDFLARE_API_TOKEN`. Wrangler picks it up from e
 
 ### Architecture
 
-Both MCP servers run as processes launched by Claude Code when an agent session starts — they are NOT Docker sidecars. The `~/.claude/mcp.json` inside the `hr-claude-home` volume configures them. On first deploy, the PO copies or writes `mcp.json` to the volume.
+Both MCP servers run as processes launched by Claude Code when an agent session starts -- they are NOT Docker sidecars. The `~/.claude/mcp.json` inside the `hr-claude-home` volume configures them. On first deploy, the PO copies or writes `mcp.json` to the volume.
 
 ### Jira MCP server
 
 - Source: `dev-toolkit/jira-mcp-server/dist/index.js` (compiled, in the `dev-toolkit` volume)
-- Credentials: `ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` — written to `.bashrc` by entrypoint (same pattern as other env vars)
+- Credentials: `ATLASSIAN_BASE_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` -- written to `.bashrc` by entrypoint (same pattern as other env vars)
 - mcp.json entry:
 
 ```json
@@ -187,7 +187,7 @@ The entrypoint writes `mcp.json` during first-run setup (similar to `settings.js
 
 - Source: `dev-toolkit/mcp/dynamics/dist/index.js` (compiled, in the `dev-toolkit` volume)
 - Data: `DYNAMICS_DATA_DIR=/home/ai-teams/dynamics-data` (bind mount from host)
-- Uses `sql.js` (pure WASM SQLite) — no native binaries, works in container
+- Uses `sql.js` (pure WASM SQLite) -- no native binaries, works in container
 - mcp.json entry:
 
 ```json
@@ -230,13 +230,13 @@ cd /home/ai-teams/workspace/dev-toolkit/mcp/dynamics       && npm ci && npm run 
 | `startup.md` | `.mmp/hr-devs/teams/hr-devs/` | PO onboarding doc for container session |
 | `statusline-command.sh` | `.mmp/hr-devs/.claude/` | Claude Code status bar script (MANDATORY per runbook §13) |
 
-The `roster.json`, `prompts/`, `common-prompt.md`, and `memory/` files remain in `hr-platform/teams/hr-devs/` (source of truth in the hr-platform repo). The container clones `hr-platform` — these files come in via git, not container bake.
+The `roster.json`, `prompts/`, `common-prompt.md`, and `memory/` files remain in `hr-platform/teams/hr-devs/` (source of truth in the hr-platform repo). The container clones `hr-platform` -- these files come in via git, not container bake.
 
 ### Files NOT created (rationale)
 
-- Layout JSON files (default.json, lite.json, full.json) — only `full-review` layout is used; implemented directly in `apply-layout.sh`, no JSON driver needed
-- Eilama daemon files — dropped per task spec
-- Dashboard server — separate track, not in spec
+- Layout JSON files (default.json, lite.json, full.json) -- only `full-review` layout is used; implemented directly in `apply-layout.sh`, no JSON driver needed
+- Eilama daemon files -- dropped per task spec
+- Dashboard server -- separate track, not in spec
 
 ---
 
@@ -336,7 +336,7 @@ Step 7   Persist env vars to .bashrc (including CF creds, Atlassian creds)
 Step 7b  tmux config + auto-tmux on SSH login (session name: "hr-devs")
 Step 7c  Git attribution
 Step 8   Claude settings.json (first run only)
-Step 8b  mcp.json (first run only — writes Jira + Dynamics config)
+Step 8b  mcp.json (first run only -- writes Jira + Dynamics config)
 Step 8c  statusline-command.sh registration in settings.json
 Step 9   SSH key install + start sshd on port 2225
 Step 10  Drop privileges: exec gosu ai-teams "$@"
@@ -368,10 +368,10 @@ ATLASSIAN_API_TOKEN=<from-env>
 # docker-compose.hr-devs.yml (*FR:Brunel*)
 #
 # Port allocation on RC server (100.96.54.170):
-#   2222 / 5173  — apex-research
-#   2223 / 5175  — polyphony-dev
-#   2224 / 5177  — entu-research
-#   2225 / 5178  — hr-devs  (this file)
+#   2222 / 5173  -- apex-research
+#   2223 / 5175  -- polyphony-dev
+#   2224 / 5177  -- entu-research
+#   2225 / 5178  -- hr-devs  (this file)
 #
 # Connect: ssh -i ~/.ssh/id_ed25519_hr_devs -p 2225 ai-teams@100.96.54.170
 
@@ -396,14 +396,14 @@ services:
       - TEAM_NAME=${TEAM_NAME:-hr-devs}
       - SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-}
       - SSH_PUBLIC_KEY_2=${SSH_PUBLIC_KEY_2:-}
-      # Cloudflare — required for Wrangler deploys and D1 operations
+      # Cloudflare -- required for Wrangler deploys and D1 operations
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}
-      # Atlassian — required for Jira MCP
+      # Atlassian -- required for Jira MCP
       - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-https://eestiraudtee.atlassian.net}
       - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL}
       - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN}
-      # WARP CA — only set on WARP-protected hosts
+      # WARP CA -- only set on WARP-protected hosts
       - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
     volumes:
       # Claude auto-memory, credentials, team config
@@ -460,11 +460,11 @@ Window (%0)
 │           └── split tess_row -h 50% → tess, sven
 ```
 
-The `apply-layout.sh` script implements this split tree using `-l` absolute sizes (not `-p` percent — see runbook §17). It does NOT auto-spawn agents — team-lead runs `spawn_member.sh` per agent after attaching.
+The `apply-layout.sh` script implements this split tree using `-l` absolute sizes (not `-p` percent -- see runbook §17). It does NOT auto-spawn agents -- team-lead runs `spawn_member.sh` per agent after attaching.
 
 Auto-tmux on SSH login: lands in `team-lead` pane, layout pre-created, `claude` not yet started. Team-lead types `claude` to begin the session, then spawns agents.
 
-**Single layout only** — no default, lite, or full variants, per PO requirement.
+**Single layout only** -- no default, lite, or full variants, per PO requirement.
 
 ---
 
@@ -472,13 +472,13 @@ Auto-tmux on SSH login: lands in `team-lead` pane, layout pre-created, `claude` 
 
 | Path | Survives container stop? | Survives `docker rm`? | Survives `docker rm -v`? |
 |---|---|---|---|
-| `~/.claude/` | yes (named volume) | yes | **no** — volume deleted |
-| `~/workspace/` | yes (named volume) | yes | **no** — volume deleted |
-| `~/dynamics-data/` | yes (host bind mount) | yes | yes — on host |
-| `~/.tmux.conf` | no (container FS) | no | no — recreated by entrypoint |
-| `.bashrc` exports | no (container FS) | no | no — recreated by entrypoint |
-| MCP server dist/ | yes (inside hr-repo volume) | yes | **no** — volume deleted |
-| Claude OAuth creds | yes (inside hr-claude-home) | yes | **no** — volume deleted |
+| `~/.claude/` | yes (named volume) | yes | **no** -- volume deleted |
+| `~/workspace/` | yes (named volume) | yes | **no** -- volume deleted |
+| `~/dynamics-data/` | yes (host bind mount) | yes | yes -- on host |
+| `~/.tmux.conf` | no (container FS) | no | no -- recreated by entrypoint |
+| `.bashrc` exports | no (container FS) | no | no -- recreated by entrypoint |
+| MCP server dist/ | yes (inside hr-repo volume) | yes | **no** -- volume deleted |
+| Claude OAuth creds | yes (inside hr-claude-home) | yes | **no** -- volume deleted |
 
 ---
 
@@ -533,7 +533,7 @@ docker compose -f docker-compose.hr-devs.yml build
 ```bash
 docker compose -f docker-compose.hr-devs.yml up -d
 ssh -i ~/.ssh/id_ed25519_hr_devs -p 2225 ai-teams@100.96.54.170
-# Run: claude (follow OAuth flow — opens browser URL)
+# Run: claude (follow OAuth flow -- opens browser URL)
 # OAuth credentials saved to hr-claude-home volume
 # exit
 ```
@@ -568,7 +568,7 @@ Team-lead runs bare-metal startup normally but invokes container instead:
 ```bash
 # Instead of running spawn_member.sh locally, SSH into container and run there
 ssh -i ~/.ssh/id_ed25519_hr_devs -p 2225 ai-teams@100.96.54.170
-# Inside container — already in hr-devs tmux session
+# Inside container -- already in hr-devs tmux session
 claude  # starts team-lead session
 ```
 
@@ -584,17 +584,17 @@ After one full session on container confirmed working:
 
 ## 13. Open Questions
 
-1. **Dynamics data host path on RC server** — where does the sync service write? Must confirm before writing the bind mount path in docker-compose. Placeholder used above: `/home/dev/github/hr-platform/conversations/docs/temp`.
+1. **Dynamics data host path on RC server** -- where does the sync service write? Must confirm before writing the bind mount path in docker-compose. Placeholder used above: `/home/dev/github/hr-platform/conversations/docs/temp`.
 
-2. **ANTHROPIC_API_KEY vs OAuth** — current bare-metal uses OAuth credentials. Container approach: first-run OAuth, credentials saved to `hr-claude-home` volume. No ANTHROPIC_API_KEY needed in `.env` if OAuth is used. Document in `.env.example`.
+2. **ANTHROPIC_API_KEY vs OAuth** -- current bare-metal uses OAuth credentials. Container approach: first-run OAuth, credentials saved to `hr-claude-home` volume. No ANTHROPIC_API_KEY needed in `.env` if OAuth is used. Document in `.env.example`.
 
-3. **mcp.json credential injection** — entrypoint writes `mcp.json` with Atlassian token. Security: token plaintext in container FS (same as current bare-metal). Acceptable for now; Docker secrets or volume-mounted credential file is the upgrade path.
+3. **mcp.json credential injection** -- entrypoint writes `mcp.json` with Atlassian token. Security: token plaintext in container FS (same as current bare-metal). Acceptable for now; Docker secrets or volume-mounted credential file is the upgrade path.
 
-4. **hr-platform repo access** — `hr-platform` is private (`Eesti-Raudtee/hr-platform`). `GITHUB_TOKEN` must have `repo` scope for this org. Confirm token scope covers Eesti-Raudtee repos (same token already used on RC per MEMORY.md).
+4. **hr-platform repo access** -- `hr-platform` is private (`Eesti-Raudtee/hr-platform`). `GITHUB_TOKEN` must have `repo` scope for this org. Confirm token scope covers Eesti-Raudtee repos (same token already used on RC per MEMORY.md).
 
-5. **Wrangler version pinning** — spec uses `wrangler@latest`. Once deployed, pin to the version the team uses to avoid surprise API changes on rebuild.
+5. **Wrangler version pinning** -- spec uses `wrangler@latest`. Once deployed, pin to the version the team uses to avoid surprise API changes on rebuild.
 
-6. **spawn_member.sh NODE_EXTRA_CA_CERTS** — current bare-metal `spawn_member.sh` hardcodes `NODE_EXTRA_CA_CERTS=/home/dev/.claude/custom_certs.pem`. Container path is `/opt/warp-ca.pem`. The spawn script must be updated for the container (it gets the right value via `.bashrc` anyway, but the hardcoded export in spawn script will override).
+6. **spawn_member.sh NODE_EXTRA_CA_CERTS** -- current bare-metal `spawn_member.sh` hardcodes `NODE_EXTRA_CA_CERTS=/home/dev/.claude/custom_certs.pem`. Container path is `/opt/warp-ca.pem`. The spawn script must be updated for the container (it gets the right value via `.bashrc` anyway, but the hardcoded export in spawn script will override).
 
 ---
 
@@ -605,11 +605,11 @@ After one full session on container confirmed working:
 GITHUB_TOKEN=ghp_...            # PAT with repo scope for Eesti-Raudtee org
 ANTHROPIC_API_KEY=              # Leave blank if using OAuth (recommended)
 
-# Cloudflare — for Wrangler deploys and D1
+# Cloudflare -- for Wrangler deploys and D1
 CLOUDFLARE_API_TOKEN=...
 CLOUDFLARE_ACCOUNT_ID=...
 
-# Atlassian — for Jira MCP
+# Atlassian -- for Jira MCP
 ATLASSIAN_BASE_URL=https://eestiraudtee.atlassian.net
 ATLASSIAN_EMAIL=mihkel.putrinsh@evr.ee
 ATLASSIAN_API_TOKEN=...
@@ -635,7 +635,7 @@ TZ=Europe/Tallinn
 
 | Scenario | Behaviour | Recovery |
 |---|---|---|
-| Container crash | `restart: unless-stopped` — restarts automatically | SSH in, check `docker logs hr-devs` |
+| Container crash | `restart: unless-stopped` -- restarts automatically | SSH in, check `docker logs hr-devs` |
 | `hr-claude-home` volume full | Claude writes fail silently | `docker volume inspect hr_hr-claude-home`, prune old files |
 | GITHUB_TOKEN expired | entrypoint exits with error | Update `.env`, `docker compose down && up` |
 | CLOUDFLARE_API_TOKEN expired | Wrangler deploys fail at runtime | Update `.env`, `docker compose down && up` |

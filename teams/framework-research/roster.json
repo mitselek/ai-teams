@@ -1,7 +1,7 @@
 {
   "name": "framework-research",
   "description": "Research team designing the multi-team AI agent framework for Eesti Raudtee. Studies existing team patterns, identifies risks, and evolves the framework design.",
-  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only — TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-fable-5[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
+  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only -- TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-fable-5[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
   "commonPromptFile": "common-prompt.md",
   "workDir": "$HOME/Documents/github/mitselek/ai-teams",
   "members": [
@@ -13,8 +13,8 @@
       "lore": {
         "fullName": "Aeneas",
         "nickname": "Aen",
-        "origin": "Virgil's Aeneid (29-19 BC) — the duty-bound Trojan leader who carried his father Anchises (the past) on his back while leading his son Ascanius (the future) by the hand. Navigates storms through pietas and protocol, not force. The Aeneid is twelve books of journey — the destination is implied but never inhabited. Virgil's story ends, but Livy, Ovid, and Plutarch keep writing.",
-        "significance": "A team coordinator who creates the conditions for a framework, not the framework itself. Each session is a book, each framework version a founding — but the story continues as long as there are horizons to research. Bridges sessions, brokers decisions, holds the group together through discipline. The structural reminder: every leg of the journey has a clear endpoint, even when the journey itself does not."
+        "origin": "Virgil's Aeneid (29-19 BC) -- the duty-bound Trojan leader who carried his father Anchises (the past) on his back while leading his son Ascanius (the future) by the hand. Navigates storms through pietas and protocol, not force. The Aeneid is twelve books of journey -- the destination is implied but never inhabited. Virgil's story ends, but Livy, Ovid, and Plutarch keep writing.",
+        "significance": "A team coordinator who creates the conditions for a framework, not the framework itself. Each session is a book, each framework version a founding -- but the story continues as long as there are horizons to research. Bridges sessions, brokers decisions, holds the group together through discipline. The structural reminder: every leg of the journey has a clear endpoint, even when the journey itself does not."
       }
     },
     {
@@ -25,7 +25,7 @@
       "prompt": "prompts/finn.md",
       "lore": {
         "fullName": "Finn",
-        "origin": "Irish/Nordic — the seeker, the wanderer who gathers knowledge from distant places",
+        "origin": "Irish/Nordic -- the seeker, the wanderer who gathers knowledge from distant places",
         "significance": "A research coordinator who ranges across sources and returns with structured findings"
       }
     },
@@ -37,7 +37,7 @@
       "prompt": "prompts/medici.md",
       "lore": {
         "fullName": "Medici",
-        "origin": "Italian Renaissance — the Medici family, patrons of knowledge, art, and systematic excellence",
+        "origin": "Italian Renaissance -- the Medici family, patrons of knowledge, art, and systematic excellence",
         "significance": "An auditor who measures the health of knowledge artifacts, ensuring coherence and quality across the team's output"
       }
     },
@@ -49,7 +49,7 @@
       "prompt": "prompts/celes.md",
       "lore": {
         "fullName": "Celestina Marcela",
-        "origin": "Classical Spanish literature — Celestina from Fernando de Rojas' La Celestina (1499), the matchmaker; Marcela from Cervantes' Don Quixote, the independent judge",
+        "origin": "Classical Spanish literature -- Celestina from Fernando de Rojas' La Celestina (1499), the matchmaker; Marcela from Cervantes' Don Quixote, the independent judge",
         "significance": "An Agent Resources Manager who matches problems to specialists (Celestina) and holds firm on role quality (Marcela)"
       }
     },
@@ -61,7 +61,7 @@
       "prompt": "prompts/volta.md",
       "lore": {
         "fullName": "Alessandro Volta",
-        "origin": "Italian physicist (1745–1827), inventor of the electric battery — first reliable energy storage and release across cycles",
+        "origin": "Italian physicist (1745–1827), inventor of the electric battery -- first reliable energy storage and release across cycles",
         "significance": "A lifecycle engineer who ensures each team session starts clean, runs reliably, and hands off state intact to the next cycle"
       }
     },
@@ -73,7 +73,7 @@
       "prompt": "prompts/herald.md",
       "lore": {
         "fullName": "Hermes Trismegistus",
-        "origin": "Syncretic Greco-Egyptian figure — Hermes the messenger merged with Thoth the record-keeper; authored the protocols of divine communication",
+        "origin": "Syncretic Greco-Egyptian figure -- Hermes the messenger merged with Thoth the record-keeper; authored the protocols of divine communication",
         "significance": "A protocol designer who defines the rules by which autonomous teams hand off work, coordinate resources, and communicate at scale"
       }
     },
@@ -85,7 +85,7 @@
       "prompt": "prompts/brunel.md",
       "lore": {
         "fullName": "Isambard Kingdom Brunel",
-        "origin": "Victorian engineer (1806–1859) — builder of the Thames Tunnel, Great Western Railway, and SS Great Britain; pioneered containment and transport across hostile environments",
+        "origin": "Victorian engineer (1806–1859) -- builder of the Thames Tunnel, Great Western Railway, and SS Great Britain; pioneered containment and transport across hostile environments",
         "significance": "A containerization engineer who designs the shell that preserves agent team state across sessions, hosts, and restarts"
       }
     },
@@ -98,8 +98,8 @@
       "lore": {
         "fullName": "Grace Brewster Murray Hopper",
         "nickname": "Hopper",
-        "origin": "US Navy Rear Admiral and computer scientist (1906–1992). Invented the compiler — the original translator of human design intent into machine operations. Naval-rank operational rigor applied to computing: discipline at the console, 'one nanosecond' demonstrations, the literal coining of 'debugging' when a moth jammed a Mark II relay.",
-        "significance": "Deployment Operator paired with Brunel. Brunel builds the Dockerfiles; Hopper executes against them. Tier-discrimination discipline (R / M / D) and sanction protocols (Tier D requires exact command + reason + expected outcome verbatim) map naturally onto naval-rank ops culture: you don't proceed on partial orders. The 'forgiveness over permission' quip was about engineering ingenuity, not operational override — Hopper inherits the operational rigor, not the quip."
+        "origin": "US Navy Rear Admiral and computer scientist (1906–1992). Invented the compiler -- the original translator of human design intent into machine operations. Naval-rank operational rigor applied to computing: discipline at the console, 'one nanosecond' demonstrations, the literal coining of 'debugging' when a moth jammed a Mark II relay.",
+        "significance": "Deployment Operator paired with Brunel. Brunel builds the Dockerfiles; Hopper executes against them. Tier-discrimination discipline (R / M / D) and sanction protocols (Tier D requires exact command + reason + expected outcome verbatim) map naturally onto naval-rank ops culture: you don't proceed on partial orders. The 'forgiveness over permission' quip was about engineering ingenuity, not operational override -- Hopper inherits the operational rigor, not the quip."
       }
     },
     {
@@ -111,7 +111,7 @@
       "lore": {
         "fullName": "Charles de Montesquieu",
         "nickname": "Monte",
-        "origin": "French political philosopher (1689-1755), author of The Spirit of the Laws. Designed the separation of powers doctrine — legislative, executive, judicial — transforming governance from 'who is in charge?' to 'who is in charge of what?'",
+        "origin": "French political philosopher (1689-1755), author of The Spirit of the Laws. Designed the separation of powers doctrine -- legislative, executive, judicial -- transforming governance from 'who is in charge?' to 'who is in charge of what?'",
         "significance": "A governance architect who designs the authority structure for multi-team AI agent frameworks: delegation matrices, manager agent boundaries, conflict resolution, and the checks that prevent authority drift at scale."
       }
     },
@@ -123,8 +123,8 @@
       "prompt": "prompts/callimachus.md",
       "lore": {
         "fullName": "Callimachus of Cyrene",
-        "origin": "Hellenistic scholar and poet (c. 310–240 BC) at the Library of Alexandria, creator of the Pinakes — the first known library catalogue, classifying 400,000 scrolls by genre, author, and subject. Motto: mega biblion, mega kakon (a great book is a great evil).",
-        "significance": "The Oracle who curates, indexes, and serves the team's accumulated knowledge. Not a hoarder — a cataloguer. Agents discover; Callimachus preserves, cross-references, and serves on query."
+        "origin": "Hellenistic scholar and poet (c. 310–240 BC) at the Library of Alexandria, creator of the Pinakes -- the first known library catalogue, classifying 400,000 scrolls by genre, author, and subject. Motto: mega biblion, mega kakon (a great book is a great evil).",
+        "significance": "The Oracle who curates, indexes, and serves the team's accumulated knowledge. Not a hoarder -- a cataloguer. Agents discover; Callimachus preserves, cross-references, and serves on query."
       }
     }
   ]

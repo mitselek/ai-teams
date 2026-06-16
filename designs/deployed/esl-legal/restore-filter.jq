@@ -1,4 +1,4 @@
-# (*ESL-L:Celes — verbatim from FR:Volta*) — jq filter for restore-inboxes.sh
+# (*ESL-L:Celes -- verbatim from FR:Volta*) -- jq filter for restore-inboxes.sh
 # Removes shutdown/idle protocol messages from inbox JSON arrays.
 #
 # Matches structural JSON pattern ("type":"shutdown_request") in .text field,

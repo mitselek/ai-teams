@@ -27,11 +27,11 @@ amendments: []
 
 # Stage-2-Confirms Filing Gate
 
-A wiki entry is **not production-grade until its named co-authors have confirmed it via Stage 2 read-back.** This norm has operated implicitly since S36 — agents follow it because they've seen it, not because it is named. This entry names it as a formal, citable, greppable filing gate (GitHub #70), so gate status can be tracked in card frontmatter, surfaced in indexes, and audited by Medici.
+A wiki entry is **not production-grade until its named co-authors have confirmed it via Stage 2 read-back.** This norm has operated implicitly since S36 -- agents follow it because they've seen it, not because it is named. This entry names it as a formal, citable, greppable filing gate (GitHub #70), so gate status can be tracked in card frontmatter, surfaced in indexes, and audited by Medici.
 
-The gate is the **filing-protocol complement** to the two existing Stage-2 process entries: [`stage-2-feedback-typology.md`](stage-2-feedback-typology.md) catalogs *what shape* read-back feedback takes (five shapes); [`stage-2-cycle-yield-narrowing-to-read-back-phase.md`](stage-2-cycle-yield-narrowing-to-read-back-phase.md) establishes *where the joint-author yield lives* (read-back, not drafting). This entry names *the gate that read-back constitutes* — when an entry crosses from draft-grade to production-grade.
+The gate is the **filing-protocol complement** to the two existing Stage-2 process entries: [`stage-2-feedback-typology.md`](stage-2-feedback-typology.md) catalogs *what shape* read-back feedback takes (five shapes); [`stage-2-cycle-yield-narrowing-to-read-back-phase.md`](stage-2-cycle-yield-narrowing-to-read-back-phase.md) establishes *where the joint-author yield lives* (read-back, not drafting). This entry names *the gate that read-back constitutes* -- when an entry crosses from draft-grade to production-grade.
 
-## The gate definition — what "confirmed" means
+## The gate definition -- what "confirmed" means
 
 The gate has three states, carried in the `stage-2` frontmatter field on cards (and optionally on full entries):
 
@@ -41,36 +41,36 @@ The gate has three states, carried in the `stage-2` frontmatter field on cards (
 | `partial` | Some named co-authors have read back and absorbed; others outstanding. The multi-author in-flight state. |
 | `confirmed` | All named co-authors have read back, and either approved-as-written or had their corrections folded. Production-grade. |
 
-**"Confirmed" requires ALL named co-authors, not a majority.** This is load-bearing and follows directly from the substrate-knowledge co-determination finding ([`recursive-narrowing-substrate-truth-evidence-discipline.md`](../patterns/recursive-narrowing-substrate-truth-evidence-discipline.md)): each co-author catches the class of error their substrate-knowledge specifically enables. A missing co-author is a missing *class* of catch, not a missing *vote*. Majority-confirms would treat read-backs as interchangeable votes; they are not — they are vantage-specific verifications.
+**"Confirmed" requires ALL named co-authors, not a majority.** This is load-bearing and follows directly from the substrate-knowledge co-determination finding ([`recursive-narrowing-substrate-truth-evidence-discipline.md`](../patterns/recursive-narrowing-substrate-truth-evidence-discipline.md)): each co-author catches the class of error their substrate-knowledge specifically enables. A missing co-author is a missing *class* of catch, not a missing *vote*. Majority-confirms would treat read-backs as interchangeable votes; they are not -- they are vantage-specific verifications.
 
 ## Single-author vs filed-on-behalf
 
 The gate's entry-state at filing depends on the relationship between **source-agent** and **filer**:
 
-1. **Author IS the filer** (Cal files her own observation; an entry where `source-agents: [callimachus]` and Cal authored it): no separate read-back exists or is needed — the author is the authority on their own claim. State: **`confirmed`** at filing.
+1. **Author IS the filer** (Cal files her own observation; an entry where `source-agents: [callimachus]` and Cal authored it): no separate read-back exists or is needed -- the author is the authority on their own claim. State: **`confirmed`** at filing.
 
 2. **Filed-on-behalf** (Cal files a single source-agent's submission via Protocol A; `source-agents: [brunel]`, Cal-filed): the source-agent has not yet read the *filed* artifact (Cal's rendering may diverge from their submission per relay-to-primary-artifact-fidelity discipline). State: **`pending`** until that agent reads back.
 
 3. **Joint / multi-author** (`source-agents: [a, b, c]`, Cal-filed as honest-fold): each co-author's read-back is a distinct vantage-verification. State progresses `pending` → `partial` (as each confirms) → `confirmed` (all in).
 
-**Architectural-fact and reference entries** (substrate facts, external-system pointers) are a special case: their "confirmation" is *empirical re-verification against the substrate*, not co-author read-back. These are `confirmed` when the substrate observation is verified (n=2 cross-substrate, or single authoritative cite), and their TTL — not a read-back — is the re-verification trigger. The `stage-2` field on an architectural-fact card reads `confirmed` once the substrate-fact is established; it does not wait on a read-back that the entry-class doesn't use.
+**Architectural-fact and reference entries** (substrate facts, external-system pointers) are a special case: their "confirmation" is *empirical re-verification against the substrate*, not co-author read-back. These are `confirmed` when the substrate observation is verified (n=2 cross-substrate, or single authoritative cite), and their TTL -- not a read-back -- is the re-verification trigger. The `stage-2` field on an architectural-fact card reads `confirmed` once the substrate-fact is established; it does not wait on a read-back that the entry-class doesn't use.
 
 ## Filing-protocol integration (Cal-side)
 
 The gate folds into the existing Protocol A / honest-fold lifecycle:
 
-1. **On filing**, set the `stage-2` field per the single-vs-joint rule above. New joint/filed-on-behalf entries start `pending` (fail-closed — an unconfirmed entry is `pending`, never silently `confirmed`).
+1. **On filing**, set the `stage-2` field per the single-vs-joint rule above. New joint/filed-on-behalf entries start `pending` (fail-closed -- an unconfirmed entry is `pending`, never silently `confirmed`).
 2. **On each read-back absorption**, advance the state: a joint entry moves `pending` → `partial` on the first co-author confirm, → `confirmed` when the last one lands. Record the read-back in the full entry's `amendments` log (existing practice) AND update the card's `stage-2` field in the same window.
-3. **Fold-discipline composes**: per the typology, a read-back may approve-as-written (advance state directly) or propose a fold (fold first per the shape's discipline, then advance). A read-back that opens a `[DISPUTE]` does NOT advance — it holds at `partial`/`pending` and sets `status: disputed` until resolved.
-4. **Fail-closed default**: when read-back status is genuinely unknown (older entries, ambiguous amendment logs), default to `pending`. A false `confirmed` is worse than a false `pending` — it asserts production-grade where verification is absent.
+3. **Fold-discipline composes**: per the typology, a read-back may approve-as-written (advance state directly) or propose a fold (fold first per the shape's discipline, then advance). A read-back that opens a `[DISPUTE]` does NOT advance -- it holds at `partial`/`pending` and sets `status: disputed` until resolved.
+4. **Fail-closed default**: when read-back status is genuinely unknown (older entries, ambiguous amendment logs), default to `pending`. A false `confirmed` is worse than a false `pending` -- it asserts production-grade where verification is absent.
 
 ## Why name it now (the #70 rationale)
 
-Three agents independently converged on this need in the Team OS article analysis (Finn #10, Cal #3, Herald #9) — independent convergence is itself evidence the gate is a real seam, not a curator's invention (cf. lossless-independent-convergence). Naming it delivers three properties the implicit norm lacked:
+Three agents independently converged on this need in the Team OS article analysis (Finn #10, Cal #3, Herald #9) -- independent convergence is itself evidence the gate is a real seam, not a curator's invention (cf. lossless-independent-convergence). Naming it delivers three properties the implicit norm lacked:
 
 - **Citable**: "this entry passed the Stage-2-confirms gate" becomes a frontmatter fact, not a tribal memory.
 - **Enforceable**: Cal tracks which entries have/haven't passed via the `stage-2` field; the per-directory INDEX tables surface it.
-- **Greppable**: `grep -rl 'stage-2: pending'` lets Medici audit gate status across the wiki — process gate at the moment quality matters (filing + read-back), not retroactively via TTL.
+- **Greppable**: `grep -rl 'stage-2: pending'` lets Medici audit gate status across the wiki -- process gate at the moment quality matters (filing + read-back), not retroactively via TTL.
 
 The Team OS "feature launch gate" pattern validates the shape: gate quality at the moment it matters, not after the fact.
 
@@ -83,8 +83,8 @@ The Team OS "feature launch gate" pattern validates the shape: gate quality at t
 
 ## Promotion posture
 
-**n=1 (this naming), medium-high confidence** — the underlying practice has n=many (every S36-S37 joint entry went through Stage 2; the yield-narrowing entry catalogs five at n=5 cumulative). The gate is naming an established practice, not proposing a new one, which is why it files at medium-high despite being n=1 *as-a-named-gate*. Promotion to common-prompt (a formal filing-gate rule alongside the Structural Change Discipline gates) is a candidate once the `stage-2` field has cycled through a full session of new filings + read-backs and the state-transition discipline is shown to hold in practice.
+**n=1 (this naming), medium-high confidence** -- the underlying practice has n=many (every S36-S37 joint entry went through Stage 2; the yield-narrowing entry catalogs five at n=5 cumulative). The gate is naming an established practice, not proposing a new one, which is why it files at medium-high despite being n=1 *as-a-named-gate*. Promotion to common-prompt (a formal filing-gate rule alongside the Structural Change Discipline gates) is a candidate once the `stage-2` field has cycled through a full session of new filings + read-backs and the state-transition discipline is shown to hold in practice.
 
-**This entry's own gate status: `pending`** — co-authors Finn and Herald (the #70 co-conveners) have not yet read this naming back. It advances to `confirmed` when they do. (The entry naming the gate is, fittingly, subject to the gate.)
+**This entry's own gate status: `pending`** -- co-authors Finn and Herald (the #70 co-conveners) have not yet read this naming back. It advances to `confirmed` when they do. (The entry naming the gate is, fittingly, subject to the gate.)
 
 (*FR:Callimachus*)

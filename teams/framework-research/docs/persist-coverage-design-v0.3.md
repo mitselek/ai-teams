@@ -1,8 +1,8 @@
-# Persist Coverage Extension — Design Proposal v0.3
+# Persist Coverage Extension -- Design Proposal v0.3
 
 **Author:** Volta (*FR:Volta*)
 **Date:** 2026-04-14
-**Status:** DRAFT — v0.3, integrates team-lead's 5 answers + 3 refinements (2026-04-14 09:59)
+**Status:** DRAFT -- v0.3, integrates team-lead's 5 answers + 3 refinements (2026-04-14 09:59)
 **Supersedes:** v0.2 (frozen as reference at `persist-coverage-design-v0.2.md`)
 **Co-authors:** Brunel (cross-read, cwd-discovery fix); team-lead (skill-patch specification, retention-age floor, MANIFEST, failure-mode abort)
 
@@ -11,36 +11,36 @@
 1. **Team-lead's 5 answers locked in as decisions** (Q1–Q5). No longer open. Two new open questions (Q6 Phase 4, Q7 repo inbox origin) remain because team-lead's reply crossed my v0.2 report in flight.
 2. **Retention policy gets an age floor.** 5-tarball count limit + "never prune younger than 7 days" secondary floor. Protects against burst-shutdown churn.
 3. **MANIFEST file inside each tarball.** Documents the exclusion policy so operators restoring a tarball know what's NOT there. Prevents "is this tarball corrupt?" confusion.
-4. **Skill-patch exact text specified.** Section "Skill integration — proposed patch text" added. Volta specs; someone else applies. Includes abort-on-error behavior for `/shutdown-team` per team-lead's directive.
-5. **Failure-mode: `/shutdown-team` aborts loud on any persist failure.** Partial persistence creates false sense of safety — worse than no persistence. Aligns with team-lead's explicit ruling.
+4. **Skill-patch exact text specified.** Section "Skill integration -- proposed patch text" added. Volta specs; someone else applies. Includes abort-on-error behavior for `/shutdown-team` per team-lead's directive.
+5. **Failure-mode: `/shutdown-team` aborts loud on any persist failure.** Partial persistence creates false sense of safety -- worse than no persistence. Aligns with team-lead's explicit ruling.
 6. **Protocol A submission timing moved to post-field-test.** Was "after v0.2 approval or after field-test". Team-lead picked post-field-test, submission carries empirical data from first uikit-dev shutdown cycle. Sequence documented.
 
 ## Summary (UNCHANGED from v0.2)
 
 Split persistence into three scripts by cadence. `persist-inboxes.sh` (existing) stays. `persist-project-state.sh` (new, cheap, per-agent) handles per-user auto-memory. `persist-session-logs.sh` (new, expensive, coordinated-shutdown-only) handles session transcripts as host-side tarballs. All three hyphen-safe. Team-config out-of-scope.
 
-## Cwd-discovery — UNCHANGED from v0.2
+## Cwd-discovery -- UNCHANGED from v0.2
 
 Marker file `.project-dir-name` primary. Computed git-toplevel fallback with warning. Framework-research marker content: `C--Users-mihkel-putrinsh-Documents-github` (verified from live project dir enumeration).
 
 See v0.2 for full reasoning and bootstrap procedure.
 
-## Hyphen-safe handling — UNCHANGED
+## Hyphen-safe handling -- UNCHANGED
 
 Absolute-path form preferred; `cd parent && ./<name>` when relative names needed (tar entry names). See v0.1.
 
-## Script designs — v0.3 REVISIONS
+## Script designs -- v0.3 REVISIONS
 
-### NEW: `persist-project-state.sh` — UNCHANGED from v0.2
+### NEW: `persist-project-state.sh` -- UNCHANGED from v0.2
 
 Mirror semantics, marker-primary discovery, POSIX wipe-then-copy. See v0.2 for full script.
 
-### NEW: `persist-session-logs.sh` — v0.3 adds MANIFEST + age-floor retention
+### NEW: `persist-session-logs.sh` -- v0.3 adds MANIFEST + age-floor retention
 
 ```bash
 #!/usr/bin/env bash
-# (*FR:Volta*) — Persist session .jsonl transcripts as a compressed tarball.
-# EXPENSIVE — runs on coordinated team shutdown or pre-rebuild only.
+# (*FR:Volta*) -- Persist session .jsonl transcripts as a compressed tarball.
+# EXPENSIVE -- runs on coordinated team shutdown or pre-rebuild only.
 # Requires GNU tar for --exclude **/pattern support.
 set -euo pipefail
 
@@ -71,7 +71,7 @@ fi
 
 PROJECT_DIR="$HOME/.claude/projects/$PROJECT_DIR_NAME"
 if [ ! -d "$PROJECT_DIR" ]; then
-  echo "No project dir at $PROJECT_DIR — nothing to persist." >&2
+  echo "No project dir at $PROJECT_DIR -- nothing to persist." >&2
   exit 0
 fi
 
@@ -81,7 +81,7 @@ MANIFEST_TMP=$(mktemp)
 
 # --- build MANIFEST file documenting what's in the tarball ---
 cat > "$MANIFEST_TMP" <<MANIFEST_EOF
-# Session Logs Tarball — MANIFEST
+# Session Logs Tarball -- MANIFEST
 team: $TEAM_NAME
 created_utc: $TIMESTAMP
 source_project_dir: $PROJECT_DIR
@@ -94,8 +94,8 @@ creator_script: persist-session-logs.sh (v0.3)
 - Subagent transcripts: <uuid>/subagents/*.jsonl
 
 ## EXCLUDED (by design, not corruption)
-- memory/ — per-user auto-memory, covered by persist-project-state.sh, persisted to repo separately
-- **/tool-results/ — redundant with parent agent conversations, excluded to reduce size
+- memory/ -- per-user auto-memory, covered by persist-project-state.sh, persisted to repo separately
+- **/tool-results/ -- redundant with parent agent conversations, excluded to reduce size
 
 ## To restore
 cd \$HOME/.claude/projects && tar xzf <this-tarball>
@@ -176,11 +176,11 @@ exit 0
 2. **MANIFEST.md inside tarball** (response to team-lead refinement): documents team, timestamp, source, discovery method, hostname, what's included, what's excluded, and restore instructions. Operator extracting a tarball can `head MANIFEST.md` and see exactly what they're looking at.
 3. **Retention with age floor** (response to team-lead refinement): `find -mtime +7` selects only tarballs older than 7 days; the count limit applies WITHIN that old set. Result: younger tarballs never get pruned regardless of count. Burst-shutdown protection.
 
-### NEW: `restore-session-logs.sh` — v0.3 MANIFEST-aware
+### NEW: `restore-session-logs.sh` -- v0.3 MANIFEST-aware
 
 ```bash
 #!/usr/bin/env bash
-# (*FR:Volta*) — Restore session logs from tarball. MANUAL-ONLY.
+# (*FR:Volta*) -- Restore session logs from tarball. MANUAL-ONLY.
 # Prints MANIFEST content before extraction so operator knows what's in the tarball.
 set -euo pipefail
 
@@ -189,7 +189,7 @@ TEAM_NAME="$(basename "$SCRIPT_DIR")"
 BACKUP_DIR="${SESSION_BACKUP_DIR:-$HOME/.claude-session-backups/$TEAM_NAME}"
 
 if [ ! -d "$BACKUP_DIR" ]; then
-  echo "No backup dir at $BACKUP_DIR — nothing to restore." >&2
+  echo "No backup dir at $BACKUP_DIR -- nothing to restore." >&2
   exit 1
 fi
 
@@ -209,7 +209,7 @@ fi
 
 # Show MANIFEST before extracting, so operator sees scope before action
 echo "=== MANIFEST ==="
-tar xzOf "$TARBALL" MANIFEST.md 2>/dev/null || echo "(no MANIFEST found — older tarball format)"
+tar xzOf "$TARBALL" MANIFEST.md 2>/dev/null || echo "(no MANIFEST found -- older tarball format)"
 echo "=== end MANIFEST ==="
 echo ""
 
@@ -223,7 +223,7 @@ exit 0
 
 **New:** MANIFEST display before extraction + confirmation prompt. Operator sees exactly what's in the tarball before committing to the restore.
 
-### `persist-project-state.sh` — v0.3 adds `--dry-run`
+### `persist-project-state.sh` -- v0.3 adds `--dry-run`
 
 Same body as v0.2 plus arg parser and dry-run branch. Sketch:
 
@@ -244,11 +244,11 @@ if [ "$DRY_RUN" = "1" ]; then
 fi
 ```
 
-## Skill integration — v0.3 proposed patch text (NEW SECTION)
+## Skill integration -- v0.3 proposed patch text (NEW SECTION)
 
 Team-lead directive: Volta specs; someone else applies. The following are the **exact changes** to propose for the two skill files.
 
-### Patch 1 — `~/.claude/skills/shutdown/SKILL.md`
+### Patch 1 -- `~/.claude/skills/shutdown/SKILL.md`
 
 Add a new **Step 3.5** between Step 3 (Ask agent to save state) and Step 4 (Close Claude via /exit):
 
@@ -264,10 +264,10 @@ bash "$TEAM_DIR/persist-project-state.sh"
 
 `persist-inboxes.sh <name>` persists only the named agent's inbox. `persist-project-state.sh` is shared-state and runs in full-team mode (no per-agent subset).
 
-**Failure mode:** if either script exits non-zero, halt the shutdown sequence and surface the error to the operator. Do NOT proceed to Step 4 — partial persistence followed by clean shutdown creates a false sense of recovery safety.
+**Failure mode:** if either script exits non-zero, halt the shutdown sequence and surface the error to the operator. Do NOT proceed to Step 4 -- partial persistence followed by clean shutdown creates a false sense of recovery safety.
 ```
 
-### Patch 2 — `~/.claude/skills/shutdown-team/SKILL.md`
+### Patch 2 -- `~/.claude/skills/shutdown-team/SKILL.md`
 
 Add a new **Step 2.9** between the per-agent loop (Step 2) and the git commit (Step 3):
 
@@ -282,7 +282,7 @@ bash "$TEAM_DIR/persist-project-state.sh"
 bash "$TEAM_DIR/persist-session-logs.sh"
 ```
 
-**Failure mode (CRITICAL):** if any of the three scripts exits non-zero, abort the shutdown sequence, surface the error, and do NOT proceed to Step 3 (git commit). Partial persistence followed by clean shutdown and git push is strictly worse than no persistence — the repo looks up-to-date when it isn't.
+**Failure mode (CRITICAL):** if any of the three scripts exits non-zero, abort the shutdown sequence, surface the error, and do NOT proceed to Step 3 (git commit). Partial persistence followed by clean shutdown and git push is strictly worse than no persistence -- the repo looks up-to-date when it isn't.
 
 If `persist-session-logs.sh` specifically fails (e.g., disk full on `$SESSION_BACKUP_DIR`), the operator should fix the backup destination and re-run `/shutdown-team` from the beginning. Session-log persist is coordinated-shutdown-only, so there's no cheaper recovery path.
 
@@ -308,9 +308,9 @@ cd "$MEMORY_REPO" && \
 3. Skill files updated at `~/.claude/skills/shutdown/SKILL.md` and `~/.claude/skills/shutdown-team/SKILL.md`
 4. Volta field-tests new invocation path on framework-research substrate (dry-run and real)
 
-Volta does NOT edit skill files directly — scope boundary holds.
+Volta does NOT edit skill files directly -- scope boundary holds.
 
-## Retention policy — v0.3 WITH AGE FLOOR
+## Retention policy -- v0.3 WITH AGE FLOOR
 
 **Pruning rule:**
 
@@ -323,13 +323,13 @@ Volta does NOT edit skill files directly — scope boundary holds.
 
 **Environment variables:**
 
-- `SESSION_BACKUP_DIR` — override backup root (default `$HOME/.claude-session-backups/<team>/`)
-- `SESSION_BACKUP_RETENTION` — count limit within old set (default 5)
-- `SESSION_BACKUP_RETENTION_AGE_DAYS` — age floor in days (default 7, NEW in v0.3)
+- `SESSION_BACKUP_DIR` -- override backup root (default `$HOME/.claude-session-backups/<team>/`)
+- `SESSION_BACKUP_RETENTION` -- count limit within old set (default 5)
+- `SESSION_BACKUP_RETENTION_AGE_DAYS` -- age floor in days (default 7, NEW in v0.3)
 
 **Trade-off:** age floor means disk usage can spike during high-churn periods. At worst case, 12 shutdowns/day × 7 days × 5MB avg = 420MB for one team during a week-long incident response. Acceptable ceiling. If a team regularly blows past this, set `SESSION_BACKUP_RETENTION_AGE_DAYS=1` in their entrypoint.
 
-## Protocol A submission — v0.3 TIMING SEQUENCE
+## Protocol A submission -- v0.3 TIMING SEQUENCE
 
 Per team-lead directive: submit **AFTER field-test**, not after v0.3 approval.
 
@@ -353,44 +353,44 @@ Gives Cal concrete provenance and keeps the wiki entry grounded in observed real
 
 **Volta still owes a Cal-prompt cross-read** before sending, per the pre-submission gate noted in v0.2. Will do it between v0.3 approval and the first field test, during the wait.
 
-## Failure modes — v0.3 additions
+## Failure modes -- v0.3 additions
 
 | Failure | When | Mitigation |
 |---|---|---|
-| Age floor + count limit contradiction | never — age floor ALWAYS takes precedence | Documented; test at dry-run |
-| MANIFEST file malformed | script bug | MANIFEST generated from variables; no user input — safe |
-| MANIFEST missing from old tarball | pre-v0.3 tarball format | restore-session-logs.sh handles it: "(no MANIFEST found — older tarball format)" |
+| Age floor + count limit contradiction | never -- age floor ALWAYS takes precedence | Documented; test at dry-run |
+| MANIFEST file malformed | script bug | MANIFEST generated from variables; no user input -- safe |
+| MANIFEST missing from old tarball | pre-v0.3 tarball format | restore-session-logs.sh handles it: "(no MANIFEST found -- older tarball format)" |
 | `/shutdown-team` aborts mid-persist, leaving partial state | any script exit-1 | Team-lead directive: abort loud, don't push commit. Partial > no persist = wrong; no persist > partial = right. |
 | dry-run flag ignored by stale caller | operator confusion | Script documents the flag in arg parser; non-zero exit on unknown args |
 
 All v0.2 failure modes remain.
 
-## Open questions — v0.3 state
+## Open questions -- v0.3 state
 
 ### RESOLVED by team-lead 2026-04-14 09:59
 
-- **Q1 — Skill integration:** Option 1 (auto-invoke). Exact patch text in v0.3 Section "Skill integration".
-- **Q2 — Backup dir root:** `$HOME/.claude-session-backups/<team>/`. Picked; env var override preserved.
-- **Q3 — Retention count:** 5 default. Plus NEW age floor of 7 days.
-- **Q4 — Subagents included / tool-results excluded:** Confirmed. MANIFEST documents the exclusion.
-- **Q5 — Cal submission timing:** After field-test. Sequence documented.
+- **Q1 -- Skill integration:** Option 1 (auto-invoke). Exact patch text in v0.3 Section "Skill integration".
+- **Q2 -- Backup dir root:** `$HOME/.claude-session-backups/<team>/`. Picked; env var override preserved.
+- **Q3 -- Retention count:** 5 default. Plus NEW age floor of 7 days.
+- **Q4 -- Subagents included / tool-results excluded:** Confirmed. MANIFEST documents the exclusion.
+- **Q5 -- Cal submission timing:** After field-test. Sequence documented.
 
 ### STILL OPEN (v0.2 additions, team-lead's reply crossed v0.2 in flight)
 
-- **Q6 — Phase 4 field-testability:** Option A / B / C / D. Volta recommends D (dry-run flag) + A (framework-research substrate). **v0.3 implements `--dry-run` flag anyway** because team-lead's answers are consistent with it (discipline-free persistence + no in-container writes during maintenance window = dry-run flag is the safe path). If team-lead prefers a different option, the flag remains useful and costs nothing.
-- **Q7 — How do repo inboxes get populated today?** Neither Volta nor Brunel knows. Answer affects whether the integration plan is "add new invocation" or "fix silently-broken existing path". Flagged in v0.2, still open.
+- **Q6 -- Phase 4 field-testability:** Option A / B / C / D. Volta recommends D (dry-run flag) + A (framework-research substrate). **v0.3 implements `--dry-run` flag anyway** because team-lead's answers are consistent with it (discipline-free persistence + no in-container writes during maintenance window = dry-run flag is the safe path). If team-lead prefers a different option, the flag remains useful and costs nothing.
+- **Q7 -- How do repo inboxes get populated today?** Neither Volta nor Brunel knows. Answer affects whether the integration plan is "add new invocation" or "fix silently-broken existing path". Flagged in v0.2, still open.
 
 ### NEW open question in v0.3
 
-- **Q8 — Coordinator-exception vs PO-application for skill patches:** team-lead offered two paths for applying the skill patches: (a) hand to PO for application, or (b) apply himself under coordinator-exception rationale. This is a process decision for team-lead, not a design decision. Volta flags but has no preference — both produce the same end state.
+- **Q8 -- Coordinator-exception vs PO-application for skill patches:** team-lead offered two paths for applying the skill patches: (a) hand to PO for application, or (b) apply himself under coordinator-exception rationale. This is a process decision for team-lead, not a design decision. Volta flags but has no preference -- both produce the same end state.
 
-## Checkpoint plan — v0.3 state
+## Checkpoint plan -- v0.3 state
 
 **Next checkpoint to team-lead:** this document (v0.3). Team-lead promised 5-minute review after receipt. Upon approval:
 
 1. Team-lead answers Q6 (Phase 4 strategy) and Q7 (inbox origin)
 2. Volta creates framework-research marker file `.project-dir-name`
-3. Volta writes the three new scripts (`persist-project-state.sh`, `persist-session-logs.sh`, `restore-session-logs.sh`, `restore-project-state.sh`) — four files total
+3. Volta writes the three new scripts (`persist-project-state.sh`, `persist-session-logs.sh`, `restore-session-logs.sh`, `restore-project-state.sh`) -- four files total
 4. Volta dry-runs all four on framework-research substrate
 5. Volta reports implementation + dry-run results to team-lead
 6. Coordination with Brunel for uikit-dev rollout (Phase 4 of his window)
@@ -407,4 +407,4 @@ All v0.2 failure modes remain.
 - v0.1 drafting: ~35 min
 - v0.2 Brunel integration: ~25 min
 - v0.3 team-lead integration: ~20 min
-- **Total design phase: ~80 min** — still under 100-min estimate
+- **Total design phase: ~80 min** -- still under 100-min estimate

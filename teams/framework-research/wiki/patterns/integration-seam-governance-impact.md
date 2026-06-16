@@ -15,7 +15,7 @@ source-issues: []
 
 # Integration Seam Determines Governance Impact
 
-When evaluating multi-provider adoption, the integration seam — not the model capability — determines governance complexity. Classify any proposal as "sidecar" or "peer" before governance analysis begins.
+When evaluating multi-provider adoption, the integration seam -- not the model capability -- determines governance complexity. Classify any proposal as "sidecar" or "peer" before governance analysis begins.
 
 ## Two Governance Profiles
 
@@ -28,7 +28,7 @@ Non-Claude model runs as a daemon/service outside the agent container, connected
 - No enforcement layer (E0-E4) participation
 - No peer enforcement role
 
-**Governance cost:** Minimal — only credential isolation (T05) and PO authorization per delegation matrix Row 8 (technology stack choice is L0/PO decision).
+**Governance cost:** Minimal -- only credential isolation (T05) and PO authorization per delegation matrix Row 8 (technology stack choice is L0/PO decision).
 
 ### Peer Agent Integration
 
@@ -39,7 +39,7 @@ Non-Claude model runs as a first-class team member with TeamCreate, SendMessage,
 - Must be covered by audit baselines (E4)
 - Must have a delegation matrix trust level
 
-**Governance cost:** Non-linear — 7 new governance requirements (enumerated in `correlated-failure-single-provider.md`).
+**Governance cost:** Non-linear -- 7 new governance requirements (enumerated in `correlated-failure-single-provider.md`).
 
 ## Decision Rule
 
@@ -49,8 +49,8 @@ Any multi-provider adoption proposal should be classified as "sidecar" or "peer"
 
 | Seam | Precedent | Governance validated? |
 |---|---|---|
-| Sidecar (Eilama) | Deployed (hr-devs) | Yes — minimal governance impact confirmed |
-| Peer (non-Claude) | None | No — would require re-validation across T01, T04, T05, T07, T08 |
+| Sidecar (Eilama) | Deployed (hr-devs) | Yes -- minimal governance impact confirmed |
+| Peer (non-Claude) | None | No -- would require re-validation across T01, T04, T05, T07, T08 |
 
 ## Provenance
 
@@ -61,8 +61,8 @@ Any multi-provider adoption proposal should be classified as "sidecar" or "peer"
 
 ## Related
 
-- [`multi-provider-integration-seams.md`](multi-provider-integration-seams.md) — documents the same seams from an infrastructure/container perspective; this entry adds the governance dimension
-- [`correlated-failure-single-provider.md`](correlated-failure-single-provider.md) — the 7 governance prerequisites apply specifically to the peer integration seam
-- [`contract-enforcement-gap-non-claude.md`](../gotchas/contract-enforcement-gap-non-claude.md) — the contract gap is specific to sidecar-and-above; peer integration has additional governance gaps beyond contracts
+- [`multi-provider-integration-seams.md`](multi-provider-integration-seams.md) -- documents the same seams from an infrastructure/container perspective; this entry adds the governance dimension
+- [`correlated-failure-single-provider.md`](correlated-failure-single-provider.md) -- the 7 governance prerequisites apply specifically to the peer integration seam
+- [`contract-enforcement-gap-non-claude.md`](../gotchas/contract-enforcement-gap-non-claude.md) -- the contract gap is specific to sidecar-and-above; peer integration has additional governance gaps beyond contracts
 
 (*FR:Callimachus*)

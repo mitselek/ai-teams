@@ -17,8 +17,8 @@ When a team crashes and the runtime dir (`~/.claude/teams/<team>/`) survives, do
 
 ## Three-Step Fix
 
-1. **Shutdown** — `SendMessage {type: shutdown_request}` to any running instance. Wait for `teammate_terminated` (NOT `shutdown_approved` alone — agent may still be writing scratchpad).
-2. **jq remove from config.json** — delete dormant original and any `-N` suffix entries:
+1. **Shutdown** -- `SendMessage {type: shutdown_request}` to any running instance. Wait for `teammate_terminated` (NOT `shutdown_approved` alone -- agent may still be writing scratchpad).
+2. **jq remove from config.json** -- delete dormant original and any `-N` suffix entries:
 
    ```bash
    cp config.json /tmp/config-backup-$(date +%s).json   # backup first
@@ -27,11 +27,11 @@ When a team crashes and the runtime dir (`~/.claude/teams/<team>/`) survives, do
      && mv /tmp/new.json ~/.claude/teams/<team>/config.json
    ```
 
-3. **Spawn via Agent tool** — `name: "<agent>"` parameter is critical. Without it the spawn is anonymous and lacks SendMessage access.
+3. **Spawn via Agent tool** -- `name: "<agent>"` parameter is critical. Without it the spawn is anonymous and lacks SendMessage access.
 
 ## Tradeoff
 
-The dormant entry holds roster-backed identity metadata (color, model tier with `[1m]` suffix, role-specific `agentType`, correct `cwd`). Removing via jq drops all of that. The Agent-tool spawn creates a minimal entry with default color, `agentType: general-purpose`, and workspace-root `cwd`. All cosmetic/navigational — none block functionality.
+The dormant entry holds roster-backed identity metadata (color, model tier with `[1m]` suffix, role-specific `agentType`, correct `cwd`). Removing via jq drops all of that. The Agent-tool spawn creates a minimal entry with default color, `agentType: general-purpose`, and workspace-root `cwd`. All cosmetic/navigational -- none block functionality.
 
 ## Provenance
 

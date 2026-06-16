@@ -18,26 +18,26 @@
 #  7b.  tmux config + auto-tmux on SSH login
 #  7c.  Git attribution
 #  8.   Claude settings.json (first run only)
-#  8b.  mcp.json (first run only — Jira + Dynamics)
+#  8b.  mcp.json (first run only -- Jira + Dynamics)
 #  8c.  statusline-command.sh registration in settings.json
 #  9.   SSH key install + start sshd on port 2225
 #  10.  Drop privileges and exec
 #
 # Required env vars:
-#   GITHUB_TOKEN       — PAT with repo scope for Eesti-Raudtee org
-#   CLOUDFLARE_API_TOKEN  — for Wrangler deploys and D1 operations
-#   CLOUDFLARE_ACCOUNT_ID — for Wrangler account targeting
-#   ATLASSIAN_EMAIL       — for Jira MCP
-#   ATLASSIAN_API_TOKEN   — for Jira MCP
+#   GITHUB_TOKEN       -- PAT with repo scope for Eesti-Raudtee org
+#   CLOUDFLARE_API_TOKEN  -- for Wrangler deploys and D1 operations
+#   CLOUDFLARE_ACCOUNT_ID -- for Wrangler account targeting
+#   ATLASSIAN_EMAIL       -- for Jira MCP
+#   ATLASSIAN_API_TOKEN   -- for Jira MCP
 #
 # Optional env vars:
-#   ANTHROPIC_API_KEY  — leave blank if using OAuth (standard)
-#   REPO_URL           — hr-platform URL (default: github.com/Eesti-Raudtee/hr-platform.git)
-#   TOOLKIT_URL        — dev-toolkit URL (default: github.com/Eesti-Raudtee/dev-toolkit.git)
-#   TEAM_NAME          — team name (default: hr-devs)
-#   NODE_EXTRA_CA_CERTS — path to WARP CA cert (set in compose on WARP hosts)
-#   SSH_PUBLIC_KEY     — public key for ai-teams SSH access (port 2225)
-#   SSH_PUBLIC_KEY_2   — additional key (supports SSH_PUBLIC_KEY_N pattern)
+#   ANTHROPIC_API_KEY  -- leave blank if using OAuth (standard)
+#   REPO_URL           -- hr-platform URL (default: github.com/Eesti-Raudtee/hr-platform.git)
+#   TOOLKIT_URL        -- dev-toolkit URL (default: github.com/Eesti-Raudtee/dev-toolkit.git)
+#   TEAM_NAME          -- team name (default: hr-devs)
+#   NODE_EXTRA_CA_CERTS -- path to WARP CA cert (set in compose on WARP hosts)
+#   SSH_PUBLIC_KEY     -- public key for ai-teams SSH access (port 2225)
+#   SSH_PUBLIC_KEY_2   -- additional key (supports SSH_PUBLIC_KEY_N pattern)
 set -e
 
 CONTAINER_USER="ai-teams"
@@ -69,13 +69,13 @@ clone_or_pull() {
     auth_url=$(echo "$repo_url" | sed "s|https://|https://${GITHUB_TOKEN}@|")
 
     if [ -d "${target_dir}/.git" ]; then
-        echo "[entrypoint] ${target_dir} exists — running git pull..."
+        echo "[entrypoint] ${target_dir} exists -- running git pull..."
         gosu "${CONTAINER_USER}" git -C "${target_dir}" remote set-url origin "${auth_url}"
         gosu "${CONTAINER_USER}" git -C "${target_dir}" pull --ff-only || {
             echo "[entrypoint] WARNING: git pull failed (non-fast-forward or network). Using existing state."
         }
     else
-        echo "[entrypoint] First run — cloning ${repo_url} to ${target_dir}..."
+        echo "[entrypoint] First run -- cloning ${repo_url} to ${target_dir}..."
         mkdir -p "${target_dir}"
         chown "${CONTAINER_UID}:${CONTAINER_GID}" "${target_dir}"
         gosu "${CONTAINER_USER}" git clone "${auth_url}" "${target_dir}"
@@ -90,7 +90,7 @@ build_mcp_server() {
         gosu "${CONTAINER_USER}" bash -c "cd '${server_dir}' && npm ci && npm run build" 2>&1 | tail -5
         echo "[entrypoint] ${name} MCP server built."
     elif [ -d "${server_dir}/dist" ]; then
-        echo "[entrypoint] ${name} MCP server dist/ already exists — skipping build."
+        echo "[entrypoint] ${name} MCP server dist/ already exists -- skipping build."
     else
         echo "[entrypoint] WARNING: ${name} MCP server directory not found: ${server_dir}"
     fi
@@ -152,7 +152,7 @@ if [ -f "${CONVERSATIONS_DIR}/package.json" ]; then
     gosu "${CONTAINER_USER}" npm --prefix "${CONVERSATIONS_DIR}" ci 2>&1 | tail -5
     echo "[entrypoint] npm ci complete."
 else
-    echo "[entrypoint] No package.json in conversations/ — skipping npm ci."
+    echo "[entrypoint] No package.json in conversations/ -- skipping npm ci."
 fi
 
 # ── Step 6: Runtime validation gates ──────────────────────────────────────────
@@ -160,13 +160,13 @@ echo "[entrypoint] Runtime validation:"
 
 NODE_VERSION=$(node --version 2>&1 | grep -oP '\d+' | head -1)
 if [ "$NODE_VERSION" -lt 20 ]; then
-    echo "  FAIL: Node.js v${NODE_VERSION} < 20 — aborting." >&2
+    echo "  FAIL: Node.js v${NODE_VERSION} < 20 -- aborting." >&2
     exit 1
 fi
 echo "  OK: Node.js v${NODE_VERSION}"
 
 if ! command -v wrangler >/dev/null 2>&1; then
-    echo "  FAIL: wrangler not found — aborting." >&2
+    echo "  FAIL: wrangler not found -- aborting." >&2
     exit 1
 fi
 echo "  OK: wrangler $(wrangler --version 2>&1 | head -1)"
@@ -182,33 +182,33 @@ fi
 if [ -d "${REPO_DIR}/.git" ]; then
     echo "  OK: hr-platform repo"
 else
-    echo "  FAIL: hr-platform repo missing — aborting." >&2
+    echo "  FAIL: hr-platform repo missing -- aborting." >&2
     exit 1
 fi
 
 if [ -d "${TOOLKIT_DIR}/.git" ]; then
     echo "  OK: dev-toolkit repo"
 else
-    echo "  FAIL: dev-toolkit repo missing — aborting." >&2
+    echo "  FAIL: dev-toolkit repo missing -- aborting." >&2
     exit 1
 fi
 
 if [ -d "${JIRA_MCP_DIR}/dist" ]; then
     echo "  OK: Jira MCP server built"
 else
-    echo "  WARN: Jira MCP server dist/ missing — Jira tools unavailable."
+    echo "  WARN: Jira MCP server dist/ missing -- Jira tools unavailable."
 fi
 
 if [ -d "${DYNAMICS_MCP_DIR}/dist" ]; then
     echo "  OK: Dynamics MCP server built"
 else
-    echo "  WARN: Dynamics MCP server dist/ missing — Dynamics tools unavailable."
+    echo "  WARN: Dynamics MCP server dist/ missing -- Dynamics tools unavailable."
 fi
 
 if [ -d "/home/ai-teams/dynamics-data" ] && [ "$(ls /home/ai-teams/dynamics-data/*.json 2>/dev/null | wc -l)" -gt 0 ]; then
     echo "  OK: Dynamics data ($(ls /home/ai-teams/dynamics-data/*.json | wc -l) JSON files)"
 else
-    echo "  WARN: Dynamics data not found at /home/ai-teams/dynamics-data — Dynamics MCP will return empty results."
+    echo "  WARN: Dynamics data not found at /home/ai-teams/dynamics-data -- Dynamics MCP will return empty results."
 fi
 
 echo "[entrypoint] All gates passed. Starting..."
@@ -258,7 +258,7 @@ echo "# Or: npm run local:start  (uses wrangler dev, check wrangler.jsonc for po
 
 # ── Step 7b: tmux config + auto-tmux on SSH login ────────────────────────────
 # NOTE (2026-04-24, #60): tmux here is HUMAN-TERMINAL scaffolding only.
-# Agent spawning no longer uses tmux panes — agents spawn via the Agent tool
+# Agent spawning no longer uses tmux panes -- agents spawn via the Agent tool
 # (team_name + name) from the team-lead Claude Code session, not via
 # `tmux send-keys`. The auto-tmux block below + apply-layout.sh remain useful
 # for PO SSH-in (persistent shell, pre-arranged panes). If the team drops
@@ -275,8 +275,8 @@ TMUX_EOF
 chown "${CONTAINER_UID}:${CONTAINER_GID}" "${HOME_DIR}/.tmux.conf"
 
 # Auto-tmux + auto-cd on SSH login.
-# Path 1: no session — create layout + start claude.
-# Path 2/3: session exists (detached or attached) — just attach.
+# Path 1: no session -- create layout + start claude.
+# Path 2/3: session exists (detached or attached) -- just attach.
 sed -i '/^# auto-tmux:/,/^fi$/{d}' "${BASHRC}"
 cat >> "${BASHRC}" << 'AUTOTMUX_EOF'
 # auto-tmux: attach or create session on SSH login
@@ -336,7 +336,7 @@ else
     # Ensure statusLine is present even if settings.json already exists
     # (idempotent: only adds if missing)
     if ! grep -q 'statusLine' "$SETTINGS_FILE" 2>/dev/null; then
-        echo "[entrypoint] WARNING: settings.json exists but missing statusLine — add manually per runbook §13."
+        echo "[entrypoint] WARNING: settings.json exists but missing statusLine -- add manually per runbook §13."
     fi
 fi
 
@@ -391,7 +391,7 @@ if [ "$KEY_COUNT" -gt 0 ]; then
     /usr/sbin/sshd -p 2225
     echo "[entrypoint] sshd started on port 2225."
 else
-    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set — SSH access disabled."
+    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set -- SSH access disabled."
 fi
 
 # ── Step 10: Drop privileges and exec ─────────────────────────────────────────

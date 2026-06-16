@@ -1,4 +1,4 @@
-# Communications Development — Common Standards
+# Communications Development -- Common Standards
 
 ## Team
 
@@ -9,7 +9,7 @@
 
 ## Workspace
 
-- **Repo:** `mitselek/ai-teams` (private) — shared with framework-research
+- **Repo:** `mitselek/ai-teams` (private) -- shared with framework-research
 - **Source code:** `comms-dev/` directory at repo root
 - **Reference specs:** Herald's inter-team transport spec (from framework-research)
 
@@ -26,9 +26,9 @@
 
 ## Deliverables
 
-1. **Message broker daemon** — per-team broker that listens on `<team-name>.sock`, handles encryption, routing, and delivery
-2. **`comms-send` CLI** — send encrypted messages to other teams via broker
-3. **`comms-publish` CLI** — bridge operational findings to GitHub Issues (`gh` CLI wrapper)
+1. **Message broker daemon** -- per-team broker that listens on `<team-name>.sock`, handles encryption, routing, and delivery
+2. **`comms-send` CLI** -- send encrypted messages to other teams via broker
+3. **`comms-publish` CLI** -- bridge operational findings to GitHub Issues (`gh` CLI wrapper)
 
 ## Communication Rule
 
@@ -43,8 +43,8 @@ All persistent text output must carry the author agent's name in the format `(*C
 | Output type | Placement |
 |---|---|
 | Source code file | Comment at top of file |
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 | GitHub Issue body | At the bottom of the body |
 
 ## Language Rules
@@ -105,7 +105,7 @@ rm .gh-issue-body.md
 
 ## Standards
 
-- This is a DEVELOPMENT team — we write production code
+- This is a DEVELOPMENT team -- we write production code
 - All code goes into `comms-dev/` at repo root
 - Tests are mandatory for all functionality
 - Code review happens via team-lead before merge
@@ -116,16 +116,16 @@ rm .gh-issue-body.md
 
 All new functionality follows the **Red → Green → Refactor** cycle:
 
-1. **Kerckhoffs writes failing tests first** — from the spec or task description, before any implementation exists
-2. **Babbage/Vigenere implement** — write the minimum code to make the tests pass
-3. **Refactor** — clean up while keeping tests green
+1. **Kerckhoffs writes failing tests first** -- from the spec or task description, before any implementation exists
+2. **Babbage/Vigenere implement** -- write the minimum code to make the tests pass
+3. **Refactor** -- clean up while keeping tests green
 
 **Workflow for new features:**
 1. Team-lead assigns a feature task
 2. Kerckhoffs reads the spec/task and writes test cases with real assertions (NOT todos)
 3. Kerckhoffs confirms tests fail (`RED`) and sends `[COORDINATION]` to the implementer with test file location
 4. Implementer writes code until tests pass (`GREEN`)
-5. Implementer sends `[COORDINATION]` back — Kerckhoffs verifies and adds edge cases if needed
+5. Implementer sends `[COORDINATION]` back -- Kerckhoffs verifies and adds edge cases if needed
 
 **Rule:** No implementation work begins until Kerckhoffs has committed failing tests for that module. The tests define the contract.
 

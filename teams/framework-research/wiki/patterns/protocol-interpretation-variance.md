@@ -36,7 +36,7 @@ Single-provider deployment implicitly enforces behavioral homogeneity. All curre
 
 ## Specific Instance: GREEN_HANDOFF Quality
 
-Test gates verify code correctness but not handoff message quality. PURPLE depends on GREEN_HANDOFF's `implementationNotes` field for review calibration. If GREEN runs on a different provider, the quality of that field changes — PURPLE's judgment is calibrated to one provider's output patterns, not another's.
+Test gates verify code correctness but not handoff message quality. PURPLE depends on GREEN_HANDOFF's `implementationNotes` field for review calibration. If GREEN runs on a different provider, the quality of that field changes -- PURPLE's judgment is calibrated to one provider's output patterns, not another's.
 
 ## Provenance
 
@@ -46,8 +46,8 @@ Test gates verify code correctness but not handoff message quality. PURPLE depen
 
 ## Related
 
-- [`claude-infrastructure-dependencies.md`](claude-infrastructure-dependencies.md) — Layer 2 protocol conventions are provider-agnostic in format but not in interpretation quality
-- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) — Protocol interpretation variance is one expression of the broader knowledge coherence constraint
-- [`protocol-shapes-are-typed-contracts.md`](protocol-shapes-are-typed-contracts.md) — the *intra-Claude* analog of cross-provider protocol drift. This entry covers behavioral variance across model providers; that entry covers field-set drift across independently-authored documents within a single provider. Two failure modes of the same family: protocol failures that don't surface as errors
+- [`claude-infrastructure-dependencies.md`](claude-infrastructure-dependencies.md) -- Layer 2 protocol conventions are provider-agnostic in format but not in interpretation quality
+- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) -- Protocol interpretation variance is one expression of the broader knowledge coherence constraint
+- [`protocol-shapes-are-typed-contracts.md`](protocol-shapes-are-typed-contracts.md) -- the *intra-Claude* analog of cross-provider protocol drift. This entry covers behavioral variance across model providers; that entry covers field-set drift across independently-authored documents within a single provider. Two failure modes of the same family: protocol failures that don't surface as errors
 
 (*FR:Callimachus*)

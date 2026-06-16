@@ -14,15 +14,15 @@
 Agent → MCP (CrossTeamSend) → Local Daemon → [persistent mTLS tunnel] → Remote Daemon → Recipient Inbox
 ```
 
-- **Per-team relay daemon** — key holder, ACL enforcer, transport
-- **mTLS tunnels** — persistent, encrypted transport (per-team ECDSA P-256 keypair)
-- **Plaintext inside tunnel** — no per-message crypto
-- **Per-agent ACL** — one-directional, wildcard support, default-deny, SIGHUP hot-reload
-- **At-least-once delivery** — ACK per message, retry with exponential backoff, dedup by message ID
-- **Trust model** — OS isolation inside container, zero trust between containers
-- **Hard invariant** — `from.team === peerCertCN` (close connection on mismatch, no NACK)
-- **Key provisioning** — pre-provisioned (.ssh model), daemon is pure consumer
-- **UDS control socket** — JSON-over-UDS for send, status, reload, peers commands
+- **Per-team relay daemon** -- key holder, ACL enforcer, transport
+- **mTLS tunnels** -- persistent, encrypted transport (per-team ECDSA P-256 keypair)
+- **Plaintext inside tunnel** -- no per-message crypto
+- **Per-agent ACL** -- one-directional, wildcard support, default-deny, SIGHUP hot-reload
+- **At-least-once delivery** -- ACK per message, retry with exponential backoff, dedup by message ID
+- **Trust model** -- OS isolation inside container, zero trust between containers
+- **Hard invariant** -- `from.team === peerCertCN` (close connection on mismatch, no NACK)
+- **Key provisioning** -- pre-provisioned (.ssh model), daemon is pure consumer
+- **UDS control socket** -- JSON-over-UDS for send, status, reload, peers commands
 
 ### Key Directory Layout
 ```
@@ -45,16 +45,16 @@ Agent → MCP (CrossTeamSend) → Local Daemon → [persistent mTLS tunnel] → 
 | 6 E2E | cross-team-e2e.test.ts | 9 | Kerckhoffs |
 
 ### GitHub Issues
-- #13 — Brainstorm decisions (open)
-- #14 — Test plan + security matrix (open)
-- #15 — Crypto implementation spec (open)
-- #16 — Protocol spec (open)
-- #17 — CLI tooling spec (open)
-- #18 — Implementation plan (open)
+- #13 -- Brainstorm decisions (open)
+- #14 -- Test plan + security matrix (open)
+- #15 -- Crypto implementation spec (open)
+- #16 -- Protocol spec (open)
+- #17 -- CLI tooling spec (open)
+- #18 -- Implementation plan (open)
 
 ### [LEARNED] TLS 1.3 gotchas (from Babbage)
-- `rejectUnauthorized: false` skips `checkServerIdentity` — verify fingerprint manually in `secureConnect`
-- `server.close(cb)` blocks until all connections close — track + destroy sockets in test helpers
+- `rejectUnauthorized: false` skips `checkServerIdentity` -- verify fingerprint manually in `secureConnect`
+- `server.close(cb)` blocks until all connections close -- track + destroy sockets in test helpers
 - Client fires `secureConnect` BEFORE server fires `secureConnection` on loopback
 
 ### [DEFERRED] Items for v2+
@@ -69,7 +69,7 @@ Agent → MCP (CrossTeamSend) → Local Daemon → [persistent mTLS tunnel] → 
 
 ### Agent Status
 - vigenere: Phase 1 delivered (tls-config + acl)
-- babbage: Phase 2+3+4 delivered (transport + daemon + MCP tool) — session MVP
+- babbage: Phase 2+3+4 delivered (transport + daemon + MCP tool) -- session MVP
 - kerckhoffs: RED tests for all phases + E2E integration
 - lovelace: Phase 5 delivered (all 3 CLI tools), pivoted from frontend to CLI/TUI
 
@@ -79,7 +79,7 @@ Agent → MCP (CrossTeamSend) → Local Daemon → [persistent mTLS tunnel] → 
 
 ### Session: Codebase Familiarisation
 
-Fresh session — all agents spawned, no prior scratchpads (except this one). Asked team to review their domains and update scratchpads.
+Fresh session -- all agents spawned, no prior scratchpads (except this one). Asked team to review their domains and update scratchpads.
 
 ### Agent Reports
 
@@ -93,7 +93,7 @@ Fresh session — all agents spawned, no prior scratchpads (except this one). As
 
 ### [GOTCHA] Key Issues
 
-1. No HTTP/WS layer — frontend cannot connect to backend without bridge
+1. No HTTP/WS layer -- frontend cannot connect to backend without bridge
 2. comms-send is v1-only, bypasses v2 security
 3. TODO(T7) connection limit unimplemented
 4. SendMessageBridge + comms-watch --consume mutual exclusion

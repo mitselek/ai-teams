@@ -1,4 +1,4 @@
-# Raamatukoi Dev — Common Standards
+# Raamatukoi Dev -- Common Standards
 
 ## Team
 
@@ -6,7 +6,7 @@
 - **Mission:** Build quality infrastructure (tests, CI, linting) for Raamatukoi webstore and rat-project, then maintain through bug fixes and refactoring
 - **Deployment:** VPS container (TBD)
 - **Client:** Raamatukoi (Estonian bookstore, "Book Moth")
-- **Pipeline tier:** Cathedral (separate PURPLEs — High domain distance: different repos, different languages)
+- **Pipeline tier:** Cathedral (separate PURPLEs -- High domain distance: different repos, different languages)
 
 ### Members
 
@@ -20,7 +20,7 @@
 
 ## Workspace
 
-**Team repo:** [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp) — cloned at `~/workspace/tugigrupp/`
+**Team repo:** [`Raamatukoi/tugigrupp`](https://github.com/Raamatukoi/tugigrupp) -- cloned at `~/workspace/tugigrupp/`
 
 ```
 ~/workspace/tugigrupp/
@@ -34,8 +34,8 @@
     └── decisions/                   # Team-lead's ADRs
 ```
 
-- **Webstore code:** `webstore/` — Next.js 16 e-commerce store ([Raamatukoi/webstore](https://github.com/Raamatukoi/webstore))
-- **Rat-project code:** `rat-project/` — FastAPI book procurement system ([Raamatukoi/rat-project](https://github.com/Raamatukoi/rat-project))
+- **Webstore code:** `webstore/` -- Next.js 16 e-commerce store ([Raamatukoi/webstore](https://github.com/Raamatukoi/webstore))
+- **Rat-project code:** `rat-project/` -- FastAPI book procurement system ([Raamatukoi/rat-project](https://github.com/Raamatukoi/rat-project))
 
 ### Submodule Workflow
 
@@ -65,8 +65,8 @@ All persistent text output must carry the author agent's name in the format `(*R
 
 | Output type | Placement |
 |---|---|
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 | Code comment (where warranted) | At the end of the comment |
 | Git commit message | In the commit body |
 
@@ -89,8 +89,8 @@ This team has two communication hubs:
 - **Database:** PostgreSQL
 - **Key deps:** Anthropic SDK, nodemailer, next-intl
 - **Linting:** ESLint
-- **Tests:** TBD (Vitest or Jest — Jikji decides based on Next.js 16 conventions)
-- **CI:** TBD (GitHub Actions — webstore pipeline sets up)
+- **Tests:** TBD (Vitest or Jest -- Jikji decides based on Next.js 16 conventions)
+- **CI:** TBD (GitHub Actions -- webstore pipeline sets up)
 
 ### Rat-project (Python / FastAPI)
 
@@ -98,19 +98,19 @@ This team has two communication hubs:
 - **Frontend:** React (CRA)
 - **Language:** Python
 - **Key deps:** opencv, open_clip_torch, google-cloud-vision, pytesseract (OCR)
-- **Linting:** TBD (ruff — rat-project pipeline sets up)
-- **Type checking:** TBD (mypy — rat-project pipeline sets up)
-- **Tests:** TBD (pytest — Babbage decides on structure)
-- **CI:** TBD (GitHub Actions — rat-project pipeline sets up)
+- **Linting:** TBD (ruff -- rat-project pipeline sets up)
+- **Type checking:** TBD (mypy -- rat-project pipeline sets up)
+- **Tests:** TBD (pytest -- Babbage decides on structure)
+- **CI:** TBD (GitHub Actions -- rat-project pipeline sets up)
 
 ## Integration Points
 
 Both repos interact with external systems. **Bodley** maintains canonical documentation for all integration contracts.
 
-- **Directo ERP** — article XML feeds (product data, pricing, stock levels), book descriptions, image URLs. Used by both webstore and rat-project.
-- **PIM system** — product information management. Shared between repos.
-- **SKU management** — article identifiers that must be consistent across systems.
-- **RARA** — Estonian national library. Book metadata import (rat-project only).
+- **Directo ERP** -- article XML feeds (product data, pricing, stock levels), book descriptions, image URLs. Used by both webstore and rat-project.
+- **PIM system** -- product information management. Shared between repos.
+- **SKU management** -- article identifiers that must be consistent across systems.
+- **RARA** -- Estonian national library. Book metadata import (rat-project only).
 
 When writing tests that touch integration points, query Bodley first for the contract specification.
 
@@ -122,7 +122,7 @@ When writing tests that touch integration points, query Bodley first for the con
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  CASSIODORUS — ARCHITECT (opus)                         │
+│  CASSIODORUS -- ARCHITECT (opus)                         │
 │  1. Receive story from Manutius                         │
 │  2. Decompose into ordered test plan                    │
 │  3. Write test plan to docs/test-plans/<story-id>.md    │
@@ -197,7 +197,7 @@ Team-lead shuts down last, commits memory files, pushes.
 
 1. Read your personal scratchpad at `teams/raamatukoi-dev/memory/<your-name>.md` if it exists
 2. Read the CLAUDE.md of your assigned repo (`webstore/CLAUDE.md` or `rat-project/CLAUDE.md`)
-3. Read `docs/tdd-pipeline.md` — the XP cycle protocol
+3. Read `docs/tdd-pipeline.md` -- the XP cycle protocol
 4. Send a brief intro message to `team-lead`
 
 (*FR:Celes*)

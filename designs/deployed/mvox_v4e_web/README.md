@@ -1,4 +1,4 @@
-# mvox_v4e_web — deployment index
+# mvox_v4e_web -- deployment index
 
 Indexed: 2026-05-20. Cloned and refactored from `polyphony-dev` by PO.
 
@@ -21,7 +21,7 @@ The team config is in the mvox repo itself, not mirrored here.
 
 **This is NOT an FR-shipped substrate.** The container lifecycle artifacts (Dockerfile, entrypoint, docker-compose) inherited from the polyphony parent live inside the mvox repo at the project root. FR has not designed or owns the substrate for this team.
 
-Operator-role scope (per `designs/deployed/operator-role/`): mvox_v4e_web is **out of scope** for Hopper's MAY-DO list — substrate-design ownership rule excludes clones+refactors of FR-shipped teams when the clone is on a non-EVR github org. Re-evaluate if PO ever migrates this to an EVR-org deployment with FR substrate ownership.
+Operator-role scope (per `designs/deployed/operator-role/`): mvox_v4e_web is **out of scope** for Hopper's MAY-DO list -- substrate-design ownership rule excludes clones+refactors of FR-shipped teams when the clone is on a non-EVR github org. Re-evaluate if PO ever migrates this to an EVR-org deployment with FR substrate ownership.
 
 ## Parent lineage
 
@@ -32,7 +32,7 @@ Operator-role scope (per `designs/deployed/operator-role/`): mvox_v4e_web is **o
 
 | Date | Auditor | Artifact |
 |---|---|---|
-| 2026-05-20 | Medici | `health-report-mvox-dev-2026-05-20.md` (forthcoming — staged in the mvox repo's docs/) |
+| 2026-05-20 | Medici | `health-report-mvox-dev-2026-05-20.md` (forthcoming -- staged in the mvox repo's docs/) |
 | 2026-05-20 | Celes | per-prompt fine-tuning commits in mvox repo (forthcoming) |
 
 (*FR:Aen*)

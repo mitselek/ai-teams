@@ -1,5 +1,5 @@
 // (*CD:Kerckhoffs*)
-// TDD — Tests for SendMessageBridge seen-set bounding (task #25).
+// TDD -- Tests for SendMessageBridge seen-set bounding (task #25).
 //
 // Bug: the `seen` Set in SendMessageBridge grows unboundedly. Paths are added
 // on first encounter but only removed on successful delivery. Failed deliveries
@@ -68,7 +68,7 @@ afterEach(() => {
 // Seen-set bounding
 // ---------------------------------------------------------------------------
 
-describe('SendMessageBridge — seen set bounding', () => {
+describe('SendMessageBridge -- seen set bounding', () => {
   it('seenSize() returns 0 before any messages are processed', () => {
     const bridge = makeBridge(brokerInboxDir, frameworkInboxDir);
     expect(bridge.seenSize()).toBe(0);
@@ -81,7 +81,7 @@ describe('SendMessageBridge — seen set bounding', () => {
       const msg = makeMessage();
       writeInboxFile(brokerInboxDir, msg);
       await new Promise(r => setTimeout(r, 700));
-      // After successful delivery the path is removed from seen — size back to 0
+      // After successful delivery the path is removed from seen -- size back to 0
       expect(bridge.seenSize()).toBe(0);
     } finally {
       bridge.stop();
@@ -95,7 +95,7 @@ describe('SendMessageBridge — seen set bounding', () => {
     const bridge = makeBridge(brokerInboxDir, badFrameworkDir, { maxSeenSize: 10 });
     bridge.start();
     try {
-      // Write 20 messages — all deliveries will fail (bad frameworkDir)
+      // Write 20 messages -- all deliveries will fail (bad frameworkDir)
       for (let i = 0; i < 20; i++) {
         writeInboxFile(brokerInboxDir, makeMessage(`msg-${i}`));
       }
@@ -171,10 +171,10 @@ describe('SendMessageBridge — seen set bounding', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Delivery correctness (regression — ensure bounding doesn't break happy path)
+// Delivery correctness (regression -- ensure bounding doesn't break happy path)
 // ---------------------------------------------------------------------------
 
-describe('SendMessageBridge — delivery correctness', () => {
+describe('SendMessageBridge -- delivery correctness', () => {
   it('delivers message to target agent framework inbox', async () => {
     const bridge = makeBridge(brokerInboxDir, frameworkInboxDir);
     bridge.start();

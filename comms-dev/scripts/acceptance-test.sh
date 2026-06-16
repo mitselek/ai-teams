@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # (*CD:Kerckhoffs*)
-# acceptance-test.sh — host-level Docker acceptance tests for comms-dev.
+# acceptance-test.sh -- host-level Docker acceptance tests for comms-dev.
 #
 # Drives docker compose, runs TC-01 through TC-08 per:
 #   comms-dev/docs/cross-container-test-matrix.md
@@ -206,7 +206,7 @@ main() {
       exec -T comms-dev test -S /shared/comms/framework-research.sock && echo 1 || echo 0)
 
     if [ "$cd_ok" = "1" ] && [ "$fr_ok" = "1" ] && [ "$sock_cd" = "1" ] && [ "$sock_fr" = "1" ]; then
-      pass "TC-01" "Broker registration — both teams present with correct socket paths"
+      pass "TC-01" "Broker registration -- both teams present with correct socket paths"
       tc01_pass=1
     else
       fail "TC-01" "Broker registration" \
@@ -218,7 +218,7 @@ main() {
 
   # ── TC-02: Heartbeat update ────────────────────────────────────────────────
 
-  log "\n[TC-02] Heartbeat update (P1 — non-blocking, requires 65s wait)"
+  log "\n[TC-02] Heartbeat update (P1 -- non-blocking, requires 65s wait)"
   log "  Skipped in fast mode. Run manually with --heartbeat flag to enable."
   # Full heartbeat test is too slow for default CI run (65s wait).
   # Enabled via opt-in flag if needed.
@@ -250,7 +250,7 @@ main() {
     fi
   else
     fail "TC-03" "Delivery comms-dev → framework-research" \
-      "skipped — TC-01 failed (no broker registration)" "P0"
+      "skipped -- TC-01 failed (no broker registration)" "P0"
   fi
 
   # ── TC-04: framework-research → comms-dev delivery ────────────────────────
@@ -280,7 +280,7 @@ main() {
     fi
   else
     fail "TC-04" "Delivery framework-research → comms-dev" \
-      "skipped — TC-01 failed (no broker registration)" "P0"
+      "skipped -- TC-01 failed (no broker registration)" "P0"
   fi
 
   # ── TC-05: Encrypted payload ───────────────────────────────────────────────
@@ -306,13 +306,13 @@ main() {
 
     # Body should not appear in logs (would indicate wire plaintext logging)
     if [ "$leaks" -eq 0 ]; then
-      pass "TC-05" "Encrypted payload — plaintext body not visible in broker logs"
+      pass "TC-05" "Encrypted payload -- plaintext body not visible in broker logs"
     else
       fail "TC-05" "Encrypted payload" \
-        "plaintext body appeared in broker logs ($leaks occurrences) — possible unencrypted wire" "P0"
+        "plaintext body appeared in broker logs ($leaks occurrences) -- possible unencrypted wire" "P0"
     fi
   else
-    fail "TC-05" "Encrypted payload" "skipped — TC-01 failed" "P0"
+    fail "TC-05" "Encrypted payload" "skipped -- TC-01 failed" "P0"
   fi
 
   # ── TC-06: Tampered message rejected ──────────────────────────────────────
@@ -352,13 +352,13 @@ s.close()
 
     local fr_inbox="/root/teams/framework-research/inboxes/team-lead"
     if ! inbox_has_message framework-research "$fr_inbox" 1 "${tc06_id}"; then
-      pass "TC-06" "Tampered message (bad checksum) — not delivered to inbox"
+      pass "TC-06" "Tampered message (bad checksum) -- not delivered to inbox"
     else
       fail "TC-06" "Tampered message" \
-        "tampered message with zeroed checksum appeared in inbox — integrity check bypassed" "P0"
+        "tampered message with zeroed checksum appeared in inbox -- integrity check bypassed" "P0"
     fi
   else
-    fail "TC-06" "Tampered message rejected" "skipped — TC-01 failed" "P0"
+    fail "TC-06" "Tampered message rejected" "skipped -- TC-01 failed" "P0"
   fi
 
   # ── TC-07: Graceful shutdown and deregistration ───────────────────────────
@@ -379,7 +379,7 @@ s.close()
     reg_after=$(registry_json_fr 2>/dev/null || echo '{}')
     if echo "$reg_after" | jq -e '.teams["comms-dev"] == null or .teams["comms-dev"] == empty' \
         >/dev/null 2>&1; then
-      pass "TC-07" "Graceful shutdown — comms-dev deregistered from registry.json"
+      pass "TC-07" "Graceful shutdown -- comms-dev deregistered from registry.json"
     else
       fail "TC-07" "Graceful shutdown" \
         "comms-dev still present in registry after SIGTERM + 3s" "P1"
@@ -390,8 +390,8 @@ s.close()
 
   # ── TC-08: Stale entry cleanup (bonus) ────────────────────────────────────
 
-  log "\n[TC-08] Stale entry cleanup (P2 — bonus)"
-  warn "TC-08" "Stale entry cleanup" "requires 130s wait — skipped in default run" "P2"
+  log "\n[TC-08] Stale entry cleanup (P2 -- bonus)"
+  warn "TC-08" "Stale entry cleanup" "requires 130s wait -- skipped in default run" "P2"
 
   # ── Teardown ───────────────────────────────────────────────────────────────
 
@@ -420,6 +420,6 @@ s.close()
 }
 
 # Trap errors and always tear down
-trap 'log "\n${RED}Unexpected error — tearing down...${NC}"; compose_down; exit 1' ERR
+trap 'log "\n${RED}Unexpected error -- tearing down...${NC}"; compose_down; exit 1' ERR
 
 main "$@"

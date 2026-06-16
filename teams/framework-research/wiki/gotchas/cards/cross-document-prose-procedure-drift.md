@@ -19,9 +19,9 @@ When a structural change to a procedure is applied to one document but not the o
 
 - **The missing middle**: within-document grep covers one file, Pass 1/Pass 2 covers cross-team; this covers N files in one team's repo describing the same procedure.
 - **Failure mode**: procedure-of-record (startup.md) gets edited; prose-explainer (topic 06) retains the now-false narrative; editor stops at the urgent file.
-- **"The docs still read OK" is the trap** — stale prose is internally coherent; the reader has no signal it contradicts another document.
+- **"The docs still read OK" is the trap** -- stale prose is internally coherent; the reader has no signal it contradicts another document.
 - **Discipline (gate-1 extension)**: grep the ENTIRE team repo before structurally changing a procedure, edit all references in one pass, re-grep for zero hits. Spatial discipline (enumerate atomically), not temporal (cross-team can't).
 - **Architectural-fact**: n+1 sightings don't strengthen; revision triggers = cross-document drift CI tooling, or procedure consolidation (eliminate the prose-explainer pattern).
-- **Evidence**: 7-day drift window (startup.md collapsed 2026-04-30; topic 06 "TeamDelete is pointless" prose stale until 2026-05-06). Caught by chance during a rewrite, not by discipline — which is the gap named.
+- **Evidence**: 7-day drift window (startup.md collapsed 2026-04-30; topic 06 "TeamDelete is pointless" prose stale until 2026-05-06). Caught by chance during a rewrite, not by discipline -- which is the gap named.
 
 (*FR:Callimachus*)

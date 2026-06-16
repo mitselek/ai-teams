@@ -19,7 +19,7 @@ related:
 
 # Decorative Polling Interval: Looks-Like-Cadence-In-Code, Isn't-Cadence-At-Runtime
 
-**Implementation anti-pattern** (RFC #66 cross-host PoC, Brunel S31 2026-05-12 Bug A; language-agnostic): when a polling loop declares a timing variable like `$watchInterval = 500ms` (or equivalent) but the loop's iteration cadence is gated by a **blocking call that does not respect the interval**, the variable is *decorative* — it reads like real polling cadence in the source code, but the actual iteration timing is whatever the blocking call yields. The runtime behavior diverges from what the code's structure suggests.
+**Implementation anti-pattern** (RFC #66 cross-host PoC, Brunel S31 2026-05-12 Bug A; language-agnostic): when a polling loop declares a timing variable like `$watchInterval = 500ms` (or equivalent) but the loop's iteration cadence is gated by a **blocking call that does not respect the interval**, the variable is *decorative* -- it reads like real polling cadence in the source code, but the actual iteration timing is whatever the blocking call yields. The runtime behavior diverges from what the code's structure suggests.
 
 The defect class is **substrate-invariant-mismatch-adjacent**: the artifact reads as if it depends on a substrate property (declared interval as cadence-source), but at runtime the actual substrate property (the blocking call's yield-cadence) is what governs behavior. The implicit invariant (interval-variable → interval-cadence) does not hold.
 
@@ -28,7 +28,7 @@ The defect class is **substrate-invariant-mismatch-adjacent**: the artifact read
 A polling loop with the anti-pattern looks like this (PowerShell, the specific instance):
 
 ```powershell
-$watchInterval = 500   # milliseconds — looks like 2 polls/sec
+$watchInterval = 500   # milliseconds -- looks like 2 polls/sec
 while ($running) {
     $line = Read-Host                # BLOCKS until full line entered
     Process-PollOnce
@@ -36,12 +36,12 @@ while ($running) {
 }
 ```
 
-The reader sees `$watchInterval = 500`, expects ~2 polls/second cadence, and is **wrong**. The actual cadence is "however long the user takes to enter a line, plus 500ms." The variable is decorative — it influences nothing important about runtime behavior. The blocking `Read-Host` is the cadence source.
+The reader sees `$watchInterval = 500`, expects ~2 polls/second cadence, and is **wrong**. The actual cadence is "however long the user takes to enter a line, plus 500ms." The variable is decorative -- it influences nothing important about runtime behavior. The blocking `Read-Host` is the cadence source.
 
 The corrected form makes the cadence source explicit and the interval real:
 
 ```powershell
-$watchInterval = 500   # milliseconds — now ACTUALLY governs cadence
+$watchInterval = 500   # milliseconds -- now ACTUALLY governs cadence
 while ($running) {
     if ([Console]::KeyAvailable) {
         $key = [Console]::ReadKey($true)
@@ -56,7 +56,7 @@ Non-blocking input check + manual buffer/echo lets the loop iterate at the decla
 
 ## Why this is anti-pattern, not just bug
 
-A single instance of `Read-Host` inside a polling loop is a bug — but the broader concern is the **structural illusion** the code creates. A reviewer scanning the loop, a debugger trying to reason about cadence, a future maintainer setting a different interval — all of them are deceived by the decorative variable. The bug is not in `Read-Host`; it's in the loop having both a declared interval AND a blocking gate that defeats it.
+A single instance of `Read-Host` inside a polling loop is a bug -- but the broader concern is the **structural illusion** the code creates. A reviewer scanning the loop, a debugger trying to reason about cadence, a future maintainer setting a different interval -- all of them are deceived by the decorative variable. The bug is not in `Read-Host`; it's in the loop having both a declared interval AND a blocking gate that defeats it.
 
 The anti-pattern characterization captures three load-bearing properties:
 
@@ -79,7 +79,7 @@ The anti-pattern characterization captures three load-bearing properties:
 
 **Generalized in Python rewrite** (`~/bin/ghost-chat.py`, S31 16:42):
 
-- Python implementation uses `select.select` (POSIX) or `msvcrt.kbhit + getwch` (Windows) for non-blocking input — same structural pattern as PowerShell fix, different language primitives.
+- Python implementation uses `select.select` (POSIX) or `msvcrt.kbhit + getwch` (Windows) for non-blocking input -- same structural pattern as PowerShell fix, different language primitives.
 - Cross-implementation parity at the structural level: the anti-pattern fix is the same shape regardless of language; the implementing primitives differ.
 
 ## Relation to substrate-invariant mismatch
@@ -90,9 +90,9 @@ The anti-pattern is a **consumer-side instance of substrate-invariant-mismatch**
 - The violating substrate: a blocking input primitive used inside the loop.
 - The silent failure: no error; cadence is just wrong; the variable misleads readers.
 
-This entry is filed as a sibling to [`substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) rather than as Instance 7 within that entry's catalog because the substrate-invariant-mismatch instances catalog focuses on cross-system substrate mismatches (filesystem roots, protocol field-sets, harness-claim-vs-runtime). This entry's mismatch is at the *language-primitive layer* — a single CLI's choice of `Read-Host` vs `[Console]::KeyAvailable`. The same diagnostic question applies (*"What substrate property is this artifact relying on, and what happens if that property differs?"*) but the substrate is the language's input-primitive semantics, not a cross-system property.
+This entry is filed as a sibling to [`substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) rather than as Instance 7 within that entry's catalog because the substrate-invariant-mismatch instances catalog focuses on cross-system substrate mismatches (filesystem roots, protocol field-sets, harness-claim-vs-runtime). This entry's mismatch is at the *language-primitive layer* -- a single CLI's choice of `Read-Host` vs `[Console]::KeyAvailable`. The same diagnostic question applies (*"What substrate property is this artifact relying on, and what happens if that property differs?"*) but the substrate is the language's input-primitive semantics, not a cross-system property.
 
-If a second language-primitive-layer instance surfaces, the two could be promoted to a named sub-shape within `substrate-invariant-mismatch.md` (e.g., "language-primitive-layer substrate mismatch" — Instance 7). Currently n=1 at that sub-shape level; not yet a sub-shape, just a sibling anti-pattern.
+If a second language-primitive-layer instance surfaces, the two could be promoted to a named sub-shape within `substrate-invariant-mismatch.md` (e.g., "language-primitive-layer substrate mismatch" -- Instance 7). Currently n=1 at that sub-shape level; not yet a sub-shape, just a sibling anti-pattern.
 
 ## Detection heuristics
 
@@ -124,16 +124,16 @@ The fix shape is uniform across languages:
 
 **Common-prompt promotion candidate triggers (deferred):**
 
-- A second team or independent specialist identifies the anti-pattern in their own CLI / loop code without cross-pollination from this entry — cross-discovery confirmation.
-- A third language instance (Go, Rust, Ruby, etc.) exhibiting the same shape — cross-language generality confirmation.
-- An FR specialist hits the anti-pattern in new code after this entry exists — Protocol C signal (recurrence-after-documentation).
+- A second team or independent specialist identifies the anti-pattern in their own CLI / loop code without cross-pollination from this entry -- cross-discovery confirmation.
+- A third language instance (Go, Rust, Ruby, etc.) exhibiting the same shape -- cross-language generality confirmation.
+- An FR specialist hits the anti-pattern in new code after this entry exists -- Protocol C signal (recurrence-after-documentation).
 
 ## Architectural-fact discipline (partial)
 
 This entry is **discipline**, not architectural-fact:
 
-- The structural claim (a blocking call inside a polling loop defeats the declared interval) is architectural-true at the language semantics layer — verifiable by inspection. n+1 sightings do NOT strengthen the architectural claim.
-- The anti-pattern naming + heuristics are discipline — teachable, can be violated, n+1 correct-applications strengthen the discipline-promotion case.
+- The structural claim (a blocking call inside a polling loop defeats the declared interval) is architectural-true at the language semantics layer -- verifiable by inspection. n+1 sightings do NOT strengthen the architectural claim.
+- The anti-pattern naming + heuristics are discipline -- teachable, can be violated, n+1 correct-applications strengthen the discipline-promotion case.
 
 **Revision triggers:**
 
@@ -143,20 +143,20 @@ This entry is **discipline**, not architectural-fact:
 ## What this is NOT
 
 - **Not a rejection of all blocking primitives.** Blocking primitives are correct in many contexts (REPLs that wait for user input, request-response handlers, anywhere a blocked-on-input semantic is intentional). The anti-pattern is specifically blocking-inside-a-loop-that-claims-cadence.
-- **Not a recommendation to remove cadence variables.** Declared intervals are useful as parameters even when the loop is non-blocking — the anti-pattern catches *decorative* intervals (no runtime effect), not *real* intervals.
+- **Not a recommendation to remove cadence variables.** Declared intervals are useful as parameters even when the loop is non-blocking -- the anti-pattern catches *decorative* intervals (no runtime effect), not *real* intervals.
 - **Not a substitute for actual polling-rate measurement.** Even with non-blocking primitives, the actual cadence depends on system load + work done per iteration + sleep precision. The fix makes the declared interval an upper-bound floor, not a guarantee. Runtime measurement is still required when cadence matters.
 
 ## Operational implications
 
 1. **Code-review heuristics:** apply the detection heuristics above when reviewing any polling loop. Cheap to check; high signal.
 2. **PoC discipline:** when writing CLIs or daemons with polling loops, choose non-blocking primitives by default; reserve blocking primitives for cases where blocking is the intent.
-3. **Library-team architecture composes cleanly** (S31 PO decision 2026-05-12) — any library-team relay daemon or polling consumer should follow non-blocking-primitive default discipline. The anti-pattern is structurally avoidable from day one.
+3. **Library-team architecture composes cleanly** (S31 PO decision 2026-05-12) -- any library-team relay daemon or polling consumer should follow non-blocking-primitive default discipline. The anti-pattern is structurally avoidable from day one.
 
 ## Related
 
-- [`patterns/substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) — **parent pattern.** This entry is a language-primitive-layer sibling/specialization. If a second language-primitive-layer instance surfaces, this entry's framing becomes a candidate sub-shape within the substrate-invariant-mismatch catalog.
-- [`patterns/cross-host-atomic-inbox-write-primitive.md`](cross-host-atomic-inbox-write-primitive.md) — S33+ sibling from the same RFC #66 PoC.
-- [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) — S33+ sibling. The Bug A fix and the by-design Bug C closure both came from the same PowerShell→Python rewrite arc; both apply at the external-CLI layer.
+- [`patterns/substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) -- **parent pattern.** This entry is a language-primitive-layer sibling/specialization. If a second language-primitive-layer instance surfaces, this entry's framing becomes a candidate sub-shape within the substrate-invariant-mismatch catalog.
+- [`patterns/cross-host-atomic-inbox-write-primitive.md`](cross-host-atomic-inbox-write-primitive.md) -- S33+ sibling from the same RFC #66 PoC.
+- [`patterns/read-flag-replication-discipline-for-external-cli.md`](read-flag-replication-discipline-for-external-cli.md) -- S33+ sibling. The Bug A fix and the by-design Bug C closure both came from the same PowerShell→Python rewrite arc; both apply at the external-CLI layer.
 
 ## Source
 

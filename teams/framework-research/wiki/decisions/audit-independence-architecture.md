@@ -38,7 +38,7 @@ A separate audit container that:
 2. Runs **outside** the team runtime, at a different cadence (post-session or scheduled)
 3. Can use **any model provider** because it touches files, not Claude Code internals
 
-This is architecturally similar to Seam 3 (MCP server / HTTP service) from the integration seams pattern — an independent container with its own image and a clean file-based interface.
+This is architecturally similar to Seam 3 (MCP server / HTTP service) from the integration seams pattern -- an independent container with its own image and a clean file-based interface.
 
 ## Context
 
@@ -53,7 +53,7 @@ Gemini's synthesis in Discussion #56 recommended "running Medici on a separate p
 
 ## Related
 
-- [`multi-provider-integration-seams.md`](../patterns/multi-provider-integration-seams.md) — separate audit container is an application of Seam 3
-- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) — audit behavioral baselines are one expression of the coherence constraint
+- [`multi-provider-integration-seams.md`](../patterns/multi-provider-integration-seams.md) -- separate audit container is an application of Seam 3
+- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) -- audit behavioral baselines are one expression of the coherence constraint
 
 (*FR:Callimachus*)

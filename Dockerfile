@@ -1,4 +1,4 @@
-# Claude Code Agent Team Container — Full Isolation (*FR:Brunel*)
+# Claude Code Agent Team Container -- Full Isolation (*FR:Brunel*)
 #
 # Final layout (PO decision 2026-03-14):
 #   Container user:  ai-teams  (uid=1000)
@@ -40,7 +40,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     && dpkg-reconfigure -f noninteractive tzdata
 
 # Container user: always 'ai-teams', uid=1000
-# Ubuntu 24.04 has GID/UID 1000 = 'ubuntu' — rename it
+# Ubuntu 24.04 has GID/UID 1000 = 'ubuntu' -- rename it
 RUN \
     groupmod -n ai-teams ubuntu && \
     usermod -l ai-teams -d /home/ai-teams -m ubuntu && \
@@ -55,7 +55,7 @@ RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} 2>&1 | tail -5
 ENV HOME=/home/ai-teams
 ENV PATH="/usr/local/bin:${PATH}"
 
-# Git identity — configurable via build args
+# Git identity -- configurable via build args
 ARG GIT_USER_NAME=mitselek
 ARG GIT_USER_EMAIL=mihkel.putrinsh@gmail.com
 RUN git config --global user.name "${GIT_USER_NAME}" && \

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Aen via coding-subagent*) — Launch ghost-bridge.py in the background.
+# (*FR:Aen via coding-subagent*) -- Launch ghost-bridge.py in the background.
 #
 # Refuses to start if PID file exists AND that PID is alive. Writes the PID
 # of the launched python process. Output (stdout/stderr from the daemon itself
@@ -28,7 +28,7 @@ if [ -f "$PID_FILE" ]; then
     echo "ERROR: ghost-bridge already running (PID $EXISTING_PID per $PID_FILE)" >&2
     exit 1
   fi
-  echo "Stale PID file found (PID $EXISTING_PID not alive) — removing."
+  echo "Stale PID file found (PID $EXISTING_PID not alive) -- removing."
   rm -f "$PID_FILE"
 fi
 
@@ -45,7 +45,7 @@ fi
 # Launch detached. nohup + & is the portable shape; works on Linux, macOS, and
 # Git Bash on Windows. Daemon writes its own PID file on startup, but we ALSO
 # capture $! and write it ourselves to cover the brief window before the daemon
-# does so itself. Daemon may overwrite — that's fine, same value.
+# does so itself. Daemon may overwrite -- that's fine, same value.
 nohup "$PYTHON" "$DAEMON" --config "$CONFIG" >/dev/null 2>&1 &
 LAUNCHED_PID=$!
 
@@ -55,7 +55,7 @@ echo "$LAUNCHED_PID" > "$PID_FILE"
 # Tiny grace period to let the daemon either crash visibly or stabilize.
 sleep 0.5
 if ! kill -0 "$LAUNCHED_PID" 2>/dev/null; then
-  echo "ERROR: daemon exited immediately — check $SCRIPT_DIR/ghost-bridge.log" >&2
+  echo "ERROR: daemon exited immediately -- check $SCRIPT_DIR/ghost-bridge.log" >&2
   rm -f "$PID_FILE"
   exit 1
 fi

@@ -24,7 +24,7 @@ Three team archetypes exist, defined by the relationship between their primary o
 - Every agent owns a **topic file** as their primary output target (Volta → `06-lifecycle.md`, Herald → `03-communication.md`, Montesquieu → `04-hierarchy-governance.md`)
 - **Section ownership tables** prevent write conflicts when two agents share adjacent domains (Volta/Brunel partition `06-lifecycle.md`)
 - **Coordination handshake protocol** between agents with overlapping concerns: `[COORDINATION] Topic: X. My finding: Y. Proposed change to your section: Z.`
-- **No git access** for agents — team-lead commits all work
+- **No git access** for agents -- team-lead commits all work
 - Team-lead is pure coordinator (SendMessage is the primary tool)
 
 **When to use:** Designing frameworks, analyzing legacy systems, producing architecture decisions. The team's value is in the quality of its analysis, not in shipped features.
@@ -37,8 +37,8 @@ Three team archetypes exist, defined by the relationship between their primary o
 
 **Structural patterns:**
 - **Tech stack defines roles:** frontend (sven/lovelace), backend (dag/babbage), QA (tess/kerckhoffs), CI/CD (piper)
-- **Domain specialists** may be added and removed as workstreams complete (alex for APEX migration in cloudflare-builders — removed in hr-devs)
-- **Code review agent** (marcus) is separate from implementers — provides independent quality gate
+- **Domain specialists** may be added and removed as workstreams complete (alex for APEX migration in cloudflare-builders -- removed in hr-devs)
+- **Code review agent** (marcus) is separate from implementers -- provides independent quality gate
 - **Named spawn configurations:** "full" (story work), "lite" (quick fix), "full-review" (with requirements verification)
 - Agents own branches end-to-end: implement → test → commit → push → PR
 - Team-lead reviews PRs but never writes code
@@ -53,8 +53,8 @@ Three team archetypes exist, defined by the relationship between their primary o
 
 **Structural patterns:**
 - **Data pipeline ownership** replaces topic file ownership: Champollion → `inventory/`, Nightingale → `shared/`, Berners-Lee → `dashboard/`, Hammurabi → `specs/`
-- **Strict directory boundaries** prevent hybrid teams from devolving into pure-dev teams — each agent has a MAY WRITE list that excludes other agents' directories
-- **Trunk-based development** — all agents commit to `main` because hybrid teams are pipeline teams (dev agents consume research agents' output files). Branch isolation breaks the data flow. Directory ownership is the isolation mechanism, not branches. (See "Data Flow Architecture" section below.)
+- **Strict directory boundaries** prevent hybrid teams from devolving into pure-dev teams -- each agent has a MAY WRITE list that excludes other agents' directories
+- **Trunk-based development** -- all agents commit to `main` because hybrid teams are pipeline teams (dev agents consume research agents' output files). Branch isolation breaks the data flow. Directory ownership is the isolation mechanism, not branches. (See "Data Flow Architecture" section below.)
 - **Dual output formats:** Markdown (human-readable) + JSON (machine-consumable) from analysis agents
 - Dev agents consume research agents' output via files, not via messaging
 
@@ -62,30 +62,30 @@ Three team archetypes exist, defined by the relationship between their primary o
 
 ### Consultancy / Guild Teams
 
-**Defining trait:** A shared pool of specialist retainers dispatched on demand to client teams, with verified competency backing and a self-correcting gap-detection loop. No standing work — retainers are dormant between engagements.
+**Defining trait:** A shared pool of specialist retainers dispatched on demand to client teams, with verified competency backing and a self-correcting gap-detection loop. No standing work -- retainers are dormant between engagements.
 
 **Observed in:** Arhitecture review team (13 personas), dispatched to dev-toolkit PRs in S41 proof-of-concept.
 
-**Full design:** See [10-guild-specialists.md](10-guild-specialists.md) — covers the four-component architecture (retainer repository, consultancy team, competency backend, gap-detection loop), the S41 trial evidence, and open questions for scale.
+**Full design:** See [10-guild-specialists.md](10-guild-specialists.md) -- covers the four-component architecture (retainer repository, consultancy team, competency backend, gap-detection loop), the S41 trial evidence, and open questions for scale.
 
 **When to use:** When teams need domain expertise they don't maintain in-house (security review, safety assessment, architecture coherence, regulatory compliance). The guild scales specialist access across 10+ teams without duplicating every persona on every team.
 
 ### Data Flow Architecture (*FR:Celes*)
 
-Orthogonal to archetype (research/development/hybrid), every team has a **data flow architecture** that determines its isolation model. This is a design-time decision made during team creation — it constrains how agents can be spawned and how they share work.
+Orthogonal to archetype (research/development/hybrid), every team has a **data flow architecture** that determines its isolation model. This is a design-time decision made during team creation -- it constrains how agents can be spawned and how they share work.
 
 | Data flow | Agent relationship | Isolation model | Git strategy |
 |---|---|---|---|
-| **Pipeline** | Sequential — each agent's input is another agent's output | Directory ownership on trunk | All agents commit to `main`; directories prevent conflicts |
-| **Independent-output** | Parallel — agents produce separate outputs with no inter-agent data dependency | Branch/worktree isolation | Each agent on own branch; PRs to `main` |
+| **Pipeline** | Sequential -- each agent's input is another agent's output | Directory ownership on trunk | All agents commit to `main`; directories prevent conflicts |
+| **Independent-output** | Parallel -- agents produce separate outputs with no inter-agent data dependency | Branch/worktree isolation | Each agent on own branch; PRs to `main` |
 
-**Pipeline teams** have a data dependency chain: `Source → Researcher → Analyst → Developer → Spec Writer`. Each stage reads the previous stage's output directory. If agents work on separate branches, the downstream agent's branch goes stale the moment an upstream agent commits — leading to merge conflicts, data drift, and rebase pain that compounds with every commit.
+**Pipeline teams** have a data dependency chain: `Source → Researcher → Analyst → Developer → Spec Writer`. Each stage reads the previous stage's output directory. If agents work on separate branches, the downstream agent's branch goes stale the moment an upstream agent commits -- leading to merge conflicts, data drift, and rebase pain that compounds with every commit.
 
 **Independent-output teams** have agents working on unrelated deliverables. Frontend and backend developers in a dev team don't read each other's output files. Branch isolation prevents accidental interference without data flow consequences.
 
-**Evidence from apex-research (RFC #3, ADR-004):** The team was originally designed with worktree isolation for Berners-Lee (dashboard on `dashboard-dev` branch while researchers commit to `main`). In practice, 37 commits across 4 agents interleaved on `main` with zero conflicts — because directory ownership was sufficient. The worktree model was formally rejected: dashboard reads `shared/*.json` (Nightingale's output) and `inventory/*.json` (Champollion's output) at build time, so a separate branch goes stale immediately.
+**Evidence from apex-research (RFC #3, ADR-004):** The team was originally designed with worktree isolation for Berners-Lee (dashboard on `dashboard-dev` branch while researchers commit to `main`). In practice, 37 commits across 4 agents interleaved on `main` with zero conflicts -- because directory ownership was sufficient. The worktree model was formally rejected: dashboard reads `shared/*.json` (Nightingale's output) and `inventory/*.json` (Champollion's output) at build time, so a separate branch goes stale immediately.
 
-**Design-time rule:** When sculpting a team, determine the data flow architecture first. If any agent reads another agent's output files, the team is a pipeline — use directory ownership on trunk, not branch isolation. The `isolation: "worktree"` spawn option is only appropriate for independent-output agents within the same team.
+**Design-time rule:** When sculpting a team, determine the data flow architecture first. If any agent reads another agent's output files, the team is a pipeline -- use directory ownership on trunk, not branch isolation. The `isolation: "worktree"` spawn option is only appropriate for independent-output agents within the same team.
 
 | Archetype | Typical data flow | Why |
 |---|---|---|
@@ -93,7 +93,7 @@ Orthogonal to archetype (research/development/hybrid), every team has a **data f
 | Development | Independent-output | Frontend/backend/QA produce separate artifacts; integration via APIs, not files |
 | Hybrid | Pipeline | Research agents feed analysis data to dev agents and spec writers |
 
-**Caveat:** This is the typical pattern, not a hard rule. A development team with a shared `types/` contract directory has a pipeline element — contract changes must be coordinated. apex-research solved this with "PRs required only for `types/` contract changes" while keeping everything else on trunk.
+**Caveat:** This is the typical pattern, not a hard rule. A development team with a shared `types/` contract directory has a pipeline element -- contract changes must be coordinated. apex-research solved this with "PRs required only for `types/` contract changes" while keeping everything else on trunk.
 
 ---
 
@@ -124,13 +124,13 @@ Six canonical agent roles recur across all observed teams. Every team is compose
 
 | Property | Pattern |
 |---|---|
-| Model | Always opus — judgment-heavy |
+| Model | Always opus -- judgment-heavy |
 | Primary tool | SendMessage |
 | Code access | Forbidden (enforced by prompt) |
 | Git access | Limited or forbidden |
 | Unique authority | Issue closure, spec approval, agent status tracking |
 
-**Invariant:** The coordinator delegates all implementation work. Even when it would be faster to do it themselves, they spawn-before-delegate. This is identity, not laziness — it prevents role drift.
+**Invariant:** The coordinator delegates all implementation work. Even when it would be faster to do it themselves, they spawn-before-delegate. This is identity, not laziness -- it prevents role drift.
 
 **Enforcement:** Peer enforcement via prompt instruction. Teammates send reminders if they observe boundary violations. Anti-patterns table in prompt documents known violations and corrections.
 
@@ -140,12 +140,12 @@ Six canonical agent roles recur across all observed teams. Every team is compose
 
 | Property | Pattern |
 |---|---|
-| Model | Varies — sonnet for volume work, opus when upgraded for judgment |
+| Model | Varies -- sonnet for volume work, opus when upgraded for judgment |
 | Primary output | Structured findings (tables, inventories, pattern reports) |
 | Scope | Reads broadly, writes narrowly (findings to specific directory) |
 | Subagent spawning | May spawn haiku subagents for parallel data gathering (Finn pattern) |
 
-**Invariant:** Researchers gather and structure data. They do not interpret, decide, or design — that's for the coordinator or specialist. "Here's what I found" not "here's what we should do."
+**Invariant:** Researchers gather and structure data. They do not interpret, decide, or design -- that's for the coordinator or specialist. "Here's what I found" not "here's what we should do."
 
 **Variations:**
 - **Finn pattern (general):** Ranges across unknown territory, spawns parallel subagents, consolidates
@@ -153,18 +153,18 @@ Six canonical agent roles recur across all observed teams. Every team is compose
 
 ### Role 3: Analyst
 
-**Observed in:** Nightingale (AR), Medici (FR, AR — as remote auditor)
+**Observed in:** Nightingale (AR), Medici (FR, AR -- as remote auditor)
 
 | Property | Pattern |
 |---|---|
-| Model | Sonnet — pattern matching, not judgment |
+| Model | Sonnet -- pattern matching, not judgment |
 | Primary output | Analysis documents, scores, matrices, health reports |
 | Input | Researcher's output (never raw source data) |
 | Scope | Reads broadly, writes to analysis directory |
 
 **Invariant:** Analysts transform raw data into actionable insights. "82 LOVs but only 3 unique" is more useful than "82 LOVs." They aggregate, cross-reference, score, and visualize.
 
-**Medici subtype:** The auditor is a specialized analyst whose scope is knowledge health — consistency between artifacts, stale data detection, gap identification. Medici is the only role that has been **reused across teams** (framework-research Medici auditing apex-research remotely).
+**Medici subtype:** The auditor is a specialized analyst whose scope is knowledge health -- consistency between artifacts, stale data detection, gap identification. Medici is the only role that has been **reused across teams** (framework-research Medici auditing apex-research remotely).
 
 ### Role 4: Developer
 
@@ -175,9 +175,9 @@ Six canonical agent roles recur across all observed teams. Every team is compose
 | Model | Sonnet (standard), opus for senior roles (sven in hr-devs) |
 | Primary output | Working, tested code |
 | Scope | Reads specs + data, writes to assigned code directories |
-| TDD | Mandatory — red → green → refactor |
+| TDD | Mandatory -- red → green → refactor |
 
-**Invariant:** Developers own implementation end-to-end within their domain. They write code, run tests, commit, push, and create PRs. They do not make architecture decisions — those go to the coordinator.
+**Invariant:** Developers own implementation end-to-end within their domain. They write code, run tests, commit, push, and create PRs. They do not make architecture decisions -- those go to the coordinator.
 
 **Subtypes:**
 
@@ -187,7 +187,7 @@ Six canonical agent roles recur across all observed teams. Every team is compose
 | Backend | Dag, Babbage | Server code, transport, database |
 | CI/CD | Piper | Deployment pipelines, environment config |
 | Integration | Harmony | Auth flows, external API connections |
-| Domain-specific | Alex | Temporary — scoped to one workstream, removed when done |
+| Domain-specific | Alex | Temporary -- scoped to one workstream, removed when done |
 
 ### Role 5: Spec Writer
 
@@ -195,14 +195,14 @@ Six canonical agent roles recur across all observed teams. Every team is compose
 
 | Property | Pattern |
 |---|---|
-| Model | Opus — consequential output (bad spec wastes a migration team's sprint) |
+| Model | Opus -- consequential output (bad spec wastes a migration team's sprint) |
 | Primary output | Formal specifications with structured frontmatter |
 | Input | Analysis data (never raw source) |
 | Scope | Reads broadly, writes to specs/ and decisions/ |
 
-**Invariant:** Spec writers produce the contracts between teams. Their output must survive context loss — the consuming team won't have the research context. Precision over elegance. Open questions are first-class (honest "unknown" > plausible guess).
+**Invariant:** Spec writers produce the contracts between teams. Their output must survive context loss -- the consuming team won't have the research context. Precision over elegance. Open questions are first-class (honest "unknown" > plausible guess).
 
-**Note:** This role emerges in hybrid and research teams that produce handoff artifacts. Pure dev teams don't need a dedicated spec writer — their "spec" is the working code.
+**Note:** This role emerges in hybrid and research teams that produce handoff artifacts. Pure dev teams don't need a dedicated spec writer -- their "spec" is the working code.
 
 ### Role 6: Design Specialist
 
@@ -245,32 +245,32 @@ Model tier (opus vs sonnet) is determined by the **consequence of error** in the
 |---|---|---|
 | **Error consequence** | Bad output wastes a team's sprint or creates a governance failure | Bad output is caught by tests or review |
 | **Task type** | Judgment, design, prioritization, review | Volume processing, pattern matching, implementation |
-| **Correction mechanism** | No automated check — requires human/agent judgment to detect errors | Tests, linters, type checkers catch errors automatically |
+| **Correction mechanism** | No automated check -- requires human/agent judgment to detect errors | Tests, linters, type checkers catch errors automatically |
 
 ### Evidence from Deployed Teams
 
 | Agent | Team | Model | Rationale |
 |---|---|---|---|
 | All team-leads | All | opus | Coordination decisions have team-wide blast radius |
-| Hammurabi | AR | opus | Specs are handoff contracts — bad spec wastes migration team's sprint |
-| Montesquieu | FR | opus | Governance design — bad framework creates bottlenecks or chaos at scale |
-| Vigenere | CD | opus | Crypto decisions — wrong algorithm choice is a security vulnerability |
-| Marcus | CB/HR | opus | Code review — missed bug in review reaches production |
-| Finn | FR | opus | Research quality — wrong findings propagate through all downstream design |
-| Champollion | AR | sonnet | File parsing — errors caught by pytest + mypy strict |
-| Nightingale | AR | sonnet | Data aggregation — errors caught by dashboard inconsistencies |
-| Berners-Lee | AR | sonnet | SvelteKit dev — errors caught by vitest + build |
-| Babbage | CD | sonnet | Backend implementation — errors caught by tests |
-| Kerckhoffs | CD | sonnet | QA — writes tests, doesn't make architecture decisions |
-| Brunel | FR | sonnet | Container design — lower-consequence than lifecycle or protocol design |
+| Hammurabi | AR | opus | Specs are handoff contracts -- bad spec wastes migration team's sprint |
+| Montesquieu | FR | opus | Governance design -- bad framework creates bottlenecks or chaos at scale |
+| Vigenere | CD | opus | Crypto decisions -- wrong algorithm choice is a security vulnerability |
+| Marcus | CB/HR | opus | Code review -- missed bug in review reaches production |
+| Finn | FR | opus | Research quality -- wrong findings propagate through all downstream design |
+| Champollion | AR | sonnet | File parsing -- errors caught by pytest + mypy strict |
+| Nightingale | AR | sonnet | Data aggregation -- errors caught by dashboard inconsistencies |
+| Berners-Lee | AR | sonnet | SvelteKit dev -- errors caught by vitest + build |
+| Babbage | CD | sonnet | Backend implementation -- errors caught by tests |
+| Kerckhoffs | CD | sonnet | QA -- writes tests, doesn't make architecture decisions |
+| Brunel | FR | sonnet | Container design -- lower-consequence than lifecycle or protocol design |
 
 ### Cost Pattern
 
 | Team archetype | Typical opus count | Total agents | Opus ratio |
 |---|---|---|---|
-| Research | 5-7 of 8 | 8 | ~75% — most roles are judgment-heavy |
-| Development | 2-3 of 5-12 | 5-12 | ~25% — most roles have automated quality gates |
-| Hybrid | 2 of 5 | 5 | 40% — coordinator + spec writer |
+| Research | 5-7 of 8 | 8 | ~75% -- most roles are judgment-heavy |
+| Development | 2-3 of 5-12 | 5-12 | ~25% -- most roles have automated quality gates |
+| Hybrid | 2 of 5 | 5 | 40% -- coordinator + spec writer |
 
 **Insight:** Research teams are expensive because their primary output (design documents) has no automated quality gate. Development teams are cheaper because tests and linters catch most errors. This is a structural property of the archetype, not a choice.
 
@@ -295,11 +295,11 @@ Optimal team size is driven by **communication overhead** vs **domain coverage n
 
 | Team | Members | Archetype | Domain breadth |
 |---|---|---|---|
-| cloudflare-builders | 12 | Dev | Broad — full-stack + CI/CD + migration |
-| hr-devs | 9 | Dev | Medium — same stack, narrower scope |
-| framework-research | 8 | Research | Broad — 8 topic files |
-| apex-research | 5 | Hybrid | Narrow — one source format, one output |
-| comms-dev | 5 | Dev | Narrow — one protocol, one system |
+| cloudflare-builders | 12 | Dev | Broad -- full-stack + CI/CD + migration |
+| hr-devs | 9 | Dev | Medium -- same stack, narrower scope |
+| framework-research | 8 | Research | Broad -- 8 topic files |
+| apex-research | 5 | Hybrid | Narrow -- one source format, one output |
+| comms-dev | 5 | Dev | Narrow -- one protocol, one system |
 
 ### Sizing Formula
 
@@ -316,9 +316,9 @@ Where:
 
 ### Constraints
 
-**Minimum: 3.** Coordinator + 2 specialists. Below this, you don't need a team — a single agent with a plan suffices.
+**Minimum: 3.** Coordinator + 2 specialists. Below this, you don't need a team -- a single agent with a plan suffices.
 
-**Maximum practical: 12.** Communication overhead scales O(N^2). At 12 agents, the coordinator spends most tokens on coordination, not decision-making. The cloudflare-builders team at 12 is at the practical ceiling — hr-devs pruned to 9 by removing workstream-complete specialists.
+**Maximum practical: 12.** Communication overhead scales O(N^2). At 12 agents, the coordinator spends most tokens on coordination, not decision-making. The cloudflare-builders team at 12 is at the practical ceiling -- hr-devs pruned to 9 by removing workstream-complete specialists.
 
 **Sweet spot: 5-7.** Large enough for meaningful parallelism, small enough that the coordinator can track all agents without losing context.
 
@@ -332,7 +332,7 @@ Start small. Add agents when bottlenecks appear, not prophylactically.
 | Coordinator can't track all work | Add a research coordinator (Finn pattern) to reduce coordinator's information-gathering burden |
 | Quality issues in output | Add an auditor (Medici pattern) or upgrade model tier |
 | New workstream opens | Add a domain specialist (temporary, like Alex) |
-| Workstream completes | Remove the specialist — don't let idle agents accumulate |
+| Workstream completes | Remove the specialist -- don't let idle agents accumulate |
 
 ### Shrinkage Strategy
 
@@ -359,21 +359,21 @@ Every team's common-prompt has a **fixed skeleton** (mandatory sections present 
 |---|---|---|
 | **Team header** | Name, members, mission | All teams |
 | **Workspace** | Repo, directories, key paths | All teams |
-| **Communication rule** | Timestamp format, mandatory reporting | All teams — identical wording |
-| **Author attribution** | `(*PREFIX:Agent*)` format, placement rules | All teams — prefix varies per team |
+| **Communication rule** | Timestamp format, mandatory reporting | All teams -- identical wording |
+| **Author attribution** | `(*PREFIX:Agent*)` format, placement rules | All teams -- prefix varies per team |
 | **Language rules** | Technical docs: English. User-facing: Estonian. | All teams |
-| **Agent spawning rule** | `run_in_background: true` | All teams — identical wording |
-| **On startup** | Read scratchpad, read common-prompt, intro to team-lead | All teams — 3-step pattern |
-| **Team memory** | Scratchpad path, 100-line limit, tag list | All teams — identical structure |
-| **Shutdown protocol** | Write scratchpad, send closing message, approve | All teams — identical 3-step pattern |
+| **Agent spawning rule** | `run_in_background: true` | All teams -- identical wording |
+| **On startup** | Read scratchpad, read common-prompt, intro to team-lead | All teams -- 3-step pattern |
+| **Team memory** | Scratchpad path, 100-line limit, tag list | All teams -- identical structure |
+| **Shutdown protocol** | Write scratchpad, send closing message, approve | All teams -- identical 3-step pattern |
 
 ### Variable Sections by Archetype
 
 | Section | Research | Development | Hybrid |
 |---|---|---|---|
-| **Standards** | "RESEARCH team — no production code" | "DEVELOPMENT team — production code, code review, conventional commits" | Implied by directory ownership |
-| **Directory ownership table** | Topic file ownership | Not needed (prompts define scope) | Critical — data pipeline ownership |
-| **Data flow diagram** | Not needed | Not needed | Critical — shows pipeline from source to output |
+| **Standards** | "RESEARCH team -- no production code" | "DEVELOPMENT team -- production code, code review, conventional commits" | Implied by directory ownership |
+| **Directory ownership table** | Topic file ownership | Not needed (prompts define scope) | Critical -- data pipeline ownership |
+| **Data flow diagram** | Not needed | Not needed | Critical -- shows pipeline from source to output |
 | **TDD mandate** | Not present | Present (detailed Red→Green→Refactor) | Present (for code-writing agents) |
 | **Tech stack** | Not present | Present (SvelteKit, TypeScript, etc.) | Present (Python + SvelteKit) |
 | **Spawn order** | Not specified | Named configurations ("full", "lite") | Explicit data-dependency order |
@@ -396,7 +396,7 @@ Prefixes are registered in roster.json (Herald's T03 recommendation) and must be
 
 ### Mandatory Estonian Sentence
 
-All observed common-prompts contain one sentence in Estonian: "**KOHUSTUSLIK: Pärast iga ülesande lõpetamist saada team-leadile SendMessage raport.** Ära mine idle ilma raporteerimata." (Mandatory: after completing any task, send team-lead a report. Do not go idle without reporting.) This is the single most important behavioral rule and is written in Estonian for emphasis — it's the PO's voice, not the framework's.
+All observed common-prompts contain one sentence in Estonian: "**KOHUSTUSLIK: Pärast iga ülesande lõpetamist saada team-leadile SendMessage raport.** Ära mine idle ilma raporteerimata." (Mandatory: after completing any task, send team-lead a report. Do not go idle without reporting.) This is the single most important behavioral rule and is written in Estonian for emphasis -- it's the PO's voice, not the framework's.
 
 ---
 
@@ -404,12 +404,12 @@ All observed common-prompts contain one sentence in Estonian: "**KOHUSTUSLIK: P�
 
 ### Can an agent belong to multiple teams?
 
-**De facto answer: No — but roles can be replicated.**
+**De facto answer: No -- but roles can be replicated.**
 
 No agent instance runs in two teams simultaneously. Each agent is spawned within one team context and can only SendMessage within that context. However:
 
 - **Medici pattern:** The same *role* exists in multiple teams (Medici in FR, auditing AR remotely). These are separate agent instances with the same role definition, not one agent in two teams.
-- **Finn pattern:** Finn exists in FR, CB, and HR — three separate instances of the same role design, adapted to each team's domain.
+- **Finn pattern:** Finn exists in FR, CB, and HR -- three separate instances of the same role design, adapted to each team's domain.
 - **Cross-team service:** An agent in Team A can serve Team B via the handoff protocol (T03), but remains a member of Team A.
 
 **Recommendation:** Do not attempt shared-membership. Instead, design roles that can be instantiated per-team (Medici, Finn) or provide cross-team service via protocols (T03 Protocol 1).
@@ -440,21 +440,21 @@ No agent instance runs in two teams simultaneously. Each agent is spawned within
 
 ### Team composition in practice
 
-**rc-team (cloudflare-builders) — 12 agents:**
+**rc-team (cloudflare-builders) -- 12 agents:**
 
 - team-lead (opus-4-6), sven (frontend), dag (database), tess (testing), piper (CI/CD), harmony (integration/auth), alex (APEX migration), marcus (code review, opus-4-6), finn (research, sonnet), arvo (requirements), medici (health audit), eilama (local LLM)
-- Includes a project-specific specialist (alex) for APEX migration — added and can be removed when that workstream ends
+- Includes a project-specific specialist (alex) for APEX migration -- added and can be removed when that workstream ends
 
-**hr-devs — 9 agents:**
+**hr-devs -- 9 agents:**
 
 - team-lead, sven, dag, tess, marcus, finn, arvo, medici, eilama (local LLM scaffolding)
 - Removed: piper (CI/CD), harmony (integration/auth), alex (APEX)
-- Added: eilama (local Ollama daemon, not a Claude agent — code boilerplate factory)
+- Added: eilama (local Ollama daemon, not a Claude agent -- code boilerplate factory)
 - Evolution: leaner roster after removing project-complete specialists; eilama shows non-Claude agent integration
 
 ### Roster is machine-readable
 
-Both teams define membership in `roster.json` — name, model tier, agentType, prompt file path, color. This enables:
+Both teams define membership in `roster.json` -- name, model tier, agentType, prompt file path, color. This enables:
 
 - `spawn_member.sh` to auto-read model/color without hardcoding
 - Team-lead to check "is X registered?" before spawning
@@ -480,8 +480,8 @@ Senior roles (team-lead, marcus/code review, sven/frontend) use opus-4-6 in hr-d
 
 Both teams define named spawn configurations:
 
-- **"full"** — story work: finn + marcus + tess + sven (+ dag if needed)
-- **"full-review"** (hr-devs only) — adds arvo for AC verification
-- **"lite"** — quick fix: finn + sven only
+- **"full"** -- story work: finn + marcus + tess + sven (+ dag if needed)
+- **"full-review"** (hr-devs only) -- adds arvo for AC verification
+- **"lite"** -- quick fix: finn + sven only
 
 This answers the "fixed roster vs elastic" question: roster is fixed (defines available agents), but active configuration is elastic (spawn subset per task type).

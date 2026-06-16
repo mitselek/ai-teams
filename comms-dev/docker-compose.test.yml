@@ -1,5 +1,5 @@
 # (*CD:Kerckhoffs*)
-# docker-compose.test.yml — two-broker acceptance test overlay.
+# docker-compose.test.yml -- two-broker acceptance test overlay.
 #
 # Extends the base docker-compose.yml with a framework-research broker
 # for cross-container delivery testing (TC-01 through TC-08).

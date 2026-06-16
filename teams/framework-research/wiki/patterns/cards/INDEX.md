@@ -1,12 +1,12 @@
-# patterns/ — Card Index
+# patterns/ -- Card Index
 
 87 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ — **52 confirmed, 2 partial, 33 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
+**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ -- **52 confirmed, 2 partial, 33 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 
 | Card | Full entry |
 |---|---|
-| agentType vs backendType — Two Orthogonal Type Fields | [card](agenttype-vs-backendtype-separation.md) · [full](../agenttype-vs-backendtype-separation.md) |
+| agentType vs backendType -- Two Orthogonal Type Fields | [card](agenttype-vs-backendtype-separation.md) · [full](../agenttype-vs-backendtype-separation.md) |
 | API Gateway Error vs Actual Server State | [card](api-gateway-error-vs-actual-server-state.md) · [full](../api-gateway-error-vs-actual-server-state.md) |
 | Artifact Claims More Than It Implements (honesty-pass + probe-don't-infer) | [card](artifact-claims-more-than-it-implements.md) · [full](../artifact-claims-more-than-it-implements.md) |
 | Audit-Trail for Rejection Rationale | [card](audit-trail-for-rejection-rationale.md) · [full](../audit-trail-for-rejection-rationale.md) |
@@ -38,7 +38,7 @@
 | In-Process Agent Respawn (No tmux) | [card](in-process-respawn.md) · [full](../in-process-respawn.md) |
 | Integration, Not Relay | [card](integration-not-relay.md) · [full](../integration-not-relay.md) |
 | Integration Seam Determines Governance Impact | [card](integration-seam-governance-impact.md) · [full](../integration-seam-governance-impact.md) |
-| Layer-0 Library-First — PRE-DRAFT Discipline | [card](layer-0-library-first-pre-draft-discipline.md) · [full](../layer-0-library-first-pre-draft-discipline.md) |
+| Layer-0 Library-First -- PRE-DRAFT Discipline | [card](layer-0-library-first-pre-draft-discipline.md) · [full](../layer-0-library-first-pre-draft-discipline.md) |
 | Layer-0 Library-First Recurrence | [card](layer-0-library-first-recurrence.md) · [full](../layer-0-library-first-recurrence.md) |
 | Live-Inject + Dockerfile-Bake Dual-Track | [card](live-inject-plus-dockerfile-bake-dual-track.md) · [full](../live-inject-plus-dockerfile-bake-dual-track.md) |
 | Lossless Independent Convergence | [card](lossless-independent-convergence.md) · [full](../lossless-independent-convergence.md) |
@@ -67,9 +67,9 @@
 | Repo as Durable Store + TeamDelete as Release Primitive | [card](repo-as-durable-store-teamdelete-as-release-primitive.md) · [full](../repo-as-durable-store-teamdelete-as-release-primitive.md) |
 | Rule-Erosion via Reasonable Exceptions | [card](rule-erosion-via-reasonable-exceptions.md) · [full](../rule-erosion-via-reasonable-exceptions.md) |
 | Same-Volume Startup Gate for Rename-Based Atomicity | [card](same-volume-startup-gate-for-rename-atomicity.md) · [full](../same-volume-startup-gate-for-rename-atomicity.md) |
-| Scope-Block Drift — Letter Lags Practice | [card](scope-block-drift-from-practice.md) · [full](../scope-block-drift-from-practice.md) |
+| Scope-Block Drift -- Letter Lags Practice | [card](scope-block-drift-from-practice.md) · [full](../scope-block-drift-from-practice.md) |
 | SemVer-Strict-Typed-Contract Discipline | [card](semver-strict-typed-contract-discipline.md) · [full](../semver-strict-typed-contract-discipline.md) |
-| Service-Team Topology — Members are Ghosts of Consumers | [card](service-team-topology.md) · [full](../service-team-topology.md) |
+| Service-Team Topology -- Members are Ghosts of Consumers | [card](service-team-topology.md) · [full](../service-team-topology.md) |
 | Single-Channel Saturation via Mode Partition | [card](single-channel-saturation-via-mode-partition.md) · [full](../single-channel-saturation-via-mode-partition.md) |
 | Snapshot-State Mis-Names Path-to-End-State | [card](snapshot-state-mis-names-path-to-end-state.md) · [full](../snapshot-state-mis-names-path-to-end-state.md) |
 | Spool Stores the Raw Entry, Re-Resolve at Deposit Time (config-fix self-heals stuck mail) | [card](spool-stores-raw-entry-reresolve-on-deposit.md) · [full](../spool-stores-raw-entry-reresolve-on-deposit.md) |
@@ -85,11 +85,11 @@
 | Timestamp-Crossed Messages | [card](timestamp-crossed-messages.md) · [full](../timestamp-crossed-messages.md) |
 | tmux pane-border-format for Agent Team Layouts | [card](tmux-pane-border-format-for-teams.md) · [full](../tmux-pane-border-format-for-teams.md) |
 | Two-Consumer Pattern: Direct-MCP vs Synthesized-Snapshot | [card](two-consumer-pattern.md) · [full](../two-consumer-pattern.md) |
-| "Why This Section Exists" — Incident Docs in Prompts | [card](why-this-section-exists-incident-docs.md) · [full](../why-this-section-exists-incident-docs.md) |
+| "Why This Section Exists" -- Incident Docs in Prompts | [card](why-this-section-exists-incident-docs.md) · [full](../why-this-section-exists-incident-docs.md) |
 | Wiki Cross-Link Convention | [card](wiki-cross-link-convention.md) · [full](../wiki-cross-link-convention.md) |
 | Windows User-Context Persistent Bridge | [card](windows-user-context-persistent-bridge.md) · [full](../windows-user-context-persistent-bridge.md) |
-| Within-Document Rename Hygiene — Grep Before Editing | [card](within-document-rename-grep-discipline.md) · [full](../within-document-rename-grep-discipline.md) |
+| Within-Document Rename Hygiene -- Grep Before Editing | [card](within-document-rename-grep-discipline.md) · [full](../within-document-rename-grep-discipline.md) |
 | Worktree Isolation for Parallel Agents | [card](worktree-isolation-for-parallel-agents.md) · [full](../worktree-isolation-for-parallel-agents.md) |
 | Worktree-Spawn Asymmetry in Message Delivery | [card](worktree-spawn-asymmetry-message-delivery.md) · [full](../worktree-spawn-asymmetry-message-delivery.md) |
-| World-State-on-Wake — Self-Orientation After Compaction | [card](world-state-on-wake.md) · [full](../world-state-on-wake.md) |
+| World-State-on-Wake -- Self-Orientation After Compaction | [card](world-state-on-wake.md) · [full](../world-state-on-wake.md) |
 | XP Cycle Applies to Infrastructure Stories | [card](xp-cycle-for-infrastructure.md) · [full](../xp-cycle-for-infrastructure.md) |

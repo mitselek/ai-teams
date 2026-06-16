@@ -1,17 +1,17 @@
-# auth/identity — competency slice
+# auth/identity -- competency slice
 #
 # DEFERRED (this worked-draft scope, PO decision): the auth domain is anchored
 # (persona + prompt + synergy) but its competency claims are NOT yet populated.
 # Only data-lifecycle is fully populated in this draft (it has the real esmuseum/
 # Pérotin/mvox backing). When populated, this file is a GENERATED slice
-# (search_claims(domain="auth")) from the global index — never hand-edited — with a
+# (search_claims(domain="auth")) from the global index -- never hand-edited -- with a
 # `generated-from: competency-index/auth/ @ <commit>` provenance header (spec §2.2).
 #
 # Known auth-domain material awaiting filing (from Finn's harvest, routed here):
 #   - API key -> JWT exchange (SHA-256 hashed permanent keys; temp OAuth/passkey tokens).
 #   - JWT IP-binding; refresh-refusal windows (>14d since refresh, or >30d since original auth).
 #   - OAuth.ee flow (provider enum: e-mail/google/apple/smart-id/mobile-id/id-card); passkey/WebAuthn.
-#   - DISPUTED (canonical apex case): JWT lifetime — openapi.get.js says 48h vs auth/*.get.js say 12h.
+#   - DISPUTED (canonical apex case): JWT lifetime -- openapi.get.js says 48h vs auth/*.get.js say 12h.
 #     File as a confirms+contradicts pair -> disputed -> escalate to Argo for maintainer-authoritative
 #     resolution. Do NOT pick a number.
 #

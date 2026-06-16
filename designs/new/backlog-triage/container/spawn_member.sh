@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)
+# DEPRECATED -- 2026-04-24 (mitselek/ai-teams#60)
 # ──────────────────────────────────────────────────────────────────────────────
 # tmux-pane spawning retired as the framework default. Do NOT invoke.
 # New spawn path: Agent tool (team_name + name) from team-lead Claude session.
@@ -12,7 +12,7 @@ set -euo pipefail
 echo "ERROR: designs/new/backlog-triage spawn_member.sh is deprecated (#60). Do not execute." >&2
 exit 1
 
-# spawn_member.sh — Spawn a backlog-triage agent into a tmux pane
+# spawn_member.sh -- Spawn a backlog-triage agent into a tmux pane
 #
 # Usage: spawn_member.sh [--target-pane %XX] <agent-name> [tmux-session]
 #
@@ -20,7 +20,7 @@ exit 1
 # Without: creates a new pane via split-window (legacy / ad-hoc)
 #
 # Agent names: archivist, forensic, consul
-# (team-lead is the PO — already in Claude, not spawned by this script)
+# (team-lead is the PO -- already in Claude, not spawned by this script)
 
 # Parse --target-pane option
 TARGET_PANE=""
@@ -42,7 +42,7 @@ PROMPTS_DIR="/home/ai-teams/team-config/prompts"
 [[ -f "$CONFIG" ]] || { echo "ERROR: $CONFIG not found. Run TeamCreate first." >&2; exit 1; }
 [[ -f "$ROSTER" ]] || { echo "ERROR: $ROSTER not found." >&2; exit 1; }
 
-# Duplicate gate — hard stop
+# Duplicate gate -- hard stop
 if jq -e ".members[] | select(.name == \"$AGENT_NAME\")" "$CONFIG" >/dev/null 2>&1; then
     echo "ERROR: $AGENT_NAME already registered in config.json. Use SendMessage instead." >&2
     exit 1

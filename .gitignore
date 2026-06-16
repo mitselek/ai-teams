@@ -1,4 +1,4 @@
-# Sensitive research — in-company public but treated as confidential per subject
+# Sensitive research -- in-company public but treated as confidential per subject
 teams/*/sensitive/
 
 # Per-machine Claude-CLI permission allowlist (paths and grants are machine-local)

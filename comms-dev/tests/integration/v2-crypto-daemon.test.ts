@@ -135,7 +135,7 @@ const FR_ACL = {
 // Both daemons configured with v2 keys.
 // Expected: inbox body === original plaintext (E2E decrypted on receive).
 
-describe('DaemonV2 v2 crypto — scenario 1: v2→v2 E2E round-trip', () => {
+describe('DaemonV2 v2 crypto -- scenario 1: v2→v2 E2E round-trip', () => {
 
   let cdDir: string;
   let frDir: string;
@@ -249,9 +249,9 @@ describe('DaemonV2 v2 crypto — scenario 1: v2→v2 E2E round-trip', () => {
     const msg  = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', body);
     await cdDaemon.sendMessage(msg);
     const delivered = await waitForInboxFile(frInbox, msg.id);
-    // Decrypted body = original plaintext — equals the sent string
+    // Decrypted body = original plaintext -- equals the sent string
     expect(delivered.body).toBe(body);
-    // Confirm it is NOT a JSON object with {ciphertext} — i.e., not still encrypted
+    // Confirm it is NOT a JSON object with {ciphertext} -- i.e., not still encrypted
     let isEncryptedPayload = false;
     try {
       const parsed = JSON.parse(delivered.body);
@@ -290,7 +290,7 @@ describe('DaemonV2 v2 crypto — scenario 1: v2→v2 E2E round-trip', () => {
 // fr has the CORRECT cd public key → verification fails → message dropped.
 // This simulates a hub forging a message that claims to be from comms-dev.
 
-describe('DaemonV2 v2 crypto — scenario 2: invalid signature → message dropped', () => {
+describe('DaemonV2 v2 crypto -- scenario 2: invalid signature → message dropped', () => {
 
   let cdDir: string;
   let frDir: string;
@@ -320,13 +320,13 @@ describe('DaemonV2 v2 crypto — scenario 2: invalid signature → message dropp
     // CORRECT cd public key (what fr expects)
     const cdSignCorrect = genPemKey('ed25519');
     const cdEncCorrect  = genPemKey('x25519');
-    // WRONG cd signing key (what cd actually uses — not in bundle)
+    // WRONG cd signing key (what cd actually uses -- not in bundle)
     const cdSignWrong   = genPemKey('ed25519');
 
     const frSign = genPemKey('ed25519');
     const frEnc  = genPemKey('x25519');
 
-    // Bundle contains CORRECT cd public key — fr will verify against this
+    // Bundle contains CORRECT cd public key -- fr will verify against this
     const bundle = {
       version:      1,
       generated_at: new Date().toISOString(),
@@ -336,7 +336,7 @@ describe('DaemonV2 v2 crypto — scenario 2: invalid signature → message dropp
       },
     };
 
-    // cd daemon uses the WRONG signing key — its signatures won't match cdSignCorrect.pub
+    // cd daemon uses the WRONG signing key -- its signatures won't match cdSignCorrect.pub
     writeFileSync(join(cdDir, 'sign.pem'), cdSignWrong.priv);   // ← wrong key
     writeFileSync(join(cdDir, 'enc.pem'),  cdEncCorrect.priv);  // enc key matches (for AAD)
     writeFileSync(join(cdDir, 'bundle.json'), JSON.stringify(bundle));
@@ -390,7 +390,7 @@ describe('DaemonV2 v2 crypto — scenario 2: invalid signature → message dropp
   });
 
   it('sendMessage still returns OK (transport-level ACK from sender side)', async () => {
-    // The sender gets OK from the TLS ACK — it can't know the receiver will drop the message.
+    // The sender gets OK from the TLS ACK -- it can't know the receiver will drop the message.
     // Message verification (and drop) happens asynchronously on the receiver side.
     const msg = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', 'should be dropped');
     const result = await cdDaemon.sendMessage(msg);
@@ -400,7 +400,7 @@ describe('DaemonV2 v2 crypto — scenario 2: invalid signature → message dropp
   it('message is NOT delivered to inbox when signature is invalid (HUB-2/HUB-8)', async () => {
     const msg = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', 'forged message payload');
     await cdDaemon.sendMessage(msg);
-    // Verify inbox stays empty — message must be dropped by fr's signature check
+    // Verify inbox stays empty -- message must be dropped by fr's signature check
     await confirmNotDelivered(frInbox, msg.id);
     const filePath = join(frInbox, `${msg.id}.json`);
     expect(existsSync(filePath)).toBe(false);
@@ -411,9 +411,9 @@ describe('DaemonV2 v2 crypto — scenario 2: invalid signature → message dropp
 //
 // cd has v2 keys, fr does NOT (no keyBundlePath/signKeyPath/encKeyPath).
 // fr receives the message and delivers the encrypted body to inbox (v1 limitation).
-// Per spec: v1 daemon cannot decrypt — accepts the ciphertext as body.
+// Per spec: v1 daemon cannot decrypt -- accepts the ciphertext as body.
 
-describe('DaemonV2 v2 crypto — scenario 3: v2→v1 backward compat', () => {
+describe('DaemonV2 v2 crypto -- scenario 3: v2→v1 backward compat', () => {
 
   let cdDir: string;
   let frDir: string;
@@ -504,7 +504,7 @@ describe('DaemonV2 v2 crypto — scenario 3: v2→v1 backward compat', () => {
   it('message IS delivered to v1 inbox (v1 daemon does not drop on missing crypto)', async () => {
     const msg = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', 'v2 to v1 body');
     await cdDaemon.sendMessage(msg);
-    // Should deliver — v1 daemon has no cryptoV2, skips verification
+    // Should deliver -- v1 daemon has no cryptoV2, skips verification
     const delivered = await waitForInboxFile(frInbox, msg.id);
     expect(delivered.id).toBe(msg.id);
   });
@@ -513,7 +513,7 @@ describe('DaemonV2 v2 crypto — scenario 3: v2→v1 backward compat', () => {
     const msg = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', 'plaintext body');
     await cdDaemon.sendMessage(msg);
     const delivered = await waitForInboxFile(frInbox, msg.id);
-    // v1 receives encrypted body — it's a JSON-serialized E2EPayload
+    // v1 receives encrypted body -- it's a JSON-serialized E2EPayload
     const parsedBody = JSON.parse(delivered.body);
     expect(parsedBody).toMatchObject({
       version:     2,
@@ -532,7 +532,7 @@ describe('DaemonV2 v2 crypto — scenario 3: v2→v1 backward compat', () => {
 // handleInbound: `if (this.cryptoV2 && possibleSigned.signature)` → false (no signature).
 // fr skips verification and delivers the plaintext body as-is.
 
-describe('DaemonV2 v2 crypto — scenario 4: v1→v2 backward compat', () => {
+describe('DaemonV2 v2 crypto -- scenario 4: v1→v2 backward compat', () => {
 
   let cdDir: string;
   let frDir: string;
@@ -660,17 +660,17 @@ describe('DaemonV2 v2 crypto — scenario 4: v1→v2 backward compat', () => {
 // Topology: cd (v2) ─mTLS→ relay (hub, no v2 keys) ─mTLS→ fr (v2)
 //
 // Routing mechanism: `defaultPeer` (Babbage's option A).
-// cd/fr have `defaultPeer: 'relay'` — unknown destinations fall back to relay tunnel.
-// relay has `role: 'hub'` — forwards on `msg.to.team` using its own peers map.
+// cd/fr have `defaultPeer: 'relay'` -- unknown destinations fall back to relay tunnel.
+// relay has `role: 'hub'` -- forwards on `msg.to.team` using its own peers map.
 //
-// Security assertions (Kerckhoffs' principle — relay has source code + spec):
-//   a) cd E2E-encrypts for fr — relay sees only opaque ciphertext
-//   b) cd signs envelope — fr verifies (hubPeers bypass allows relay-relayed messages)
-//   c) relay has no v2 keys — cannot read or forge body
+// Security assertions (Kerckhoffs' principle -- relay has source code + spec):
+//   a) cd E2E-encrypts for fr -- relay sees only opaque ciphertext
+//   b) cd signs envelope -- fr verifies (hubPeers bypass allows relay-relayed messages)
+//   c) relay has no v2 keys -- cannot read or forge body
 //
 // Spec: security-report.md HUB-1 (E2E), HUB-2 (forgery), HUB-8 (identity)
 
-describe('DaemonV2 v2 crypto — scenario 5: hub relay (three-daemon)', () => {
+describe('DaemonV2 v2 crypto -- scenario 5: hub relay (three-daemon)', () => {
 
   const RELAY_TEAM = 'relay';
 
@@ -715,7 +715,7 @@ describe('DaemonV2 v2 crypto — scenario 5: hub relay (three-daemon)', () => {
     writeFileSync(join(cdDir, 'acl.json'), JSON.stringify(CD_ACL));
     writeFileSync(join(frDir, 'acl.json'), JSON.stringify(FR_ACL));
 
-    // v2 key material for cd and fr only — relay gets none
+    // v2 key material for cd and fr only -- relay gets none
     const cdSign = genPemKey('ed25519');
     const cdEnc  = genPemKey('x25519');
     const frSign = genPemKey('ed25519');
@@ -756,7 +756,7 @@ describe('DaemonV2 v2 crypto — scenario 5: hub relay (three-daemon)', () => {
       reconnectBaseMs:     50,
       heartbeatIntervalMs: 60_000,
       deadConnectionMs:    120_000,
-      // No v2 keys — relay cannot read E2E-encrypted bodies
+      // No v2 keys -- relay cannot read E2E-encrypted bodies
     });
 
     mkdirSync(join(tmpdir(), `v2int-s5-relayinbox-${ts}`), { recursive: true });
@@ -828,7 +828,7 @@ describe('DaemonV2 v2 crypto — scenario 5: hub relay (three-daemon)', () => {
     expect(delivered.body).toBe(body);
   });
 
-  it('relay (hub) has no v2 keys — confirms HUB-1: relay blind to body content', async () => {
+  it('relay (hub) has no v2 keys -- confirms HUB-1: relay blind to body content', async () => {
     // Verify by inspection: relay daemon has no cryptoV2 (no key paths configured).
     // This proves the relay cannot decrypt the E2E-encrypted body.
     // Structural test: relay was started without signKeyPath/encKeyPath/keyBundlePath.
@@ -839,7 +839,7 @@ describe('DaemonV2 v2 crypto — scenario 5: hub relay (three-daemon)', () => {
     const msg  = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', body);
     await cdDaemon.sendMessage(msg);
     const delivered = await waitForInboxFile(frInbox, msg.id, 5000);
-    // fr has plaintext — decryption happened at fr using fr's private key (not relay)
+    // fr has plaintext -- decryption happened at fr using fr's private key (not relay)
     expect(delivered.body).toBe(body);
   });
 
@@ -852,7 +852,7 @@ describe('DaemonV2 v2 crypto — scenario 5: hub relay (three-daemon)', () => {
     expect(delivered.body).toBe(body);
   });
 
-  it('fr inbox from.team is comms-dev (not relay) — Ed25519 sender identity preserved', async () => {
+  it('fr inbox from.team is comms-dev (not relay) -- Ed25519 sender identity preserved', async () => {
     const body = 'hub relay: sender identity check';
     const msg  = makeMsg(CD_TEAM, 'babbage', FR_TEAM, 'herald', body);
     await cdDaemon.sendMessage(msg);

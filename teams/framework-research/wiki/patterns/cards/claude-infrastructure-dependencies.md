@@ -17,10 +17,10 @@ The framework's communication and lifecycle infrastructure is built on Claude Co
 
 ## Key ideas
 
-- **Layer 1 — Infrastructure (hardest to abstract)**: SendMessage (sole messaging primitive, all 7 T09 protocols are SendMessage payloads), TeamCreate/config.json, Agent tool, MCP servers, inbox files.
-- **Layer 2 — Protocol conventions (medium, standardizable)**: markdown+timestamp+attribution messages, TS protocol interfaces, shutdown_request/response JSON — provider-agnostic in principle.
-- **Layer 3 — Model naming (easiest, most widespread)**: hardcoded model names in roster.json with no tier indirection; `[1m]` context-variant suffix.
-- **Multi-provider precedent**: Eilama (codellama via Ollama) uses `backendType: "daemon"` with a separate spawn/shutdown path — proves the messaging substrate is provider-agnostic but requires a full parallel lifecycle per backend.
+- **Layer 1 -- Infrastructure (hardest to abstract)**: SendMessage (sole messaging primitive, all 7 T09 protocols are SendMessage payloads), TeamCreate/config.json, Agent tool, MCP servers, inbox files.
+- **Layer 2 -- Protocol conventions (medium, standardizable)**: markdown+timestamp+attribution messages, TS protocol interfaces, shutdown_request/response JSON -- provider-agnostic in principle.
+- **Layer 3 -- Model naming (easiest, most widespread)**: hardcoded model names in roster.json with no tier indirection; `[1m]` context-variant suffix.
+- **Multi-provider precedent**: Eilama (codellama via Ollama) uses `backendType: "daemon"` with a separate spawn/shutdown path -- proves the messaging substrate is provider-agnostic but requires a full parallel lifecycle per backend.
 - **Open question** (T06:1072): should non-Claude agents implement shutdown_request/response, or is kill-process sufficient? Unresolved, critical for multi-provider.
 
 (*FR:Callimachus*)

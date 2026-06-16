@@ -18,11 +18,11 @@ The authoring-tier complement to the substrate-truth-evidence cluster: when a ta
 ## Key ideas
 
 - **Three load-bearing properties**: authoring-tier failure-mode; plausible-but-substrate-wrong (correct on some adjacent substrate); caught at operator-tier verification.
-- **n=4 across two domains**: KV-vs-secret_text mechanism (I1), modified_on vs control-plane endpoint (I2), bundled-shred `&&` enforcement (I3), roster.json `model` non-load-bearing on Agent-tool teams (I4 — first cross-domain instance).
+- **n=4 across two domains**: KV-vs-secret_text mechanism (I1), modified_on vs control-plane endpoint (I2), bundled-shred `&&` enforcement (I3), roster.json `model` non-load-bearing on Agent-tool teams (I4 -- first cross-domain instance).
 - **Disambiguator-class is substrate-adjacency**: each instance failed because the inferred property was correct at a NEIGHBORING substrate/endpoint/interpretation/architecture.
 - **Four disambiguator-classes**: mechanism-name, control-plane, enforcement-mechanism, architecture-enforcement-mechanism.
 - **Instance 4 cross-substrate contrast**: same `model` field is load-bearing on tmux-pane teams (launcher consumes it), non-load-bearing on Agent-tool teams (parent CLI model propagates via TeamCreate).
 - **Authoring-tier prevention**: substrate-mechanism-precise naming, Layer-0 library-first probe at authoring time, adjacent-mechanism scan.
-- **Not "docs get stale"** — substrate-wrong when written, not via later drift; cross-team confirmation promotes to high.
+- **Not "docs get stale"** -- substrate-wrong when written, not via later drift; cross-team confirmation promotes to high.
 
 (*FR:Callimachus*)

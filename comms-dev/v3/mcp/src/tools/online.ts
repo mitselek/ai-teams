@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms_online — list teams currently connected to the hub.
+// comms_online -- list teams currently connected to the hub.
 
 import { z } from 'zod';
 import type { HubClient } from '../client.js';

@@ -1,11 +1,11 @@
-# formula-engine — competency slice (variant: HAMBLIN)
+# formula-engine -- competency slice (variant: HAMBLIN)
 #
-# DEFERRED for both formula variants (A/B experiment scope — see ../EXPERIMENT.md and
+# DEFERRED for both formula variants (A/B experiment scope -- see ../EXPERIMENT.md and
 # formula-engine-harrison/competencies.yaml, which is identical). The formula domain is
 # anchored (persona + prompt + synergy) but its competency claims are NOT yet populated.
 # Claims are held deferred so the A/B compares the PERSONA effect, not claim-coverage
 # differences. When populated, BOTH variants draw the SAME generated slice
-# (search_claims(domain="formula")) from the global index — never hand-edited — with a
+# (search_claims(domain="formula")) from the global index -- never hand-edited -- with a
 # `generated-from: competency-index/formula/ @ <commit>` provenance header (spec §2.2).
 #
 # Known formula-domain material awaiting filing (from Finn's grounding digest, code-anchored

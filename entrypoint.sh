@@ -7,8 +7,8 @@
 # 3. gosu drop to ai-teams and exec the requested command (preserves env vars)
 #
 # Required env vars:
-#   GITHUB_TOKEN  — personal access token for HTTPS git operations
-#   REPO_URL      — git remote URL (e.g. https://github.com/mitselek/ai-teams.git)
+#   GITHUB_TOKEN  -- personal access token for HTTPS git operations
+#   REPO_URL      -- git remote URL (e.g. https://github.com/mitselek/ai-teams.git)
 set -e
 
 CONTAINER_USER="ai-teams"
@@ -48,12 +48,12 @@ fi
 AUTH_URL=$(echo "$REPO_URL" | sed "s|https://|https://${GITHUB_TOKEN}@|")
 
 if [ -d "${WORKSPACE}/.git" ]; then
-    echo "[entrypoint] Repo exists — running git pull..."
+    echo "[entrypoint] Repo exists -- running git pull..."
     # Refresh remote URL with current token (token may rotate between sessions)
     gosu "${CONTAINER_USER}" git -C "${WORKSPACE}" remote set-url origin "${AUTH_URL}"
     gosu "${CONTAINER_USER}" git -C "${WORKSPACE}" pull --ff-only
 else
-    echo "[entrypoint] First run — cloning repo to ${WORKSPACE}..."
+    echo "[entrypoint] First run -- cloning repo to ${WORKSPACE}..."
     mkdir -p "${WORKSPACE}"
     chown "${CONTAINER_UID}:${CONTAINER_GID}" "${WORKSPACE}"
     gosu "${CONTAINER_USER}" git clone "${AUTH_URL}" "${WORKSPACE}"

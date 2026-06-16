@@ -14,13 +14,13 @@
 #   hr-repo         → /home/ai-teams/workspace  (hr-platform + dev-toolkit repos)
 #
 # Workspace layout (cloned by entrypoint):
-#   ~/workspace/hr-platform/   — main working repo (Eesti-Raudtee/hr-platform)
-#   ~/workspace/dev-toolkit/   — MCP servers + standards (Eesti-Raudtee/dev-toolkit)
+#   ~/workspace/hr-platform/   -- main working repo (Eesti-Raudtee/hr-platform)
+#   ~/workspace/dev-toolkit/   -- MCP servers + standards (Eesti-Raudtee/dev-toolkit)
 #
 # Ports:
-#   2225  — SSH (PO access, auto-tmux on login)
-#   5178  — Vite dev server (configured via VITE_PORT env)
-#   8787  — Wrangler dev server
+#   2225  -- SSH (PO access, auto-tmux on login)
+#   5178  -- Vite dev server (configured via VITE_PORT env)
+#   8787  -- Wrangler dev server
 #
 # Build:
 #   docker compose -f docker-compose.hr-devs.yml build
@@ -32,12 +32,12 @@ FROM ai-teams-claude:latest
 
 # ── Fix inherited apt sources ──────────────────────────────────────────────────
 # Base image adds GitHub CLI apt repo with a key that may go stale.
-# gh is already installed — remove the apt source, it's not needed.
+# gh is already installed -- remove the apt source, it's not needed.
 RUN rm -f /etc/apt/sources.list.d/github-cli.list \
     && rm -f /usr/share/keyrings/githubcli-archive-keyring.gpg
 
 # ── Node.js 22 LTS ────────────────────────────────────────────────────────────
-# Base image has Node.js 18 from Ubuntu apt — too old for Claude Code and Wrangler.
+# Base image has Node.js 18 from Ubuntu apt -- too old for Claude Code and Wrangler.
 # Download binary directly.
 #
 # WARP note: --insecure for nodejs.org download (WARP TLS interception at build time).
@@ -53,7 +53,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 # ── Timezone + SSH server + tmux + locales ────────────────────────────────────
 # NOTE (#60): tmux is retained for HUMAN SSH session scaffolding only.
-# Agent spawning is Agent-tool-based post-#60 — no tmux panes required.
+# Agent spawning is Agent-tool-based post-#60 -- no tmux panes required.
 # If the container drops PO SSH access, tmux can be removed from the apt line.
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -87,7 +87,7 @@ RUN usermod -p '*' ai-teams \
 
 # ── Wrangler CLI ──────────────────────────────────────────────────────────────
 # Install globally so agents can run `wrangler` from any directory.
-# Pin after first successful deploy — use @latest for initial deployment.
+# Pin after first successful deploy -- use @latest for initial deployment.
 RUN npm install -g wrangler@latest 2>&1 | tail -3 \
     && wrangler --version
 

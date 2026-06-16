@@ -1,6 +1,6 @@
-# Apex Keys — Phase 2 Recreate Dispatch (DRAFT — Tier D sanction needed)
+# Apex Keys -- Phase 2 Recreate Dispatch (DRAFT -- Tier D sanction needed)
 
-**Status:** DRAFT — staged for execution as the companion to Phase-1-Redux. Do NOT dispatch to Hopper until preconditions are met AND the Tier D sanction package below is approved by PO.
+**Status:** DRAFT -- staged for execution as the companion to Phase-1-Redux. Do NOT dispatch to Hopper until preconditions are met AND the Tier D sanction package below is approved by PO.
 **Composed:** 2026-05-20 (post Phase-1-Redux composition)
 **Predecessor:** Phase-1-Redux dispatch at `designs/new/apex-keys-phase1-redux-dispatch.md` (Tier R + Tier M `.env` write)
 **Catalyzing context:** PO 2026-05-20 confirmation that apex team's down-state IS the maintenance window for this work
@@ -23,7 +23,7 @@ If any precondition fails, hard-gate stop. Do not proceed.
 
 ## Background
 
-Phase-1-Redux wrote a new `.env` at `$COMPOSE_DIR`. The running apex container is still serving on its pre-2026-04-29 baked-in Config.Env (`.env` was missing during the entire post-fresh-clone era; the running container has never seen the new file). To activate the new `.env`, the container must be recreated — that's the canonical lifecycle event where compose reads `.env` and entrypoint Step 7 re-runs to write `authorized_keys`.
+Phase-1-Redux wrote a new `.env` at `$COMPOSE_DIR`. The running apex container is still serving on its pre-2026-04-29 baked-in Config.Env (`.env` was missing during the entire post-fresh-clone era; the running container has never seen the new file). To activate the new `.env`, the container must be recreated -- that's the canonical lifecycle event where compose reads `.env` and entrypoint Step 7 re-runs to write `authorized_keys`.
 
 This is Tier D: `--force-recreate` destroys the running container and creates a new one. Any live SSH sessions to apex drop. Apex team is offline precisely so this drop has no operational impact on their work.
 
@@ -45,7 +45,7 @@ ssh -T dev@100.96.54.170 "cd '/home/dev/github/apex-migration-research' && docke
 
 Apply the new `.env` (created by Phase-1-Redux P3.6 in this same maintenance window) so that the entrypoint Step 7 installs SSH keys for SLOT 1 = PO, SLOT 2 = Aleksandr, SLOT 3 = rc-connect on the next container start. The current container's Config.Env is stale (pre-2026-04-29 fresh-clone): SLOT 1 empty, SLOT 2 = PO, SLOT 3 absent, no GH_TOKEN. Without recreate, the new `.env` is dormant and the substrate keeps serving on the stale baked-in env. Recreate is the canonical lifecycle event the substrate is designed for, but `--force-recreate` is Tier D because (i) it destroys the running container and all in-process state, and (ii) live SSH sessions drop. Apex team is offline by design to make this drop harmless; that's the precondition that elevates this from "impossible without coordination" to "safe-in-the-window."
 
-The alternative — leave `.env` written but never recreate — would mean Aleksandr's key persistence remains unaddressed (the original ask) and the substrate stays in fragile state (any unplanned restart still causes the credential cascade). Doing the recreate now, within the sanctioned window, is the only way to actually achieve the task.
+The alternative -- leave `.env` written but never recreate -- would mean Aleksandr's key persistence remains unaddressed (the original ask) and the substrate stays in fragile state (any unplanned restart still causes the credential cascade). Doing the recreate now, within the sanctioned window, is the only way to actually achieve the task.
 
 ### (c) Expected outcome
 
@@ -62,7 +62,7 @@ The alternative — leave `.env` written but never recreate — would mean Aleks
 - `ssh -T dev@100.96.54.170 "docker logs apex-research --tail 50"` → no entrypoint errors; KEY_COUNT=3 line present
 - Optional manual verification (PO's call): test SSH login as each key from a workstation
 
-**Failure mode to watch for:** if entrypoint fails (e.g., malformed `.env` token, missing required var), the new container restarts repeatedly or exits. Detection: `docker ps -a | grep apex` shows status `Restarting` or `Exited`. Recovery: rollback `.env` (`ssh -T dev@... "cp $BACKUP_DIR/.env $COMPOSE_DIR/.env"`) and re-recreate to restore pre-Phase-1-Redux state (PO key as SLOT 2 only — substrate still in fragile state but at least running). Surface to Brunel + PO immediately on this failure mode.
+**Failure mode to watch for:** if entrypoint fails (e.g., malformed `.env` token, missing required var), the new container restarts repeatedly or exits. Detection: `docker ps -a | grep apex` shows status `Restarting` or `Exited`. Recovery: rollback `.env` (`ssh -T dev@... "cp $BACKUP_DIR/.env $COMPOSE_DIR/.env"`) and re-recreate to restore pre-Phase-1-Redux state (PO key as SLOT 2 only -- substrate still in fragile state but at least running). Surface to Brunel + PO immediately on this failure mode.
 
 ---
 
@@ -78,7 +78,7 @@ ssh -T dev@100.96.54.170 "docker ps --filter name=apex-research --format '{{.Nam
 
 Capture verbatim. Pass criterion: container is running; three apex volumes listed; `.env` exists (from Phase-1-Redux); backup `.env` exists.
 
-### P4.2 [Tier D — PO sanction quoted verbatim above] Execute recreate
+### P4.2 [Tier D -- PO sanction quoted verbatim above] Execute recreate
 
 Run the exact command from sanction (a):
 
@@ -98,7 +98,7 @@ ssh -T dev@100.96.54.170 "sleep 10 && docker ps --filter name=apex-research --fo
 
 Pass criterion: status is `Up <seconds>`, not `Restarting` or `Exited`.
 
-**Failure mode & rollback:** if `Restarting` or `Exited`, the entrypoint failed. Capture logs (`docker logs apex-research --tail 100`) then roll back: `ssh -T dev@... "cp '$BACKUP_DIR/.env' '$COMPOSE_DIR/.env' && docker compose up -d --force-recreate apex-research"`. This recreates from backup `.env` (returns to pre-Phase-1-Redux state — PO in SLOT 2 only). Surface to Brunel + PO.
+**Failure mode & rollback:** if `Restarting` or `Exited`, the entrypoint failed. Capture logs (`docker logs apex-research --tail 100`) then roll back: `ssh -T dev@... "cp '$BACKUP_DIR/.env' '$COMPOSE_DIR/.env' && docker compose up -d --force-recreate apex-research"`. This recreates from backup `.env` (returns to pre-Phase-1-Redux state -- PO in SLOT 2 only). Surface to Brunel + PO.
 
 ### P4.4 [Tier R, host-user SSH] Verify Config.Env
 
@@ -119,7 +119,7 @@ Pass criterion:
 ssh -i ~/.ssh/id_ed25519_apex -p 2222 ai-teams@100.96.54.170 "cat /home/ai-teams/.ssh/authorized_keys"
 ```
 
-Pass criterion: three lines — one each for PO (`mihkel.putrinsh@evr.ee apex-research`), Aleksandr (`ghost-bridge@aleksandr-2026-05-15`), rc-connect (`rc-connect`).
+Pass criterion: three lines -- one each for PO (`mihkel.putrinsh@evr.ee apex-research`), Aleksandr (`ghost-bridge@aleksandr-2026-05-15`), rc-connect (`rc-connect`).
 
 ### P4.6 [Tier R, host-user SSH] Verify entrypoint logs
 
@@ -140,15 +140,15 @@ Pass criterion: same three volumes (`apex-research_apex-claude-home`, `apex-rese
 ### P4.8 [Tier R + log + report] Close Phase 2
 
 Operations-log entry (5th entry in append-only chain, after the 4 prior P-entries):
-- Tasker: Aen (with PO Tier D sanction text quoted verbatim — full sanction package above is the "sanction status" field)
-- Dispatch summary: "apex-research Phase 2 recreate — applied new .env from Phase-1-Redux P3.6; container recreated; entrypoint installed three SSH keys; tokens restored; volumes preserved"
+- Tasker: Aen (with PO Tier D sanction text quoted verbatim -- full sanction package above is the "sanction status" field)
+- Dispatch summary: "apex-research Phase 2 recreate -- applied new .env from Phase-1-Redux P3.6; container recreated; entrypoint installed three SSH keys; tokens restored; volumes preserved"
 - Outcome: success (or partial/failed per actual)
 
 Report to Brunel + CC Aen + (informally) to PO. Phase 2 close = the original task ("make Aleksandr's key persist apex rebuilds") is now ACHIEVED.
 
 Scratchpad updates:
-- Hopper `[LEARNED]` — Phase-2 recreate executed successfully. Three keys + all tokens now baked into container's Config.Env. Substrate is recreate-safe; next maintenance recreate will install the same keys.
-- Remove/supersede the `[GOTCHA]` about "any recreate = lockout" — no longer true.
+- Hopper `[LEARNED]` -- Phase-2 recreate executed successfully. Three keys + all tokens now baked into container's Config.Env. Substrate is recreate-safe; next maintenance recreate will install the same keys.
+- Remove/supersede the `[GOTCHA]` about "any recreate = lockout" -- no longer true.
 
 ---
 
@@ -156,17 +156,17 @@ Scratchpad updates:
 
 - No modifications to apex-research substrate beyond the recreate command itself
 - No touching other FR-shipped substrates
-- No `docker volume rm` or `docker compose down -v` (those would destroy named volumes — explicitly NOT in scope)
+- No `docker volume rm` or `docker compose down -v` (those would destroy named volumes -- explicitly NOT in scope)
 - Do not proceed past any [SURFACE-BACK] gate without explicit tasker response
 
 ---
 
 ## Sanction summary
 
-- P4.1 — Tier R, default-permitted
-- **P4.2 — Tier D, PO sanction package quoted verbatim above**
-- P4.3-P4.7 — Tier R, default-permitted
-- P4.8 — Tier R + log + scratchpad write to MAY-WRITE paths
+- P4.1 -- Tier R, default-permitted
+- **P4.2 -- Tier D, PO sanction package quoted verbatim above**
+- P4.3-P4.7 -- Tier R, default-permitted
+- P4.8 -- Tier R + log + scratchpad write to MAY-WRITE paths
 
 ---
 
@@ -178,7 +178,7 @@ If P4.2 succeeds but P4.3-P4.7 fail (container running but state is wrong):
 ssh -T dev@100.96.54.170 "cp '/home/dev/github/apex-migration-research.pre-fresh-clone-2026-04-29/.env' '/home/dev/github/apex-migration-research/.env' && docker compose up -d --force-recreate apex-research"
 ```
 
-Returns substrate to pre-Phase-1-Redux state with PO in SLOT 2 only — recreate-safe-enough for apex team to come back online and resume their work. Aleksandr's key persistence remains unaddressed (the original ask); diagnose offline before re-attempting.
+Returns substrate to pre-Phase-1-Redux state with PO in SLOT 2 only -- recreate-safe-enough for apex team to come back online and resume their work. Aleksandr's key persistence remains unaddressed (the original ask); diagnose offline before re-attempting.
 
 If P4.2 itself fails (compose error before recreate triggers), `.env` is still the new file from Phase-1-Redux but no destruction has happened. Substrate is in pre-P4 state. Surface to Brunel.
 

@@ -18,10 +18,10 @@ A new team archetype distinct from research, development, and XP-pipeline teams,
 ## Key ideas
 
 - **Four characteristics**: no TDD pipeline (no RED/GREEN/PURPLE), succession-framing as first-class concern, low-volume cadence (1-3 sessions/week), persistent roster with episodic sessions.
-- **Mission framing**: "load-shed [stakeholder] via [PO] as liaison, succession-readiness baked in" — supporting-the-next-holder, not the current one.
+- **Mission framing**: "load-shed [stakeholder] via [PO] as liaison, succession-readiness baked in" -- supporting-the-next-holder, not the current one.
 - **Two practical consequences**: artifacts written for an audience that doesn't yet exist; decisions evaluated against transferability, not current-task efficiency.
 - **Why it matters**: force-fitting into "research" would document several properties as exceptions and produce confused tooling expectations (research-Librarian assumptions don't apply to succession-first teams).
-- **First instance**: esl-suvekool (Haapsalu-Suvekool) — 4-char roster, all opus-4-7, succession-framed (stakeholder departure ~Jan-Apr 2027).
+- **First instance**: esl-suvekool (Haapsalu-Suvekool) -- 4-char roster, all opus-4-7, succession-framed (stakeholder departure ~Jan-Apr 2027).
 - **n=1 speculative watch**: promotion trigger is a second similar team converging on the same four characteristics independently.
 
 (*FR:Callimachus*)

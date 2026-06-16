@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// comms-publish — bridge operational findings to GitHub Issues via the `gh` CLI.
+// comms-publish -- bridge operational findings to GitHub Issues via the `gh` CLI.
 //
 // Usage:
 //   comms-publish --title <title> --type <type> [--affects <team>] [--body <text>] [--body-file <path>]
@@ -7,15 +7,15 @@
 // Options:
 //   --title <text>       Issue title (required)
 //   --type <type>        finding|decision|question|blocker (required)
-//   --affects <team>     Team name affected (or "all") — creates 'affects:<team>' label
+//   --affects <team>     Team name affected (or "all") -- creates 'affects:<team>' label
 //   --body <text>        Issue body markdown
 //   --body-file <path>   Read body from file (preferred for long content)
 //   --dry-run            Print gh command but don't execute
 //
 // Required environment:
-//   COMMS_TEAM_NAME   — creates 'team:<name>' label
-//   COMMS_AGENT_NAME  — used in attribution footer
-//   COMMS_TEAM_PREFIX — used in attribution footer
+//   COMMS_TEAM_NAME   -- creates 'team:<name>' label
+//   COMMS_AGENT_NAME  -- used in attribution footer
+//   COMMS_TEAM_PREFIX -- used in attribution footer
 
 import { execFileSync } from 'child_process';
 import fs from 'fs';
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
     `(*${teamPrefix}:${agentName}*)`,
   ].filter(line => line !== undefined).join('\n');
 
-  // Write to temp file (not /tmp — gh CLI sandbox restriction)
+  // Write to temp file (not /tmp -- gh CLI sandbox restriction)
   fs.writeFileSync(TEMP_BODY_FILE, issueBody, 'utf8');
 
   // Build gh command
@@ -99,7 +99,7 @@ async function main(): Promise<void> {
   ];
 
   if (values['dry-run']) {
-    console.log('DRY RUN — would execute:');
+    console.log('DRY RUN -- would execute:');
     console.log(`gh ${ghArgs.join(' ')}`);
     console.log('\nBody:\n' + issueBody);
     cleanup();
@@ -128,7 +128,7 @@ function cleanup(): void {
   try {
     fs.unlinkSync(TEMP_BODY_FILE);
   } catch {
-    // Already gone — fine
+    // Already gone -- fine
   }
 }
 

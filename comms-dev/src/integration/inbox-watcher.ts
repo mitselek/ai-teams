@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// InboxWatcher — polls the file-based broker inbox and dispatches each
+// InboxWatcher -- polls the file-based broker inbox and dispatches each
 // message to the provided handler. Files are consumed (deleted) after
 // successful dispatch.
 //
@@ -12,7 +12,7 @@ import type { Message } from '../types.js';
 
 export interface InboxWatcherOptions {
   teamName: string;
-  /** Base directory — inbox lives at <baseDir>/<teamName>/inboxes/ */
+  /** Base directory -- inbox lives at <baseDir>/<teamName>/inboxes/ */
   baseDir: string;
   /** Called once per message. If it throws, the file is NOT deleted. */
   onMessage: (message: Message) => Promise<void>;
@@ -55,7 +55,7 @@ export class InboxWatcher {
         .filter(f => f.endsWith('.json') && !f.endsWith('.tmp'))
         .map(f => path.join(this.inboxDir, f));
     } catch {
-      return; // Directory doesn't exist yet — wait
+      return; // Directory doesn't exist yet -- wait
     }
 
     for (const filePath of files) {
@@ -64,7 +64,7 @@ export class InboxWatcher {
         const raw = fs.readFileSync(filePath, 'utf8');
         message = JSON.parse(raw) as Message;
       } catch {
-        // Malformed — consume the file and skip
+        // Malformed -- consume the file and skip
         try { fs.unlinkSync(filePath); } catch { /* ignore */ }
         continue;
       }
@@ -75,7 +75,7 @@ export class InboxWatcher {
         fs.unlinkSync(filePath);
       } catch (err) {
         this.onError(err as Error);
-        // Leave the file in place — it will be retried on the next poll cycle.
+        // Leave the file in place -- it will be retried on the next poll cycle.
         // Deleting on failure would cause permanent message loss for transient errors.
       }
     }

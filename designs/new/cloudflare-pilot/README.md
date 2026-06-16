@@ -7,18 +7,18 @@ discovered: 2026-05-26
 po-thesis: "if we manage to solve single-agent comms, then we essentially solve inter-team comms, too"
 synthesis-author: aen
 source-briefs:
-  - designs/new/cloudflare-pilot/substrate.md (Brunel — CF rights inventory + substrate-class + secrets + identity)
-  - designs/new/cloudflare-pilot/lifecycle.md (Volta — session model + team membership + R2 scratchpads + startup discipline + A1)
-  - designs/new/cloudflare-pilot/comms.md (Herald — DO mailbox + KV roster + idFromName + envelope + discovery + persistence semantics)
+  - designs/new/cloudflare-pilot/substrate.md (Brunel -- CF rights inventory + substrate-class + secrets + identity)
+  - designs/new/cloudflare-pilot/lifecycle.md (Volta -- session model + team membership + R2 scratchpads + startup discipline + A1)
+  - designs/new/cloudflare-pilot/comms.md (Herald -- DO mailbox + KV roster + idFromName + envelope + discovery + persistence semantics)
 source-finding: docs/findings.md
 companion-task: task #10 (FR TaskList)
 ---
 
-# Cloudflare Claude Managed Agents — Pilot Experiment
+# Cloudflare Claude Managed Agents -- Pilot Experiment
 
 ## Motivation
 
-PO (2026-05-26) directed a pilot per Q4 in `docs/findings.md`. PO's thesis: *"if we manage to solve single-agent comms, then we essentially solve inter-team comms, too."* This maps directly onto FR's positioning in docs/findings.md §S2 — we build the multi-agent coordination layer above single-agent substrates. **The pilot IS the construction of that layer.**
+PO (2026-05-26) directed a pilot per Q4 in `docs/findings.md`. PO's thesis: *"if we manage to solve single-agent comms, then we essentially solve inter-team comms, too."* This maps directly onto FR's positioning in docs/findings.md §S2 -- we build the multi-agent coordination layer above single-agent substrates. **The pilot IS the construction of that layer.**
 
 Three research goals (per PO 2026-05-26 AskUserQuestion answers):
 
@@ -28,11 +28,11 @@ Three research goals (per PO 2026-05-26 AskUserQuestion answers):
 
 Multi-session, rough-plan-first; execution begins as soon as Q1 (account activation) resolves.
 
-## Synthesis — what the three briefs agree on
+## Synthesis -- what the three briefs agree on
 
 | Dimension | Decision | Source |
 |---|---|---|
-| **Pilot composition Round 1** | 2 microVM agents (Pilot-A "talker", Pilot-B "responder") — substrate-class CONSTANT to isolate comms variable | Brunel §2 |
+| **Pilot composition Round 1** | 2 microVM agents (Pilot-A "talker", Pilot-B "responder") -- substrate-class CONSTANT to isolate comms variable | Brunel §2 |
 | **Identity (framework layer)** | Agent-name is the canonical handle; R2/KV roster as authoritative `members[]` analog | Volta §VL2 + Herald §2 |
 | **Identity (substrate layer)** | Sandbox ID per agent (persistence anchor); `idFromName(<agent-name>)` resolves name → deterministic DO ID for comms | Brunel §4 + Herald §2 |
 | **Comms primitive** | Durable Object as per-recipient mailbox (storage-backed; strong consistency; single-instance addressable); HTTP POST from sender Worker route to recipient DO | Herald §1 |
@@ -43,7 +43,7 @@ Multi-session, rough-plan-first; execution begins as soon as Q1 (account activat
 | **Startup (per session)** | Two-step: sync framework-state from R2 + announce-alive to team-lead; substrate-managed sandbox allocation collapses Step 2 entirely | Volta §VL4 |
 | **A1 NEXT SESSION seed** | Stays framework-layer; M1 pattern applies from session 2 onward (session 1 = bootstrap-write) | Volta §VL5 |
 
-## Identity-anchor intersection — RESOLVED
+## Identity-anchor intersection -- RESOLVED
 
 Volta and Herald both flagged this intersection without resolving it; my read after synthesizing:
 
@@ -61,13 +61,13 @@ Sandbox ID              ← substrate-state, persistent for sandbox lifecycle
 - **DO ID and Sandbox ID are deterministic-from-name** (via idFromName resolution and Sandboxes API binding). Substrate-side persistent handles, but recoverable from the name.
 - **Q1 (cross-session identity continuity) resolves trivially if the chain holds:** a new session for agent-name "pilot-b" gets the same DO ID via idFromName, can read prior DO storage; gets a (possibly new) Sandbox ID but Sandbox state is session-scoped anyway.
 
-**This means the pilot doesn't need to resolve "primary identity" between framework and substrate — they're layered, not competing.** The framework-layer name is the user-facing identity; substrate identifiers are implementation details derived from it.
+**This means the pilot doesn't need to resolve "primary identity" between framework and substrate -- they're layered, not competing.** The framework-layer name is the user-facing identity; substrate identifiers are implementation details derived from it.
 
 The Q2 probe (terminate B; spawn B-prime same idFromName; check storage survival) tests whether this layered chain is actually durable.
 
-## Round 0 — Substrate deployment smoke test (precedes Round 1)
+## Round 0 -- Substrate deployment smoke test (precedes Round 1)
 
-**Source:** [github.com/cloudflare/claude-managed-agents — connecting-to-private-services.md](https://github.com/cloudflare/claude-managed-agents/blob/main/docs/connecting-to-private-services.md). The doc's own "5-minute laptop-tunnel end-to-end" tutorial. Validates substrate deployment + agent-to-private-service connectivity at minimal cost, **before** investing in inter-agent-comms construction.
+**Source:** [github.com/cloudflare/claude-managed-agents -- connecting-to-private-services.md](https://github.com/cloudflare/claude-managed-agents/blob/main/docs/connecting-to-private-services.md). The doc's own "5-minute laptop-tunnel end-to-end" tutorial. Validates substrate deployment + agent-to-private-service connectivity at minimal cost, **before** investing in inter-agent-comms construction.
 
 **Goal:** validate the deployment path + private-service connectivity. Resolves several of our open questions by direct observation rather than design speculation.
 
@@ -89,9 +89,9 @@ The Q2 probe (terminate B; spawn B-prime same idFromName; check storage survival
 | Outcome | Resolves |
 |---|---|
 | Deployment succeeds end-to-end | Q1 collapses to "yes, account has what's needed" |
-| Agent calls `call_service` and reaches local service | Q3 (secrets-injection / API surface) — observable directly |
+| Agent calls `call_service` and reaches local service | Q3 (secrets-injection / API surface) -- observable directly |
 | Status 200 round-trip | Substrate deployment path validated |
-| QUIC tunnel works from PO's network (UDP/7844) | No-fallback risk — if QUIC blocked, HTTP/2 fallback breaks DNS per gotchas section |
+| QUIC tunnel works from PO's network (UDP/7844) | No-fallback risk -- if QUIC blocked, HTTP/2 fallback breaks DNS per gotchas section |
 | `cloudflared` shows `originService=warp-routing` | Confirms Workers VPC path is correct (not ingress) |
 
 **Failure paths inform Round 1 design:**
@@ -102,17 +102,17 @@ The Q2 probe (terminate B; spawn B-prime same idFromName; check storage survival
 
 **Cost:** ~30 min of operator work; minimal CF resources (one VPC Service + one Worker deploy). Cheap to roll back.
 
-**Why Round 0 precedes Round 1:** the doc's pattern uses CF's *own* `call_service` tool — independent of Herald's DO-mailbox design surface. Validates substrate without entangling framework-layer construction. If Round 0 succeeds, Round 1's DO mailbox design starts from a known-working substrate. If Round 0 surfaces operational frictions (auth scope, tier issues, network-blocked QUIC, etc.), those get resolved before they confound Round 1's data.
+**Why Round 0 precedes Round 1:** the doc's pattern uses CF's *own* `call_service` tool -- independent of Herald's DO-mailbox design surface. Validates substrate without entangling framework-layer construction. If Round 0 succeeds, Round 1's DO mailbox design starts from a known-working substrate. If Round 0 surfaces operational frictions (auth scope, tier issues, network-blocked QUIC, etc.), those get resolved before they confound Round 1's data.
 
 **Complementary, not redundant:**
 
 - Round 0 tests **agent ↔ private-service** comms (the VPC binding pattern)
 - Round 1 tests **agent ↔ agent** comms (the DO mailbox pattern)
-- Both can coexist in the final pilot — VPC bindings for any private-service reach; DO mailboxes for inter-agent comms
+- Both can coexist in the final pilot -- VPC bindings for any private-service reach; DO mailboxes for inter-agent comms
 
-**Substrate-research observation from the CF doc itself:** the gotchas section of `connecting-to-private-services.md` documents four distinct Sub-shape E drift instances (L1-design-vs-L3-runtime: warp-routing-vs-ingress; L2-config-vs-L3-DNS: Host resolution; L2-config-vs-L3-listener: HTTP port; intra-L2 semantic: `hostname` matcher-vs-destination). **Independent vendor corroboration of FR's Sub-shape E pattern** — Cloudflare documents the same structural drift class their own customers hit. Strengthens E1 wiki-confidence promotion beyond medium-high; Cal-Protocol-A queue item worth filing as concrete cross-substrate evidence post-pilot.
+**Substrate-research observation from the CF doc itself:** the gotchas section of `connecting-to-private-services.md` documents four distinct Sub-shape E drift instances (L1-design-vs-L3-runtime: warp-routing-vs-ingress; L2-config-vs-L3-DNS: Host resolution; L2-config-vs-L3-listener: HTTP port; intra-L2 semantic: `hostname` matcher-vs-destination). **Independent vendor corroboration of FR's Sub-shape E pattern** -- Cloudflare documents the same structural drift class their own customers hit. Strengthens E1 wiki-confidence promotion beyond medium-high; Cal-Protocol-A queue item worth filing as concrete cross-substrate evidence post-pilot.
 
-## Round 1 — Executable spec (HARD-BLOCKED on Q1)
+## Round 1 -- Executable spec (HARD-BLOCKED on Q1)
 
 **Participants:**
 
@@ -121,17 +121,17 @@ The Q2 probe (terminate B; spawn B-prime same idFromName; check storage survival
 
 **Infrastructure (CF services required):**
 
-- Sandboxes API — both agent sandboxes
-- Durable Objects — one per agent for mailbox (`idFromName(<agent-name>)`)
-- R2 — bucket for scratchpads + roster
-- Workers — control-plane HTTP routes (`/inbox/<recipient>`)
-- Workers Secrets — ANTHROPIC_API_KEY as proxy-binding
+- Sandboxes API -- both agent sandboxes
+- Durable Objects -- one per agent for mailbox (`idFromName(<agent-name>)`)
+- R2 -- bucket for scratchpads + roster
+- Workers -- control-plane HTTP routes (`/inbox/<recipient>`)
+- Workers Secrets -- ANTHROPIC_API_KEY as proxy-binding
 
 **Framework-state (R2 contents at pilot launch):**
 
-- `roster.json` — `{ "pilot-a": { ... }, "pilot-b": { ... } }`
-- `scratchpads/pilot-a.md` — empty seed
-- `scratchpads/pilot-b.md` — empty seed
+- `roster.json` -- `{ "pilot-a": { ... }, "pilot-b": { ... } }`
+- `scratchpads/pilot-a.md` -- empty seed
+- `scratchpads/pilot-b.md` -- empty seed
 
 **Substrate-state (Sandbox-config per agent):**
 
@@ -141,21 +141,21 @@ The Q2 probe (terminate B; spawn B-prime same idFromName; check storage survival
 
 **Execution sequence:**
 
-1. **PO unblocks Q1** — confirm Sandboxes activated on account `8f150f98013eec8cae0a9db20a010c49`. If not, request beta access. Acquire Sandboxes API docs.
+1. **PO unblocks Q1** -- confirm Sandboxes activated on account `8f150f98013eec8cae0a9db20a010c49`. If not, request beta access. Acquire Sandboxes API docs.
 2. **Provisioning (Brunel-led):** Workers project scaffold; sandbox-config schemas; DO class for `AgentMailbox`; R2 bucket; secret binding.
 3. **Boot Pilot-A and Pilot-B sequentially.** Each reads roster + own scratchpad from R2; registers sandbox-config; announces-alive (no team-lead in pilot; both announce to each other).
-4. **Test 1 — Round-trip:** Pilot-A sends a message to Pilot-B via HTTP POST to `/inbox/pilot-b` (Worker routes to `idFromName("pilot-b")` DO, which appends to storage). Pilot-B polls own DO storage, reads message, responds. Pilot-A receives.
-5. **Test 2 — Sleep-resume:** Send message to sleeping Pilot-B; verify message persists; wake Pilot-B; verify read.
-6. **Test 3 — Session termination (Q2 probe):** Terminate Pilot-B's session entirely. Spawn Pilot-B-prime with same `idFromName`. Send message; verify whether prior storage messages still present. **This is the primary research data point.**
+4. **Test 1 -- Round-trip:** Pilot-A sends a message to Pilot-B via HTTP POST to `/inbox/pilot-b` (Worker routes to `idFromName("pilot-b")` DO, which appends to storage). Pilot-B polls own DO storage, reads message, responds. Pilot-A receives.
+5. **Test 2 -- Sleep-resume:** Send message to sleeping Pilot-B; verify message persists; wake Pilot-B; verify read.
+6. **Test 3 -- Session termination (Q2 probe):** Terminate Pilot-B's session entirely. Spawn Pilot-B-prime with same `idFromName`. Send message; verify whether prior storage messages still present. **This is the primary research data point.**
 7. **Measurements:** latency per round-trip (compare to FR's 657-854ms ssh+python+fcntl baseline); envelope round-trip integrity; dyad-crossed-messages pattern recurrence.
 
-## Round 2 — Planned (after Round 1 stabilizes)
+## Round 2 -- Planned (after Round 1 stabilizes)
 
 **Additions:**
 
-- Pilot-C: V8 isolate (instead of microVM) — tests substrate-class-fit for stateless responder workload
-- KV roster (instead of static R2 file) — automated agent-registration
-- Queues — broadcast events on agent join/leave (push-based discovery)
+- Pilot-C: V8 isolate (instead of microVM) -- tests substrate-class-fit for stateless responder workload
+- KV roster (instead of static R2 file) -- automated agent-registration
+- Queues -- broadcast events on agent join/leave (push-based discovery)
 
 **Tests:**
 
@@ -163,7 +163,7 @@ The Q2 probe (terminate B; spawn B-prime same idFromName; check storage survival
 - Substrate-class fit: does Pilot-C-on-V8 successfully participate in the comms primitive?
 - Scale: latency under 3-agent N×N comms vs 2-agent baseline
 
-## Round 3 — Deferred (M4)
+## Round 3 -- Deferred (M4)
 
 - Cross-account / cross-team comms (tests inter-team comms thesis)
 - Bridge to FR-existing teams via ghost-member pattern (`ghost-member-as-universal-integration-surface.md`)
@@ -229,7 +229,7 @@ The pilot will generate substantive wiki-grade findings depending on outcomes:
 
 - **C-pilot-1: Layered identity chain (name → idFromName → Sandbox ID).** Framework-grade pattern, validates after Q1+Q2 resolve.
 - **C-pilot-2: Substrate-vs-framework boundary materialized at comms layer.** Strengthens C2 from docs/findings.md §S7 with concrete instance.
-- **C-pilot-3: Lifecycle-phase-invariance corollary** (Volta §VL4 — startup-side bifurcation symmetric with shutdown-side bifurcation). Strengthens C2.
+- **C-pilot-3: Lifecycle-phase-invariance corollary** (Volta §VL4 -- startup-side bifurcation symmetric with shutdown-side bifurcation). Strengthens C2.
 - **C-pilot-4: Substrate-state reduction in practice (~10 vars → 1 binding).** Documents the apex-research procedural-to-structural conversion at pilot scale.
 - **E-pilot-1: Sub-shape E n=2 → n=3 if pilot exhibits same drift-surface redistribution as predicted in docs/findings.md §S5.**
 - **C-pilot-5 (potential): dyad-crossed-messages substrate-invariance** if EO4 resolves positive.
@@ -238,21 +238,21 @@ All routed to Cal post-pilot through standard Protocol-A flow.
 
 ## What Aen does next
 
-1. **Surface Q1 to PO** (DONE — 2026-05-26 11:30, before this synthesis).
+1. **Surface Q1 to PO** (DONE -- 2026-05-26 11:30, before this synthesis).
 2. **Hold pilot execution** until PO returns Q1 resolution.
 3. **If Q1 positive:** dispatch Brunel for Workers project scaffold (this becomes S36 first action).
-4. **If Q1 negative (no Sandboxes):** evaluate alternatives — request beta, or design experiment to use only generally-available CF products (Workers + DO + R2 + KV without Sandboxes), accept that "managed agents" semantics won't be tested.
+4. **If Q1 negative (no Sandboxes):** evaluate alternatives -- request beta, or design experiment to use only generally-available CF products (Workers + DO + R2 + KV without Sandboxes), accept that "managed agents" semantics won't be tested.
 
 ## Cross-references
 
-- `docs/findings.md` — task #7 joint Brunel + Volta substrate-gap-analysis (FR positioning + bottleneck-alignment n=3 + cluster-decomposition meta-principle)
-- `designs/new/cloudflare-pilot/substrate.md` — Brunel's full brief
-- `designs/new/cloudflare-pilot/lifecycle.md` — Volta's full brief
-- `designs/new/cloudflare-pilot/comms.md` — Herald's full brief
-- <https://blog.cloudflare.com/claude-managed-agents/> — source announcement
-- <https://platform.claude.com/docs/en/managed-agents/overview> — Anthropic Managed Agents platform docs (resolved several blog-post-implicit caveats; Q1 largely de-risked)
-- <https://developers.cloudflare.com/sandbox/tutorials/claude-managed-agents/> — Cloudflare integration tutorial
-- <https://github.com/cloudflare/claude-managed-agents> — deployment template repo (fork-and-deploy starting point for the pilot)
-- <https://github.com/cloudflare/claude-managed-agents/blob/main/docs/connecting-to-private-services.md> — Workers VPC + `call_service` + `vpc_services` binding doc (Round 0 source; documents Sub-shape E drift instances in its gotchas section as independent vendor corroboration)
+- `docs/findings.md` -- task #7 joint Brunel + Volta substrate-gap-analysis (FR positioning + bottleneck-alignment n=3 + cluster-decomposition meta-principle)
+- `designs/new/cloudflare-pilot/substrate.md` -- Brunel's full brief
+- `designs/new/cloudflare-pilot/lifecycle.md` -- Volta's full brief
+- `designs/new/cloudflare-pilot/comms.md` -- Herald's full brief
+- <https://blog.cloudflare.com/claude-managed-agents/> -- source announcement
+- <https://platform.claude.com/docs/en/managed-agents/overview> -- Anthropic Managed Agents platform docs (resolved several blog-post-implicit caveats; Q1 largely de-risked)
+- <https://developers.cloudflare.com/sandbox/tutorials/claude-managed-agents/> -- Cloudflare integration tutorial
+- <https://github.com/cloudflare/claude-managed-agents> -- deployment template repo (fork-and-deploy starting point for the pilot)
+- <https://github.com/cloudflare/claude-managed-agents/blob/main/docs/connecting-to-private-services.md> -- Workers VPC + `call_service` + `vpc_services` binding doc (Round 0 source; documents Sub-shape E drift instances in its gotchas section as independent vendor corroboration)
 
-(*FR:Aen — synthesis on behalf of Brunel + Volta + Herald*)
+(*FR:Aen -- synthesis on behalf of Brunel + Volta + Herald*)

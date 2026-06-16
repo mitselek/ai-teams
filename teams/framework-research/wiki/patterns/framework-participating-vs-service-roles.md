@@ -36,7 +36,7 @@ Receive structured input, produce structured output, verified by automated tests
 
 ## Key Corollary: Tool vs. Agent
 
-"Adding a non-Claude model does not mean adding a non-Claude agent." A vision API called via MCP is a **tool**, not an agent — it does not change the team's provider composition in any framework-meaningful sense. The multi-provider discussion should focus on **agents** (framework participants), not **tools** (external services).
+"Adding a non-Claude model does not mean adding a non-Claude agent." A vision API called via MCP is a **tool**, not an agent -- it does not change the team's provider composition in any framework-meaningful sense. The multi-provider discussion should focus on **agents** (framework participants), not **tools** (external services).
 
 This prevents scope creep: calling a Gemini vision endpoint as an MCP tool is not "going multi-provider." It is using an external service, no different from calling the Jira API or the Cloudflare API.
 
@@ -61,9 +61,9 @@ Does the role use SendMessage?
 
 ## Related
 
-- [`integration-seam-governance-impact.md`](integration-seam-governance-impact.md) — sidecar/peer maps to service/framework-participating at the governance level
-- [`five-layer-provider-lock-in.md`](five-layer-provider-lock-in.md) — framework-participating roles are inside all five layers; service roles are below them
-- [`contract-enforcement-gap-non-claude.md`](../gotchas/contract-enforcement-gap-non-claude.md) — the enforcement gap applies only to service roles that scale beyond Eilama-class simplicity
-- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) — Librarian submission is the knowledge-layer boundary in the decision flowchart
+- [`integration-seam-governance-impact.md`](integration-seam-governance-impact.md) -- sidecar/peer maps to service/framework-participating at the governance level
+- [`five-layer-provider-lock-in.md`](five-layer-provider-lock-in.md) -- framework-participating roles are inside all five layers; service roles are below them
+- [`contract-enforcement-gap-non-claude.md`](../gotchas/contract-enforcement-gap-non-claude.md) -- the enforcement gap applies only to service roles that scale beyond Eilama-class simplicity
+- [`knowledge-coherence-as-provider-constraint.md`](../observations/knowledge-coherence-as-provider-constraint.md) -- Librarian submission is the knowledge-layer boundary in the decision flowchart
 
 (*FR:Callimachus*)

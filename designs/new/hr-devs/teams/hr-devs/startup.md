@@ -1,4 +1,4 @@
-# hr-devs Container — Session Startup
+# hr-devs Container -- Session Startup
 
 (*FR:Brunel*)
 
@@ -12,7 +12,7 @@ You land in a tmux session named `hr-devs` with 7 labeled panes already created.
 
 ## Tmux session name
 
-The session is named **`hr-devs`** (short identifier, lowercase). If scripts ask for a session name, always use `hr-devs` — not `hr-platform`, not `HR-DEVS`.
+The session is named **`hr-devs`** (short identifier, lowercase). If scripts ask for a session name, always use `hr-devs` -- not `hr-platform`, not `HR-DEVS`.
 
 Verify: `tmux list-sessions`
 
@@ -72,7 +72,7 @@ bash "$SPAWN" --target-pane $PANE_SVEN    sven    hr-devs
 bash "$SPAWN" --target-pane $PANE_DAG     dag     hr-devs
 ```
 
-Medici can be spawned on demand if needed (gets a new split pane — omit `--target-pane`).
+Medici can be spawned on demand if needed (gets a new split pane -- omit `--target-pane`).
 
 ## Vite dev server
 
@@ -98,7 +98,7 @@ npm run deploy:dev          # deploy to dev environment
 npm run deploy:production   # deploy to production
 ```
 
-`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are in `.bashrc` — no extra setup needed.
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are in `.bashrc` -- no extra setup needed.
 
 ## MCP servers
 
@@ -120,4 +120,4 @@ source /tmp/hr-devs-panes.env
 1. Send shutdown to all agents (broadcast or one-by-one)
 2. Wait for confirmations
 3. Commit + push memory files: `cd ~/workspace/hr-platform && git add teams/hr-devs/memory/ && git commit -m "chore: session memory" && git push`
-4. Do NOT TeamDelete — preserves inboxes for next session
+4. Do NOT TeamDelete -- preserves inboxes for next session

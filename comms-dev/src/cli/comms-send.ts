@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// comms-send — CLI for sending a message to another team.
+// comms-send -- CLI for sending a message to another team.
 //
 // Usage:
 //   comms-send --to <team-name> --type <type> --body <markdown-text> [options]
@@ -14,10 +14,10 @@
 //   --reply-to <id>      Message ID being replied to
 //
 // Required environment:
-//   COMMS_TEAM_NAME    — this team's name
-//   COMMS_TEAM_PREFIX  — this team's prefix
-//   COMMS_SOCKET_DIR   — default: /shared/comms
-//   COMMS_AGENT_NAME   — this agent's name (default: team-lead)
+//   COMMS_TEAM_NAME    -- this team's name
+//   COMMS_TEAM_PREFIX  -- this team's prefix
+//   COMMS_SOCKET_DIR   -- default: /shared/comms
+//   COMMS_AGENT_NAME   -- this agent's name (default: team-lead)
 
 import fs from 'fs';
 import path from 'path';
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
     cryptoProvider = createCryptoProvider(createCryptoAPI(keys));
     integrityKey = keys.integrityKey;
   } catch {
-    // Plaintext mode — no PSK file
+    // Plaintext mode -- no PSK file
   }
 
   // Look up target team's socket

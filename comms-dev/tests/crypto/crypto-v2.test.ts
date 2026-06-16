@@ -2,25 +2,25 @@
 // RED tests for v2 hub-mode crypto: X25519 E2E encryption, Ed25519 signing,
 // pairwise key derivation, and key bundle loading.
 //
-// These tests are intentionally RED — createCryptoAPIv2 is not yet exported
+// These tests are intentionally RED -- createCryptoAPIv2 is not yet exported
 // from src/crypto/index.ts. Green condition: Vigenere implements the v2 API
-// per crypto-spec.md §Hub-Mode Cryptographic Protocol — v2.
+// per crypto-spec.md §Hub-Mode Cryptographic Protocol -- v2.
 //
 // Test matrix:
-//   Pairwise key derivation — DH symmetry, salt construction, key size,
+//   Pairwise key derivation -- DH symmetry, salt construction, key size,
 //                             isolation, unknown peer rejection
-//   E2E encrypt/decrypt     — round-trip, fresh IV per call, wrong receiver
+//   E2E encrypt/decrypt     -- round-trip, fresh IV per call, wrong receiver
 //                             (HUB-3 scenario), AAD mismatch, tampered
 //                             ciphertext, tampered tag
-//   Ed25519 signing         — valid round-trip, tampered from.team (HUB-8),
+//   Ed25519 signing         -- valid round-trip, tampered from.team (HUB-8),
 //                             tampered to.team (HUB-3), tampered body,
 //                             tampered body_hash, wrong signer key, missing
 //                             signature, tampered timestamp (replay)
-//   loadKeyBundle           — valid path, missing fields, bad path
-//   Version compat          — v1 path unaffected; v2 instance exposes v1 API
-//   Known-answer vectors    — placeholders pending Vigenere's test vectors
+//   loadKeyBundle           -- valid path, missing fields, bad path
+//   Version compat          -- v1 path unaffected; v2 instance exposes v1 API
+//   Known-answer vectors    -- placeholders pending Vigenere's test vectors
 //
-// Spec: crypto-spec.md §Hub-Mode Cryptographic Protocol — v2
+// Spec: crypto-spec.md §Hub-Mode Cryptographic Protocol -- v2
 // Security: security-report.md HUB-T01 (AAD/to.team), HUB-T03 (signature)
 
 import { describe, it, expect, beforeAll } from 'vitest';
@@ -104,7 +104,7 @@ beforeAll(() => {
 
 // ── Pairwise key derivation ───────────────────────────────────────────────────
 
-describe('v2 crypto — pairwise key derivation', () => {
+describe('v2 crypto -- pairwise key derivation', () => {
 
   it('DH symmetry: comms-dev derives same encryption key as framework-research for the pair', () => {
     const cdKeys = cdCrypto.derivePairwiseKeys(TEAM_FR);
@@ -164,7 +164,7 @@ describe('v2 crypto — pairwise key derivation', () => {
 
 // ── E2E encrypt / decrypt ─────────────────────────────────────────────────────
 
-describe('v2 crypto — e2eEncrypt / e2eDecrypt', () => {
+describe('v2 crypto -- e2eEncrypt / e2eDecrypt', () => {
 
   const MESSAGE_ID = 'e2e-test-001';
   const PLAINTEXT  = Buffer.from('Hello from comms-dev to framework-research');
@@ -201,9 +201,9 @@ describe('v2 crypto — e2eEncrypt / e2eDecrypt', () => {
     expect(p1.iv).not.toBe(p2.iv);
   });
 
-  it('HUB-3: wrong receiver — different pairwise key causes decryption failure', async () => {
+  it('HUB-3: wrong receiver -- different pairwise key causes decryption failure', async () => {
     // Scenario: hub redirects A→B message to team C.
-    // C has a different pairwise key with A — decryption must fail.
+    // C has a different pairwise key with A -- decryption must fail.
     const bundleWithOther: KeyBundle = {
       ...keyBundle,
       teams: {
@@ -219,13 +219,13 @@ describe('v2 crypto — e2eEncrypt / e2eDecrypt', () => {
     });
 
     const payload = await cdCrypto.e2eEncrypt(PLAINTEXT, TEAM_FR, MESSAGE_ID);
-    // Attempt decrypt as OTHER — has a different pairwise key with CD
+    // Attempt decrypt as OTHER -- has a different pairwise key with CD
     await expect(otherCrypto.e2eDecrypt(payload, MESSAGE_ID)).rejects.toThrow();
   });
 
   it('AAD mismatch: modified message ID causes decryption failure', async () => {
     // AAD = "v2:" + message.id + ":" + sender_team + ":" + receiver_team
-    // Hub re-routes with a different message ID — AAD no longer matches
+    // Hub re-routes with a different message ID -- AAD no longer matches
     const payload = await cdCrypto.e2eEncrypt(PLAINTEXT, TEAM_FR, MESSAGE_ID);
     await expect(frCrypto.e2eDecrypt(payload, 'tampered-msg-id')).rejects.toThrow();
   });
@@ -271,7 +271,7 @@ function buildTestMessage(overrides: Partial<Message> = {}): Message {
   };
 }
 
-describe('v2 crypto — Ed25519 signEnvelope / verifySignature', () => {
+describe('v2 crypto -- Ed25519 signEnvelope / verifySignature', () => {
 
   it('valid sign/verify round-trip', () => {
     const message   = buildTestMessage();
@@ -335,14 +335,14 @@ describe('v2 crypto — Ed25519 signEnvelope / verifySignature', () => {
     const signed: SignedMessage = {
       ...message,
       signature,
-      body_hash: 'sha256:' + 'aa'.repeat(32), // all-0xaa hash — not the real hash
+      body_hash: 'sha256:' + 'aa'.repeat(32), // all-0xaa hash -- not the real hash
     };
     expect(frCrypto.verifySignature(signed)).toBe(false);
   });
 
   it('signature from wrong team key fails verification (HUB-2 scenario)', () => {
     // frCrypto (framework-research) signs a message that claims to be from comms-dev.
-    // Verifier looks up comms-dev public key — signature won't match.
+    // Verifier looks up comms-dev public key -- signature won't match.
     const message      = buildTestMessage(); // from.team = comms-dev
     const wrongSig     = frCrypto.signEnvelope(message); // signed with FR key, not CD
     const signed: SignedMessage = {
@@ -353,7 +353,7 @@ describe('v2 crypto — Ed25519 signEnvelope / verifySignature', () => {
     expect(frCrypto.verifySignature(signed)).toBe(false);
   });
 
-  it('missing signature field returns false — API contract: returns boolean, must not throw', () => {
+  it('missing signature field returns false -- API contract: returns boolean, must not throw', () => {
     // Per CryptoAPIv2 interface: verifySignature(...): boolean
     // Implementation must null-check message.signature before Buffer.from().
     // Throwing here violates the type contract (callers check return value, not exceptions).
@@ -405,7 +405,7 @@ describe('v2 crypto — Ed25519 signEnvelope / verifySignature', () => {
 
 // ── loadKeyBundle ─────────────────────────────────────────────────────────────
 
-describe('v2 crypto — loadKeyBundle', () => {
+describe('v2 crypto -- loadKeyBundle', () => {
 
   it('loads a valid bundle from disk', () => {
     const path = join(tmpdir(), `comms-bundle-valid-${Date.now()}.json`);
@@ -449,7 +449,7 @@ describe('v2 crypto — loadKeyBundle', () => {
 
 // ── Version compatibility ─────────────────────────────────────────────────────
 
-describe('v2 crypto — version compatibility', () => {
+describe('v2 crypto -- version compatibility', () => {
 
   it('v1 createCryptoAPI is unaffected by v2 exports', async () => {
     const psk  = Buffer.alloc(32, 0xab);
@@ -471,7 +471,7 @@ describe('v2 crypto — version compatibility', () => {
   });
 
   it('CryptoAPIv2 also exposes v1 methods (extends CryptoAPI)', () => {
-    // Per spec: CryptoAPIv2 extends CryptoAPI — backward compat
+    // Per spec: CryptoAPIv2 extends CryptoAPI -- backward compat
     expect(typeof cdCrypto.encrypt).toBe('function');
     expect(typeof cdCrypto.decrypt).toBe('function');
     expect(typeof cdCrypto.computeChecksum).toBe('function');
@@ -485,7 +485,7 @@ describe('v2 crypto — version compatibility', () => {
 // These tests verify cryptographic properties (DH symmetry, round-trip,
 // sign/verify) using freshly generated keys per test run.
 
-describe('v2 crypto — property-based vectors', () => {
+describe('v2 crypto -- property-based vectors', () => {
 
   let vectorKeys: {
     teamA: { sign: ReturnType<typeof genEd25519>; enc: ReturnType<typeof genX25519> };
@@ -524,7 +524,7 @@ describe('v2 crypto — property-based vectors', () => {
     });
   });
 
-  it('Vector 1 — pairwise key derivation: DH symmetry — both sides derive identical keys', () => {
+  it('Vector 1 -- pairwise key derivation: DH symmetry -- both sides derive identical keys', () => {
     const keysA = vectorCryptoA.derivePairwiseKeys('team-b');
     const keysB = vectorCryptoB.derivePairwiseKeys('team-a');
 
@@ -536,7 +536,7 @@ describe('v2 crypto — property-based vectors', () => {
     expect(keysA.integrityKey.length).toBe(32);
   });
 
-  it('Vector 2 — e2eEncrypt/e2eDecrypt round-trip recovers plaintext', async () => {
+  it('Vector 2 -- e2eEncrypt/e2eDecrypt round-trip recovers plaintext', async () => {
     const plaintext = Buffer.from('Hello from team-a to team-b');
     const messageId = 'msg-test-vector-001';
     const payload   = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', messageId);
@@ -544,14 +544,14 @@ describe('v2 crypto — property-based vectors', () => {
     expect(recovered.toString()).toBe('Hello from team-a to team-b');
   });
 
-  it('Vector 3 — e2eEncrypt produces unique IV per call', async () => {
+  it('Vector 3 -- e2eEncrypt produces unique IV per call', async () => {
     const plaintext = Buffer.from('Hello from team-a to team-b');
     const payload1 = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', 'msg-1');
     const payload2 = await vectorCryptoA.e2eEncrypt(plaintext, 'team-b', 'msg-2');
     expect(payload1.iv).not.toBe(payload2.iv);
   });
 
-  it('Vector 4 — signEnvelope + verifySignature round-trip', () => {
+  it('Vector 4 -- signEnvelope + verifySignature round-trip', () => {
     const message: Message = {
       version:   '1',
       id:        'msg-test-vector-001',
@@ -579,7 +579,7 @@ describe('v2 crypto — property-based vectors', () => {
     expect(vectorCryptoB.verifySignature(signed)).toBe(true);
   });
 
-  it('Vector 5 — verifySignature rejects tampered signature', () => {
+  it('Vector 5 -- verifySignature rejects tampered signature', () => {
     const message: Message = {
       version:   '1',
       id:        'msg-test-vector-002',

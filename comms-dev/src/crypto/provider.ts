@@ -24,7 +24,7 @@ export function createCryptoProvider(api: CryptoAPI): CryptoProvider {
     },
 
     async decrypt(ciphertext: Buffer): Promise<Buffer> {
-      // AAD is embedded in the EncryptedPayload — the crypto module
+      // AAD is embedded in the EncryptedPayload -- the crypto module
       // extracts and verifies it automatically during decryption.
       const payload = JSON.parse(ciphertext.toString('utf-8'));
       return api.decrypt(payload);

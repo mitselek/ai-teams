@@ -20,10 +20,10 @@ The read-path validation gating SendMessage dispatch (`members[]` check) and the
 ## Key ideas
 
 - **Third-leg sibling** to members-array-edit (dispatch-validation stage) + inbox-file-write-as-wake (recipient-wake stage); this names the lifecycle-asymmetry between members-list and inbox-file.
-- **Empirical basis**: apex-research had 5 active members but 6 inbox files — a residual `hammurabi.json` orphan (member removed, inbox not GC'd).
+- **Empirical basis**: apex-research had 5 active members but 6 inbox files -- a residual `hammurabi.json` orphan (member removed, inbox not GC'd).
 - **Operational implications**: orphan inbox files are normal substrate state (don't infer active membership from inbox presence); re-adding a removed member surfaces stale messages; external CLIs must read `members[]`, not inbox-file presence, for member-active state.
 - **Together the three siblings**: dispatch gated by `members[]`; inbox-file existence/persistence is not.
 - **Architectural-fact**: n+1 orphan sightings don't strengthen; revision trigger = harness adds GC sweep on member-removal. TTL 2026-11-19.
-- **Not a security claim, not a recommendation to write to orphan inboxes** (dead-letter — no live process).
+- **Not a security claim, not a recommendation to write to orphan inboxes** (dead-letter -- no live process).
 
 (*FR:Callimachus*)

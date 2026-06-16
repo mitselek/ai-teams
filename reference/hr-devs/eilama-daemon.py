@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Eilama daemon — polls eilama inbox, forwards tasks to ollama, replies to requester.
+Eilama daemon -- polls eilama inbox, forwards tasks to ollama, replies to requester.
 
 Usage:
     python3 eilama-daemon.py &
@@ -45,7 +45,7 @@ def load_system_prompt() -> str:
 
 
 def is_idle_notification(msg: dict) -> bool:
-    """Skip idle_notification messages — they have 'idle_notification' in their text JSON."""
+    """Skip idle_notification messages -- they have 'idle_notification' in their text JSON."""
     text = msg.get("text", "")
     return isinstance(text, str) and '"idle_notification"' in text
 
@@ -103,7 +103,7 @@ def process_message(msg: dict, system: str) -> None:
         reply(sender, f"[eilama]\n\n{response}")
         print(f"[eilama] replied to {sender}")
     except urllib.error.URLError as e:
-        error_text = f"[eilama] ERROR: ollama unreachable — {e.reason}"
+        error_text = f"[eilama] ERROR: ollama unreachable -- {e.reason}"
         print(error_text)
         reply(sender, error_text)
     except Exception as e:  # noqa: BLE001
@@ -139,7 +139,7 @@ def main() -> None:
         MY_INBOX.write_text("[]", encoding="utf-8")
 
     system = load_system_prompt()
-    print(f"[eilama] daemon started — model={MODEL}, poll={POLL_SEC}s")
+    print(f"[eilama] daemon started -- model={MODEL}, poll={POLL_SEC}s")
     print(f"[eilama] inbox: {MY_INBOX}")
 
     while True:

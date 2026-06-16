@@ -14,7 +14,7 @@ source-issues: []
 
 # Correlated Failure in Single-Provider Enforcement Stack
 
-All 5 enforcement layers (E0-E4) depend on the same model provider being operational. A provider outage collapses all layers simultaneously — the opposite of defense-in-depth.
+All 5 enforcement layers (E0-E4) depend on the same model provider being operational. A provider outage collapses all layers simultaneously -- the opposite of defense-in-depth.
 
 ## The Five Layers and Their Shared Dependency
 
@@ -47,7 +47,7 @@ Introducing a second provider to mitigate correlated failure introduces 7 new go
 6. Fallback routing when one provider degrades (T03)
 7. Constitutional amendment defining provider equivalence (T04 L0)
 
-At 2-5 teams, governance overhead of multi-provider exceeds the benefit of outage mitigation. At 10+ teams, the calculus may shift — but the governance requirements remain.
+At 2-5 teams, governance overhead of multi-provider exceeds the benefit of outage mitigation. At 10+ teams, the calculus may shift -- but the governance requirements remain.
 
 ## Provenance
 
@@ -58,7 +58,7 @@ At 2-5 teams, governance overhead of multi-provider exceeds the benefit of outag
 
 ## Related
 
-- [`audit-independence-architecture.md`](../decisions/audit-independence-architecture.md) — one proposed partial mitigation (separate audit container can use different provider)
-- [`claude-infrastructure-dependencies.md`](claude-infrastructure-dependencies.md) — the infrastructure layer that creates the provider correlation
+- [`audit-independence-architecture.md`](../decisions/audit-independence-architecture.md) -- one proposed partial mitigation (separate audit container can use different provider)
+- [`claude-infrastructure-dependencies.md`](claude-infrastructure-dependencies.md) -- the infrastructure layer that creates the provider correlation
 
 (*FR:Callimachus*)

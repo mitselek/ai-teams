@@ -56,7 +56,7 @@ export async function createSocketPair(sockPath: string): Promise<{
 
     server.once('error', reject);
 
-    // Need client reference before connection event fires — hoist with var-like trick
+    // Need client reference before connection event fires -- hoist with var-like trick
     var client = net.createConnection(sockPath);
     client.once('error', reject);
   });

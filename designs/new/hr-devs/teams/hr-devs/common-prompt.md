@@ -1,4 +1,4 @@
-# HR Devs — Common Standards
+# HR Devs -- Common Standards
 
 ## Team
 
@@ -19,8 +19,8 @@ All persistent text output must carry the author agent's name in the format `(*R
 
 | Output type | Placement |
 |---|---|
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading, e.g. `## Analysis (*RC-DEV:Finn*)` |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading, e.g. `## Analysis (*RC-DEV:Finn*)` |
 | GitHub issue / PR body | At the bottom of the body |
 | Commit message | At the end of the message body (not subject line) |
 | Jira issue description | At the bottom of the description |
@@ -41,7 +41,7 @@ All persistent text output must carry the author agent's name in the format `(*R
 
 - Read `dev-toolkit/CODING_STANDARDS.md` for TypeScript, Svelte 5, and D1 patterns
 - Follow `dev-toolkit/WORKFLOW.md` for the story workflow (TDD mandatory)
-- **Branch from `develop`** — never branch from or target `main`. PR base is always `develop`
+- **Branch from `develop`** -- never branch from or target `main`. PR base is always `develop`
 - Branch naming: `story/<issue-number>-short-description` or `fix/<issue-number>-short-description`
 - Quality gates before PR: `npm run tests`, `npm run check`, `npm run lint`
 - **PR body:** use the PR template format. All `[ ]` checkboxes must be ticked (`[x]`) before running `gh pr create`. Do not create a PR with unchecked boxes.
@@ -75,7 +75,7 @@ Project key: **VL** (Vestluste lahendus). Board: <https://eestiraudtee.atlassian
 
 ## On Startup
 
-1. Read `hr-platform/teams/hr-devs/memory/<your-name>.md` if it exists — this is your scratchpad from previous sessions
+1. Read `hr-platform/teams/hr-devs/memory/<your-name>.md` if it exists -- this is your scratchpad from previous sessions
 2. Read shared knowledge files relevant to your role (see Team Memory below)
 3. Send a brief intro message to `team-lead` saying you're ready and what you recall from your scratchpad
 
@@ -83,37 +83,37 @@ Project key: **VL** (Vestluste lahendus). Board: <https://eestiraudtee.atlassian
 
 ### Directory Structure
 
-- **`memory/`** — agent scratchpads (personal, per-session state). One file per agent.
-- **`docs/`** — shared knowledge files (team-wide reference material).
+- **`memory/`** -- agent scratchpads (personal, per-session state). One file per agent.
+- **`docs/`** -- shared knowledge files (team-wide reference material).
 
 ### Personal Scratchpads
 
 Each teammate maintains a personal notes file at `hr-platform/teams/hr-devs/memory/<your-name>.md`.
-You own this file — only you write to it. Keep it under 100 lines; prune stale entries.
+You own this file -- only you write to it. Keep it under 100 lines; prune stale entries.
 
 Use tags to categorize entries (date every entry):
 
-- `[DECISION]` — settled choices and rationale
-- `[PATTERN]` — discovered approaches that work
-- `[WIP]` — in-progress state (resume points)
-- `[CHECKPOINT]` — periodic progress snapshots during long tasks
-- `[DEFERRED]` — items pending a decision, with reason
-- `[GOTCHA]` — important pitfalls or surprises
-- `[LEARNED]` — key discoveries worth remembering
+- `[DECISION]` -- settled choices and rationale
+- `[PATTERN]` -- discovered approaches that work
+- `[WIP]` -- in-progress state (resume points)
+- `[CHECKPOINT]` -- periodic progress snapshots during long tasks
+- `[DEFERRED]` -- items pending a decision, with reason
+- `[GOTCHA]` -- important pitfalls or surprises
+- `[LEARNED]` -- key discoveries worth remembering
 
 ### Shared Knowledge Files
 
 For cross-cutting discoveries, append to the relevant shared file in `hr-platform/teams/hr-devs/docs/`:
 
-- **`architecture-decisions.md`** — settled architectural choices (format: decision, rationale, date). Any teammate may append.
-- **`test-gaps.md`** — untested areas for triage (Tess appends, team-lead triages into issues).
-- **`api-contracts.md`** — agreed API shapes between frontend and backend (Sven and Dag both write).
+- **`architecture-decisions.md`** -- settled architectural choices (format: decision, rationale, date). Any teammate may append.
+- **`test-gaps.md`** -- untested areas for triage (Tess appends, team-lead triages into issues).
+- **`api-contracts.md`** -- agreed API shapes between frontend and backend (Sven and Dag both write).
 
 ### When to Save
 
-- **Immediately on discovery** — don't defer to session end; context compaction kills deferred writes
-- **During long tasks** — checkpoint progress periodically (tag: `[CHECKPOINT]`)
-- **Before shutdown** — see Shutdown Protocol below
+- **Immediately on discovery** -- don't defer to session end; context compaction kills deferred writes
+- **During long tasks** -- checkpoint progress periodically (tag: `[CHECKPOINT]`)
+- **Before shutdown** -- see Shutdown Protocol below
 
 ### What to Save
 
@@ -135,7 +135,7 @@ Only persist knowledge that:
 
 Follow `hr-platform/teams/hr-devs/docs/startup-shutdown.md` for the full procedure.
 
-**Teammates — when you receive a shutdown request:**
+**Teammates -- when you receive a shutdown request:**
 
 1. Write in-progress state to your scratchpad (`[WIP]` or `[CHECKPOINT]`)
 2. Send a closing message to team-lead with: `[LEARNED]`, `[DEFERRED]`, `[WARNING]` (1 bullet each, max)
@@ -145,20 +145,20 @@ Follow `hr-platform/teams/hr-devs/docs/startup-shutdown.md` for the full procedu
 
 The team shares one git working directory. To prevent conflicts:
 
-- **Only one agent owns git operations at a time** — the agent creating the PR handles all git (checkout, add, commit, push)
-- **Team-lead is read-only during implementation** — delegates, doesn't touch files
-- **Coordinate before switching branches** — message team-lead before `git checkout` so they can alert other agents
+- **Only one agent owns git operations at a time** -- the agent creating the PR handles all git (checkout, add, commit, push)
+- **Team-lead is read-only during implementation** -- delegates, doesn't touch files
+- **Coordinate before switching branches** -- message team-lead before `git checkout` so they can alert other agents
 - **Never force-push or reset** without team-lead approval
 
 ## Code Review Protocol (Marcus)
 
-Marcus posts all code review verdicts via the GitHub Reviews API — never as plain PR comments:
+Marcus posts all code review verdicts via the GitHub Reviews API -- never as plain PR comments:
 
 ```bash
 source ~/.claude/.env && GH_TOKEN=$GITHUB_TOKEN gh pr review <PR_NUMBER> --repo Eesti-Raudtee/hr-platform --comment --body "..."
 ```
 
-Using `--comment` (COMMENTED state) creates a formal review record visible in the GitHub reviews widget, providing an audit trail even though the shared account cannot self-approve. Never use `gh pr comment` for review verdicts — those appear only in the comment thread and not in `reviews: []`.
+Using `--comment` (COMMENTED state) creates a formal review record visible in the GitHub reviews widget, providing an audit trail even though the shared account cannot self-approve. Never use `gh pr comment` for review verdicts -- those appear only in the comment thread and not in `reviews: []`.
 
 ## Issue Closure Protocol
 
@@ -185,30 +185,30 @@ You can push any document to the team dashboard for the user (PO) to read. Use t
 
 - Renders as a tab in the dashboard header strip
 - User can close tabs with `×` when done reading
-- In-memory only — docs disappear on dashboard restart
+- In-memory only -- docs disappear on dashboard restart
 - Title defaults to filename without extension if omitted
 
-**When to use:** research reports, code review summaries, architecture docs, test coverage reports, schema mappings — anything the user would want to read in a formatted view rather than as a raw SendMessage.
+**When to use:** research reports, code review summaries, architecture docs, test coverage reports, schema mappings -- anything the user would want to read in a formatted view rather than as a raw SendMessage.
 
 ## Known Pitfalls
 
-- **`$app/paths` in `.server.ts`** — NEVER import `$app/paths` in server files. Use literal strings. workerd vitest pool resolves `window`-dependent code at module load time, causing CI failures.
-- **gray-matter YAML dates** — `gray-matter` coerces bare YAML dates to JS Date objects. Convert back with `.toISOString().slice(0, 10)` before Zod validation.
-- **`~/.claude/.env` values MUST be quoted** — special chars break without quotes.
-- **Jira API endpoint** — use `/rest/api/3/search/jql` (old `/search` removed by Atlassian).
-- **`overflow-x: auto/scroll/hidden` blocks `position: sticky`** — use `overflow-x: clip` instead (clips without creating a scroll context).
+- **`$app/paths` in `.server.ts`** -- NEVER import `$app/paths` in server files. Use literal strings. workerd vitest pool resolves `window`-dependent code at module load time, causing CI failures.
+- **gray-matter YAML dates** -- `gray-matter` coerces bare YAML dates to JS Date objects. Convert back with `.toISOString().slice(0, 10)` before Zod validation.
+- **`~/.claude/.env` values MUST be quoted** -- special chars break without quotes.
+- **Jira API endpoint** -- use `/rest/api/3/search/jql` (old `/search` removed by Atlassian).
+- **`overflow-x: auto/scroll/hidden` blocks `position: sticky`** -- use `overflow-x: clip` instead (clips without creating a scroll context).
 - **D1 multi-statement prepare().run():** Only executes the FIRST statement. Split into separate `.run()` calls per statement. Exception: single INSERT with multiple value rows works fine.
-- **SvelteKit +page.server.ts exports:** Only allows `load`, `actions`, `config`, `prerender`, `csr`, `ssr`, `trailingSlash`, `entries`, or `_`-prefixed exports. Exporting helper functions causes build failure — extract to `$lib/` instead.
+- **SvelteKit +page.server.ts exports:** Only allows `load`, `actions`, `config`, `prerender`, `csr`, `ssr`, `trailingSlash`, `entries`, or `_`-prefixed exports. Exporting helper functions causes build failure -- extract to `$lib/` instead.
 - **Vite ?raw imports:** Top-level `import ... from "...?raw"` bundles the file into ALL builds including production. Use dynamic `await import("...?raw")` inside environment guards for dev-only files (e.g. seeds, fixtures).
 
 ## Contextual Guidance
 
 When team-lead assigns work via message, the message should include:
 
-- **Current state** — what's already merged, what branches exist
-- **Starting point** — which files to read first
-- **Dependencies** — what must be done before or after
-- **Branch name** — what to call the branch
+- **Current state** -- what's already merged, what branches exist
+- **Starting point** -- which files to read first
+- **Dependencies** -- what must be done before or after
+- **Branch name** -- what to call the branch
 
 ## Team-Lead Role Boundary (enforced by all teammates)
 

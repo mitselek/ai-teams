@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// TLS client — outbound mTLS connection to a peer daemon.
+// TLS client -- outbound mTLS connection to a peer daemon.
 // Verifies server cert fingerprint, sends framed messages, emits disconnect events.
 // Spec: #16 §3, #15 §1, #18 Phase 2.2
 
@@ -47,7 +47,7 @@ export class TlsClient {
   }
 
   async connect(): Promise<void> {
-    // Reject immediately if no fingerprint for this peer — unknown peer
+    // Reject immediately if no fingerprint for this peer -- unknown peer
     const expectedFingerprint = this.config.peerFingerprints.get(this.peerTeam);
     if (!expectedFingerprint) {
       throw new Error(`No pinned cert for peer team: ${this.peerTeam}`);

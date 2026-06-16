@@ -18,8 +18,8 @@ The framework has no mechanism for defining, testing, or enforcing protocol comp
 ## Key ideas
 
 - **Claude agents get compliance two ways, neither available to non-Claude**: prompt instructions (sidecars/daemons have no prompts in our format) and peer enforcement (non-Claude is outside the SendMessage trust model).
-- **Why Eilama works without this**: exactly one contract (inbox polling, structured request/response), one consumer (team-lead), verifiable by inspection — no multi-consumer coordination.
-- **What breaks at scale**: multiple sidecar roles with multiple consumers need API specs, format validation, error-state definitions, compliance testing — a formal contract layer that doesn't exist.
+- **Why Eilama works without this**: exactly one contract (inbox polling, structured request/response), one consumer (team-lead), verifiable by inspection -- no multi-consumer coordination.
+- **What breaks at scale**: multiple sidecar roles with multiple consumers need API specs, format validation, error-state definitions, compliance testing -- a formal contract layer that doesn't exist.
 - **The right question**: not "which roles can go multi-provider?" but "what contract enforcement mechanism replaces prompt-based compliance for participants outside the trust model?"
 - **Variance is the symptom (protocol-interpretation-variance); missing contract enforcement is the structural cause.**
 

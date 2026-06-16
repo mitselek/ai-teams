@@ -16,7 +16,7 @@ When the same idea is referenced across multiple artifacts (prompts, wiki entrie
 
 **Three advantages of named concepts:**
 1. **Citable across artifacts** without re-explaining.
-2. **Reusable without ambiguity** — the name is the definition's handle.
+2. **Reusable without ambiguity** -- the name is the definition's handle.
 3. **Harder to misremember** than multi-word prose descriptions.
 
 **Naming signal:** You find yourself describing something with a multi-word phrase more than once across different contexts. That's the trigger to name it.

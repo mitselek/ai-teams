@@ -1,8 +1,8 @@
-# Security Report — Hub/Relay Architecture Threat Analysis
+# Security Report -- Hub/Relay Architecture Threat Analysis
 
 (*CD:Kerckhoffs*)
 
-**Status:** DRAFT — awaiting Vigenere's E2E crypto design for test vector finalization
+**Status:** DRAFT -- awaiting Vigenere's E2E crypto design for test vector finalization
 **Date:** 2026-03-30
 **Ref:** PO directive (hub/relay architecture), `threat-model.md`, `crypto-spec.md`
 
@@ -21,7 +21,7 @@ Team B daemon
 ```
 
 Two layers of security:
-- **Layer 1 (Transport):** mTLS between each team and the hub. Hub terminates TLS — it sees plaintext at the TLS layer.
+- **Layer 1 (Transport):** mTLS between each team and the hub. Hub terminates TLS -- it sees plaintext at the TLS layer.
 - **Layer 2 (E2E Application Encryption):** Application-layer encryption team A → team B. Hub sees only ciphertext. Vigenere is designing this layer.
 
 The threat model assumes Layer 2 exists and is correct. Findings below cover cases where it fails, is absent, or is insufficient.
@@ -30,7 +30,7 @@ The threat model assumes Layer 2 exists and is correct. Findings below cover cas
 
 ## Threat Matrix
 
-### HUB-1 — Hub Reads Message Content *(CRITICAL if E2E absent)*
+### HUB-1 -- Hub Reads Message Content *(CRITICAL if E2E absent)*
 
 **Attack vector:** Compromised hub terminates mTLS and reads decrypted envelope body before re-encrypting for onward delivery.
 
@@ -46,7 +46,7 @@ The threat model assumes Layer 2 exists and is correct. Findings below cover cas
 
 ---
 
-### HUB-2 — Hub Forges Messages *(HIGH)*
+### HUB-2 -- Hub Forges Messages *(HIGH)*
 
 **Attack vector:** Compromised hub injects a message into the delivery pipeline claiming `from.team = "team-a"`, even though no real message came from Team A.
 
@@ -62,21 +62,21 @@ The threat model assumes Layer 2 exists and is correct. Findings below cover cas
 
 **With per-team asymmetric keys (v2):** Hub cannot forge ciphertext. Envelope forgery (metadata only) is detectable if `from.team` is in AAD and E2E signature is present.
 
-**Mitigation required:** E2E message signing — sender signs over `{id, from.team, to.team, body_hash}` with sender's private key. Receiver verifies signature before accepting.
+**Mitigation required:** E2E message signing -- sender signs over `{id, from.team, to.team, body_hash}` with sender's private key. Receiver verifies signature before accepting.
 
 **Severity:** CRITICAL (v1 PSK) / HIGH (v2 without signing) / MEDIUM (v2 with signing)
 
 ---
 
-### HUB-3 — Hub Redirects Message to Wrong Team *(HIGH)*
+### HUB-3 -- Hub Redirects Message to Wrong Team *(HIGH)*
 
 **Attack vector:** Compromised hub modifies `to.team` in the envelope, delivering Team A's message to Team C instead of Team B.
 
-**Current AAD:** `message.id + ":" + message.from.team` — does NOT include `to.team`.
+**Current AAD:** `message.id + ":" + message.from.team` -- does NOT include `to.team`.
 
 **Impact:**
 - With symmetric E2E (shared PSK): Team C can decrypt and read the message. Full content disclosure.
-- With asymmetric E2E (per-team keys): Team C cannot decrypt (message encrypted to Team B's key). Delivery fails silently — Team A gets no error, message disappears.
+- With asymmetric E2E (per-team keys): Team C cannot decrypt (message encrypted to Team B's key). Delivery fails silently -- Team A gets no error, message disappears.
 
 **Both outcomes are unacceptable.**
 
@@ -88,11 +88,11 @@ Any `to.team` tampering causes decryption failure at the receiver. Sender can de
 
 **This is an actionable gap in the current AAD design (crypto-spec.md §AAD Usage).**
 
-**Severity:** HIGH — silent message loss or misdirected content
+**Severity:** HIGH -- silent message loss or misdirected content
 
 ---
 
-### HUB-4 — Hub Replays Captured Messages *(HIGH)*
+### HUB-4 -- Hub Replays Captured Messages *(HIGH)*
 
 **Attack vector:** Hub captures a valid A→B message and re-injects it later (same session or after reconnect). Dedup window may have expired.
 
@@ -108,11 +108,11 @@ Any `to.team` tampering causes decryption failure at the receiver. Sender can de
 - Timestamp validation: reject messages older than threshold
 - Sequence numbers per tunnel: monotonic counter on each A↔B channel. Out-of-order or repeated sequence numbers rejected.
 
-**Severity:** HIGH — enables duplicate task execution, state divergence between teams
+**Severity:** HIGH -- enables duplicate task execution, state divergence between teams
 
 ---
 
-### HUB-5 — Hub as Metadata Observer *(MEDIUM — ACCEPTED by PO)*
+### HUB-5 -- Hub as Metadata Observer *(MEDIUM -- ACCEPTED by PO)*
 
 **Attack vector:** Even with E2E encryption, hub observes all routing metadata:
 - `from.team`, `to.team` (plaintext in envelope, required for routing)
@@ -128,11 +128,11 @@ Any `to.team` tampering causes decryption failure at the receiver. Sender can de
 
 **PO Decision (2026-03-30):** ACCEPTED. Hub sees from/to/timestamp/size. No mitigation required for v1/v2.
 
-**Severity:** MEDIUM — **ACCEPTED RISK** (PO directive, no action required)
+**Severity:** MEDIUM -- **ACCEPTED RISK** (PO directive, no action required)
 
 ---
 
-### HUB-6 — Hub Impersonation *(MEDIUM)*
+### HUB-6 -- Hub Impersonation *(MEDIUM)*
 
 **Attack vector:** Attacker stands up a fake hub with a self-signed certificate, tricks teams into connecting, observing or modifying traffic.
 
@@ -146,11 +146,11 @@ Any `to.team` tampering causes decryption failure at the receiver. Sender can de
 
 **Mitigation:** Hub certificate distributed to all team `peers/` directories at deploy time. `peerFingerprints` check enforced (already in TlsServer). Hub identity = specific CN ("hub" or "comms-hub").
 
-**Severity:** MEDIUM — mitigated by existing cert pinning if correctly deployed
+**Severity:** MEDIUM -- mitigated by existing cert pinning if correctly deployed
 
 ---
 
-### HUB-7 — Hub Single Point of Failure *(HIGH)*
+### HUB-7 -- Hub Single Point of Failure *(HIGH)*
 
 **Attack vector:** Hub process crashes, network partition, or intentional DoS. All cross-team communication fails immediately.
 
@@ -160,7 +160,7 @@ Any `to.team` tampering causes decryption failure at the receiver. Sender can de
 - Messages in flight are lost (no persistent queue at hub level)
 - Teams may not detect hub failure immediately
 
-**Current detection:** TunnelManager reconnect loop — detects TCP close. Reconnect attempts with exponential backoff. But: no hub-specific health check, no alert to operator/team-lead.
+**Current detection:** TunnelManager reconnect loop -- detects TCP close. Reconnect attempts with exponential backoff. But: no hub-specific health check, no alert to operator/team-lead.
 
 **Mitigation plan:**
 1. **Hub keepalive:** Periodic ping/pong between hub and each team (30s interval). Teams detect hub loss within 60s.
@@ -168,13 +168,13 @@ Any `to.team` tampering causes decryption failure at the receiver. Sender can de
 3. **Failure notification:** On hub loss detection, daemon publishes `{ type: "hub_unavailable" }` to team-lead inbox.
 4. **Reconnect backoff:** Existing `reconnectBaseMs` handles reconnect. Max backoff should be capped (e.g., 30s) to bound recovery time.
 
-**Severity:** HIGH — availability impact, no current mitigation for message loss during outage
+**Severity:** HIGH -- availability impact, no current mitigation for message loss during outage
 
 ---
 
-### HUB-8 — Cross-Team Identity Binding Gap *(HIGH)*
+### HUB-8 -- Cross-Team Identity Binding Gap *(HIGH)*
 
-**Attack vector:** mTLS verifies Team A's identity to the HUB. But it does not verify Team A's identity to Team B end-to-end. The hub asserts "this came from Team A" — Team B has no cryptographic proof.
+**Attack vector:** mTLS verifies Team A's identity to the HUB. But it does not verify Team A's identity to Team B end-to-end. The hub asserts "this came from Team A" -- Team B has no cryptographic proof.
 
 **Scenario:** Hub receives message from Team A (mTLS cert = comms-dev). Hub forwards envelope to Team B. Team B's broker sees `from.team = "comms-dev"` in the envelope and the hub's mTLS cert (not Team A's cert). Team B trusts the hub's assertion.
 
@@ -190,7 +190,7 @@ Team B verifies signature using Team A's public key (from registry or pre-distri
 
 **This requires asymmetric keys per team (v2 path).**
 
-**Severity:** HIGH — fundamental gap in hub-based architecture until E2E signing is implemented
+**Severity:** HIGH -- fundamental gap in hub-based architecture until E2E signing is implemented
 
 ---
 
@@ -198,10 +198,10 @@ Team B verifies signature using Team A's public key (from registry or pre-distri
 
 | Decision | Detail |
 |---|---|
-| Metadata leakage (HUB-5) | **ACCEPTED** — hub sees from/to/timestamp/size, no mitigation needed |
-| Forward secrecy | **DEFERRED to v3** — static X25519 is acceptable for v2 |
-| Peer-to-peer fallback | **REJECTED** — hub is the ONLY routing path; no dual-path or graceful degradation |
-| Human endpoints | **NEW REQUIREMENT** — humans are first-class endpoints; design required |
+| Metadata leakage (HUB-5) | **ACCEPTED** -- hub sees from/to/timestamp/size, no mitigation needed |
+| Forward secrecy | **DEFERRED to v3** -- static X25519 is acceptable for v2 |
+| Peer-to-peer fallback | **REJECTED** -- hub is the ONLY routing path; no dual-path or graceful degradation |
+| Human endpoints | **NEW REQUIREMENT** -- humans are first-class endpoints; design required |
 
 ---
 
@@ -254,10 +254,10 @@ Once Vigenere provides the E2E crypto design and test vectors, I will implement:
 | HUB-T01 | Hub modifies `to.team` in envelope | Decryption fails at wrong recipient (if `to.team` in AAD) |
 | HUB-T02 | Hub replays message after session restart | Rejected by persistent dedup |
 | HUB-T03 | Hub injects message with forged `from.team` | Signature verification fails (v2) |
-| HUB-T04 | Hub sends message with zero-byte content (size leak) | Padding normalises sizes — padded to block boundary |
+| HUB-T04 | Hub sends message with zero-byte content (size leak) | Padding normalises sizes -- padded to block boundary |
 | HUB-T05 | Fake hub presents wrong mTLS cert | Connection rejected by cert fingerprint check |
 | HUB-T06 | Hub process killed mid-session | Team detects failure within 60s, messages queued, reconnect on recovery |
-| HUB-T07 | Hub drops ACK (causes sender retry) | Receiver deduplicates retried message — inbox has one copy |
+| HUB-T07 | Hub drops ACK (causes sender retry) | Receiver deduplicates retried message -- inbox has one copy |
 | HUB-T08 | Hub delays message 301s (beyond timestamp window) | Rejected as too old |
 
 ---
@@ -269,26 +269,26 @@ Once Vigenere provides the E2E crypto design and test vectors, I will implement:
 With shared PSK, a compromised hub has the encryption key and can read, forge, and replay any message. The hub+E2E architecture only provides confidentiality and integrity guarantees if the E2E layer uses per-team asymmetric keys that the hub does not possess.
 
 **Minimum bar for hub deployment:**
-1. Per-team asymmetric keys (v2 crypto) — Vigenere
-2. `to.team` in AAD — Vigenere
-3. Persistent dedup — Babbage
-4. Hub keepalive + local queue — Babbage
+1. Per-team asymmetric keys (v2 crypto) -- Vigenere
+2. `to.team` in AAD -- Vigenere
+3. Persistent dedup -- Babbage
+4. Hub keepalive + local queue -- Babbage
 
 ---
 
 ---
 
-## Human Endpoints — Security Analysis (NEW REQUIREMENT, 2026-03-30)
+## Human Endpoints -- Security Analysis (NEW REQUIREMENT, 2026-03-30)
 
-*PO directive (clarified 2026-03-30): Humans are API clients identical to team daemons — same mTLS, same JSON envelope, same E2E crypto, same hub routing. Only distinction: registry `type` field ("team" vs "human"). Hub is source of truth for registry.*
+*PO directive (clarified 2026-03-30): Humans are API clients identical to team daemons -- same mTLS, same JSON envelope, same E2E crypto, same hub routing. Only distinction: registry `type` field ("team" vs "human"). Hub is source of truth for registry.*
 
 **Threat surface delta from this model: minimal.** Humans using the same protocol and crypto as teams inherit all existing security properties. The protocol requires no new attack surface to analyse. Findings below cover what IS different.
 
 ---
 
-### HUM-1 — Human Key Material Storage *(HIGH)*
+### HUM-1 -- Human Key Material Storage *(HIGH)*
 
-**Problem:** Agent daemons run in controlled environments (Docker containers) with key files on a protected filesystem. Human clients run on end-user machines — laptops, personal workstations — with different threat exposure.
+**Problem:** Agent daemons run in controlled environments (Docker containers) with key files on a protected filesystem. Human clients run on end-user machines -- laptops, personal workstations -- with different threat exposure.
 
 **Attack scenarios:**
 - TLS private key stored as unprotected file → local attacker or malware reads key, impersonates human at mTLS layer
@@ -302,15 +302,15 @@ With shared PSK, a compromised hub has the encryption key and can read, forge, a
 | Key file with restrictive permissions (chmod 600) | Filesystem ACL | Acceptable minimum |
 | Key file encrypted with passphrase | Passphrase + filesystem ACL | Good |
 | Unprotected plaintext key file | None | No |
-| Hub-managed key | Hub can impersonate human | **BROKEN — violates E2E** |
+| Hub-managed key | Hub can impersonate human | **BROKEN -- violates E2E** |
 
-**Severity:** HIGH — key storage is the only human-specific crypto risk; protocol itself is unchanged
+**Severity:** HIGH -- key storage is the only human-specific crypto risk; protocol itself is unchanged
 
 ---
 
-### HUM-2 — Key Revocation via Hub Registry *(HIGH)*
+### HUM-2 -- Key Revocation via Hub Registry *(HIGH)*
 
-**Problem:** Hub registry is now hub-managed state (not shared volume). When a human's key is compromised or they leave the organisation, revocation requires updating the hub registry. Agent teams cache the key bundle — stale cache means they continue accepting signatures from revoked keys.
+**Problem:** Hub registry is now hub-managed state (not shared volume). When a human's key is compromised or they leave the organisation, revocation requires updating the hub registry. Agent teams cache the key bundle -- stale cache means they continue accepting signatures from revoked keys.
 
 **Attack:** Human leaves, hub registry updated to remove them. But agent team daemons loaded the key bundle at startup and have not refreshed. They continue accepting signed messages from the revoked key for the duration of their cache TTL.
 
@@ -319,35 +319,35 @@ With shared PSK, a compromised hub has the encryption key and can read, forge, a
 - Hub can push a `registry_updated` event to all connected daemons to trigger immediate refresh
 - For high-severity revocations: hub can refuse to route messages where `from.team` matches a revoked entry, independent of per-team signature verification
 
-**Severity:** HIGH — revocation latency window scales with cache TTL; must be bounded
+**Severity:** HIGH -- revocation latency window scales with cache TTL; must be bounded
 
 ---
 
-### HUM-3 — Hub Registry as Privileged Single Point of Trust *(HIGH)*
+### HUM-3 -- Hub Registry as Privileged Single Point of Trust *(HIGH)*
 
 **Problem:** Registry moves from shared volume (content-addressed, readable by all) to hub-managed state. The hub is now the sole authority for who exists, what their public keys are, and what their `type` is.
 
-**Attack:** Compromised hub rewrites registry — adds a fake human entry with attacker-controlled key, or modifies a team's public key so messages encrypt to attacker's key.
+**Attack:** Compromised hub rewrites registry -- adds a fake human entry with attacker-controlled key, or modifies a team's public key so messages encrypt to attacker's key.
 
 **This is a new threat not present in the shared-volume model**, where registry tampering required write access to the shared volume (detectable via filesystem audit).
 
 **Mitigation requirements:**
 - Registry mutations must be authenticated (only hub operator or designated admin can write)
-- Registry content must be signed at rest — teams can verify registry integrity without trusting the hub's serving layer
+- Registry content must be signed at rest -- teams can verify registry integrity without trusting the hub's serving layer
 - Key bundle changes should require a secondary approval channel (e.g., admin confirmation out-of-band)
 - Teams should log and alert on key bundle changes for any existing peer
 
-**Severity:** HIGH — hub registry compromise enables silent MITM against all endpoints
+**Severity:** HIGH -- hub registry compromise enables silent MITM against all endpoints
 
 ---
 
-### HUM-4 — Human Message Replay *(MEDIUM — existing controls apply)*
+### HUM-4 -- Human Message Replay *(MEDIUM -- existing controls apply)*
 
 Human client sends messages using the same envelope format with `id` (UUID) and `timestamp`. Existing dedup (persistent, TTL-bounded) and timestamp validation window (300s) apply identically.
 
 **No new mechanism required.** Human clients must use fresh UUIDs per message and current timestamps, same as agent daemons.
 
-**Severity:** MEDIUM — covered by existing dedup and timestamp validation
+**Severity:** MEDIUM -- covered by existing dedup and timestamp validation
 
 ---
 
@@ -358,18 +358,18 @@ Human client sends messages using the same envelope format with `id` (UUID) and 
 | HUM-1 | Human key material storage | HIGH | Lovelace (client) | Design required |
 | HUM-2 | Key revocation via hub registry | HIGH | Babbage (hub) + Vigenere (registry spec) | Design required |
 | HUM-3 | Hub registry as privileged single point of trust | HIGH | Babbage (hub) + Vigenere (registry spec) | Design required |
-| HUM-4 | Human message replay | MEDIUM | None — existing controls apply | COVERED |
+| HUM-4 | Human message replay | MEDIUM | None -- existing controls apply | COVERED |
 
-**Dropped from earlier draft:** HUM-1 (authentication) — resolved by mTLS (same as teams). HUM-3 (identity model) — resolved by "human = team with type field". Forward secrecy — deferred to v3 per PO.
+**Dropped from earlier draft:** HUM-1 (authentication) -- resolved by mTLS (same as teams). HUM-3 (identity model) -- resolved by "human = team with type field". Forward secrecy -- deferred to v3 per PO.
 
 ### Minimum Bar for Human Endpoint Deployment
 
 1. Human key pair generated and stored with OS keychain or equivalent (HUM-1)
 2. Key bundle cache TTL bounded and hub-push refresh supported (HUM-2)
 3. Hub registry mutations authenticated + registry content signed at rest (HUM-3)
-4. Human client passes same E2E encrypt/sign/verify pipeline as agent daemons — no protocol differences
+4. Human client passes same E2E encrypt/sign/verify pipeline as agent daemons -- no protocol differences
 
-### Test Plan — Human Endpoints
+### Test Plan -- Human Endpoints
 
 | Test ID | Scenario | Expected result |
 |---|---|---|

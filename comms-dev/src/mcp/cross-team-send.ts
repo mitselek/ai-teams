@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// CrossTeamSend — MCP tool that sends a message to a remote agent via the local daemon.
+// CrossTeamSend -- MCP tool that sends a message to a remote agent via the local daemon.
 // Connects to the daemon's UDS socket, sends a JSON command, waits for response.
 // Spec: #16 §4, §6, #18 Phase 4
 

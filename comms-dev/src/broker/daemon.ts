@@ -1,16 +1,16 @@
 // (*CD:Babbage*)
-// Message broker daemon — the main entry point for a team's comms broker.
+// Message broker daemon -- the main entry point for a team's comms broker.
 // Wires together: UDS server, discovery registry, message store, crypto, and routing.
 //
 // Usage: tsx src/broker/daemon.ts
 // Or via: npm run broker
 //
 // Environment variables:
-//   COMMS_TEAM_NAME    — required, e.g. "comms-dev"
-//   COMMS_TEAM_PREFIX  — required, e.g. "CD"
-//   COMMS_SOCKET_DIR   — default: /shared/comms
-//   COMMS_CAPABILITIES — comma-separated list, default: "messaging"
-//   COMMS_PSK_FILE     — path to PSK file, default: /run/secrets/comms-psk
+//   COMMS_TEAM_NAME    -- required, e.g. "comms-dev"
+//   COMMS_TEAM_PREFIX  -- required, e.g. "CD"
+//   COMMS_SOCKET_DIR   -- default: /shared/comms
+//   COMMS_CAPABILITIES -- comma-separated list, default: "messaging"
+//   COMMS_PSK_FILE     -- path to PSK file, default: /run/secrets/comms-psk
 //                        If file missing, broker starts in PLAINTEXT mode (dev only)
 
 import fs from 'fs';
@@ -63,12 +63,12 @@ function loadCryptoMaterial(pskFile: string): CryptoMaterial | undefined {
     const keys: DerivedKeys = deriveKey(psk, PSK_CONTEXT);
     const api = createCryptoAPI(keys);
     const provider = createCryptoProvider(api);
-    console.log(`[broker] Crypto enabled — PSK loaded from ${pskFile}`);
+    console.log(`[broker] Crypto enabled -- PSK loaded from ${pskFile}`);
     return { provider, integrityKey: keys.integrityKey };
   } catch (err) {
     console.warn(
       `[broker] WARNING: PSK file not found or invalid (${pskFile}): ${(err as Error).message}. ` +
-      'Starting in PLAINTEXT mode — do not use in production.'
+      'Starting in PLAINTEXT mode -- do not use in production.'
     );
     return undefined;
   }
@@ -112,7 +112,7 @@ class Broker {
   }
 
   async start(): Promise<void> {
-    console.log(`[broker] Starting — team: ${this.config.teamName}`);
+    console.log(`[broker] Starting -- team: ${this.config.teamName}`);
     this.store.start();
     this.bridge.start();
     await this.server.listen();
@@ -175,10 +175,10 @@ class Broker {
   }
 
   private async handleIncoming(message: Message): Promise<void> {
-    // Dedup: at-least-once — sender retries, we silently swallow duplicates
+    // Dedup: at-least-once -- sender retries, we silently swallow duplicates
     const isNew = this.store.record(message);
     if (!isNew) {
-      console.log(`[broker] Duplicate message ${message.id} — discarded`);
+      console.log(`[broker] Duplicate message ${message.id} -- discarded`);
       return;
     }
 

@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// TLS server — accepts inbound mTLS connections from peer daemons.
+// TLS server -- accepts inbound mTLS connections from peer daemons.
 // v1 (peer-to-peer): enforces from.team === peerCertCN.
 // v2 (hub mode): peer is hub (CN=comms-hub); skips from.team check for hubPeers;
 //   sender identity is proven by Ed25519 signature verified in the application layer.
@@ -20,7 +20,7 @@ export interface TlsServerOptions {
   /**
    * Cert CNs of trusted hub peers (e.g. ["comms-hub"]).
    * When a message arrives from one of these peers, the from.team === peerCertCN
-   * check is skipped — sender identity is proven by Ed25519 signature instead
+   * check is skipped -- sender identity is proven by Ed25519 signature instead
    * (verified at the application layer by DaemonV2). This is the v1 stepping stone
    * to the full v2 two-layer auth model described in crypto-spec.md §Hub-Mode.
    */
@@ -104,7 +104,7 @@ export class TlsServer {
       });
 
       server.on('secureConnection', (socket: TLSSocket) => {
-        // Absorb socket-level errors — they are expected for rejected connections
+        // Absorb socket-level errors -- they are expected for rejected connections
         socket.on('error', () => {});
         this.handleConnection(socket);
       });
@@ -156,7 +156,7 @@ export class TlsServer {
       return;
     }
 
-    // Peer authenticated — store team on socket and notify handlers
+    // Peer authenticated -- store team on socket and notify handlers
     (socket as any)._authenticatedTeam = peerTeam;
     for (const h of this.connectionHandlers) h(peerTeam);
     for (const h of this.peerSocketHandlers) h(peerTeam, socket);
@@ -178,7 +178,7 @@ export class TlsServer {
 
   private handleFrame(socket: TLSSocket, authenticatedTeam: string, message: Message): void {
     // v1 invariant: from.team must match mTLS peer cert CN.
-    // v2 hub mode: peer is the hub (in hubPeers) — skip this check; sender identity
+    // v2 hub mode: peer is the hub (in hubPeers) -- skip this check; sender identity
     // is proven by Ed25519 signature verified by DaemonV2's handleInbound().
     if (!this.hubPeers.has(authenticatedTeam)) {
       const check = validateSenderIdentity(message, authenticatedTeam);
@@ -190,7 +190,7 @@ export class TlsServer {
       }
     }
 
-    // Send ACK back — but never ACK an ACK (avoids ACK storms when hub
+    // Send ACK back -- but never ACK an ACK (avoids ACK storms when hub
     // forwards ACK frames back down inbound sockets).
     if (message.type !== 'ack') {
       const ack = buildMessage({

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Persist project-scoped auto-memory .md files to repo.
+# (*FR:Volta*) -- Persist project-scoped auto-memory .md files to repo.
 # Runs on per-agent shutdown (cheap: small text files, typically <100KB total).
 # Mirror semantics: dest is wiped before copy, so removing a file in runtime
 # also removes it from the repo-persisted version. Prevents orphan accumulation.
@@ -42,7 +42,7 @@ if [ ! -d "$RUNTIME_MEMORY" ]; then
     echo "ERROR: Marker-specified project dir missing memory/: $RUNTIME_MEMORY" >&2
     exit 1
   else
-    echo "No runtime auto-memory at $RUNTIME_MEMORY — nothing to persist."
+    echo "No runtime auto-memory at $RUNTIME_MEMORY -- nothing to persist."
     exit 0
   fi
 fi
@@ -73,7 +73,7 @@ done
 
 DEST_COUNT=$(find "$REPO_PROJECT_MEMORY" -maxdepth 1 -name '*.md' -type f | wc -l)
 if [ "$DEST_COUNT" -ne "$PERSISTED" ]; then
-  echo "ERROR: Count mismatch — persisted=$PERSISTED dest=$DEST_COUNT" >&2
+  echo "ERROR: Count mismatch -- persisted=$PERSISTED dest=$DEST_COUNT" >&2
   exit 1
 fi
 

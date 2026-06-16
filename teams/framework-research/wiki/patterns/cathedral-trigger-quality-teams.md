@@ -23,7 +23,7 @@ When a team's primary mission is introducing tests, CI, and refactoring for test
 
 ## Key Insight
 
-This is the clearest possible Cathedral trigger: the team exists to do what PURPLE does. No judgment call needed — the tier selection is deterministic from the mission statement.
+This is the clearest possible Cathedral trigger: the team exists to do what PURPLE does. No judgment call needed -- the tier selection is deterministic from the mission statement.
 
 ## Related
 

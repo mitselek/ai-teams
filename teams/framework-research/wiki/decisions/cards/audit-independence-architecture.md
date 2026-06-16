@@ -19,7 +19,7 @@ Audit independence cannot be achieved by running Medici on a different model pro
 
 - **Why not a provider swap**: Medici is deeply integrated with Claude Code tool primitives (Read scratchpads, query config.json, inbox state, git log/grep, SendMessage, health-report gates Phase 5). A non-Claude Medici would replicate the entire tool environment or audit a snapshot, not the live team.
 - **Correct pattern**: a separate audit container reading committed artifacts (git history, health reports, wiki, scratchpads) from a read-only mount, running OUTSIDE the team runtime at a different cadence, usable with any provider because it touches files, not Claude Code internals.
-- **Architecturally similar to Seam 3** (MCP server / HTTP service) — independent container, clean file-based interface.
-- **Two distinct problems**: behavioral baseline (Cal — non-Claude auditor interpreting Claude baselines) AND infrastructure (Brunel — Medici's tool dependencies make a swap infeasible). This decision addresses the infrastructure problem.
+- **Architecturally similar to Seam 3** (MCP server / HTTP service) -- independent container, clean file-based interface.
+- **Two distinct problems**: behavioral baseline (Cal -- non-Claude auditor interpreting Claude baselines) AND infrastructure (Brunel -- Medici's tool dependencies make a swap infeasible). This decision addresses the infrastructure problem.
 
 (*FR:Callimachus*)

@@ -1,39 +1,39 @@
 // (*CD:Kerckhoffs*)
 // RED tests for story/32: SQLite offline message queue.
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — bulk storage:
+//   AC1 -- bulk storage:
 //     Given: team-b has no active SSE subscription
 //     When:  5 messages are sent to team-b
 //     Then:  all 5 are stored; queueDepth === 5
 //
-//   AC2 — ordered replay on reconnect:
+//   AC2 -- ordered replay on reconnect:
 //     Given: team-b receives M1 live; then disconnects; M2 and M3 are queued while offline
 //     When:  team-b reconnects (no Last-Event-ID filter needed)
 //     Then:  M2 is delivered before M3 (insertion order preserved)
 //
-//   AC3 — capacity cap (oldest dropped):
+//   AC3 -- capacity cap (oldest dropped):
 //     Given: hub with queueCapacity: 3; team-b offline
 //     When:  4 messages (M1..M4) are sent
 //     Then:  queue holds exactly 3; M1 (oldest) is absent; M2, M3, M4 are present
 //
-//   AC4 — TTL expiry:
+//   AC4 -- TTL expiry:
 //     Given: hub with queueTtlMs: 100; team-b offline
 //     When:  M1 is queued, 150ms elapse, team-b subscribes (triggering cleanup)
 //     Then:  M1 is NOT delivered; queueDepth is 0
 //
-//   AC5 — persistence across restart:
+//   AC5 -- persistence across restart:
 //     Given: hub using queuePath file; M1 queued for offline team-b
 //     When:  hub is closed and a new hub opens with the same queuePath
 //     Then:  M1 is delivered to team-b on the new hub
 //
-//   AC6 — opaque body (E2E encrypted):
+//   AC6 -- opaque body (E2E encrypted):
 //     Given: message body is an opaque base64 blob (E2E-encrypted)
 //     When:  it passes through the offline queue
 //     Then:  the body is delivered byte-for-byte unchanged; hub does not decrypt
 //
-//   AC7 — SQL injection resistance:
+//   AC7 -- SQL injection resistance:
 //     Given: team name contains SQL metacharacters (`'; DROP TABLE messages; --`)
 //     When:  the team is registered and a message is queued for another team
 //     Then:  the queue remains functional (parameterized statements prevented injection)
@@ -45,9 +45,9 @@
 //   AC1, AC2, AC6, AC7 may be accidentally GREEN; file is RED due to AC3/AC4/AC5.
 //
 // New HubOptions fields required (Babbage to add):
-//   queuePath?: string        — SQLite file path; absent = :memory: or temp file
-//   queueCapacity?: number    — max messages per team; default 100
-//   queueTtlMs?: number       — message TTL ms; default 86_400_000 (24h)
+//   queuePath?: string        -- SQLite file path; absent = :memory: or temp file
+//   queueCapacity?: number    -- max messages per team; default 100
+//   queueTtlMs?: number       -- message TTL ms; default 86_400_000 (24h)
 //
 // Ref: https://github.com/mitselek/ai-teams/issues/32
 
@@ -317,9 +317,9 @@ afterAll(() => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — Bulk storage ────────────────────────────────────────────────────────
+// ── AC1 -- Bulk storage ────────────────────────────────────────────────────────
 
-describe('AC1 — 5 messages sent to offline team stored in queue', () => {
+describe('AC1 -- 5 messages sent to offline team stored in queue', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -355,9 +355,9 @@ describe('AC1 — 5 messages sent to offline team stored in queue', () => {
   });
 });
 
-// ── AC2 — Ordered replay on reconnect ────────────────────────────────────────
+// ── AC2 -- Ordered replay on reconnect ────────────────────────────────────────
 
-describe('AC2 — queued messages delivered in insertion order on reconnect', () => {
+describe('AC2 -- queued messages delivered in insertion order on reconnect', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -389,7 +389,7 @@ describe('AC2 — queued messages delivered in insertion order on reconnect', ()
     await httpsPost(hubPort, '/api/send', caCrt, teamACert, msgM2);
     await httpsPost(hubPort, '/api/send', caCrt, teamACert, msgM3);
 
-    // 3. Reconnect — both messages should drain from queue
+    // 3. Reconnect -- both messages should drain from queue
     const sub = openSSE(hubPort, caCrt, teamBCert);
 
     await sub.waitFor((e) => (e.data as { id?: string })?.id === msgM3.id, 2000);
@@ -404,9 +404,9 @@ describe('AC2 — queued messages delivered in insertion order on reconnect', ()
   });
 });
 
-// ── AC3 — Queue capacity (oldest dropped) ────────────────────────────────────
+// ── AC3 -- Queue capacity (oldest dropped) ────────────────────────────────────
 
-describe('AC3 — queue capacity: oldest message dropped when limit reached', () => {
+describe('AC3 -- queue capacity: oldest message dropped when limit reached', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -473,9 +473,9 @@ describe('AC3 — queue capacity: oldest message dropped when limit reached', ()
   });
 });
 
-// ── AC4 — TTL expiry ──────────────────────────────────────────────────────────
+// ── AC4 -- TTL expiry ──────────────────────────────────────────────────────────
 
-describe('AC4 — TTL: expired messages not delivered and removed from queue', () => {
+describe('AC4 -- TTL: expired messages not delivered and removed from queue', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -505,7 +505,7 @@ describe('AC4 — TTL: expired messages not delivered and removed from queue', (
 
     // Subscribe triggers cleanup; queue drains (nothing to deliver)
     const sub = openSSE(hubPort, caCrt, teamBCert);
-    await settle(200); // generous wait — if delivered it would arrive here
+    await settle(200); // generous wait -- if delivered it would arrive here
     sub.close();
 
     const delivered = sub.events.some((e) => (e.data as { id?: string })?.id === expiredMsg.id);
@@ -520,9 +520,9 @@ describe('AC4 — TTL: expired messages not delivered and removed from queue', (
   });
 });
 
-// ── AC5 — Persistence across hub restart ─────────────────────────────────────
+// ── AC5 -- Persistence across hub restart ─────────────────────────────────────
 
-describe('AC5 — SQLite queue persists across hub restart', () => {
+describe('AC5 -- SQLite queue persists across hub restart', () => {
   it('message queued before hub restart is delivered after restart', async () => {
     // RED: in-memory queue lost on hub.close() → message gone after restart
     const dbPath = join(tmpDir, `queue-ac5-${Date.now()}.db`);
@@ -546,7 +546,7 @@ describe('AC5 — SQLite queue persists across hub restart', () => {
     // Verify SQLite file was created
     expect(existsSync(dbPath)).toBe(true);
 
-    // Second hub instance: same dbPath — M1 should still be in queue
+    // Second hub instance: same dbPath -- M1 should still be in queue
     const port2 = await getFreePort();
     const hub2 = createHub({
       tls: { ca: caCrt, cert: hubCrt, key: hubKey },
@@ -556,7 +556,7 @@ describe('AC5 — SQLite queue persists across hub restart', () => {
     } as HubOptionsExt);
     await hub2.listen({ port: port2, host: '127.0.0.1' });
 
-    // team-b subscribes on the NEW hub — M1 should drain from persistent queue
+    // team-b subscribes on the NEW hub -- M1 should drain from persistent queue
     const sub = openSSE(port2, caCrt, teamBCert);
     const event = await sub.waitFor((e) => (e.data as { id?: string })?.id === persistMsg.id, 3000);
     sub.close();
@@ -566,9 +566,9 @@ describe('AC5 — SQLite queue persists across hub restart', () => {
   });
 });
 
-// ── AC6 — Opaque E2E-encrypted body ──────────────────────────────────────────
+// ── AC6 -- Opaque E2E-encrypted body ──────────────────────────────────────────
 
-describe('AC6 — E2E-encrypted body passes through queue unchanged', () => {
+describe('AC6 -- E2E-encrypted body passes through queue unchanged', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;
@@ -616,9 +616,9 @@ describe('AC6 — E2E-encrypted body passes through queue unchanged', () => {
   });
 });
 
-// ── AC7 — SQL injection resistance ───────────────────────────────────────────
+// ── AC7 -- SQL injection resistance ───────────────────────────────────────────
 
-describe('AC7 — SQL injection resistance: parameterized statements prevent injection', () => {
+describe('AC7 -- SQL injection resistance: parameterized statements prevent injection', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hub: any;
   let hubPort: number;

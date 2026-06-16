@@ -3,7 +3,7 @@
 // Spec: #15 §1–§3
 //
 // Tests use test fixtures (self-signed certs generated in beforeAll).
-// Node.js built-ins: tls, crypto, fs — no external dependencies.
+// Node.js built-ins: tls, crypto, fs -- no external dependencies.
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { execSync } from 'node:child_process';
@@ -42,7 +42,7 @@ beforeAll(() => {
   // Generate daemon cert
   genSelfSignedCert(fixtureDir, 'comms-dev', 'daemon');
 
-  // Generate peer certs — filenames match CNs
+  // Generate peer certs -- filenames match CNs
   genSelfSignedCert(peersDir, 'framework-research');
   genSelfSignedCert(peersDir, 'entu-research');
 });
@@ -51,9 +51,9 @@ afterAll(() => {
   rmSync(fixtureDir, { recursive: true, force: true });
 });
 
-// ── §2 loadDaemonCrypto — startup validation ───────────────────────────────
+// ── §2 loadDaemonCrypto -- startup validation ───────────────────────────────
 
-describe('loadDaemonCrypto — startup validation', () => {
+describe('loadDaemonCrypto -- startup validation', () => {
 
   it('loads valid key, cert, and peer certs without error', async () => {
     config = await loadDaemonCrypto({
@@ -158,9 +158,9 @@ describe('loadDaemonCrypto — startup validation', () => {
 });
 
 // ── §2 Cert filename === cert CN validation ───────────────────────────────────
-// Spec: #16 §8 — peer cert filename MUST match cert CN; mismatch = fatal startup error
+// Spec: #16 §8 -- peer cert filename MUST match cert CN; mismatch = fatal startup error
 
-describe('loadDaemonCrypto — cert filename vs CN validation', () => {
+describe('loadDaemonCrypto -- cert filename vs CN validation', () => {
 
   it('rejects peer cert where filename does not match cert CN', async () => {
     const mismatchPeersDir = join(tmpdir(), `kerckhoffs-cn-mismatch-${Date.now()}`);
@@ -187,7 +187,7 @@ describe('computeFingerprint', () => {
   it('returns a SHA-256 fingerprint in colon-separated hex format', () => {
     const certPem = readFileSync(join(peersDir, 'framework-research.crt'));
     const fp = computeFingerprint(certPem);
-    // Format: "AB:CD:EF:..." — 32 bytes = 95 chars (64 hex + 31 colons)
+    // Format: "AB:CD:EF:..." -- 32 bytes = 95 chars (64 hex + 31 colons)
     expect(fp).toMatch(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/i);
   });
 

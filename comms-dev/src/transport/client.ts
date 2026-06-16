@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// UDS client — connects to a peer team's broker socket and sends a single message,
+// UDS client -- connects to a peer team's broker socket and sends a single message,
 // then waits for an ACK. Implements at-least-once delivery with exponential backoff.
 //
 // Encryption: if a CryptoProvider is supplied, the JSON payload is encrypted before
@@ -57,7 +57,7 @@ export class UDSClient {
     }
 
     const err = new Error(
-      `UNREACHABLE: ${this.socketPath} — failed after ${attempts} attempt(s) ` +
+      `UNREACHABLE: ${this.socketPath} -- failed after ${attempts} attempt(s) ` +
       `over ${MAX_DURATION_MS / 1000}s`
     );
     (err as NodeJS.ErrnoException).code = 'UNREACHABLE';
@@ -74,7 +74,7 @@ export class UDSClient {
     }
 
     // Encrypt if crypto provider is available.
-    // AAD binds message ID + sender team to the ciphertext — prevents ciphertext transplant attacks.
+    // AAD binds message ID + sender team to the ciphertext -- prevents ciphertext transplant attacks.
     if (opts.crypto) {
       const aad = `${message.id}:${message.from.team}`;
       payload = Buffer.from(await opts.crypto.encrypt(payload, aad));
@@ -108,7 +108,7 @@ export class UDSClient {
           return;
         }
 
-        // Wait for ACK — ACK frames are always plaintext (no encryption on control messages)
+        // Wait for ACK -- ACK frames are always plaintext (no encryption on control messages)
         const decoder = new FrameDecoder(
           maxSize,
           (raw) => {

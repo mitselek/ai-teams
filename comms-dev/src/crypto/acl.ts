@@ -38,14 +38,14 @@ export function matchesPattern(address: string, pattern: string): boolean {
   // Exact match
   if (address === pattern) return true;
 
-  // Bare wildcard — not supported
+  // Bare wildcard -- not supported
   if (pattern === '*') return false;
 
   // Wildcard agent match: "*@team"
   if (pattern.startsWith('*@')) {
     const patternTeam = pattern.slice(2);
 
-    // Reject "*@*" — not supported in v1
+    // Reject "*@*" -- not supported in v1
     if (patternTeam === '*') return false;
 
     const atIndex = address.indexOf('@');

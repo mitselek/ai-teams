@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// TunnelManager — manages persistent mTLS tunnels to peer daemons.
+// TunnelManager -- manages persistent mTLS tunnels to peer daemons.
 // One TlsClient per peer, exponential backoff reconnect, per-peer outbound queue,
 // heartbeat sender, dead-connection detection, ACK-based at-least-once delivery.
 // Spec: #16 §3.4, #18 Phase 2.2
@@ -103,7 +103,7 @@ export class TunnelManager {
   }
 
   /**
-   * Called with non-ACK frames received on outbound sockets — i.e. the hub
+   * Called with non-ACK frames received on outbound sockets -- i.e. the hub
    * wrote a message back down the connection we initiated to it.
    * DaemonV2 wires this to handleInbound() so messages arriving this way
    * are processed identically to messages received via TlsServer.
@@ -117,7 +117,7 @@ export class TunnelManager {
    * send-path for a peer. Used by hub mode: when team-a connects inbound,
    * hub registers the socket so forwardMessage() can write back down it.
    *
-   * The hub does NOT set up a data handler here — TlsServer already owns
+   * The hub does NOT set up a data handler here -- TlsServer already owns
    * the read side of this socket. We only write to it.
    *
    * If the peer already has an outbound tunnel, the inbound socket is used
@@ -181,7 +181,7 @@ export class TunnelManager {
         return this.sendAndWaitAck(state, message);
       }
 
-      // Outbound is down — try inbound socket before queuing
+      // Outbound is down -- try inbound socket before queuing
       if (this.inboundSockets.has(team)) {
         return this.sendViaInbound(team, message);
       }
@@ -193,7 +193,7 @@ export class TunnelManager {
       return 'QUEUED';
     }
 
-    // 2. No outbound tunnel — try inbound socket registered by TlsServer.
+    // 2. No outbound tunnel -- try inbound socket registered by TlsServer.
     if (this.inboundSockets.has(team)) {
       return this.sendViaInbound(team, message);
     }
@@ -201,7 +201,7 @@ export class TunnelManager {
     return 'PEER_UNKNOWN';
   }
 
-  // No outbound tunnel — try inbound socket registered by hub's TlsServer.
+  // No outbound tunnel -- try inbound socket registered by hub's TlsServer.
   // Write directly and return OK: hub already ACKed the original sender,
   // so delivery here is best-effort (per architecture §ACK semantics).
   private sendViaInbound(team: string, message: Message): SendResult {
@@ -257,7 +257,7 @@ export class TunnelManager {
           pending.resolve('OK');
         }
       } else {
-        // Non-ACK frame received on our outbound socket — hub is sending us
+        // Non-ACK frame received on our outbound socket -- hub is sending us
         // a message back down the connection we initiated.
         for (const h of this.inboundMessageHandlers) h(msg);
       }
@@ -271,7 +271,7 @@ export class TunnelManager {
 
     const expectedFingerprint = this.config.peerFingerprints.get(team);
     if (!expectedFingerprint) {
-      // No cert for this peer — don't retry
+      // No cert for this peer -- don't retry
       state.connecting = false;
       this.notifyConnectWaiters(state);
       return;
@@ -422,7 +422,7 @@ export class TunnelManager {
       const elapsed = Date.now() - state.lastDataAt;
       if (elapsed >= this.deadConnectionMs) {
         console.warn(
-          `[tunnel-manager] Dead connection to ${team} (${elapsed}ms since last data) — closing`,
+          `[tunnel-manager] Dead connection to ${team} (${elapsed}ms since last data) -- closing`,
         );
         state.socket?.destroy();
         // The close event handler will call scheduleReconnect

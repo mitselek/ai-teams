@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # (*CD:Babbage*)
-# test-comms.sh — cross-container comms integration test.
+# test-comms.sh -- cross-container comms integration test.
 #
 # Tests that comms-dev can send a message to framework-research and
 # that it is delivered to the framework-research inbox.
@@ -14,11 +14,11 @@
 #   ./comms-dev/scripts/test-comms.sh
 #
 # Environment:
-#   COMMS_PSK_FILE        — path to PSK (default: /run/secrets/comms-psk)
-#   COMMS_SOCKET_DIR      — UDS directory (default: /shared/comms)
-#   FR_INBOX_DIR          — framework-research inbox dir to verify delivery
+#   COMMS_PSK_FILE        -- path to PSK (default: /run/secrets/comms-psk)
+#   COMMS_SOCKET_DIR      -- UDS directory (default: /shared/comms)
+#   FR_INBOX_DIR          -- framework-research inbox dir to verify delivery
 #                           (default: /home/ai-teams/.claude/teams/framework-research/inboxes)
-#   TEST_TIMEOUT_SECS     — seconds to wait for delivery (default: 15)
+#   TEST_TIMEOUT_SECS     -- seconds to wait for delivery (default: 15)
 
 set -euo pipefail
 
@@ -42,20 +42,20 @@ info() { echo "[test-comms] $*"; }
 info "Preflight checks..."
 
 if [ ! -d "$COMMS_SOCKET_DIR" ]; then
-    fail "Socket dir not found: $COMMS_SOCKET_DIR — is the comms volume mounted?"
+    fail "Socket dir not found: $COMMS_SOCKET_DIR -- is the comms volume mounted?"
 fi
 
 if [ ! -f "$REGISTRY" ]; then
-    fail "registry.json not found at $REGISTRY — is the comms-dev broker running?"
+    fail "registry.json not found at $REGISTRY -- is the comms-dev broker running?"
 fi
 
 # Check that framework-research is registered
 if ! jq -e '.teams["framework-research"]' "$REGISTRY" > /dev/null 2>&1; then
-    fail "framework-research not in registry — is the framework-research broker running?"
+    fail "framework-research not in registry -- is the framework-research broker running?"
 fi
 
 if ! jq -e '.teams["comms-dev"]' "$REGISTRY" > /dev/null 2>&1; then
-    fail "comms-dev not in registry — is the comms-dev broker running?"
+    fail "comms-dev not in registry -- is the comms-dev broker running?"
 fi
 
 pass "Both teams registered in registry"

@@ -25,7 +25,7 @@ Pointer to `poc/ghost-bridge/stationmaster-protocol.md` v1.0.0 (RATIFIED S49). I
 
 ## Rejected
 
-- Hub-pull/hub-initiated (needs hub credentials + inbound reachability — empirically one-way).
+- Hub-pull/hub-initiated (needs hub credentials + inbound reachability -- empirically one-way).
 - True-mirror replication (drain-back wipe race; replication unit = entry not file state).
 - Co-sign consent ceremony (channel auth already is signature).
 - Mail over MCP (MCP = control-plane only; wake + durability live on inbox path; MCP phase 2).
@@ -33,6 +33,6 @@ Pointer to `poc/ghost-bridge/stationmaster-protocol.md` v1.0.0 (RATIFIED S49). I
 
 ## Scope
 
-Team-level grants v1 (agent identity in signatures, D9); registration human step v1; supersedes ghost-bridge v2 daemon. Doc statuses at S49 close: protocol RATIFIED / onboarding ACCEPTED (`87ef7d4`) / courier-hints ACCEPTED; reference courier landed S50 (Herald). stage-2 CONFIRMED 2026-06-12 (Aen read-back; one correction folded — onboarding ACCEPTED not DRAFT).
+Team-level grants v1 (agent identity in signatures, D9); registration human step v1; supersedes ghost-bridge v2 daemon. Doc statuses at S49 close: protocol RATIFIED / onboarding ACCEPTED (`87ef7d4`) / courier-hints ACCEPTED; reference courier landed S50 (Herald). stage-2 CONFIRMED 2026-06-12 (Aen read-back; one correction folded -- onboarding ACCEPTED not DRAFT).
 
 (*FR:Callimachus*)

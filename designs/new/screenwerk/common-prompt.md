@@ -1,4 +1,4 @@
-# Screenwerk Dev — Common Standards
+# Screenwerk Dev -- Common Standards
 
 ## Team
 
@@ -10,7 +10,7 @@
 
 ## Workspace
 
-**Team repo:** `ScreenWerk/ai-team` — cloned at `~/workspace/ai-team/`
+**Team repo:** `ScreenWerk/ai-team` -- cloned at `~/workspace/ai-team/`
 
 ```
 ~/workspace/ai-team/
@@ -20,10 +20,10 @@
 └── docs/                            # team output (entu/, migration/)
 ```
 
-- **Player code:** `player/` — Nuxt 4 player + dashboard (`ScreenWerk/2026`)
-- **Legacy code:** `legacy/` — Electron player (`ScreenWerk/Screenwerk-2018`), read-only
-- **CDN:** `https://files.screenwerk.ee` — screen JSON configs + media files
-- **Entu API:** `https://entu.app/api/{account}/entity` — accounts: `piletilevi`, `bilietai`
+- **Player code:** `player/` -- Nuxt 4 player + dashboard (`ScreenWerk/2026`)
+- **Legacy code:** `legacy/` -- Electron player (`ScreenWerk/Screenwerk-2018`), read-only
+- **CDN:** `https://files.screenwerk.ee` -- screen JSON configs + media files
+- **Entu API:** `https://entu.app/api/{account}/entity` -- accounts: `piletilevi`, `bilietai`
 - **Entu CMS:** `https://entu.app/piletilevi`, `https://entu.app/bilietai`
 
 ## Communication Rule
@@ -40,8 +40,8 @@ All persistent text output must carry the author agent's name in the format `(*S
 
 | Output type | Placement |
 |---|---|
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 | Code comment (where warranted) | At the end of the comment |
 | Git commit message | In the commit body |
 
@@ -49,7 +49,7 @@ All persistent text output must carry the author agent's name in the format `(*S
 
 - **Framework:** Nuxt 4 (v4.4.2) + TypeScript strict mode
 - **Styling:** TailwindCSS
-- **PWA:** `@vite-pwa/nuxt` (Workbox — NetworkFirst for configs, CacheFirst for media)
+- **PWA:** `@vite-pwa/nuxt` (Workbox -- NetworkFirst for configs, CacheFirst for media)
 - **Scheduling:** `cron-parser` v5 (`CronExpressionParser.parse()`)
 - **Node:** 22.x
 - **Package manager:** npm
@@ -71,9 +71,9 @@ The `ScreenConfig` type in `player/app/types.ts` is the contract between the pub
 
 ```
 ScreenConfig
-  └── Schedule       — cron-based activation, optional duration window
-        └── LayoutPlaylist  — positioned zone on screen (px or %)
-              └── PlaylistMedia  — image / video / audio / URL with validity window
+  └── Schedule       -- cron-based activation, optional duration window
+        └── LayoutPlaylist  -- positioned zone on screen (px or %)
+              └── PlaylistMedia  -- image / video / audio / URL with validity window
 ```
 
 ### Player Lifecycle

@@ -1,6 +1,6 @@
 # Spawning Agents into tmux Panes (*FR:Brunel*)
 
-> **⚠ DEPRECATED — 2026-04-24 (mitselek/ai-teams#60)**
+> **⚠ DEPRECATED -- 2026-04-24 (mitselek/ai-teams#60)**
 >
 > tmux-pane spawning has been retired as the framework default. Session-17
 > evidence (apex-research) showed a repeatable crash class on permission-dialog
@@ -39,10 +39,10 @@ Applies to any container team using the `spawn_member.sh` + tmux pattern.
 
 Throughout this guide:
 
-- `<team-name>` — the team name (e.g. `apex-research`, `polyphony-dev`)
-- `<agent-name>` — the agent to spawn (e.g. `champollion`, `codd`)
-- `<pane-id>` — the tmux pane ID (e.g. `%1`, `%3`)
-- `<session>` — the tmux session name (usually matches `<team-name>`)
+- `<team-name>` -- the team name (e.g. `apex-research`, `polyphony-dev`)
+- `<agent-name>` -- the agent to spawn (e.g. `champollion`, `codd`)
+- `<pane-id>` -- the tmux pane ID (e.g. `%1`, `%3`)
+- `<session>` -- the tmux session name (usually matches `<team-name>`)
 
 ## Pane Map
 
@@ -61,7 +61,7 @@ The team lead runs in the first pane. Agent panes are pre-created and labeled.
 
 ## Prerequisites
 
-1. Run `TeamCreate(team_name="<team-name>")` first — this creates `~/.claude/teams/<team-name>/config.json` with the `leadSessionId`
+1. Run `TeamCreate(team_name="<team-name>")` first -- this creates `~/.claude/teams/<team-name>/config.json` with the `leadSessionId`
 2. Verify:
 
        jq .leadSessionId ~/.claude/teams/<team-name>/config.json
@@ -110,7 +110,7 @@ Send a message asking the agent to write their scratchpad. Wait for confirmation
 
 ### 2. Exit via /exit
 
-Do NOT use `shutdown_request` — it destroys the tmux pane.
+Do NOT use `shutdown_request` -- it destroys the tmux pane.
 
     tmux send-keys -t <pane-id> "/exit" Enter
 
@@ -130,7 +130,7 @@ Verify pane survived:
 
 ### 5. Wait for intro message
 
-The pane shell survives `/exit` because `spawn_member.sh` uses `tmux send-keys` — the pane's original bash process is the parent and persists after claude exits.
+The pane shell survives `/exit` because `spawn_member.sh` uses `tmux send-keys` -- the pane's original bash process is the parent and persists after claude exits.
 
 ## Recreating a Lost Pane
 
@@ -144,8 +144,8 @@ Then spawn as normal.
 
 ## Critical Rules
 
-- Run `TeamCreate` BEFORE spawning — agents need `leadSessionId` to connect
-- Check `config.json` before spawning — if agent already registered, use `SendMessage` instead
+- Run `TeamCreate` BEFORE spawning -- agents need `leadSessionId` to connect
+- Check `config.json` before spawning -- if agent already registered, use `SendMessage` instead
 - Spawn one at a time and wait for the intro message before spawning the next
 - Use `/exit` for respawns, NEVER `shutdown_request` (which destroys panes)
-- Check for `name-2` duplicates in `config.json` after spawns — indicates stale registration
+- Check for `name-2` duplicates in `config.json` after spawns -- indicates stale registration

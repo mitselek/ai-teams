@@ -15,7 +15,7 @@
 # Pre-cleans any stale daemon before each launch (pkill), so re-running is
 # safe and a crashed prior run does not block a restart.
 #
-# NB: set -u (nounset) ONLY — NOT set -e. errexit inside a supervisor
+# NB: set -u (nounset) ONLY -- NOT set -e. errexit inside a supervisor
 # while-loop is a known footgun (the S52 'set +e' learning): a single
 # non-zero from the daemon or a `pkill` that matched nothing would kill the
 # supervisor itself, defeating the whole point. We trap exits explicitly
@@ -56,7 +56,7 @@ while true; do
     # from a host crash, a lingering session-launched instance, etc. This is
     # single-instance layer 2 (layer 1 = task MultipleInstances=IgnoreNew,
     # layer 3 = the daemon's own lock file). pkill matching nothing returns
-    # non-zero — masked with `|| true` so it never trips us up.
+    # non-zero -- masked with `|| true` so it never trips us up.
     pkill -f "fr-courier-daemon.py" 2>/dev/null || true
     sleep 1
 

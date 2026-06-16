@@ -1,4 +1,4 @@
-# Hub Onboarding Runbook — Adding a New Team to the Comms Relay
+# Hub Onboarding Runbook -- Adding a New Team to the Comms Relay
 
 Operator guide for onboarding a team to the inter-team comms hub. After completing these steps, the new team can send and receive messages through the hub relay.
 
@@ -22,7 +22,7 @@ Operator guide for onboarding a team to the inter-team comms hub. After completi
 
 Each team daemon connects outbound to the hub. The hub forwards messages between teams. mTLS ensures both sides verify identity via self-signed ECDSA P-256 certificates.
 
-**Key concept:** Team daemons connect TO the hub (outbound). The hub does NOT need to connect outbound to teams — it pushes messages back on the same inbound connection. This means firewalled teams only need to reach port 8443 on the hub host.
+**Key concept:** Team daemons connect TO the hub (outbound). The hub does NOT need to connect outbound to teams -- it pushes messages back on the same inbound connection. This means firewalled teams only need to reach port 8443 on the hub host.
 
 ## Step-by-step: Onboard Team `<NEW_TEAM>`
 
@@ -92,8 +92,8 @@ EOF
 ```
 
 Rules:
-- `default: "deny"` — ACL is always default-deny
-- `*@*` wildcards do NOT work — use team-scoped patterns: `*@comms-dev`
+- `default: "deny"` -- ACL is always default-deny
+- `*@*` wildcards do NOT work -- use team-scoped patterns: `*@comms-dev`
 - Add entries for each agent name that will send/receive messages
 - Include `*@relay` to allow hub-relayed traffic
 
@@ -124,8 +124,8 @@ process.on("SIGINT", () => d.stop().then(() => process.exit(0)));
 ```
 
 Key options:
-- `hubPeers: ["relay"]` — REQUIRED. Without this, the daemon rejects forwarded messages from the hub (the `from.team` won't match the TLS cert CN, which is `relay`)
-- `defaultPeer: "relay"` — routes messages to unknown teams via the hub instead of failing
+- `hubPeers: ["relay"]` -- REQUIRED. Without this, the daemon rejects forwarded messages from the hub (the `from.team` won't match the TLS cert CN, which is `relay`)
+- `defaultPeer: "relay"` -- routes messages to unknown teams via the hub instead of failing
 
 ### Step 5: Register the new team in the hub's peer config
 
@@ -171,14 +171,14 @@ npx tsx start-hub.ts > /tmp/hub.log 2>&1 &
 cat /tmp/hub.log
 ```
 
-If the new team is inbound-only, no hub restart is needed — just ensure the hub has the team's cert in `peers/`.
+If the new team is inbound-only, no hub restart is needed -- just ensure the hub has the team's cert in `peers/`.
 
 ### Step 8: Verify with a test message
 
 From the new team, send a test message to comms-dev:
 
 ```typescript
-// send-test.ts — adjust keysDir and port
+// send-test.ts -- adjust keysDir and port
 import * as tls from "node:tls";
 import * as fs from "node:fs";
 import * as crypto from "node:crypto";
@@ -240,7 +240,7 @@ If the new team cannot reach PROD-LLM port 8443 directly (e.g., Windows workstat
    ssh -i ~/.ssh/id_ed25519_apex -L 8443:localhost:8443 -N michelek@10.100.136.162
    ```
 2. In the team daemon, set the relay peer to `127.0.0.1:8443` (the local tunnel endpoint)
-3. The hub sees this as an inbound connection — no hub-side config change needed (just cert exchange)
+3. The hub sees this as an inbound connection -- no hub-side config change needed (just cert exchange)
 
 This is how `framework-research` connects from the local Windows workstation.
 

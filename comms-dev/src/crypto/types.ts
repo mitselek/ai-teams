@@ -19,7 +19,7 @@ export interface EncryptedPayload {
   tag: string;
   /** Additional authenticated data that was bound to this ciphertext (base64-encoded) */
   aad: string;
-  /** Crypto protocol version — for future migration */
+  /** Crypto protocol version -- for future migration */
   version: 1;
 }
 
@@ -39,7 +39,7 @@ export interface DerivedKeys {
  * Options for encrypt/decrypt operations.
  */
 export interface CryptoOptions {
-  /** Additional authenticated data — bound to the ciphertext but not encrypted.
+  /** Additional authenticated data -- bound to the ciphertext but not encrypted.
    *  Typically: message ID + sender identity, to prevent ciphertext transplant attacks. */
   aad?: string;
 }
@@ -96,7 +96,7 @@ export interface CryptoAPI {
 /**
  * E2E encrypted payload for hub-mode (v2).
  * Encrypted with a pairwise X25519-derived AES-256-GCM key.
- * The hub forwards this opaquely — it cannot decrypt.
+ * The hub forwards this opaquely -- it cannot decrypt.
  */
 export interface E2EPayload {
   /** AES-256-GCM initialization vector (12 bytes, base64) */
@@ -105,7 +105,7 @@ export interface E2EPayload {
   ciphertext: string;
   /** GCM authentication tag (16 bytes, base64) */
   tag: string;
-  /** Sender team name — receiver needs this to derive the pairwise key */
+  /** Sender team name -- receiver needs this to derive the pairwise key */
   sender_team: string;
   /** Crypto protocol version */
   version: 2;
@@ -113,11 +113,11 @@ export interface E2EPayload {
 
 /**
  * Key bundle containing all teams' public keys.
- * Provisioned out-of-band via Docker secrets — NOT via the hub.
+ * Provisioned out-of-band via Docker secrets -- NOT via the hub.
  * Path: /run/secrets/comms-key-bundle.json
  */
 export interface KeyBundle {
-  /** Monotonically increasing version — reject downgrades */
+  /** Monotonically increasing version -- reject downgrades */
   version: number;
   /** ISO 8601 timestamp of bundle generation */
   generated_at: string;
@@ -151,7 +151,7 @@ export interface CryptoAPIv2Options {
 
 /**
  * v2 crypto API for hub-mode E2E encryption and message signing.
- * Extends v1 CryptoAPI — v1 methods remain available for backward compatibility.
+ * Extends v1 CryptoAPI -- v1 methods remain available for backward compatibility.
  */
 export interface CryptoAPIv2 extends CryptoAPI {
   /**

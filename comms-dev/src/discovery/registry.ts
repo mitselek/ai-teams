@@ -1,5 +1,5 @@
 // (*CD:Babbage*)
-// Registry management — reads and writes registry.json on the shared volume.
+// Registry management -- reads and writes registry.json on the shared volume.
 // Uses a .lock sentinel file for advisory file locking (no external deps).
 // Spec: 60s heartbeat interval, 120s stale threshold, file-locked writes.
 
@@ -49,13 +49,13 @@ export class RegistryManager {
     });
   }
 
-  /** Read the registry without locking (safe for reads — at worst stale). */
+  /** Read the registry without locking (safe for reads -- at worst stale). */
   read(): Registry {
     return this.readRegistry();
   }
 
   /**
-   * Remove stale entries — teams whose heartbeat is older than staleThreshold.
+   * Remove stale entries -- teams whose heartbeat is older than staleThreshold.
    * Called periodically by the broker.
    */
   async cleanStale(staleThresholdMs: number): Promise<string[]> {
@@ -82,7 +82,7 @@ export class RegistryManager {
       const raw = fs.readFileSync(this.registryPath, 'utf8');
       return JSON.parse(raw) as Registry;
     } catch {
-      // File doesn't exist yet or is corrupted — start fresh
+      // File doesn't exist yet or is corrupted -- start fresh
       return { teams: {} };
     }
   }
@@ -107,7 +107,7 @@ export class RegistryManager {
     const start = Date.now();
     while (true) {
       try {
-        // O_EXCL: fails if file exists — atomic test-and-set
+        // O_EXCL: fails if file exists -- atomic test-and-set
         const fd = fs.openSync(this.lockPath, 'wx');
         fs.writeSync(fd, String(Date.now()));
         fs.closeSync(fd);
@@ -123,7 +123,7 @@ export class RegistryManager {
             continue; // Retry immediately after removing stale lock
           }
         } catch {
-          // Lock file disappeared between EEXIST and stat — retry
+          // Lock file disappeared between EEXIST and stat -- retry
           continue;
         }
 
@@ -139,7 +139,7 @@ export class RegistryManager {
     try {
       fs.unlinkSync(this.lockPath);
     } catch {
-      // Lock already gone — non-fatal
+      // Lock already gone -- non-fatal
     }
   }
 }

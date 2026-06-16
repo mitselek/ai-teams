@@ -1,34 +1,34 @@
 // (*CD:Kerckhoffs*)
 // RED tests for story/28: Fastify hub with mTLS authentication.
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — valid cert:
+//   AC1 -- valid cert:
 //     Given: hub running with 'team-a' cert pre-registered
 //     When:  client connects presenting 'team-a' cert
 //     Then:  HTTP 200; response body contains peerTeam: 'team-a'
 //
-//   AC2 — unregistered cert:
+//   AC2 -- unregistered cert:
 //     Given: hub running; 'team-b' cert is CA-signed but NOT in registry
 //     When:  client connects presenting 'team-b' cert
 //     Then:  HTTP 403
 //
-//   AC3 — no client cert:
+//   AC3 -- no client cert:
 //     Given: hub running with requestCert: true, rejectUnauthorized: true
 //     When:  client connects without any client certificate
 //     Then:  TLS handshake rejected (connection error, no HTTP response)
 //
-//   AC4 — hot-reload via POST /api/register:
+//   AC4 -- hot-reload via POST /api/register:
 //     Given: hub running with only 'team-a' registered; 'team-c' NOT registered
 //     When:  team-a POSTs { team: 'team-c', cert: <PEM> } to POST /api/register
 //     Then:  next connection from 'team-c' returns 200 (no hub restart)
 //
-//   AC5 — per-peer rate limiting:
+//   AC5 -- per-peer rate limiting:
 //     Given: hub running with rate limit { max: 10, timeWindow: 60_000 }
 //     When:  'team-a' sends 15 rapid requests
 //     Then:  first 10 return 200; remaining 5 return 429
 //
-//   AC6 — Pino structured logging includes peerTeam:
+//   AC6 -- Pino structured logging includes peerTeam:
 //     Given: hub with Pino logger writing to captured stream
 //     When:  'team-a' makes a request
 //     Then:  at least one log line is valid JSON with field peerTeam: 'team-a'
@@ -56,7 +56,7 @@ const { createHub } = (await import('./server.js')) as any;
 
 export interface HubOptions {
   tls: {
-    ca: string; // CA cert PEM — used to verify client certs
+    ca: string; // CA cert PEM -- used to verify client certs
     cert: string; // Hub's TLS cert PEM
     key: string; // Hub's TLS key PEM
   };
@@ -133,7 +133,7 @@ function httpsGet(
         method: 'GET',
         ca,
         // Hub cert CN=hub has no SAN for 127.0.0.1; CA verification (above) is
-        // the meaningful check here — skip hostname validation.
+        // the meaningful check here -- skip hostname validation.
         checkServerIdentity: () => undefined,
         ...(clientCert ?? {}),
       },
@@ -195,7 +195,7 @@ function httpsPost(
 let tmpDir: string;
 let hubPort: number;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let hub: any; // FastifyInstance — typed as any until server.ts exports the type
+let hub: any; // FastifyInstance -- typed as any until server.ts exports the type
 
 let caCrt: string;
 let hubTeamACert: { cert: string; key: string };
@@ -235,7 +235,7 @@ beforeAll(async () => {
 
   hubPort = await getFreePort();
 
-  // RED: createHub is not implemented — this will throw "createHub is not a function"
+  // RED: createHub is not implemented -- this will throw "createHub is not a function"
   hub = createHub({
     tls: {
       ca: caCrt,
@@ -245,7 +245,7 @@ beforeAll(async () => {
     peers: {
       'team-a': hubTeamACert.cert,
       // team-b is intentionally NOT pre-registered (AC2)
-      // team-c is intentionally NOT pre-registered (AC4 — registered at runtime)
+      // team-c is intentionally NOT pre-registered (AC4 -- registered at runtime)
     },
     rateLimit: { max: 10, timeWindow: 60_000 },
   });
@@ -258,9 +258,9 @@ afterAll(async () => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — Valid registered cert ────────────────────────────────────────────────
+// ── AC1 -- Valid registered cert ────────────────────────────────────────────────
 
-describe('AC1 — valid registered cert', () => {
+describe('AC1 -- valid registered cert', () => {
   it('given team-a registered, when team-a connects, then HTTP 200', async () => {
     const res = await httpsGet(hubPort, '/api/status', caCrt, hubTeamACert);
     expect(res.status).toBe(200);
@@ -273,18 +273,18 @@ describe('AC1 — valid registered cert', () => {
   });
 });
 
-// ── AC2 — Unregistered cert ────────────────────────────────────────────────────
+// ── AC2 -- Unregistered cert ────────────────────────────────────────────────────
 
-describe('AC2 — unregistered CA-signed cert', () => {
+describe('AC2 -- unregistered CA-signed cert', () => {
   it('given team-b cert not in registry, when team-b connects, then HTTP 403', async () => {
     const res = await httpsGet(hubPort, '/api/status', caCrt, teamBCert);
     expect(res.status).toBe(403);
   });
 });
 
-// ── AC3 — No client cert ───────────────────────────────────────────────────────
+// ── AC3 -- No client cert ───────────────────────────────────────────────────────
 
-describe('AC3 — no client certificate', () => {
+describe('AC3 -- no client certificate', () => {
   it('given hub requires client cert, when client presents no cert, then connection rejected', async () => {
     // Hub uses requestCert: true, rejectUnauthorized: true → TLS handshake fails.
     // httpsGet rejects the returned Promise → expect it to throw.
@@ -292,9 +292,9 @@ describe('AC3 — no client certificate', () => {
   });
 });
 
-// ── AC4 — Hot-reload via POST /api/register ────────────────────────────────────
+// ── AC4 -- Hot-reload via POST /api/register ────────────────────────────────────
 
-describe('AC4 — hot-reload: POST /api/register', () => {
+describe('AC4 -- hot-reload: POST /api/register', () => {
   it('given team-c not registered, when team-c connects, then 403 (baseline)', async () => {
     const res = await httpsGet(hubPort, '/api/status', caCrt, teamCCert);
     expect(res.status).toBe(403);
@@ -320,9 +320,9 @@ describe('AC4 — hot-reload: POST /api/register', () => {
   });
 });
 
-// ── AC5 — Per-peer rate limiting ───────────────────────────────────────────────
+// ── AC5 -- Per-peer rate limiting ───────────────────────────────────────────────
 
-describe('AC5 — per-peer rate limiting (max 10 / 60s window)', () => {
+describe('AC5 -- per-peer rate limiting (max 10 / 60s window)', () => {
   it(
     'given rate limit max=10, when team-a sends 15 rapid requests in the same window, ' +
       'then exactly 10 return 200 and exactly 5 return 429',
@@ -341,7 +341,7 @@ describe('AC5 — per-peer rate limiting (max 10 / 60s window)', () => {
       });
       await rlHub.listen({ port: rlPort, host: '127.0.0.1' });
 
-      // 15 concurrent requests — all land inside the same rate-limit window.
+      // 15 concurrent requests -- all land inside the same rate-limit window.
       const results = await Promise.all(
         Array.from({ length: 15 }, () => httpsGet(rlPort, '/api/status', caCrt, hubTeamACert)),
       );
@@ -356,9 +356,9 @@ describe('AC5 — per-peer rate limiting (max 10 / 60s window)', () => {
   );
 });
 
-// ── AC6 — Pino structured logging includes peerTeam ───────────────────────────
+// ── AC6 -- Pino structured logging includes peerTeam ───────────────────────────
 
-describe('AC6 — Pino structured logging', () => {
+describe('AC6 -- Pino structured logging', () => {
   it('log lines are valid JSON with peerTeam field when team-a makes a request', async () => {
     // Restart hub with a captured log stream.
     // This sub-suite starts its own hub instance with logger pointing to a buffer.

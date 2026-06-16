@@ -1,5 +1,5 @@
 ---
-title: Cloudflare Pilot — S35 Substrate State + S36 Decisions & Preparations + S37 Plan
+title: Cloudflare Pilot -- S35 Substrate State + S36 Decisions & Preparations + S37 Plan
 date: 2026-05-26
 author: aen
 status: status-report
@@ -7,13 +7,13 @@ scope: Round-1 op-step-1 (path-rule bypass on /webhooks) execution-ready; downst
 audience: PO (Mihkel) + Hopper (executor) + Brunel (substrate validator) + Cal (knowledge-layer)
 ---
 
-# Cloudflare Pilot — S35 Substrate State + S36 Decisions & Preparations + S37 Plan
+# Cloudflare Pilot -- S35 Substrate State + S36 Decisions & Preparations + S37 Plan
 
 ## 1. CF substrate changes in previous session (S35, 2026-05-21 → 2026-05-26)
 
 ### 1.1 Deployment substrate established
 
-Executed by Aen-direct per S35 DECISION (team-lead.md:51 — "Aen-direct execution sanctioned by PO for substrate operations Hopper couldn't reach via SSH paths"). Source: cloned CF managed-agents template at `~/Documents/github/.mmp/claude-managed-agents/`.
+Executed by Aen-direct per S35 DECISION (team-lead.md:51 -- "Aen-direct execution sanctioned by PO for substrate operations Hopper couldn't reach via SSH paths"). Source: cloned CF managed-agents template at `~/Documents/github/.mmp/claude-managed-agents/`.
 
 - **Worker:** `fr-cma-pilot` live at `https://fr-cma-pilot.evree.workers.dev/`
 - **CF account:** EVR (`8f150f98013eec8cae0a9db20a010c49`)
@@ -24,10 +24,10 @@ Executed by Aen-direct per S35 DECISION (team-lead.md:51 — "Aen-direct executi
 - **KV × 2:** `SECRETS` (id `cf67fa1020...`) + `EGRESS_POLICIES` (id `9780ffa017...`)
 - **D1 × 1:** `fr-cma-pilot-db`, id `5d28cbc6-5b35-4479-9650-4d793ccbca44`
 - **R2 × 1:** `fr-cma-pilot-snapshots`
-- **DO classes declared in `wrangler.jsonc`:** `Sandbox`, `IsolateRunner` — both v1 migration as `new_sqlite_classes`
+- **DO classes declared in `wrangler.jsonc`:** `Sandbox`, `IsolateRunner` -- both v1 migration as `new_sqlite_classes`
 - **Container DO block:** **commented out** in `wrangler.jsonc:80-96` ("DISABLED FOR ROUND 0 (Isolate-only smoke test). MicroVM backend requires Docker for Dockerfile build at deploy time; not installed locally. Re-enable when (a) Docker installed locally, OR (b) deployed via Workers Builds.")
 - **Cron trigger:** `"0 4 * * *"`
-- **VPC bindings:** commented placeholder only — no actual VPC service bound
+- **VPC bindings:** commented placeholder only -- no actual VPC service bound
 
 ### 1.3 Worker-level secrets uploaded (4)
 
@@ -36,7 +36,7 @@ Per CF template `docs/securing-access.md:150-164` checklist:
 | Secret | Purpose | Notes |
 |---|---|---|
 | `WEBHOOK_SECRET` | Anthropic-inbound HMAC verification (Standard Webhooks spec) | `whsec_<base64>` format |
-| `ANTHROPIC_API_KEY` | Outbound to api.anthropic.com (sessions.retrieve etc.) | **OAuth subscription token (`sk-ant-oat...`) per S35 DECISION** — caveats: scope coverage, header format, audit attribution |
+| `ANTHROPIC_API_KEY` | Outbound to api.anthropic.com (sessions.retrieve etc.) | **OAuth subscription token (`sk-ant-oat...`) per S35 DECISION** -- caveats: scope coverage, header format, audit attribution |
 | `ANTHROPIC_ENVIRONMENT_KEY` | Control-plane work.poll/ack/heartbeat | sk-ant-oat01-… |
 | (likely) `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` | R2 snapshot presigning per `wrangler.jsonc:139-142` | Counted as the 4th |
 
@@ -56,7 +56,7 @@ S35 closed at "Round 0 substrate validated end-to-end; ready for Round 1 sandbox
 
 ---
 
-## 2. S36 (this session) — Decisions and preparations
+## 2. S36 (this session) -- Decisions and preparations
 
 ### 2.1 PO decisions ratified (chronological)
 
@@ -66,16 +66,16 @@ S35 closed at "Round 0 substrate validated end-to-end; ready for Round 1 sandbox
 | D2 | 14:00 | EVR Access bypass approach = **path-rule on `/webhooks`** | Minimum-scope exception; rest of Worker stays Access-gated |
 | D3 | 14:36 | Substrate-class = **Path 1 Isolate-only Round 1** (Brunel-recommended) | MicroVM defers to Round 2. No Docker, no v2 migration, no Workers Builds setup. Already-deployed substrate is exec-ready |
 | D4 | 14:36 | Hopper sanctioned to **execute bypass + acquire CF auth** | Hopper becomes CF substrate operator going forward; extends S35 Aen-direct precedent |
-| D5 | 14:40 (committed) | **CF API Token provisioning** — 5 scopes, EVR-account-bounded, 24h TTL | **Pending delivery — only remaining blocker for op-step-1 execution** |
+| D5 | 14:40 (committed) | **CF API Token provisioning** -- 5 scopes, EVR-account-bounded, 24h TTL | **Pending delivery -- only remaining blocker for op-step-1 execution** |
 | D6 | 14:40 | **Tier-D sanction "Approve as drafted"** on Hopper's Deliverable 2 (NEW Access App with `destinations:[]` + bypass policy) | Valid (14:43 re-sanction was against wrong-correction; moot per Brunel substrate-truth-evidence cross-read at 14:42) |
 | D7 | DEFERRED | Finn-Q1 credential shape (single-OAuth-token vs three-credential split per reference impl) | Tracked as task #10; load-bearing post-W4 (sessions.create scope is now required) |
 | D8 | 14:43 | Pilot-A creation path = **PO via CF dashboard** (not service token, not deferred) | 5-click path post-bypass: Agents → New Agent → Backend: Isolate → name: pilot-a → model: claude-sonnet-4-6 → tools: [] |
 
 ### 2.2 Substrate-truth-evidence catches reshaping Round 1 design
 
-Five substantive findings that change Round 1's implementation shape (NOT CF-substrate mutations — design corrections):
+Five substantive findings that change Round 1's implementation shape (NOT CF-substrate mutations -- design corrections):
 
-**Catch 1 — CF Access bypass canonical pattern** (Brunel substrate-truth-evidence cross-read against canonical CF API ref at 14:42):
+**Catch 1 -- CF Access bypass canonical pattern** (Brunel substrate-truth-evidence cross-read against canonical CF API ref at 14:42):
 
 The CF template's `~/Documents/github/.mmp/claude-managed-agents/docs/securing-access.md:60-68` ("Add a Bypass policy under the same application covering `/webhooks`") is **dashboard-UX-focused phrasing that does not map to API-canonical mechanism**. CF Access Policies API has NO path-scope fields. Path-scope lives on the Access Application's `destinations[]`.
 
@@ -85,19 +85,19 @@ Canonical CF API pattern for path-rule bypass:
 - Inline bypass policy `{decision:"bypass", include:[{everyone:{}}], precedence:1}` on that new app
 - More-specific-URL-wins precedence ensures the new app overrides the existing EVR org-wide Access app on `/webhooks`
 
-Policy-on-existing-app would **over-broaden the bypass** to the App's full destinations (`*.workers.dev` or `*.evree.workers.dev`) — anonymous access leaking to `/`, `/api/*`, `/ws/terminal`. Substrate-level over-broadening incident prevented by the substrate-truth cross-read.
+Policy-on-existing-app would **over-broaden the bypass** to the App's full destinations (`*.workers.dev` or `*.evree.workers.dev`) -- anonymous access leaking to `/`, `/api/*`, `/ws/terminal`. Substrate-level over-broadening incident prevented by the substrate-truth cross-read.
 
-**Catch 2 — Anthropic connectivity is outbound-only** (Finn `claude-api` skill catch at 15:31):
+**Catch 2 -- Anthropic connectivity is outbound-only** (Finn `claude-api` skill catch at 15:31):
 
-> "Connectivity is outbound-only: your worker long-polls Anthropic's work queue; Anthropic never dials into your network." — `shared/managed-agents-self-hosted-sandboxes.md`
+> "Connectivity is outbound-only: your worker long-polls Anthropic's work queue; Anthropic never dials into your network." -- `shared/managed-agents-self-hosted-sandboxes.md`
 
 There is no inbound-event URL on Anthropic's side that AgentMailbox can dial. Inverted-trigger framing in prior design was a mismodel on connectivity-model grounds.
 
-**Catch 3 — Wake mechanism = `client.beta.sessions.create()` from mailbox handler:**
+**Catch 3 -- Wake mechanism = `client.beta.sessions.create()` from mailbox handler:**
 
 The actual wake path:
 
-1. AgentMailbox.append(envelope) — SQLite write
+1. AgentMailbox.append(envelope) -- SQLite write
 2. **AgentMailbox handler ALSO calls** `client.beta.sessions.create(agent=recipient_agent_id, environment_id, ...)` via Anthropic SDK in same handler invocation
 3. Anthropic enqueues work for the new session
 4. Our worker long-polls `environments.work.poller()` continuously
@@ -107,7 +107,7 @@ The actual wake path:
 
 Resolves Hopper Task #11. W4 = W1-shape (sessions.create) ratified; W2 (work-enqueue) + W3 (polling-only-blocker) falsified.
 
-**Catch 4 — Identity is a three-layer chain** (Brunel Gate B2 at 14:33):
+**Catch 4 -- Identity is a three-layer chain** (Brunel Gate B2 at 14:33):
 
 ```
 agent-name (user-facing)
@@ -121,7 +121,7 @@ DO ID (per Sandbox/IsolateRunner)     ← per-SESSION, ephemeral
 
 Existing DO classes (`Sandbox`, `IsolateRunner`) are **per-session, ephemeral**. For per-agent durable mailbox: **AgentMailbox must be a separate DO class**, keyed `idFromName(agent_id)` for durability across session boundaries.
 
-**Catch 5 — Secrets-injection mechanism** (Brunel Gate B3):
+**Catch 5 -- Secrets-injection mechanism** (Brunel Gate B3):
 
 Per `docs/applying-egress-policies.md`: agent-side secrets are injected via **egress-policy `header-injection` rules from KV `SECRETS` namespace**, NOT via secret_bindings array on the sandbox. Sandbox-edge interceptor injects headers on outbound requests matching the policy target; agent never sees the secret value.
 
@@ -138,13 +138,13 @@ Per `docs/applying-egress-policies.md`: agent-side secrets are injected via **eg
 | `docs/wake-mechanism-w4-finding-2026-05-26.md` | Finn | ~120 lines | Resolves Task #11; SDK call shape; always-on `EnvironmentWorker.run()` long-poll vs webhook-driven `EnvironmentWorker.run_one()` worker shapes; resume-vs-create-new tradeoff |
 | `docs/round-1-anthropic-platform-checklist-2026-05-26.md` | Finn | ~210 lines, 6 sections | §1 viability reconciliation × gap-classes; §2 Console one-time setup; §3 four credential smoke-tests; §4 Round-1 anti-patterns; §5 8-check exec-readiness gate; §6 four open questions |
 
-`designs/new/cloudflare-pilot/substrate.md` was **deliberately NOT amended** — queued post-Round-1 per Brunel; substrate.md is the strategic-positioning brief (which holds); upstream `claude-managed-agents/docs/` is the substrate-mechanics reference for Round 1.
+`designs/new/cloudflare-pilot/substrate.md` was **deliberately NOT amended** -- queued post-Round-1 per Brunel; substrate.md is the strategic-positioning brief (which holds); upstream `claude-managed-agents/docs/` is the substrate-mechanics reference for Round 1.
 
-### 2.4 Hopper bypass prep package — 4 deliverables locked
+### 2.4 Hopper bypass prep package -- 4 deliverables locked
 
-**Deliverable 1 — Credential acquisition shape** (see §3 below for full detail).
+**Deliverable 1 -- Credential acquisition shape** (see §3 below for full detail).
 
-**Deliverable 2 — Exact bypass command, Tier-D, PO 14:40 verbatim sanction valid:**
+**Deliverable 2 -- Exact bypass command, Tier-D, PO 14:40 verbatim sanction valid:**
 
 ```bash
 curl -sS -X POST \
@@ -166,15 +166,15 @@ curl -sS -X POST \
   }'
 ```
 
-**Deliverable 3 — Three post-bypass verification probes (all Tier-R):**
+**Deliverable 3 -- Three post-bypass verification probes (all Tier-R):**
 
 | # | Method/URL | Pass criterion |
 |---|---|---|
 | Probe 1 | `POST /webhooks` (unsigned, JSON body) | HTTP **401 from Worker** (not 302 from Access); `Server: cloudflare`; no `cf-access-*` headers; body = webhook-signature error from `src/webhooks.ts:74-126` |
-| Probe 2 | `GET /` (root) | HTTP **302 to IdP** OR 401 from Access — root still gated (positive control for path-scoping) |
-| Probe 3 | `GET /webhooks` | Worker response (likely 404/405 from Worker — bypass is path-scoped, not method-scoped) |
+| Probe 2 | `GET /` (root) | HTTP **302 to IdP** OR 401 from Access -- root still gated (positive control for path-scoping) |
+| Probe 3 | `GET /webhooks` | Worker response (likely 404/405 from Worker -- bypass is path-scoped, not method-scoped) |
 
-**Deliverable 4 — Layer-3 substrate-truth read batch (all Tier-R, sanctioned):**
+**Deliverable 4 -- Layer-3 substrate-truth read batch (all Tier-R, sanctioned):**
 
 ```bash
 # Pre-flight
@@ -219,7 +219,7 @@ Reasoning (Hopper Deliverable 1):
 
 ### 3.3 Account binding
 
-**Account Resources: Include → Specific account → EVR (`8f150f98013eec8cae0a9db20a010c49`)** — token cannot reach any other CF account.
+**Account Resources: Include → Specific account → EVR (`8f150f98013eec8cae0a9db20a010c49`)** -- token cannot reach any other CF account.
 
 ### 3.4 TTL recommendation: 24h
 
@@ -237,7 +237,7 @@ Single-dispatch tool; should expire shortly after use. If S37 work extends beyon
 
 ### 3.6 Delivery to Hopper
 
-Preferred: **secure share-link** (1Password / equivalent). Acceptable fallback: **chat-paste** — Hopper sets `$env:CLOUDFLARE_API_TOKEN` in current PowerShell session, never persists to disk. Optional: `$env:CLOUDFLARE_ACCOUNT_ID=8f150f98013eec8cae0a9db20a010c49` so `--account-id` doesn't have to be passed on every call.
+Preferred: **secure share-link** (1Password / equivalent). Acceptable fallback: **chat-paste** -- Hopper sets `$env:CLOUDFLARE_API_TOKEN` in current PowerShell session, never persists to disk. Optional: `$env:CLOUDFLARE_ACCOUNT_ID=8f150f98013eec8cae0a9db20a010c49` so `--account-id` doesn't have to be passed on every call.
 
 ---
 
@@ -247,16 +247,16 @@ Preferred: **secure share-link** (1Password / equivalent). Acceptable fallback: 
 
 | Step | Action | Tier | Owner | Time |
 |---|---|---|---|---|
-| 1 | Hopper sets `$env:CLOUDFLARE_API_TOKEN` + `$env:CLOUDFLARE_ACCOUNT_ID` in PowerShell | — | Hopper | ~10s |
-| 2 | Pre-flight `curl /user/tokens/verify` — confirms token + scopes | R | Hopper | ~5s |
-| 3 | `wrangler --version` + `wrangler kv --help` — substrate-truth-anchor CLI syntax | R | Hopper | ~5s |
+| 1 | Hopper sets `$env:CLOUDFLARE_API_TOKEN` + `$env:CLOUDFLARE_ACCOUNT_ID` in PowerShell | -- | Hopper | ~10s |
+| 2 | Pre-flight `curl /user/tokens/verify` -- confirms token + scopes | R | Hopper | ~5s |
+| 3 | `wrangler --version` + `wrangler kv --help` -- substrate-truth-anchor CLI syntax | R | Hopper | ~5s |
 | 4 | Deliverable 4 L3 batch (5 wrangler reads + 1 Access apps `curl`) | R | Hopper | ~30s |
-| 5 | **STOP at surface-back gate.** Hopper relays to Aen: L3 outputs + EVR Access App UUID + destinations[] inventory + ordering-conflict assessment | — | Hopper → Aen | — |
-| 6 | Aen relays to PO for final clearance via single AskUserQuestion | — | Aen → PO | ~1 min |
-| 7 | Hopper executes Tier-D bypass POST (Deliverable 2) — PO 14:40 sanction valid | D | Hopper | ~5s |
-| 8 | CF propagation wait | — | — | 30-60s |
+| 5 | **STOP at surface-back gate.** Hopper relays to Aen: L3 outputs + EVR Access App UUID + destinations[] inventory + ordering-conflict assessment | -- | Hopper → Aen | -- |
+| 6 | Aen relays to PO for final clearance via single AskUserQuestion | -- | Aen → PO | ~1 min |
+| 7 | Hopper executes Tier-D bypass POST (Deliverable 2) -- PO 14:40 sanction valid | D | Hopper | ~5s |
+| 8 | CF propagation wait | -- | -- | 30-60s |
 | 9 | Tier-R three-probe verification batch (Deliverable 3) | R | Hopper | ~30s |
-| 10 | Hopper drafts ops-log entry — 8-field audit declaration with sanction quote verbatim + L3 substrate-truth read excerpts + probe outputs verbatim + Round-0-framing-as-confirmed + Brunel-paired-read attribution | — | Hopper | ~5 min |
+| 10 | Hopper drafts ops-log entry -- 8-field audit declaration with sanction quote verbatim + L3 substrate-truth read excerpts + probe outputs verbatim + Round-0-framing-as-confirmed + Brunel-paired-read attribution | -- | Hopper | ~5 min |
 
 **End state at step 10:** `/webhooks` reachable from public Internet for Anthropic webhook delivery; rest of Worker still Access-gated; substrate state confirmed via L3 reads; full audit trail on disk. **Round-1 op-step-1 = COMPLETE.**
 
@@ -271,27 +271,27 @@ Preferred: **secure share-link** (1Password / equivalent). Acceptable fallback: 
 | op-step-6 | Observe end-to-end: Anthropic webhook → Worker `/webhooks` route → `handleWebhook` → IsolateRunner.start() → first session response | Hopper monitors | op-step-5 |
 | op-step-7 | Repeat op-step-3 / op-step-5 for Pilot-B (second pilot agent) | PO | op-step-6 verified |
 | op-step-8 | Brunel + Hopper deploy **AgentMailbox DO class** + Worker route per Herald comms.md v1.4 § §1.1 (Worker scaffold; new DO migration) | Brunel design / Hopper deploy | op-step-7 + token still valid OR new token |
-| op-step-9 | First Pilot-A → Pilot-B message via `send_message` custom tool — validates the comms primitive end-to-end | Hopper monitors | op-step-8 |
+| op-step-9 | First Pilot-A → Pilot-B message via `send_message` custom tool -- validates the comms primitive end-to-end | Hopper monitors | op-step-8 |
 | op-step-10 | Round 1 success-criteria checks (per `designs/new/cloudflare-pilot/README.md` §Success criteria): round-trip succeeds, sleep-resume persists, Q2 termination-respawn preserves storage, envelope round-trips cleanly, latency vs FR baseline | Hopper + Brunel | op-step-9 |
 
 ### 4.3 Realistic S37 scope-for-tonight if token delivered
 
 **High-confidence achievable:**
 
-- op-step-1 (bypass + verification) — bounded, well-prepared, ~10 min
-- op-step-3 (Pilot-A creation via dashboard) — PO 5-click action; can happen in same window
-- op-step-4 (Hopper verifies via D1 read) — bounded Tier-R follow-on
+- op-step-1 (bypass + verification) -- bounded, well-prepared, ~10 min
+- op-step-3 (Pilot-A creation via dashboard) -- PO 5-click action; can happen in same window
+- op-step-4 (Hopper verifies via D1 read) -- bounded Tier-R follow-on
 
 **Conditional on op-step-2 resolution:**
 
-- op-step-5 (trigger first session) — requires credential decision first
-- op-step-6 (observe end-to-end first session) — natural follow-on if session triggers
+- op-step-5 (trigger first session) -- requires credential decision first
+- op-step-6 (observe end-to-end first session) -- natural follow-on if session triggers
 
 **Likely S38+ scope:**
 
-- op-step-7 (Pilot-B creation) — second agent + AgentMailbox prep
-- op-step-8 (AgentMailbox DO + Worker route deployment) — design-side work; Brunel scaffold needed; non-trivial Worker code change + new DO migration
-- op-step-9 (first inter-agent message) — full Round-1 round-trip
+- op-step-7 (Pilot-B creation) -- second agent + AgentMailbox prep
+- op-step-8 (AgentMailbox DO + Worker route deployment) -- design-side work; Brunel scaffold needed; non-trivial Worker code change + new DO migration
+- op-step-9 (first inter-agent message) -- full Round-1 round-trip
 - op-step-10 (Round-1 success-criteria validation)
 
 ### 4.4 Open PO-pending items for S37
@@ -305,7 +305,7 @@ Preferred: **secure share-link** (1Password / equivalent). Acceptable fallback: 
 
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| Token has wrong scopes — Hopper hits 403 on bypass | LOW | Re-issue token; ~1 min | Deliverable 1 lists exact scopes verbatim |
+| Token has wrong scopes -- Hopper hits 403 on bypass | LOW | Re-issue token; ~1 min | Deliverable 1 lists exact scopes verbatim |
 | EVR Access App has destinations matching `.../webhooks` already → ordering conflict | LOW | Step 5 STOP-gate catches this; surface to PO | Brunel jq refinement on `GET /access/apps` |
 | Bypass executes but `/webhooks` POST still 403s from Access | LOW | Propagation < 60s usually; re-probe | Step 8 propagation wait |
 | OAuth subscription token (S35 ANTHROPIC_API_KEY) lacks `sessions.create` scope | MEDIUM-HIGH | Blocks op-step-5; needs Task #10 resolution + secret refresh | Surface as part of credential-shape decision; have refresh path ready |
@@ -329,11 +329,11 @@ This session also produced substantial wiki + memory output beyond CF-pilot oper
 
 | # | Status | Owner | Subject |
 |---|---|---|---|
-| #1 | in_progress | Hopper | Round-1 op-step-1 path-rule bypass + Round-0 verification — **awaiting CF API token** |
-| #5 | in_progress | Cal | Protocol-A queue absorption — 8 entries shipped; remaining queue 10+ candidates |
+| #1 | in_progress | Hopper | Round-1 op-step-1 path-rule bypass + Round-0 verification -- **awaiting CF API token** |
+| #5 | in_progress | Cal | Protocol-A queue absorption -- 8 entries shipped; remaining queue 10+ candidates |
 | #9 | in_progress (standby) | Monte | Manager-team architecture watch (dormant unless PO surfaces) |
 | #10 | pending | PO | Anthropic credential shape decision (single-OAuth vs three-credential split) |
-| #11 | pending → closeable | Hopper | Step-5 wake mechanism — RESOLVED by Finn W4 brief; flip on absorb |
+| #11 | pending → closeable | Hopper | Step-5 wake mechanism -- RESOLVED by Finn W4 brief; flip on absorb |
 
 Tasks #2, #3, #4, #6 = completed. Tasks #7, #8 = pending (standby, no surface this session).
 

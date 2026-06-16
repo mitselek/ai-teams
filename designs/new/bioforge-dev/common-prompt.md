@@ -1,9 +1,9 @@
-# BioForge Dev — Common Standards
+# BioForge Dev -- Common Standards
 
 ## Team
 
 - **Team:** bioforge-dev
-- **Mission:** Build BioForge — a terminal-based TypeScript ecosystem simulation with four species evolving on a torus under a hard energy-conservation invariant
+- **Mission:** Build BioForge -- a terminal-based TypeScript ecosystem simulation with four species evolving on a torus under a hard energy-conservation invariant
 - **Deployment:** Local development
 - **Pipeline tier:** Cathedral-lite (team-lead as navigator/architect, single XP triple)
 
@@ -50,14 +50,14 @@ All persistent text output must carry the author agent's name in the format `(*B
 
 | Output type | Placement |
 |---|---|
-| `.md` file — short block | On a new line directly below the block |
-| `.md` file — whole section by one agent | Next to the section heading |
+| `.md` file -- short block | On a new line directly below the block |
+| `.md` file -- whole section by one agent | Next to the section heading |
 | Code comment (where warranted) | At the end of the comment |
 | Git commit message | In the commit body |
 
 ## Stack
 
-- **Language:** TypeScript 5 (strict mode — `strict: true`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`)
+- **Language:** TypeScript 5 (strict mode -- `strict: true`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`)
 - **Runtime:** Node 22+
 - **Framework:** None (pure Node + blessed for UI)
 - **Tests:** Vitest 2.x
@@ -68,7 +68,7 @@ All persistent text output must carry the author agent's name in the format `(*B
 
 ### Type Discipline
 
-- No `any` — anywhere
+- No `any` -- anywhere
 - No `!` non-null assertions
 - No `@ts-ignore`
 - `@ts-expect-error` only with a comment explaining why and how to remove it
@@ -131,7 +131,7 @@ Humboldt assigns AC to Merian
 ```markdown
 ## Test Spec
 - Story: <story-id>
-- Test case: <N of M> — <one-line description>
+- Test case: <N of M> -- <one-line description>
 - Preconditions: <what must be true before this test>
 - Expected behavior: <what the test asserts>
 - Constraints: <boundaries>
@@ -182,7 +182,7 @@ Humboldt assigns AC to Merian
 ```markdown
 ## Cycle Complete
 - Story: <story-id>
-- Test case: <N of M> — DONE
+- Test case: <N of M> -- DONE
 - Total cycles: <how many GREEN→PURPLE round-trips>
 - Final commit: <sha>
 - Quality notes: <structural observations>
@@ -203,30 +203,30 @@ Within the pipeline, agents hold the write-lock sequentially. No merge conflicts
 
 ## Quality Gates
 
-### Layer 1 — Phase gates
+### Layer 1 -- Phase gates
 
 Per `docs/WORKFLOW.md` §4. Enforced by the performing agent, verified by the next.
 
-### Layer 2 — Pre-commit (lefthook)
+### Layer 2 -- Pre-commit (lefthook)
 
-1. `tsc --noEmit` — strict config, zero errors
-2. `eslint` — zero warnings
-3. `prettier --check` — formatting clean
+1. `tsc --noEmit` -- strict config, zero errors
+2. `eslint` -- zero warnings
+3. `prettier --check` -- formatting clean
 4. Architecture: no `src/ui/` import from `src/core/`
 5. Purity: no `Math.random` in `src/core/`
 6. Type hygiene: no `any`
 
-**`vitest run` is NOT a per-commit gate** — RED commits must contain failing tests.
+**`vitest run` is NOT a per-commit gate** -- RED commits must contain failing tests.
 
-### Layer 3 — Story acceptance
+### Layer 3 -- Story acceptance
 
 Before Humboldt hands a story to PO:
 
-1. `npm run typecheck` — clean
-2. `npm run lint` — exit 0
-3. `npm run format:check` — exit 0
-4. `npm run test` — all tests pass
-5. `npm run test:coverage` — coverage thresholds met (`src/core/` >= 95% lines/functions/statements, >= 90% branches)
+1. `npm run typecheck` -- clean
+2. `npm run lint` -- exit 0
+3. `npm run format:check` -- exit 0
+4. `npm run test` -- all tests pass
+5. `npm run test:coverage` -- coverage thresholds met (`src/core/` >= 95% lines/functions/statements, >= 90% branches)
 6. Every AC went RED -> GREEN -> PURPLE
 7. Humboldt reviewed commits against spec
 8. PO explicitly accepts
@@ -251,7 +251,7 @@ Team-lead shuts down last, commits memory files, pushes.
 ## On Startup
 
 1. Read your personal scratchpad at `teams/bioforge-dev/memory/<your-name>.md` if it exists
-2. Read `docs/WORKFLOW.md` — the XP cycle protocol
+2. Read `docs/WORKFLOW.md` -- the XP cycle protocol
 3. Read the spec at `docs/superpowers/specs/2026-04-10-bioforge-design.md` (at least the sections relevant to current work)
 4. Send a brief intro message to `team-lead`
 

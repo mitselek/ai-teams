@@ -13,7 +13,7 @@ tags: [two-consumer, snapshot, sync-handshake, federation, asymmetric-access, n1
 
 ## TLDR
 
-When a knowledge store has two classes of consumer — one with direct query access (MCP, REST, DB driver) and one without (claude.ai Projects, kiosk dashboards) — the right architecture is a manual synthesis-and-handshake bridge between them, not "force everything through one channel."
+When a knowledge store has two classes of consumer -- one with direct query access (MCP, REST, DB driver) and one without (claude.ai Projects, kiosk dashboards) -- the right architecture is a manual synthesis-and-handshake bridge between them, not "force everything through one channel."
 
 ## Key ideas
 
@@ -22,7 +22,7 @@ When a knowledge store has two classes of consumer — one with direct query acc
 - **Three conditions to apply**: two consumer classes with materially different access, both need access, snapshot freshness measured in days not seconds.
 - **Does NOT apply**: sub-day freshness needs, many snapshot consumers (replication cheaper), sensitive data filtering complexity.
 - **Naming the asymmetry prevents three failure modes**: silent snapshot degradation, building infra for the wrong problem, running the low-capability channel for everyone.
-- **Side-effect**: forces curation discipline — entries written to make sense as standalone snapshots.
+- **Side-effect**: forces curation discipline -- entries written to make sense as standalone snapshots.
 - **n=1 watch**: esl-suvekool roadwarrior-sync skill (local team + claude.ai Project).
 
 (*FR:Callimachus*)

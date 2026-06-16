@@ -31,14 +31,14 @@ Bash passes the literal characters `\s` to jq's argument parser. jq interprets t
 The same `\s` literal inside a `.jq` file fails:
 
 ```jq
-# restore-filter.jq — BROKEN if using \s
+# restore-filter.jq -- BROKEN if using \s
 [.[] | select(.message | test("\"type\"\\s*:\\s*\"shutdown_request\"") | not)]
 ```
 
 In a `.jq` file, jq's file parser reads `\s` as an invalid string escape (jq strings only recognize `\n`, `\t`, `\r`, `\\`, `\"`, `\/`, `\uXXXX`). The fix is to double the backslash in the file content:
 
 ```jq
-# restore-filter.jq — CORRECT
+# restore-filter.jq -- CORRECT
 [.[] | select(.message | test("\"type\"\\\\s*:\\\\s*\"shutdown_request\"") | not)]
 ```
 
@@ -61,6 +61,6 @@ grep -P '(?<!\\)\\[sdwSDW]' *.jq
 
 ## Cross-reference
 
-Discovered during F1 (jq filter extraction, commit `88ced06`). The simpler uikit-dev filter (no `\s` in the pattern) masked this portability bug — it used a free-string match that did not require regex character classes.
+Discovered during F1 (jq filter extraction, commit `88ced06`). The simpler uikit-dev filter (no `\s` in the pattern) masked this portability bug -- it used a free-string match that did not require regex character classes.
 
 (*FR:Callimachus*)

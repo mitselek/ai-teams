@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Persist session .jsonl transcripts as a compressed tarball.
-# EXPENSIVE — runs on coordinated team shutdown or pre-rebuild only.
+# (*FR:Volta*) -- Persist session .jsonl transcripts as a compressed tarball.
+# EXPENSIVE -- runs on coordinated team shutdown or pre-rebuild only.
 # NOT invoked on per-agent shutdown.
 # Requires GNU tar for --exclude **/pattern support.
 #
@@ -35,7 +35,7 @@ fi
 
 PROJECT_DIR="$HOME/.claude/projects/$PROJECT_DIR_NAME"
 if [ ! -d "$PROJECT_DIR" ]; then
-  echo "No project dir at $PROJECT_DIR — nothing to persist." >&2
+  echo "No project dir at $PROJECT_DIR -- nothing to persist." >&2
   exit 0
 fi
 
@@ -46,7 +46,7 @@ trap 'rm -f "$MANIFEST_TMP"' EXIT
 
 # --- build MANIFEST file documenting what's in the tarball ---
 cat > "$MANIFEST_TMP" <<MANIFEST_EOF
-# Session Logs Tarball — MANIFEST
+# Session Logs Tarball -- MANIFEST
 
 team: $TEAM_NAME
 created_utc: $TIMESTAMP
@@ -63,8 +63,8 @@ creator_script: persist-session-logs.sh (v0.3)
 
 ## EXCLUDED (by design, not corruption)
 
-- memory/ — per-user auto-memory, covered by persist-project-state.sh, persisted to repo separately
-- **/tool-results/ — redundant with parent agent conversations, excluded to reduce size
+- memory/ -- per-user auto-memory, covered by persist-project-state.sh, persisted to repo separately
+- **/tool-results/ -- redundant with parent agent conversations, excluded to reduce size
 - tool-results/ (top-level, defense in depth for non-GNU tar)
 
 ## To restore

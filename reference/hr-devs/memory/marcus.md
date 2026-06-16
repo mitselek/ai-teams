@@ -1,10 +1,10 @@
-# Marcus — Code Reviewer Scratchpad
+# Marcus -- Code Reviewer Scratchpad
 
-## [DECISION] 2026-03-12 — Review-only, no merge
+## [DECISION] 2026-03-12 -- Review-only, no merge
 
 Team-lead handles all merges. Marcus reviews → reports verdict → stops. Do NOT merge PRs or delete branches.
 
-## [REVIEW] 2026-03-12/13 — Session summary (22 reviews)
+## [REVIEW] 2026-03-12/13 -- Session summary (22 reviews)
 
 | PR/Branch | Verdict | Key finding |
 |-----------|---------|-------------|
@@ -20,7 +20,7 @@ Team-lead handles all merges. Marcus reviews → reports verdict → stops. Do N
 | #265 internship auto-send | YELLOW→GREEN | Sequential await → `Promise.allSettled()`, added `notified` to return |
 | #266 conversations route move | YELLOW→GREEN | New index redirect pointed to old path |
 | #270 stale URL fixes | YELLOW→GREEN | Email link in `show/+page.server.ts` still used `/questionnaires/` |
-| #272 impersonation elevated rights | YELLOW→GREEN | `\|\|` on `hasElevatedRights` applied in production — gated with `!isProduction()` |
+| #272 impersonation elevated rights | YELLOW→GREEN | `\|\|` on `hasElevatedRights` applied in production -- gated with `!isProduction()` |
 | #274 test row clickable | GREEN | Dev-only `/test` page, `requestSubmit()` on row click |
 | #260 F2+F9 card+nav fixes | GREEN | Block `<a>` wrapping card, `isTestPage` hides nav |
 | #278 F3 rating heading spacing | GREEN | `px-3` on matrix headers/cells (created PR, merged) |
@@ -32,34 +32,34 @@ Team-lead handles all merges. Marcus reviews → reports verdict → stops. Do N
 | #126 internship sticky sections | GREEN | Migration 0042 sort_order shifts verified; frontend follows exit pattern exactly |
 | #215 sentinel date filtering | GREEN | `parseDateOrNull` replaces 6 `.split("T")[0]` sites; fallback chain preserved |
 
-## [LEARNED] 2026-03-12 — Route restructuring patterns
+## [LEARNED] 2026-03-12 -- Route restructuring patterns
 
 - `/management/*` → `/annual/management/*`, `/conversations/*` → `/annual/conversations/*`
 - 301 redirect on old layout must preserve sub-path: `event.url.pathname.replace() + event.url.search`
 - `isAnnualSection` derived progressively simplified as routes moved under `/annual`
-- Always grep for stale URL strings in email templates — not just UI routes
+- Always grep for stale URL strings in email templates -- not just UI routes
 
-## [LEARNED] 2026-03-12 — Security review patterns
+## [LEARNED] 2026-03-12 -- Security review patterns
 
-- `hasElevatedRights` (Cloudflare Access group) is the correct guard for HR access — NOT `selectedQuestionnaireUserRole` (user-selectable DB column)
+- `hasElevatedRights` (Cloudflare Access group) is the correct guard for HR access -- NOT `selectedQuestionnaireUserRole` (user-selectable DB column)
 - Any `||` fallback on `hasElevatedRights` must be gated with `!isProduction()` to avoid bypassing Cloudflare Access in prod
-- `requireHrRole` checks `hasElevatedRights !== true` — strict comparison handles false/undefined/null
+- `requireHrRole` checks `hasElevatedRights !== true` -- strict comparison handles false/undefined/null
 
-## [LEARNED] 2026-03-13 — Test validation patterns
+## [LEARNED] 2026-03-13 -- Test validation patterns
 
 - **False green tests:** When test uses `_load` to get `questions` and `answers`, verify they come from the SAME questionnaire. `LIMIT 1` may return a different questionnaire than the one seeded by the test → ID mismatch → assertions pass trivially.
 - **D1 multi-statement prepare():** In some workerd contexts, `db.prepare("stmt1; stmt2").run()` only executes the first statement. Split into separate `.run()` calls per statement.
 - **Vite `?raw` imports:** Top-level `import ... from "...?raw"` bundles the file into ALL builds (including production). Use dynamic `await import("...?raw")` inside environment guards to avoid shipping test data to production.
 
-## [DECISION] 2026-03-10 — SvelteKit export rules
+## [DECISION] 2026-03-10 -- SvelteKit export rules
 
 SvelteKit `+page.server.ts` only allows exports: `load`, `actions`, `config`, `prerender`, `csr`, `ssr`, `trailingSlash`, `entries`, or `_`-prefixed. Named function exports cause build failures. Always extract to `$lib/` modules.
 
-## [DECISION] 2026-03-10 — Complexity refactoring patterns
+## [DECISION] 2026-03-10 -- Complexity refactoring patterns
 
 - **Per-question-type dispatch:** Replace monolithic switch/case with lookup table (`Partial<Record<QuestionType, handler>>`) + pure handler functions.
 - **Phase decomposition:** For orchestrator functions, extract phases returning `Result<T, E>`.
-- **`Number("")` returns 0, not NaN** — always guard with `if (!value)` before `Number(value)`.
+- **`Number("")` returns 0, not NaN** -- always guard with `if (!value)` before `Number(value)`.
 
 ## [LEARNED] 2026-02-23
 

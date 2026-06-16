@@ -8,7 +8,7 @@ Supervision chains, escalation, approval authority, and decision delegation.
 
 ### Design Principle
 
-Governance is not about control — it is about defining who decides what, so that every agent can act without asking. The goal is a system where the default answer to "may I do this?" is derivable from a document, not from a person.
+Governance is not about control -- it is about defining who decides what, so that every agent can act without asking. The goal is a system where the default answer to "may I do this?" is derivable from a document, not from a person.
 
 ### Five-Layer Governance Stack
 
@@ -22,17 +22,17 @@ The framework already has a de facto governance system, accumulated from inciden
 | **L3: Peer enforcement** | Social policing by teammates | Intra-team, runtime | Self-correcting; violations logged to scratchpad |
 | **L4: Incident amendment** | Known Pitfalls, MEMORY.md addenda | Varies by incident scope | Discoverer documents, PO reviews |
 
-**Precedent over prescription.** De facto governance (how decisions were actually made) takes priority over de jure governance (how the document says they should be made). When the two diverge, the document must be updated to match reality — not the other way around. This prevents governance drift where the documentation becomes fiction.
+**Precedent over prescription.** De facto governance (how decisions were actually made) takes priority over de jure governance (how the document says they should be made). When the two diverge, the document must be updated to match reality -- not the other way around. This prevents governance drift where the documentation becomes fiction.
 
 **Evidence sources for this analysis:**
 
-- `reference/rc-team/cloudflare-builders/` — common-prompt, team-lead prompt, memory files
-- `reference/hr-devs/` — common-prompt, team-lead prompt, memory files
-- Workspace MEMORY.md — accumulated governance rules from incidents
-- `apex-migration-research/teams/apex-research/` — common-prompt, agent prompts
-- `prompts/richelieu.md` — manager agent draft (input, not settled design)
-- `topics/03-communication.md` — Herald's inter-team protocols
-- `topics/07-safety-guardrails.md` — permission categories
+- `reference/rc-team/cloudflare-builders/` -- common-prompt, team-lead prompt, memory files
+- `reference/hr-devs/` -- common-prompt, team-lead prompt, memory files
+- Workspace MEMORY.md -- accumulated governance rules from incidents
+- `apex-migration-research/teams/apex-research/` -- common-prompt, agent prompts
+- `prompts/richelieu.md` -- manager agent draft (input, not settled design)
+- `topics/03-communication.md` -- Herald's inter-team protocols
+- `topics/07-safety-guardrails.md` -- permission categories
 
 ### Constitutional Rules
 
@@ -56,7 +56,7 @@ Knowledge produced at L3 (specialists, team wikis, Librarian-curated content) mu
 - PO decides at own discretion whether to record in MEMORY.md
 - PO directives to teams flow through common-prompt, team-lead messages, or explicit Knowledge Submissions to the Librarian (with attribution), never through direct wiki edits
 
-**Why this is a constitutional rule, not a delegation matrix row.** The matrix specifies who *may* decide something. This rule specifies a flow that *no one* may authorize — not even the PO, because the L0 ↔ L3 gap exists by design. Preserving it preserves the hierarchy's synthesis-at-the-top property: the PO's context is deliberately curated, not flooded with raw team output.
+**Why this is a constitutional rule, not a delegation matrix row.** The matrix specifies who *may* decide something. This rule specifies a flow that *no one* may authorize -- not even the PO, because the L0 ↔ L3 gap exists by design. Preserving it preserves the hierarchy's synthesis-at-the-top property: the PO's context is deliberately curated, not flooded with raw team output.
 
 **Source:** T09 v2 Part 2, lines 877-893 (PO MEMORY.md Bridge section). Extended from Monte's round 5 position with Finn's anti-pattern (round 5). See T09 v2 for the full PO MEMORY.md bridge discussion and the "PO is the bridge" framing.
 
@@ -85,12 +85,12 @@ Coordination layer between PO and multiple team-leads. Operates autonomously wit
 
 ### Level 2: Team Lead
 
-Owns the team's workflow. Coordinator-only — never implements.
+Owns the team's workflow. Coordinator-only -- never implements.
 
 - Routes tasks to specialists within the team
 - Controls spawn order and agent lifecycle
 - Initiates code review (delegates to Marcus or equivalent)
-- Closes issues after review approval (exclusive responsibility — never delegated)
+- Closes issues after review approval (exclusive responsibility -- never delegated)
 - Reports to L1 (manager agent or PO)
 - May NOT: edit source code, run builds/tests/deployments, commit/push, communicate cross-team without L1 routing
 
@@ -106,7 +106,7 @@ Executes within delegated scope. Owns work end-to-end: research, implement, test
 
 #### Scope Authority Within L3 (Spec Writer Specialization Spectrum)
 
-The canonical L3 specialist has *execution* authority within its own scope — it decides how to implement, test, or refactor the work assigned to it. Some L3 specialists are additionally granted **scope authority over other L3 peers** for bounded durations. These are the "Spec Writer specialization" roles: they produce work breakdowns that other specialists consume.
+The canonical L3 specialist has *execution* authority within its own scope -- it decides how to implement, test, or refactor the work assigned to it. Some L3 specialists are additionally granted **scope authority over other L3 peers** for bounded durations. These are the "Spec Writer specialization" roles: they produce work breakdowns that other specialists consume.
 
 **Scope authority does not create a new hierarchy level.** The scope constraint (the bounded duration over which the specialist's decisions bind other specialists) replaces what would otherwise be a hierarchical layer. When the scope ends, the authority ends. ARCHITECT's authority over RED, GREEN, and PURPLE lasts one story; at story boundaries, ARCHITECT returns to peer status.
 
@@ -115,13 +115,13 @@ The canonical L3 specialist has *execution* authority within its own scope — i
 | Specialization | Precedent | Authority mechanics |
 |---|---|---|
 | **Drafting authority** | Hammurabi (apex-research) drafts specs that Schliemann (L2 team-lead) approves per decision (`draft → reviewed → approved → handed-off`). The specs are not binding on downstream consumers until the team-lead approves the transition. | L3 produces, L2 approves each instance, L3 peers consume approved output. L2 re-approval is a per-decision gate. |
-| **Binding authority within bounded scope** | ARCHITECT (T09 v2 XP pipeline) decomposes a story into a test plan. The decomposition binds RED, GREEN, and PURPLE without team-lead re-approval during the story. Team-lead assigned the story; ARCHITECT owns the decomposition; the pipeline agents execute within it. | L3 produces, L3 peers are bound by the output within the assigned scope (one story). L2 re-approval is not required per decision — the scope assignment itself is the authorization. |
+| **Binding authority within bounded scope** | ARCHITECT (T09 v2 XP pipeline) decomposes a story into a test plan. The decomposition binds RED, GREEN, and PURPLE without team-lead re-approval during the story. Team-lead assigned the story; ARCHITECT owns the decomposition; the pipeline agents execute within it. | L3 produces, L3 peers are bound by the output within the assigned scope (one story). L2 re-approval is not required per decision -- the scope assignment itself is the authorization. |
 
 The innovation in T09 v2 is the second row: **a bounded zone of L3 autonomy over L3 peers that does not require a new hierarchy level because the scope (one story) is the structural constraint.** ARCHITECT does not sit at a new level between L2 and L3. ARCHITECT sits at L3 with scoped binding authority that expires when the story completes.
 
 **Why both are "Spec Writer specializations."** Both roles produce work breakdowns that other specialists consume. Both use judgment over structural decomposition. Both fail in similar ways (bad decomposition cascades through downstream work). They differ in the authority mechanics, not the cognitive act. T04 recognizes both as valid patterns within the Spec Writer family.
 
-**Implication for team designers.** When adopting a role with binding scope authority (like ARCHITECT), the scope must be explicit and bounded at the team-lead level. If the scope is unbounded or informal, the role drifts toward becoming a team-lead peer — which violates the L2 coordination monopoly. The delegation matrix rows that encode scope-authority roles (see rows 40-45) always include the scope constraint explicitly.
+**Implication for team designers.** When adopting a role with binding scope authority (like ARCHITECT), the scope must be explicit and bounded at the team-lead level. If the scope is unbounded or informal, the role drifts toward becoming a team-lead peer -- which violates the L2 coordination monopoly. The delegation matrix rows that encode scope-authority roles (see rows 40-45) always include the scope constraint explicitly.
 
 ---
 
@@ -142,70 +142,70 @@ This is the central governance artifact. For any decision type, it specifies: wh
 | # | Decision type | PO (L0) | Mgr Agent (L1) | Team Lead (L2) | Specialist (L3) | Escalation trigger |
 |---|---|---|---|---|---|---|
 | **Team lifecycle** | | | | | | |
-| 1 | Create a new team | D | C | — | — | Always PO |
-| 2 | Dissolve a team (permanent — see §Row 2 vs. session-boundary `TeamDelete`) | D | C | I | I | Always PO |
-| 3 | Change team composition (add/remove agent role) | D | C | C | — | Always PO |
-| 4 | Spawn an agent within approved roster | I | — | D | — | Agent not in roster → escalate to PO |
-| 5 | Shut down an agent (session end); execute team-shutdown procedure (T06 Phases 1–5) | I | — | D | I | Per T06 canonical lifecycle |
+| 1 | Create a new team | D | C | -- | -- | Always PO |
+| 2 | Dissolve a team (permanent -- see §Row 2 vs. session-boundary `TeamDelete`) | D | C | I | I | Always PO |
+| 3 | Change team composition (add/remove agent role) | D | C | C | -- | Always PO |
+| 4 | Spawn an agent within approved roster | I | -- | D | -- | Agent not in roster → escalate to PO |
+| 5 | Shut down an agent (session end); execute team-shutdown procedure (T06 Phases 1–5) | I | -- | D | I | Per T06 canonical lifecycle |
 | **Architecture & design** | | | | | | |
-| 6 | Architecture decision (cross-team) | D | C | C | — | Always PO |
-| 7 | Architecture decision (within team scope) | I | — | D | C | Affects other teams → escalate to L1/PO |
+| 6 | Architecture decision (cross-team) | D | C | C | -- | Always PO |
+| 7 | Architecture decision (within team scope) | I | -- | D | C | Affects other teams → escalate to L1/PO |
 | 8 | Technology stack choice | D | C | C | C | Always PO |
 | **Code & delivery** | | | | | | |
-| 9 | Branch strategy within a team | I | — | D | I | — |
-| 10 | Create a feature branch | — | — | I | D | — |
-| 11 | Commit and push to feature branch | — | — | I | D | — |
-| 12 | Create a pull request | — | — | I | D | — |
-| 13 | Code review verdict | — | — | I | D (reviewer) | — |
-| 14 | Merge PR to develop | — | — | D | C (reviewer) | Quality gates must pass |
-| 15 | Merge develop to main | D | I | C | — | Always PO |
-| 16 | Close a GitHub issue | — | — | D | — | Exclusive to team-lead |
+| 9 | Branch strategy within a team | I | -- | D | I | -- |
+| 10 | Create a feature branch | -- | -- | I | D | -- |
+| 11 | Commit and push to feature branch | -- | -- | I | D | -- |
+| 12 | Create a pull request | -- | -- | I | D | -- |
+| 13 | Code review verdict | -- | -- | I | D (reviewer) | -- |
+| 14 | Merge PR to develop | -- | -- | D | C (reviewer) | Quality gates must pass |
+| 15 | Merge develop to main | D | I | C | -- | Always PO |
+| 16 | Close a GitHub issue | -- | -- | D | -- | Exclusive to team-lead |
 | **Deployment** | | | | | | |
-| 17 | Deploy to dev environment | I | — | D | — | — |
-| 18 | Deploy to staging | D | I | C | — | Always PO |
-| 19 | Deploy to production | D | I | C | — | Always PO |
-| 20 | Database migration (dev) | — | — | D | C | — |
-| 21 | Database migration (production) | D | I | C | — | Always PO |
+| 17 | Deploy to dev environment | I | -- | D | -- | -- |
+| 18 | Deploy to staging | D | I | C | -- | Always PO |
+| 19 | Deploy to production | D | I | C | -- | Always PO |
+| 20 | Database migration (dev) | -- | -- | D | C | -- |
+| 21 | Database migration (production) | D | I | C | -- | Always PO |
 | **External systems** | | | | | | |
-| 22 | Create/update Jira issues | D | — | — | — | Always PO; agents never on own initiative |
-| 23 | Send external email | D | — | — | — | Always PO review first |
-| 24 | Create GitHub issues | — | — | D | D | Agent-managed; no approval needed |
-| 25 | Comment on GitHub issues/PRs | — | — | D | D | — |
+| 22 | Create/update Jira issues | D | -- | -- | -- | Always PO; agents never on own initiative |
+| 23 | Send external email | D | -- | -- | -- | Always PO review first |
+| 24 | Create GitHub issues | -- | -- | D | D | Agent-managed; no approval needed |
+| 25 | Comment on GitHub issues/PRs | -- | -- | D | D | -- |
 | **Inter-team coordination** | | | | | | |
-| 26 | Route a handoff request | I | D | C (requester) | — | Target team doesn't exist → escalate to PO |
-| 27 | Grant a direct communication link | I | D | C | — | Security-sensitive resources → escalate to PO |
-| 28 | Revoke a direct communication link | I | D | I | — | Team-lead disputes → escalate to PO |
-| 29 | Broadcast to all teams | D (unrestricted) | D (with reason) | Escalate → L1 | — | Team-leads may not broadcast directly |
-| 30 | Resolve inter-team resource conflict | I | D (if policy exists) | C | — | No policy exists → escalate to PO |
-| 31 | Prioritize competing cross-team requests | I | D (normal/high) | C | — | Blocking priority conflict → escalate to PO |
+| 26 | Route a handoff request | I | D | C (requester) | -- | Target team doesn't exist → escalate to PO |
+| 27 | Grant a direct communication link | I | D | C | -- | Security-sensitive resources → escalate to PO |
+| 28 | Revoke a direct communication link | I | D | I | -- | Team-lead disputes → escalate to PO |
+| 29 | Broadcast to all teams | D (unrestricted) | D (with reason) | Escalate → L1 | -- | Team-leads may not broadcast directly |
+| 30 | Resolve inter-team resource conflict | I | D (if policy exists) | C | -- | No policy exists → escalate to PO |
+| 31 | Prioritize competing cross-team requests | I | D (normal/high) | C | -- | Blocking priority conflict → escalate to PO |
 | **Quality & audit** | | | | | | |
-| 32 | Initiate code review | — | — | D | — | Team-lead assigns reviewer |
-| 33 | Quality gate enforcement (tests, lint, check) | — | — | I | D (implementer) | Gates must pass before PR |
+| 32 | Initiate code review | -- | -- | D | -- | Team-lead assigns reviewer |
+| 33 | Quality gate enforcement (tests, lint, check) | -- | -- | I | D (implementer) | Gates must pass before PR |
 | 34 | Cross-team quality audit | I | D (assigns) | C (audited team) | D (auditor, e.g. Medici) | See §Cross-Team Audit Authority |
-| 35 | Act on audit findings | — | D (routes) | D (within own team) | — | Disagreement → escalate to PO |
+| 35 | Act on audit findings | -- | D (routes) | D (within own team) | -- | Disagreement → escalate to PO |
 | **Governance** | | | | | | |
-| 36 | Amend workspace MEMORY.md | D | — | — | — | Always PO |
-| 37 | Amend team common-prompt | D | I | C | — | Team-lead proposes, PO approves |
-| 38 | Amend agent prompt | D | I | C | — | Celes designs, PO approves |
-| 39 | Override a governance rule | D | — | — | — | Always PO; no agent may override |
+| 36 | Amend workspace MEMORY.md | D | -- | -- | -- | Always PO |
+| 37 | Amend team common-prompt | D | I | C | -- | Team-lead proposes, PO approves |
+| 38 | Amend agent prompt | D | I | C | -- | Celes designs, PO approves |
+| 39 | Override a governance rule | D | -- | -- | -- | Always PO; no agent may override |
 | **XP Pipeline governance** | | | | | | |
-| 40 | Story decomposition into test plan | I | — | C | D (ARCHITECT) | ARCHITECT decides within assigned story; inability to decompose → escalate to team-lead |
-| 41 | Test plan ordering | — | — | I | D (ARCHITECT), C (RED) | RED may flag untestable ordering; ARCHITECT revises or escalates to team-lead |
-| 42 | Scope dispute within pipeline (RED/GREEN/PURPLE disagrees with test spec) | — | — | Escalation target | D (ARCHITECT, first instance); C (disputing agent) | Unresolvable after ARCHITECT ruling → escalate to team-lead (L2) → PO (L0) |
-| 43 | Structural refactoring within PURPLE scope (rename, extract, restructure) | — | — | I | D (PURPLE); C (ARCHITECT) | Restructuring that would cross PURPLE's scope boundary (interface change, new module, test file edit) → escalate to ARCHITECT |
-| 44 | Mid-cycle termination of PURPLE (forced shutdown during refactoring) | — | — | D (team-lead) | C (ARCHITECT); C (PURPLE) | Watchdog detects hung/stuck state at 5-minute soft boundary; team-lead authority activates; PURPLE cannot refuse |
-| 45 | Cross-pipeline pattern extraction (shared utility across pipelines) | — | — | I | D (ARCHITECT); C (PURPLE flags via Librarian) | Shared PURPLE observing cross-pipeline pattern MUST flag to ARCHITECT via Librarian; may not extract unilaterally |
+| 40 | Story decomposition into test plan | I | -- | C | D (ARCHITECT) | ARCHITECT decides within assigned story; inability to decompose → escalate to team-lead |
+| 41 | Test plan ordering | -- | -- | I | D (ARCHITECT), C (RED) | RED may flag untestable ordering; ARCHITECT revises or escalates to team-lead |
+| 42 | Scope dispute within pipeline (RED/GREEN/PURPLE disagrees with test spec) | -- | -- | Escalation target | D (ARCHITECT, first instance); C (disputing agent) | Unresolvable after ARCHITECT ruling → escalate to team-lead (L2) → PO (L0) |
+| 43 | Structural refactoring within PURPLE scope (rename, extract, restructure) | -- | -- | I | D (PURPLE); C (ARCHITECT) | Restructuring that would cross PURPLE's scope boundary (interface change, new module, test file edit) → escalate to ARCHITECT |
+| 44 | Mid-cycle termination of PURPLE (forced shutdown during refactoring) | -- | -- | D (team-lead) | C (ARCHITECT); C (PURPLE) | Watchdog detects hung/stuck state at 5-minute soft boundary; team-lead authority activates; PURPLE cannot refuse |
+| 45 | Cross-pipeline pattern extraction (shared utility across pipelines) | -- | -- | I | D (ARCHITECT); C (PURPLE flags via Librarian) | Shared PURPLE observing cross-pipeline pattern MUST flag to ARCHITECT via Librarian; may not extract unilaterally |
 | **Knowledge base (Librarian) governance** | | | | | | |
-| 46 | Knowledge submission scope classification (agent-only / team-wide / cross-team) | — | — | I | D (Librarian); C (submitting agent) | Submitting agent proposes scope; Librarian decides on filing; team-lead reviews disputes |
-| 47 | Knowledge promotion proposal acceptance (wiki entry → common-prompt candidate) | I | — | D | C (Librarian proposes) | Team-lead decides whether to forward to PO; final common-prompt amendment is Row 37 |
-| 48 | Librarian respawn authority (SPOF recovery) | — | — | D | — | Normal agent lifecycle per Rows 4-5; no special authority. Librarian state marker prevents re-running bootstrap. |
-| 49 | `[URGENT-KNOWLEDGE]` interrupt decision (whether to interrupt an affected agent with new knowledge) | — | — | D | C (Librarian flags relevance); C (affected agent receives) | Librarian never interrupts agents directly. Team-lead is the traffic controller. |
+| 46 | Knowledge submission scope classification (agent-only / team-wide / cross-team) | -- | -- | I | D (Librarian); C (submitting agent) | Submitting agent proposes scope; Librarian decides on filing; team-lead reviews disputes |
+| 47 | Knowledge promotion proposal acceptance (wiki entry → common-prompt candidate) | I | -- | D | C (Librarian proposes) | Team-lead decides whether to forward to PO; final common-prompt amendment is Row 37 |
+| 48 | Librarian respawn authority (SPOF recovery) | -- | -- | D | -- | Normal agent lifecycle per Rows 4-5; no special authority. Librarian state marker prevents re-running bootstrap. |
+| 49 | `[URGENT-KNOWLEDGE]` interrupt decision (whether to interrupt an affected agent with new knowledge) | -- | -- | D | C (Librarian flags relevance); C (affected agent receives) | Librarian never interrupts agents directly. Team-lead is the traffic controller. |
 
-**§Row 2 vs. session-boundary `TeamDelete`** (_FR:Volta_ — 2026-05-06): Row 2 governs *team dissolution* (permanent end — charter retired, members reassigned, repo `teams/<name>/` archived). The `TeamDelete()` primitive is also called at session boundaries (T06 Shutdown Phase 5 graceful exit; T06 Startup Phase 2 best-effort recovery) to release the parent CLI's in-memory team-leadership state. Session-boundary `TeamDelete` is the team-lead's operational authority and does not require PO approval. The semantic distinction: dissolution ends the team; session-boundary `TeamDelete` releases ephemeral leadership state. The team's existence as a repo entity (scratchpads, inboxes, wiki, charter) is unaffected by session-boundary `TeamDelete`.
+**§Row 2 vs. session-boundary `TeamDelete`** (_FR:Volta_ -- 2026-05-06): Row 2 governs *team dissolution* (permanent end -- charter retired, members reassigned, repo `teams/<name>/` archived). The `TeamDelete()` primitive is also called at session boundaries (T06 Shutdown Phase 5 graceful exit; T06 Startup Phase 2 best-effort recovery) to release the parent CLI's in-memory team-leadership state. Session-boundary `TeamDelete` is the team-lead's operational authority and does not require PO approval. The semantic distinction: dissolution ends the team; session-boundary `TeamDelete` releases ephemeral leadership state. The team's existence as a repo entity (scratchpads, inboxes, wiki, charter) is unaffected by session-boundary `TeamDelete`.
 
-**Reading the ARCHITECT, PURPLE, and Librarian rows.** Rows 40-49 use the existing 5-column format with role qualifiers in the Specialist (L3) column. ARCHITECT, PURPLE, and Librarian are all L3 specialists with scoped authority — they are not a new hierarchy level (see §Level 3: Scope Authority Within L3). The qualifier in parentheses identifies which L3 role holds the specified authority. Cross-reference `topics/09-development-methodology.md` Part 1 (Authority Boundaries, lines 284-299) for the 6-column view that isolates ARCHITECT into its own column for easier reading within the XP pipeline context.
+**Reading the ARCHITECT, PURPLE, and Librarian rows.** Rows 40-49 use the existing 5-column format with role qualifiers in the Specialist (L3) column. ARCHITECT, PURPLE, and Librarian are all L3 specialists with scoped authority -- they are not a new hierarchy level (see §Level 3: Scope Authority Within L3). The qualifier in parentheses identifies which L3 role holds the specified authority. Cross-reference `topics/09-development-methodology.md` Part 1 (Authority Boundaries, lines 284-299) for the 6-column view that isolates ARCHITECT into its own column for easier reading within the XP pipeline context.
 
-**ARCHITECT's authority is scoped to a single story at a time.** Between stories, ARCHITECT has no scope authority — it is passively available until the team-lead assigns the next story. This prevents authority creep. See T09 v2 Part 1, "Pipeline Governance as a Nested System" for the full treatment.
+**ARCHITECT's authority is scoped to a single story at a time.** Between stories, ARCHITECT has no scope authority -- it is passively available until the team-lead assigns the next story. This prevents authority creep. See T09 v2 Part 1, "Pipeline Governance as a Nested System" for the full treatment.
 
 **The mid-cycle termination row (44) is load-bearing for safety.** PURPLE's execution authority (Row 43) does NOT override team-lead's coordination authority (Row 44). When the watchdog detects a stuck state at the 5-minute soft boundary, team-lead termination activates and PURPLE cannot refuse. This preserves the L2-over-L3 termination invariant across the XP pipeline addition. See T09 v2 "Mid-Cycle Shutdown: Watchdog + Team Lead Authority" for the four exit states and the composition of Volta's git-state watchdog with the soft boundary.
 
@@ -253,8 +253,8 @@ Medici's cross-team audit findings are delivered to the audited team's team-lead
 The `HANDED-OFF` status means a spec has been transferred to a downstream migration team for implementation. This is a cross-team deliverable handoff with production implications. Per the delegation matrix:
 
 - **draft → reviewed:** Team-lead (Schliemann) initiates review, assigns reviewer (Row 32)
-- **reviewed → approved:** PO approves (this is an architecture/scope decision with downstream team impact — Row 6)
-- **approved → handed-off:** PO directs the handoff (this creates work for another team — Row 1 analogue: only PO authorizes inter-team work commitments of this magnitude)
+- **reviewed → approved:** PO approves (this is an architecture/scope decision with downstream team impact -- Row 6)
+- **approved → handed-off:** PO directs the handoff (this creates work for another team -- Row 1 analogue: only PO authorizes inter-team work commitments of this magnitude)
 
 **Why not team-lead?** A migration spec handed off to cloudflare-builders creates a commitment of that team's resources. Only PO has authority to commit one team's resources based on another team's output.
 
@@ -262,7 +262,7 @@ The `HANDED-OFF` status means a spec has been transferred to a downstream migrat
 
 **Answer: PO (L0). Always.**
 
-Row 1 in the delegation matrix. No agent — not team-lead, not manager agent — may create a new team. The manager agent is consulted (provides assessment of whether the team design is sound), but the PO decides.
+Row 1 in the delegation matrix. No agent -- not team-lead, not manager agent -- may create a new team. The manager agent is consulted (provides assessment of whether the team design is sound), but the PO decides.
 
 **Rationale:** Team creation commits resources (compute, tokens, human attention). At scale, uncontrolled team proliferation is the governance equivalent of a fork bomb.
 
@@ -320,11 +320,11 @@ Audit authority is separated from executive authority. The auditor assesses; the
 
 | Audit type | Auditor | Trigger | Authority | Output |
 |---|---|---|---|---|
-| **Knowledge health** | Medici (any team) | Periodic (per session) or on-demand | Advisory — findings only | Health report to team-lead |
-| **Cross-team health** | Medici (home team) | L1/PO assigns | Advisory — findings to L1 | Report to L1, who routes to audited team |
-| **Code review** | Marcus (or equivalent) | Team-lead assigns per PR | Binding within team — GREEN required for merge | Review verdict on PR |
-| **Spec review** | Domain expert | Team-lead assigns | Advisory — recommendations | Review comments on spec |
-| **Authority drift (federation-scale)** | Substrate-typed drift detector (sidecar over poll-stream) | Continuous (per poll cycle) on shared firehose | Advisory — typed `ProducerAction` emission; observe-only, no authority delegated | Per-team weekly digest (primary) + per-event escalation on typed-invariant breach (exception). Recipients: L1 (typed-invariant) or digest-aggregator (statistical); never named curator directly |
+| **Knowledge health** | Medici (any team) | Periodic (per session) or on-demand | Advisory -- findings only | Health report to team-lead |
+| **Cross-team health** | Medici (home team) | L1/PO assigns | Advisory -- findings to L1 | Report to L1, who routes to audited team |
+| **Code review** | Marcus (or equivalent) | Team-lead assigns per PR | Binding within team -- GREEN required for merge | Review verdict on PR |
+| **Spec review** | Domain expert | Team-lead assigns | Advisory -- recommendations | Review comments on spec |
+| **Authority drift (federation-scale)** | Substrate-typed drift detector (sidecar over poll-stream) | Continuous (per poll cycle) on shared firehose | Advisory -- typed `ProducerAction` emission; observe-only, no authority delegated | Per-team weekly digest (primary) + per-event escalation on typed-invariant breach (exception). Recipients: L1 (typed-invariant) or digest-aggregator (statistical); never named curator directly |
 
 ### Cross-Team Audit Flow
 
@@ -367,8 +367,8 @@ Substrate poll-stream
     │  (envelope log, RegistrationAuthority records)
     v
 Drift detector reducer
-  - Typed-invariant signals (D1/D2/D5/D6) — single envelope, binary
-  - Statistical signals (D3/D4/D7/D8) — time-window, BaselineDeviation
+  - Typed-invariant signals (D1/D2/D5/D6) -- single envelope, binary
+  - Statistical signals (D3/D4/D7/D8) -- time-window, BaselineDeviation
     │
     v
 Severity classification
@@ -396,27 +396,27 @@ Severity classification
         Digest-aggregator → team-lead (digest cadence, not per-event)
 ```
 
-The flow mirrors the Cross-Team Audit Flow above structurally — auditor (drift detector) produces findings; L1 routes; audited team-lead decides action. Difference: detector is substrate-resident sidecar, not Medici-as-agent; cadence is continuous, not per-session; output is typed (`ProducerAction`), not prose; recipient routing is severity-graded (per-event vs digest).
+The flow mirrors the Cross-Team Audit Flow above structurally -- auditor (drift detector) produces findings; L1 routes; audited team-lead decides action. Difference: detector is substrate-resident sidecar, not Medici-as-agent; cadence is continuous, not per-session; output is typed (`ProducerAction`), not prose; recipient routing is severity-graded (per-event vs digest).
 
 ### What the Drift Detector May NOT Do (Federation-Scale)
 
-- Auto-correct violations (would collapse separation of powers — substrate IS NOT governance)
+- Auto-correct violations (would collapse separation of powers -- substrate IS NOT governance)
 - Route signals to per-namespace curator as governance-recipient (curator is signal *subject*, not *recipient*; per Cal Protocol B 2026-05-06)
 - Block writes (the detector observes post-admission; admission control is bootstrap's domain, not drift's)
 - Override team-lead's corrective decision (detector emits typed signals; downstream consumers integrate per `wiki/patterns/integration-not-relay.md`)
 - Read scratchpad content or message bodies (detector consumes envelope poll-metadata only; narrative-detection is Medici's single-team scope)
 
-The boundary is structural: drift detection is observe-only, advisory, substrate-resident, and below the governance layer (per `wiki/patterns/substrate-shape-vs-authority-shape-orthogonality.md` — corrective authority lives above the substrate, not at the substrate's write-authority layer).
+The boundary is structural: drift detection is observe-only, advisory, substrate-resident, and below the governance layer (per `wiki/patterns/substrate-shape-vs-authority-shape-orthogonality.md` -- corrective authority lives above the substrate, not at the substrate's write-authority layer).
 
 ---
 
-## Manager Agent — Role Definition (*FR:Montesquieu*)
+## Manager Agent -- Role Definition (*FR:Montesquieu*)
 
 ### Design Principle
 
 The manager agent is an **information broker**, not a bottleneck. It routes information to the right team, does not accumulate it. It delegates research, delegates execution, and keeps only coordination state: the handoff ledger, the direct link registry, and one-line team status summaries.
 
-The analogy is a switchboard operator, not a general. The manager agent has authority to make routing decisions and apply existing policy. It does not have authority to create policy, commit resources, or make strategic choices — those belong to PO.
+The analogy is a switchboard operator, not a general. The manager agent has authority to make routing decisions and apply existing policy. It does not have authority to create policy, commit resources, or make strategic choices -- those belong to PO.
 
 ### When Is a Manager Agent Needed?
 
@@ -448,7 +448,7 @@ The manager agent is the hub in the hybrid communication topology (T03 Protocol 
 - Track status in the Handoff Ledger
 - Relay ACKs, rejections, and completions back to the requesting team
 
-**Handoff Ledger** — persistent record of all inter-team work requests:
+**Handoff Ledger** -- persistent record of all inter-team work requests:
 
 ```markdown
 | ID | From | To | Type | Priority | Status | Requested | Updated |
@@ -479,7 +479,7 @@ Controls who broadcasts what to which teams (T03 Protocol 3).
 
 - PO may broadcast unrestricted
 - Manager agent may broadcast with stated reason
-- Team-leads must request broadcast through the manager agent — it decides whether to broadcast or send targeted messages
+- Team-leads must request broadcast through the manager agent -- it decides whether to broadcast or send targeted messages
 - Maximum 3 broadcasts per session per authority level
 - Scope-filter broadcasts: only send to affected teams, not all
 
@@ -508,7 +508,7 @@ All disputes reaching the manager agent are logged to the Handoff Ledger with `t
 - Detect teams that go silent (no reports within expected timeframe)
 - Escalate to PO if a team appears stuck or unresponsive
 
-This is observational, not directive. The manager agent does not tell a team how to fix its health — it flags the issue to PO.
+This is observational, not directive. The manager agent does not tell a team how to fix its health -- it flags the issue to PO.
 
 ### Manager Agent Authority Boundaries
 
@@ -524,7 +524,7 @@ Derived from the delegation matrix. This is the formal authority mapping.
 | Broadcast with stated reason | 29 | ≤3 per session |
 | Resolve inter-team conflicts (policy exists) | 30 | Policy must be documented |
 | Prioritize competing normal/high requests | 31 | Not blocking priority |
-| Route cross-team audit findings | 35 | — |
+| Route cross-team audit findings | 35 | -- |
 | Review direct links (per lifecycle protocol) | 27, 28 | Per T03 triggers |
 
 **Always escalate to PO (manager agent may recommend, PO decides):**
@@ -554,11 +554,11 @@ Derived from the delegation matrix. This is the formal authority mapping.
 | Code review assignments | Team-lead delegates to reviewer |
 | Messaging specialists directly | Bypasses team-lead chain of command |
 
-### Tool Restrictions — Hard Rules
+### Tool Restrictions -- Hard Rules
 
 The manager agent follows the same FORBIDDEN/ALLOWED pattern as team-leads, but scoped to the cross-team level.
 
-**FORBIDDEN tools (absolute — no exceptions):**
+**FORBIDDEN tools (absolute -- no exceptions):**
 
 - `Edit/Write` on source code, config files, or any team's working files
 - `Edit/Write` on any team's memory directory (only own memory directory)
@@ -567,7 +567,7 @@ The manager agent follows the same FORBIDDEN/ALLOWED pattern as team-leads, but 
 - `git commit/push` on any team's repository
 - `NotebookEdit`
 
-**FORBIDDEN actions (behavioral — enforced by prompt, detected by audit):**
+**FORBIDDEN actions (behavioral -- enforced by prompt, detected by audit):**
 
 - Messaging specialists directly (must route through team-lead)
 - Creating or modifying Jira issues without PO request
@@ -611,7 +611,7 @@ The existing `prompts/richelieu.md` (designed by Celes in R6) is the current man
 |---|---|---|
 | Position in hierarchy (L0→L1→L2→L3) | **Confirmed.** Matches delegation matrix exactly. | None |
 | Core responsibilities 1-5 (routing, ledger, registry, broadcast, conflict) | **Confirmed.** All 5 map to delegation matrix rows. | None |
-| Responsibility 6 (team health monitoring) | **Confirmed with clarification.** Observational only — manager agent flags, does not direct fix. | Minor update to prompt: add "observational, not directive" |
+| Responsibility 6 (team health monitoring) | **Confirmed with clarification.** Observational only -- manager agent flags, does not direct fix. | Minor update to prompt: add "observational, not directive" |
 | Tool restrictions (FORBIDDEN/ALLOWED) | **Confirmed with additions.** Richelieu's prompt covers the essentials. T04 adds: explicit ban on editing other teams' memory directories, ban on reading source code, 1-message-cycle routing SLA. | Update prompt to add missing restrictions |
 | Decision authority matrix (10 rows) | **Subsumed by T04 delegation matrix (39 rows).** Richelieu's 10-row table is a correct subset. The T04 matrix is now the canonical authority source. | Update prompt to reference T04 matrix instead of inlining a subset |
 | Anti-patterns (6 rows) | **Confirmed.** All 6 are valid and appear in T04's failure modes. | None |
@@ -635,7 +635,7 @@ These prompt updates are Celes's responsibility (agent prompt ownership per gove
 
 ### The Problem
 
-When a manager agent is first deployed, there is a transition period where both PO and manager agent could be issuing directives. This creates the "dual authority" failure mode (see Failure Modes table). The handoff must be explicit and atomic — team-leads must know exactly when the reporting chain changes.
+When a manager agent is first deployed, there is a transition period where both PO and manager agent could be issuing directives. This creates the "dual authority" failure mode (see Failure Modes table). The handoff must be explicit and atomic -- team-leads must know exactly when the reporting chain changes.
 
 ### Handoff Procedure
 
@@ -657,7 +657,7 @@ Phase 2: ANNOUNCEMENT (PO → all team-leads)
   │     - Report to [name] for cross-team routing, handoffs, and conflicts.
   │     - PO handles: team creation, architecture, production, Jira, external comms.
   │     - If [name] is unavailable, escalate to PO."
-  └─ Each team-lead ACKs (mandatory — no silent acceptance)
+  └─ Each team-lead ACKs (mandatory -- no silent acceptance)
 
 Phase 3: ACTIVE (manager agent operational)
   │
@@ -695,7 +695,7 @@ If the manager agent is not performing (bottleneck, authority drift, context ove
 3. Manager agent persists final state (ledger, registry) to disk
 4. Manager agent shuts down
 
-This is a clean rollback because the PO was always capable of performing L1 functions — the manager agent was additive, not replacing.
+This is a clean rollback because the PO was always capable of performing L1 functions -- the manager agent was additive, not replacing.
 
 ---
 
@@ -722,8 +722,8 @@ Emergency authority is **time-bounded** and **scope-limited**. It expires. It do
 
 When PO is unavailable, the manager agent may additionally:
 
-- **Triage blocking priority conflicts** — choose which team proceeds first, with documented reasoning. This is normally a PO escalation (Row 31), but blocking means both teams are idle, which is worse than a possibly-wrong triage.
-- **Defer precedent-setting disputes** — log the dispute, assign a temporary resolution, mark it as "pending PO review." The temporary resolution is explicitly reversible.
+- **Triage blocking priority conflicts** -- choose which team proceeds first, with documented reasoning. This is normally a PO escalation (Row 31), but blocking means both teams are idle, which is worse than a possibly-wrong triage.
+- **Defer precedent-setting disputes** -- log the dispute, assign a temporary resolution, mark it as "pending PO review." The temporary resolution is explicitly reversible.
 
 The manager agent may NOT, even in emergency:
 
@@ -743,7 +743,7 @@ Every emergency decision is logged by the acting authority:
 
 | # | Timestamp | Acting authority | Decision | Normal authority | Reason PO unavailable | Reversible? | PO reviewed |
 |---|---|---|---|---|---|---|---|
-| E-001 | 2026-03-20 14:30 | MGR:Rich | Prioritized apex-research handoff over hr-devs request | PO (Row 31 blocking) | Session timeout, PO offline | Yes — re-prioritize on PO return | Pending |
+| E-001 | 2026-03-20 14:30 | MGR:Rich | Prioritized apex-research handoff over hr-devs request | PO (Row 31 blocking) | Session timeout, PO offline | Yes -- re-prioritize on PO return | Pending |
 ```
 
 The log persists in the manager agent's memory directory. PO reviews all entries on return. PO may reverse any emergency decision.
@@ -763,9 +763,9 @@ When no manager agent is deployed and PO is unavailable, the **senior team-lead*
 
 | Violation | Risk | Prevention |
 |---|---|---|
-| Emergency authority used when PO is available but busy | Authority creep — "busy" is not "unavailable" | Agent must attempt PO contact before invoking emergency protocol |
+| Emergency authority used when PO is available but busy | Authority creep -- "busy" is not "unavailable" | Agent must attempt PO contact before invoking emergency protocol |
 | Emergency decision treated as precedent | Bypasses PO's policy-making authority | All emergency decisions are explicitly temporary and reversible |
-| Manager agent makes architecture decision under emergency | Scope expansion beyond what emergency authority grants | Emergency authority list is exhaustive — anything not listed is forbidden |
+| Manager agent makes architecture decision under emergency | Scope expansion beyond what emergency authority grants | Emergency authority list is exhaustive -- anything not listed is forbidden |
 | No post-hoc review | Emergency decisions become de facto policy without PO awareness | PO reviews emergency log at start of every session |
 
 ---
@@ -776,7 +776,7 @@ When no manager agent is deployed and PO is unavailable, the **senior team-lead*
 
 Both reference teams are flat: PO → team-lead → specialists. No manager agent layer exists yet. The framework vision adds a Level 1 manager agent layer, but it's not implemented in either reference team.
 
-### Team-lead is coordinator-only — enforced by prompt
+### Team-lead is coordinator-only -- enforced by prompt
 
 The team-lead role boundary is explicit and enforced by agent prompts:
 
@@ -792,7 +792,7 @@ The team-lead role boundary is explicit and enforced by agent prompts:
 - `Read` for team config, memory files, CLAUDE.md, roster
 - `Edit/Write` only under the team's memory directory and roster JSON
 - `Bash` for `date`, tmux commands, `git pull` (dev-toolkit only), cleanup scripts, `gh` commands for issue/PR management
-- `SendMessage` — primary tool
+- `SendMessage` -- primary tool
 - Task coordination tools
 
 **Enforcement mechanism:** Teammates are instructed to send a reminder message if they observe team-lead violating these boundaries. Self-policing by the team, not infrastructure enforcement.
@@ -823,7 +823,7 @@ Jira issue creation/update requires explicit user request (from workspace MEMORY
 
 ### PR governance
 
-Code review (Marcus) uses GitHub Reviews API with `--comment` (COMMENTED state) — creates formal review record in reviews widget, provides audit trail. Issue closure happens only after GREEN review from Marcus.
+Code review (Marcus) uses GitHub Reviews API with `--comment` (COMMENTED state) -- creates formal review record in reviews widget, provides audit trail. Issue closure happens only after GREEN review from Marcus.
 
 ### Schedule awareness rule
 
@@ -837,13 +837,13 @@ How does this governance model behave as team count grows?
 
 | Teams | L1 status | Governance load | Bottleneck risk |
 |---|---|---|---|
-| 1 | PO acts as L1 | Minimal — all intra-team | None |
-| 2–3 | PO acts as L1 | Low — occasional cross-team routing | PO context switching |
-| 4–5 | Manager agent recommended | Moderate — regular handoffs, potential conflicts | PO becomes routing bottleneck |
-| 6–10 | Manager agent required | High — multiple concurrent handoffs, broadcast management | Manager agent context window |
-| 10+ | Multiple manager agents or domain grouping | Very high — need sub-hierarchies | Single manager agent context limit |
+| 1 | PO acts as L1 | Minimal -- all intra-team | None |
+| 2–3 | PO acts as L1 | Low -- occasional cross-team routing | PO context switching |
+| 4–5 | Manager agent recommended | Moderate -- regular handoffs, potential conflicts | PO becomes routing bottleneck |
+| 6–10 | Manager agent required | High -- multiple concurrent handoffs, broadcast management | Manager agent context window |
+| 10+ | Multiple manager agents or domain grouping | Very high -- need sub-hierarchies | Single manager agent context limit |
 
-**At 10+ teams:** Consider domain-grouped management — one manager agent per domain (e.g., project teams, infrastructure teams, research teams), with PO coordinating the managers. This adds a governance layer but prevents any single agent from holding context on 10+ teams.
+**At 10+ teams:** Consider domain-grouped management -- one manager agent per domain (e.g., project teams, infrastructure teams, research teams), with PO coordinating the managers. This adds a governance layer but prevents any single agent from holding context on 10+ teams.
 
 ---
 
@@ -863,13 +863,13 @@ How does this governance model behave as team count grows?
 
 ## Authority-Drift Detection at Federation Scale (*FR:Montesquieu*)
 
-Single-team authority drift is narrative-detected — Medici reads scratchpads, peer agents flag inconsistencies, MEMORY.md amendments capture incidents. This does not scale beyond a handful of teams. At federation scale (n=10+ teams), narrative detection misses violations because no human or agent holds context on all teams' scratchpads simultaneously.
+Single-team authority drift is narrative-detected -- Medici reads scratchpads, peer agents flag inconsistencies, MEMORY.md amendments capture incidents. This does not scale beyond a handful of teams. At federation scale (n=10+ teams), narrative detection misses violations because no human or agent holds context on all teams' scratchpads simultaneously.
 
 ### Substrate-typed detection
 
-The federation observes drift via **substrate-typed signals derived from the same poll-stream that Phase A's federation-bootstrap sidecar consumes** — different reducer over a shared firehose. Detection lives below the governance layer. The detector emits *advisory* signals via the existing `ProducerAction` enum (`escalate-to-team-lead`, `escalate-to-governance`); corrective authority is a separate decision made by an actor above the substrate.
+The federation observes drift via **substrate-typed signals derived from the same poll-stream that Phase A's federation-bootstrap sidecar consumes** -- different reducer over a shared firehose. Detection lives below the governance layer. The detector emits *advisory* signals via the existing `ProducerAction` enum (`escalate-to-team-lead`, `escalate-to-governance`); corrective authority is a separate decision made by an actor above the substrate.
 
-The placement is structural, not convenience: if the substrate auto-corrected violations, the substrate would become governance, and the separation of powers would collapse on first autonomous correction. The asymmetry — **admission needs to commit, observation needs to caution** — keeps binding-by-bootstrap separate from advisory-by-drift.
+The placement is structural, not convenience: if the substrate auto-corrected violations, the substrate would become governance, and the separation of powers would collapse on first autonomous correction. The asymmetry -- **admission needs to commit, observation needs to caution** -- keeps binding-by-bootstrap separate from advisory-by-drift.
 
 ### Signal classes
 
@@ -879,25 +879,25 @@ Two detection mechanics, two false-positive profiles:
 - Path-namespace breach: `sourceTeam ≠ leading segment of logical_path` without authorization
 - CuratorAuthority overreach: `WriteAccept.curator ≠ latest-non-superseded-RegistrationAuthority(team).curator`
 - R2 sovereignty boundary crossing: `SovereigntyClaim.state === "R2-violated"` (consumes Brunel's typed 3-state union from observer surface; substrate has done the classification work)
-- Authority-floor regression: structurally-valid `RegistrationAuthority.supersedes` chain advances without corresponding §3.4 ratification record (invalid `supersedes` references — broken-chain — are handled separately as substrate-validation R9-rule under `EnvelopeInvalidRecovery`, not as authority-floor signal, per Herald Directive C in Brunel v0.3)
+- Authority-floor regression: structurally-valid `RegistrationAuthority.supersedes` chain advances without corresponding §3.4 ratification record (invalid `supersedes` references -- broken-chain -- are handled separately as substrate-validation R9-rule under `EnvelopeInvalidRecovery`, not as authority-floor signal, per Herald Directive C in Brunel v0.3)
 
 **Statistical signals** (time-window aggregation, threshold-tuned, false-positive rate governed by tuning, consumes Brunel's typed `BaselineDeviation` 4-state union):
 - Cross-namespace WriteAccept anomaly (`BaselineDeviation` per-team)
 - ContentCategory misclassification (recurring)
 - Rejection-rate anomaly (per-team `errorClass` distribution `BaselineDeviation`)
-- Admission-velocity anomaly (`RegistrationAuthority` envelope rate via supersedes-chain traversal — cumulative count derived detector-side, not stored on envelope)
+- Admission-velocity anomaly (`RegistrationAuthority` envelope rate via supersedes-chain traversal -- cumulative count derived detector-side, not stored on envelope)
 
 `BaselineDeviation` severity mapping: `within-baseline` → no signal, `deviating-conservatively` → info, `deviating-aggressively` → warning, `insufficient-data` → info-with-flag. This typed-output discipline preserves implementation-flexibility on Brunel's measurement-method side while giving the detector a stable severity contract.
 
-### Output design — digest-first, escalate by exception
+### Output design -- digest-first, escalate by exception
 
 Per-team weekly digest is the primary output mode; per-event escalation is the exception. Typed-invariant breaches escalate per-event; statistical signals route to digest by default. The two output modes carry different load profiles (advisory-fatigue load vs. breach load) and do not compete for the same channel.
 
 ### Recipient and authority chain
 
-Drift advisories route per Topic 04 cross-team-audit precedent: **L1 router → team-lead of accused team → team-lead decides corrective action**. The per-namespace curator named in a drift signal is the *subject* of the signal, not the *recipient* of governance authority. The detector emits typed signals; downstream consumers decide. By construction, this introduces no co-ownership / shared-curatorship — drift detection is observe-only, no authority delegated.
+Drift advisories route per Topic 04 cross-team-audit precedent: **L1 router → team-lead of accused team → team-lead decides corrective action**. The per-namespace curator named in a drift signal is the *subject* of the signal, not the *recipient* of governance authority. The detector emits typed signals; downstream consumers decide. By construction, this introduces no co-ownership / shared-curatorship -- drift detection is observe-only, no authority delegated.
 
-The per-namespace curator's authority is **write-authority only, not corrective-authority** — confirmed by Cal Protocol B resolution (2026-05-06) citing Surface 1 §1.1 ("each curator is sole-writer for their team's namespace shard") and `wiki/patterns/substrate-shape-vs-authority-shape-orthogonality.md` (substrate-shape and authority-shape are orthogonal axes; corrective authority lives above the substrate at governance layer, not at the substrate's write-authority layer). Severity ceilings under this resolution do NOT shift; the binding-bootstrap-vs-advisory-drift asymmetry holds in its existing form. ProducerAction emission targets are L1 (typed-invariant breach) or digest-aggregator (statistical signal); never the named curator directly.
+The per-namespace curator's authority is **write-authority only, not corrective-authority** -- confirmed by Cal Protocol B resolution (2026-05-06) citing Surface 1 §1.1 ("each curator is sole-writer for their team's namespace shard") and `wiki/patterns/substrate-shape-vs-authority-shape-orthogonality.md` (substrate-shape and authority-shape are orthogonal axes; corrective authority lives above the substrate at governance layer, not at the substrate's write-authority layer). Severity ceilings under this resolution do NOT shift; the binding-bootstrap-vs-advisory-drift asymmetry holds in its existing form. ProducerAction emission targets are L1 (typed-invariant breach) or digest-aggregator (statistical signal); never the named curator directly.
 
 ### Reference
 
@@ -912,14 +912,14 @@ Full design lives in `teams/framework-research/memory/montesquieu.md` (session 2
 - ~~How many levels of hierarchy?~~ → 4 levels: PO (L0) → Manager agent (L1) → Team lead (L2) → Specialist (L3)
 - ~~Can a manager agent approve PRs or only humans?~~ → Neither. PR merge is team-lead scope (L2). Code review verdict is specialist scope (reviewer agent). Manager agent has no PR authority.
 - ~~What decisions require human approval vs. can be delegated?~~ → See Decision Delegation Matrix (49 decision types mapped, including XP pipeline governance rows 40-45 and Librarian governance rows 46-49 added from T09 v2)
-- ~~Conflict resolution — when two teams disagree, who decides?~~ → See Q5 (escalation ladder: direct → L1 → PO)
+- ~~Conflict resolution -- when two teams disagree, who decides?~~ → See Q5 (escalation ladder: direct → L1 → PO)
 - ~~How do we prevent a manager agent from going rogue?~~ → See Anti-Patterns table + Failure Modes (authority drift, governance bypass)
 
 ### Still open
 
-1. **Multiple manager agents** — At 10+ teams, one manager agent cannot hold context on all teams. Domain-grouped management is proposed but not designed. What are the domains? How do manager agents coordinate with each other?
+1. **Multiple manager agents** -- At 10+ teams, one manager agent cannot hold context on all teams. Domain-grouped management is proposed but not designed. What are the domains? How do manager agents coordinate with each other?
 
-2. **Governance document amendment protocol** — The delegation matrix says PO amends governance docs, but the process for proposing amendments (who drafts, who reviews, what approval looks like) is undefined beyond "PO edits directly."
+2. **Governance document amendment protocol** -- The delegation matrix says PO amends governance docs, but the process for proposing amendments (who drafts, who reviews, what approval looks like) is undefined beyond "PO edits directly."
 
 3. ~~**Emergency authority override**~~ → Resolved. See §Emergency Authority Protocol. Time-bounded, scope-limited emergency authority with mandatory post-hoc PO review. Four escalation levels: PO present → PO unavailable with manager agent → PO unavailable without manager agent → blocking production incident.
 

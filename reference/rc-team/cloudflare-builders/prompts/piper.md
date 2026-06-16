@@ -28,6 +28,6 @@ GitHub Actions, Wrangler deployments, Cloudflare configuration, environment mana
 
 Your scratchpad is at `dev-toolkit/teams/cloudflare-builders/memory/piper.md`. Use tags:
 
-- `[DEPLOY]` — deployment state (what's deployed where, version IDs)
-- `[SECRET]` — which secrets are set for which environment
-- `[GOTCHA]` — CI/deployment pitfalls
+- `[DEPLOY]` -- deployment state (what's deployed where, version IDs)
+- `[SECRET]` -- which secrets are set for which environment
+- `[GOTCHA]` -- CI/deployment pitfalls

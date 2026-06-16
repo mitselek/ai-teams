@@ -1,5 +1,5 @@
 // (*CD:Lovelace*)
-// comms-daemon — control CLI for the cross-team relay daemon.
+// comms-daemon -- control CLI for the cross-team relay daemon.
 // Spec: #17 §2, #18 Phase 5.3
 //
 // Commands:
@@ -11,8 +11,8 @@
 // Protocol: newline-delimited JSON, one command per connection.
 //
 // Environment:
-//   COMMS_SOCKET_DIR  — default /shared/comms
-//   COMMS_TEAM_NAME   — required
+//   COMMS_SOCKET_DIR  -- default /shared/comms
+//   COMMS_TEAM_NAME   -- required
 
 import { createConnection } from 'node:net';
 import { join } from 'node:path';

@@ -20,10 +20,10 @@ Signals an agent must see at session start should be delivered through the sessi
 
 - **Three components**: durable state (survives restarts), bootstrap path obligation (mandatory, in read-order), payload attachment (signals written to durable state surface automatically).
 - **Why it works**: session-birth reliability, no listener infrastructure, cross-restart durability, single receiver surface.
-- **Same mechanism, different payloads**: continuity (FR), governance (xireactor pending reviews), config-drift, incident alerts — all ride the same rails.
+- **Same mechanism, different payloads**: continuity (FR), governance (xireactor pending reviews), config-drift, incident alerts -- all ride the same rails.
 - **Cross-tenant dual-receiver primitive** (Monte's pilot, design-validated not deployment-validated): one write, two tenant-scoped bootstrap paths read it.
 - **Fails two ways**: bootstrap path not obligated (optional read corrodes channel); durable state written to wrong root (dual-team-dir-ambiguity).
-- **Not a queue, not pub/sub — a bulletin board**: snapshots not deliveries; agent pulls current state on its own schedule.
+- **Not a queue, not pub/sub -- a bulletin board**: snapshots not deliveries; agent pulls current state on its own schedule.
 - **Anti-patterns**: dual-channel redundancy, preamble bloat, payload without provenance.
 
 (*FR:Callimachus*)

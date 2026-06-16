@@ -1,7 +1,7 @@
 // (*CD:Babbage*)
-// Hub v3 — Fastify REST API + SSE server with mTLS
+// Hub v3 -- Fastify REST API + SSE server with mTLS
 // story/28: mTLS auth, peer registry, per-peer rate limiting, structured logging
-// story/29: POST /api/send, GET /api/subscribe — message routing + offline queue
+// story/29: POST /api/send, GET /api/subscribe -- message routing + offline queue
 // story/30: SSE id: field, per-team event buffer, Last-Event-ID replay on reconnect
 // story/31: GET /api/online, enhanced /api/status, /api/register admin + dedup
 
@@ -15,7 +15,7 @@ import { MessageQueue } from './delivery/queue.js';
 
 export interface HubOptions {
   tls: {
-    ca: string; // CA cert PEM — verify client certs against this
+    ca: string; // CA cert PEM -- verify client certs against this
     cert: string; // Hub's TLS cert PEM
     key: string; // Hub's TLS key PEM
   };
@@ -186,7 +186,7 @@ export function createHub(options: HubOptions) {
     ...resolveLogger(options.logger),
   });
 
-  // Combined auth + rate-limit hook — single onRequest to avoid plugin ordering issues
+  // Combined auth + rate-limit hook -- single onRequest to avoid plugin ordering issues
   hub.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
     const cn = getPeerCN(request.raw.socket as TLSSocket);
 
@@ -224,7 +224,7 @@ export function createHub(options: HubOptions) {
     queue.close(); // flush WAL and close SQLite connection
   });
 
-  // GET /api/status — hub metrics + peerTeam for authenticated caller
+  // GET /api/status -- hub metrics + peerTeam for authenticated caller
   hub.get('/api/status', async (request: FastifyRequest) => {
     const peerTeam = getPeerCN(request.raw.socket as TLSSocket)!;
     const uptime = (Date.now() - startTime) / 1000;
@@ -232,12 +232,12 @@ export function createHub(options: HubOptions) {
     return { uptime, version: HUB_VERSION, peerCount: registry.size, queueDepth, peerTeam };
   });
 
-  // GET /api/online — list teams that have ever had an SSE subscription
+  // GET /api/online -- list teams that have ever had an SSE subscription
   hub.get('/api/online', async () => {
     return Array.from(presence.values());
   });
 
-  // POST /api/register — add a new peer cert at runtime (hot-reload, no restart)
+  // POST /api/register -- add a new peer cert at runtime (hot-reload, no restart)
   hub.post('/api/register', async (request: FastifyRequest, reply: FastifyReply) => {
     const cn = getPeerCN(request.raw.socket as TLSSocket)!;
     const body = request.body as { team?: string; cert?: string };
@@ -260,7 +260,7 @@ export function createHub(options: HubOptions) {
     return reply.code(201).send({ registered: body.team });
   });
 
-  // GET /api/subscribe — SSE endpoint; client receives messages addressed to their team.
+  // GET /api/subscribe -- SSE endpoint; client receives messages addressed to their team.
   // Supports Last-Event-ID replay: on reconnect, buffered events missed since lastId are
   // replayed before the stream goes live. Offline-queued messages are also drained.
   hub.get('/api/subscribe', async (request: FastifyRequest, reply: FastifyReply) => {
@@ -316,7 +316,7 @@ export function createHub(options: HubOptions) {
       }
     }
 
-    // Drain offline queue — TTL cleanup runs inside drain() before delivery
+    // Drain offline queue -- TTL cleanup runs inside drain() before delivery
     for (const msg of queue.drain(cn)) {
       const sseId = nextSseId(cn);
       bufferEvent(cn, sseId, msg);
@@ -335,7 +335,7 @@ export function createHub(options: HubOptions) {
     return reply.send(stream);
   });
 
-  // POST /api/send — route message to active subscriber or offline queue
+  // POST /api/send -- route message to active subscriber or offline queue
   hub.post('/api/send', async (request: FastifyRequest, reply: FastifyReply) => {
     const msg = request.body as Record<string, unknown>;
 
@@ -354,7 +354,7 @@ export function createHub(options: HubOptions) {
     const fromTeam = (msg.from as { team: string }).team;
 
     // CN ↔ from.team binding: TLS identity must match the claimed sender.
-    // Belt-and-suspenders — Ed25519 sig also catches this, but the transport check is free
+    // Belt-and-suspenders -- Ed25519 sig also catches this, but the transport check is free
     // and catches spoofing attempts from peers that haven't registered a signing key.
     const senderCN = getPeerCN(request.raw.socket as TLSSocket)!;
     if (fromTeam !== senderCN) {
@@ -366,7 +366,7 @@ export function createHub(options: HubOptions) {
       return reply.code(400).send({ error: 'body_hash mismatch' });
     }
 
-    // Ed25519 signature verification — only when key is configured AND message carries sig + body_hash
+    // Ed25519 signature verification -- only when key is configured AND message carries sig + body_hash
     if (options.signPubKeys?.[fromTeam] && msg.signature && msg.body_hash) {
       const sigError = verifySignature(msg, fromTeam);
       if (sigError) return reply.code(403).send({ error: sigError });
@@ -386,7 +386,7 @@ export function createHub(options: HubOptions) {
     const rawSubs = subscriptions.get(toTeam) ?? [];
 
     // Eagerly prune destroyed streams/sockets (isLiveStream checks both stream.destroyed
-    // and socket.destroyed — the latter catches the RST race window).
+    // and socket.destroyed -- the latter catches the RST race window).
     const liveSubs = rawSubs.filter(isLiveStream);
     if (liveSubs.length === 0) subscriptions.delete(toTeam);
     else if (liveSubs.length < rawSubs.length) subscriptions.set(toTeam, liveSubs);

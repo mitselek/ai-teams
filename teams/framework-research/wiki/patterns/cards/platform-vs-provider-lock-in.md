@@ -17,9 +17,9 @@ Two distinct risks currently conflated because Claude Code (platform) and Anthro
 
 ## Key ideas
 
-- **Platform lock-in (Claude Code)**: the binding constraint — all lifecycle and communication protocols are built on these primitives; all six Discussion #56 agents converged on this as primary.
-- **Provider lock-in (Anthropic models)**: the secondary, separable-in-principle constraint — model API and behavioral calibration prompts are tuned for.
-- **Practical implication**: if Claude Code supported non-Anthropic models natively, most multi-provider objections evaporate — only behavioral-calibration concerns remain.
+- **Platform lock-in (Claude Code)**: the binding constraint -- all lifecycle and communication protocols are built on these primitives; all six Discussion #56 agents converged on this as primary.
+- **Provider lock-in (Anthropic models)**: the secondary, separable-in-principle constraint -- model API and behavioral calibration prompts are tuned for.
+- **Practical implication**: if Claude Code supported non-Anthropic models natively, most multi-provider objections evaporate -- only behavioral-calibration concerns remain.
 - **Migration planning**: separate "how do we leave Claude Code?" (platform migration, high cost, rarely justified) from "how do we use non-Anthropic models?" (provider diversification, trivial-to-hard).
 - **Conflating them** overestimates provider-diversification difficulty and underestimates platform-migration difficulty.
 

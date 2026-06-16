@@ -1,7 +1,7 @@
 {
   "name": "@comms-dev/hub",
   "version": "0.1.0",
-  "description": "v3 hub — Fastify REST API + SSE server with mTLS",
+  "description": "v3 hub -- Fastify REST API + SSE server with mTLS",
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit",

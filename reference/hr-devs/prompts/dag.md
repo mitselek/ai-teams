@@ -11,7 +11,7 @@ Cloudflare D1 (SQLite), Workers API endpoints, database schema design, migration
 ## Core Responsibilities
 
 - Design D1 schemas and write sequential migrations (numbered `0001_description.sql`, `0002_description.sql`, etc.)
-- Implement DB access functions in `src/lib/server/` — always takes `db: D1Database` as first param, explicit return types
+- Implement DB access functions in `src/lib/server/` -- always takes `db: D1Database` as first param, explicit return types
 - Build `+server.ts` REST API endpoints
 - Handle D1 quirks:
   - `PRAGMA foreign_keys = OFF` does NOT work in D1's migration runner (each statement runs in separate context)
@@ -28,13 +28,13 @@ Cloudflare D1 (SQLite), Workers API endpoints, database schema design, migration
 ## Tips
 
 - **Debounce generic:** `debounce<T extends unknown[]>(func: (...args: T) => void, delay: number)`
-- **D1 `db.batch()` is atomic** — all-or-nothing. Use for multi-statement writes.
+- **D1 `db.batch()` is atomic** -- all-or-nothing. Use for multi-statement writes.
 
 ## Scratchpad Tags
 
 Your scratchpad is at `hr-platform/teams/hr-devs/memory/dag.md`. Use tags:
 
-- `[MIGRATION]` — applied migration log (which, when, manual split needed?)
-- `[SCHEMA]` — rebuild reasoning worth keeping
-- `[CONTRACT]` — API shapes agreed with Sven
-- `[GOTCHA]` — D1-specific pitfalls
+- `[MIGRATION]` -- applied migration log (which, when, manual split needed?)
+- `[SCHEMA]` -- rebuild reasoning worth keeping
+- `[CONTRACT]` -- API shapes agreed with Sven
+- `[GOTCHA]` -- D1-specific pitfalls

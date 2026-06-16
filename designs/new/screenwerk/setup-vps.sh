@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup-vps.sh — Provision a Hostinger VPS for the screenwerk-dev AI team
+# setup-vps.sh -- Provision a Hostinger VPS for the screenwerk-dev AI team
 #
 # Target: srv1559865.hstgr.cloud (Debian)
 # Run as: root

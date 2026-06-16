@@ -18,10 +18,10 @@ For teams maintaining 2+ repos with different tech stacks: shared ARCHITECT + se
 ## Key ideas
 
 - **Shared ARCHITECT**: decomposition knowledge crosses repos (shared integration points); under sequential execution, no contention.
-- **Separate PURPLE per repo**: per T09 High-domain-distance rule — language boundaries force separation.
+- **Separate PURPLE per repo**: per T09 High-domain-distance rule -- language boundaries force separation.
 - **Shared Librarian**: integration knowledge bridges repos; both pipelines query the same external contracts.
 - **Separate RED/GREEN per repo**: standard per-pipeline allocation.
-- **Resulting composition (2 repos)**: 9 chars — team-lead + ARCHITECT + 2×[RED+GREEN+PURPLE] + Librarian; model split 5 opus + 4 sonnet.
+- **Resulting composition (2 repos)**: 9 chars -- team-lead + ARCHITECT + 2×[RED+GREEN+PURPLE] + Librarian; model split 5 opus + 4 sonnet.
 - **Provenance**: raamatukoi-dev (webstore TS/Next.js + rat-project Python/FastAPI), both sharing Directo ERP + PIM integrations.
 
 (*FR:Callimachus*)

@@ -1,8 +1,8 @@
-# Backlog Triage Team — Implementation Plan
+# Backlog Triage Team -- Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Create and deploy the backlog-triage team — roster, agent prompts, container config — so it can autonomously cross-reference VL Jira backlog with hr-platform GitHub history.
+**Goal:** Create and deploy the backlog-triage team -- roster, agent prompts, container config -- so it can autonomously cross-reference VL Jira backlog with hr-platform GitHub history.
 
 **Architecture:** Four-agent team (lead + archivist + forensic + consul) deployed in a Debian-based Docker container on RC server. Lead coordinates a sequential pipeline per ticket. Container needs Jira MCP tools, `gh` CLI, and the hr-platform repo.
 
@@ -14,7 +14,7 @@
 
 ## Parallelism
 
-Tasks 1–3 (Celes) and Tasks 4–6 (Brunel) are **fully independent** — run them in parallel. Task 7 (final review) depends on both completing.
+Tasks 1–3 (Celes) and Tasks 4–6 (Brunel) are **fully independent** -- run them in parallel. Task 7 (final review) depends on both completing.
 
 ```
 Celes: Task 1 → Task 2 → Task 3 ──┐
@@ -30,13 +30,13 @@ All files created under `designs/new/backlog-triage/`:
 |---|---|
 | `roster.json` | Team members, models, prompt file paths, lore |
 | `common-prompt.md` | Mission, communication rules, pipeline protocol, verdict definitions |
-| `prompts/team-lead.md` | Lead agent prompt — ticket routing, Jira writes, report compilation |
-| `prompts/archivist.md` | Issue researcher prompt — GitHub issues/PRs search |
-| `prompts/forensic.md` | Code researcher prompt — commits, diffs, codebase search |
-| `prompts/consul.md` | Stakeholder advocate prompt — evidence evaluation, verdict rendering |
+| `prompts/team-lead.md` | Lead agent prompt -- ticket routing, Jira writes, report compilation |
+| `prompts/archivist.md` | Issue researcher prompt -- GitHub issues/PRs search |
+| `prompts/forensic.md` | Code researcher prompt -- commits, diffs, codebase search |
+| `prompts/consul.md` | Stakeholder advocate prompt -- evidence evaluation, verdict rendering |
 | `container/Dockerfile.backlog-triage` | Debian-based container (no Wrangler, no Dynamics, simpler than hr-devs) |
 | `container/docker-compose.backlog-triage.yml` | Compose file with env vars, volumes, ports |
-| `container/entrypoint-backlog-triage.sh` | Container entrypoint — clone repo, build Jira MCP, SSH, env setup |
+| `container/entrypoint-backlog-triage.sh` | Container entrypoint -- clone repo, build Jira MCP, SSH, env setup |
 
 ---
 
@@ -91,7 +91,7 @@ All files created under `designs/new/backlog-triage/`:
 }
 ```
 
-Celes fills in the lore fields — names, origins, and significance that match each agent's role. The structural fields (model, agentType, prompt path, color) are fixed per the design spec.
+Celes fills in the lore fields -- names, origins, and significance that match each agent's role. The structural fields (model, agentType, prompt path, color) are fixed per the design spec.
 
 - [ ] **Step 2: Review roster for completeness**
 
@@ -117,23 +117,23 @@ git commit -m "feat(backlog-triage): add roster.json with team composition"
 
 Must include these sections:
 
-1. **Team** — name, members with roles, mission statement
-2. **Workspace** — repo layout (`~/workspace/hr-platform/`), output files (`todo.md`, `toconfirm.md`, `done.md`)
-3. **Communication Rule** — timestamp format `[YYYY-MM-DD HH:MM]`, mandatory report after each task
-4. **Author Attribution** — `(*BT:<AgentName>*)` format (BT = Backlog Triage)
-5. **Pipeline Protocol** — the 5-step sequential flow per ticket:
+1. **Team** -- name, members with roles, mission statement
+2. **Workspace** -- repo layout (`~/workspace/hr-platform/`), output files (`todo.md`, `toconfirm.md`, `done.md`)
+3. **Communication Rule** -- timestamp format `[YYYY-MM-DD HH:MM]`, mandatory report after each task
+4. **Author Attribution** -- `(*BT:<AgentName>*)` format (BT = Backlog Triage)
+5. **Pipeline Protocol** -- the 5-step sequential flow per ticket:
    - Step 1: Lead picks ticket via `jira_get_issue`, sends to Archivist
    - Step 2: Archivist searches GitHub issues/PRs, reports to Lead
    - Step 3: Forensic searches commits/code, reports to Lead
    - Step 4: Consul evaluates evidence, renders verdict
    - Step 5: Lead acts on verdict (update docs, post to Jira, transition if `done`)
-6. **Verdict Definitions** — the three verdicts with exact actions:
+6. **Verdict Definitions** -- the three verdicts with exact actions:
    - `not_connected` → append to `todo.md`, no Jira action
    - `needs_confirmation` → append to `toconfirm.md`, post Jira comment with evidence links
    - `done` → append to `done.md`, post Jira comment with evidence links, transition to Done (ID 31)
-7. **Jira Reference** — project VL, transition IDs (11=To Do, 21=In Progress, 31=Done, 41=Open)
-8. **GitHub Reference** — repo `Eesti-Raudtee/hr-platform`, use `gh` CLI for issues/PRs, `git log` for commits
-9. **Shutdown Protocol** — same as framework-research (scratchpad, closing message with tags, approve)
+7. **Jira Reference** -- project VL, transition IDs (11=To Do, 21=In Progress, 31=Done, 41=Open)
+8. **GitHub Reference** -- repo `Eesti-Raudtee/hr-platform`, use `gh` CLI for issues/PRs, `git log` for commits
+9. **Shutdown Protocol** -- same as framework-research (scratchpad, closing message with tags, approve)
 
 - [ ] **Step 2: Review for completeness against spec**
 
@@ -169,7 +169,7 @@ Lead agent prompt. Key responsibilities:
   - Post Jira comment via `jira_update_issue` with evidence links
   - Transition via `jira_transition` (ID 31) for `done` verdicts
   - Append row to the correct output file (`todo.md`, `toconfirm.md`, or `done.md`)
-- Track progress — which tickets are processed, which remain
+- Track progress -- which tickets are processed, which remain
 - Access: all 4 Jira MCP tools, `gh` CLI
 
 - [ ] **Step 2: Write archivist.md**
@@ -180,10 +180,10 @@ Issue researcher prompt. Key responsibilities:
 - Search GitHub issues: `gh issue list --repo Eesti-Raudtee/hr-platform --state all --search "<keywords>"`
 - Search PRs: `gh pr list --repo Eesti-Raudtee/hr-platform --state all --search "<keywords>"`
 - Read promising issues/PRs with `gh issue view` / `gh pr view` for details
-- Extract keywords from the Jira ticket — feature names, component names, Estonian terms
+- Extract keywords from the Jira ticket -- feature names, component names, Estonian terms
 - Report: list of matching GitHub issues/PRs with links and relevance explanation
 - Access: `jira_get_issue` (read ticket directly), `gh` CLI (issues/PRs only), no codebase access
-- Strictly read-only — no writes to any system
+- Strictly read-only -- no writes to any system
 
 - [ ] **Step 3: Write forensic.md**
 
@@ -194,9 +194,9 @@ Code researcher prompt. Key responsibilities:
 - Search code changes: `git log -S "<string>" --oneline` (pickaxe) for added/removed code
 - Search current codebase: grep/glob for files implementing the described feature
 - Check test files for tests validating the described behavior
-- Cross-reference with Archivist's findings — do the linked issues have commits?
+- Cross-reference with Archivist's findings -- do the linked issues have commits?
 - Report: list of matching commits (hash + message), relevant files, test coverage
-- Access: `jira_get_issue`, git commands, file reading — no GitHub issue/PR access, no writes
+- Access: `jira_get_issue`, git commands, file reading -- no GitHub issue/PR access, no writes
 
 - [ ] **Step 4: Write consul.md**
 
@@ -208,11 +208,11 @@ Stakeholder advocate prompt. Key responsibilities:
   - Is the implementation complete or partial?
   - Are there UI/UX aspects that can't be verified from code? → flag for manual review
 - Render one of three verdicts with justification:
-  - `not_connected` — no evidence found, or evidence is unrelated
-  - `needs_confirmation` — evidence exists but intent match is uncertain, or UI verification needed
-  - `done` — clear evidence that the ticket's requirement is fully implemented
+  - `not_connected` -- no evidence found, or evidence is unrelated
+  - `needs_confirmation` -- evidence exists but intent match is uncertain, or UI verification needed
+  - `done` -- clear evidence that the ticket's requirement is fully implemented
 - Access: `jira_get_issue`, `gh` CLI (to verify links), file reading (to spot-check code)
-- Strictly read-only — no writes to any system
+- Strictly read-only -- no writes to any system
 
 - [ ] **Step 5: Review all 4 prompts**
 
@@ -239,12 +239,12 @@ git commit -m "feat(backlog-triage): add agent prompts for lead, archivist, fore
 
 - Create: `designs/new/backlog-triage/container/Dockerfile.backlog-triage`
 
-**Reference:** `designs/new/hr-devs/container/Dockerfile.hr-devs` — adapt, don't copy. This team is simpler:
+**Reference:** `designs/new/hr-devs/container/Dockerfile.hr-devs` -- adapt, don't copy. This team is simpler:
 
 - No Wrangler CLI (no Cloudflare deploys)
 - No Dynamics MCP (not needed)
 - No Vite/dev server port
-- Debian base instead of Ubuntu (`ai-teams-claude:latest` is Ubuntu — must use a Debian base image instead)
+- Debian base instead of Ubuntu (`ai-teams-claude:latest` is Ubuntu -- must use a Debian base image instead)
 
 - [ ] **Step 1: Write Dockerfile**
 
@@ -254,7 +254,7 @@ Key differences from hr-devs:
 - Install from scratch: Node.js 22, git, gh CLI, openssh-server, tmux, locales, gosu, curl, jq
 - No Wrangler
 - SSH port: 2226 (next available after hr-devs' 2225)
-- Expose only 2226 (SSH) — no dev server ports needed
+- Expose only 2226 (SSH) -- no dev server ports needed
 - Claude Code native install
 - Timezone Europe/Tallinn
 
@@ -287,7 +287,7 @@ git commit -m "feat(backlog-triage): add Debian-based Dockerfile"
 
 Key settings:
 
-- Port allocation: 2226 (SSH) — document in port allocation table
+- Port allocation: 2226 (SSH) -- document in port allocation table
 - Named volumes: `bt-claude-home` (Claude state), `bt-repo` (hr-platform repo)
 - No Dynamics data bind mount
 - No Cloudflare env vars
@@ -318,7 +318,7 @@ git commit -m "feat(backlog-triage): add docker-compose with ports and volumes"
 
 - Create: `designs/new/backlog-triage/container/entrypoint-backlog-triage.sh`
 
-**Reference:** `designs/new/hr-devs/container/entrypoint-hr-devs.sh` — simplify significantly.
+**Reference:** `designs/new/hr-devs/container/entrypoint-hr-devs.sh` -- simplify significantly.
 
 - [ ] **Step 1: Write entrypoint script**
 
@@ -369,7 +369,7 @@ git commit -m "feat(backlog-triage): add entrypoint script for container setup"
 
 ```
 designs/new/backlog-triage/
-├── 2026-03-20-backlog-triage-design.md   (spec — already committed)
+├── 2026-03-20-backlog-triage-design.md   (spec -- already committed)
 ├── 2026-03-20-backlog-triage-plan.md     (this plan)
 ├── roster.json
 ├── common-prompt.md

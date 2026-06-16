@@ -1,56 +1,56 @@
 // (*CD:Kerckhoffs*)
 // RED tests for story/34: MCP server for Claude Code agents.
 //
-// Acceptance criteria (Given/When/Then — EN 50716:2023 / CODING_STANDARDS.md):
+// Acceptance criteria (Given/When/Then -- EN 50716:2023 / CODING_STANDARDS.md):
 //
-//   AC1 — tool registration:
+//   AC1 -- tool registration:
 //     Given: a configured MCP server
 //     When:  Claude Code starts it via stdio (tested via InMemoryTransport)
 //     Then:  tools/list returns 5 tools: comms_send, comms_inbox, comms_online,
 //            comms_reply, comms_status
 //
-//   AC2 — comms_send:
+//   AC2 -- comms_send:
 //     Given: hub is reachable; team-b is subscribed via SSE
 //     When:  comms_send called with { to: 'team-b', body: 'hello' }
 //     Then:  POST /api/send is made with mTLS; response { ok: true, id: ... }
 //
-//   AC3 — comms_inbox:
+//   AC3 -- comms_inbox:
 //     Given: team-b sent a message to our MCP team (team-a) via the hub
 //     When:  comms_inbox is called
 //     Then:  the message appears in the returned content
 //
-//   AC4 — comms_reply:
+//   AC4 -- comms_reply:
 //     Given: a message from team-b is buffered in inbox (id: originalId)
 //     When:  comms_reply called with { id: originalId, body: 'response' }
 //     Then:  a message is sent with reply_to: originalId
 //
-//   AC5 — comms_online:
+//   AC5 -- comms_online:
 //     Given: hub responds to GET /api/online
 //     When:  comms_online is called
 //     Then:  tool returns the peer list as JSON content
 //
-//   AC6 — comms_status:
+//   AC6 -- comms_status:
 //     Given: SSE subscription is active
 //     When:  comms_status is called
 //     Then:  response includes { connected: true, unread: N }
 //
-//   AC7 — SSE reconnection:
+//   AC7 -- SSE reconnection:
 //     Given: hub goes down (or was never up)
 //     When:  SSESubscriber.start() is called
 //     Then:  subscriber.connected === false; comms_status shows connected: false
 //
-//   AC8 — env var config:
+//   AC8 -- env var config:
 //     Given: COMMS_HUB_URL, COMMS_TLS_CERT, COMMS_TLS_KEY, COMMS_CA_CERT,
 //            COMMS_TEAM_NAME are set
 //     When:  createMcpFromEnv() is called
 //     Then:  returned client uses those credentials
 //
-//   AC9 — Zod validation:
+//   AC9 -- Zod validation:
 //     Given: each tool's Zod schema
 //     When:  invalid input is provided (missing required fields)
 //     Then:  schema.safeParse() returns success: false with a ZodError
 //
-//   AC10 — one tool per file:
+//   AC10 -- one tool per file:
 //     Given: tools/ directory
 //     When:  each tool file is inspected
 //     Then:  tools/send.ts → TOOL_NAME = 'comms_send', etc.
@@ -123,7 +123,7 @@ import * as StatusTool from './tools/status.js';
 // Hub is available cross-package via relative path:
 import { createHub } from '../../hub/src/server.js';
 
-// MCP SDK — for AC1 tool registration test
+// MCP SDK -- for AC1 tool registration test
 import { Client } from '@modelcontextprotocol/sdk/client';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory';
 
@@ -289,9 +289,9 @@ afterAll(async () => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ── AC1 — MCP server registers 5 tools ───────────────────────────────────────
+// ── AC1 -- MCP server registers 5 tools ───────────────────────────────────────
 
-describe('AC1 — createMcpServer registers 5 tools', () => {
+describe('AC1 -- createMcpServer registers 5 tools', () => {
   it('tools/list response contains exactly the 5 comms tools', async () => {
     // Connect MCP server to an in-memory client transport to test tool registration
     const { mcpServer } = createMcpServer({
@@ -321,9 +321,9 @@ describe('AC1 — createMcpServer registers 5 tools', () => {
   });
 });
 
-// ── AC2 — comms_send POSTs to hub with mTLS ───────────────────────────────────
+// ── AC2 -- comms_send POSTs to hub with mTLS ───────────────────────────────────
 
-describe('AC2 — comms_send sends message via hub client', () => {
+describe('AC2 -- comms_send sends message via hub client', () => {
   it('execute returns { ok: true, id } when message queued for offline team-b', async () => {
     const client = new HubClient({
       hubUrl,
@@ -346,9 +346,9 @@ describe('AC2 — comms_send sends message via hub client', () => {
   });
 });
 
-// ── AC3 — comms_inbox returns buffered messages ───────────────────────────────
+// ── AC3 -- comms_inbox returns buffered messages ───────────────────────────────
 
-describe('AC3 — comms_inbox returns buffered unread messages from SSE', () => {
+describe('AC3 -- comms_inbox returns buffered unread messages from SSE', () => {
   it('returns messages received by SSESubscriber from hub', async () => {
     const client = new HubClient({
       hubUrl,
@@ -383,9 +383,9 @@ describe('AC3 — comms_inbox returns buffered unread messages from SSE', () => 
   });
 });
 
-// ── AC4 — comms_reply sets reply_to ──────────────────────────────────────────
+// ── AC4 -- comms_reply sets reply_to ──────────────────────────────────────────
 
-describe('AC4 — comms_reply sends message with reply_to set to original ID', () => {
+describe('AC4 -- comms_reply sends message with reply_to set to original ID', () => {
   it('message sent via comms_reply has reply_to === originalMsg.id', async () => {
     const client = new HubClient({
       hubUrl,
@@ -450,7 +450,7 @@ describe('AC4 — comms_reply sends message with reply_to set to original ID', (
       { client, inbox, teamName: 'team-a' },
     );
     subscriber.stop();
-    // NOTE: keep sseBReq open until after waitUntil — closing it early kills the channel
+    // NOTE: keep sseBReq open until after waitUntil -- closing it early kills the channel
     // before the reply event can arrive.
 
     const parsed = JSON.parse(replyResult.content[0].text) as { ok: boolean };
@@ -466,9 +466,9 @@ describe('AC4 — comms_reply sends message with reply_to set to original ID', (
   });
 });
 
-// ── AC5 — comms_online returns peer list ──────────────────────────────────────
+// ── AC5 -- comms_online returns peer list ──────────────────────────────────────
 
-describe('AC5 — comms_online returns GET /api/online peer list', () => {
+describe('AC5 -- comms_online returns GET /api/online peer list', () => {
   it('execute returns JSON content with an array of peers', async () => {
     const client = new HubClient({
       hubUrl,
@@ -486,9 +486,9 @@ describe('AC5 — comms_online returns GET /api/online peer list', () => {
   });
 });
 
-// ── AC6 — comms_status shows { connected, unread } ───────────────────────────
+// ── AC6 -- comms_status shows { connected, unread } ───────────────────────────
 
-describe('AC6 — comms_status reports SSE connection state and unread count', () => {
+describe('AC6 -- comms_status reports SSE connection state and unread count', () => {
   it('returns { connected: true, unread: N } when subscriber is active', async () => {
     const client = new HubClient({
       hubUrl,
@@ -516,9 +516,9 @@ describe('AC6 — comms_status reports SSE connection state and unread count', (
   });
 });
 
-// ── AC7 — SSE reconnects with exponential backoff ─────────────────────────────
+// ── AC7 -- SSE reconnects with exponential backoff ─────────────────────────────
 
-describe('AC7 — SSESubscriber reconnects; comms_status shows disconnected state', () => {
+describe('AC7 -- SSESubscriber reconnects; comms_status shows disconnected state', () => {
   it('subscriber.connected is false when hub URL is unreachable', async () => {
     const unreachableUrl = 'https://127.0.0.1:1'; // port 1 is always closed
     const inbox = new InboxBuffer();
@@ -560,9 +560,9 @@ describe('AC7 — SSESubscriber reconnects; comms_status shows disconnected stat
   });
 });
 
-// ── AC8 — env var configuration ───────────────────────────────────────────────
+// ── AC8 -- env var configuration ───────────────────────────────────────────────
 
-describe('AC8 — createMcpFromEnv() reads hub config from environment variables', () => {
+describe('AC8 -- createMcpFromEnv() reads hub config from environment variables', () => {
   it('creates a functioning MCP server from COMMS_* env vars', () => {
     const prev = {
       COMMS_HUB_URL: process.env.COMMS_HUB_URL,
@@ -605,9 +605,9 @@ describe('AC8 — createMcpFromEnv() reads hub config from environment variables
   });
 });
 
-// ── AC9 — Zod input validation ────────────────────────────────────────────────
+// ── AC9 -- Zod input validation ────────────────────────────────────────────────
 
-describe('AC9 — tool schemas reject invalid input with Zod', () => {
+describe('AC9 -- tool schemas reject invalid input with Zod', () => {
   it('comms_send schema rejects missing "to" field', () => {
     const result = SendTool.schema.safeParse({ body: 'hello' });
     expect(result.success).toBe(false);
@@ -639,9 +639,9 @@ describe('AC9 — tool schemas reject invalid input with Zod', () => {
   });
 });
 
-// ── AC10 — One tool per file ──────────────────────────────────────────────────
+// ── AC10 -- One tool per file ──────────────────────────────────────────────────
 
-describe('AC10 — each tool is in its own file with correct TOOL_NAME', () => {
+describe('AC10 -- each tool is in its own file with correct TOOL_NAME', () => {
   it('tools/send.ts exports TOOL_NAME = "comms_send"', () => {
     expect(SendTool.TOOL_NAME).toBe('comms_send');
   });

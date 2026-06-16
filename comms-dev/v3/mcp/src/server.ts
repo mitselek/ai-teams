@@ -1,5 +1,5 @@
 // (*CD:Vigenere+Lovelace*)
-// MCP server v3 — Claude Code agent interface to the comms hub.
+// MCP server v3 -- Claude Code agent interface to the comms hub.
 // Registers 5 tools: comms_send, comms_inbox, comms_online, comms_reply, comms_status.
 // E2E crypto: loads keys from file paths, wires into send tool and SSE subscriber.
 
@@ -130,7 +130,7 @@ export function createMcpFromEnv(): ReturnType<typeof createMcpServer> {
     key: process.env.COMMS_TLS_KEY!,
     ca: process.env.COMMS_CA_CERT!,
     teamName: process.env.COMMS_TEAM_NAME!,
-    // E2E crypto (optional — omit to run without encryption)
+    // E2E crypto (optional -- omit to run without encryption)
     keyBundlePath: process.env.COMMS_KEY_BUNDLE_PATH,
     signKeyPath: process.env.COMMS_SIGN_KEY_PATH,
     encKeyPath: process.env.COMMS_ENC_KEY_PATH,

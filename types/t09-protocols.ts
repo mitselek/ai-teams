@@ -6,10 +6,10 @@
  * the interfaces here describe shape. Each interface references the T09
  * section that is authoritative for its meaning.
  *
- * Strict typing throughout — no `any`, all fields explicit.
+ * Strict typing throughout -- no `any`, all fields explicit.
  *
  * Resolves issue #51 (T09: Formalize all comms protocols as TypeScript
- * interfaces — foundation for inter-team comms API).
+ * interfaces -- foundation for inter-team comms API).
  *
  * (*FR:Celes*)
  */
@@ -73,7 +73,7 @@ export type KnowledgeType =
   | "reference";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Part 1 — XP Pipeline Communication Protocol
+// Part 1 -- XP Pipeline Communication Protocol
 // See topics/09-development-methodology.md § "Communication Protocol
 // (Herald's Four Message Types)".
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,7 +95,7 @@ export interface TestSpec {
   /** What the test asserts. */
   expectedBehavior: string;
   /**
-   * Boundaries ARCHITECT imposes on RED — e.g., "do not modify existing API
+   * Boundaries ARCHITECT imposes on RED -- e.g., "do not modify existing API
    * surface". Prevents scope creep within a single test case.
    */
   constraints: string[];
@@ -125,7 +125,7 @@ export interface GreenHandoff {
   testResult: "PASS";
   /**
    * Shortcuts GREEN took, what is ugly, and what GREEN knows is suboptimal.
-   * Critical field — this is the signal PURPLE needs to refactor effectively.
+   * Critical field -- this is the signal PURPLE needs to refactor effectively.
    */
   implementationNotes: string;
   commit: CommitSha;
@@ -136,7 +136,7 @@ export interface GreenHandoff {
  *
  * PURPLE's ACCEPT/REJECT decision after refactoring. On REJECT, the verdict
  * includes concrete guidance for GREEN. On the third consecutive rejection,
- * the verdict escalates to ARCHITECT with the full rejection chain — this
+ * the verdict escalates to ARCHITECT with the full rejection chain -- this
  * is the three-strike authority-boundary signal.
  *
  * Source: T09 § "Communication Protocol" → "PURPLE_VERDICT" and
@@ -162,7 +162,7 @@ export interface PurpleVerdictAccept {
 
 /**
  * REJECT branch of `PurpleVerdict` (rejection count 1 or 2).
- * Routes back to GREEN with concrete guidance — "extract the validation
+ * Routes back to GREEN with concrete guidance -- "extract the validation
  * into a shared function at X", not "make it better".
  */
 export interface PurpleVerdictReject {
@@ -214,7 +214,7 @@ export interface CycleComplete {
   totalCycles: number;
   finalCommit: CommitSha;
   /**
-   * Structural observations for ARCHITECT — e.g., "growing coupling between
+   * Structural observations for ARCHITECT -- e.g., "growing coupling between
    * modules X and Y across test cases 3-5". Not a judgment; a pattern report.
    */
   qualityNotes: string;
@@ -225,7 +225,7 @@ export interface CycleComplete {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Part 2 — Librarian Dual-Hub Routing
+// Part 2 -- Librarian Dual-Hub Routing
 // See topics/09-development-methodology.md § "Dual-Hub Topology" and
 // "[URGENT-KNOWLEDGE] message format".
 // ─────────────────────────────────────────────────────────────────────────────
@@ -236,13 +236,13 @@ export interface CycleComplete {
  * The narrow routing exception to the dual-hub topology. The Librarian uses
  * this when new knowledge may invalidate another agent's in-flight work.
  * Team-lead's prompt treats the message as a priority interrupt, processed
- * before the next work dispatch — this bounds the damage window to one
+ * before the next work dispatch -- this bounds the damage window to one
  * team-lead dispatch cycle.
  *
  * Source: T09 § "Dual-Hub Topology" → "[URGENT-KNOWLEDGE] message format".
  */
 export interface UrgentKnowledgeMessage {
-  /** Always "Librarian" — the Librarian is the only sender of this message type. */
+  /** Always "Librarian" -- the Librarian is the only sender of this message type. */
   from: "Librarian";
   /** The agent whose current work may be invalidated. */
   affectsAgent: string;
@@ -256,7 +256,7 @@ export interface UrgentKnowledgeMessage {
   /** Which of the affected agent's current tasks may be invalidated. */
   affectedWork: string;
   /**
-   * Librarian's recommendation. Team-lead makes the final call — "interrupt",
+   * Librarian's recommendation. Team-lead makes the final call -- "interrupt",
    * "queue for next handoff", or "informational only" are the three levers
    * team-lead can pull.
    */
@@ -267,14 +267,14 @@ export interface UrgentKnowledgeMessage {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Part 2 — Librarian Communication Protocols
+// Part 2 -- Librarian Communication Protocols
 // See topics/09-development-methodology.md § "Communication Protocols"
 // (Protocol A: Knowledge Submission, Protocol B: Knowledge Query,
 // Protocol C: Knowledge Promotion).
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Protocol A — Knowledge Submission (Agent → Librarian).
+ * Protocol A -- Knowledge Submission (Agent → Librarian).
  *
  * An agent explicitly submits a discovery to the Librarian. The agent makes
  * the initial scope classification (they have the domain context); the
@@ -293,7 +293,7 @@ export interface KnowledgeSubmission {
   confidence: KnowledgeConfidence;
   /** The discovery, with enough context to be useful to future agents. */
   content: string;
-  /** Where observed — file paths, test names, session context. */
+  /** Where observed -- file paths, test names, session context. */
   evidence: {
     files?: string[];
     tests?: string[];
@@ -303,7 +303,7 @@ export interface KnowledgeSubmission {
 }
 
 /**
- * Protocol B (request) — Knowledge Query (Agent → Librarian).
+ * Protocol B (request) -- Knowledge Query (Agent → Librarian).
  *
  * An agent asks the Librarian a question. `urgency` controls whether the
  * Librarian responds ahead of other work ("blocking") or folds the query
@@ -321,10 +321,10 @@ export interface KnowledgeQuery {
 }
 
 /**
- * Protocol B (response) — Knowledge Response (Librarian → Agent).
+ * Protocol B (response) -- Knowledge Response (Librarian → Agent).
  *
  * The Librarian's reply to a `KnowledgeQuery`. On `not-documented` or `partial`,
- * the Librarian also creates a gap stub — an explicit record of what the team
+ * the Librarian also creates a gap stub -- an explicit record of what the team
  * doesn't know. Over time, gap stubs form a map of the team's ignorance.
  *
  * Gap stubs are collaborative requests: the response asks the querying
@@ -354,7 +354,7 @@ export interface KnowledgeResponse {
 }
 
 /**
- * Protocol C — Knowledge Promotion (Librarian → Team-Lead → Common-Prompt).
+ * Protocol C -- Knowledge Promotion (Librarian → Team-Lead → Common-Prompt).
  *
  * When a wiki entry matures enough to become a team rule, the Librarian
  * proposes promotion to common-prompt. Team-lead reviews: approved
@@ -381,7 +381,7 @@ export interface PromotionProposal {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Part 2 — Wiki Provenance
+// Part 2 -- Wiki Provenance
 // See topics/09-development-methodology.md § "Provenance, Source Linking,
 // and Staleness".
 // ─────────────────────────────────────────────────────────────────────────────
@@ -407,7 +407,7 @@ export interface WikiProvenance {
   sourceAgents: string[];
   /** ISO date when the knowledge was discovered. */
   discovered: string;
-  /** Always "librarian" — the Librarian is the sole writer to the wiki. */
+  /** Always "librarian" -- the Librarian is the sole writer to the wiki. */
   filedBy: "librarian";
   /** ISO date when the entry was last verified as current. */
   lastVerified: string;

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# (*FR:Volta*) — Re-register ghost members from roster into runtime config.json
+# (*FR:Volta*) -- Re-register ghost members from roster into runtime config.json
 #
 # Rationale: TeamCreate seeds runtime members[] from harness-init state, not
 # from roster.json. Ghost members (agentType == "ghost") are never spawned, so
@@ -40,7 +40,7 @@ mkdir -p "$RUNTIME_INBOXES"
 GHOST_NAMES=$(jq -r '.members[] | select(.agentType == "ghost") | .name' "$ROSTER")
 
 if [ -z "$GHOST_NAMES" ]; then
-  echo "No ghost members in roster — nothing to register."
+  echo "No ghost members in roster -- nothing to register."
   exit 0
 fi
 

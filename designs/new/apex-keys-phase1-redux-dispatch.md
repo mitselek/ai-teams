@@ -1,6 +1,6 @@
-# Apex Keys — Phase-1-Redux Dispatch (DRAFT)
+# Apex Keys -- Phase-1-Redux Dispatch (DRAFT)
 
-**Status:** DRAFT — staged for execution. Do NOT dispatch to Hopper until preconditions are met.
+**Status:** DRAFT -- staged for execution. Do NOT dispatch to Hopper until preconditions are met.
 **Composed:** 2026-05-20 (after S34 dispatch arc + PO design parameters captured)
 **Supersedes:** the rescinded Phase-1 dispatch r3 (referenced by `teams/framework-research/docs/operations-log-2026-05.md` 17:09 entry)
 **Catalyzing context:** `teams/framework-research/docs/apex-keys-dispatch-2026-05-20-findings.md` + `apex-keys-diff-2026-05-20.md`
@@ -38,11 +38,11 @@ This dispatch stages `.env` reconstruction ONLY. Tier D recreate is a SEPARATE F
 
 ## Read these deployed-artifacts before executing (audit declaration)
 
-- `designs/deployed/apex-research/container/entrypoint-apex.sh:166-196` — Step 7 multi-key SSH_PUBLIC_KEY* enumeration
-- `designs/deployed/apex-research/container/docker-compose.yml` — `environment:` block (note operational compose-yml on host has SLOT 3 not in FR design)
-- `teams/framework-research/docs/operations-log-2026-05.md` — full audit trail of S34 dispatch arc + diff probe results
-- `teams/framework-research/docs/apex-keys-diff-2026-05-20.md` — substrate-state diff between backup and Config.Env
-- Hopper scratchpad `teams/framework-research/memory/hopper.md` — apex-research substrate facts already captured
+- `designs/deployed/apex-research/container/entrypoint-apex.sh:166-196` -- Step 7 multi-key SSH_PUBLIC_KEY* enumeration
+- `designs/deployed/apex-research/container/docker-compose.yml` -- `environment:` block (note operational compose-yml on host has SLOT 3 not in FR design)
+- `teams/framework-research/docs/operations-log-2026-05.md` -- full audit trail of S34 dispatch arc + diff probe results
+- `teams/framework-research/docs/apex-keys-diff-2026-05-20.md` -- substrate-state diff between backup and Config.Env
+- Hopper scratchpad `teams/framework-research/memory/hopper.md` -- apex-research substrate facts already captured
 
 ---
 
@@ -112,13 +112,13 @@ Capture as `$rcKey`.
 ssh -T dev@100.96.54.170 "docker inspect apex-research --format '{{range .Config.Env}}{{println .}}{{end}}' | grep '^GH_TOKEN=' | cut -d= -f2-"
 ```
 
-Capture as `$ghToken`. Do NOT log or persist this value to any local artifact — kept in-session memory only for the P3.6 write.
+Capture as `$ghToken`. Do NOT log or persist this value to any local artifact -- kept in-session memory only for the P3.6 write.
 
 **Pass criterion:** `$ghToken` is a non-empty string starting `gho_`.
 
-### P3.6 [Tier M — Brunel single-line ack] Compose new `.env` on host
+### P3.6 [Tier M -- Brunel single-line ack] Compose new `.env` on host
 
-**Tasker ack (Brunel):** "I sanction this Tier M op. The substrate's docker-compose.yml is designed for `.env` at `$COMPOSE_DIR/.env`; writing this file is the canonical lifecycle path. Backup `.env` at `$BACKUP_DIR/.env` remains untouched as rollback. Operation is reversible by `rm $COMPOSE_DIR/.env` (returns substrate to pre-write state). — Brunel"
+**Tasker ack (Brunel):** "I sanction this Tier M op. The substrate's docker-compose.yml is designed for `.env` at `$COMPOSE_DIR/.env`; writing this file is the canonical lifecycle path. Backup `.env` at `$BACKUP_DIR/.env` remains untouched as rollback. Operation is reversible by `rm $COMPOSE_DIR/.env` (returns substrate to pre-write state). -- Brunel"
 
 **Composition logic (run on the host via a single ssh):**
 
@@ -202,14 +202,14 @@ ssh -T dev@100.96.54.170 "cd '/home/dev/github/apex-migration-research' && docke
 **Operations-log entry:**
 - Fields per Hopper's role-of-record discipline. Outcome: `success` (or `partial`/`failed` per actual result).
 - Tasker: Brunel for the Tier M ack; Aen for overall dispatch.
-- Pubkey values: SHA-256 fingerprints of the three pubkeys (not full plaintext — those are in the substrate's `.env` now and we don't need to duplicate them in the audit log).
+- Pubkey values: SHA-256 fingerprints of the three pubkeys (not full plaintext -- those are in the substrate's `.env` now and we don't need to duplicate them in the audit log).
 - Token values: redacted to first-4-chars + length per Hopper's secret-discipline.
 
 **Report:** to Brunel (close diagnosis loop) + CC Aen.
 
 **Scratchpad update:**
-- `[LEARNED — substrate, apex-research]` Phase-1-redux executed; `.env` reconstructed with slot 1=PO, slot 2=Aleksandr, slot 3=rc-connect. Tokens preserved from 2026-04-29 backup; GH_TOKEN added from current Config.Env. Substrate is now "fix staged"; next compose-recreate would install all three SSH keys + restore all credentials.
-- `[GOTCHA]` remove or supersede the "any recreate = multi-system credential loss" entry — that's no longer true post-P3 (assuming P3 succeeds).
+- `[LEARNED -- substrate, apex-research]` Phase-1-redux executed; `.env` reconstructed with slot 1=PO, slot 2=Aleksandr, slot 3=rc-connect. Tokens preserved from 2026-04-29 backup; GH_TOKEN added from current Config.Env. Substrate is now "fix staged"; next compose-recreate would install all three SSH keys + restore all credentials.
+- `[GOTCHA]` remove or supersede the "any recreate = multi-system credential loss" entry -- that's no longer true post-P3 (assuming P3 succeeds).
 
 ---
 
@@ -228,7 +228,7 @@ Phase 2 dispatch will reference this P3 dispatch's ops-log entry timestamp as th
 
 ## Scope boundary (hard NO during P3)
 
-- No `docker compose` operations beyond `inspect` (Tier R) and `config` (Tier R) — NO `up`, `restart`, `down`, `recreate`, `start`, `stop`, `pull`.
+- No `docker compose` operations beyond `inspect` (Tier R) and `config` (Tier R) -- NO `up`, `restart`, `down`, `recreate`, `start`, `stop`, `pull`.
 - No `docker exec` into apex container.
 - No modifications to any FR-shipped substrate other than the `.env` write at `$COMPOSE_DIR/.env`.
 - No modifications to the backup `.env` at `$BACKUP_DIR/.env` (stays as rollback artifact).
@@ -238,11 +238,11 @@ Phase 2 dispatch will reference this P3 dispatch's ops-log entry timestamp as th
 
 ## Sanction summary
 
-- P3.1 — Tier R (substrate-state-unchanged check), default-permitted
-- P3.2-P3.5 — Tier R (probe extractions), default-permitted
-- **P3.6 — Tier M (`.env` write), tasker single-line ack quoted in P3.6 body**
-- P3.7 — Tier R (compose config verify), default-permitted
-- P3.8 — Tier R + log + scratchpad write to MAY-WRITE paths
+- P3.1 -- Tier R (substrate-state-unchanged check), default-permitted
+- P3.2-P3.5 -- Tier R (probe extractions), default-permitted
+- **P3.6 -- Tier M (`.env` write), tasker single-line ack quoted in P3.6 body**
+- P3.7 -- Tier R (compose config verify), default-permitted
+- P3.8 -- Tier R + log + scratchpad write to MAY-WRITE paths
 
 No Tier D in P3.
 

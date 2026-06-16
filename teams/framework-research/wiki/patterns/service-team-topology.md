@@ -20,9 +20,9 @@ related:
   - patterns/path-namespace-as-federation-primitive.md
 ---
 
-# Service-Team Topology — Members are Ghosts of Consumer Teams
+# Service-Team Topology -- Members are Ghosts of Consumer Teams
 
-A **service team** is a team whose `members[]` are ghost representations of the teams it serves. The canonical example is a library team — a team-lead (master librarian) plus `ghost-team-A`, `ghost-team-B`, ... entries, one per consuming team. From the master librarian's seat, every consuming team is *literally a teammate*. A query from team A arrives as a message from `ghost-team-A`; the librarian replies via SendMessage to that same ghost; the response routes back to the original asker's inbox in team A.
+A **service team** is a team whose `members[]` are ghost representations of the teams it serves. The canonical example is a library team -- a team-lead (master librarian) plus `ghost-team-A`, `ghost-team-B`, ... entries, one per consuming team. From the master librarian's seat, every consuming team is *literally a teammate*. A query from team A arrives as a message from `ghost-team-A`; the librarian replies via SendMessage to that same ghost; the response routes back to the original asker's inbox in team A.
 
 Per RFC #66 (2026-05-12), proposed as direct answers to Issue #47's open questions on the Librarian / cross-team knowledge layer.
 
@@ -46,7 +46,7 @@ Per RFC #66 (2026-05-12), proposed as direct answers to Issue #47's open questio
 
 From the service-team side: every consumer is a named member, addressable like any teammate. From the consumer-team side: a single `library` ghost (no awareness of how many other consumers connect, who's asking what, or how the library is structured internally).
 
-Built on [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-member-as-universal-integration-surface.md) — the abstraction that makes "a teammate" equivalent to "a name + an inbox file."
+Built on [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-member-as-universal-integration-surface.md) -- the abstraction that makes "a teammate" equivalent to "a name + an inbox file."
 
 ## Properties that fall out
 
@@ -54,7 +54,7 @@ Built on [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-mem
 - **Per-consumer view at the consuming end.** Team A specialists only see their own `library` ghost; they don't know how many other teams are connected, who's asking what, or how the library is structured internally. Information hiding by default.
 - **ACL is one-sided.** The service team controls who connects by adding or removing ghost members in its own `members[]`. Revoking a consumer is a single config edit. Consumer doesn't need to cooperate.
 - **Audit trail is the inbox.** Every query and every answer is a JSON entry in `inboxes/ghost-team-X.json` on the service-team side. No separate logging.
-- **Bidirectional knowledge flow without ceremony.** Same channel carries queries (consumer → service) and pushes (service → consumer — e.g., proactive `[NEW PATTERN AVAILABLE]` notifications, or a librarian noticing team-B is about to repeat a mistake team-A already fixed).
+- **Bidirectional knowledge flow without ceremony.** Same channel carries queries (consumer → service) and pushes (service → consumer -- e.g., proactive `[NEW PATTERN AVAILABLE]` notifications, or a librarian noticing team-B is about to repeat a mistake team-A already fixed).
 - **Findings ingest is just inbound messages.** Each consumer team can expose a `findings` ghost (write-only emitter) that pipes `[LEARNED]` entries from scratchpads into the service team's inbox. The Librarian's "Ingest" operation becomes "process new messages from ghost-team-X." No polling of remote scratchpads, no special protocol.
 
 ## Generalization beyond libraries
@@ -75,23 +75,23 @@ In each case: service team is the **canonical view**; consumer teams hold thin p
 
 | OQ | RFC #66 claim | Assessment |
 |---|---|---|
-| OQ1 (Librarian standalone vs Medici evolution) | Standalone — but more than that: standalone *team*, not just standalone agent | **Partial**: the standalone choice is confirmed; the original within-team binary (one agent vs Medici-evolution) is sidestepped, not answered. The reframe is sound but exceeds the original OQ scope |
-| OQ2 (trigger mechanism: poll/tagged-msgs/Medici-batches) | No polling. `[LEARNED]` entries become messages from a `findings` ghost; master librarian wakes on inbox write like any teammate | **Holds clearly** — substrate-level guarantee from [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) makes this clean |
-| OQ3 (cross-team wiki: global vs per-team) | Library *team* IS the cross-team layer. Per-team wikis can stay where they are; library is a peer service, not a replacement | **Holds** — resolves layering without forcing redesign of per-team Librarian-equivalents |
-| OQ5 (write conflicts) | Library team is sole writer to its own `wiki/`. Standard directory-ownership pattern. No locking needed | **Holds** — already proven discipline at within-team layer (FR's "Wiki Directory Sovereignty" rule); generalizes cleanly to service-team layer |
-| OQ7 (bootstrapping) | Consumer teams don't bootstrap; library does, once, centrally. New consumers register a `library` ghost — no wiki initialization on their side | **Holds**, AND sidesteps the Karpathy-ingest-vs-empty debate by making bootstrap a one-time central event with later organic accumulation |
-| OQ8 (Memex / associative trails) | Trails are observable in the librarian's inbox itself — convergent queries on same page IS a trail | **Partial** — mechanism is present, but trail-preservation requires explicit inbox-retention discipline. Once messages are marked `read: true` and old messages are pruned, trail material vanishes. Surfacing trails is a deliberate curation task on top of the substrate, not free |
+| OQ1 (Librarian standalone vs Medici evolution) | Standalone -- but more than that: standalone *team*, not just standalone agent | **Partial**: the standalone choice is confirmed; the original within-team binary (one agent vs Medici-evolution) is sidestepped, not answered. The reframe is sound but exceeds the original OQ scope |
+| OQ2 (trigger mechanism: poll/tagged-msgs/Medici-batches) | No polling. `[LEARNED]` entries become messages from a `findings` ghost; master librarian wakes on inbox write like any teammate | **Holds clearly** -- substrate-level guarantee from [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) makes this clean |
+| OQ3 (cross-team wiki: global vs per-team) | Library *team* IS the cross-team layer. Per-team wikis can stay where they are; library is a peer service, not a replacement | **Holds** -- resolves layering without forcing redesign of per-team Librarian-equivalents |
+| OQ5 (write conflicts) | Library team is sole writer to its own `wiki/`. Standard directory-ownership pattern. No locking needed | **Holds** -- already proven discipline at within-team layer (FR's "Wiki Directory Sovereignty" rule); generalizes cleanly to service-team layer |
+| OQ7 (bootstrapping) | Consumer teams don't bootstrap; library does, once, centrally. New consumers register a `library` ghost -- no wiki initialization on their side | **Holds**, AND sidesteps the Karpathy-ingest-vs-empty debate by making bootstrap a one-time central event with later organic accumulation |
+| OQ8 (Memex / associative trails) | Trails are observable in the librarian's inbox itself -- convergent queries on same page IS a trail | **Partial** -- mechanism is present, but trail-preservation requires explicit inbox-retention discipline. Once messages are marked `read: true` and old messages are pruned, trail material vanishes. Surfacing trails is a deliberate curation task on top of the substrate, not free |
 
 **Unanswered OQs from #47** (not addressed by RFC #66):
 
-- **OQ4** (wiki/scratchpad boundary): the classification work stays with the consuming-team librarian — RFC presupposes per-team scratchpads + per-team wikis continue. Still open at within-team layer.
+- **OQ4** (wiki/scratchpad boundary): the classification work stays with the consuming-team librarian -- RFC presupposes per-team scratchpads + per-team wikis continue. Still open at within-team layer.
 - **OQ6** (token cost / Sprint/Standard/Cathedral tiering): the service team itself has token cost (continuous master-librarian + ghost-members). Open.
 
 ## Composition with FR's existing cross-pollination pattern
 
 FR already operates a primitive cross-team flow:
 
-- [`patterns/wiki-cross-link-convention.md`](wiki-cross-link-convention.md) introduced `source-team` frontmatter as a single-entry experiment — first cross-pollination filing from apex-research.
+- [`patterns/wiki-cross-link-convention.md`](wiki-cross-link-convention.md) introduced `source-team` frontmatter as a single-entry experiment -- first cross-pollination filing from apex-research.
 - [`process/companion-pair-submission-protocol.md`](../process/companion-pair-submission-protocol.md) cross-pollinated from apex-research via Finn's comparative analysis.
 
 These flows are today **Finn-mediated, ad-hoc, low-frequency**. The service-team topology generalizes the same pattern to **inbox-mediated, structured, higher-frequency**. The substrate change is significant: cross-team-applicable entries become first-class messages to the service-team library; the `source-team` frontmatter field becomes a population-time property rather than a manual-curation marker.
@@ -100,7 +100,7 @@ These flows are today **Finn-mediated, ad-hoc, low-frequency**. The service-team
 
 ## Why this beats peer-to-peer for service relationships
 
-A peer-to-peer model (every team has a `library` ghost talking to every other team via direct links) has N² potential channels and no central view. The service-team model has N channels (one per consumer) and a single locus where the librarian works. For relationships that are inherently asymmetric — service provider vs. consumers — modeling them as such is honest and structural. Topic 03 §Protocol 2 already chose hub-and-spoke for inter-team comms with similar reasoning; the service-team pattern applies that decision to specific service domains.
+A peer-to-peer model (every team has a `library` ghost talking to every other team via direct links) has N² potential channels and no central view. The service-team model has N channels (one per consumer) and a single locus where the librarian works. For relationships that are inherently asymmetric -- service provider vs. consumers -- modeling them as such is honest and structural. Topic 03 §Protocol 2 already chose hub-and-spoke for inter-team comms with similar reasoning; the service-team pattern applies that decision to specific service domains.
 
 ## Confidence
 
@@ -109,7 +109,7 @@ A peer-to-peer model (every team has a `library` ghost talking to every other te
 Confidence will upgrade to `high` on:
 
 - First service-team deployment (e.g., a library team running with two consumer teams) demonstrating end-to-end query/response/findings-ingest cycle
-- Cross-team confirmation that the topology survives the operational realities not captured in the design (e.g., what happens when a consumer team has its own internal Librarian — do the two coexist? does the cross-team Librarian observe the within-team Librarian as a peer or as a passthrough?)
+- Cross-team confirmation that the topology survives the operational realities not captured in the design (e.g., what happens when a consumer team has its own internal Librarian -- do the two coexist? does the cross-team Librarian observe the within-team Librarian as a peer or as a passthrough?)
 
 ## Promotion posture
 
@@ -127,11 +127,11 @@ Confidence will upgrade to `high` on:
 
 ## Related
 
-- [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-member-as-universal-integration-surface.md) — the abstraction this topology builds on.
-- [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) — the substrate property that makes ghost-as-teammate work.
-- [`patterns/wiki-cross-link-convention.md`](wiki-cross-link-convention.md) — FR's first cross-pollination filing; precedent for `source-team` frontmatter that this topology formalizes.
-- [`patterns/two-consumer-pattern.md`](two-consumer-pattern.md) — handles asymmetric consumer access; service-team topology is the complementary shape for symmetric-access consumers.
-- [`patterns/path-namespace-as-federation-primitive.md`](path-namespace-as-federation-primitive.md) — the convention-as-federation-contract pattern; service-team topology is the message-mediated counterpart to path-namespace-mediated federation.
+- [`patterns/ghost-member-as-universal-integration-surface.md`](ghost-member-as-universal-integration-surface.md) -- the abstraction this topology builds on.
+- [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) -- the substrate property that makes ghost-as-teammate work.
+- [`patterns/wiki-cross-link-convention.md`](wiki-cross-link-convention.md) -- FR's first cross-pollination filing; precedent for `source-team` frontmatter that this topology formalizes.
+- [`patterns/two-consumer-pattern.md`](two-consumer-pattern.md) -- handles asymmetric consumer access; service-team topology is the complementary shape for symmetric-access consumers.
+- [`patterns/path-namespace-as-federation-primitive.md`](path-namespace-as-federation-primitive.md) -- the convention-as-federation-contract pattern; service-team topology is the message-mediated counterpart to path-namespace-mediated federation.
 
 ## Source
 

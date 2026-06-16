@@ -1,7 +1,7 @@
 # .dockerignore (*FR:Brunel*)
-# The Docker build context is the repo root — exclude large/irrelevant paths
+# The Docker build context is the repo root -- exclude large/irrelevant paths
 
-# Credentials — never include in image
+# Credentials -- never include in image
 .env
 
 # Runtime state (managed by named volumes, not image)

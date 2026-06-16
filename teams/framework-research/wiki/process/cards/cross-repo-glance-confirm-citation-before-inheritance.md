@@ -18,10 +18,10 @@ When a stakeholder cites a pattern as "battle-proof at repo X" and the team is a
 ## Key ideas
 
 - **Three conditions to apply**: a specific repo is named, downstream design is about to DEPEND on the citation (not just be informed by it), the team hasn't verified it in the current session.
-- **A glance is NOT a deep-read** — sized 30-60 min (clone + grep + skim canonical docs); produces 3 top-line bullets, source-paths-checked, quotes-with-file:line, and an unattributed-claims list (the load-bearing artifact).
+- **A glance is NOT a deep-read** -- sized 30-60 min (clone + grep + skim canonical docs); produces 3 top-line bullets, source-paths-checked, quotes-with-file:line, and an unattributed-claims list (the load-bearing artifact).
 - **When NOT to glance**: informational (non-load-bearing) citation, authoritative recent second-hand knowledge, unreachable repo (then ask the citing party).
-- **First instance**: polyphony-dev glance (citation did NOT match — "federation" was choral-music) + Haapsalu-Suvekool glance (matched — esl-suvekool on Brilliant); reframed FR Phase A from "design a federation layer" to "scale a proven pattern." ~90 min avoided weeks of misdirection.
-- **Not adversarial** — trust the citing party's intent, verify the substrate; the glance produces neutral facts, the citing party reframes.
+- **First instance**: polyphony-dev glance (citation did NOT match -- "federation" was choral-music) + Haapsalu-Suvekool glance (matched -- esl-suvekool on Brilliant); reframed FR Phase A from "design a federation layer" to "scale a proven pattern." ~90 min avoided weeks of misdirection.
+- **Not adversarial** -- trust the citing party's intent, verify the substrate; the glance produces neutral facts, the citing party reframes.
 - **The narrow research practice serving the broader integration-not-relay standard.**
 
 (*FR:Callimachus*)
