@@ -13,6 +13,7 @@ Doc-index signpost (Tier 2 navigation). The eight numbered topic files are the f
 - 08-observability.md -- logging, auditing, and monitoring team activity
 - 09-development-methodology.md -- how dev teams produce code and preserve knowledge (synthesis of Discussions #46 XP pipeline + #47 Knowledge Base/Librarian)
 - 10-guild-specialists.md -- shared expert pool with competency backend, dispatched on demand across teams (fourth team archetype)
+- 11-deployment-lifecycle.md -- CCR (Coordinated Container Rebuild): deploy-surface convention + PR-review + windowed rebuild; teams own content, FR gates activation
 
 ## Key context
 These are the canonical framework-design documents -- the authoritative output of the research team. Findings mature elsewhere (`teams/framework-research/docs/`, `wiki/`) and land here once ratified. When a design decision needs a home, it goes in the matching numbered topic. 01-08 cover the original design axes; 09 was added for development-team methodology; 10 for the guild/consultancy pattern. Typed protocols referenced by these files live in `types/`.
