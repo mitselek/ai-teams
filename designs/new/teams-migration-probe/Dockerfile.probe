@@ -1,0 +1,72 @@
+# syntax=docker/dockerfile:1.4
+# teams-migration-probe -- THROWAWAY 2.1.178+ implicit-teams probe container (*FR:Brunel*)
+#
+# Purpose: empirically test the post-2.1.178 implicit-teams model (probes P6 + P1-P5,
+# see teams/framework-research/docs/teams-migration-probe-container-scope-2026-06-17.md).
+# Disposable: no live-team coupling, throwaway ~/.claude volume, down -v after.
+#
+# Build (on the rc host, where docker lives):
+#   DOCKER_BUILDKIT=1 docker compose -f docker-compose.probe.yml build
+#
+# Auth: this image bakes NO credentials. The auth material is supplied at RUN time
+# (compose), per the option chosen by PO -- see docker-compose.probe.yml + README.
+
+FROM ubuntu:24.04
+
+# ── Base toolchain ──────────────────────────────────────────────────────────────
+# curl/ca-certs/git for installs; tmux + openssh-server for the REMOTE tmux drive
+# (operator send-keys/capture-pane over SSH); jq + python3 for FS inspection between
+# probe steps; gosu to drop to the non-root probe user.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        gosu \
+        jq \
+        openssh-server \
+        python3 \
+        tmux \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /run/sshd \
+    && ssh-keygen -A \
+    && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?Port .*/Port 2222/' /etc/ssh/sshd_config
+
+# ── Node.js 22 LTS ───────────────────────────────────────────────────────────────
+# Claude Code needs Node 20+. Direct tarball (same approach as apex). --insecure is a
+# BUILD-TIME-ONLY workaround for WARP TLS interception on the rc host; drop on non-WARP.
+RUN curl --insecure -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz \
+       -o /tmp/node.tar.gz \
+    && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+    && rm /tmp/node.tar.gz \
+    && node --version
+
+# ── Non-root probe user (uid 1000), apex-style ──────────────────────────────────
+RUN useradd -m -u 1000 -s /bin/bash ai-teams \
+    && usermod -p '*' ai-teams \
+    && mkdir -p /home/ai-teams/.ssh \
+    && chmod 700 /home/ai-teams/.ssh \
+    && chown 1000:1000 /home/ai-teams/.ssh \
+    && passwd -l root
+
+# ── Claude Code -- PINNED to exactly 2.1.179 ────────────────────────────────────
+# npm-global path: the native claude.ai/install.sh uses Node fetch() which does NOT
+# honor SOCKS5/WARP proxies (documented in the backlog-triage Dockerfile), so on the
+# WARP/SOCKS rc host npm is the reliable path. @2.1.179 pins the exact post-2.1.178
+# version under test. --insecure registry only at build time for WARP TLS.
+RUN npm config set strict-ssl false \
+    && npm install -g @anthropic-ai/claude-code@2.1.179 \
+    && npm config set strict-ssl true \
+    && claude --version
+
+# ── Entrypoint ──────────────────────────────────────────────────────────────────
+COPY entrypoint-probe.sh /entrypoint-probe.sh
+RUN chmod +x /entrypoint-probe.sh
+
+ENV CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+WORKDIR /home/ai-teams
+EXPOSE 2222
+ENTRYPOINT ["/entrypoint-probe.sh"]
+CMD ["sleep", "infinity"]

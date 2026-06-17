@@ -1,0 +1,60 @@
+# teams-migration-probe -- THROWAWAY 2.1.178+ probe container (*FR:Brunel*)
+#
+# Usage (on the rc host):
+#   DOCKER_BUILDKIT=1 docker compose -f docker-compose.probe.yml build
+#   docker compose -f docker-compose.probe.yml up -d
+#   docker compose -f docker-compose.probe.yml exec teams-migration-probe bash
+#   docker compose -f docker-compose.probe.yml down -v        # THROWAWAY: deletes the volume
+#
+# AUTH (PO decision -- pick ONE; see README). The image bakes no credentials.
+#   (a) OAuth token reuse: operator copies apex's ~/.claude/.credentials.json into the
+#       probe volume AFTER `up` (docker cp ... teams-migration-probe:/home/ai-teams/.claude/),
+#       then chown 1000:1000. No compose change needed.
+#   (b) API key: set ANTHROPIC_API_KEY in the rc-host env before `up`; it flows in via the
+#       environment: block below. NEVER hard-code the key in this file.
+#   (c) Interactive login: `docker exec -it ... gosu ai-teams claude login` once.
+#
+# Isolated: own named volume, own SSH port (2229 to avoid clashing with live 2222-2228),
+# host networking only if WARP requires it (default bridge here -- simplest for a throwaway;
+# switch to network_mode: host + the WARP CA mount if egress needs the tunnel).
+
+services:
+  teams-migration-probe:
+    build:
+      context: .
+      dockerfile: Dockerfile.probe
+      network: host
+    image: teams-migration-probe:2.1.179
+    container_name: teams-migration-probe
+    hostname: teams-migration-probe
+    # Bridge net + published SSH on 2229 (operator drives via tmux over SSH).
+    # If the rc host's egress to api.anthropic.com requires WARP, switch to
+    # network_mode: host and mount the WARP CA (see commented block below).
+    ports:
+      - "2229:2222"
+    environment:
+      - HOME=/home/ai-teams
+      - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+      # Auth option (b): API key from the rc-host env. Empty unless the host exports it.
+      # Option (a)/(c) leave this empty and supply creds another way (see README).
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      # Operator SSH pubkey for the tmux drive (set in rc-host env before `up`).
+      - SSH_PUBLIC_KEY=${PROBE_SSH_PUBLIC_KEY:-}
+      # WARP TLS CA for Node egress (only needed on the WARP host).
+      - NODE_EXTRA_CA_CERTS=${PROBE_NODE_EXTRA_CA_CERTS:-}
+    # --- WARP host variant (uncomment if egress needs the tunnel) ---
+    # network_mode: host
+    # volumes:
+    #   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
+    # and set PROBE_NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
+    volumes:
+      # THROWAWAY claude state -- the probes' filesystem observation surface.
+      # down -v deletes it. Lets the operator docker cp snapshots out for the record.
+      - probe-claude-home:/home/ai-teams/.claude
+    stdin_open: true
+    tty: true
+    restart: "no"   # throwaway -- do NOT auto-restart
+
+volumes:
+  probe-claude-home:
+    name: teams-migration-probe_claude-home
