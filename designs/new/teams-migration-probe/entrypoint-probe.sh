@@ -4,10 +4,11 @@
 # Runs as root, sets up minimal substrate, drops to ai-teams. Deliberately tiny --
 # this is a disposable probe, not a real team container. No courier, no repos, no MCP.
 #
-# Auth is NOT handled here (the image bakes no credentials). Whichever option PO picks
-# (OAuth-token copy / API-key env / interactive login) is applied at/after `up`; see
-# docker-compose.probe.yml + README. This entrypoint only sets up SSH + ownership so
-# the operator can drive the tmux session over SSH.
+# Auth is NOT handled here (the image bakes no credentials). Per PO decision (option c),
+# auth is a FRESH `claude login` run interactively over tmux AFTER `up` -- the probe's
+# ~/.claude starts EMPTY and the login writes its own .credentials.json there. This
+# entrypoint only sets up SSH + ownership so the operator can drive the tmux session
+# (and the login) over SSH.
 set -e
 
 CONTAINER_USER="ai-teams"
@@ -34,10 +35,11 @@ else
     echo "[entrypoint] WARNING: PROBE_SSH_PUBLIC_KEY not set -- no SSH-in; use docker exec to drive."
 fi
 
-# ── Sanity: claude present + version ─────────────────────────────────────────────
+# ── Sanity: claude present + version (auth comes LATER, via tmux `claude login`) ──
 echo "[entrypoint] claude version: $(gosu "$CONTAINER_USER" claude --version 2>&1 | head -1)"
 echo "[entrypoint] CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-<unset>}"
-echo "[entrypoint] NOTE: auth not configured by entrypoint -- apply PO-chosen option, then verify with: gosu ai-teams claude -p 'reply OK'"
+echo "[entrypoint] NOTE: ~/.claude starts EMPTY by design. Auth = run 'claude login' over tmux (option c)."
+echo "[entrypoint] Do NOT expect 'claude -p' to work until the login completes."
 
 # ── Hand off: stay alive so the operator can exec/ssh in and drive the probes ────
 echo "[entrypoint] probe container ready. Drive via: ssh -p 2229 ai-teams@<rc-host>  (or docker exec)."

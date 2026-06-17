@@ -6,13 +6,12 @@
 #   docker compose -f docker-compose.probe.yml exec teams-migration-probe bash
 #   docker compose -f docker-compose.probe.yml down -v        # THROWAWAY: deletes the volume
 #
-# AUTH (PO decision -- pick ONE; see README). The image bakes no credentials.
-#   (a) OAuth token reuse: operator copies apex's ~/.claude/.credentials.json into the
-#       probe volume AFTER `up` (docker cp ... teams-migration-probe:/home/ai-teams/.claude/),
-#       then chown 1000:1000. No compose change needed.
-#   (b) API key: set ANTHROPIC_API_KEY in the rc-host env before `up`; it flows in via the
-#       environment: block below. NEVER hard-code the key in this file.
-#   (c) Interactive login: `docker exec -it ... gosu ai-teams claude login` once.
+# AUTH = option (c), PO decision 2026-06-17 18:23: FRESH `claude login` INSIDE the probe,
+# driven interactively over tmux at runtime (NOT an API key, NOT a copy of apex's creds).
+# The probe's ~/.claude starts EMPTY; the login writes its OWN ~/.claude/.credentials.json
+# there -- isolated token, apex's live OAuth seat untouched. No credential env/mount here.
+# The OAuth device-code flow needs egress to console.anthropic.com / claude.ai (not just
+# api.anthropic.com) -- see the WARP/host-net note below.
 #
 # Isolated: own named volume, own SSH port (2229 to avoid clashing with live 2222-2228),
 # host networking only if WARP requires it (default bridge here -- simplest for a throwaway;
@@ -35,14 +34,14 @@ services:
     environment:
       - HOME=/home/ai-teams
       - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-      # Auth option (b): API key from the rc-host env. Empty unless the host exports it.
-      # Option (a)/(c) leave this empty and supply creds another way (see README).
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      # NO credential env -- auth is a runtime `claude login` (option c). Deliberately absent.
       # Operator SSH pubkey for the tmux drive (set in rc-host env before `up`).
       - SSH_PUBLIC_KEY=${PROBE_SSH_PUBLIC_KEY:-}
       # WARP TLS CA for Node egress (only needed on the WARP host).
       - NODE_EXTRA_CA_CERTS=${PROBE_NODE_EXTRA_CA_CERTS:-}
     # --- WARP host variant (uncomment if egress needs the tunnel) ---
+    # The OAuth login flow must reach console.anthropic.com / claude.ai, not just
+    # api.anthropic.com -- on the WARP host that means the tunnel + the WARP CA.
     # network_mode: host
     # volumes:
     #   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro

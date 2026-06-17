@@ -22,7 +22,7 @@ Claude Code **2.1.178** silently **removed the `TeamCreate` / `TeamDelete` tools
 | Where it lives | On the persistent volume, `~/.claude/.credentials.json`. Survives restart/recreate because the volume persists. |
 | Can a SIBLING probe container reuse it? | **Not as an API key (there is none).** Reuse options: (a) copy apex's `.credentials.json` into the probe's `~/.claude` -- works, but shares one OAuth seat (refresh/contention risk); (b) PO supplies a real `ANTHROPIC_API_KEY` (clean isolation); (c) fresh `claude login` in the probe (isolated, not scriptable). |
 
-**PO action for auth (the gate):** decide (a) OAuth-token reuse / (b) PO-supplied API key / (c) fresh login. My recommendation: (b) if a spare/scoped key exists (best isolation for a throwaway); else (a) with the shared-seat caveat. Build artifacts (`designs/new/teams-migration-probe/`) are parameterized for all three. **No build/run until PO picks an option.**
+**AUTH DECIDED (PO 2026-06-17 18:23): option (c) -- fresh `claude login` inside the probe, over tmux at runtime.** NOT an API key, NOT a copy of apex's creds. The probe's `~/.claude` starts EMPTY; the login writes its own `.credentials.json`. Keeps apex's OAuth seat untouched; isolated throwaway token. Container already supports it (tmux + SSH-in + egress). Build-time verify = `claude --version`==2.1.179 ONLY (no pre-login `claude -p`). Egress must reach `console.anthropic.com`/`claude.ai` for the device-code flow (WARP host-net + CA covers it). Build artifacts updated to (c)-only.
 
 **Lesson (my own doctrine):** empirical-probe beats artifact-inference. The compose `environment:` declaration looked authoritative but was a dead var; only reading the live container revealed the real OAuth-file auth.
 
