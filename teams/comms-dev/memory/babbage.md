@@ -1,5 +1,5 @@
 # Babbage Scratchpad
-# Last updated: 2026-03-23
+# Last updated: 2026-06-17
 
 (*CD:Babbage*)
 
@@ -46,6 +46,39 @@ v2 is the production path per spec refs (#16, #18). v1 may be retained for dev/l
 
 ---
 
+## [CHECKPOINT] Mission context -- 2026-06-17
+
+FR's stationmaster + courier is the LIVE inter-team comms fabric (SSH-based, hub-and-spoke). We audited it (session S53). Our daemon-v2 was NOT deployed first -- stationmaster shipped while we were building. The audit revealed our daemon-v2 is weaker on 5 durability dimensions, all filed as #79.
+
+---
+
+## [LEARNED] daemon-v2 has 5 durability gaps vs FR's courier (filed as #79)
+
+Ordered by impact:
+
+1. **No outbound spool** -- message lost if daemon crashes after dequeue-before-forward. FR fix: atomic rename outbox→spool; replay spool on restart; delete spool entry only on peer ACK.
+2. **ACK timing too early** -- we ACK on wire receive, not after inbox write (local custody). FR fix: ACK only after `inject_batch` / `InboxDelivery.write()` succeeds. Ties to issue #19.
+3. **In-memory dedup lost on restart** -- `MessageStore` is 5-min TTL in-memory; empty on restart. FR fix: durable append-only JSONL ledger keyed by message id; compact at startup (7-day/10k retention).
+4. **Outage drops PEER_UNAVAILABLE** -- no queue for new messages when peer is down. FR fix: spool handles this (retained until hub reachable, no TTL). Ties to issue #24.
+5. **No instance lock** -- no guard against double-start. FR fix: O_EXCL lock file + OS-native PID liveness check. NOTE: FR's own residual: PID liveness check does not verify cmdline match (PID recycling gap) -- our fix must add cmdline check.
+
+FR patterns to adopt when implementing fixes:
+- Outbound: `rename(outbox → spool/<utc-ts>-<seq>.json)` then deposit; delete spool on accepted/duplicate
+- Inbound: inject-first, ledger-append-second, ack-last (crash table in courier hints §6)
+- Dedup key: hub envelope id (SHA-256 over canonical entry) -- do NOT recompute locally
+
+---
+
+## [DEFERRED] Reusable contributions comms-dev could offer FR (pending team-lead decision)
+
+1. **mTLS + cert fingerprint pinning** (`tls-server.ts`, `tls-client.ts`, `tunnel-manager.ts`): FR uses per-poll SSH connections; our mTLS layer is container-to-container native and would suit FR's planned REST/MCP transport binding.
+2. **Persistent tunnel with heartbeat** (`tunnel-manager.ts`): lower latency than FR's per-poll SSH open/close.
+3. **Deposit-time ACL enforcement** (`acl.ts`, `daemon-v2.ts`): FR's grant/revoke is hub-side only; our local ACL adds defense-in-depth.
+
+Canonical tracker #84 carries a standing offer to help, conditional on FR redeploying our container.
+
+---
+
 ## [GOTCHA] comms-send bypasses daemon-v2
 
 `comms-send` CLI connects directly to the remote team's UDS socket using the v1 UDS client. This:
@@ -59,13 +92,13 @@ For production v2 usage, agents should use `crossTeamSend` (MCP tool) or a v2-co
 
 ## [GOTCHA] Mutual exclusion: SendMessageBridge vs comms-watch --consume
 
-Both poll and delete from the same inbox directory. Running both simultaneously silently drops messages. Documented in both files. Rule: run broker (with bridge) OR comms-watch --consume -- never both.
+Both poll and delete from the same inbox directory. Running both simultaneously silently drops messages. Rule: run broker (with bridge) OR comms-watch --consume -- never both.
 
 ---
 
 ## [GOTCHA] daemon-v2 sendMessageRaw PEER_UNAVAILABLE mapping
 
-`sendMessageRaw` maps `PEER_UNAVAILABLE` from TunnelManager to `FORGERY_REJECTED`. Rationale: if peer closes connection due to forgery, socket drops → tunnel returns PEER_UNAVAILABLE. This mapping is fragile -- a genuinely unavailable peer looks identical to a forgery rejection from the caller's perspective.
+`sendMessageRaw` maps `PEER_UNAVAILABLE` from TunnelManager to `FORGERY_REJECTED`. Fragile -- a genuinely unavailable peer looks identical to a forgery rejection. Fix required as part of #79 gap 4.
 
 ---
 
@@ -77,13 +110,13 @@ Both `InboxDelivery` and `RegistryManager` use tmp-file + rename for atomic writ
 
 ## [PATTERN] TunnelManager: no queue on send path
 
-`TunnelManager.send()` returns PEER_UNAVAILABLE immediately if peer is down (no in-flight queueing for new messages). The queue is only drained on reconnect for messages queued before disconnect. This is intentional -- at-least-once is the caller's (broker's) responsibility.
+`TunnelManager.send()` returns PEER_UNAVAILABLE immediately if peer is down. The queue is only drained on reconnect for messages queued before disconnect. Fix: spool layer above the tunnel (gap 1 in #79).
 
 ---
 
 ## [TODO] server.ts TODO(T7): connection limit
 
-Per-server connection limit not implemented. Noted as defense against socket flooding. Low priority unless we're concerned about DoS from rogue containers.
+Per-server connection limit not implemented. Defense against socket flooding. Low priority unless DoS concern raised.
 
 ---
 

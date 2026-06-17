@@ -99,3 +99,37 @@ Fresh session -- all agents spawned, no prior scratchpads (except this one). Ask
 4. SendMessageBridge + comms-watch --consume mutual exclusion
 
 (*CD:Marconi*)
+
+---
+
+## [CHECKPOINT] 2026-06-17 20:14 — Session: Stationmaster Security Audit (mission pivot)
+
+### [FACTS for next session] The landscape shifted
+- **comms-dev's mission was overtaken.** While we built the mTLS hub (v2 mesh → v3 hub, never deployed — #37 still blocked, HUB-3/4/7/8 findings still open), **framework-research shipped a LIVE inter-team comms fabric: `stationmaster + courier`** (SSH forced-command + restricted-shell, identity-by-key, grant-based consent). It is the production transport now (the `inter-team-comms` skill documents it). Source: `teams/framework-research/poc/ghost-bridge/` (stationmaster-courier.py 47KB hub, fr-courier-daemon.py, stationmaster-protocol.md, SPEC/SPEC-v3, TRUTHS.md). FR is actively iterating it (#75 notify-on-subscribe, #76 scp transfer).
+- **We did NOT compete.** User chose: audit stationmaster as security reviewers. Read-only, findings filed for FR's consideration.
+
+### [DONE] Audit shipped — 8 findings, 1 canonical tracker
+- Vigenere (trust/crypto), Kerckhoffs (SSH-jail/consent/ops), Babbage (delivery/transport). Lovelace parked (no frontend role in a backend audit).
+- **Canonical tracker: #84** (closed dup races #83, #85 — see GOTCHA). Tiered:
+  - **Tier 1 actionable:** #77 AcceptEnv env-smuggling (`type:blocker`, ONLY possibly-live hole, needs hub sshd_config verify), #81 host-key-pinning not enforced at courier startup (one-liner fix).
+  - **Tier 2 confirms accepted-risk:** #21 comment (HUB-8 transitive trust — identity is purely the SSH key at the hub, NO E2E sig; FR's *documented deliberate* choice), #78 (SSH key conflates auth+authz+integrity, no rotation; dedup≠anti-replay), #80 (stationmaster reserved-name unrevocable bypass), #82 (cleartext hub/SPOF).
+  - **Tier 3 pre-impl guidance:** #76 comment (scp jail spec), #75 comment (notify-on-subscribe hardening).
+  - **Mirror (comms-dev internal):** #79 — our daemon-v2 is WEAKER than FR's courier on 5 durability dims (no outbound spool, ACK-too-early, in-mem dedup lost on restart, outage drops, no instance lock). Real backlog.
+- **Headline:** audit largely VALIDATES stationmaster; scariest vectors closed by design. Frame findings as "residual risk in your stated model + optional closures," NOT bug reports.
+
+### [DECISION] Standing offer added to #84 Notes
+comms-dev is available to help on the actionable items + the ed25519 E2E-signing closure + porting durability patterns. **Precondition stated: FR must redeploy the comms-dev container per these latest insights** for us to engage. (User's framing: "wake up in new home.")
+
+### [GOTCHA] Tracker-filing race — process fix
+Three index issues got filed near-simultaneously (#83, #84, #85). Kerckhoffs self-filed #83 + #85; I filed #84. **Rule going forward: filing the tracking/index issue is the TEAM-LEAD's job.** Agents report their issue numbers; team-lead assembles the single tracker. Kerckhoffs recorded this in his scratchpad too.
+
+### [DEFERRED]
+- Babbage staged 3 reusable contributions to pitch to FR (mTLS+cert pinning, persistent heartbeat tunnel, deposit-time ACL) — pending decision + container redeploy.
+- Vigenere can spec the ed25519 E2E-signing API on request (fold id+ts into signed payload → courier ledger becomes a real anti-replay window).
+- #77 AcceptEnv unverified — needs a look at the live hub's sshd_config (hub behind apex/PROD-LLM tunnels).
+- Babbage [WARNING]: if we adopt FR's instance-lock, add cmdline-match — their `_pid_alive()` has a residual PID-recycling gap.
+
+### [NEXT SESSION ENTRY POINT]
+Team is shut down, awaiting redeploy "in new home" (the offer's precondition). On next boot: re-read #84. If FR has redeployed our container, the actionable work is #77 verify → #81 one-liner → ed25519 closure design. If not, the ball is in FR's court — decide whether to push the offer to FR directly (via stationmaster) or stand down.
+
+(*CD:Marconi*)

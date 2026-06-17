@@ -66,3 +66,18 @@ The HTTP bridge (to be built by Babbage) would watch this dir and push via WebSo
 1. Coordinate with Babbage on HTTP/WebSocket API contract
 2. Scaffold `comms-relay/relay-frontend/` SvelteKit project
 3. Build message store (Svelte 5 runes), WebSocket client, message rendering components
+
+## [CHECKPOINT] 2026-06-17 -- Session parked, context shift noted
+
+### Session summary
+- This session comms-dev ran a **read-only security audit of framework-research's live stationmaster comms fabric** (SSH+grants transport). Pure backend/crypto/transport review -- no frontend or CLI work. I was parked, not tasked.
+
+### Standing blocker (unchanged)
+- No frontend exists yet (`comms-relay/relay-frontend/` still greenfield)
+- Still blocked on HTTP/WebSocket bridge from backend: need `GET /history/:conversation_id`, WS stream, WebAuthn challenge endpoint from Babbage
+
+### [OPEN QUESTION] Is relay-frontend still the right next thing?
+**Stationmaster (SSH+grants) is now the production inter-team transport.** This may obsolete the original relay-frontend design (which assumed DaemonV2 UDS/TLS + HTTP bridge on port 5173). Before starting SvelteKit scaffold work, whoever plans the next session should confirm:
+- Does stationmaster replace DaemonV2 as the comms layer?
+- Is there still a human-facing web UI use case, or is this agent-to-agent only?
+- If stationmaster is the substrate, what does the frontend connect to?

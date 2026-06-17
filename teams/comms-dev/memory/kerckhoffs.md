@@ -67,6 +67,37 @@ via Node.js openssl). Low-priority for current threat model.
 - Queue per peer: max 100 messages
 - Dedup: MessageStore by message ID, 5-minute TTL
 
+## Session: 2026-06-17 -- FR stationmaster security audit (task #2) CLOSED
+
+[MISSION] This session was a security audit of FR's live stationmaster comms fabric
+(not comms-dev implementation work). comms-dev acted as external security reviewers.
+
+[CHECKPOINT] 6 findings filed, all team-lead approved before filing.
+
+| Finding | Severity | Filed |
+|---|---|---|
+| F1: AcceptEnv env-smuggling (SM_STATE_DIR via sshd AcceptEnv) | Med-High | #77 (type:blocker) |
+| F2: stationmaster reserved name = unrevocable consent bypass | Medium | #80 |
+| F3: Host-key pinning not enforced in courier startup | Medium | #81 |
+| F4: Hub cleartext storage / SPOF / no E2E encryption | Low (arch) | #82 |
+| F5: scp extension #76 has no jail spec | Low (advisory) | comment on #76 |
+| F6: notify-on-subscribe (#75) unsolicited-payload + spoofability | Medium (design) | comment on #75 |
+
+Canonical tracker: #84 (team-lead assembled; spans all 3 auditors).
+
+[LEARNED] F1 (#77) is the ONLY possibly-live hole -- depends on whether hub sshd_config
+has AcceptEnv. Everything else is accepted-risk or design-phase advisory. FR operator
+must verify sshd_config and close or act on #77 before clean bill of health.
+
+[LEARNED] Not-findings verified sound: SSH_ORIGINAL_COMMAND never parsed by hub (team
+name comes from forced-command argv[1] only); `restrict` key option correct; team name
+grammar excludes all shell metacharacters; default-deny consent enforced at deposit time.
+These are preserved in #84.
+
+[LEARNED] PROCESS: filing the tracking/index issue is team-lead's job. We raced 3 trackers
+(#83/#84/#85); #84 is canonical, #83+#85 closed as duplicates. Next session: report filed
+issue numbers to team-lead and let them assemble the tracker. Do not self-file an index.
+
 ## Write Scope
 - `comms-dev/tests/` -- all test files
 - `comms-dev/vitest.config.ts` -- test config

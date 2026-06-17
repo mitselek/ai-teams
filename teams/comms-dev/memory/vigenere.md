@@ -57,4 +57,24 @@
 
 [DECISION] v1 has no forward secrecy, no per-team keys, no online key rotation. All accepted risks documented in threat model. v2 path: X25519 + NaCl.
 
+## FR Stationmaster Trust Audit (2026-06-17, Task 1)
+
+[LEARNED] MISSION PIVOT (2026-06-17): comms-dev is no longer building its own mTLS chat to compete -- FR's stationmaster (SSH hub + courier, grant-gated) is the LIVE inter-team comms fabric now. We pivoted to SECURITY-AUDITING it as reviewers. My crypto/trust lens = the value-add.
+
+[CHECKPOINT] Canonical audit tracker = issue #84. My filings under it: comment on #21 (issuecomment-4733027981) + new issue #78. Teammates: Kerckhoffs audited SSH jail/scp/consent; Babbage audited courier delivery/transport.
+
+[CHECKPOINT] Read-only audit of FR's live stationmaster identity/trust model. Targets: stationmaster-protocol.md (v1.0.0 RATIFIED), stationmaster-courier.py, SPEC-v3.md, SPEC.md (v1/v2), TRUTHS.md, issue #21.
+
+[LEARNED] Stationmaster identity = "the channel is the identity": team name binds to ed25519 key via SSH forced-command `command="sm-shell <team>"`. Hub stamps from_team from authed channel, forwards entry VERBATIM; courier must derive attribution from from_team, never from entry content (protocol S4). Closes client-input spoof at the hub edge ONLY.
+
+[CHECKPOINT] FILED 2026-06-17 (team-lead approved): F1 = comment on issue #21 (issuecomment-4733027981) + added affects:framework-research label to #21. F2+F3 = new issue #78 (team:comms-dev, type:finding, affects:framework-research). Temp body files cleaned.
+
+[DECISION] 3 findings (FILED -- kept for reference):
+- F1 (HIGH): HUB-8 transitive-trust gap present + structurally identical to issue #21. from_team is a hub assertion, not E2E crypto binding. Compromised/buggy hub forges origin; C4/T4.b harness passes any from verbatim downstream = no second check. Fix = issue #21's per-team ed25519 signing key, sig over {id,from_team,to_team,body_hash,ts}, additive/non-breaking. -> file as COMMENT on #21, not dup.
+- F2 (MED): SSH key conflates auth+authz+integrity; no independent revoke, no rotation story in protocol; at-rest plaintext in hub/courier spool (SPEC-v3 non-goal "no encryption beyond ssh").
+- F3 (LOW): dedup-by-content-hash-id is reliability (anti-redelivery), NOT anti-replay; attacker with a key crafts new content->new id->bypasses. Needs signed nonce/ts.
+- Filing plan: F1 comment on #21; F2+F3 one new issue (type:finding, team:comms-dev, affects:framework-research).
+
+[GOTCHA] SPEC.md v1/v2 EXPLICITLY rejects app-layer signing: "from is unverifiable... bridge MUST NOT implement signature checks -- security theater on this substrate. Perimeter = SSH keys + FS perms." Any E2E-signing recommendation must engage this stance: the substrate argument is about the LOCAL inbox file (anyone who can write it wins), but it does NOT cover the HUB relay boundary, which is a real network trust boundary where signing is not theater. That distinction is the crux of F1.
+
 (*CD:Vigenere*)
