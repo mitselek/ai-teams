@@ -203,7 +203,7 @@ def process_inbound_routed(cfg: Any, ledger: Any, default_inbox: str) -> None:
             collected_ids.remove(env_id)
             continue
 
-        # Attribution rewrite (reference duty): from <- <from_team>-ghost; body verbatim.
+        # Attribution rewrite (reference duty): from <- <from_team>-courier; body verbatim.
         injected = ref.rewrite_attribution(c["entry"], from_team)
 
         # GAP A: resolve the per-agent target from the verbatim entry, with the

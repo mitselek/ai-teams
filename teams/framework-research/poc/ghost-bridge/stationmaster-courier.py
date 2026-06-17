@@ -64,7 +64,7 @@ from pathlib import Path
 #     "ssh_key":         "~/.ssh/sm_myteam",     # private key, never leaves host (onboarding S1)
 #     "ssh_opts":        ["-o", "BatchMode=yes"],# optional extra ssh args
 #     "inboxes_dir":     "~/.claude/teams/framework-research/inboxes",
-#     "ghost_outboxes":  ["hr-devs-bridge"],     # session-less names our agents SendMessage to (hints S1)
+#     "ghost_outboxes":  ["hr-devs-courier"],    # session-less names our agents SendMessage to (hints S1; -bridge accepted for backwards-compat)
 #     "target_inbox":    "team-lead",            # live member inbox we inject into (hints S1)
 #     "state_dir":       "~/.stationmaster/framework-research",  # spool + ledger live here
 #     "poll_interval_s": 30,                      # hints S8 [CONV] 5-60s
@@ -467,9 +467,10 @@ def deposit_spool(cfg: Config) -> None:
         # docs specify consignment = {"to": <team>, "entry": {...}} but do not
         # specify how a generic ghost outbox names its destination team. This
         # reference maps one ghost-outbox name -> one destination team via the
-        # `<name>-bridge` -> `<name>` convention (hints S1 example uses
-        # `hr-devs-bridge`). If a ghost outbox must fan out to multiple teams, that
-        # is a routing extension the protocol does not yet define.
+        # `<name>-courier` -> `<name>` convention (hints S1; `-bridge` accepted for
+        # backwards-compat -- see _outbox_to_team). If a ghost outbox must fan out
+        # to multiple teams, that is a routing extension the protocol does not yet
+        # define.
         to_team = _outbox_to_team(spool_file, cfg)
         if to_team is None:
             warn(f"spool {spool_file.name}: cannot derive destination team; leaving for inspection")
@@ -664,12 +665,20 @@ def inject_batch(cfg: Config, batch_entries: list[dict], max_rounds: int = 50) -
 def rewrite_attribution(entry: dict, from_team: str) -> dict:
     """
     hints S4 attribution duty (protocol S4): derive the injected `from` from the
-    hub envelope's from_team -- local convention `<from_team>-ghost`. NEVER trust a
-    team identity claimed inside entry (spoofable -- T4.b). Rewrite ONLY `from`;
-    body stays verbatim.
+    hub envelope's from_team -- cross-team convention `<from_team>-courier`. NEVER
+    trust a team identity claimed inside entry (spoofable -- T4.b). Rewrite ONLY
+    `from`; body stays verbatim.
+
+    Channel-naming note (S53, adopted from apex-research): a remote team's mail is
+    attributed to a single `<remote-team>-courier` channel name -- the SAME name
+    both sides use as the cross-team outbox (see _outbox_to_team). Standardizing on
+    one channel name closes the reply dead-letter class: when an agent replies to an
+    inbound peer message, SendMessage targets the inbound `from`; if attribution and
+    the watched outbox disagree, the reply silently dead-letters. The prior local
+    convention was `<from_team>-ghost`; `-courier` is now the documented standard.
     """
     rewritten = dict(entry)  # shallow copy; we touch only the top-level `from`
-    rewritten["from"] = f"{from_team}-ghost"
+    rewritten["from"] = f"{from_team}-courier"
     return rewritten
 
 
@@ -807,19 +816,30 @@ def _utc_stamp() -> str:
 
 def _outbox_to_team(spool_file: Path, cfg: Config) -> str | None:
     """
-    Derive the destination team for a spool file. v1 convention (hints S1 example
-    `hr-devs-bridge` -> hr-devs): a ghost-outbox name `<team>-bridge` routes to
-    `<team>`. The spool filename does not carry the source outbox name in v1, so we
-    fall back to single-destination config when only one ghost outbox is defined.
+    Derive the destination team for a spool file. Convention (hints S1): a
+    cross-team outbox name `<team>-courier` routes to `<team>` (strip `-courier`).
+    The spool filename does not carry the source outbox name in v1, so we fall back
+    to single-destination config when only one outbox is defined.
+
+    Channel-naming standard (S53, adopted from apex-research): the cross-team
+    channel name is `<team>-courier` -- the SAME name both sides use (see
+    rewrite_attribution). The legacy `<team>-bridge` suffix is STILL accepted for
+    backwards-compat (the live FR<->apex link runs `apex-research-bridge` until
+    Brunel's gated config flip lands; do not break it). Strip `-courier` first, then
+    `-bridge`; if neither suffix matches, the outbox name IS the team name.
 
     PROTOCOL AMBIGUITY (surfaced to team-lead, not resolved here): the docs do not
-    specify how a generic ghost outbox names its destination when multiple outboxes
-    or multiple destinations exist. This v1 reference handles the single-destination
-    and `<team>-bridge` cases; multi-destination fan-out is an undefined extension.
+    specify how a generic outbox names its destination when multiple outboxes or
+    multiple destinations exist. This reference handles the single-destination and
+    `<team>-courier` / `<team>-bridge` cases; multi-destination fan-out is an
+    undefined extension.
     """
     if len(cfg.ghost_outboxes) == 1:
         name = cfg.ghost_outboxes[0]
-        return name[:-len("-bridge")] if name.endswith("-bridge") else name
+        for suffix in ("-courier", "-bridge"):  # -courier standard; -bridge backwards-compat
+            if name.endswith(suffix):
+                return name[: -len(suffix)]
+        return name
     # Multiple ghost outboxes: cannot disambiguate from the spool file alone in v1.
     # (A production extension would stamp the source outbox into the spool filename
     # or wrap entries with routing at consume time.) Surface rather than guess.

@@ -5,12 +5,12 @@
   "ssh_key": "~/.ssh/sm_framework-research",
   "ssh_opts": ["-o", "BatchMode=yes", "-o", "ConnectTimeout=15"],
   "inboxes_dir": "~/.claude/teams/framework-research/inboxes",
-  "ghost_outboxes": ["apex-research-bridge"],
+  "ghost_outboxes": ["apex-research-courier"],
   "target_inbox": "team-lead",
   "default_inbox": "team-lead",
   "state_dir": "~/.stationmaster/framework-research",
   "poll_interval_s": 30,
   "collect_limit": 100,
   "_routing_note": "Inbound is routed per-agent on entry.to with three guards (present + name-hygiene + inbox-file-already-exists). default_inbox (team-lead) is the fallback when any guard fails. target_inbox is retained for reference-courier compatibility and as the inject_batch working field; default_inbox is what FR routing actually falls back to.",
-  "_outbox_note": "ghost_outboxes is the list of session-less local inbox names our agents SendMessage to for OUTBOUND mail. The outbox name MUST be <registered-team>-bridge: apex-research-bridge -> apex-research (strip -bridge) per the CR-4 convention. CAUTION: the name strips literally, so apex-bridge would route to team 'apex' (NOT registered) -> E_UNKNOWN_TEAM; always use the full registered team name. Per-destination outboxes (one per team) is the PO-ratified v1 routing (CR-4, candidate A); single-outbox multi-destination fan-out is out-of-scope (courier refuses-and-retains)."
+  "_outbox_note": "ghost_outboxes is the list of session-less local inbox names our agents SendMessage to for OUTBOUND mail. The outbox name MUST be <registered-team>-courier: apex-research-courier -> apex-research (strip -courier) per the standardized cross-team channel convention. The SAME name is used both as the local outbox AND as the from-attribution the far side replies to, which closes the reply-path dead-letter class (apex-research's finding, PO-ratified both sides; FR flipped 2026-06-17). BACKWARDS-COMPAT: the courier (stationmaster-courier.py _outbox_to_team) strips -courier FIRST, then still accepts the legacy -bridge suffix, so old -bridge outboxes keep routing until fully retired. CAUTION: the name strips literally, so apex-courier would route to team 'apex' (NOT registered) -> E_UNKNOWN_TEAM; always use the full registered team name. Per-destination outboxes (one per team) is the PO-ratified v1 routing (CR-4, candidate A); single-outbox multi-destination fan-out is out-of-scope (courier refuses-and-retains)."
 }

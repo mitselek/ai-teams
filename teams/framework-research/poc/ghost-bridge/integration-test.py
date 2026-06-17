@@ -81,7 +81,7 @@ def main() -> int:
     fr_inboxes.mkdir(parents=True)
     cfg = courier.Config({
         "team": "framework-research", "ssh_target": "sm@hub", "ssh_key": "~/.ssh/none",
-        "inboxes_dir": str(fr_inboxes), "ghost_outboxes": ["hr-devs-bridge"],
+        "inboxes_dir": str(fr_inboxes), "ghost_outboxes": ["hr-devs-courier"],
         "target_inbox": "team-lead", "state_dir": str(root / "fr" / "state"),
     })
     courier.validate_startup(cfg)
@@ -105,7 +105,7 @@ def main() -> int:
           r.ok and r.data_lines[0]["team"] == "framework-research")
     check("ping reports a fingerprint field", "fingerprint" in r.data_lines[0])
 
-    ob = fr_inboxes / "hr-devs-bridge.json"
+    ob = fr_inboxes / "hr-devs-courier.json"
     ob.write_text(json.dumps([{"from": "finn", "text": "hi hr-devs", "summary": "s",
                                "timestamp": "2026-06-12T10:00:00Z", "read": False}]), encoding="utf-8")
     courier.consume_outboxes_to_spool(cfg)
@@ -140,8 +140,8 @@ def main() -> int:
     tgt = fr_inboxes / "team-lead.json"
     got = json.loads(tgt.read_text()) if tgt.exists() else []
     check("inbound: injected into team-lead inbox", len(got) == 1)
-    check("anti-spoof: from = hr-devs-ghost (authenticated from_team, NOT entry.from claim)",
-          bool(got) and got[0]["from"] == "hr-devs-ghost")
+    check("anti-spoof: from = hr-devs-courier (authenticated from_team, NOT entry.from claim)",
+          bool(got) and got[0]["from"] == "hr-devs-courier")
     check("body forwarded verbatim", bool(got) and got[0]["text"] == "inbound hello")
 
     r = run_sm_shell("framework-research", ['{"v":1,"cmd":"collect"}'])
@@ -158,6 +158,18 @@ def main() -> int:
     courier.process_inbound(cfg, ledger2)
     check("no duplicate on clean re-run (ledger + ack both held)",
           len(json.loads(tgt.read_text())) == 1)
+
+    # S53 channel-naming standard + backwards-compat: -courier is the standard, but
+    # a config still on the legacy -bridge suffix must keep routing (staged flip).
+    class _C:
+        pass
+    for _outbox, _expect in (("apex-research-courier", "apex-research"),
+                             ("apex-research-bridge", "apex-research"),
+                             ("hr-devs", "hr-devs")):
+        _cfg = _C()
+        _cfg.ghost_outboxes = [_outbox]
+        check(f"route: {_outbox} -> {_expect} (S53 -courier standard / -bridge compat)",
+              courier._outbox_to_team(None, _cfg) == _expect)
 
     print(f"== {stats['p']} passed, {stats['f']} failed ==")
     return 1 if stats["f"] else 0

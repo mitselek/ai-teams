@@ -129,7 +129,7 @@ A **courier** is the small process on your host that loops: consume your team's 
 
 A courier's outbound side reads a local ghost outbox and must supply the consignment's `to` (destination team). The hub routes by `to`, but a harness inbox entry carries no destination field -- so the courier originates `to` from the **outbox name**. The PO-ratified v1 resolution (candidate A, "per-destination outboxes"):
 
-- **NORMATIVE (v1):** an outbox named `<team>-bridge` routes to `<team>` (strip the `-bridge` suffix). **One outbox per destination team** -- to reach N teams, maintain N outboxes. The reference courier implements this; it is the supported and only routing shape in v1.
+- **NORMATIVE (v1; channel name standardized S53):** an outbox named `<team>-courier` routes to `<team>` (strip the `-courier` suffix). **One outbox per destination team** -- to reach N teams, maintain N outboxes. The reference courier implements this; it is the supported routing shape. The legacy `<team>-bridge` suffix is STILL accepted for backwards-compat (the reference courier strips `-courier` first, then `-bridge`), so a config still pointing at `<team>-bridge` keeps working through a staged flip -- but new links SHOULD use `-courier`. **Both sides of a cross-team link MUST use the SAME channel name:** it is simultaneously the outbox a team's agents `SendMessage` to AND the `<remote-team>-courier` attribution the peer courier stamps on inbound mail. When the two disagree, replies dead-letter -- an agent replying to an inbound peer message targets the inbound `from`, but the courier watches a differently-named outbox, so the reply silently accumulates in an unwatched slot. Standardizing on one channel name closes that dead-letter class. *(*FR:Herald*)*
 - **Fan-out (one outbox → multiple destinations): OUT OF SCOPE in v1.** A single outbox serving several destinations has no per-entry disambiguation; the reference courier refuses-and-retains (never drops) such an entry. Per-destination outboxes are the answer -- do not build single-outbox fan-out. (Revisited only if a real consumer forces it; that would be a separate amendment, not a v1 gap.)
 
 ### Verify drain-on-delivery on YOUR Claude Code CLI before production *(CR-5 -- substrate invariant)*
@@ -157,7 +157,7 @@ These are real artifacts from the first external customer's onboarding (cross-re
     "-o", "UserKnownHostsFile=~/.ssh/stationmaster_known_hosts",  // host-key pinning lives in ssh_opts -- this file MUST be provisioned (see lesson iv); ephemeral ~/.ssh ⇒ bake or use persistent vol
     "-o", "StrictHostKeyChecking=yes", "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes"],
   "inboxes_dir": "<repo-or-home>/.claude/teams/<team>/inboxes",
-  "ghost_outboxes": ["framework-research-bridge"],   // <dest-team>-bridge per CR-4 → routes to framework-research
+  "ghost_outboxes": ["framework-research-courier"], // <dest-team>-courier (S53 standard) → routes to framework-research; legacy -bridge still accepted
   "target_inbox": "team-lead",                  // live member inbox the courier injects into
   "state_dir": "<persistent-vol>/teams/<team>/stationmaster-state",  // MUST be same volume as inboxes_dir
   "poll_interval_s": 30,
@@ -165,7 +165,7 @@ These are real artifacts from the first external customer's onboarding (cross-re
 }
 ```
 
-Worked-example lessons baked in: (i) host-key pinning rides in `ssh_opts` (the reference courier passes them through verbatim); (ii) `state_dir` co-located with `inboxes_dir` on the **same persistent volume** (`rename()` atomicity is per-volume); (iii) `ghost_outboxes` uses the `<dest>-bridge` form (CR-4), not a historical per-pair name.
+Worked-example lessons baked in: (i) host-key pinning rides in `ssh_opts` (the reference courier passes them through verbatim); (ii) `state_dir` co-located with `inboxes_dir` on the **same persistent volume** (`rename()` atomicity is per-volume); (iii) `ghost_outboxes` uses the `<dest>-courier` form (S53 standard; legacy `-bridge` still accepted), not a historical per-pair name.
 
 (iv) **the host key in `stationmaster_known_hosts` must be PROVISIONED -- the config requires it but does not create it.** `StrictHostKeyChecking=yes` means the courier refuses to connect until that file contains the hub's real host key (Step 3: pin it out-of-band, never TOFU / `accept-new`, never `ssh-keyscan` the hub blind -- that trusts whatever answers). On an **ephemeral-`~/.ssh` container** the file does not survive a rebuild, so it must be provisioned durably: bake the known-authentic host-key line at image/entrypoint build time (same pattern as the courier private key), OR point `UserKnownHostsFile` at the **persistent volume** (the same volume as `state_dir`). Symptom if skipped: the courier authenticates its own key fine but every poll fails `No ED25519 host key is known … strict checking` → collect blocked, no mail moves. (apex-research S52: this was the 3rd provisioning gap; closed by baking the host key into the entrypoint.)
 *(*FR:Herald*)*
@@ -175,7 +175,7 @@ Worked-example lessons baked in: (i) host-key pinning rides in `ssh_opts` (the r
 Method: observational snapshot of the live inbox dir during normal operation (read-only; **not** a timed test).
 
 - Live member inbox (`team-lead.json`) = 0 entries / returns to `[]` after harness delivery → inbound verify-empty→exclusive-create assumption **VALID**.
-- Session-less ghost **outbox** (e.g. `framework-research-bridge.json`) = entries accumulate, no drain → outbound consume-by-rename assumption **VALID**.
+- Session-less ghost **outbox** (e.g. `framework-research-courier.json`) = entries accumulate, no drain → outbound consume-by-rename assumption **VALID**.
 - Ghost inbox with no live reader = accumulates, no drain → only a **live agent's** inbox is drained on delivery.
 
 **Verdict:** drain-on-delivery HOLDS on 2.1.173 (agrees with the 2.1.170 baseline; third sample). **Caveat:** steady-state snapshot, not a timed inject/drain-latency test.
@@ -198,3 +198,5 @@ Method: observational snapshot of the live inbox dir during normal operation (re
 ---
 
 *Revision S51 (2026-06-15) folds change-requests CR-1..7 from apex-research (first external customer; cross-repo + ephemeral-home substrate). CR-4 outbox-routing PO-ratified as candidate A (per-destination outboxes; `<team>-bridge`→`<team>` normative v1; single-outbox fan-out out-of-scope). CR-7 renderable-body field pinned to `text` at protocol §4 (clarifying errata, no major bump). Worked examples (apex-contributed) folded in: their adapted `courier.json` and the CLI-2.1.173 T1.b datapoint. (*FR:Herald*)*
+
+*Revision S53 (2026-06-17) standardizes the cross-team channel name on `<team>-courier` (adopted from apex-research). The S51 `<team>-bridge` suffix is now legacy-but-accepted: the reference courier strips `-courier` first, then `-bridge`, so a config still on `-bridge` keeps working through a staged flip. Motivation: a reply dead-letter class -- both sides must use the SAME channel name (it is simultaneously the outbox and the inbound attribution), or replies to an inbound peer message silently accumulate in an unwatched slot. (*FR:Herald*)*
