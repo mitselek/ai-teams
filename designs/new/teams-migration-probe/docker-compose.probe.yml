@@ -42,6 +42,13 @@ services:
     # --- WARP host variant (uncomment if egress needs the tunnel) ---
     # The OAuth login flow must reach console.anthropic.com / claude.ai, not just
     # api.anthropic.com -- on the WARP host that means the tunnel + the WARP CA.
+    # The CA mount is HOST_SOURCE:CONTAINER_TARGET. Source = the real host CA file
+    # (apex uses /usr/local/share/ca-certificates/managed-warp.pem, a SYMLINK ->
+    # /etc/ssl/certs/managed-warp.pem ~1139B; either resolves). Target = /opt/warp-ca.pem
+    # INSIDE the container -- this path does NOT pre-exist on the host; the mount creates it.
+    # NODE_EXTRA_CA_CERTS points at the in-container TARGET, not the host source.
+    # IMPORTANT: only set PROBE_NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem IF this mount is
+    # uncommented -- otherwise NODE points at a path that doesn't exist in the container.
     # network_mode: host
     # volumes:
     #   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro

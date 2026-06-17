@@ -43,7 +43,10 @@ RUN curl --insecure -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x
     && node --version
 
 # ── Non-root probe user (uid 1000), apex-style ──────────────────────────────────
-RUN useradd -m -u 1000 -s /bin/bash ai-teams \
+# ubuntu:24.04 ships a stock `ubuntu` user already at uid 1000 -- remove it first or
+# `useradd -u 1000` fails ("UID 1000 already in use"). Verified on-host by Hopper 2026-06-17.
+RUN (userdel -r ubuntu 2>/dev/null || true) \
+    && useradd -m -u 1000 -s /bin/bash ai-teams \
     && usermod -p '*' ai-teams \
     && mkdir -p /home/ai-teams/.ssh \
     && chmod 700 /home/ai-teams/.ssh \
