@@ -728,3 +728,39 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** -- **5th GAP CLOSED -- container sshd host key now PERSISTENT + STABLE across rebuilds (proven via 2nd-recreate fp-unchanged).** New permanent fp `SHA256:z1/fXAE8gRCfUrKnIJ8PM5bcO/pBhAMrZESNHbmh4vA` reported to Aen for the PO's one-time `ssh-keygen -R '[100.96.54.170]:2222'` + accept = inbound-SSH identity churn fixed forever. Private keys volume-only (never baked), root-owned 700 (agent can't read) = secure. All prior hardening (ASK-1/ASK-2/inbox/GH_TOKEN/dashboard/lock-pre-clean/host-key-collect-transport) regression-GREEN on the new image 862c799f. apex DOWN throughout (read-only verify via docker-exec; recreates don't wake the agent). PR #165 now 6 commits.
 
 (*FR:Hopper*)
+
+## 2026-06-17T18:30+03:00 -- teams-migration probe (2.1.179 implicit-teams): throwaway container build + drive P1-P6 (Task #4, Phase 2)
+
+**timestamp** -- 2026-06-17T18:30+03:00 (FLEDT)
+
+**tasker** -- Aen (team-lead); Brunel authored the probe artifacts (paired diagnosis-then-execution).
+
+**dispatch summary** -- Build a throwaway container running Claude Code 2.1.179 (post-2.1.178, TeamCreate/TeamDelete stripped) and empirically drive probes P1-P6 to answer whether FR's named-team courier lifecycle can migrate onto the session-scoped implicit-team model. P1 (team-name controllable?) and P6 (bare-session reachable?) are load-bearing.
+
+**tier classification + sanction status** -- Mixed, all sanctioned. Tier R throughout for inspection/snapshot (default-permitted). Build+up of a NEW throwaway container = Aen GO (18:29-18:37, repeated): "you're authorized to apply that compose config directly on the rc-host copy ... this is throwaway." No live-team mutation. The compose+Dockerfile edits were on-host throwaway copies (Aen: "no need to round-trip the tweak through git"). No Tier D against any live substrate.
+
+**deployed-artifacts-read declaration**
+- **Layer 1 (FR design-as-shipped):** `designs/new/teams-migration-probe/{Dockerfile.probe, docker-compose.probe.yml, entrypoint-probe.sh, README.md}` read in full (repo @ 520a714 then a7c8cee; built from on-host 520a714 copy -- Aen confirmed a7c8cee is cosmetic-only (c)-clean docs, no rebuild needed).
+- **Layer 2 (operational, rc host):** apex reference read for egress posture -- `docker inspect apex-research` NetworkMode=host, NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem (in-container bind target), ANTHROPIC_API_KEY empty. WARP CA host source = `/etc/ssl/certs/managed-warp.pem` (1139B, real file; `/usr/local/share/ca-certificates/managed-warp.pem` is a symlink to it). Host :2222 already bound by apex live sshd (`ss -tln`).
+- **Layer 3 (running probe container):** `claude --version`=2.1.179; `sessions/121.json` (pid 121, sessionId d0cf4760..., peerProtocol 1); `teams/session-d0cf4760/config.json`; `inboxes/{team-lead,ghost-courier}.json`.
+- **Audit-trail artifacts:** findings doc `docs/teams-migration-probe-findings-2026-06-17.md`; rc-host snapshot `/tmp/probe-snapshot-teams`.
+
+**commands executed** (verbatim, abridged to load-bearing; all via `ssh -T dev@100.96.54.170`)
+- Egress pre-checks (Tier R throwaway, curl image removed after): bridge -> `Could not resolve host` (000); `docker run --network host -v /etc/ssl/certs/managed-warp.pem:/opt/warp-ca.pem:ro ... curl https://api.anthropic.com/v1/models` -> 401; claude.ai/console.anthropic.com -> 302.
+- Compose adaptation (on-host throwaway copy): network_mode: host + bind `/etc/ssl/certs/managed-warp.pem:/opt/warp-ca.pem:ro` + NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem + removed ports: + PROBE_SSH_PUBLIC_KEY left unset (entrypoint skips sshd).
+- Dockerfile fix (on-host throwaway copy): prepend `(userdel -r ubuntu 2>/dev/null || true) &&` before `useradd -m -u 1000 ai-teams` -- ubuntu:24.04 base now ships a stock `ubuntu` user at uid 1000 (collision).
+- `DOCKER_BUILDKIT=1 docker compose -f docker-compose.probe.yml build && up -d`; verify `claude --version`=2.1.179; entrypoint skipped sshd (host :2222 still only apex).
+- Auth: tmux `/login` (method 1 subscription), OAuth URL relayed to Aen, code injected via `tmux send-keys -l` (never echoed). Logged in mihkel.putrinsh@evr.ee, .credentials.json present.
+- Probes: spawn teammate with team_name=framework-research (P1); SendMessage round-trip lead<->probemate (P2/P3); external append ghost-courier to config members[] + SendMessage to it (P4); external write to inboxes/team-lead.json x2 + observe wake (P5/P6).
+- Snapshot: `docker cp teams-migration-probe:/home/ai-teams/.claude/teams /tmp/probe-snapshot-teams`.
+
+**outputs** (key results)
+- **P1 FAIL (name NOT controllable):** team_name=framework-research IGNORED on disk; on-disk team = `session-d0cf4760`, member agentId=`probemate@session-d0cf4760`, config.name="session-d0cf4760". No framework-research dir. => courier hardcoded path breaks; needs runtime name-discovery.
+- **P2/P3 PASS:** SendMessage exists + bidirectional delivery (probemate PROBEMATE-UP -> lead; lead -> probemate).
+- **P4 PASS:** externally-injected ghost-courier member honored; SendMessage to it returned success + wrote inboxes/ghost-courier.json.
+- **P5/P6 PASS (P6 corrected mid-probe):** external write to inboxes/team-lead.json proactively WAKES + DELIVERS to the idle lone session (clean re-test woke with no nudge), harness then drains inbox to []. Inbox shape adds a `type` field on 2.1.179. config.json is eager; inboxes/ is lazy.
+- **Migration verdict:** members[] injection + inbox-file-write delivery BOTH survive 2.1.178+; only the hardcoded team-name path breaks (P1). Replace with runtime name-discovery and the comms layer migrates cleanly -- no injection/delivery redesign needed.
+
+**outcome** -- **success.** All 6 probes executed with evidence; findings doc written. P1 = name uncontrollable (runtime-discoverable); P6 = bare session reachable via inbox-write. One in-flight build defect (ubuntu uid-1000 collision) fixed under Aen authorization (throwaway, exact diff above + relayed to Brunel). Throwaway torn down with `docker compose -f docker-compose.probe.yml down -v` after snapshot. No live-team container touched; apex :2222 never collided; ANTHROPIC_API_KEY unused; OAuth code never logged.
+
+(*FR:Hopper*)
