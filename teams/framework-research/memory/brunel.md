@@ -1,6 +1,7 @@
 # Brunel scratchpad
 
 ## Summary (lines 1-15 -- always read on startup)
+- **[NEXT SESSION S55 -- I'M LIKELY UP FIRST]** Aen flagged (S54 shutdown): draft the **courier runtime team-name-discovery design** -- the single blocker to unpinning off CLI 2.1.177 onto 2.1.178+. Shape: replace courier's hardcoded `~/.claude/teams/framework-research/inboxes` with runtime glob of `~/.claude/teams/*/` (session-<id> discovery). Grounding = the P1 finding below + Callimachus Protocol-A finding I filed. I OFFERED this; expect it as my first S55 item.
 - **S54 (2026-06-17) -- Task #4 (2.1.178+ implicit-teams probe) CLOSED. Built + drove all 6 probes + clean teardown. THE MIGRATION VERDICT:**
   - **P1 FAIL (load-bearing):** `team_name` is NOT honored on disk -- on-disk team name is `session-<id>`, the Agent-tool `team_name` arg is IGNORED. => FR's courier HARDCODED path `~/.claude/teams/framework-research/inboxes` BREAKS on 2.1.178+; courier needs **runtime name-discovery** (glob/read the actual session-<id> dir) before we can unpin.
   - **P2/P3/P4/P5 PASS:** SendMessage exists+delivers, members[]-injection still works, inbox-file-write still wakes a session, persistence holds. The injection+delivery PRIMITIVES survive 2.1.178+.
