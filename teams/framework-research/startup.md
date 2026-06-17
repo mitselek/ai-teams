@@ -25,7 +25,7 @@ All paths are derived from two anchors:
 | Scratchpads | `teams/framework-research/memory/*.md` |
 | Topic files | `topics/01` through `topics/08` |
 | Reference teams | `reference/rc-team/`, `reference/hr-devs/` |
-| Lifecycle scripts | `teams/framework-research/restore-inboxes.sh`, `persist-inboxes.sh`, `restore-ghost-members.sh` |
+| Lifecycle scripts | `teams/framework-research/restore-inboxes.sh`, `persist-inboxes.sh` |
 
 **Known gotcha #1:** `roster.json` says `workDir: "$HOME/github/mitselek-ai-teams"` -- this may be WRONG on your machine. Use `git rev-parse --show-toplevel` to get the actual repo path.
 
@@ -105,29 +105,6 @@ ls "$HOME/.claude/teams/framework-research/config.json"
 **Do NOT spawn any agent until the team is verified operational.** In Restart 4, an agent was spawned into a broken team state (TeamCreate returned "success" but team was non-functional). The agent was wasted.
 
 The verify-on-disk check above IS this gate. One `ls` separates a working team from a broken one. Do not proceed to Step 4 (Spawn) until config.json is confirmed.
-
-### Step 2c: Re-register ghost members from roster (*FR:Volta*)
-
-`TeamCreate` seeds runtime `members[]` from harness-init state, NOT from `roster.json`. The harness consults `roster.json` on agent SPAWN to find a member's prompt/model -- but ghost members (`agentType: "ghost"`) are never spawned (they're comm endpoints, no agent process), so they never enter runtime `members[]` via the natural `TeamCreate` → spawn path. Result: a fresh-session `config.json` is missing every ghost in the roster. Native `SendMessage` to a ghost name fails validation until somebody re-registers it.
-
-The fix exploits substrate finding #8 v3 (canonical: [`wiki/references/members-array-edit-honored-mid-session.md`](wiki/references/members-array-edit-honored-mid-session.md)) -- plain JSON edits to runtime `members[]` are honored on the next `SendMessage` validation. So after `TeamCreate`, we read the roster, filter for `agentType == "ghost"`, and append any missing entries directly to the runtime `config.json`.
-
-```bash
-REPO="$(git rev-parse --show-toplevel)"
-bash "$REPO/teams/framework-research/restore-ghost-members.sh"
-```
-
-The script handles:
-
-- Reads ghost entries (`agentType == "ghost"`) from `teams/framework-research/roster.json`
-- For each ghost: appends to runtime `members[]` if missing; copies `backendType` and `color` from the roster entry; sets `isActive: false`, fresh `joinedAt`, empty `tmuxPaneId`/`cwd`/`subscriptions`
-- Ensures an empty inbox file (`[]`) exists at `$HOME/.claude/teams/framework-research/inboxes/<ghost-name>.json` -- the ghost-bridge daemon polls this file and would log missing-file warnings without it
-- **Idempotent:** running twice produces the same final state (one-line "All ghost members already registered" on no-op)
-- Exit 0 on success, non-zero on error
-
-**Verify:** Script outputs `Re-registered N ghost member(s).` or `All ghost members already registered.` Non-zero exit = error, investigate before proceeding.
-
-**Discipline:** runs unconditionally on every startup -- no gate on "do we have ghosts?" The script self-checks and no-ops cheaply if all ghosts are already registered. Adding a new ghost to the roster requires zero startup-script changes; the next session picks it up automatically.
 
 ### Step 3: Restore inboxes from repo
 
