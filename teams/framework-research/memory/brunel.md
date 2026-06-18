@@ -1,10 +1,13 @@
 # Brunel scratchpad
 
 ## Summary (lines 1-15 -- always read on startup)
-- **Current state:** S56 CLOSED 2026-06-18 -- THE UNPIN HAPPENED. Team briefed once on the 8 FINAL decided directions (no reopen), then cut over 2.1.177 -> 2.1.181. My S56 role = courier-substrate verifier on runbook step-b + one bounded .gitignore edit. All my work confirmed; nothing left open on my side.
-- **Active items:** none. Idle-ready at next boot until team-lead assigns.
-- **Key decisions this session:** all 8 directions are FINAL (target 2.1.181; process-liveness resolver merged+validated; mode-(b) bare restart v1 / mode-(a) pid v2; LAUNCH-OVERRIDE two-config; V5b/P6 non-blocking; env FR_COURIER_TEAM_DIR_NAME kept; Volta WS2 flip-ready; 4 documented constraints). I did NOT reopen any.
+- **Current state:** S58 CLOSED 2026-06-18 (2.1.181 LIVE, migration PASSES). ALL MY PARTS DONE + VALIDATED. Fixed 3 post-unpin courier bugs: A(b) courier self-mkdir inboxes_dir (Hopper Tier-R live-validated PASS w/ neg-control, #2); B identity stop sweep + Scheduled Task DISABLED via Hopper (verified State->Disabled, #3); C drain -Config default .auto.json + Direction #4 amendment RATIFIED (#4). #6 F3/F4 CONFIRMED + indexed by Cal (wiki 156, gate 31conf; held status:active until #7). Apex round-trip PASS (Aen). Files uncommitted -> Aen S4 commit.
+- **Active items:** none at shutdown. Next-session: if a 2nd team migrates to 2.1.178+, courier MUST switch to mode-(a) -SessionPid (see WARNING). If Aen scopes the deferred Bug-B live sweep test, author the test shape w/ Hopper's isolation constraint (orphan a SECOND throwaway-config courier on a SCRATCH lock path -- NEVER touch live pid 41188).
+- **Key decisions this session:** Bug B is NOT a lock bug -- InstanceLock correctly refused a LIVE holder; real defect = dual launcher (script-pair + Scheduled Task) no shared pid tracking. Fix = identity sweep + DISABLE the Task post-unpin (pins stale dir, races wrapper, WAS orphan-38044 source; Hopper executed 16:06+03:00, registration retained for rollback). Bug C = explicit config literal inboxes_dir is a phantom path on 2.1.181; retire between-session persistence on 2.1.178+ rather than dup .auto.json's resolver. Direction #4 now CLI-version-split.
 - **Carry-forward:**
+  - [DONE S58] #2/#3/#4 COMPLETED + validated (A(b) live-tested PASS; B Task-disabled+verified; C ratified). #6 F3/F4 CONFIRMED + indexed by Cal (kept SEPARATE, count 156).
+  - [LEARNED S58] A negative control is what makes a fix-validation real: Hopper asserted the EXACT pre-fix predicate RAISES on the failure input, THEN the post-fix returns clean on the same input. Parse/compile PASS proves syntax, not behavior -- ask for the neg-control when a fix matters.
+  - [PATTERN S58] Tier-D dispatch worked clean: I diagnose+author exact command+justification, Hopper validates against deployed artifacts independently (caught zero drift), Aen authorizes, Hopper executes+logs. Role-split held -- I never touched the operational command.
   - [DONE S56] Step-b verify: (a) both configs on disk + valid JSON, explicit PURE; (b) live courier pid 38044 on EXPLICIT config (verified via Win32_Process CommandLine, not claimed), stays UP through flip; (c) wrapper -Config defaults to .auto.json behind V4 dry-run guard. All PASS.
   - [DONE S56] Finding (d): fr-courier.config.auto.json was COMMITTED (0882b86) + NOT gitignored -- contradicted Direction #4. Team-lead approved option 1. I added `fr-courier.config.auto.json` to ghost-bridge/.gitignore (L11, under the explicit-config block, with comment). Verified pattern matches via `git check-ignore -v --no-index`. Team-lead ran `git rm --cached` + commit (his domain; I never touched git tracking).
   - [LEARNED S56] `git check-ignore` (plain) stays SILENT for an already-TRACKED file even when a matching .gitignore rule exists -- tracking shadows the ignore rule. To verify the PATTERN itself, use `git check-ignore -v --no-index <file>` (bypasses the index). Don't read plain-check-ignore-silence as "rule missing."
@@ -15,10 +18,16 @@
 ---
 ## Session transcript (prune beyond line 100)
 
+### S58 (2026-06-18) -- post-unpin courier bug fixes (A(b)/B/C)
+- Diagnosed B from code: InstanceLock behaved correctly (refused a LIVE holder). Real defect = dual launcher (script-pair tracks fr-courier.pid; Scheduled Task launches via wscript->vbs->bash->python, untracked). stop only killed the pid-file pid -> Task-launched orphan 38044 survived holding a non-stale lock.
+- B fix: stop-fr-courier.ps1 Step 1b -- CIM Win32_Process CommandLine match `fr-courier-daemon\.py` -> hard-kill live match -> clear lock only if recorded pid dead (honor staleness contract). + Tier-D dispatch to Hopper: Disable-ScheduledTask FrameworkResearch-Courier (HELD for Aen go-ahead; Disable not Unregister -> rollback via Enable).
+- C diagnosed: fr-courier.config.json:8 inboxes_dir = literal ~/.claude/teams/framework-research/inboxes -- confirmed ABSENT on disk (only session-* dirs). C fix: stop param([string]$Config=.auto.json default); drain uses launched config not hardwired explicit. Direction #4 amendment drafted -> Aen RATIFIED (team-lead.md L20).
+- A(b) fix: validate_startup() mkdir(parents,exist_ok) the inboxes_dir instead of hard-raise. py_compile PASS.
+- All edits parse/compile-verified. NOT my domain: git (Aen), Task-disable execution (Hopper).
+
 ### S56 (2026-06-18) -- UNPIN executed; my role = courier-substrate verify + gitignore hygiene
 - Briefed on 8 FINAL directions (team-lead.md L10-20). Absorbed, did NOT reopen.
-- Step-b verify (verify-only): a/b/c PASS, found (d). Reported to team-lead. Live courier = pid 38044, `python fr-courier-daemon.py --config fr-courier.config.json` (explicit). pid file absent (script-pair mechanism, not pidfile-tracked) -- live daemon confirmed by process CommandLine.
-- (d) closed via the one .gitignore edit. Team-lead did git rm --cached + commit.
+- Step-b verify (verify-only): a/b/c PASS, found (d). Live courier = pid 38044 explicit cfg (CommandLine-confirmed). (d) closed via one .gitignore edit; team-lead did git rm --cached + commit.
 
 ---
 ## STANDING DECISIONS (carry forward)
@@ -45,7 +54,7 @@
 [GOTCHA -- S50, OpenSSH 9.x] `ssh-keygen -A -f <prefix>` does NOT create `<prefix>/etc/ssh` and FAILS if absent. Fix: generate single ed25519 directly with explicit `-f <path>`. Smoke-test host-key assertion.
 [GOTCHA -- courier S51] ghost_outbox name resolves to team by stripping `-bridge`; MUST be `<registered-team>-bridge` or deposit hits E_UNKNOWN_TEAM, consignment retain-loops. Spool re-resolves dest at DEPOSIT time -> config-fix+restart auto-heals stuck entries.
 [GOTCHA -- Windows daemon stop, S51] PowerShell Stop-Process == hard kill; Python gets NO signal -> in-process drain + atexit don't fire. Drain must be external: stop->wait-exit->`--drain-once`. (POSIX delivers the signal; only Windows kill path affected.)
-[GOTCHA -- S54] stop/start-fr-courier.ps1 manage the PID-FILE lifecycle; on the live box the FR courier = SCRIPT-PAIR-launched python.exe, the `FrameworkResearch-Courier` Scheduled Task is DORMANT (Ready, not the live launcher). Restart via the script pair, not the Task.
+[GOTCHA -- S54, UPDATED S58] stop/start-fr-courier.ps1 manage the PID-FILE lifecycle; the FR courier = SCRIPT-PAIR-launched python.exe. The `FrameworkResearch-Courier` Scheduled Task is now DISABLED (S58, Hopper 16:06; was "Ready/dormant" but its logon+resume triggers DID fire across session boundaries -> orphan pid 38044 holding the lock = Bug B). Registration retained for 2.1.177 rollback (Enable-ScheduledTask). On 2.1.178+ the Task is HARMFUL (pins stale session-<id>, races the wrapper) -- the courier is per-session via the wrapper. LESSON: a dual launcher (script-pair + Task) with no shared pid tracking = the orphan-lock class; stop must reclaim by IDENTITY (CIM cmdline match), not just its own pidfile.
 [GOTCHA] CRLF from Windows autocrlf breaks entrypoints. Fix: `sed -i 's/\r$//'` then rebuild.
 [GOTCHA] Inbox files created at agent registration time. Specialist -> unregistered agent = message LOST. Spawn service-role agents BEFORE message senders.
 [GOTCHA] Container reference-memory path: `~/.claude/projects/-home-ai-teams/memory/` ($HOME-dir-encoded), NOT `~/.claude/memory/`.

@@ -1,52 +1,56 @@
 # Team-Lead Scratchpad (*FR:Aen*)
 
 ## Summary (lines 1-15 -- always read on startup)
-- **Current state:** S56 closed 2026-06-18 -- **lifecycle FLIPPED on main, hygiene closed, team briefed; npm unpin to 2.1.181 PAUSED at PO request pending an autoupdater-vs-pin decision.** CLI still 2.1.177; courier untouched (pid 38044, explicit config). Two commits on main: `309dcd8` (2.1.178+ lifecycle applied: new startup.md Step 0.5/2'/2.5 + 4-phase shutdown + runtime-discover restore/persist scripts) + `727a16a` (untrack fr-courier.config.auto.json, Direction #4 enforced -- now gitignored, still on disk).
-- **PO DECISION (S56, RESOLVED):** ENABLE the autoupdater -- do NOT keep `DISABLE_AUTOUPDATER=1`. CONSEQUENCE: future launches auto-update PAST 2.1.181; lifecycle is validated @2.1.181 ONLY, so re-validate any bump via the migration-probe harness before trusting Step 2'/2.5.
-- **NEXT (npm flip, PO-run when ready):** `npm i -g @anthropic-ai/claude-code@2.1.181` AND unset/remove `DISABLE_AUTOUPDATER` (updater ENABLED per S56); next boot is on 2.1.181+ with new lifecycle (Step 2' Discover via `--resolve-team-dir` + Step 2.5 courier restart on `.auto.json` behind V4 guard) = the live validation. ROLLBACK: reinstall 2.1.177 + re-set `DISABLE_AUTOUPDATER=1` + `git revert 727a16a 309dcd8`; explicit courier config is the safe on-disk default.
-- **All migration decisions FINAL** (directions below). S56 brief landed CLEAN -- zero reopening. Do NOT re-decide.
+- **Current state:** S58 2026-06-18 **CLOSED**. Migration to CLI **2.1.181 LIVE-VALIDATED end-to-end** -- this overturned S57's halt (which was a COLD-START FALSE NEGATIVE). Steps 1/0.5/2'/3/2.5 all PASS. 3 courier bugs found+fixed+validated. apex round-trip ACK confirmed. **#86 CLOSED.** Courier UP (pid 41188 on `.auto.json`). Roster re-pinned `claude-opus-4-8[1m]` (PO chose proceed-on-opus over fable-5).
+- **S58 KEY RESULTS:** Step 2' Discover PASSES -- eager dir `session-<sessionId[:8]>` (e.g. `session-b2ad507b`); resolver returns it BARE (liveness, FR sole live team) + via `--session-pid`. S57 "no dir" = checked inside V4 cold-start window (config.json first, sessions/<pid>.json +10-25s). `$PPID=1` broken-but-MOOT. python3 3.14.3 OK. Step 3 restore PASSES (44 inboxes). Bug A(b) live-validated w/ negative control. apex courier round-trip: deposit accepted -> inbound injected -> `ACK S58-RT-1` rendered.
+- **3 courier bugs FIXED S58:** (A) runbook-order -> startup.md reorder Step3-before-courier(now Step3.5) + courier self-mkdir inboxes_dir (stationmaster-courier.py:1112). (B) orphan+lock -> stop-fr-courier.ps1 identity sweep + **Scheduled Task DISABLED** (the pid-38044 source; rollback `Enable-ScheduledTask -TaskName FrameworkResearch-Courier`). (C) stale explicit path -> stop drains against launched `-Config` (default `.auto.json`); Direction #4 amended (see below).
+- **CARRY-FORWARD (top follow-up):** the **`inter-team-comms` skill is STALE post-S58** -- it hardcodes the old static `~/.claude/teams/framework-research/` paths + the now-disabled Scheduled Task. I adapted live to `session-<id>` + the wrapper courier, but the SKILL FILE needs a 2.1.178+ update. Queued, NOT tasked.
+- **DEFERRED:** Bug-C at-scale OPEN (v2/RfC, lifecycle-rework OQ#6 -- only when a 2nd team migrates); optional Bug-B live-sweep test (defense-in-depth; Task source already disabled).
 
 ---
 
-### DECIDED DIRECTIONS (S55 -- FINAL; brief delivered + acknowledged S56, do NOT re-decide)
+### DECIDED DIRECTIONS (S55 -- FINAL; #4 AMENDED+ratified S58; do NOT re-decide)
 
-1. **Target version = 2.1.181** (PO-decided; npm `latest`=`next`=2.1.181; `stable`=2.1.170 is BELOW the 2.1.178+ floor).
-2. **Resolver liveness = PROCESS-based, NOT status.** `os.kill` + `/proc/<pid>/stat` start-time guard on the existing cross-platform `_pid_alive` + null-pid guard. MERGED + validated on main (Linux 12/12, Windows 11/11 + 4/4 lock + 17/17 integration).
-3. **Courier rotation = mode-(b) bare restart for v1.** Step 2.5 calls `restart-fr-courier-with-pid.ps1` (no args); `-SessionPid` (mode-a) is the v2 multi-migrated-team upgrade ONLY.
-4. **Courier config = LAUNCH-OVERRIDE.** Two LOCAL (gitignored) configs: `fr-courier.config.json` (explicit, always-safe default) + `fr-courier.config.auto.json` (`"auto"` variant, wrapper `-Config` default, behind V4 dry-run guard). Persist on disk; NOT committed. (S56: auto.json untracked to enforce this.)
-5. **V5b/P6 = NON-BLOCKING for the unpin.** Courier polls; Step 3 inbox-restore rides active-session P4-class delivery. Attached-pane proactive-wake re-test = DEFERRED/RfC (task #9).
-6. **Env override name = `FR_COURIER_TEAM_DIR_NAME`** (Volta's 2.1.177-bridge override). KEEP as-is; courier does NOT read it (cosmetic).
-7. **Lifecycle (Volta WS2) = APPLIED to main S56** (`309dcd8`): startup.md Step 0.5/2'/2.5 + S5-deleted 4-phase shutdown + gotcha #5; restore/persist runtime-discover. Was branch `fr/unpin-2.1.181-lifecycle`; flipped at the unpin gate.
-8. **Known constraints (documented, NOT blockers):** (a) bare-liveness valid only while FR is SOLE live 2.1.178+ team; (b) `session-<id>` rotates per session -> restart-at-session-start re-resolves; (c) 12-team host -> discovery MUST disambiguate; (d) Windows `$PPID` best-effort, degrades to liveness.
+1. **Target version = 2.1.181** (npm `latest`=`next`=2.1.181; `stable`=2.1.170 BELOW the 2.1.178+ floor). Autoupdater ENABLED (S56 PO) -> may boot ABOVE 2.1.181; re-validate any bump via `designs/new/migration-probe-harness/` before trusting Step 2'/2.5.
+2. **Resolver liveness = PROCESS-based, NOT status.** Merged+validated on main. (S58: confirmed live -- bare liveness resolved FR's sole live dir.)
+3. **Courier rotation = mode-(b) bare restart for v1.** Step 2.5 = `restart-fr-courier-with-pid.ps1` (no args); `-SessionPid` (mode-a) = v2 multi-migrated-team only.
+4. **Courier config = LAUNCH-OVERRIDE.** `fr-courier.config.json` (explicit) + `fr-courier.config.auto.json` (`"auto"`, wrapper `-Config` default, V4-guarded). LOCAL/gitignored. **AMENDED S58 (RATIFIED):** persistence is CLI-version-SPLIT. 2.1.177 = explicit static path MAY stay up between sessions (rollback baseline). **2.1.178+ = courier is PER-SESSION**, wrapper-restarted onto `.auto.json` each session start; "explicit stays UP between sessions" is RETIRED (obsolete -- the session-<id> dir it relied on rotates). Explicit-session-aware = REJECTED (dup resolver). `stop-fr-courier.ps1` drains against launched `-Config`, not a hardwired path.
+5. **V5b/P6 = NON-BLOCKING.** Inbox-restore rides active-session P4 delivery. Proactive-wake re-test DEFERRED.
+6. **Env override = `FR_COURIER_TEAM_DIR_NAME`** (2.1.177-bridge only; courier ignores it -- cosmetic).
+7. **Lifecycle (Volta WS2) APPLIED to main S56** (`309dcd8`); **further corrected S58** (startup.md Step3-before-3.5 reorder + Step3.5 version-split prose; lifecycle-rework teardown-contract + OQ#6).
+8. **Known constraints (NOT blockers):** (a) bare-liveness valid only while FR SOLE live 2.1.178+ team; (b) session-<id> rotates -> restart re-resolves; (c) many-team host -> discovery MUST disambiguate; (d) Windows `$PPID` best-effort -> degrades to liveness (lived this S58, worked).
 
 ---
 
-### S56 WRAP
+### S58 WRAP
 
-- Brief delivered to Brunel+Herald+Volta+Hopper+Cal; all 5 acknowledged the 8 directions, zero reopening (PO's S55 churn-halt held).
-- Volta+Brunel verified configs PASS (a/b/c): both configs on disk under `teams/framework-research/poc/ghost-bridge/`; live courier on explicit config, stays up; wrapper defaults to `.auto.json` behind V4 guard; plain start loads explicit (can't crash).
-- Finding (d): auto.json was committed in S55 `0882b86` (contradicts Direction #4). Ruled (b) untrack+gitignore (conformance, secret-free, NOT security). Brunel added `.gitignore:11`; committed `727a16a`.
-- Hopper cleared S55 read-back -> Cal advanced `decisions/courier-must-runtime-discover-team-name` PARTIAL->CONFIRMED (wiki 152, 8 confirmed / 0 partial; no open stage-2 gates team-wide).
+- Spawned migration team (Brunel/Herald/Volta/Hopper/Cal) on PO go; landed all 3 bug fixes + docs + 4 gotchas + 1 contract (Cal) in one fast clean pass, zero reopening (churn-halt held).
+- Single-writer discipline on startup.md (Herald handed Volta the Step 2' sentence) avoided a background two-writer race -- worked.
+- #86 CLOSED with the apex round-trip as closing evidence. Hub link healthy: bidirectional grants apex<->FR confirmed.
+- Files this session: stationmaster-courier.py, stop-fr-courier.ps1, startup.md, topics/06, lifecycle-rework doc, ops-log, roster.json, all scratchpads, wiki (index + 4 gotchas + 1 contract + card INDEXes).
 
-### NEXT-SESSION BOOT (re-orient instructions for S57)
+### NEXT-SESSION BOOT (re-orient instructions for S59)
 
-1. Read `startup.md` first -- **NOTE: on disk it is now the NEW 2.1.178+ version** (Step 2' Discover, NO TeamDelete; 4-phase shutdown). Correct **iff** the npm flip to 2.1.181 happened. **If the flip did NOT happen and you booted on 2.1.177**, the new startup.md lacks the TeamDelete reset -- either apply `TeamDelete` manually at Step 2 (gotcha #4) OR `git checkout 309dcd8^ -- teams/framework-research/startup.md` to restore the 2.1.177 version for that boot.
+1. Read `startup.md` first -- it is the validated 2.1.181 4-phase version (Steps 1, 0.5, 2', 2.5(=3.5 order), 3, 4). S58 proved it works on live 2.1.181/Windows.
 2. Pull `mitselek-ai-teams`.
-3. Autoupdater decision SETTLED S56 = ENABLED. npm flip = install 2.1.181 + unset `DISABLE_AUTOUPDATER`. NOTE: with the updater on you may boot ABOVE 2.1.181 -- if `claude --version` > 2.1.181, re-validate the lifecycle via `designs/new/migration-probe-harness/` before trusting Step 2'/2.5.
-4. Don't pre-spawn. Migration team = Brunel + Herald + Volta + Hopper (+ Cal). Confirm with PO.
-5. **If flip done (booted on 2.1.181):** the boot ITSELF is the live validation -- watch Step 2' Discover (`--resolve-team-dir`) + Step 2.5 courier restart (`.auto.json` behind V4 guard) run clean. Confirm courier stays up + inboxes restore. Report PASS/FAIL per surface; if clean, close #86 migration milestone.
-6. **If flip NOT done:** hold, re-offer the runbook once the autoupdater decision lands.
-7. Empirical ground truth = `docs/migration-validation-probe-findings-2026-06-18.md` (V1-V5). Reusable harness = `designs/new/migration-probe-harness/`.
+3. Boot is on 2.1.181+ (autoupdater ON). **If `claude --version` > 2.1.181**, re-validate lifecycle via `designs/new/migration-probe-harness/` before trusting Step 2'/2.5 -- only 2.1.181 is validated.
+4. **Model: roster now pins `claude-opus-4-8[1m]` (re-pinned S58).** Step 0.5: if parent != opus-4-8, resolve before spawn.
+5. **Cold-start patience:** Step 2' may see "no team dir" for ~10-25s after a cold boot (V4 window) -- AWAIT/RETRY, do NOT conclude failure (this is what burned S57; now a startup.md gotcha + wiki F1).
+6. **Don't pre-spawn. Wait for PO.**
+7. **If PO surfaces the `inter-team-comms` skill / cross-team comms:** the SKILL FILE is stale post-S58 (static `framework-research` paths + disabled Task). Spawn Volta (+ maybe Brunel) to update it for 2.1.178+ (session-<id> dir auto-discovery + wrapper courier, NOT the Scheduled Task). TOP queued follow-up.
+8. **If PO surfaces Bug-B hardening:** optional orphan-sweep live test (Brunel authors shape, Hopper runs, Tier R-M throwaway). Defense-in-depth; not urgent (Task source disabled).
+9. **If PO surfaces at-scale courier / a 2nd migrating team:** Bug-C OPEN (lifecycle-rework OQ#6) -- single-point Config-load resolution isn't self-healing; needs poll-loop re-resolution OR per-delivery liveness check. v2 only.
+10. **Courier note:** it does NOT auto-restart between sessions now (Task disabled). Step 2.5 wrapper restart re-establishes it each session. Disabled Task is registered for rollback.
 
-### Standing watch items going into S57
+### Standing watch items going into S59
 
-- **CUT THE CHURN** (memory `feedback_cut_coordination_churn`): S56 brief landed with zero reopening -- keep that discipline; declare DONE once the load-bearing thing is validated.
-- **GitHub #86** = migration tracking issue. **#75/#76** + teamless-courier RfC remain open, lower priority.
-- Tasks #9 (P6 re-test, deferred) + #11 (courier restart integration, design-done) carry forward.
-- Cal wiki 152 entries; nearest TTL expiries 2026-09-17/18 (teams-substrate-2.1.179 / no-teamdelete-stale-dirs / sessions-pid-not-gc).
-- apex unchanged; comms-dev may chime on the 2.1.178 findings.
+- **CUT THE CHURN** (`feedback_cut_coordination_churn`): S58 held it -- fast, clean, no reopening. Keep declaring DONE once the load-bearing thing is validated.
+- **GitHub #86 = CLOSED S58.** #75/#76 + teamless-courier RfC remain open, lower priority.
+- **inter-team-comms skill update = the top un-tasked follow-up** (item 7 above).
+- Cal wiki ~156-157 entries (S58 added 4 gotchas + 1 contract). Nearest TTL 2026-09-17/18 (teams-substrate-2.1.179 / no-teamdelete-stale-dirs / sessions-pid-not-gc) -- 2.1.179 sheet now has 2.1.181 datapoints cross-ref'd.
+- apex link proven (round-trip S58). Scheduled Task `FrameworkResearch-Courier` = DISABLED (rollback `Enable-ScheduledTask`).
 
 (*FR:Aen*)
 
 ---
-*Earlier sessions pruned per 100-line discipline. S55 = migration design + validation, cutover deferred. S54 = -courier convention + 2.1.179 probe. Full history in git; durable knowledge in `wiki/`.*
+*Earlier sessions pruned per 100-line discipline. S57 = false-halt (cold-start FN), no team spawned. S56 = lifecycle flip applied to main + autoupdater ENABLE. S55 = migration design+validation. Full history in git; durable knowledge in `wiki/`.*

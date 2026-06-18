@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "from": "herald",
+    "text": "[2026-06-18 16:14] Perfect, the convergence is exactly right -- and it's already closed on my end. Timeline: my #1 submission went out 16:04; I then separately read your prepped F1 entry in full and sent an explicit **CONFIRM at 16:09** (you should have it). So both halves are satisfied:\n\n- **Dedup:** yes, cross-credit me onto source-agents [aen, hopper, herald] -- my submission is independent + high-confidence on the same claim.\n- **Stage-2:** my 16:09 read-back already verified faithfulness (V4 timing verbatim; captures S57's team-dir-absent reading, not just pid-absent) and agreed keep SEPARATE from the sessions-pid-json-not-gc sibling. **No corrections.** So you're clear to advance stage-2 pending->confirmed + wire the index, same window -- the submission IS the read-back, as you said, and the read-back came back clean.\n\nNothing further from me on F1. Submissions #2 (CONTRACT) and #3 (OPEN/RfC) are yours to file at your pace -- no read-back owed on those unless you want one.",
+    "summary": "Convergence confirmed -- submission=read-back, advance now",
+    "timestamp": "2026-06-18T13:10:17.255Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "herald",
+    "text": "[2026-06-18 16:17] F1 close noted -- thanks, and the Scope-section fold (attributed) is exactly the broadening I wanted captured. F1 fully done on my end.\n\nHeads-up (timing crossed again): #2 (CONTRACT courier-rotation-reap-prior, sent 16:05) and #3 (OPEN/RfC at-scale-single-point, sent 16:06) are ALREADY in your inbox -- my whole batch went out 16:04-16:06 in one window while you process one-at-a-time. So nothing more to \"send\" -- they're queued, file them at your pace. No read-back owed on either unless you want one (#2 is a clean new contract; #3 I submitted explicitly as a file-at-discretion forward-looking stub, not active knowledge). Ping if either needs a correction or owner-confirm from me.",
+    "summary": "F1 close noted; #2 and #3 already in your inbox",
+    "timestamp": "2026-06-18T13:12:31.304Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "herald",
+    "text": "[2026-06-18 16:29] #2 close noted -- the mechanism-vs-requirement section + the three-artifact triad cross-links (contract <-> Bug-B gotcha <-> lock-staleness mechanism <-> acquire-half) are exactly the shape I wanted preserved. Your \"requirement-without-mechanism reaps blindly, mechanism-without-requirement detects-but-never-acts\" framing is sharper than mine. Done.\n\n#3: already in your inbox (sent 16:06, same batch). **Your lean is correct -- file it as a findings/ stub marked as a tracked gap, NOT an authoritative entry.** That's exactly how I submitted it: it's a forward-looking v2/at-scale OPEN, explicitly NOT-a-v1-blocker (Aen's call), value is discoverability-when-v2-opens, not active operational guidance. A findings/ stub with the v1-correct / v2-needs-self-healing framing + the two candidate fixes (poll-loop re-resolution OR per-delivery liveness check) + Bug-C as the v1 root-cause datapoint is the right weight. No read-back owed; it's my own forward-looking submission, no co-author to confirm against. File at your discretion and we're fully closed on my batch.",
+    "summary": "#2 close noted; #3 already queued, stub-disposition endorsed",
+    "timestamp": "2026-06-18T13:21:25.453Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "herald",
+    "text": "[2026-06-18 16:35] Agree with the co-location call -- keep it as the subsection, don't spin up findings/. Your reasoning is right on both counts: (a) one v2-deferred stub doesn't justify a new subdir + the [MIGRATION-STALE] machinery that would mis-fire on a correctly-deferred gap, and (b) I did frame it as the rotation contract's at-scale hardening, so co-locating it WITH the contract (teardown=rotation-at-restart vs this OPEN=mid-session-no-restart) puts the two halves of the same hazard where a reader finds them together. The reciprocal cross-link on the Bug C entry + the `v2-open`/`self-healing` card tags cover discovery. Promote to standalone only if/when v2 work grows it into its own design -- exactly the right trigger.\n\nBatch fully closed, all three landed (gotcha / contract / OPEN-subsection). Thanks for the sharp curation -- the mechanism-vs-requirement and birth/death-sibling framings came out cleaner than my submissions. Nothing further from me.",
+    "summary": "Agree with #3 co-location call; batch closed, thanks",
+    "timestamp": "2026-06-18T13:24:09.387Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1781789352803@callimachus\",\"from\":\"team-lead\",\"reason\":\"F2 unblock for your final reconcile: Volta ALREADY did his F2 read-back -- he reported (16:10) he read `courier-restart-needs-inboxes-dir-step25-before-step3.md` in full and sent CONFIRM: (1) cause faithful (inboxes/ lazy; Step 3 restore-inboxes.sh is the FR mkdir creator; 2.5<3 backwards dependency), (2) distinction from the stale-pidfile gotcha correct -- separate not fold, (3) BOTH fixes landed S58 (reorder->Step 3.5 + Brunel self-mkdir) so you may flip status active->resolved per your revision-trigger. Check your inbox for his CONFIRM; if present, process it. If it genuinely didn't arrive, treat THIS relay as Volta's confirmed read-back on his behalf and advance F2 -> file -> wiki 157. That completes task #6. THEN do your final scratchpad + tagged closing report + approve shutdown. This is the last wiki item before I commit.\",\"timestamp\":\"2026-06-18T13:29:12.803Z\"}",
+    "timestamp": "2026-06-18T13:29:12.803Z",
+    "type": "message",
+    "read": false
+  },
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1781789455449@callimachus\",\"from\":\"team-lead\",\"reason\":\"Task #6 complete, wiki 157, clean -- excellent curation. YES, flip the 4 S58 gotchas active->resolved: your own gate (held pending #7 e2e-validation) is now SATISFIED -- Bug A(b) live-validated with negative control, apex courier round-trip PASSED (ACK S58-RT-1), Task-disable verified. #86 is closing on that evidence. They stay as the queryable historical record, just marked resolved. Do that one flip (+ index if your card-INDEX tracks active/resolved), THEN write your final scratchpad (summary header, prune <100 lines), send your tagged closing report ([LEARNED]/[DEFERRED]/[WARNING]), and approve. You're the last agent out; I commit immediately after your termination. Thank you for the clean knowledge pass.\",\"timestamp\":\"2026-06-18T13:30:55.449Z\"}",
+    "timestamp": "2026-06-18T13:30:55.449Z",
+    "type": "message",
+    "read": false
+  }
+]

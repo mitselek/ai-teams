@@ -125,27 +125,58 @@ ls "$HOME/.claude/teams/$SLUG/config.json"              # operational gate (old 
 2. `config.json` exists on disk under the discovered `<slug>` (the `ls` above), `.name == <slug>`, and `members[]` contains this session as `team-lead`
 3. Roster matches `teams/framework-research/roster.json`
 
-Record `SLUG` as `TEAM_DIR_NAME` for the rest of startup -- Step 3 (inbox restore) and Step 4 (spawn dup-gate) read it. **In v1 (FR is the sole migrated team) you do NOT need to emit a session pid** -- Step 2.5's courier restart runs bare (option b), and the lifecycle scripts derive their own `$PPID` best-effort. Only the **v2** multi-migrated-team courier (Step 2.5 option a) needs the live Claude session pid (the CLI process with a `~/.claude/sessions/<pid>.json` entry, the one `--session-pid` resolved against) -- record it then.
+Record `SLUG` as `TEAM_DIR_NAME` for the rest of startup -- Step 3 (inbox restore) and Step 4 (spawn dup-gate) read it. **In v1 (FR is the sole migrated team) you do NOT need to emit a session pid** -- Step 3.5's courier restart runs bare (option b), and the lifecycle scripts derive their own `$PPID` best-effort. Only the **v2** multi-migrated-team courier (Step 3.5 option a) needs the live Claude session pid (the CLI process with a `~/.claude/sessions/<pid>.json` entry, the one `--session-pid` resolved against) -- record it then.
 
 **Failure mode -- there is NO create-retry.** If discovery returns no dir, or `config.json` is absent under the discovered slug, that is a substrate/platform fault: the same code path that started the session creates the team, so its absence means the session itself is broken. **STOP and report to the user.** Do NOT attempt to fabricate a team dir by hand (the harness owns that file). Do NOT guess if discovery is genuinely ambiguous -- the resolver fails fast with the candidate list.
 
 **Multi-dir is the norm, not an error (Brunel WS1 finding 2026-06-18).** A real host has many team dirs (11 on this box). The resolver returns `ambiguous ... (live: [])` and exits non-zero UNLESS you disambiguate -- so always pass a disambiguator: `--session-pid "$PPID"` on 2.1.178+ (the dir is `session-<id>` and the live session's pid maps to it), or `--team-dir-name framework-research` on the 2.1.177 bridge (dirs are TeamCreate-named, so the explicit override is the only thing that resolves). Ambiguity here is the **expected** state of an undisambiguated call, not a fault to STOP on -- supply the disambiguator. STOP only when even the disambiguated call fails (genuine absence / a slug you cannot positively identify).
 
-**Cold-start window note (probe V4):** `config.json` is written FIRST; `sessions/<pid>.json` appears only at interactive-ready (~10-25s later). If Step 2' runs in that window and there are multiple dirs, the pid tiebreaker is not yet usable -- single-dir glob still resolves (the common case). For a multi-dir cold start, prefer a short wait for `sessions/<pid>.json` before passing `--session-pid`, OR accept single-dir-glob with fail-fast-then-retry. By the time Step 3/S4 scripts run (after this gate), the pid entry is reliably present.
+**Cold-start window note (probe V4):** `config.json` is written FIRST; `sessions/<pid>.json` appears only at interactive-ready (~10-25s later). If Step 2' runs in that window and there are multiple dirs, the pid tiebreaker is not yet usable -- single-dir glob still resolves (the common case). For a multi-dir cold start, prefer a short wait for `sessions/<pid>.json` before passing `--session-pid`, OR accept single-dir-glob with fail-fast-then-retry. By the time the Step 3 / Shutdown-S4 lifecycle scripts run (after this gate), the pid entry is reliably present.
+
+**Cold-start false-negative (S57 halt -- *FR:Herald*, 2026-06-18):** the window is not only a degraded-pid-tiebreaker problem; it produces false negatives for ANY existence/liveness probe. A discovery or liveness probe that returns "nothing here" within ~25s of cold start must AWAIT/RETRY before reporting absence -- never conclude lazy-create. (S57's halt was exactly this false negative: `config.json` was present but the probe checked inside the window before `sessions/<pid>.json` existed and mis-generalized the transient absence as a permanent "lazy-create" property.)
 
 #### Operational gate (*FR:Volta* -- from R4-3, retained under implicit teams)
 
 **Do NOT spawn any agent until the team is verified operational.** In Restart 4 an agent was spawned into a broken team and wasted. The verify-on-disk check above IS this gate -- one `ls` under the *discovered* slug separates a working team from a broken one. Do not proceed to Step 4 (Spawn) until `config.json` is confirmed under `$SLUG`.
 
-### Step 2.5: Restart the FR courier (the rotation fix) (*FR:Volta* -- 2026-06-18, S55; 2.1.178+ only)
+### Step 3: Restore inboxes from repo
+
+```bash
+REPO="$(git rev-parse --show-toplevel)"
+bash "$REPO/teams/framework-research/restore-inboxes.sh"
+```
+
+The script handles:
+
+- **Runtime-discovers the team dir name** via the shared resolver (NOT the hardcoded `framework-research`), passing `--session-pid "$PPID"` for the 2.1.178+ pid tiebreaker, then targets `~/.claude/teams/<discovered-slug>/inboxes/`. **On the 2.1.177 bridge** (multi-dir, TeamCreate-named), export `FR_COURIER_TEAM_DIR_NAME=framework-research` before running -- the script forwards it as the resolver's `--team-dir-name` override (the only thing that disambiguates a multi-dir 2.1.177 box; shared env with the courier per Aen 2026-06-18). Fail-closed: a resolver no-resolve/ambiguity aborts the script (it will NOT write into an empty path).
+- Precondition check (runtime dir must exist) + `mkdir -p` the `inboxes/` dir (bare-fresh sessions have no `inboxes/` until first activity). **This step runs BEFORE Step 3.5 (courier restart) specifically so the `inboxes/` dir exists when the courier validates it** -- see the Step 3.5 ordering note (Bug A, *FR:Volta* S58).
+- Copies inbox JSON files from repo to runtime, **keyed by agent name** (`team-lead.json`, ...) -- the agent-name keying is what makes the durable copy portable across `session-<id>` rotations
+- **Prunes stale shutdown/idle messages** (shutdown_request, shutdown_approved, shutdown_response, idle_notification)
+- Verification (source/dest count match)
+- Exit code 0 on success, 1 on error
+
+**Why this is MORE load-bearing now:** the runtime dir is platform-ephemeral *and* its name rotates every session; the durable copy in the repo (agent-name-keyed) is the only bridge across both. Restore runs *during* startup while the session is **active** -- it rides the normal active-session inbox-read path (probe P4-class, confirmed on 2.1.181), NOT the idle-proactive-wake path (P6, inconclusive on 2.1.181). Restore correctness does not depend on proactive wake.
+
+**Verify:** Script outputs "Restored N inbox(es)..." or "No repo inboxes found..." (cold start). Non-zero exit = error, investigate before proceeding.
+
+### Step 3.5: Restart the FR courier (the rotation fix) (*FR:Volta* -- 2026-06-18, S55; renumbered from Step 2.5 in S58; 2.1.178+ only)
+
+**Ordering note (Bug A fix -- *FR:Volta* S58, 2026-06-18):** this step runs **AFTER Step 3 (restore)**, not before. The courier's `validate_startup` requires its resolved `inboxes_dir` to exist; on a bare-fresh cold boot that dir is first created by Step 3's `restore-inboxes.sh` (`mkdir -p`). Running the courier first crashed it (`inboxes_dir does not exist`) until Step 3 had run. **Two fixes, belt-and-suspenders:** (a) this reorder (Step 3 before Step 3.5), and (b) the courier now self-creates its resolved `inboxes_dir` in `validate_startup` (`mkdir parents/exist_ok`, matching its sibling state/spool/inject dirs -- Brunel, S58), so the courier is robust regardless of boot order or caller. Bonus of the reorder: inboxes are restored **before** the courier starts polling, so there is no window where a live courier acts on a half-populated inbox dir.
 
 **Why this step exists (the rotation fix):** on 2.1.178+ the team dir is `session-<id>`, **random per session**. A courier resolves its `inboxes_dir` **once** at Config-load -- so a courier left running from a prior session tracks a **stale, dead** team dir and silently delivers nothing. The fix is to **restart the courier at each session start onto auto-discovery**: the restart re-resolves the current live `session-<id>`, which is what solves rotation. The single-session probe could not surface this (no rotation in one session).
 
-**You do NOT touch any config -- the wrapper owns the auto/explicit choice (launch-override).** There are **two local configs** (gitignored infra, persisted on disk, NOT committed): `fr-courier.config.json` (the explicit-default -- **always safe**, a plain start can never crash) and `fr-courier.config.auto.json` (the `inboxes_dir:"auto"` variant). The wrapper's `-Config` **defaults to `.auto.json`**, so the no-arg call loads auto -- and **only the wrapper ever loads auto**, behind its V4 pre-flight dry-run guard. The courier **stays UP** between sessions (it is NOT stopped at session-end): the default config is structurally safe, so no stop step is needed. So Step 2.5 is one call; you do not edit any config, set `inboxes_dir`, or manage the auto/explicit choice. Rollback = stop calling the wrapper (the explicit default is untouched; the CLI-side rollback is reinstall 2.1.177 + revert the tracked-files commit).
+**You do NOT touch any config -- the wrapper owns the auto/explicit choice (launch-override).** There are **two local configs** (gitignored infra, persisted on disk, NOT committed): `fr-courier.config.json` (the explicit-default -- **always safe**, a plain start can never crash) and `fr-courier.config.auto.json` (the `inboxes_dir:"auto"` variant). The wrapper's `-Config` **defaults to `.auto.json`**, so the no-arg call loads auto -- and **only the wrapper ever loads auto**, behind its V4 pre-flight dry-run guard. So Step 3.5 is one call; you do not edit any config, set `inboxes_dir`, or manage the auto/explicit choice.
+
+**Courier lifetime is CLI-version-SPLIT (Direction #4 amendment, ratified S58 2026-06-18 -- *FR:Volta*; Herald rotation-teardown contract §3).** The earlier "courier stays UP between sessions, no stop step needed" property is **2.1.177-ONLY** and is **RETIRED on 2.1.178+** -- obsolete, not broken: the static `inboxes_dir` path it relied on no longer exists once the team dir is a per-session `session-<id>`.
+
+- **2.1.177 (bridge / rollback baseline):** the explicit config has a static path, so that courier MAY stay up between sessions and is left untouched -- this is the rollback baseline.
+- **2.1.178+ (the live path):** the courier is **PER-SESSION**. Step 3.5's restart-at-session-start is a full **reap-then-restart**: `stop-fr-courier.ps1` kills + drains + releases the lock of the prior-session courier *against the launched `-Config` (default `.auto.json`)*, THEN `start-fr-courier.ps1` re-resolves the live `session-<id>` and acquires. The courier is NOT "left up untouched" between sessions on 2.1.178+ -- it is reaped and re-pointed each session start. (Making the explicit config session-aware was REJECTED -- it would duplicate the resolver.)
+
+Rollback = stop calling the wrapper (on the 2.1.177 baseline the explicit default is untouched); the CLI-side rollback is reinstall 2.1.177 + revert the tracked-files commit.
 
 **v1 invocation (option b -- OMIT the pid):** while **FR is the sole migrated 2.1.178+ team** on the host, the courier's bare `"auto"`+process-liveness resolution narrows to the one live `session-<id>` (FR's own). No pid needed; the restart-at-session-start handles rotation by itself.
 
-**Precondition:** Step 2' confirmed the team operational. (No SESSION_PID hand-off is needed for the courier in v1 -- see the v2 note.)
+**Precondition:** Step 2' confirmed the team operational AND Step 3 (restore) has run (so the runtime `inboxes/` dir exists -- the Bug A ordering above). (No SESSION_PID hand-off is needed for the courier in v1 -- see the v2 note.)
 
 ```powershell
 # Windows substrate (the live FR host). ONE line, no args. The wrapper loads fr-courier.config.auto.json
@@ -161,27 +192,7 @@ Record `SLUG` as `TEAM_DIR_NAME` for the rest of startup -- Step 3 (inbox restor
 
 **v2 upgrade (option a -- pass the pid; multi-migrated-team only):** once a **second** team migrates to 2.1.178+ on the same host, bare liveness can see >1 live `session-<id>` and the courier needs FR's specifically. Then pass FR's Claude-session pid: `restart-fr-courier-with-pid.ps1 -SessionPid <claude-session-pid>` -- the wrapper binds `FR_COURIER_SESSION_PID` so the resolver's pid tiebreaker picks FR's dir. The supplied pid MUST be the live Claude session pid (the one with `~/.claude/sessions/<pid>.json`), NOT the launcher/script pid; the wrapper **fails closed** if that file is absent. Step 2' would then need to emit the session pid for this step. **v1 omits all of that** -- it is the simpler correct default while FR is the only migrated team.
 
-**2.1.177 bridge note:** Step 2.5 is a **2.1.178+ step -- do NOT call it on the pinned CLI** (the courier stays on the default explicit-path config, which is always safe). Even if called on 2.1.177, the wrapper's pre-flight dry-run aborts (the multi-dir fail-fast) rather than crashing the courier. If FR runs no cross-team courier this session, Step 2.5 is skippable (it only matters when the courier must track the live inbox dir).
-
-### Step 3: Restore inboxes from repo
-
-```bash
-REPO="$(git rev-parse --show-toplevel)"
-bash "$REPO/teams/framework-research/restore-inboxes.sh"
-```
-
-The script handles:
-
-- **Runtime-discovers the team dir name** via the shared resolver (NOT the hardcoded `framework-research`), passing `--session-pid "$PPID"` for the 2.1.178+ pid tiebreaker, then targets `~/.claude/teams/<discovered-slug>/inboxes/`. **On the 2.1.177 bridge** (multi-dir, TeamCreate-named), export `FR_COURIER_TEAM_DIR_NAME=framework-research` before running -- the script forwards it as the resolver's `--team-dir-name` override (the only thing that disambiguates a multi-dir 2.1.177 box; shared env with the courier per Aen 2026-06-18). Fail-closed: a resolver no-resolve/ambiguity aborts the script (it will NOT write into an empty path).
-- Precondition check (runtime dir must exist) + `mkdir -p` the `inboxes/` dir (bare-fresh sessions have no `inboxes/` until first activity)
-- Copies inbox JSON files from repo to runtime, **keyed by agent name** (`team-lead.json`, ...) -- the agent-name keying is what makes the durable copy portable across `session-<id>` rotations
-- **Prunes stale shutdown/idle messages** (shutdown_request, shutdown_approved, shutdown_response, idle_notification)
-- Verification (source/dest count match)
-- Exit code 0 on success, 1 on error
-
-**Why this is MORE load-bearing now:** the runtime dir is platform-ephemeral *and* its name rotates every session; the durable copy in the repo (agent-name-keyed) is the only bridge across both. Restore runs *during* startup while the session is **active** -- it rides the normal active-session inbox-read path (probe P4-class, confirmed on 2.1.181), NOT the idle-proactive-wake path (P6, inconclusive on 2.1.181). Restore correctness does not depend on proactive wake.
-
-**Verify:** Script outputs "Restored N inbox(es)..." or "No repo inboxes found..." (cold start). Non-zero exit = error, investigate before proceeding.
+**2.1.177 bridge note:** Step 3.5 is a **2.1.178+ step -- do NOT call it on the pinned CLI** (the courier stays on the default explicit-path config, which is always safe). Even if called on 2.1.177, the wrapper's pre-flight dry-run aborts (the multi-dir fail-fast) rather than crashing the courier. If FR runs no cross-team courier this session, Step 3.5 is skippable (it only matters when the courier must track the live inbox dir).
 
 ### Step 4: Spawn agents
 
@@ -262,7 +273,7 @@ S5 is therefore **deleted, not replaced.** The shutdown protocol goes from **5 p
 
 ### ⚠ Cutover notes -- validate at the 2.1.181 flip (*FR:Volta* -- 2026-06-18, S55)
 
-1. **Windows-substrate validation (not yet exercised at the flip):** the lifecycle scripts + the resolver shim were authored against the abstract Linux model but the live host is Windows. At the flip, quick-validate: (a) `python3` vs `python` on Git Bash -- the scripts call `python3`; if only `python` is on PATH, set an alias or adjust; (b) `$PPID` in a `bash script.sh` invocation on the Windows box -- confirm it resolves to the Claude session pid (the disambiguator depends on it on 2.1.178+); (c) the courier restart-with-pid (Step 2.5) is the `.ps1` path, not the `.sh` path.
+1. **Windows-substrate validation (not yet exercised at the flip):** the lifecycle scripts + the resolver shim were authored against the abstract Linux model but the live host is Windows. At the flip, quick-validate: (a) `python3` vs `python` on Git Bash -- the scripts call `python3`; if only `python` is on PATH, set an alias or adjust; (b) `$PPID` in a `bash script.sh` invocation on the Windows box -- confirm it resolves to the Claude session pid (the disambiguator depends on it on 2.1.178+); (c) the courier restart-with-pid (Step 3.5) is the `.ps1` path, not the `.sh` path.
 2. **Commit stays gated:** team-lead (Aen) holds the commit until the CLI flips to 2.1.181. This file BREAKS on 2.1.177 by its own CLI-version note above, so the rewrite + the flip are ONE coherent step. Do not commit ahead of the flip.
 
 (*FR:Volta*)

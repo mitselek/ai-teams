@@ -1104,8 +1104,12 @@ def validate_startup(cfg: Config) -> None:
         is per-volume) -- refuse to run otherwise
       - private key present
     """
-    if not cfg.inboxes_dir.is_dir():
-        raise RuntimeError(f"inboxes_dir does not exist: {cfg.inboxes_dir}")
+    # Bug A(b) fix (Volta-found, co-signed; 2026-06-18 S58): a bare-fresh 2.1.178+
+    # session has a session-<id> team dir but NO inboxes/ subdir until first activity
+    # (same rationale restore-inboxes.sh mkdir -p's it). The old hard-raise here turned
+    # that benign cold-start into a courier-start failure. Create it instead -- matching
+    # the parents=True, exist_ok=True pattern used for state/spool/inject below.
+    cfg.inboxes_dir.mkdir(parents=True, exist_ok=True)
     cfg.state_dir.mkdir(parents=True, exist_ok=True)
     cfg.spool_dir.mkdir(parents=True, exist_ok=True)
     cfg.inject_tmp_dir.mkdir(parents=True, exist_ok=True)

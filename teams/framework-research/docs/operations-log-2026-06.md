@@ -870,3 +870,32 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** -- **aborted-pre-execution.** Restart NEVER executed; no rollback needed (nothing changed live). Live FR courier stays UP, pid 38044, on its pre-flip explicit-path config; live FR<->apex comms uninterrupted. Brunel reverted fr-courier.config.json to the explicit path (his edit -- I did NOT also touch it, avoiding cross-agent working-tree contention). The "auto" flip is re-coupled to the AT-unpin (2.1.178+) step with a team_dir_name disambiguator -- on 2.1.181 FR's dir becomes session-<id> with a live entry so bare "auto" resolves cleanly. Launch-parentage finding (script-pair mechanism) held for the real restart at cutover. apex untouched throughout. The resolver itself is already validated (WS3b 12/12 + shim) so no live pre-unpin round-trip is needed. Discovered-dir + round-trip validation did NOT run (premise invalidated pre-restart).
 
 (*FR:Hopper*)
+
+---
+
+## 2026-06-18T16:06+03:00 -- DISABLE FrameworkResearch-Courier Scheduled Task (post-unpin harmful; orphan-lock source) -- EXECUTED (S58, Tier D)
+
+**timestamp** 2026-06-18T16:06+03:00
+
+**tasker** Brunel (dispatch 15:56, package author + tier classification) + Aen (role-of-record; final go 16:06, Brunel's hold released). WS3 / Bug B; gate #86 closure.
+
+**dispatch summary** Disable (NOT unregister) the Windows Scheduled Task `FrameworkResearch-Courier` so it no longer auto-launches a courier on logon / power-resume. On 2.1.178+ a Task-kept-alive courier pins a stale `session-<id>` and, being untracked by the script-pair pid file, survives `stop-fr-courier.ps1` and holds a correctly-non-stale InstanceLock -> every wrapper-spawned courier dies FileExistsError. This Task was the orphan-pid-38044 source (S57/S58). Disable keeps it registered for instant 2.1.177 rollback.
+
+**tier classification** Tier D (stops a registered auto-start mechanism; no entrypoint-owned recovery). Validated on receipt against deployed Layer-1 artifact. Full PO/team sanction present: (a) exact command, (b) reason, (c) reversibility + expected-outcome + verify -- all quoted verbatim by Aen at go. Disable is the minimum-destructive option (registration retained; rollback = `Enable-ScheduledTask`).
+
+**deployed-artifacts-read declaration** -- Single-layer substrate (this Windows workstation IS the host; FR courier + Task run locally, no remote clone). Read: `teams/framework-research/poc/ghost-bridge/register-courier-task.ps1` (Layer-1 design intent: TaskName "FrameworkResearch-Courier" L8; wscript+run-courier-hidden.vbs action L9-18; AtLogOn trigger L20; power-resume Power-Troubleshooter EventID 1 subscription L22-27; 24/7-supervisor description L1-4,40). Live Task definition (`Get-ScheduledTask`): State=Ready/idle, action = `wscript.exe //B //Nologo run-courier-hidden.vbs`, triggers logon + power-resume -- MATCHES Layer-1. No L1<->live drift. Confirmed pre-execution that the Task is NOT the launcher of the live courier (pid 41188 is wrapper-started), so disable would not touch live comms.
+
+**commands executed** (verbatim)
+- `Disable-ScheduledTask -TaskName "FrameworkResearch-Courier"`
+- VERIFY 1: `(Get-ScheduledTask -TaskName "FrameworkResearch-Courier").State`
+- VERIFY 2: `Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object CommandLine -like '*fr-courier-daemon.py*'` (enumerate all live courier daemons)
+- VERIFY 3: `Get-Content ~/.stationmaster/framework-research/courier.lock` (lock holder)
+
+**outputs** (key results)
+- VERIFY 1: Task State `Ready` -> `Disabled` (confirmed by the Disable cmdlet return AND the follow-up Get-ScheduledTask).
+- VERIFY 2: SOLE live courier = pid 41188 on `fr-courier.config.auto.json`. No Task-spawned `python fr-courier-daemon.py` respawn; no second courier.
+- VERIFY 3: `courier.lock` = `{"pid": 41188, "ts": "20260618T123645614751"}` -- the wrapper-started courier holds it, as expected. Lock intact, not orphaned.
+
+**outcome** -- **success.** Task disabled; registration retained for non-destructive rollback (`Enable-ScheduledTask -TaskName "FrameworkResearch-Courier"`). Live wrapper-started courier (pid 41188, .auto.json) is the sole live courier and still holds courier.lock; FR comms uninterrupted by the disable. The orphan-lock recurrence path (Task relaunching an untracked courier every logon/resume) is now closed. No mid-execution drift; all three verify steps matched the expected outcome quoted in the dispatch.
+
+(*FR:Hopper*)

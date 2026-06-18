@@ -1,16 +1,21 @@
-# Task List Snapshot — S54 close (2026-06-17) (*FR:Aen*)
+# Task List Snapshot -- S58 close (2026-06-18) (*FR:Aen*)
 
-Snapshot at session-end per shutdown procedure S2b. Supersedes S52 snapshot.
+Snapshot at session-end per shutdown procedure S2b. Supersedes S54 snapshot.
 
-All six S54 tasks completed:
+All S58 tasks complete. Migration to CLI 2.1.181 validated end-to-end; #86 closed.
 
-| # | Task | Status |
-|---|---|---|
-| 1 | Herald: -courier convention in shared stationmaster-courier.py | completed |
-| 2 | Brunel: flip FR courier config + runtime to -courier, live test with apex | completed |
-| 3 | Brunel: scope 2.1.178+ probe container | completed |
-| 4 | Phase 2: build + run the 2.1.178 probe container, execute P1-P6 | completed |
-| 5 | Callimachus: curate probe + hook findings into wiki | completed |
-| 6 | Aen: draft teamless-courier RfC + 2.1.178-migration note | completed (RfC drafted; numbered RFC filing deferred to S55) |
+| # | Task | Status | Owner |
+|---|---|---|---|
+| 1 | Bug A: startup.md reorder (Step 3 before 3.5) + topics/06 note | ✅ completed | volta |
+| 2 | Bug A(b): courier self-mkdir inboxes_dir in validate_startup | ✅ completed | brunel (volta co-sign) |
+| 3 | Bug B: identity-based stop sweep + disable Scheduled Task | ✅ completed | brunel + hopper |
+| 4 | Bug C: retire explicit-fallback-between-sessions; drain fix; Direction #4 amendment | ✅ completed | brunel |
+| 5 | Docs: Step 2' cold-start sentence + rotation-teardown contract + Bug-C at-scale OPEN | ✅ completed | herald + volta |
+| 6 | Catalog 4 S58 gotchas (Stage-2 gated) | ✅ completed | callimachus |
+| 7 | Validate fixes + execute Task-disable; gate #86 closure | ✅ completed | hopper + team-lead |
+| 8 | Cross-team courier round-trip test with apex-research | ✅ completed | team-lead |
 
-No pending/in_progress tasks at close. Next-session work captured in `team-lead.md` NEXT-SESSION BOOT — primary: prepare to unpin off 2.1.177 / adopt 2.1.178 (courier runtime team-name-discovery design first, then unpin + validate).
+## Carry-forward (NOT tasks this session -- see NEXT-SESSION BOOT in team-lead.md)
+- **inter-team-comms skill update** (stale post-S58: hardcodes static framework-research paths + disabled Task) -- TOP queued follow-up.
+- Bug-B orphan-sweep live test -- optional defense-in-depth (Task source disabled).
+- Bug-C at-scale OPEN (lifecycle-rework OQ#6) -- v2/RfC, only when a 2nd team migrates.

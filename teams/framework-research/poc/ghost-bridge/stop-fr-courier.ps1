@@ -24,12 +24,27 @@
 #   behavior) and honest: the drain is a separate, observable step, not a claim about
 #   what the kill does.
 #
-# Usage: ./stop-fr-courier.ps1
+# Usage:
+#   ./stop-fr-courier.ps1                 # drain against the auto config (matches the wrapper)
+#   ./stop-fr-courier.ps1 -Config <path>  # explicit config (2.1.177 path)
+#
+# BUG C FIX (S58, 2026-06-18): the drain config used to be HARDWIRED to
+# fr-courier.config.json, whose inboxes_dir is the literal
+# ~/.claude/teams/framework-research/inboxes -- a path that DOES NOT EXIST on
+# 2.1.181 (only session-<id> dirs do). So the final --drain-once errored rc=1 on
+# a phantom inbox path. The drain must use the SAME config the courier was launched
+# with; the wrapper (restart-fr-courier-with-pid.ps1) launches on .auto.json, so
+# that is now the default here too. On 2.1.178+ .auto.json resolves inboxes_dir via
+# auto-discovery (the live session-<id>) exactly as the daemon does. The 2.1.177
+# explicit path is still reachable via -Config fr-courier.config.json.
+param(
+    [string]$Config = "$PSScriptRoot/fr-courier.config.auto.json"
+)
 
 $ErrorActionPreference = "Stop"
 $pidFile  = Join-Path $PSScriptRoot "fr-courier.pid"
 $daemon   = Join-Path $PSScriptRoot "fr-courier-daemon.py"
-$config   = Join-Path $PSScriptRoot "fr-courier.config.json"
+$config   = $Config
 $lockFile = Join-Path $HOME ".stationmaster/framework-research/courier.lock"
 
 # --- Step 1: stop the running daemon (hard kill) -----------------------------------
@@ -58,7 +73,46 @@ if (Test-Path $pidFile) {
     }
     Remove-Item $pidFile -ErrorAction SilentlyContinue
 } else {
-    Write-Host "no pid file; daemon not tracked as running. Running a final drain anyway (safe no-op if nothing queued)."
+    Write-Host "no pid file; daemon not tracked as running. Sweeping for an untracked-but-live courier (Step 1b) before drain."
+}
+
+# --- Step 1b: identity-based sweep (BUG B FIX, S58 2026-06-18) ----------------------
+# WHY: the pid-file kill above only reclaims the courier THIS script pair launched.
+# But the courier has a SECOND launcher -- the FrameworkResearch-Courier Scheduled
+# Task (register-courier-task.ps1 -> wscript -> vbs -> bash -> python), which writes
+# NO fr-courier.pid the script pair sees. A Task-launched (or otherwise untracked)
+# courier therefore survives the Step-1 kill, and because it is ALIVE its
+# InstanceLock is correctly judged NON-stale (_is_stale = not _pid_alive) -- so every
+# new courier the wrapper spawns dies with FileExistsError on the lock. The lock is
+# behaving correctly; the defect is the orphan was alive at all. Fix: find ANY live
+# courier by IDENTITY (CommandLine match on fr-courier-daemon.py -- the same probe
+# used to verify pid 38044 in S56), kill it, then clear the lock only if its recorded
+# pid is now dead. This makes stop reclaim the singleton regardless of who launched it.
+$swept = @(Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -and $_.CommandLine -match 'fr-courier-daemon\.py' })
+foreach ($p in $swept) {
+    Write-Host "[sweep] untracked-but-live FR courier pid $($p.ProcessId) -- HARD KILL (CommandLine: $($p.CommandLine))"
+    Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue
+    for ($i = 0; $i -lt 20; $i++) {
+        if (-not (Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue)) { break }
+        Start-Sleep -Milliseconds 250
+    }
+}
+if ($swept.Count -eq 0) { Write-Host "[sweep] no untracked-but-live FR courier found." }
+
+# Clear the lock ONLY if its recorded pid is now dead (never yank a lock from a live
+# holder -- that is what InstanceLock's staleness check guarantees; we honor it here).
+if (Test-Path $lockFile) {
+    $lockPid = $null
+    try { $lockPid = (Get-Content $lockFile -Raw | ConvertFrom-Json).pid } catch { $lockPid = $null }
+    $lockAlive = $false
+    if ($lockPid) { $lockAlive = [bool](Get-Process -Id $lockPid -ErrorAction SilentlyContinue) }
+    if (-not $lockAlive) {
+        Write-Host "[sweep] lock holder pid '$lockPid' is dead/unreadable -> clearing stale lock $lockFile"
+        Remove-Item $lockFile -ErrorAction SilentlyContinue
+    } else {
+        Write-Warning "[sweep] lock holder pid $lockPid is STILL ALIVE after sweep -- NOT clearing (a live courier we could not match by CommandLine?). Investigate before restart."
+    }
 }
 
 # --- Step 2: explicit drain (the daemon is now down -> lock is free) ----------------

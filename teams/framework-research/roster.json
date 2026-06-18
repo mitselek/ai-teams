@@ -8,7 +8,7 @@
     {
       "name": "team-lead",
       "agentType": "team-lead",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "prompt": "prompts/aeneas.md",
       "lore": {
         "fullName": "Aeneas",
@@ -20,7 +20,7 @@
     {
       "name": "finn",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "black",
       "prompt": "prompts/finn.md",
       "lore": {
@@ -32,7 +32,7 @@
     {
       "name": "medici",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "magenta",
       "prompt": "prompts/medici.md",
       "lore": {
@@ -44,7 +44,7 @@
     {
       "name": "celes",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "cyan",
       "prompt": "prompts/celes.md",
       "lore": {
@@ -56,7 +56,7 @@
     {
       "name": "volta",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "blue",
       "prompt": "prompts/volta.md",
       "lore": {
@@ -68,7 +68,7 @@
     {
       "name": "herald",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "green",
       "prompt": "prompts/herald.md",
       "lore": {
@@ -80,7 +80,7 @@
     {
       "name": "brunel",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "yellow",
       "prompt": "prompts/brunel.md",
       "lore": {
@@ -92,7 +92,7 @@
     {
       "name": "hopper",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "navy",
       "prompt": "prompts/hopper.md",
       "lore": {
@@ -105,7 +105,7 @@
     {
       "name": "monte",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "white",
       "prompt": "prompts/montesquieu.md",
       "lore": {
@@ -118,7 +118,7 @@
     {
       "name": "callimachus",
       "agentType": "librarian",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-8[1m]",
       "color": "gold",
       "prompt": "prompts/callimachus.md",
       "lore": {
