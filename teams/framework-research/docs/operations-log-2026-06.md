@@ -764,3 +764,79 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** -- **success.** All 6 probes executed with evidence; findings doc written. P1 = name uncontrollable (runtime-discoverable); P6 = bare session reachable via inbox-write. One in-flight build defect (ubuntu uid-1000 collision) fixed under Aen authorization (throwaway, exact diff above + relayed to Brunel). Throwaway torn down with `docker compose -f docker-compose.probe.yml down -v` after snapshot. No live-team container touched; apex :2222 never collided; ANTHROPIC_API_KEY unused; OAuth code never logged.
 
 (*FR:Hopper*)
+
+---
+
+## 2026-06-18T11:55+03:00 -- migration-validation probe (V1-V5) ABORTED-MID-EXECUTION: rc host root FS 100% full
+
+**timestamp** 2026-06-18T11:55+03:00
+
+**tasker** Brunel (dispatch) + Aen (task #5 / WS3b role-of-record). Consolidated re-route 10:49 authoritative.
+
+**dispatch summary** Run the migration-validation probe V1-V5 through the scripted harness `designs/new/migration-probe-harness/` on a throwaway CLI 2.1.181 container (the PO-confirmed unpin-target), drive order V3->V4->V1->V5->V2, dogfooding the harness. Sibling of the S54 P1-P6 probe; same isolation envelope (WARP host-net + WARP CA + no sshd + docker-exec drive).
+
+**tier classification** R/M. **sanction status:** Brunel single-line ack (R/M, all mutations throwaway-only). Validated on receipt against harness.sh + lib/checks.sh per discipline: every mutation confined to the throwaway container/volume (V3 probe-internal tmux sessions + /exit + kill -9; V5 throwaway config.json members[] append + inbox write; V2 cp-r plant + rm-rf session-deadbeef; teardown down -v + rmi of the version-tagged LEAF image). No destructive surface on any live artifact. R/M CONCUR.
+
+**deployed-artifacts-read declaration**
+- **Layer 1 (FR design-as-shipped):** read all 9 harness artifacts at `designs/new/migration-probe-harness/` (harness.sh, lib/checks.sh, README.md, Dockerfile.probe, docker-compose.probe.yml, entrypoint-probe.sh, staging/{resolve_team_dir.py, config_resolve_check.py, fr-courier.config.json}) + the brief `migration-validation-probe-brief-2026-06-18.md` + the S54 sibling findings.
+- **Layer 2 (operational on substrate host):** rc clone `/home/dev/github/mitselek-ai-teams` (CLEAN, chosen over the dirty `/home/dev/mitselek-ai-teams` per build-source discipline); `git pull --ff-only` 520a714..e52077c landed the harness; on-host WARP-block uncomment applied to the throwaway compose (backup `.bak-prewarp`, reverted at abort -- committed file untouched). `docker compose config CLAUDE_VERSION=2.1.181` rendered network_mode:host + image teams-migration-probe:2.1.181 + CA mount /opt/warp-ca.pem.
+- **Layer 3 (running container):** container `teams-migration-probe` came up host-net; `claude --version` = 2.1.181 (harness MUST-match asserted, build also asserted installed==2.1.181); 3 probe files staged + owned ai-teams; CA `/opt/warp-ca.pem` present; `~/.claude/.credentials.json` ABSENT (auth not yet performed).
+
+**commands executed** (verbatim, abridged; all via `ssh -T dev@100.96.54.170`)
+- Tier-R pre-flight: `docker ps` (apex-research UP 45h, host-net; others up, none on :2229); `ls -l /usr/local/share/ca-certificates/managed-warp.pem` (present, 1139B); host npm under nvm (not on non-login PATH -> host dist-tag re-query moot; in-container Dockerfile assert is authoritative).
+- `git -C /home/dev/github/mitselek-ai-teams pull --ff-only origin main` (520a714..e52077c; harness 9 files present; e52077c ancestor confirmed).
+- On-host WARP edit (throwaway compose, backup kept): uncomment `network_mode: host` + add `/usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro` to the real volumes block.
+- `chmod +x harness.sh lib/checks.sh; bash -n` both (OK).
+- `CLAUDE_VERSION=2.1.181 ./harness.sh build` -> image built; **assert `requested=2.1.181 installed=2.1.181` PASSED** (version invariant verified at substrate).
+- `CLAUDE_VERSION=2.1.181 PROBE_NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem ./harness.sh up` -> container up host-net, claude 2.1.181, files staged, creds ABSENT.
+- Start auth tmux: `docker exec -u ai-teams teams-migration-probe bash -lc "tmux new-session -d -s auth claude"` -> **FAIL: `couldn't create directory /tmp/tmux-1000 (No space left on device)`.**
+- Diagnosis (Tier R): `df -h /` host root `/dev/mapper/...-root` 58G **100% full, 0 avail**; container overlay = same root, also 100%. Host `/tmp` is a separate 32G tmpfs (2%) but the container's `/tmp` is on the full overlay. `docker system df`: Images 19.35GB (18.75GB reclaimable, 96%), Containers 6.58GB, Volumes 11.08GB (4.66GB reclaimable), Build cache 4.26GB (3.7GB reclaimable). My probe image = 1.02GB.
+- Teardown (reverse own footprint): confirmed only my container referenced `teams-migration-probe:2.1.181` (no cascade) -> `CLAUDE_VERSION=2.1.181 ./harness.sh teardown` (down -v removed container + volume; rmi deleted leaf image 96356db96a81). Reverted on-host compose edit (`mv .bak-prewarp`). Verified: no probe container/volume/image lingering; apex-research UP 46h untouched.
+
+**outputs** (key results)
+- **ABORT CAUSE: rc host root filesystem 100% full (58G used / 0 avail).** Pre-existing host-health condition, NOT caused by the probe (host was already ~critically full; my 1.02GB image tipped it but `docker system df` shows 18.75GB reclaimable images + 3.7GB reclaimable build cache predating this run). The container's overlay `/` (and thus its `/tmp`) sits on the full root LV, so tmux cannot create its socket dir and NO session can launch -> the probe cannot run.
+- **Version invariant VERIFIED before abort:** the build's `installed==requested` assert passed at 2.1.181 (the one design-relevant fact captured before the disk-full wall). probe-target-version == unpin-target == 2.1.181 confirmed resolvable + installable on this substrate.
+- **V1-V5 NOT executed.** No substrate findings (V3 GC status string, V4 write-order, V1/V2 resolver, V5 P4/P6) captured -- the host must be remediated first.
+- **Reclaiming the 18.75GB Docker garbage is NOT my call** -- those images/volumes/cache may back other teams' live deployments (cortex, uikit, backlog-triage, entu, polyphony all up); `docker image/system prune` without walking the dependency chain risks a cascade (per `feedback_docker_rmi_cascade`). Surfaced to PO/Aen as a host-health item, not remediated unilaterally.
+
+**outcome** -- **aborted-mid-execution.** Hard-gate stop on an unexpected substrate state (host disk full at the auth step). Did NOT work around it (no destructive cleanup of host artifacts FR does not own). Reversed own footprint cleanly (throwaway container+volume+image gone, compose edit reverted, apex untouched). Probe re-runnable AS-IS once the host root FS has free space -- the harness, version pin (2.1.181), and envelope are all proven up to the auth step; only host disk blocks. Result logs retained at `designs/new/migration-probe-harness/results-2.1.181-*.log`. Surfaced to Brunel (diagnosis) + Aen (role-of-record).
+
+(*FR:Hopper*)
+
+---
+
+## 2026-06-18T12:34+03:00 -- migration-validation probe (V1-V5) RUN 2 COMPLETE on 2.1.181 (post-disk-remediation)
+
+**timestamp** 2026-06-18T12:34+03:00
+
+**tasker** Brunel (dispatch, consolidated re-route 10:49) + Aen (task #5 / WS3b role-of-record + GO 12:11 after PO reclaimed disk).
+
+**dispatch summary** Re-run of the migration-validation probe V1-V5 through the scripted harness on a throwaway 2.1.181 container, after the PO reclaimed ~13.6G (host root 100% -> 76%). Drive order V3->V4->V1->V5->V2, V3 load-bearing status capture. Auth = team-driven tmux pipeline, PO did the browser OAuth + returned the code.
+
+**tier classification** R/M. **sanction status:** Brunel single-line ack (R/M, throwaway-only mutations) + Aen GO. Re-validated against harness.sh + lib/checks.sh + the live substrate: all mutations confined to the throwaway (V3 probe-internal session kills, V5 throwaway config/inbox writes, V2 plant attempt, my clean-isolation `rm` of stale victim dirs inside the throwaway). No live-team artifact touched.
+
+**deployed-artifacts-read declaration**
+- **Layer 1:** all 9 harness artifacts (re-pulled to `de2f24e`, Brunel's `phase_preflight` guard added) + brief + S54 sibling findings.
+- **Layer 2:** clean rc clone `/home/dev/github/mitselek-ai-teams` (ff e52077c..de2f24e); on-host WARP-block uncomment re-applied (backup, reverted at teardown). `docker compose config CLAUDE_VERSION=2.1.181` rendered host-net + image 2.1.181 + CA mount.
+- **Layer 3:** container host-net, `claude --version`=2.1.181 (build assert + harness re-verify); auth `.credentials.json` 471B/600; live session pid 81 `sessions/81.json` status=idle; team dir eager `session-e7b15705`.
+
+**commands executed** (verbatim, abridged; all via `ssh -T dev@100.96.54.170`)
+- Tier-R pre-flight: `df -h /` (76%/14G), `docker ps` (apex UP 46h, host-net), WARP CA present.
+- `git pull --ff-only` -> de2f24e; `phase_preflight` present (df -P / >=90% abort).
+- WARP edit on-host (backup); `chmod +x`; `CLAUDE_VERSION=2.1.181 ./harness.sh build` (preflight PASS 76%<90%; `installed==2.1.181` assert PASS) -> `up` (host-net, staged, creds absent).
+- Auth: team-driven tmux -- `send-keys` theme->Enter, login-method "1. subscription/OAuth"->Enter, captured OAuth URL verbatim (relayed to Aen->PO), PO authed in browser, injected returned code via `tmux send-keys -l '<code>' Enter` (code never logged), cleared security+trust prompts -> ready. `.credentials.json` present; `sessions/81.json` registered.
+- `./harness.sh drive` (V3->V4->V1->V5->V2). Then direct clean-isolated re-probes (resolve_team_dir.py no-pid + --session-pid, kill -0 liveness, config_resolve_check.py) + clean V5a/V5b (ghost-courier inject + SendMessage; external inbox-writes to authed + to a fresh bare-idle session pid 2782).
+- Snapshot evidence to host `/tmp/migration-probe-v1v5-evidence-20260618/`; `./harness.sh teardown` (down -v + rmi leaf 212a04ab); reverted WARP edit.
+
+**outputs** (key results -- full detail in findings doc)
+- **V3 (LOAD-BEARING):** `sessions/<pid>.json` NOT GC'd on exit (graceful + kill -9); lingers with **`status:"idle"`** -- captured verbatim for dead pid 344 (kill -0 344=DEAD, entry persists idle) vs live pid 81 (also idle). **Status cannot distinguish dead from live; the resolver's `dead/exited/stopped` allowlist is WRONG -> must use process-liveness on the `pid` field.** THE decision-relevant finding.
+- **V4:** config.json written FIRST; sessions/<pid>.json only at interactive-ready. Early-discovery window EXISTS.
+- **V1:** PASS clean-isolated -- resolver glob -> live session-<id>; inboxes_dir:"auto" -> discovered dir, not framework-research.
+- **V2:** pid-keyed PASS (selects live dir); glob-only FAILS-FAST (safe) on stale idle-lingering entries -- the predicted V2b<->V3 coupling confirmed.
+- **V5a (P4):** PASS -- members[]-injection routes (ghost-courier.json received the SendMessage).
+- **V5b (P6):** INCONCLUSIVE leaning-negative -- external write did NOT wake a bare idle session in 35-90s (differs from S54 ~15s); confound = headless never-attached pane (`focus-events off`). Needs attached-pane re-test.
+- **Harness defects (dogfood):** drive-phase check-isolation -- V3/V4 leave stale dirs contaminating V1/V5/V2 in-sequence verdicts (true verdicts via direct re-probe); V2 false-PASS on empty live_dir; V4 poller newsess-diff bug. build/up/teardown/preflight phases all clean. Surfaced to Brunel as WS3a+ items.
+
+**outcome** -- **success (probe executed; findings captured).** V1/V2-pid/V5a VALIDATE; V3 yields the one must-fix (liveness=process-not-status); V4 measured; V5b is the one open risk (attached-pane re-test needed). Findings doc `migration-validation-probe-findings-2026-06-18.md` authored (per-check V1-V5 + env table + harness defects + isolation record). Clean teardown; apex UP 46h untouched; no cascade; Docker garbage left for PO. Reported to Brunel (diagnosis) + Aen (role-of-record).
+
+(*FR:Hopper*)
