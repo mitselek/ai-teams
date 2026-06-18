@@ -6,9 +6,10 @@ source-agents:
   - brunel
 discovered: 2026-06-17
 filed-by: librarian
-last-verified: 2026-06-17
+last-verified: 2026-06-18
 status: active
 confidence: high
+# 2026-06-18: cross-linked to sessions-pid-json-not-gc + no-teamdelete-stale-dirs (process-liveness sibling family, Herald)
 source-files:
   - teams/framework-research/docs/teams-migration-probe-findings-2026-06-17.md
 source-commits:
@@ -16,6 +17,9 @@ source-commits:
 related:
   - patterns/windows-user-context-persistent-bridge.md
   - references/inbox-file-write-as-wake-mechanism.md
+  - gotchas/sessions-pid-json-not-gc-status-idle-lingers.md
+  - gotchas/no-teamdelete-stale-session-dirs-accumulate.md
+  - gotchas/lockfile-pid-staleness-false-refuse-across-container-recreate.md
 ---
 
 # Courier restart: Task-Scheduler relaunch vs. stale pidfile
@@ -52,5 +56,8 @@ Any singleton daemon relaunched by an unattended supervisor (Task Scheduler, cro
 
 - [`patterns/windows-user-context-persistent-bridge.md`](../patterns/windows-user-context-persistent-bridge.md) -- the persistence stack the courier runs under; its component #5 (stale-process cleanup) is the general form of this gotcha. This entry is the courier-specific instance.
 - [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) -- why a dropped/duplicated courier matters: it is the process that performs the inbox-file writes that wake recipients; a no-op restart silently stops cross-team delivery.
+- [`gotchas/sessions-pid-json-not-gc-status-idle-lingers.md`](sessions-pid-json-not-gc-status-idle-lingers.md) -- **sibling: same abstraction.** Both are "stale-state-on-a-persistent-substrate, the recorded status/presence is useless, the fix is process-liveness." There: `sessions/<pid>.json` lingers `status:"idle"` for dead sessions -> check the process. Here: a pidfile lingers after ungraceful exit -> check the pid is live AND is the courier (cmdline match). The shared lesson: **a recorded flag (pidfile presence, session status) is a claim, not proof; only the OS knows liveness.**
+- [`gotchas/no-teamdelete-stale-session-dirs-accumulate.md`](no-teamdelete-stale-session-dirs-accumulate.md) -- the team-dir-level instance of the same stale-leftover-on-a-no-GC-substrate family; its sweep also relies on process-liveness.
+- [`gotchas/lockfile-pid-staleness-false-refuse-across-container-recreate.md`](lockfile-pid-staleness-false-refuse-across-container-recreate.md) -- the **across-container-recreate escalation** of this same-host gotcha: there pid-reuse happens across a relaunch on one host; that one is pid-reuse across container *instances* (PID namespace resets), needing a PID-1-starttime discriminator on top of pid-liveness.
 
 (*FR:Callimachus*)

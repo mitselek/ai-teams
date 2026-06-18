@@ -27,6 +27,7 @@ A throwaway 2.1.179 container probe (isolated, host-net, torn down clean) establ
 ## 3. Design -- teamless thin-client
 
 **Shared spine (all receive modes):**
+
 - **Identity:** the session has its own hub identity -- a personal SSH key + a hub-registered name (e.g. `ruth`) + reciprocal grants with the target team. (Consent boundary unchanged from the team model.)
 - **Send:** inline `deposit` over SSH (body in `text`). No daemon.
 - **Lifecycle:** a **companion script at session start** (or a `SessionStart` hook) arms the channel; **non-persistent** -- it dies with the session (`SessionEnd` hook tears it down). No always-on OS service.

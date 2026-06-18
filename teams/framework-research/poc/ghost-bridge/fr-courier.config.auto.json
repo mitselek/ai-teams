@@ -1,0 +1,17 @@
+{
+  "_comment": "AT-UNPIN (2.1.178+) FR courier config -- the 'auto' runtime-discovery variant. LOCAL machine-only infra (gitignored, like fr-courier.config.json), persists on disk across sessions, NOT committed. SEPARATE from fr-courier.config.json (which stays EXPLICIT + is ALWAYS the safe fallback on 2.1.177 in any courier state). This .auto.json is loaded ONLY by restart-fr-courier-with-pid.ps1 (its -Config defaults here), NEVER by a between-session 2.1.177 restart via plain start-fr-courier.ps1 -- so 'auto' can ONLY activate via the wrapper (Step 2.5 on 2.1.178+). LAUNCH-OVERRIDE mechanism (Brunel, team-lead-approved 2026-06-18): the flip is a config-FILE swap at launch, never an in-place edit -> rollback-clean (the explicit default is untouched). The courier stays UP between sessions on the explicit config (mail keeps flowing, no down-window).",
+  "_unpin_note": "WS3 #86 cutover: on the 2.1.178+ session, Step 2.5 (restart-fr-courier-with-pid.ps1, no args) restarts the courier on THIS config. inboxes_dir:'auto' + team_dir_name:null -> merged Config('auto') calls resolve_team_dir -> globs ~/.claude/teams/*/config.json, process-liveness-filters (V3 fix) to FR's ONE live session-<id>: the 11 named 2.1.177 dirs don't match session-<hex>; FR's own accumulating stale session-<id> dirs have dead pids -> filtered; FR's CURRENT session-<id> has the live pid -> the one match. PRECONDITION (Herald): valid WHILE FR is the SOLE migrated 2.1.178+ team on the host (else set team_dir_name or export FR_COURIER_SESSION_PID -- wrapper mode-a). ROTATION: handled by restart-at-each-session-start (Step 2.5). V4 cold-start: the wrapper's pre-flight --resolve-team-dir dry-run aborts (leaving the courier untouched) if sessions/<pid>.json isn't written yet, so a too-early restart refuses instead of crashing. ROLLBACK: reinstall 2.1.177 + stop calling the wrapper (the explicit fr-courier.config.json is the safe default, untouched).",
+  "team": "framework-research",
+  "ssh_target": "sm@10.100.136.162",
+  "ssh_key": "~/.ssh/sm_framework-research",
+  "ssh_opts": ["-p", "2222", "-o", "BatchMode=yes", "-o", "ConnectTimeout=15"],
+  "inboxes_dir": "auto",
+  "claude_home": "~/.claude",
+  "team_dir_name": null,
+  "ghost_outboxes": ["apex-research-courier"],
+  "target_inbox": "team-lead",
+  "default_inbox": "team-lead",
+  "state_dir": "~/.stationmaster/framework-research",
+  "poll_interval_s": 30,
+  "collect_limit": 100
+}

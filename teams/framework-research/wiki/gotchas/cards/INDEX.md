@@ -1,12 +1,15 @@
 # gotchas/ -- Card Index
 
-29 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+32 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ -- **24 confirmed, 5 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending; deposit-no-data-line + v2-restart-redelivery-dupe both confirmed via Herald read-back 2026-06-15). 2026-06-17 batch: ubuntu2404-uid-1000-collision (architectural-fact, base-image) + warp-host-sshd-2222-collision (single-source Brunel) = confirmed; courier-scheduled-task-vs-stale-pidfile (filed-on-behalf Brunel, single-incident) = pending. Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. gotchas/ -- **28 confirmed, 4 pending** (three-bucket rule: single-source + architectural-fact = confirmed; multi-author or filed-on-behalf without documented read-back = pending; deposit-no-data-line + v2-restart-redelivery-dupe both confirmed via Herald read-back 2026-06-15). 2026-06-17 batch: ubuntu2404-uid-1000-collision (architectural-fact, base-image) + warp-host-sshd-2222-collision (single-source Brunel) = confirmed. courier-scheduled-task-vs-stale-pidfile: **confirmed via Brunel read-back 2026-06-18** (sole co-author). 2026-06-18 WS2: no-teamdelete-stale-session-dirs-accumulate (Herald) confirmed via Herald read-back 2026-06-18 -- and its **`confidence` bumped medium→high** when OQ2 resolved (V3). 2026-06-18 WS3b: sessions-pid-json-not-gc-status-idle-lingers (hopper/brunel/herald, empirically probe-verified substrate-fact on 2.1.181) = **confirmed**. 2026-06-18 S52-sibling: lockfile-pid-staleness-false-refuse-across-container-recreate (brunel/herald, empirically-verified apex S52 incident) = **confirmed** (closes the field-22 sibling cross-link). Audit: `grep -rl 'stage-2: pending' gotchas/cards/`.
 
 | Card | Full entry |
 |---|---|
 | A Courier Must Originate Routing the Wire Protocol Leaves Undefined | [card](courier-originates-routing-protocol-leaves-undefined.md) · [full](../courier-originates-routing-protocol-leaves-undefined.md) |
+| Lockfile pid-Staleness False-Refuse Across Container Recreate | [card](lockfile-pid-staleness-false-refuse-across-container-recreate.md) · [full](../lockfile-pid-staleness-false-refuse-across-container-recreate.md) |
+| No TeamDelete -> Stale session-id Dirs Accumulate | [card](no-teamdelete-stale-session-dirs-accumulate.md) · [full](../no-teamdelete-stale-session-dirs-accumulate.md) |
+| sessions/pid.json Not GC'd -- status:idle Lingers (dead reads as live) | [card](sessions-pid-json-not-gc-status-idle-lingers.md) · [full](../sessions-pid-json-not-gc-status-idle-lingers.md) |
 | ai-teams Has No NOPASSWD Sudoers -- Use docker exec -u root | [card](ai-teams-user-no-sudo-use-docker-exec-root.md) · [full](../ai-teams-user-no-sudo-use-docker-exec-root.md) |
 | CF Access → APEX SSO Trusts Email Header Without JWT Verification | [card](cf-access-apex-sso-header-trust-without-jwt-verify.md) · [full](../cf-access-apex-sso-header-trust-without-jwt-verify.md) |
 | Courier Restart: Task-Scheduler Relaunch vs. Stale Pidfile | [card](courier-scheduled-task-restart-vs-stale-pidfile.md) · [full](../courier-scheduled-task-restart-vs-stale-pidfile.md) |

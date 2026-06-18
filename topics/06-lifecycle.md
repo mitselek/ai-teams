@@ -4,7 +4,24 @@ Spawning, scaling, shutdown, and handover of teams.
 
 ## Canonical Startup Protocol (_FR:Volta_)
 
+> ### ⚠ 2.1.178+ migration amendment -- Clean+Create collapse to Discover (_FR:Volta_ -- 2026-06-18, S55)
+>
+> **CLI 2.1.178+ removed `TeamCreate` and `TeamDelete`.** Teams are now **implicit**: a lone authenticated session is *already* a 1-member team with itself as `team-lead`, and `config.json` is written **eagerly** on session start (probe P3). The on-disk dir name is a random `session-<id>` (probe P1) -- the Agent-tool `team_name` param is a cosmetic chat label, ignored on disk.
+>
+> **The startup sequence collapses from 7 phases to 6.** Phase 2 (Clean: `TeamDelete`) and Phase 3 (Create: `TeamCreate`) are **superseded** by a single **Phase 2′: Discover** -- the team auto-exists, so the session *discovers* which `session-<id>` dir is its own (via the shared resolver) and verifies it operational, rather than creating one. There is nothing to acquire and nothing to clean.
+>
+> **New sequence:** **Orient → Sync → Discover → Restart-courier → Restore → Audit → Spawn**.
+>
+> - **Phase 2′: Discover.** Resolve the live team dir via the shared WS1 resolver (`stationmaster-courier.py --resolve-team-dir`); order = explicit-override → single-dir → pid-tiebreaker → **process-liveness** filter → fail-fast. **A real host carries MANY team dirs** (Brunel WS1 finding 2026-06-18: 11 on this box -- stale `session-*` leftovers on 2.1.178+, TeamCreate-named dirs on 2.1.177), so the multi-dir path is the NORM and a bare call returns `ambiguous (live: [])` + non-zero. The in-session caller therefore **always passes a disambiguator**: `--session-pid` on 2.1.178+ (the dir is `session-<id>`; the live pid maps to it), or `--team-dir-name framework-research` on the **2.1.177 bridge** (dirs are TeamCreate-named, so only the explicit override resolves). Verify `config.json` exists under the discovered slug, `.name == slug`, this session is `team-lead`. This IS the operational gate (old Phase 4b's role survives). Record the slug **and the session pid** for the later steps. Surface the slug to the operator. **No create-retry exists:** if the *disambiguated* call genuinely returns no dir, STOP and report -- the same code path that started the session creates the team, so its absence means the session is broken. Never fabricate a dir, never hardcode the runtime path, never guess on genuine ambiguity.
+>   - *Cold-start window (probe V4):* `config.json` is written FIRST; `sessions/<pid>.json` appears ~10-25s later at interactive-ready. So on a fresh multi-dir cold start the pid tiebreaker may not be usable yet -- prefer a short wait for `sessions/<pid>.json` before the `--session-pid` call, OR (bridge) rely on `--team-dir-name`. By the time Restart-courier / Restore (Phase 4) / Persist (Shutdown Phase 4) run, the pid entry is reliably present.
+> - **Phase 2.5: Restart-courier (the ROTATION fix, 2.1.178+).** Because `session-<id>` rotates every session and the courier resolves `inboxes_dir` ONCE at Config-load (`"auto"`), a courier left running from a prior session tracks a **dead** dir and silently delivers nothing. So after Discover, **restart the FR courier** (`restart-fr-courier-with-pid.ps1`, one call, no args) -- the restart-at-session-start is what re-resolves the live `session-<id>` and solves rotation. The wrapper owns the auto/explicit choice (**launch-override**): two local gitignored configs -- `fr-courier.config.json` (explicit-default, always safe -- a plain start can't crash) + `fr-courier.config.auto.json` (the `"auto"` variant). The wrapper's `-Config` defaults to `.auto.json`, so only the wrapper loads auto, behind its V4 dry-run guard; the courier **stays UP** between sessions (the default config is structurally safe, so no stop-at-session-end is needed). The lifecycle doc touches no config (rollback = stop calling the wrapper; configs are local infra, not committed). **v1 (option b -- OMIT the pid):** while FR is the SOLE migrated 2.1.178+ team, bare `"auto"`+process-liveness narrows to FR's one live `session-<id>`; no pid hand-off needed. The wrapper is self-protecting (a read-only pre-flight dry-run aborts and leaves the running courier UNTOUCHED if resolution fails, e.g. a too-early restart in the V4 cold-start window). **v2 upgrade (option a -- pass `-SessionPid <claude-session-pid>`):** once a SECOND team migrates, bare liveness sees >1 live session, so bind `FR_COURIER_SESSION_PID` via the pid tiebreaker to pick FR's dir specifically (the pid MUST be the live Claude session pid with a `sessions/<pid>.json`; the wrapper fails closed otherwise). The single-session probe could not surface the rotation problem (no rotation in one session). **2.1.177 bridge:** the courier stays on the explicit `inboxes_dir` path, so this step is 2.1.178+-only (harmless but pointless pre-flip). Skippable in a session that runs no cross-team courier.
+> - **Phases 0, 0.5, 1 unchanged.** Phase 0.5 (parent-model check) now reads the *auto-created* `config.json`'s effective model rather than gating a `TeamCreate` stamp -- same intent, same action.
+> - **Phase 4 (Restore) unchanged in purpose, name-parameterized** by the discovered slug (see the Restore amendment below).
+> - **Phases 2-3 below are HISTORICAL** (explicit-team CLI ≤ 2.1.177). Retained as record + rollback reference. Design: `teams/framework-research/docs/lifecycle-rework-implicit-teams-2026-06-18.md` (Herald). Evidence: `migration-validation-probe-findings-2026-06-18.md` (Hopper, V1-V5).
+
 ### Decision
+
+> **Superseded on 2.1.178+ (see amendment above):** the live sequence is **6 phases** (Orient → Sync → Discover → Restore → Audit → Spawn). The 7-phase form below is the historical explicit-team protocol.
 
 Startup is a 7-phase sequence: **Orient → Sync → Clean → Create → Restore → Audit → Spawn**. Each phase has a precondition and a verifiable outcome. Skipping or reordering any phase produces a known failure mode (documented below).
 
@@ -88,7 +105,9 @@ cd <team-config-repo> && git pull
 **Expected outcome:** Prompts, roster, and common-prompt are at HEAD.
 **Failure if skipped:** Stale prompts or roster -- agents spawn with outdated instructions or wrong models.
 
-### Phase 2: Clean (_FR:Volta_ -- rewritten 2026-05-06, S5-aware)
+### Phase 2: Clean (_FR:Volta_ -- rewritten 2026-05-06, S5-aware) — **HISTORICAL (≤ 2.1.177); superseded by Phase 2′ Discover**
+
+> **2.1.178+:** `TeamDelete` is gone and there is nothing to clean -- leadership is not a held token, it is the implicit property of a live session. This phase is superseded by Phase 2′ (Discover) in the migration amendment at the top of this protocol. Retained below as the explicit-team record / rollback reference.
 
 **Precondition:** Orient and Sync complete. Team lead has read the roster, common-prompt, and own scratchpad (Phase 0), and pulled the latest config (Phase 1).
 **Action:** One primitive: `TeamDelete(team_name="<team-name>")` -- best-effort, ignore "no team to delete".
@@ -138,7 +157,9 @@ TEAM_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
 
 **`startup.md` is machine-specific by design** -- it may use an absolute path for the runtime dir (e.g., `/c/Users/<username>/.claude/teams/<team-name>/`) instead of `$HOME`-derived. The lifecycle scripts (which travel across machines via the repo) keep the validation gate.
 
-### Phase 3: Create
+### Phase 3: Create — **HISTORICAL (≤ 2.1.177); superseded by Phase 2′ Discover**
+
+> **2.1.178+:** `TeamCreate` is gone and the team auto-exists (eager `config.json`, probe P3) -- there is nothing to create. This phase is superseded by Phase 2′ (Discover). The *verify-config.json-on-disk* half survives, repurposed as the discovery gate (confirm the auto-created team is present and operational). The retry-via-`TeamDelete`+`TeamCreate` block does NOT survive -- Phase 2′ STOPs on genuine absence, it does not retry-create. Retained below as the explicit-team record / rollback reference.
 
 **Precondition:** Phase 2 (Clean) ran `TeamDelete` -- no in-memory leadership state held.
 **Action:** `TeamCreate(team_name="<team-name>")` with post-creation verification and retry.
@@ -177,6 +198,8 @@ TEAM_DIR="$RESOLVED_HOME/.claude/teams/<team-name>"
 **CRITICAL: Do NOT spawn any agents until Phase 3 verification passes.** In Restart 4, Medici was spawned after the first (broken) TeamCreate -- the spawn returned "success" but the team was non-functional. The agent was wasted. Phase 3 verification is a hard gate for all subsequent phases.
 
 ### Phase 4: Restore (_FR:Volta_ -- amended 2026-03-13, inbox durability)
+
+> **2.1.178+ amendment (_FR:Volta_ -- 2026-06-18):** unchanged in purpose, **name-parameterized** by the discovered slug. The runtime target is now `~/.claude/teams/<discovered-slug>/inboxes/` (from Phase 2′), NOT the literal `framework-research`. `restore-inboxes.sh` runtime-discovers the team dir name via the shared resolver instead of `basename $SCRIPT_DIR` -- passing `--session-pid "$PPID"` (2.1.178+) and forwarding the shared `FR_COURIER_TEAM_DIR_NAME` env as `--team-dir-name` for the 2.1.177 bridge (the host is multi-dir, so a disambiguator is required; fail-closed otherwise). This step is **MORE load-bearing** under implicit teams: the durable repo copy is keyed by **agent name** (`team-lead.json`, ...), so it survives a team name that rotates every session -- the agent-name keying is the bridge across both ephemerality and name-rotation. Restore runs *during* startup while the session is active, so it rides the normal active-session inbox-read path (probe P4-class, confirmed on 2.1.181), NOT the idle-proactive-wake path (P6, inconclusive on 2.1.181); its correctness does not depend on proactive wake. The precondition below ("TeamCreate succeeded") reads as "Phase 2′ confirmed the discovered team operational."
 
 **Precondition:** TeamCreate succeeded. `config.json` exists with fresh `leadSessionId`.
 **Action:** Restore inboxes from repo (durable copy persisted during prior session's Shutdown Phase 4a).
@@ -258,7 +281,23 @@ Medici reads all scratchpads, prompts, and common-prompt, then reports:
 
 ## Canonical Shutdown Protocol (_FR:Volta_)
 
+> ### ⚠ 2.1.178+ migration amendment -- Release (S5) is DELETED, 5 phases → 4 (_FR:Volta_ -- 2026-06-18, S55)
+>
+> **CLI 2.1.178+ removed `TeamDelete`, and leadership-release evaporates as a concept.** Every clause of Phase 5's rationale was specific to the explicit-team model:
+> - Leadership is no longer a *held token* -- it is the implicit property of a running session.
+> - It does not survive process exit -- **process exit IS the release.** The live session ends, and with it the implicit leadership.
+> - There is no `TeamDelete` to call and nothing to release. The next session derives a *fresh* `session-<id>` and ignores any leftover dir, so there is no acquire-step that stale state could block.
+>
+> **Phase 5 (Release) is therefore DELETED, not replaced.** The shutdown protocol goes from **5 phases to 4**: **Halt → Notify → Collect → Persist**. The startup-Phase-2 ⟷ shutdown-Phase-5 symmetry argument also evaporates -- there is no create/delete pair to be symmetric about. The new symmetry: startup **discovers** the implicit team; shutdown **persists** durable state and exits. Both ends are about durable state in the repo, not leadership tokens.
+>
+> - **Phase 4 (Persist) is now the LAST durable step**, name-parameterized by the discovered slug (see the Persist amendment below). `persist-inboxes.sh` runtime-discovers the team dir name; the durable copy stays agent-name-keyed.
+> - **Phases 1-3 unchanged** -- none touch `TeamCreate`/`TeamDelete` (P2 confirms SendMessage/delivery survive, so the shutdown handshake is intact).
+> - **Residue -- stale-dir hygiene (NOT a shutdown step):** `TeamDelete` used to also remove the on-disk dir, so `~/.claude/teams/session-*/` now accumulates. This is **disk hygiene, not a leadership concern and not a per-shutdown blocker** (the next session ignores leftovers; the resolver's liveness filter skips dead dirs). Handle out-of-band via an optional pid-guarded sweep that MUST exclude the live session's own dir and keys liveness on **process-liveness** (NOT the `status` field -- probe V3: dead sessions linger `status:"idle"`). See "Stale `session-<id>` dir hygiene" below.
+> - **Phase 5 below is HISTORICAL** (≤ 2.1.177). Design: `teams/framework-research/docs/lifecycle-rework-implicit-teams-2026-06-18.md` (Herald §5). Evidence: `migration-validation-probe-findings-2026-06-18.md` (V3).
+
 ### Decision
+
+> **Superseded on 2.1.178+ (see amendment above):** the live sequence is **4 phases** (Halt → Notify → Collect → Persist). The 5-phase form below is the historical explicit-team protocol.
 
 Shutdown is a 5-phase sequence: **Halt → Notify → Collect → Persist → Release**. Team lead shuts down last. The repo is the sole durable store; the runtime dir and the parent CLI's in-memory leadership state are both released cleanly on graceful exit.
 
@@ -444,6 +483,8 @@ The next session's PURPLE queries the Librarian for `[DEFERRED-REFACTOR]` entrie
 
 ### Phase 4: Persist (_FR:Volta_ -- amended 2026-03-13, inbox durability)
 
+> **2.1.178+ amendment (_FR:Volta_ -- 2026-06-18):** unchanged in purpose, **name-parameterized** by the discovered slug, and now the **LAST durable step** (Phase 5 Release is deleted). `persist-inboxes.sh` runtime-discovers the team dir name via the shared resolver instead of `basename $SCRIPT_DIR` (same `--session-pid "$PPID"` + `FR_COURIER_TEAM_DIR_NAME`-as-`--team-dir-name` disambiguation as Restore, fail-closed on multi-dir ambiguity); it reads from `~/.claude/teams/<discovered-slug>/inboxes/` and writes the **agent-name-keyed** durable copy to the repo (name-rotation-proof). The Phase-5 ordering note below ("commit+push before Release") is moot -- there is no Release; persist+commit+push is simply the final action before process exit.
+
 **Precondition:** All agents terminated. Task snapshot already created (Phase 2b).
 **Action:** Copy inboxes from runtime dir to repo, then commit all session state to version control.
 
@@ -499,7 +540,11 @@ git push
 
 **Note (_FR:Volta_ -- superseded 2026-05-06, see Phase 5 below):** Earlier versions said "Phase 4 is the final shutdown step. Calling TeamDelete is pointless." This was wrong. The runtime *dir* is platform-managed, but the parent CLI's *in-memory team-leadership state* is not -- it survives `/clear` independently of disk. Phase 5 (Release) below is the explicit primitive that releases it on graceful exit. See Phase 5 rationale and `startup.md` gotcha #4 for the empirical evidence (2026-04-30 session-startup).
 
-### Phase 5: Release (_FR:Volta_ -- 2026-05-06, S5 propagation from `startup.md`)
+> **2.1.178+ re-correction (_FR:Volta_ -- 2026-06-18):** "Phase 4 is the final shutdown step" is **true again on 2.1.178+, for a new reason.** The 2026-05-06 note was correct *for the explicit-team CLI*: in-memory leadership survived `/clear` and needed an explicit `TeamDelete` (Phase 5). On 2.1.178+ that in-memory held-token does not exist -- leadership evaporates on process exit -- so Phase 5 is deleted and Phase 4 (Persist) is once more the last durable step. The distinction the 2026-05-06 note drew (runtime-dir ephemerality vs. in-memory-leadership persistence) still holds *as analysis*; the substrate simply no longer has the persistent in-memory half.
+
+### Phase 5: Release (_FR:Volta_ -- 2026-05-06, S5 propagation from `startup.md`) — **DELETED on 2.1.178+**
+
+> **2.1.178+ (_FR:Volta_ -- 2026-06-18):** This phase is **deleted, not replaced** -- there is no `TeamDelete` and nothing to release; **process exit IS the release** (see the migration amendment at the top of the Shutdown Protocol). Shutdown is now 4 phases (Halt → Notify → Collect → Persist). The dir-removal half that `TeamDelete` also did becomes out-of-band stale-dir hygiene (below), not a shutdown step. Everything below is HISTORICAL (explicit-team CLI ≤ 2.1.177), retained as record / rollback reference.
 
 **Precondition:** Phase 4 (Persist) committed and pushed all session state. The repo holds the durable copy of scratchpads, task snapshot, and pruned inboxes.
 **Action:** Release the parent CLI's in-memory team-leadership state.
@@ -535,6 +580,20 @@ When both boundaries call `TeamDelete`, the steady state is: graceful-exit Phase
 | Phase 5 skipped because crash before Phase 4 finished | Crash, OOM, force-quit                                      | Next session's Phase 2 cleans up. Durable state already on remote (Phase 4 committed before Phase 5 by design). |
 | Phase 5 errors with "no team to delete"              | Already cleaned up by some other path (concurrent CLI, manual) | Idempotent -- error is benign. Continue.                                                              |
 | Phase 5 ordered before Phase 4 by mistake             | Protocol misread; team lead reorders                        | `startup.md` Step S5 documents the ordering. Reference implementation (below) is sequential. T06 phase numbering enforces order. |
+
+---
+
+## Stale `session-<id>` dir hygiene (_FR:Volta_ -- 2026-06-18, S55; new concern on 2.1.178+)
+
+**Why this exists:** under explicit teams, `TeamDelete` (shutdown Phase 5 + startup Phase 2) kept `~/.claude/teams/` to a single live dir. With both gone (see the migration amendments above), every session exit -- graceful or crashed -- leaves a `session-<id>` dir behind. They accumulate.
+
+- **Does it break anything? No.** The next session derives its own fresh `session-<id>` (Discover, Phase 2′) and ignores leftovers. Discovery is resolver-mediated precisely so leftovers are non-fatal -- the **process-liveness** filter skips dead dirs.
+- **Does it cost anything?** Disk (small JSON dirs) and a discovery-disambiguation burden (the reason the `.name`-glob path needs a liveness filter / pid tiebreaker). Unbounded accumulation over many sessions is untidy, not load-bearing. Accumulation scales with **session** count, not team count.
+- **Remediation -- out-of-band, NOT a mandatory lifecycle step (promoted by probe V3):** an optional startup-time or cron sweep that removes `~/.claude/teams/session-*/` dirs **not** backed by a live session. V3 promotes this from "convenience" to "recommended": because `sessions/<pid>.json` lingers `status:"idle"` for dead sessions (NOT GC'd), stale dirs accumulate AND the resolver's liveness disambiguation depends entirely on **process-liveness** -- so a `_pid_alive`-keyed sweep is the clean GC the substrate doesn't provide.
+- **Hazards to encode in any sweep:** (1) MUST exclude the live session's own dir; (2) key liveness on **process-liveness** (`_pid_alive` on the entry's `pid`, optionally `procStart`-guarded against PID reuse), **NOT** the `status` field (V3: `status` is useless -- dead lingers `idle`); (3) stays OUT of the mandatory startup/shutdown sequence so a failed sweep never blocks a session.
+- **Ownership:** platform-substrate territory -- touches the container/host filesystem lifecycle (Brunel's containerization domain) as much as the protocol. The sweep design is a Brunel/Volta follow-up, **not blocking the unpin**.
+
+Cataloged as a Callimachus gotcha (`no-teamdelete-stale-session-dirs-accumulate`, confidence bumped medium→high now V3 confirmed the GC behavior). Cross-ref: `startup.md` gotcha #5.
 
 ---
 
@@ -913,6 +972,18 @@ Files with defined owners and purpose:
 
 ## Stale-Team Recovery (_FR:Volta_)
 
+> ### ⚠ 2.1.178+ migration amendment -- recovery IS Discover (_FR:Volta_ -- 2026-06-18, S55)
+>
+> The scenario table below is written against the explicit-team `TeamDelete`+`TeamCreate` model and is **HISTORICAL**. On 2.1.178+ the substrate inverts the whole frame: there is **no leadership state to recover** (it evaporates on process exit) and **no `TeamDelete`/`TeamCreate`** to idempotently re-run. Every session's live team is the **freshly auto-created** `session-<id>` it is already running in; prior-session dirs are inert leftovers, never the thing you recover *into*.
+>
+> **The recovery primitive is now Discovery (Phase 2′), not Clean+Create.** Mapping the old scenarios:
+> - *Graceful / post-`/clear` / crashed prior session:* irrelevant to this session -- it has its own fresh `session-<id>`. Discover resolves it; leftovers are skipped by the liveness filter.
+> - *Inboxes lost from runtime dir:* unchanged -- repo-side agent-name-keyed inboxes are the source of truth; Restore (Phase 4) reads from repo regardless.
+> - *Wrong / multiple team-name dirs on disk:* this is now the **common** case (no `TeamDelete` cleanup), handled by the resolver's disambiguation (pid tiebreaker → process-liveness filter → fail-fast), NOT by `TeamDelete(canonical)`. Removing leftovers is out-of-band stale-dir hygiene, not recovery.
+> - *First-ever session:* the team auto-exists eagerly (P3); Discover resolves the single dir; Restore is a cold-start no-op.
+>
+> **Key insight, restated:** there is still no special recovery procedure -- but now because the substrate *creates and releases* the team for free (not because one idempotent primitive handles all prior states). The startup protocol's Phase 2′ (Discover) IS the recovery, and its only failure mode is genuine absence → STOP (the session itself is broken). The table below is retained as the explicit-team record.
+
 ### Decision
 
 A "stale team" is one where the team directory exists from a previous session but the current session has no live team context. This is the normal state at the start of every session. The canonical startup protocol (Phases 2-4) handles this case by design.
@@ -1105,6 +1176,18 @@ This shows the lifecycle framework can accommodate non-Claude agents transparent
 8. **TeamCreate silent failure** -- TeamCreate can return success but not write config.json to disk. Phase 3 now has a retry loop, but the root cause is unknown. Is this a race condition? A permissions issue? Does it correlate with the `$HOME` bug? (_FR:Volta_ -- discovered restart 4, 2026-03-13)
 
 9. **Inbox size thresholds** -- The 100-message-per-file pruning limit (Shutdown Phase 4a) is a reasonable default for research teams with short sessions. For production teams with long sessions and many agents, the right threshold may be different. Should this be configurable per team (in roster.json)? What is the actual size of 100 messages in JSON -- does it stay under reasonable git commit sizes? (_FR:Volta_ -- 2026-03-13)
+
+### 2.1.178+ migration -- obsoleted + new (_FR:Volta_ -- 2026-06-18, S55)
+
+**Obsoleted by the implicit-teams migration** (the substrate removed the primitives these questions were about):
+
+- *Resolved entry "TeamCreate succeeds but config.json doesn't exist"* and *Still-open #8 (TeamCreate silent failure)* -- **moot.** There is no `TeamCreate`; `config.json` is written eagerly by the session's own startup code path (probe P3). The retry loop they motivated is deleted (Phase 2′ STOPs on genuine absence, it does not retry-create).
+- *Resolved entry "distinguish first-session from lost-state via Phase 2 TeamDelete idempotency"* -- re-resolved by Discovery: the team auto-exists; the distinction stays non-load-bearing for a different reason (process exit releases leadership; the next session is always fresh).
+
+**New open questions (from the migration design + probe):**
+
+10. **Stale-dir sweep ownership** -- the out-of-band pid-guarded sweep ("Stale `session-<id>` dir hygiene" section) is a Brunel/Volta follow-up, explicitly OUT of the mandatory sequence and NOT blocking the unpin. Confirm ownership + whether it lives as a startup-time opt-in or a cron. (_FR:Volta_ -- 2026-06-18)
+11. **P6 proactive-wake on 2.1.181** -- external inbox-write waking a *bare idle* session was inconclusive-leaning-negative on 2.1.181 with a named headless-pane/focus-events confound (probe V5b). Restore (Phase 4) does NOT depend on it (it runs during an active session), and cross-team delivery is guaranteed by the courier's poll loop, so this is a *latency* property, not a *delivery* blocker. Re-test with an attached pane before any design leans on proactive wake. DEFERRED, RfC-scope. (_FR:Hopper/Volta_ -- 2026-06-18)
 
 ---
 

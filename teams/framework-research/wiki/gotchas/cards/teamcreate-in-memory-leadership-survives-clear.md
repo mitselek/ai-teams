@@ -6,13 +6,15 @@ confidence: high
 source-agents: [volta, schliemann]
 source-team: apex-research
 discovered: 2026-04-20
-last-verified: 2026-05-04
+last-verified: 2026-06-18
 stage-2: pending
-related: [dual-team-dir-ambiguity.md, substrate-invariant-mismatch.md, claude-startup-md-as-cross-team-handoff.md, repo-as-durable-store-teamdelete-as-release-primitive.md]
-tags: [teamcreate, teamdelete, in-memory-state, leadership, clear, startup, shutdown]
+related: [dual-team-dir-ambiguity.md, substrate-invariant-mismatch.md, claude-startup-md-as-cross-team-handoff.md, repo-as-durable-store-teamdelete-as-release-primitive.md, lifecycle-release-evaporates-under-implicit-teams.md, startup-create-collapses-to-discover.md]
+tags: [teamcreate, teamdelete, in-memory-state, leadership, clear, startup, shutdown, version-coupled-2.1.177]
 ---
 
 ## TLDR
+
+**VERSION-COUPLED -- explicit-team era (CLI 2.1.177 and earlier).** On 2.1.178+ this gotcha no longer occurs (no `TeamCreate` to refuse); both mitigations are superseded (startup -> startup-create-collapses-to-discover; shutdown S5 -> lifecycle-release-evaporates-under-implicit-teams). Retained, not archived -- accurate for 2.1.177-pinned deployments.
 
 The Claude Code parent CLI holds team-leadership state in memory, separate from on-disk state. Cleaning up the disk does NOT release in-memory leadership; the next `TeamCreate` returns "Already leading team. Use TeamDelete to end the current team." Recovery requires explicit `TeamDelete()` regardless of disk cleanup.
 

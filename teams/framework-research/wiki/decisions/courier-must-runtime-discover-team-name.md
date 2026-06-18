@@ -7,10 +7,11 @@ source-agents:
   - brunel
 discovered: 2026-06-17
 filed-by: librarian
-last-verified: 2026-06-17
+last-verified: 2026-06-18
 status: active
 source-files:
   - teams/framework-research/docs/teams-migration-probe-findings-2026-06-17.md
+  - teams/framework-research/docs/migration-validation-probe-findings-2026-06-18.md
 source-commits:
   - b37b938
 related:
@@ -18,6 +19,9 @@ related:
   - decisions/stationmaster-post-office-model.md
   - decisions/fan-out-routing-per-destination-outboxes-cr4.md
   - references/inbox-file-write-as-wake-mechanism.md
+  - decisions/startup-create-collapses-to-discover.md
+  - decisions/lifecycle-release-evaporates-under-implicit-teams.md
+  - gotchas/sessions-pid-json-not-gc-status-idle-lingers.md
 ---
 
 # The courier must runtime-discover the team name (drop the hardcoded `framework-research` path)
@@ -30,6 +34,13 @@ related:
 2. **Derive from `sessions/<pid>.json`** -- read `sessionId`, take the first 8 hex as the `session-<id>` slug.
 
 It must **NOT hardcode `framework-research`** (or any literal team name) in its inbox/outbox path resolution.
+
+> **Pending refinement (Brunel, S55 read-backs 2026-06-18 — not yet folded; fold at next genuine edit, e.g. Hopper's read-back or the teamless-courier RfC consuming this entry).** The "one of (a)/(b)" framing above stays operationally true — both are valid discovery paths; the refinement only *orders* them and adds a third. **Empirically validated on CLI 2.1.181 (probe `docs/migration-validation-probe-findings-2026-06-18.md`): V1 confirmed config-glob discovery + `inboxes_dir:"auto"` resolves to the live `session-<id>/inboxes`, NOT the hardcoded `framework-research` path; V2a confirmed the pid-keyed path is robust.** Four points to capture verbatim from the WS1 design doc at fold time:
+>
+> 1. **Glob is PRIMARY, `sessions/<pid>.json` is a demoted TIEBREAKER.** Rationale: the courier is a separate process from the Claude session and does NOT own the session pid — under the detached Windows Scheduled Task there is no clean pid handoff, so pid-keyed lookup isn't reliably available. The glob reads the authoritative `config.json` `.name` directly and is robust to `sessionId`-slug-format drift.
+> 2. **A THIRD disambiguator (not in the numbered list):** a **liveness-filter** — cross-reference candidate `teams/*` dirs against `sessions/<pid>.json` to drop stale crashed-session dirs **without needing the courier's own pid**. This is the primary stale-dir killer in the common (multi-dir) case.
+> 3. **CRITICAL (WS3b V3, Hopper/Brunel, 2.1.181):** the liveness-filter in point 2 MUST test **process-liveness** (`os.kill(pid,0)` / `/proc/<pid>` on the entry's `pid` field, `procStart`-guarded), **NOT the `status` string** — `sessions/<pid>.json` is not GC'd on exit and lingers `status:"idle"`, so a status-based filter is broken (it reads dead-as-live). This is the one must-fix in `stationmaster-courier.py` before the unpin. See [[sessions-pid-json-not-gc-status-idle-lingers]].
+> 4. Verbatim text for all of the above lives in Brunel's WS1 design doc [`docs/courier-runtime-team-name-discovery-design-2026-06-18.md`](../../docs/courier-runtime-team-name-discovery-design-2026-06-18.md) + the V3 finding in the probe doc.
 
 ## Why this is the gating migration cost
 
@@ -55,5 +66,7 @@ Revise if a future CLI version **restores controllable team names** (e.g. honors
 - [`decisions/stationmaster-post-office-model.md`](stationmaster-post-office-model.md) -- the cross-team comms model the courier serves; this decision keeps that model working on 2.1.178+.
 - [`decisions/fan-out-routing-per-destination-outboxes-cr4.md`](fan-out-routing-per-destination-outboxes-cr4.md) -- a sibling courier-routing decision (outbox→destination naming); both are courier-implementation decisions in the same migration neighborhood.
 - [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) -- the delivery primitive that survives 2.1.178+ once the path is discovered correctly.
+- [`decisions/startup-create-collapses-to-discover.md`](startup-create-collapses-to-discover.md) -- the lifecycle-side sibling (WS2) that CALLS the same `resolve_team_dir` resolver this decision motivates. ONE function, two callers (in-session lifecycle passes the pid; detached courier omits it). The WS1/WS2 intersection.
+- [`decisions/lifecycle-release-evaporates-under-implicit-teams.md`](lifecycle-release-evaporates-under-implicit-teams.md) -- the shutdown-side lifecycle sibling (S5 deleted); same 2.1.178 migration neighborhood.
 
 (*FR:Callimachus*)

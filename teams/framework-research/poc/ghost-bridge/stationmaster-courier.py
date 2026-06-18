@@ -93,8 +93,11 @@ class Config:
         # The sentinel "auto" runtime-DISCOVERS the live session-<id> team dir on 2.1.178+
         # (team dir is random per session; hardcoded name breaks -- probe P1). Discovery is the
         # detached-courier vantage (no session pid -> glob .name + process-liveness filter);
-        # an optional FR_COURIER_SESSION_PID / team_dir_name override disambiguates a multi-dir
-        # host. Discovery only fires for "auto"; the pinned-2.1.177 explicit path is untouched.
+        # the FR_COURIER_* override family disambiguates a multi-dir host (one convention for
+        # the courier AND the lifecycle scripts -- Aen 2026-06-18):
+        #   FR_COURIER_SESSION_PID       -> pid tiebreaker (post-unpin session-<id> dirs)
+        #   FR_COURIER_TEAM_DIR_NAME     -> explicit dir override (the 2.1.177 named-host bridge)
+        # Discovery only fires for "auto"; the pinned-2.1.177 explicit-path config is untouched.
         _raw_inboxes = raw["inboxes_dir"]
         if _raw_inboxes == "auto":
             _claude_home = _expand(raw.get("claude_home", "~/.claude"))
@@ -102,7 +105,10 @@ class Config:
             _team_dir = resolve_team_dir(
                 _claude_home,
                 session_pid=int(_pid_env) if _pid_env and _pid_env.isdigit() else None,
-                explicit_dir_name=raw.get("team_dir_name"),
+                # config primary, env fallback: a deliberately-set config value wins; a
+                # null/absent config falls to the FR_COURIER_TEAM_DIR_NAME env (an ambient
+                # env must not silently override a persisted config field).
+                explicit_dir_name=raw.get("team_dir_name") or os.environ.get("FR_COURIER_TEAM_DIR_NAME"),
             )
             self.inboxes_dir: Path = _team_dir / "inboxes"
             if not raw.get("team"):
@@ -1186,10 +1192,48 @@ def do_ping(cfg: Config) -> int:
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description="stationmaster reference courier")
-    ap.add_argument("--config", required=True, help="path to courier JSON config")
+    # --config is NOT required when --resolve-team-dir is given: that is a PRE-config-load
+    # lifecycle touchpoint (WS2 T1/T2/T3 -- startup discover + restore/persist-inboxes.sh run
+    # before any courier config exists). It's required for every other mode.
+    ap.add_argument("--config", help="path to courier JSON config")
     ap.add_argument("--once", action="store_true", help="run a single cycle and exit")
     ap.add_argument("--ping", action="store_true", help="ping the hub and exit (onboarding verify)")
+    # WS2 lifecycle shim (#86): discover the team dir WITHOUT a courier config, so the bash
+    # lifecycle scripts can `SLUG=$(stationmaster-courier.py --resolve-team-dir --name)`.
+    #   --resolve-team-dir         -> print the discovered team DIR (the inboxes_dir base)
+    #   --resolve-team-dir --name  -> print the bare session-<id> slug
+    # exit 0 on success; stderr message + nonzero on no-resolve / unresolved ambiguity.
+    ap.add_argument("--resolve-team-dir", dest="resolve_team_dir", action="store_true",
+                    help="discover and print the live team dir (or --name = bare slug), then exit")
+    ap.add_argument("--name", action="store_true",
+                    help="with --resolve-team-dir: print the bare session-<id> slug, not the full path")
+    ap.add_argument("--claude-home", default="~/.claude", help="claude home for --resolve-team-dir")
+    ap.add_argument("--session-pid", type=int, default=None,
+                    help="with --resolve-team-dir: session pid for the pid tiebreaker (in-session callers)")
+    ap.add_argument("--team-dir-name", default=None,
+                    help="with --resolve-team-dir: explicit team dir name override (skip discovery)")
     args = ap.parse_args(argv)
+
+    # Pre-config lifecycle shim: resolve + print + exit, no config / no lock / no hub.
+    if args.resolve_team_dir:
+        # session_pid precedence: explicit --session-pid, else FR_COURIER_SESSION_PID env
+        # (the same env the "auto" Config path reads -- one contract for both callers).
+        pid = args.session_pid
+        if pid is None:
+            _env = os.environ.get("FR_COURIER_SESSION_PID")
+            pid = int(_env) if _env and _env.isdigit() else None
+        try:
+            team_dir = resolve_team_dir(
+                _expand(args.claude_home), session_pid=pid, explicit_dir_name=args.team_dir_name
+            )
+            print(team_dir.name if args.name else team_dir)
+            return 0
+        except RuntimeError as exc:
+            sys.stderr.write(f"{exc}\n")
+            return 1
+
+    if not args.config:
+        ap.error("--config is required unless --resolve-team-dir is given")
 
     cfg = load_config(args.config)
 

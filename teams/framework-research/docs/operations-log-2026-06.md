@@ -840,3 +840,33 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** -- **success (probe executed; findings captured).** V1/V2-pid/V5a VALIDATE; V3 yields the one must-fix (liveness=process-not-status); V4 measured; V5b is the one open risk (attached-pane re-test needed). Findings doc `migration-validation-probe-findings-2026-06-18.md` authored (per-check V1-V5 + env table + harness defects + isolation record). Clean teardown; apex UP 46h untouched; no cascade; Docker garbage left for PO. Reported to Brunel (diagnosis) + Aen (role-of-record).
 
 (*FR:Hopper*)
+
+---
+
+## 2026-06-18T13:27+03:00 -- live FR courier "auto"-flip restart ABORTED-PRE-EXECUTION (config premise invalid on 12-team host)
+
+**timestamp** 2026-06-18T13:27+03:00
+
+**tasker** Brunel (dispatch 13:16) + Aen (role-of-record; HOLD 13:26). WS3 unpin-prep.
+
+**dispatch summary** Restart the LIVE FR courier daemon so it picks up the flipped `fr-courier.config.json` (inboxes_dir explicit-path -> "auto"), to validate runtime team-dir discovery against the live courier on 2.1.177 before the unpin. Validate: discovered dir == framework-research + a SEQ-tagged round-trip FR<->apex.
+
+**tier classification** Tier M (live-courier state mutation via restart; touches live FR<->apex production comms; reversible via documented rollback). Validated on receipt; verify-before-restart gate treated as non-negotiable.
+
+**deployed-artifacts-read declaration** -- FR courier runs LOCALLY from this repo's working tree (`teams/framework-research/poc/ghost-bridge/`), NOT a remote rc-host clone (single-layer substrate; this workstation = the host). Read: `stationmaster-courier.py` (auto-branch L99, null-pid guard L949), `fr-courier-daemon.py` (importlib import of the courier by path + FRConfig wrapping ref.Config), `fr-courier.config.json` (flipped to "auto", rollback value in _unpin_flip_note), `start-fr-courier.ps1`/`stop-fr-courier.ps1` (restart mechanism).
+
+**commands executed** (verbatim, abridged; Tier-R gate probes only -- NO restart ever issued)
+- GATE 1 (courier code): `grep '"auto"'` + `grep 'pid = int(pid)'` on the working-tree courier -> both present; confirmed daemon imports it via importlib + ref.Config. NOT stale.
+- GATE 2 (config): read fr-courier.config.json -> inboxes_dir:"auto", claude_home, team_dir_name:null; rollback value present. `git diff` on the courier -> uncommitted ` M` = task#10 --resolve-team-dir shim, confined to main(), daemon code paths unaffected, py_compile OK.
+- GATE 3 (hub): `ping` + `status` over SSH -> ok, identity framework-research, fp nkmhWN...DpyQ, grants_out=[apex-research,fr-test], waiting_for_me={}, deposited_uncollected={}, hub uptime ~5.8d.
+- Launch-parentage probe: live daemon = plain `python.exe` pid 38044 (CreationDate 2026-06-17 15:34); Scheduled Task `FrameworkResearch-Courier` State=Ready/idle, LastRunTime June 15 -> Task is NOT the live launcher; the dispatch's "Stop-ScheduledTask->Task relaunches" mechanism does not apply this session; correct mechanism = stop/start-fr-courier.ps1 script pair.
+- **NO restart, no kill, no config edit issued by me.** Held for mechanism confirm.
+
+**outputs** (key results)
+- **ABORT CAUSE: the bare "auto"+team_dir_name:null config is invalid on THIS substrate.** `~/.claude/teams/` here has 11-12 TeamCreate-NAMED team dirs (framework-research, bigbook-dev, ...), NOT one session-<id> dir; the lone live session (session-<hex>) matches NO named dir -> the resolver's glob+liveness filter returns live:[] -> `resolve_team_dir` RAISES "ambiguous" rc=1. Brunel verified live via `--resolve-team-dir` dry-run. A restart on bare "auto" would crash the courier at Config-load (validate_startup never passes). Aen's "single framework-research dir" premise assumed one team dir.
+- **Caught BEFORE any restart** -- gates 1+2 (code-handles-auto + config-flipped) are NECESSARY-NOT-SUFFICIENT; the crash is at RESOLVE time, not import/config-presence time. The missing gate is a `--resolve-team-dir` rc=0 DRY-RUN (Brunel supplied it). My holding for the mechanism confirm bought the time for the finding to surface.
+- Corroborates the WS3b V2 finding: glob+liveness fail-fast on a multi-dir box is the SAFE degradation, working exactly as designed -- here it makes bare-"auto" unviable on 2.1.177, not a bug.
+
+**outcome** -- **aborted-pre-execution.** Restart NEVER executed; no rollback needed (nothing changed live). Live FR courier stays UP, pid 38044, on its pre-flip explicit-path config; live FR<->apex comms uninterrupted. Brunel reverted fr-courier.config.json to the explicit path (his edit -- I did NOT also touch it, avoiding cross-agent working-tree contention). The "auto" flip is re-coupled to the AT-unpin (2.1.178+) step with a team_dir_name disambiguator -- on 2.1.181 FR's dir becomes session-<id> with a live entry so bare "auto" resolves cleanly. Launch-parentage finding (script-pair mechanism) held for the real restart at cutover. apex untouched throughout. The resolver itself is already validated (WS3b 12/12 + shim) so no live pre-unpin round-trip is needed. Discovered-dir + round-trip validation did NOT run (premise invalidated pre-restart).
+
+(*FR:Hopper*)

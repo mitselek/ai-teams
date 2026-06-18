@@ -4,7 +4,7 @@ source-agents:
   - schliemann
 discovered: 2026-04-20
 filed-by: librarian
-last-verified: 2026-05-04
+last-verified: 2026-06-18
 status: active
 source-team: apex-research
 source-files:
@@ -18,6 +18,8 @@ source-issues:
 ---
 
 # `TeamCreate` in-memory leadership state survives `/clear`
+
+> **VERSION-COUPLED -- explicit-team era (CLI 2.1.177 and earlier).** This gotcha and its mitigation describe the **explicit-team model**. On **CLI 2.1.178+** (implicit teams) `TeamCreate`/`TeamDelete` are gone, leadership is the implicit property of a live session, and this gotcha **no longer occurs** (no `TeamCreate` to refuse). The **shutdown S5 mitigation below is superseded** by [`decisions/lifecycle-release-evaporates-under-implicit-teams.md`](../decisions/lifecycle-release-evaporates-under-implicit-teams.md), and the **startup `TeamDelete`+`TeamCreate` mitigation** by [`decisions/startup-create-collapses-to-discover.md`](../decisions/startup-create-collapses-to-discover.md). This entry is **retained, not archived** -- it is an accurate architectural fact about the explicit-team substrate, still applicable on any 2.1.177-pinned deployment. (*FR:Callimachus*, 2026-06-18, per Herald WS2 submission, issue #86.)
 
 The Claude Code parent CLI process holds team-leadership state **in memory**, separate from on-disk state. Cleaning up the disk does NOT release in-memory leadership. The next `TeamCreate` returns:
 
@@ -93,6 +95,8 @@ High -- n=2 cross-team confirmation is promotion-grade per Volta's criterion, pl
 
 ## Related
 
+- [`decisions/lifecycle-release-evaporates-under-implicit-teams.md`](../decisions/lifecycle-release-evaporates-under-implicit-teams.md) -- **supersedes the shutdown-S5 mitigation here** on CLI 2.1.178+ (leadership released by process exit, no `TeamDelete`).
+- [`decisions/startup-create-collapses-to-discover.md`](../decisions/startup-create-collapses-to-discover.md) -- **supersedes the startup `TeamDelete`+`TeamCreate` mitigation here** on CLI 2.1.178+ (team auto-exists; discover, don't create).
 - [`dual-team-dir-ambiguity.md`](dual-team-dir-ambiguity.md) -- sibling at the platform-state-separation layer (different layer, same root-cause shape).
 - [`substrate-invariant-mismatch.md`](../patterns/substrate-invariant-mismatch.md) -- the generalized pattern this gotcha exemplifies (state is split across substrates; disk-only cleanup misses the in-memory half).
 - [`claude-startup-md-as-cross-team-handoff.md`](../patterns/claude-startup-md-as-cross-team-handoff.md) -- depends on this gotcha's mitigation. The cross-team handoff pattern's `.claude/startup.md` calls `TeamCreate` from the target team's first session, which works cleanly only because the target session has no in-memory leadership state inherited from elsewhere.

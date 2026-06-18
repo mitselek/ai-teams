@@ -38,7 +38,7 @@ related:
 |---|---|---|
 | `teams/<name>/config.json` | **Eager** -- written on session start, before any spawn | A lone authenticated session is a **1-member team with itself as `team-lead`** (`backendType:"in-process"`, `tmuxPaneId:"leader"`). The team exists on disk before any Agent spawn. |
 | `teams/<name>/inboxes/<member>.json` | **Lazy** -- absent on a fresh bare session; created on first message route / first inbox-file write | A brand-fresh bare session has team dir = **`config.json` only**, NO `inboxes/` dir, NO `team-lead.json`. The team-lead is a config *member* with no inbox *file* yet. |
-| `sessions/<pid>.json` | live session registry | `{pid, sessionId, cwd, version, peerProtocol, kind, entrypoint, status}` -- the **pid -> sessionId -> status map** the harness uses to track running sessions. Derive the `session-<id>` slug from the first 8 hex of `sessionId`. |
+| `sessions/<pid>.json` | live session registry | `{pid, sessionId, cwd, version, peerProtocol, kind, entrypoint, status, procStart, ...}` -- the **pid -> sessionId -> status map** the harness uses to track running sessions. Derive the `session-<id>` slug from the first 8 hex of `sessionId`. **GC-on-exit (2.1.181 datapoint, NOT verified on 2.1.179):** the entry is **NOT GC'd on exit** and lingers `status:"idle"` (dead reads identical to live) -> liveness MUST be process-liveness not status. Full finding: [`gotchas/sessions-pid-json-not-gc-status-idle-lingers.md`](../gotchas/sessions-pid-json-not-gc-status-idle-lingers.md). Per this sheet's revision-trigger discipline, that's a **different-version datapoint** cross-referenced here, not folded as a 2.1.179 row. |
 | `tasks/<name>/` | per-team task dir | empty throughout the probe |
 | `projects/<cwd-slug>/<uuid>.jsonl` | session transcript | |
 
@@ -90,5 +90,6 @@ This is a **version-coupled** empirical sheet, not a version-stable architectura
 - [`decisions/courier-must-runtime-discover-team-name.md`](../decisions/courier-must-runtime-discover-team-name.md) -- the operational remediation this sheet's P1 finding forces (drop the hardcoded path).
 - [`gotchas/teamcreate-in-memory-leadership-survives-clear.md`](../gotchas/teamcreate-in-memory-leadership-survives-clear.md) -- prior-version observation that leadership is in-memory; the implicit-teams model makes "lone session is already a 1-member self-led team" the eager-on-disk default.
 - [`decisions/stationmaster-post-office-model.md`](../decisions/stationmaster-post-office-model.md) -- the cross-team comms redesign built on these substrate primitives; the migration verdict says it survives 2.1.178+ modulo the team-name path.
+- [`gotchas/sessions-pid-json-not-gc-status-idle-lingers.md`](../gotchas/sessions-pid-json-not-gc-status-idle-lingers.md) -- **2.1.181 datapoint** filling this sheet's one open substrate-fact gap (`sessions/<pid>.json` GC-on-exit): not GC'd, lingers `status:"idle"`. Filed as a separate version-stamped gotcha, not a 2.1.179 row, per this sheet's "different-version sighting is a new datapoint" discipline.
 
 (*FR:Callimachus*)
