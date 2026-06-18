@@ -1,48 +1,52 @@
 # Team-Lead Scratchpad (*FR:Aen*)
 
 ## Summary (lines 1-15 -- always read on startup)
-- **Current state:** S55 closed 2026-06-18 -- **the 2.1.178+ migration is FULLY DESIGNED + VALIDATED, but NOT yet cut over.** PO halted the cutover at the commit gate (coordination over-churned on cosmetics -- env-name, prose, mode-a/b re-confirms). **CLI still 2.1.177; courier untouched (pid 38044, explicit config).** Durable work committed to main; the new 2.1.178+ lifecycle files (`startup.md` + `restore/persist` scripts) are staged on branch **`fr/unpin-2.1.181-lifecycle`** (kept OFF main so S56 boots CLEAN on 2.1.177).
-- **NEXT SESSION (S56) SCOPE (PO-stated, verbatim intent):** boot clean on 2.1.177 -> **(a) CLOSE all open questions + BRIEF the team on the DECIDED DIRECTIONS below -- state them ONCE, do NOT reopen/re-decide/cross-decide.** -> **(b) THEN unpin to 2.1.181** (runbook below).
-- **All migration decisions are FINAL.** Do NOT reopen them. The churn is the thing the PO halted -- brief once, execute.
+- **Current state:** S56 closed 2026-06-18 -- **lifecycle FLIPPED on main, hygiene closed, team briefed; npm unpin to 2.1.181 PAUSED at PO request pending an autoupdater-vs-pin decision.** CLI still 2.1.177; courier untouched (pid 38044, explicit config). Two commits on main: `309dcd8` (2.1.178+ lifecycle applied: new startup.md Step 0.5/2'/2.5 + 4-phase shutdown + runtime-discover restore/persist scripts) + `727a16a` (untrack fr-courier.config.auto.json, Direction #4 enforced -- now gitignored, still on disk).
+- **OPEN PO DECISION (carry into S57 / pre-flip):** pin to 2.1.181 (keep `DISABLE_AUTOUPDATER=1`, adopt-but-controlled) **vs** enable the autoupdater. Runbook currently assumes PIN. Resolve before/at the npm step.
+- **NEXT (post-decision):** PO runs `npm i -g @anthropic-ai/claude-code@2.1.181`; next boot is on 2.1.181 + new lifecycle (Step 2' Discover via `--resolve-team-dir` + Step 2.5 courier restart on `.auto.json` behind V4 guard) = the live validation. ROLLBACK: reinstall 2.1.177 + `git revert 727a16a 309dcd8`; explicit courier config is the safe on-disk default.
+- **All migration decisions FINAL** (directions below). S56 brief landed CLEAN -- zero reopening. Do NOT re-decide.
 
 ---
 
-### DECIDED DIRECTIONS (S55 -- FINAL; communicate to the team once, do NOT re-decide)
+### DECIDED DIRECTIONS (S55 -- FINAL; brief delivered + acknowledged S56, do NOT re-decide)
 
-1. **Target version = 2.1.181** (PO-decided; npm `latest`=`next`=2.1.181; `stable`=2.1.170 is BELOW the 2.1.178+ floor, so "latest stable" was a contradiction -- 2.1.181 is the call).
-2. **Resolver liveness = PROCESS-based, NOT status.** V3 proved `sessions/<pid>.json` is NOT GC'd on exit and lingers `status:"idle"` (indistinguishable from live). Fix = `os.kill` + `/proc/<pid>/stat` start-time guard, layered on the EXISTING cross-platform `_pid_alive` (Windows-safe), + a null-pid guard. **MERGED into `stationmaster-courier.py` + validated: Linux 12/12 unit, Windows 11/11 + 4/4 InstanceLock + 17/17 integration. DONE (on main).**
-3. **Courier rotation fix = mode-(b) bare restart for v1.** Step 2.5 calls `restart-fr-courier-with-pid.ps1` (NO args) -> bare `"auto"`+process-liveness resolves FR's sole live `session-<id>`; restart-at-session-start handles rotation. The `-SessionPid` path (mode-a) is the documented **v2 multi-migrated-team** upgrade ONLY.
-4. **Courier config = LAUNCH-OVERRIDE.** Two LOCAL (gitignored) configs: `fr-courier.config.json` (explicit, ALWAYS-safe default -- a plain start can never crash) + `fr-courier.config.auto.json` (the `"auto"` variant the wrapper's `-Config` defaults to). Only the wrapper loads `.auto.json`, behind its V4 pre-flight dry-run guard. Courier stays UP. Configs persist on disk; NOT committed.
-5. **V5b/P6 = NON-BLOCKING for the unpin.** Courier polls (delivery guaranteed); Step 3 inbox-restore rides active-session P4-class delivery (confirmed on 2.1.181), NOT idle-proactive-wake. The attached-pane proactive-wake re-test is DEFERRED/RfC-scope (task #9) -- only if real recipient-wake latency shows post-unpin or the teamless-courier RfC needs it.
-6. **Env override name = `FR_COURIER_TEAM_DIR_NAME`** (Volta's scripts' 2.1.177-bridge override -> `--team-dir-name`). KEEP as-is. The courier does NOT read it (cosmetic). Do NOT revert.
-7. **Lifecycle (Volta WS2) = FLIP-READY on branch `fr/unpin-2.1.181-lifecycle`:** startup.md (Step 0.5 reads auto-config; Step 2' Discover via `--resolve-team-dir` shim; Step 2.5 courier restart; S5 deleted -> 4-phase shutdown; gotchas #3/#4 historical, #5 stale-dir + process-liveness) + topic-06 banners (on main) + restore/persist scripts (runtime-discover). Grounded in `docs/lifecycle-rework-implicit-teams-2026-06-18.md` (Herald, on main).
-8. **Known constraints (documented, NOT blockers):** (a) bare-liveness valid only while FR is the SOLE live 2.1.178+ team (2nd migrated team -> mode-a pid); (b) `session-<id>` rotates per session -> restart-at-session-start re-resolves; (c) 12-team host -> discovery MUST disambiguate (`--session-pid` on 2.1.178+, `--team-dir-name framework-research` on the 2.1.177 bridge); (d) Windows `$PPID` is best-effort, degrades to liveness (non-fatal).
+1. **Target version = 2.1.181** (PO-decided; npm `latest`=`next`=2.1.181; `stable`=2.1.170 is BELOW the 2.1.178+ floor).
+2. **Resolver liveness = PROCESS-based, NOT status.** `os.kill` + `/proc/<pid>/stat` start-time guard on the existing cross-platform `_pid_alive` + null-pid guard. MERGED + validated on main (Linux 12/12, Windows 11/11 + 4/4 lock + 17/17 integration).
+3. **Courier rotation = mode-(b) bare restart for v1.** Step 2.5 calls `restart-fr-courier-with-pid.ps1` (no args); `-SessionPid` (mode-a) is the v2 multi-migrated-team upgrade ONLY.
+4. **Courier config = LAUNCH-OVERRIDE.** Two LOCAL (gitignored) configs: `fr-courier.config.json` (explicit, always-safe default) + `fr-courier.config.auto.json` (`"auto"` variant, wrapper `-Config` default, behind V4 dry-run guard). Persist on disk; NOT committed. (S56: auto.json untracked to enforce this.)
+5. **V5b/P6 = NON-BLOCKING for the unpin.** Courier polls; Step 3 inbox-restore rides active-session P4-class delivery. Attached-pane proactive-wake re-test = DEFERRED/RfC (task #9).
+6. **Env override name = `FR_COURIER_TEAM_DIR_NAME`** (Volta's 2.1.177-bridge override). KEEP as-is; courier does NOT read it (cosmetic).
+7. **Lifecycle (Volta WS2) = APPLIED to main S56** (`309dcd8`): startup.md Step 0.5/2'/2.5 + S5-deleted 4-phase shutdown + gotcha #5; restore/persist runtime-discover. Was branch `fr/unpin-2.1.181-lifecycle`; flipped at the unpin gate.
+8. **Known constraints (documented, NOT blockers):** (a) bare-liveness valid only while FR is SOLE live 2.1.178+ team; (b) `session-<id>` rotates per session -> restart-at-session-start re-resolves; (c) 12-team host -> discovery MUST disambiguate; (d) Windows `$PPID` best-effort, degrades to liveness.
 
 ---
 
-### NEXT-SESSION BOOT (re-orient for S56)
+### S56 WRAP
 
-1. Read `startup.md` first -- it is the OLD 2.1.177 version on main (TeamDelete+TeamCreate Step 2). The new 2.1.178+ version is on branch `fr/unpin-2.1.181-lifecycle`, applied AT the unpin, NOT before. Boot the team CLEAN on 2.1.177 as normal.
+- Brief delivered to Brunel+Herald+Volta+Hopper+Cal; all 5 acknowledged the 8 directions, zero reopening (PO's S55 churn-halt held).
+- Volta+Brunel verified configs PASS (a/b/c): both configs on disk under `teams/framework-research/poc/ghost-bridge/`; live courier on explicit config, stays up; wrapper defaults to `.auto.json` behind V4 guard; plain start loads explicit (can't crash).
+- Finding (d): auto.json was committed in S55 `0882b86` (contradicts Direction #4). Ruled (b) untrack+gitignore (conformance, secret-free, NOT security). Brunel added `.gitignore:11`; committed `727a16a`.
+- Hopper cleared S55 read-back -> Cal advanced `decisions/courier-must-runtime-discover-team-name` PARTIAL->CONFIRMED (wiki 152, 8 confirmed / 0 partial; no open stage-2 gates team-wide).
+
+### NEXT-SESSION BOOT (re-orient instructions for S57)
+
+1. Read `startup.md` first -- **NOTE: on disk it is now the NEW 2.1.178+ version** (Step 2' Discover, NO TeamDelete; 4-phase shutdown). Correct **iff** the npm flip to 2.1.181 happened. **If the flip did NOT happen and you booted on 2.1.177**, the new startup.md lacks the TeamDelete reset -- either apply `TeamDelete` manually at Step 2 (gotcha #4) OR `git checkout 309dcd8^ -- teams/framework-research/startup.md` to restore the 2.1.177 version for that boot.
 2. Pull `mitselek-ai-teams`.
-3. Don't pre-spawn. On PO go, the migration team = Brunel + Herald + Volta + Hopper (+ Cal). Confirm with PO.
-4. **PRIMARY: (a) brief the team on the DECIDED DIRECTIONS above (once, no reopening). (b) then unpin.**
-5. **UNPIN RUNBOOK (on PO go):**
-   - a. Apply lifecycle: `git checkout fr/unpin-2.1.181-lifecycle -- teams/framework-research/startup.md teams/framework-research/restore-inboxes.sh teams/framework-research/persist-inboxes.sh` -> commit to main.
-   - b. Confirm `fr-courier.config.auto.json` exists on disk (local; recreate if missing) + wrapper `-Config` defaults to it.
-   - c. PO runs `npm i -g @anthropic-ai/claude-code@2.1.181` (KEEP `DISABLE_AUTOUPDATER=1` -- adopt-but-controlled).
-   - d. End the session; the NEXT boot is on 2.1.181 with the new lifecycle (Step 2' Discover + Step 2.5 courier restart on `.auto.json`) = the live validation.
-   - e. ROLLBACK: `npm i -g @anthropic-ai/claude-code@2.1.177` + revert the lifecycle commit; the explicit courier config is the safe on-disk default.
-6. Empirical ground truth = `docs/migration-validation-probe-findings-2026-06-18.md` (V1-V5). Repeatable harness = `designs/new/migration-probe-harness/` (reusable for future CLI-version migrations).
+3. **RESOLVE THE OPEN PO DECISION FIRST** (autoupdater vs pin) if not already settled post-S56 -- it gates the npm step.
+4. Don't pre-spawn. Migration team = Brunel + Herald + Volta + Hopper (+ Cal). Confirm with PO.
+5. **If flip done (booted on 2.1.181):** the boot ITSELF is the live validation -- watch Step 2' Discover (`--resolve-team-dir`) + Step 2.5 courier restart (`.auto.json` behind V4 guard) run clean. Confirm courier stays up + inboxes restore. Report PASS/FAIL per surface; if clean, close #86 migration milestone.
+6. **If flip NOT done:** hold, re-offer the runbook once the autoupdater decision lands.
+7. Empirical ground truth = `docs/migration-validation-probe-findings-2026-06-18.md` (V1-V5). Reusable harness = `designs/new/migration-probe-harness/`.
 
-### Standing watch items going into S56
+### Standing watch items going into S57
 
-- **CUT THE CHURN (PO feedback S55, memory `feedback_cut_coordination_churn`):** brief the decided directions ONCE; do NOT let the team re-harmonize cosmetics. When agent messages stop adding substance and start re-affirming settled choices, that's the cue to cut it and execute.
+- **CUT THE CHURN** (memory `feedback_cut_coordination_churn`): S56 brief landed with zero reopening -- keep that discipline; declare DONE once the load-bearing thing is validated.
 - **GitHub #86** = migration tracking issue. **#75/#76** + teamless-courier RfC remain open, lower priority.
-- **Cal wiki 147->152** committed S55 (process-liveness / field-22 family: "a recorded flag is a claim, not proof; OS start-time is proof"). Hopper owes a read-back on `decisions/courier-must-runtime-discover-team-name` (PARTIAL->CONFIRMED).
-- **apex** unchanged; **comms-dev** may chime on the 2.1.178 findings.
-- Tasks #3 (unpin) + #9 (P6 re-test, deferred) + #11 (courier restart integration, design-done) carry forward.
+- Tasks #9 (P6 re-test, deferred) + #11 (courier restart integration, design-done) carry forward.
+- Cal wiki 152 entries; nearest TTL expiries 2026-09-17/18 (teams-substrate-2.1.179 / no-teamdelete-stale-dirs / sessions-pid-not-gc).
+- apex unchanged; comms-dev may chime on the 2.1.178 findings.
 
 (*FR:Aen*)
 
 ---
-*Earlier sessions pruned per 100-line discipline. S54 = -courier convention + 2.1.179 probe (empirically answered the migration question). S53 = CCR protocol + apex ref instance. Full history in git; durable knowledge in `wiki/`.*
+*Earlier sessions pruned per 100-line discipline. S55 = migration design + validation, cutover deferred. S54 = -courier convention + 2.1.179 probe. Full history in git; durable knowledge in `wiki/`.*

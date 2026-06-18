@@ -28,19 +28,20 @@ related:
 
 **Operational decision (probe-forced, 2026-06-17).** On CLI **2.1.178+** the on-disk team directory name is **`session-<id>`** -- session-derived, random per session, and **not controllable** via the Agent-tool `team_name` parameter (ignored on disk; see [`references/teams-substrate-2.1.179-implicit-teams.md`](../references/teams-substrate-2.1.179-implicit-teams.md) row "Name-on-disk"). Therefore the courier's hardcoded path `~/.claude/teams/framework-research/inboxes/` **cannot survive** on 2.1.178+.
 
-**Decision:** the courier MUST **discover the team name at runtime**, by one of:
+**Decision:** the courier MUST **discover the team name at runtime**. Two discovery paths, **ordered** (refinement folded S56 2026-06-18; empirically validated on CLI 2.1.181, probe `docs/migration-validation-probe-findings-2026-06-18.md` V1/V2a):
 
-1. **Glob `~/.claude/teams/*/config.json`** and read `.name` (the single dir under `teams/` on a lone-team host), OR
-2. **Derive from `sessions/<pid>.json`** -- read `sessionId`, take the first 8 hex as the `session-<id>` slug.
+1. **PRIMARY -- Glob `~/.claude/teams/*/config.json`** and read `.name`. Rationale: the courier is a separate process from the Claude session and does NOT own the session pid -- under the detached Windows Scheduled Task there is no clean pid handoff, so pid-keyed lookup isn't reliably available. The glob reads the authoritative `config.json` `.name` directly and is robust to `sessionId`-slug-format drift. (V1 confirmed: config-glob discovery + `inboxes_dir:"auto"` resolves to the live `session-<id>/inboxes`, NOT the hardcoded `framework-research` path.)
+2. **TIEBREAKER -- Derive from `sessions/<pid>.json`** -- read `sessionId`, take the first 8 hex as the `session-<id>` slug. Demoted to tiebreaker because of the pid-ownership gap above. (V2a confirmed the pid-keyed path is robust when a pid is available.)
 
 It must **NOT hardcode `framework-research`** (or any literal team name) in its inbox/outbox path resolution.
 
-> **Pending refinement (Brunel, S55 read-backs 2026-06-18 — not yet folded; fold at next genuine edit, e.g. Hopper's read-back or the teamless-courier RfC consuming this entry).** The "one of (a)/(b)" framing above stays operationally true — both are valid discovery paths; the refinement only *orders* them and adds a third. **Empirically validated on CLI 2.1.181 (probe `docs/migration-validation-probe-findings-2026-06-18.md`): V1 confirmed config-glob discovery + `inboxes_dir:"auto"` resolves to the live `session-<id>/inboxes`, NOT the hardcoded `framework-research` path; V2a confirmed the pid-keyed path is robust.** Four points to capture verbatim from the WS1 design doc at fold time:
->
-> 1. **Glob is PRIMARY, `sessions/<pid>.json` is a demoted TIEBREAKER.** Rationale: the courier is a separate process from the Claude session and does NOT own the session pid — under the detached Windows Scheduled Task there is no clean pid handoff, so pid-keyed lookup isn't reliably available. The glob reads the authoritative `config.json` `.name` directly and is robust to `sessionId`-slug-format drift.
-> 2. **A THIRD disambiguator (not in the numbered list):** a **liveness-filter** — cross-reference candidate `teams/*` dirs against `sessions/<pid>.json` to drop stale crashed-session dirs **without needing the courier's own pid**. This is the primary stale-dir killer in the common (multi-dir) case.
-> 3. **CRITICAL (WS3b V3, Hopper/Brunel, 2.1.181):** the liveness-filter in point 2 MUST test **process-liveness** (`os.kill(pid,0)` / `/proc/<pid>` on the entry's `pid` field, `procStart`-guarded), **NOT the `status` string** — `sessions/<pid>.json` is not GC'd on exit and lingers `status:"idle"`, so a status-based filter is broken (it reads dead-as-live). This is the one must-fix in `stationmaster-courier.py` before the unpin. See [[sessions-pid-json-not-gc-status-idle-lingers]].
-> 4. Verbatim text for all of the above lives in Brunel's WS1 design doc [`docs/courier-runtime-team-name-discovery-design-2026-06-18.md`](../../docs/courier-runtime-team-name-discovery-design-2026-06-18.md) + the V3 finding in the probe doc.
+### Disambiguating multiple `teams/*` dirs -- the liveness-filter
+
+A **THIRD disambiguator** (beyond the two discovery paths) handles the common multi-dir case: a **liveness-filter** cross-references candidate `teams/*` dirs against `sessions/<pid>.json` to drop stale crashed-session dirs **without needing the courier's own pid**. This is the primary stale-dir killer.
+
+**CRITICAL (WS3b V3, Hopper/Brunel, validated on 2.1.181):** the liveness-filter MUST test **process-liveness** (`os.kill(pid,0)` / `/proc/<pid>` on the entry's `pid` field, `procStart`-guarded), **NOT the `status` string** -- `sessions/<pid>.json` is not GC'd on exit and lingers `status:"idle"`, so a status-based filter is broken (it reads dead-as-live). This is the one must-fix in `stationmaster-courier.py` before the unpin. See [[sessions-pid-json-not-gc-status-idle-lingers]]. (Per DECIDED-DIRECTION #2, the fix is MERGED + validated: Linux 12/12 unit, Windows 11/11 + 4/4 InstanceLock + 17/17 integration.)
+
+Verbatim source for all of the above: Brunel's WS1 design doc [`docs/courier-runtime-team-name-discovery-design-2026-06-18.md`](../../docs/courier-runtime-team-name-discovery-design-2026-06-18.md) + the V3 finding in the probe doc.
 
 ## Why this is the gating migration cost
 
@@ -68,5 +69,10 @@ Revise if a future CLI version **restores controllable team names** (e.g. honors
 - [`references/inbox-file-write-as-wake-mechanism.md`](../references/inbox-file-write-as-wake-mechanism.md) -- the delivery primitive that survives 2.1.178+ once the path is discovered correctly.
 - [`decisions/startup-create-collapses-to-discover.md`](startup-create-collapses-to-discover.md) -- the lifecycle-side sibling (WS2) that CALLS the same `resolve_team_dir` resolver this decision motivates. ONE function, two callers (in-session lifecycle passes the pid; detached courier omits it). The WS1/WS2 intersection.
 - [`decisions/lifecycle-release-evaporates-under-implicit-teams.md`](lifecycle-release-evaporates-under-implicit-teams.md) -- the shutdown-side lifecycle sibling (S5 deleted); same 2.1.178 migration neighborhood.
+
+## Amendments log
+
+- **2026-06-18 (S55, Brunel read-back):** stage-2 `pending` → `partial` (1 of 2 co-authors). Brunel's glob-PRIMARY / pid-TIEBREAKER / liveness-filter refinement held as a pending-refinement blockquote (orders + adds, not a correction).
+- **2026-06-18 (S56, Hopper read-back):** stage-2 `partial` → **`confirmed`** (final co-author). Hopper confirmed all three load-bearing claims verbatim-faithful, no corrections: (1) CRITICAL process-liveness must-fix matches V3, (2) glob-PRIMARY/pid-TIEBREAKER + V1 config-glob resolution matches probe RUN-2, (3) single-gating-cost framing (P4 members[]-injection + P5/P6 delivery both survive; only hardcoded team-name breaks) matches S54 #4 + S55 V5a. Brunel's refinement folded from blockquote into the body; entry is substrate-faithful.
 
 (*FR:Callimachus*)
