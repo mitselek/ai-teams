@@ -2,8 +2,8 @@
 
 ## Summary (lines 1-15 -- always read on startup)
 - **Current state:** S56 closed 2026-06-18 -- **lifecycle FLIPPED on main, hygiene closed, team briefed; npm unpin to 2.1.181 PAUSED at PO request pending an autoupdater-vs-pin decision.** CLI still 2.1.177; courier untouched (pid 38044, explicit config). Two commits on main: `309dcd8` (2.1.178+ lifecycle applied: new startup.md Step 0.5/2'/2.5 + 4-phase shutdown + runtime-discover restore/persist scripts) + `727a16a` (untrack fr-courier.config.auto.json, Direction #4 enforced -- now gitignored, still on disk).
-- **OPEN PO DECISION (carry into S57 / pre-flip):** pin to 2.1.181 (keep `DISABLE_AUTOUPDATER=1`, adopt-but-controlled) **vs** enable the autoupdater. Runbook currently assumes PIN. Resolve before/at the npm step.
-- **NEXT (post-decision):** PO runs `npm i -g @anthropic-ai/claude-code@2.1.181`; next boot is on 2.1.181 + new lifecycle (Step 2' Discover via `--resolve-team-dir` + Step 2.5 courier restart on `.auto.json` behind V4 guard) = the live validation. ROLLBACK: reinstall 2.1.177 + `git revert 727a16a 309dcd8`; explicit courier config is the safe on-disk default.
+- **PO DECISION (S56, RESOLVED):** ENABLE the autoupdater -- do NOT keep `DISABLE_AUTOUPDATER=1`. CONSEQUENCE: future launches auto-update PAST 2.1.181; lifecycle is validated @2.1.181 ONLY, so re-validate any bump via the migration-probe harness before trusting Step 2'/2.5.
+- **NEXT (npm flip, PO-run when ready):** `npm i -g @anthropic-ai/claude-code@2.1.181` AND unset/remove `DISABLE_AUTOUPDATER` (updater ENABLED per S56); next boot is on 2.1.181+ with new lifecycle (Step 2' Discover via `--resolve-team-dir` + Step 2.5 courier restart on `.auto.json` behind V4 guard) = the live validation. ROLLBACK: reinstall 2.1.177 + re-set `DISABLE_AUTOUPDATER=1` + `git revert 727a16a 309dcd8`; explicit courier config is the safe on-disk default.
 - **All migration decisions FINAL** (directions below). S56 brief landed CLEAN -- zero reopening. Do NOT re-decide.
 
 ---
@@ -32,7 +32,7 @@
 
 1. Read `startup.md` first -- **NOTE: on disk it is now the NEW 2.1.178+ version** (Step 2' Discover, NO TeamDelete; 4-phase shutdown). Correct **iff** the npm flip to 2.1.181 happened. **If the flip did NOT happen and you booted on 2.1.177**, the new startup.md lacks the TeamDelete reset -- either apply `TeamDelete` manually at Step 2 (gotcha #4) OR `git checkout 309dcd8^ -- teams/framework-research/startup.md` to restore the 2.1.177 version for that boot.
 2. Pull `mitselek-ai-teams`.
-3. **RESOLVE THE OPEN PO DECISION FIRST** (autoupdater vs pin) if not already settled post-S56 -- it gates the npm step.
+3. Autoupdater decision SETTLED S56 = ENABLED. npm flip = install 2.1.181 + unset `DISABLE_AUTOUPDATER`. NOTE: with the updater on you may boot ABOVE 2.1.181 -- if `claude --version` > 2.1.181, re-validate the lifecycle via `designs/new/migration-probe-harness/` before trusting Step 2'/2.5.
 4. Don't pre-spawn. Migration team = Brunel + Herald + Volta + Hopper (+ Cal). Confirm with PO.
 5. **If flip done (booted on 2.1.181):** the boot ITSELF is the live validation -- watch Step 2' Discover (`--resolve-team-dir`) + Step 2.5 courier restart (`.auto.json` behind V4 guard) run clean. Confirm courier stays up + inboxes restore. Report PASS/FAIL per surface; if clean, close #86 migration milestone.
 6. **If flip NOT done:** hold, re-offer the runbook once the autoupdater decision lands.
