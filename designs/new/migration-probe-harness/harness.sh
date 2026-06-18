@@ -40,8 +40,30 @@ record() { # check, verdict(PASS/FAIL/PARTIAL/MEASURE), detail
     printf 'RESULT %-4s %-8s %s\n' "$1" "$2" "$3" | tee -a "$RESULTS_LOG"
 }
 
+# ---- Substrate-readiness pre-check (host disk) ----------------------------------------
+# Fail-fast on a full host root BEFORE build+up+teardown burn a cycle. Added after the S55
+# dogfood aborted at the auth wall because the rc host root was 100% full (the container
+# overlay / + /tmp ride the host root LV, so `tmux new-session` -> "No space left on device"
+# and no Claude session can launch). Same fail-closed philosophy as the CLAUDE_VERSION guard.
+HOST_DISK_ABORT_PCT="${HOST_DISK_ABORT_PCT:-90}"   # abort if root use% >= this
+phase_preflight() {
+    local use_pct avail
+    # `df -P /` -> portable columns; Use% is field 5 (strip the % for arithmetic).
+    use_pct="$(df -P / | awk 'NR==2 {gsub("%","",$5); print $5}')"
+    avail="$(df -h / | awk 'NR==2 {print $4}')"
+    log "PREFLIGHT: host root / is ${use_pct}% full (avail ${avail}); abort threshold ${HOST_DISK_ABORT_PCT}%"
+    if [ -n "$use_pct" ] && [ "$use_pct" -ge "$HOST_DISK_ABORT_PCT" ]; then
+        log "PREFLIGHT ABORT: host root ${use_pct}% full (>= ${HOST_DISK_ABORT_PCT}%). FREE SPACE before probing --"
+        log "  the throwaway container's overlay / + /tmp ride this LV; a Claude session can't launch on a full root."
+        log "  (Disk remediation is an operator/PO decision -- do NOT auto-prune Docker garbage; cascade risk.)"
+        exit 3
+    fi
+    log "PREFLIGHT ok."
+}
+
 # ---- Phase: BUILD ---------------------------------------------------------------------
 phase_build() {
+    phase_preflight   # substrate-readiness gate (host disk) -- fail-fast before burning a build
     log "BUILD: image teams-migration-probe:${CLAUDE_VERSION} (build-arg CLAUDE_VERSION=${CLAUDE_VERSION})"
     DOCKER_BUILDKIT=1 $COMPOSE build --build-arg "CLAUDE_VERSION=${CLAUDE_VERSION}"
     log "BUILD ok. (Dockerfile asserts installed==requested; a mismatch would have failed the build.)"
@@ -124,12 +146,13 @@ phase_teardown() {
 # ---- Orchestration --------------------------------------------------------------------
 log "migration-probe-harness | CLAUDE_VERSION=${CLAUDE_VERSION} | phase=${PHASE} | results=${RESULTS_LOG}"
 case "$PHASE" in
+    preflight) phase_preflight ;;
     build)    phase_build ;;
     up)       phase_up ;;
     auth)     phase_auth ;;
     drive)    phase_drive ;;
     teardown) phase_teardown ;;
     all)      phase_build; phase_up; phase_auth; phase_drive; phase_teardown ;;
-    *) echo "usage: CLAUDE_VERSION=<ver> $0 [build|up|auth|drive|teardown|all]" >&2; exit 2 ;;
+    *) echo "usage: CLAUDE_VERSION=<ver> $0 [preflight|build|up|auth|drive|teardown|all]" >&2; exit 2 ;;
 esac
 log "harness phase '${PHASE}' finished."

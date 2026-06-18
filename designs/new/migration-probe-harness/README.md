@@ -68,12 +68,21 @@ docker exec -it -u ai-teams teams-migration-probe tmux attach -t auth
 ### Phase-by-phase (debugging / partial re-run)
 
 ```bash
-CLAUDE_VERSION=2.1.181 ./harness.sh build      # just build the tagged image
+CLAUDE_VERSION=2.1.181 ./harness.sh preflight  # host-disk readiness check only (df -h /)
+CLAUDE_VERSION=2.1.181 ./harness.sh build      # preflight + build the tagged image
 CLAUDE_VERSION=2.1.181 ./harness.sh up         # up + stage probe files
 CLAUDE_VERSION=2.1.181 ./harness.sh auth       # interactive auth pause only
 CLAUDE_VERSION=2.1.181 ./harness.sh drive      # run V3->V4->V1->V5->V2 (needs an authed session)
 CLAUDE_VERSION=2.1.181 ./harness.sh teardown   # snapshot + down -v + rmi
 ```
+
+**Substrate-readiness pre-check (added after the S55 dogfood):** `phase_build` runs `phase_preflight`
+first -- a `df -P /` check that ABORTS (exit 3) if the host root is `>= HOST_DISK_ABORT_PCT`% full
+(default 90). The S55 run aborted at the auth wall because the rc host root was 100% full (the
+container overlay `/` + `/tmp` ride the host root LV, so a Claude session can't `tmux new-session` on
+a full root). This guard fails fast BEFORE build+up+teardown burn a cycle. Override the threshold with
+`HOST_DISK_ABORT_PCT=<n>`. Disk remediation is an operator/PO decision -- the harness does NOT prune
+Docker garbage (cascade risk); it only refuses to run on a full host.
 
 Results land in `results-<version>-<stamp>.log` (every `RESULT <check> <verdict> <detail>` line +
 the V3/V4 raw captures). Snapshot of `~/.claude` lands in `/tmp/migration-probe-snapshot-<version>-<stamp>/`.
