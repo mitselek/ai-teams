@@ -6,6 +6,9 @@ ghost-bridge.log
 # --- fr-courier-daemon (session-scoped FR courier) runtime artifacts ---
 # Host-specific live config (real hub address/key) -- .example.json stays tracked.
 fr-courier.config.json
+# Local at-unpin "auto" runtime-discovery variant -- machine-only infra, NOT committed
+# (Direction #4 + the file's own _unpin_note). Loaded only by restart-fr-courier-with-pid.ps1.
+fr-courier.config.auto.json
 # Process/lock/log produced at runtime, never committed.
 fr-courier.pid
 fr-courier.log
