@@ -940,6 +940,15 @@ def _pid_alive(pid: int, procstart: "str | None" = None) -> bool:
     to the cross-platform liveness result below (never flips a conservative-alive to dead on a
     transient error). The cross-platform liveness contract (Windows tasklist / POSIX os.kill,
     conservative-on-can't-tell) is UNCHANGED for the no-procstart caller."""
+    # Entry guard: a sessions/<pid>.json may carry a null / missing / non-numeric `pid`
+    # (partial write, corrupted entry) -- exactly the messy registry the V3 fix must survive.
+    # Coerce-or-dead FIRST, before any arithmetic, so the liveness filter (and resolve_team_dir)
+    # never crash on a malformed entry. (d.get("pid", 0) yields None for an explicit JSON null,
+    # not the 0 default -- so this guard, not the default, is what makes the caller crash-safe.)
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
     if pid <= 0:
         return False
     if os.name == "nt":
