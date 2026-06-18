@@ -117,16 +117,28 @@ EOF
     fi
 }
 
-# ---- Phase: DRIVE (V3 -> V4 -> V1 -> V5 -> V2; order is load-bearing, see brief) -------
+# ---- Phase: DRIVE -------
+# RUN ORDER CORRECTED (S55 dogfood, Hopper): clean-state resolver checks (V1,V5) run FIRST on the
+# pristine single authed session; the SESSION-SPAWNING checks (V4 cold-start, V3 victim-kills) run
+# AFTER, since their spawned sessions/<pid>.json entries LINGER (the very V3 finding!) and would
+# otherwise contaminate the resolver-dependent checks. V2 runs LAST with its own controlled
+# stale-dir plant + cleanup. Between the clean group and the spawner group we record the victim
+# sessions so kill_victims() can reap their processes (the dirs still linger -- that's V3 -- but
+# reaping the PROCESSES keeps the post-fix process-liveness resolver honest in V2).
+#
+# NB the original V3->V4->V1->V5->V2 order guaranteed contamination: V3/V4 spawn first, their
+# lingering entries poison V1/V5/V2. V3's finding (sessions don't GC) is now baked into the
+# process-liveness resolver, so V3 no longer needs to run *before* the resolver checks to inform
+# them -- it only needs to MEASURE the substrate, which it can do last-but-one.
 phase_drive() {
     # shellcheck source=lib/checks.sh
     source "${HERE}/lib/checks.sh"
-    log "DRIVE: run order V3 -> V4 -> V1 -> V5 -> V2 (V3 first: its GC finding tells us how V2b reads)"
-    check_v3_session_gc      || log "V3 returned nonzero (see results)"
-    check_v4_write_order     || true   # MEASURE-ONLY returns 2
+    log "DRIVE: corrected order V1 -> V5 -> V4 -> V3 -> V2 (clean resolver checks BEFORE session-spawners)"
     check_v1_courier_glob    || log "V1 returned nonzero (see results)"
     check_v5_p4_p6_regression|| log "V5 returned nonzero (see results)"
-    check_v2_lifecycle_pid   || log "V2 returned nonzero (see results)"
+    check_v4_write_order     || true   # MEASURE-ONLY returns 2 (spawns a cold session)
+    check_v3_session_gc      || log "V3 returned nonzero (see results)"  # spawns + kills victims
+    check_v2_lifecycle_pid   || log "V2 returned nonzero (see results)"  # own controlled plant + asserts
     log "DRIVE complete. Results summary:"
     grep '^RESULT' "$RESULTS_LOG" | tee -a "$RESULTS_LOG" >&2 || true
 }

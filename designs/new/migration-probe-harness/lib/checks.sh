@@ -79,15 +79,23 @@ check_v4_write_order() {
     pre_sessions="$(dxu 'ls ~/.claude/sessions 2>/dev/null | sort')"
 
     dxu tmux new-session -d -s v4cold "claude"
-    # Tight poll loop INSIDE the container (one docker exec, no per-tick round-trip).
+    # Poll loop INSIDE the container (one docker exec, no per-tick round-trip).
+    # FIX (S55 dogfood #3): the original diff-against-PRE logic left `newsess` empty -- the
+    # set-subtraction via `case` was fragile when sessions/ was absent at snapshot. Simpler +
+    # correct: detect ANY new team-dir/config.json and ANY new sessions/<pid>.json by comparing
+    # the CURRENT file list to the pre-snapshot passed as a here-string. Also: window widened to
+    # 600 cycles (~60s) -- sessions/<pid>.json lands only at interactive-ready (~10-25s after
+    # launch, sometimes later under load), so a 30s window could miss it and false-INCONCLUSIVE.
     local order
-    order="$(dxu bash -c '
-        PRE_T="'"$(printf '%s' "$pre_teams" | tr "\n" "," )"'"
-        PRE_S="'"$(printf '%s' "$pre_sessions" | tr "\n" "," )"'"
-        for i in $(seq 1 300); do
+    order="$(printf '%s\n---\n%s\n' "$pre_teams" "$pre_sessions" | dxu bash -c '
+        PRE="$(cat)"
+        PRE_T="$(printf "%s" "$PRE" | sed "/^---$/q" | grep -v "^---$")"
+        PRE_S="$(printf "%s" "$PRE" | sed "1,/^---$/d")"
+        is_new() { ! printf "%s\n" "$2" | grep -qxF "$1"; }   # is "$1" absent from list "$2"?
+        for i in $(seq 1 600); do
             NT=""; NS=""
-            for d in $(ls ~/.claude/teams 2>/dev/null); do case ",$PRE_T," in *",$d,"*) ;; *) NT="$d";; esac; done
-            for f in $(ls ~/.claude/sessions 2>/dev/null); do case ",$PRE_S," in *",$f,"*) ;; *) NS="$f";; esac; done
+            for d in $(ls ~/.claude/teams 2>/dev/null); do is_new "$d" "$PRE_T" && NT="$d" && break; done
+            for f in $(ls ~/.claude/sessions 2>/dev/null); do is_new "$f" "$PRE_S" && NS="$f" && break; done
             CT=""; CS=""
             [ -n "$NT" ] && [ -f ~/.claude/teams/"$NT"/config.json ] && CT=Y
             [ -n "$NS" ] && CS=Y
@@ -216,11 +224,26 @@ check_v2_lifecycle_pid() {
     log "V2: resolver pid-keyed path (lifecycle, session_pid supplied) + planted stale dir."
     local live_dir; live_dir="$(dxu "python3 /home/ai-teams/resolve_team_dir.py 2>/dev/null")"
     local live_slug; live_slug="$(basename "$live_dir")"
+    # GUARD (S55 dogfood fix #2): the resolver MUST return a non-empty live dir before we proceed.
+    # The original V2 silently passed when live_dir was empty (empty==empty), masking a broken
+    # resolver. Assert non-empty + that it's a real session-<id> dir, else FAIL LOUD and bail.
+    if [ -z "$live_dir" ] || [ "$live_slug" = "." ] || [ "$live_slug" = "/" ]; then
+        record V2 FAIL "resolver returned EMPTY live_dir ('${live_dir}') -- cannot run V2 (broken resolver or contaminated state)"
+        return 1
+    fi
     # Plant a stale session-deadbeef dir whose config.json .name=session-deadbeef and leadSessionId
-    # matches NO live sessions/<pid>.json.
-    dxu bash -c "cp -r '${live_dir}' ~/.claude/teams/session-deadbeef 2>/dev/null; \
-        python3 -c \"import json;p='/home/ai-teams/.claude/teams/session-deadbeef/config.json';d=json.load(open(p));d['name']='session-deadbeef';d['leadSessionId']='deadbeefdeadbeef';json.dump(d,open(p,'w'))\""
+    # matches NO live sessions/<pid>.json. FAIL LOUD if the plant cp fails (fix #2: was silent).
+    if ! dxu "cp -r '${live_dir}' ~/.claude/teams/session-deadbeef && \
+        python3 -c \"import json;p='/home/ai-teams/.claude/teams/session-deadbeef/config.json';d=json.load(open(p));d['name']='session-deadbeef';d['leadSessionId']='deadbeefdeadbeef';json.dump(d,open(p,'w'))\""; then
+        record V2 FAIL "stale-dir plant FAILED (cp from ${live_dir}) -- V2 multi-dir disambiguation untestable"
+        return 1
+    fi
     local n_dirs; n_dirs="$(dxu 'ls -d ~/.claude/teams/*/ 2>/dev/null | wc -l')"
+    if [ "$n_dirs" -lt 2 ]; then
+        record V2 FAIL "expected >=2 team dirs after plant, got ${n_dirs} -- plant did not take"
+        dxu "rm -rf ~/.claude/teams/session-deadbeef" 2>/dev/null || true
+        return 1
+    fi
     log "V2: planted stale dir; team dirs now=${n_dirs} (live slug=${live_slug})"
 
     # -- V2a in-session pid-keyed: pass the LIVE session pid -> must pick the live dir, not stale. --

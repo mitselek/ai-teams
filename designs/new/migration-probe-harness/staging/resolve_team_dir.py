@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # THROWAWAY probe stand-in for WS1 resolve_team_dir (real home = stationmaster-courier.py).
-# Staged into the probe container by harness.sh. Verbatim WS1 §5 logic + a __main__ shim.
-# The `status` dead-string allowlist below is a GUESS pending V3 -- V3 records the ACTUAL
-# post-exit status string; the real WS1 integration keys on what V3 finds, not this guess.
+# Staged into the probe container by harness.sh. Mirrors the MERGED resolver in
+# stationmaster-courier.py (Herald, L927-) so the harness re-run validates production-equivalent
+# logic -- including the CROSS-PLATFORM _pid_alive (the live courier runs on WINDOWS / Scheduled
+# Task; a Linux-only os.kill replacement would break production liveness -- Herald's catch).
+# LIVENESS = PROCESS-LIVENESS (V3-corrected): sessions/<pid>.json is NOT GC'd on exit and dead
+# entries linger status:"idle", so `status` is useless; key on cross-platform _pid_alive against
+# the entry's `pid`, with an OPTIONAL Linux-only procStart PID-reuse guard that degrades on Windows.
 # (*FR:Brunel*)
-import json, sys, argparse
+import json, os, subprocess, sys, argparse
 from pathlib import Path
 
 def discover_by_config_glob(claude_home):
@@ -25,15 +29,51 @@ def discover_by_session_pid(claude_home, pid):
         return None
     return f"session-{sid[:8]}"
 
+def _pid_alive(pid, procstart=None):
+    """Cross-platform process-liveness -- MIRRORS stationmaster-courier.py L927 (the merged
+    production function). Windows tasklist (conservative-on-can't-tell) / POSIX os.kill. The
+    `procstart` guard is an OPTIONAL Linux-only PID-reuse narrowing (/proc/<pid>/stat field 22);
+    it degrades to the cross-platform result on Windows or any /proc-read failure -- never flips
+    a conservative-alive to dead on a transient error. status is NOT a liveness signal (V3)."""
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        try:
+            out = subprocess.run(["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+                                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10)
+            return str(pid) in out.stdout.decode(errors="replace")
+        except (OSError, subprocess.SubprocessError):
+            return True  # can't tell -> assume alive (conservative)
+    else:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        except (PermissionError, OSError):
+            return True  # exists but not ours / can't tell -> conservative alive
+        if procstart is not None:
+            try:
+                with open(f"/proc/{pid}/stat", encoding="utf-8") as fh:
+                    fields = fh.read().rsplit(")", 1)[1].split()
+                return str(procstart) == str(fields[19])  # field 22; idx 19 post-comm
+            except (OSError, IndexError, ValueError):
+                return True
+        return True
+
 def _has_live_session(claude_home, team_name):
-    # GUESS allowlist -- replace with V3's actual dead-status finding before real integration.
+    # PROCESS-LIVENESS (V3-corrected): match the team's session-<id> AND confirm its pid is a
+    # live process (status is NOT a liveness signal -- dead entries linger status:"idle").
     for s in Path(claude_home, "sessions").glob("*.json"):
         try:
             d = json.loads(s.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
         if f"session-{d.get('sessionId','')[:8]}" == team_name \
-           and d.get("status") not in ("dead", "exited", "stopped"):
+           and _pid_alive(d.get("pid"), d.get("procStart")):
             return True
     return False
 

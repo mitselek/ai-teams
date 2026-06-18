@@ -80,12 +80,35 @@ PROTOCOL_MAJOR = 1  # protocol S3: the major version this client speaks
 
 class Config:
     def __init__(self, raw: dict) -> None:
-        self.team: str = raw["team"]
+        # `team` is cosmetic (logging/sanity only). Required when inboxes_dir is an explicit
+        # path; OPTIONAL when inboxes_dir="auto" (the discovered session-<id> fills it for log
+        # fidelity -- see the inboxes_dir block below). Default "" keeps the field always set.
+        self.team: str = raw.get("team", "")
         self.ssh_target: str = raw["ssh_target"]
         self.ssh_key: str = os.path.expanduser(raw["ssh_key"])
         self.ssh_opts: list[str] = list(raw.get("ssh_opts", []))
         # Path.home() / %USERPROFILE%, NOT $HOME -- Git Bash $HOME-empty gotcha (hints S8).
-        self.inboxes_dir: Path = _expand(raw["inboxes_dir"])
+        # inboxes_dir resolution (WS1 #86): an explicit path is honored verbatim (the 2.1.177
+        # form, e.g. ~/.claude/teams/framework-research/inboxes -- this is ALSO the rollback).
+        # The sentinel "auto" runtime-DISCOVERS the live session-<id> team dir on 2.1.178+
+        # (team dir is random per session; hardcoded name breaks -- probe P1). Discovery is the
+        # detached-courier vantage (no session pid -> glob .name + process-liveness filter);
+        # an optional FR_COURIER_SESSION_PID / team_dir_name override disambiguates a multi-dir
+        # host. Discovery only fires for "auto"; the pinned-2.1.177 explicit path is untouched.
+        _raw_inboxes = raw["inboxes_dir"]
+        if _raw_inboxes == "auto":
+            _claude_home = _expand(raw.get("claude_home", "~/.claude"))
+            _pid_env = os.environ.get("FR_COURIER_SESSION_PID")
+            _team_dir = resolve_team_dir(
+                _claude_home,
+                session_pid=int(_pid_env) if _pid_env and _pid_env.isdigit() else None,
+                explicit_dir_name=raw.get("team_dir_name"),
+            )
+            self.inboxes_dir: Path = _team_dir / "inboxes"
+            if not raw.get("team"):
+                self.team = _team_dir.name  # log fidelity: report the discovered session-<id>
+        else:
+            self.inboxes_dir = _expand(_raw_inboxes)
         self.ghost_outboxes: list[str] = list(raw["ghost_outboxes"])
         self.target_inbox: str = raw["target_inbox"]
         self.state_dir: Path = _expand(raw["state_dir"])
@@ -901,11 +924,27 @@ class InstanceLock:
         self.release()
 
 
-def _pid_alive(pid: int) -> bool:
+def _pid_alive(pid: int, procstart: "str | None" = None) -> bool:
+    """Cross-platform process-liveness probe.
+
+    Used in two places, hence the optional `procstart` guard:
+      - InstanceLock._is_stale (no procstart) -- reclaim a lock only if its PID is dead.
+      - _has_live_session (with procstart) -- the team-dir liveness filter (WS1 resolver).
+        V3 (WS3b probe, 2.1.181) proved sessions/<pid>.json is NOT GC'd on exit and dead
+        entries linger status:"idle" -- so liveness MUST be process-based, not status-based.
+
+    `procstart` is an OPTIONAL Linux-only PID-reuse guard: when supplied AND /proc is
+    readable, the recorded process start-time (/proc/<pid>/stat field 22) must still match,
+    else the PID was recycled to an unrelated process -> dead. It is strictly NARROWING and
+    only fires on POSITIVE evidence of reuse; on Windows or any /proc-read failure it degrades
+    to the cross-platform liveness result below (never flips a conservative-alive to dead on a
+    transient error). The cross-platform liveness contract (Windows tasklist / POSIX os.kill,
+    conservative-on-can't-tell) is UNCHANGED for the no-procstart caller."""
     if pid <= 0:
         return False
     if os.name == "nt":
         # Windows: query the task list. No os.kill(0) semantics for liveness.
+        # No /proc, so the procstart reuse-guard is unavailable here (degrades to tasklist).
         try:
             out = subprocess.run(
                 ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
@@ -917,13 +956,125 @@ def _pid_alive(pid: int) -> bool:
     else:
         try:
             os.kill(pid, 0)  # signal 0 = liveness probe, no signal delivered
-            return True
         except ProcessLookupError:
             return False
         except PermissionError:
             return True  # exists but not ours
         except OSError:
             return True
+        # PID is live. If a procstart was recorded, confirm it's the SAME process
+        # (PID-reuse guard, Linux-only -- /proc/<pid>/stat field 22, the value after the
+        # final ')'). Mismatch -> recycled PID -> dead. Unreadable /proc (race / no procfs)
+        # -> fall back to the os.kill result (do NOT mis-drop a live process on a read error).
+        if procstart is not None:
+            try:
+                with open(f"/proc/{int(pid)}/stat", encoding="utf-8") as fh:
+                    fields = fh.read().rsplit(")", 1)[1].split()
+                return str(procstart) == str(fields[19])  # field 22 overall; idx 19 post-comm
+            except (OSError, IndexError, ValueError):
+                return True
+        return True
+
+
+# ===========================================================================
+# RUNTIME TEAM-DIR DISCOVERY (WS1 -- issue #86, 2.1.178+ implicit teams)
+# ===========================================================================
+# On CLI 2.1.178+ the on-disk team dir is `session-<id>` (random per session); the
+# Agent-tool `team_name` is ignored on disk (probe P1). So the hardcoded
+# `~/.claude/teams/framework-research/inboxes` path breaks -- the courier (and the
+# lifecycle scripts) must DISCOVER the live team dir at runtime. This is the ONE shared
+# resolver (function = the contract); the path that fires is caller-relative:
+#   - a caller that holds the session pid (lifecycle, in-session) passes session_pid ->
+#     pid tiebreaker, O(1), unambiguous even amid stale leftovers;
+#   - the detached courier (Scheduled Task, no session pid) passes None -> glob config.json
+#     `.name` (canonical) + liveness filter.
+# Resolution order: explicit-override -> single-dir -> pid tiebreaker -> liveness filter ->
+# FAIL FAST (never guess; no hardcoded-name fallback -- that's the bug being removed).
+# Decision: wiki/decisions/courier-must-runtime-discover-team-name.md +
+# startup-create-collapses-to-discover.md. Validated: migration-validation-probe-findings
+# -2026-06-18.md (V1 glob PASS, V2 pid PASS, V3 forced liveness=process-not-status).
+
+def discover_by_config_glob(claude_home: Path) -> "list[tuple[str, Path]]":
+    """[(name, team_dir), ...] for every team dir with a readable config.json `.name`."""
+    out = []
+    for cfg_path in sorted(Path(claude_home, "teams").glob("*/config.json")):
+        try:
+            name = json.loads(cfg_path.read_text(encoding="utf-8"))["name"]
+        except (OSError, json.JSONDecodeError, KeyError):
+            continue  # skip unreadable / malformed (stale, mid-write) dirs
+        out.append((name, cfg_path.parent))
+    return out
+
+
+def discover_by_session_pid(claude_home: Path, pid: int) -> "str | None":
+    """Read sessions/<pid>.json, return session-<first8hex-of-sessionId> (the team slug)."""
+    sess = Path(claude_home, "sessions", f"{pid}.json")
+    try:
+        sid = json.loads(sess.read_text(encoding="utf-8"))["sessionId"]
+    except (OSError, json.JSONDecodeError, KeyError):
+        return None
+    return f"session-{sid[:8]}"
+
+
+def _has_live_session(claude_home: Path, team_name: str) -> bool:
+    """A team dir is LIVE if some sessions/<pid>.json matches its slug AND that pid is a live
+    PROCESS. V3 (WS3b, 2.1.181): sessions/<pid>.json is NOT GC'd on exit and dead entries linger
+    status:"idle" -- so `status` is NOT a liveness signal. Liveness keys on the cross-platform
+    _pid_alive against the entry's `pid`, procStart-guarded against PID reuse (Linux-only,
+    degrades on Windows). This drops stale dirs for the no-pid (courier) caller."""
+    for sess in Path(claude_home, "sessions").glob("*.json"):
+        try:
+            d = json.loads(sess.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if f"session-{d.get('sessionId', '')[:8]}" == team_name \
+           and _pid_alive(d.get("pid", 0), d.get("procStart")):
+            return True
+    return False
+
+
+def resolve_team_dir(
+    claude_home: Path,
+    *,
+    session_pid: "int | None" = None,
+    explicit_dir_name: "str | None" = None,
+) -> Path:
+    """Resolve the live on-disk team dir under ~/.claude/teams/. Returns the team DIR (caller
+    appends /inboxes). Raises RuntimeError on no-match or unresolved-ambiguity -- never guesses,
+    never falls back to a hardcoded name. Order: explicit -> single-dir -> pid -> liveness -> fail."""
+    teams_root = Path(claude_home, "teams")
+    if explicit_dir_name:
+        d = teams_root / explicit_dir_name
+        if not d.is_dir():
+            raise RuntimeError(f"explicit team_dir_name {explicit_dir_name!r} not found under {teams_root}")
+        return d
+    candidates = discover_by_config_glob(claude_home)
+    if not candidates:
+        raise RuntimeError(
+            f"no team dir found under {teams_root} (no config.json). "
+            f"Is a Claude session running on 2.1.178+?"
+        )
+    if len(candidates) == 1:
+        # defensive single-dir self-confirm: if a pid was passed and its derived slug
+        # disagrees with the one dir, WARN rather than blindly return (Aen hardening note).
+        if session_pid is not None:
+            want = discover_by_session_pid(claude_home, session_pid)
+            if want and want != candidates[0][0]:
+                warn(f"resolve_team_dir: single dir {candidates[0][0]!r} != pid-derived {want!r}")
+        return candidates[0][1]
+    # multiple dirs -> disambiguate
+    if session_pid is not None:
+        want = discover_by_session_pid(claude_home, session_pid)
+        for name, d in candidates:
+            if name == want:
+                return d
+    live = [(name, d) for name, d in candidates if _has_live_session(claude_home, name)]
+    if len(live) == 1:
+        return live[0][1]
+    raise RuntimeError(
+        f"ambiguous team dir: {[n for n, _ in candidates]} (live: {[n for n, _ in live]}). "
+        f"Set team_dir_name in config or pass session_pid to disambiguate."
+    )
 
 
 # ===========================================================================
