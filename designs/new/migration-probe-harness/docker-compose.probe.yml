@@ -1,0 +1,46 @@
+# migration-probe-harness -- THROWAWAY CLI-migration probe, VERSION-PARAMETERIZED (*FR:Brunel*)
+#
+# Driven by harness.sh -- do not hand-run unless debugging. CLAUDE_VERSION threads from the
+# environment into BOTH the build arg AND the image tag, so each version gets its own tagged
+# throwaway image (teams-migration-probe:<version>) and they never collide.
+#
+# Auth = runtime `claude login` over tmux (option c, PO). No credential env/mount here.
+# WARP host: uncomment network_mode:host + the CA mount and set PROBE_NODE_EXTRA_CA_CERTS.
+
+services:
+  teams-migration-probe:
+    build:
+      context: .
+      dockerfile: Dockerfile.probe
+      network: host
+      args:
+        # Required. harness.sh exports CLAUDE_VERSION; a bare `docker compose build` without it fails
+        # at the Dockerfile's `test -n "$CLAUDE_VERSION"` guard (deliberate -- no silent stale version).
+        CLAUDE_VERSION: ${CLAUDE_VERSION:?set CLAUDE_VERSION (the unpin-target CLI version)}
+    image: teams-migration-probe:${CLAUDE_VERSION:?set CLAUDE_VERSION}
+    container_name: teams-migration-probe
+    hostname: teams-migration-probe
+    ports:
+      - "2229:2222"
+    environment:
+      - HOME=/home/ai-teams
+      - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+      - SSH_PUBLIC_KEY=${PROBE_SSH_PUBLIC_KEY:-}
+      - NODE_EXTRA_CA_CERTS=${PROBE_NODE_EXTRA_CA_CERTS:-}
+    # --- WARP host variant (uncomment if egress needs the tunnel; the OAuth login flow must reach
+    #     console.anthropic.com / claude.ai, not just api.anthropic.com) ---
+    # network_mode: host
+    # volumes:
+    #   - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
+    #   and set PROBE_NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
+    volumes:
+      # THROWAWAY claude state -- the probes' FS observation surface. down -v deletes it.
+      # Named per-version so concurrent version probes don't share a volume.
+      - probe-claude-home:/home/ai-teams/.claude
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+volumes:
+  probe-claude-home:
+    name: teams-migration-probe_claude-home_${CLAUDE_VERSION:?set CLAUDE_VERSION}

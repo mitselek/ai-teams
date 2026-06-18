@@ -1,0 +1,73 @@
+# syntax=docker/dockerfile:1.4
+# migration-probe-harness -- THROWAWAY CLI-migration probe container, VERSION-PARAMETERIZED (*FR:Brunel*)
+#
+# Evolved from designs/new/teams-migration-probe/Dockerfile.probe (S54). The ONE structural
+# change: the CLI version is a build ARG (CLAUDE_VERSION) instead of a hardcoded 2.1.179, so
+# the NEXT pin/unpin cycle rebuilds against a new target without editing this file.
+#
+# Build (driven by harness.sh -- do not hand-build unless debugging):
+#   DOCKER_BUILDKIT=1 docker compose -f docker-compose.probe.yml build \
+#     --build-arg CLAUDE_VERSION=<unpin-target>
+#
+# Auth: bakes NO credentials. Auth = a fresh interactive `claude login` over tmux AFTER up
+# (PO-performed, option c). The probe's ~/.claude starts EMPTY. See harness.sh AUTH PAUSE.
+
+FROM ubuntu:24.04
+
+# CLAUDE_VERSION -- the EXACT CLI version under test. No default: the harness MUST pass it,
+# so a forgotten pin fails loudly at build rather than silently testing a stale version.
+ARG CLAUDE_VERSION
+RUN test -n "$CLAUDE_VERSION" || (echo "FATAL: build-arg CLAUDE_VERSION is required" >&2; exit 1)
+
+# -- Base toolchain (curl/git/ssh/jq/python3/tmux/gosu) -- identical to S54 --
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        gosu \
+        jq \
+        openssh-server \
+        python3 \
+        tmux \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /run/sshd \
+    && ssh-keygen -A \
+    && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/^#\?Port .*/Port 2222/' /etc/ssh/sshd_config
+
+# -- Node.js 22 LTS (Claude needs 20+). --insecure is BUILD-TIME-ONLY for WARP TLS; harmless off-WARP. --
+RUN curl --insecure -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz \
+       -o /tmp/node.tar.gz \
+    && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+    && rm /tmp/node.tar.gz \
+    && node --version
+
+# -- Non-root probe user (uid 1000), apex-style. ubuntu:24.04 ships stock `ubuntu`@1000 -> remove first. --
+RUN (userdel -r ubuntu 2>/dev/null || true) \
+    && useradd -m -u 1000 -s /bin/bash ai-teams \
+    && usermod -p '*' ai-teams \
+    && mkdir -p /home/ai-teams/.ssh \
+    && chmod 700 /home/ai-teams/.ssh \
+    && chown 1000:1000 /home/ai-teams/.ssh \
+    && passwd -l root
+
+# -- Claude Code -- PINNED to the build-arg version. npm path (native installer's fetch() ignores
+#    SOCKS5/WARP). The build asserts the installed version MATCHES the requested one (catches an
+#    npm dist-tag drift or a typo'd version that silently resolves to something else). --
+RUN npm config set strict-ssl false \
+    && npm install -g "@anthropic-ai/claude-code@${CLAUDE_VERSION}" \
+    && npm config set strict-ssl true \
+    && INSTALLED="$(claude --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)" \
+    && echo "[build] requested=${CLAUDE_VERSION} installed=${INSTALLED}" \
+    && [ "$INSTALLED" = "$CLAUDE_VERSION" ] || (echo "FATAL: installed $INSTALLED != requested $CLAUDE_VERSION" >&2; exit 1)
+
+COPY entrypoint-probe.sh /entrypoint-probe.sh
+RUN chmod +x /entrypoint-probe.sh
+
+ENV CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+WORKDIR /home/ai-teams
+EXPOSE 2222
+ENTRYPOINT ["/entrypoint-probe.sh"]
+CMD ["sleep", "infinity"]

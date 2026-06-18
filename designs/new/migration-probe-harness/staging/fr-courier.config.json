@@ -1,0 +1,16 @@
+{
+  "_comment": "THROWAWAY probe courier config (harness V1). inboxes_dir:'auto' exercises the WS1 runtime-discovery sentinel. ssh_target is a dummy -- the throwaway has no hub; V1 validates PATH RESOLUTION (does 'auto' resolve to the live session-<id> dir?), NOT a full hub round-trip (no SSH egress to a hub in the throwaway). state_dir is local + on the same volume as ~/.claude so the same-volume startup check passes.",
+  "team": "auto",
+  "ssh_target": "sm@dummy-hub.invalid",
+  "ssh_key": "~/.ssh/sm_framework-research",
+  "ssh_opts": ["-o", "BatchMode=yes", "-o", "ConnectTimeout=5"],
+  "inboxes_dir": "auto",
+  "claude_home": "~/.claude",
+  "team_dir_name": null,
+  "ghost_outboxes": ["apex-research-courier"],
+  "target_inbox": "team-lead",
+  "default_inbox": "team-lead",
+  "state_dir": "~/.claude/.probe-stationmaster-state",
+  "poll_interval_s": 30,
+  "collect_limit": 100
+}
