@@ -1,5 +1,19 @@
 # Medici -- Knowledge Health Checker Scratchpad
 
+## [CHECKPOINT] 2026-06-26 -- apex #176 contamination-recovery eval (Q3: FR corpus applicability)
+
+Read apex playbook `contamination-recovery.md` (Hammurabi) + battle-test `dokosign-battle-test-report.md` (Champollion) + Disc #176 (Schliemann). Mode A=grep sweep+classify; Mode B=truth-tree forward-trace from contamination point through provenance links (catches semantic dependents invisible to grep). Root cause: model-knowledge inference ("DOKOSIGN=eIDAS CIS signing") as sourced fact across 54 files; human architect (Rein Kadastik) caught it.
+
+**FR corpus measured:** wiki 325 files (322 carry source markers; 314 source-agents, 157 source-files, 232 `related:` = Mode B edges EXIST). topics 12 files/7615 lines. docs 83. scratchpads 15. prompts 13. playbooks 6.
+
+**VERDICT (to team-lead):**
+- FR's WIKI is apex's *aspirational end-state* -- frontmatter provenance + `related:` graph already there. Mode B is NOT a no-op on wiki; it's runnable today. Contamination posture on wiki = STRONG (Stage-2-confirms gate + Cal sole-writer + TTL + source-agents).
+- EXPOSED surface = **topic files** (design-doc layer): large, citation-SPARSE (02/05/08 near-zero internal refs), full of synthesized design assertions. This is exactly where an inference hardens into "fact" -- and there's NO `related:` graph there for Mode B.
+- KEY GAP: FR has **no provenance RULE** (apex common-prompt has "every claim traceable to local file or tag [speculative]"). FR's analog is the `[ORPHAN-CLAIM]` audit (my #74 category) -- but that's periodic-audit, not authoring-time. apex's rule is authoring-time prevention.
+- REC: ADAPT, not adopt-as-is. (a) Mode A works corpus-wide now (grep is substrate-agnostic). (b) Mode B works on WIKI now, no-op on topics until they get provenance edges. (c) Health signal worth tracking: provenance-coverage % per segment (wiki ~99%, topics ~low). FR's distinctive risk is INTERNAL-inference-as-synthesis in topics, vs apex's external-domain-inference.
+
+[DONE 16:02] Q3 report delivered (task #2 completed). Team-lead then asked me to file 2 durable lessons to Cal via Protocol A (NOT through team-lead): **Lesson 2** = provenance-coverage-% per-segment as health metric (type pattern; predicts Mode-B reach). **Lesson 3** = authoring-time-prevention vs audit-time-detection control points (type pattern; apex prevents at write-time, FR's [ORPHAN-CLAIM] only detects at audit-time; filed the DISTINCTION, NOT a decision to adopt -- separate PO call per team-lead). Both sent to Cal; Cal picks taxonomy slots. Skipped apex-artifact critique per scope. Reported back to team-lead.
+
 ## [CHECKPOINT] 2026-06-09 session -- hr-devs ghost-member members[] claim audit
 
 Consultancy audit (hr-devs via ghost-bridge): "fr-lead-ghost does NOT need to be in members[] for SendMessage outbound; inbox-file presence suffices; removed config entry without breaking." Deliverable: `docs/health-report-hr-devs-ghost-members-claim-2026-06-09.md` (dated file; did NOT overwrite v6 baseline `health-report.md`).

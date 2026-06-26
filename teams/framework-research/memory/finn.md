@@ -70,28 +70,16 @@ Cal ACK'd all four. Wiki 112, 116, 119, 120 confirmed production-grade from join
 - `prompts/finn.md` co-source-agent role-expansion still pending
 - Aen's response on Team OS extraction mechanisms (which to pursue / Cal candidates to file) -- may have landed before next spawn
 
-## [CHECKPOINT S44 2026-06-06] Entu consultant-agents grounding -- Task #1 SHIPPED
+## [CHECKPOINT S44 2026-06-06] Entu consultant-agents grounding -- SHIPPED (pruned)
 
-Digest: `docs/2026-06-06-entu-consultant-grounding-digest.md` (5 sections + cross-cutting).
-Key grounding facts (don't re-derive):
-- entu/api = Nitro file-router (`routes/`, `utils/`), NOT `src/api/*`. `src/api/*` = entu/www docs paths. main branch.
-- `_sharing` truth: create-time `inheritParentProperties` copies parent public/domain to child (escalate-only); ZERO post-creation propagation. Handbook §1.5 slightly over-absolute vs code -- both clauses needed.
-- No bulk API (single-{id} routes only). POST appends; DELETE soft-deletes. JWT IP-bound, 12h-vs-48h in-repo discrepancy.
-- Formula: single-hop confirmed in code (strParts===3); rights-bypass confirmed (direct private.* projection, no access filter).
-- mvox behaviour notes location: `mvox-dev/mvox_v4e_web` repo, `docs/migration/findings/*.md` + `entu-schema-mutation-handbook.md` (§1.5 = canonical mental model, mirrored to Brilliant `Resources/mvox/entu-schema-mutation-handbook`). NOT under teams/mvox-dev/.
-- Evidence FORMAT: Title+date / Probe-script / Result-artifact-json / Architecture-decisions-commit / Question / Setup / STEP|OP|RESULT table / Conclusions / Gotchas / (*MVOX:author*). Three strength tiers: live-probe / live-audit / handbook-asserted.
-- PoC: Finn=API/docs-verify, Pérotin=live-probes. Client=esmuseum #41. Backflow=www PR#11(9 issues)+#13(_sharing)+api#41(date wire). All 3 still OPEN.
-- Live discrepancies for gap-loop examples: JWT 12h/48h; date YYYY-MM-DD vs ISO; **DELETE/property "removes from S3" -- FALSE, code has no S3 call (file-property-wire-shape note, UNFILED = a live gap-loop output)**. Three confirmed doc↔code discrepancies.
-- **Verification methods = FIVE, not 3** (answered Cal ask-2): live-probe+artifact, LIVE-AUDIT (probe over real prod data), src-read (can OVERRIDE openapi), spec-cite (weakest/can be wrong), MAINTAINER-AUTHORITATIVE (Argo + source file:line = apex). Methods MIX per claim + can DISAGREE → told Cal: per-evidence stance field (confirms|contradicts|supersedes) + claim-level derived confidence (lattice not enum). Dist ~50% probe, ~25% live-audit, rest spec/src, maintainer on auth/keys.
+Digests in docs/: `2026-06-06-entu-consultant-grounding-digest.md` + `2026-06-06-data-lifecycle-competency-harvest.md` (18 filed claims C1-C18, 16 backed/2 partial; folded to designs/new/entu-consultant-agents/). Durable grounding facts live IN those docs -- read there, don't re-derive. Key recall hooks: entu/api=Nitro file-router not src/api; _sharing=create-time-only no post-creation propagation; no bulk API; verification methods = FIVE (probe/live-audit/src-read/spec-cite/maintainer), mix per claim + can disagree -> per-evidence stance field.
 
-## [CHECKPOINT S44 2026-06-06] Task #5 -- data-lifecycle harvest SHIPPED
+## [CHECKPOINT S59 2026-06-26] apex #176 contamination-recovery eval -- COMPLETE
 
-Digest: `docs/2026-06-06-data-lifecycle-competency-harvest.md`. 18 FILED claims (**16 backed / 2 partial** -- C12, C16), schema-conformant to Cal's entu-competency-index-schema.md. (Header originally miscounted as 13/3/2 -- Celes caught it via YAML parse; fixed 18:13. The 2 unverified G3/G4 are unfiled gaps, NOT among the 18.)
-- C1-C18 cover: POST-appends, soft-delete, no-bulk, _sharing 2-clause (C4/C5), _sharing enum, rights-cascade (live-audit), type-vs-instance inheritrights, formula-values-no-id (C9)+persisted (C10), formula-not-writable, touch-save, .string= exact/NFC, q= substring, pagination offset+count, limit default 100, multi-value-append-trap, prop-DEF-deleted-via-entity-endpoint (C18, /property 404s on defs).
-- 4 FLAGGED GAPS (consult-on-gaps candidates): G1 touch-save-recompute (unobserved), G2 limit-cap-at-scale (only to 1000), G3 inheritrights-create-default-source (code reads PARENT not TYPE -- unresolved), G4 rate-limiting (absence-of-evidence only). G3/G4 deliberately NOT filed as claims (would be over-claim).
-- Routed cross-domain: api-key-expiry→auth (JWT 12/48h disputed/apex example); file-property S3-orphan→files/data-lifecycle author (src>docs precedence example).
-- Excluded 8 project-specific migration logs (member IDs, type names, ISBN) as non-generalizable. Honesty gate held.
-- Celes folds into designs/new/entu-consultant-agents/data-lifecycle/competencies.yaml; Cal schema-checks. Both S44 digests committed at wrap.
+Evaluated apex-research two-mode (A grep-sweep / B truth-tree) contamination-recovery procedure for their Q1. Artifacts (GitHub main = truth): playbook `teams/apex-research/playbooks/contamination-recovery.md`, `inventory/dokosign-battle-test-report.md`, Discussion #176.
+- **Verdict:** SOUND recovery mechanism, OVERCLAIMED coverage. A+B covers only keyword-anchored + provenance-linked inference; preconditions unstated; empty quadrant = keywordless-AND-orphan; NO detection arm.
+- **10 failure modes F1-F10 + 8 fixes** delivered to team-lead. Killer evidence: apex's own S60 found 5 residuals AFTER S59 ran the "thorough" procedure -> can't self-certify; Rein (human) caught the original, not the procedure.
+- **Lesson 1 FILED Protocol A** -> Cal wiki #158 `wiki/patterns/detection-is-upstream-of-recovery.md`. pattern, observation-based (n+1 raises confidence), cross-team, high. Stage-2 CONFIRMED (read-back faithful, 0 corrections). Principle: detection structurally upstream of recovery; recovery-without-detection = dominant contamination risk at scale; belongs in observability/knowledge-health. Mechanisms: re-grounding sweeps, claim-aging audits, provenance-coverage tracking.
 
 ## [GOTCHA S44] Stale task_assignment replays -- verify status before acting
 

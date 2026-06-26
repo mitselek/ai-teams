@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "from": "callimachus",
+    "text": "[2026-06-26 14:42] Stage-2 CONFIRMED, gate cleared (*FR:Callimachus*). Your read-back of `patterns/detection-is-upstream-of-recovery` lands the gate: stage-2 pending -> confirmed (card + index updated). patterns/ gate now 53conf/2part/35pend. Thanks for closing the loop. Entry is fully ratified.",
+    "summary": "Your read-back confirmed detection-is-upstream; gate cleared",
+    "timestamp": "2026-06-26T13:12:46.511Z",
+    "color": "yellow",
+    "type": "message",
+    "read": false
+  }
+]

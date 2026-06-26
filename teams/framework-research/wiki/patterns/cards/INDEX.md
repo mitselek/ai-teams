@@ -1,8 +1,8 @@
 # patterns/ -- Card Index
 
-87 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
+90 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
-**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ -- **52 confirmed, 2 partial, 33 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
+**Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending`). patterns/ -- **53 confirmed, 2 partial, 35 pending**. Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 
 | Card | Full entry |
 |---|---|
@@ -10,6 +10,7 @@
 | API Gateway Error vs Actual Server State | [card](api-gateway-error-vs-actual-server-state.md) · [full](../api-gateway-error-vs-actual-server-state.md) |
 | Artifact Claims More Than It Implements (honesty-pass + probe-don't-infer) | [card](artifact-claims-more-than-it-implements.md) · [full](../artifact-claims-more-than-it-implements.md) |
 | Audit-Trail for Rejection Rationale | [card](audit-trail-for-rejection-rationale.md) · [full](../audit-trail-for-rejection-rationale.md) |
+| Authoring-Time Prevention vs Audit-Time Detection (The Distinction) | [card](authoring-time-prevention-vs-audit-time-detection.md) · [full](../authoring-time-prevention-vs-audit-time-detection.md) |
 | Bootstrap-Preamble as In-Band Signal Channel | [card](bootstrap-preamble-as-in-band-signal-channel.md) · [full](../bootstrap-preamble-as-in-band-signal-channel.md) |
 | Bottleneck Determines Adoption (Cross-Domain) | [card](bottleneck-determines-adoption.md) · [full](../bottleneck-determines-adoption.md) |
 | Cadence-Crossing DYAD Variant + Asymmetric-Cross 3-Vector | [card](cadence-crossing-dyad-variant-with-asymmetric-cross-vector-framework.md) · [full](../cadence-crossing-dyad-variant-with-asymmetric-cross-vector-framework.md) |
@@ -25,6 +26,7 @@
 | Credential Handoff via Temp-File Context-Firewall | [card](credential-handoff-via-temp-file-context-firewall.md) · [full](../credential-handoff-via-temp-file-context-firewall.md) |
 | Cross-Host Atomic Inbox-Write Primitive | [card](cross-host-atomic-inbox-write-primitive.md) · [full](../cross-host-atomic-inbox-write-primitive.md) |
 | Decorative Polling Interval Anti-Pattern | [card](decorative-polling-interval-anti-pattern.md) · [full](../decorative-polling-interval-anti-pattern.md) |
+| Detection Is Upstream of Recovery (Recovery-Without-Detection Is the Dominant Contamination Risk at Scale) | [card](detection-is-upstream-of-recovery.md) · [full](../detection-is-upstream-of-recovery.md) |
 | Discriminator Anchored on a Sub-Canonical Source | [card](discriminator-anchored-on-sub-canonical-source.md) · [full](../discriminator-anchored-on-sub-canonical-source.md) |
 | Discriminator Field-Name Consistency Over Uniqueness | [card](discriminator-field-name-consistency-over-uniqueness.md) · [full](../discriminator-field-name-consistency-over-uniqueness.md) |
 | Dispatch Granularity Matches Recovery-Handler | [card](dispatch-granularity-matches-recovery-handler.md) · [full](../dispatch-granularity-matches-recovery-handler.md) |
@@ -60,6 +62,7 @@
 | Protocol-Completeness Across Surfaces | [card](protocol-completeness-across-surfaces.md) · [full](../protocol-completeness-across-surfaces.md) |
 | Protocol Interpretation Variance | [card](protocol-interpretation-variance.md) · [full](../protocol-interpretation-variance.md) |
 | Protocol Shapes Are Typed Contracts, Not Prose | [card](protocol-shapes-are-typed-contracts.md) · [full](../protocol-shapes-are-typed-contracts.md) |
+| Provenance-Coverage % Per Corpus Segment as a Knowledge-Health Metric | [card](provenance-coverage-percent-as-knowledge-health-metric.md) · [full](../provenance-coverage-percent-as-knowledge-health-metric.md) |
 | Read-Flag-Replication Discipline for External-CLI | [card](read-flag-replication-discipline-for-external-cli.md) · [full](../read-flag-replication-discipline-for-external-cli.md) |
 | Recursive Citation as Canonical Validation | [card](recursive-citation-as-canonical-validation.md) · [full](../recursive-citation-as-canonical-validation.md) |
 | Recursive-Narrowing Substrate-Truth-Evidence Discipline | [card](recursive-narrowing-substrate-truth-evidence-discipline.md) · [full](../recursive-narrowing-substrate-truth-evidence-discipline.md) |
