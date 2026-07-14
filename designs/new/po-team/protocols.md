@@ -137,7 +137,7 @@ Provisional sentinels below come from the WS3b probe (`teams-migration-probe-con
 
 ### 1.6 Control-message semantics (stop, pause, redirect)
 
-A **control message** is an instruction *about* the work rather than a unit of work — stop, pause, hold, drop that, change priority. These are the highest-consequence things a PO sends over the driving channel, and they follow three rules. (Commissioned S60, Mihkel; the station-lane retraction is the named instance of rule 1 — the lane was *stopped* and its draft *preserved*, not reverted.)
+A **control message** is an instruction *about* the work rather than a unit of work — stop, pause, hold, drop that, change priority. These are the highest-consequence things a PO sends over the driving channel, and they follow three rules. (Commissioned S60, Mihkel. Origin instance: the S60 station-lane retraction — see the provenance note below; the failure it records is exactly what these rules prevent.)
 
 1. **"Stop" ≠ "revert." A stop order means CEASE, never destroy.** Never bundle revert, cleanup, or undo into a stop. An untouched uncommitted tree on the remote side is a **decision deferred** — it can be resumed, inspected, or discarded later with full information. A reverted one is **work lost**, irreversibly, before anyone decided it should be. If you want the work gone, that is a separate, explicit, later instruction — never a rider on "stop."
 
@@ -147,7 +147,7 @@ A **control message** is an instruction *about* the work rather than a unit of w
 
 **Why this lives in the driving contract:** these rules bind every channel a PO controls with (tmux most acutely, but the principle is channel-neutral), and they are the safety spine under §3 escalation — a PO handling a stalled remote team applies rule 1 (cease, don't unwind) and rule 2 (reroute at the seam) rather than reaching in. Cross-referenced from §3.
 
-*(Provenance: Mihkel's verbatim S60 lesson. Callimachus is filing the wiki entries in parallel — entry names to be cited here once he reports them.)*
+*(Provenance: Mihkel's verbatim S60 formulation, filed as [`wiki/process/control-signal-semantics-at-authority-boundaries.md`](../../../teams/framework-research/wiki/process/control-signal-semantics-at-authority-boundaries.md). The origin instance is honest in both directions: in the S60 station-lane retraction the parked draft was correctly preserved-not-deleted (rule 1 upheld for that artifact), while a completed §7 edit was over-reverted when a plain "cease" would have left it intact — rule 1 violated for that artifact, the very hazard this section exists to prevent. Same stop, two artifacts, opposite outcomes: cease-not-destroy is decided **per artifact at execution time**, not once for the whole halt (the wiki entry files this under its sub-lesson 2, "stop is not revert"). The wiki entry is the durable record and adds sub-lesson 1 (musing ≠ commission) for the reading side of the same mechanism.)*
 
 ---
 

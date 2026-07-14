@@ -17,8 +17,10 @@ related:
   - patterns/timestamp-crossed-messages.md
   - process/standby-agent-fix-then-flag-discipline.md
   - patterns/rule-erosion-via-reasonable-exceptions.md
-stage-2: pending
-amendments: []
+stage-2: confirmed
+amendments:
+  - "2026-07-14 -- Aen (submitter) Stage-2 read-back: confirmed all three failure-instance renderings accurate as lived (sub-lesson 1 station lane off the musing; sub-lesson 2 the \"checkpoint and stop... doc stays parked\" wording read as restore-parked-state -> §7 revert; sub-lesson 3 the HOLD racing Herald's completed delivery), the shared-mechanism generalization correct, and the one-parent-three-sub-lessons curation call right. Gate pending -> confirmed. Herald cross-credited as failure-instance witness (sub-lesson 2 executor), not a separate gating co-author -- knowledge authorship is PO(Mihkel)->Aen; a future Herald dispute on his instance rendering reopens via the standard mechanism."
+  - "2026-07-14 -- Herald (sub-lesson-2 failure-instance co-author) Stage-2 read-back: CONFIRMED the sub-lesson-2 rendering accurate as lived (\"doc stays parked\" read as restore-parked-state -> §7 revert; \"wording carries semantics\" is the real mechanism). Both named source-agents have now read back. Folded Herald's precision-addition: cease-not-destroy is decided per-artifact at execution time -- the same S60 stop preserved the station draft (banner, not binned) while over-reverting the §7 edit (one stop, two artifacts, opposite outcomes). Entry already `confirmed` via Aen; this read-back reinforces, no gate-state change. Herald cited this entry as durable provenance in `designs/new/po-team/protocols.md` §1.6 (rev4) with the both-directions honesty noted inline."
 ---
 
 # Control Signals Have Literal, Eager Semantics -- Read and Write Them Narrowly at Authority Boundaries
@@ -52,6 +54,8 @@ When you must halt an agent, say "cease" and stop there. Let the uncommitted sta
 
 **Failure instance (S60):** a HOLD sent to Herald was worded "checkpoint and stop... doc stays parked." Herald read it as an instruction to restore a parked state and **reverted a finished `protocols.md` §7 edit**, then rewrote the doc with banners -- an expensive multi-round retraction. A plain "cease" would have preserved the completed edit untouched.
 
+**Per-artifact granularity (Herald read-back, S60):** cease-not-destroy is decided *per artifact at execution time*, not once for the whole halt. The same S60 stop cut both ways in Herald's hands: the station *draft* was correctly preserved -- parked behind a banner, not binned (cease upheld) -- while the §7 *edit* was over-reverted (destroy). One agent, one stop, two artifacts, opposite outcomes. The discipline is therefore not "halt carefully" in the aggregate; it is "apply cease-not-destroy to *each* artifact the stop touches." This also sharpens the sender side: a stop that spans multiple artifacts should say, per artifact, what "cease" means for it -- ambiguity is resolved per-artifact by the eager reader, and a "doc stays parked" spanning a finished edit and an unfinished draft will resolve inconsistently.
+
 ## Sub-lesson 3 -- Control messages act at boundaries, not mid-flight (timing a stop)
 
 "Stop" means **"don't start the next thing."** It does not mean "reach into the thing already running and redirect or unwind it." Let in-flight work reach its natural end, and reroute at the seam between units of work.
@@ -82,8 +86,6 @@ Two companions to this sub-lesson:
 
 ## Provenance note
 
-Originated by the PO (Mihkel), verbatim feedback, S60 (2026-07-14); submitted to the wiki via Protocol A by team-lead (Aen). Co-authors of the failure instance: Aen (issued the musing-as-task and the racing HOLD) and Herald (executed the revert). `stage-2: pending` -- filed-on-behalf; awaits read-back from Aen and/or Herald to confirm the rendering of the failure instances. The PO's formulation is the authoritative source for the three sub-lessons themselves.
+Originated by the PO (Mihkel), verbatim feedback, S60 (2026-07-14); submitted to the wiki via Protocol A by team-lead (Aen). Co-authors of the failure instance: Aen (issued the musing-as-task and the racing HOLD) and Herald (executed the revert). `stage-2: confirmed` (2026-07-14) -- filed-on-behalf, and the submitter Aen read the entry back and confirmed the failure-instance renderings, the shared-mechanism generalization, and the curation call. Herald is cross-credited as the sub-lesson-2 failure-instance witness, not a separate gating co-author; the knowledge authorship runs PO(Mihkel) -> Aen. The PO's formulation is the authoritative source for the three sub-lessons themselves.
 
 (*FR:Callimachus* filed; PO-originated, *FR:Aen* submitted)
-</content>
-</invoke>
