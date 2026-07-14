@@ -81,6 +81,29 @@ Evaluated apex-research two-mode (A grep-sweep / B truth-tree) contamination-rec
 - **10 failure modes F1-F10 + 8 fixes** delivered to team-lead. Killer evidence: apex's own S60 found 5 residuals AFTER S59 ran the "thorough" procedure -> can't self-certify; Rein (human) caught the original, not the procedure.
 - **Lesson 1 FILED Protocol A** -> Cal wiki #158 `wiki/patterns/detection-is-upstream-of-recovery.md`. pattern, observation-based (n+1 raises confidence), cross-team, high. Stage-2 CONFIRMED (read-back faithful, 0 corrections). Principle: detection structurally upstream of recovery; recovery-without-detection = dominant contamination risk at scale; belongs in observability/knowledge-health. Mechanisms: re-grounding sweeps, claim-aging audits, provenance-coverage tracking.
 
+## [CHECKPOINT S60 2026-07-14] PO-team precedent research -- SHIPPED
+
+Wrote `designs/new/po-team/research-precedent.md` (5 sections + TL;DR + risks). Key findings:
+- **Remote access:** transport SOLVED (registry.json/deployments.md: direct-ssh RC / ProxyJump PROD-LLM, per-team key+port). Interaction UNSOLVED: NO precedent for agent driving tmux send-keys; tmux-pane spawning DEPRECATED #60 (crash class). Every proven agent-channel is inbox-based.
+- **Structure:** operational-team archetype is the lens (persistent roster+episodic, succession, no TDD). Carry: roster/common-prompt/lifecycle/scratchpads/librarian/dual-hub. Drop: XP roles, partition table, worktree.
+- **Comms:** stationmaster hub (RATIFIED S49) + courier + ghost-member = proven message channel; ssh+tmux driving is genuinely NEW. RECOMMEND ghost-member/stationmaster as primary, ssh+tmux for human observation only.
+- **Role precedent:** Hopper (operator) = closest = agent acting into teams it doesn't live in; tiered-risk + read-artifacts-first + audit log = template for PO.
+- **GitHub:** issue-as-knowledge-layer + PR-is-contract (CCR) + personal-repo reference-clone (mvox .mmp) exist; epic/task issue taxonomy = NET-NEW.
+- 9 open questions delivered; #1 (channel decision) is highest-leverage gate.
+
+## [CHECKPOINT S60 second-pass 2026-07-14] tmux-drive mechanics -- SHIPPED (§6 appended)
+
+PO chose LITERAL tmux driving (overrode my hybrid rec). Researched agent-driven tmux/screen over ssh; appended §6 to research-precedent.md. **KEY CORRECTION: my first-pass "NO precedent" was WRONG -- retracted.** Prior art is strong:
+- **Hopper WS3b probe (S54/S55) = proof**: drove live Claude sessions via remote send-keys+capture-pane over ssh, incl OAuth login. Method WORKS; failures were disk-full + P6 wake-confound, NOT crashes.
+- **Crash class disambiguated (2 modes, both avoidable):** (1) #60/apex-S17 = permission-dialog under tmux-pane-LAUNCHED claude (why SPAWNING retired); (2) runbook §16 = send-keys SHELL cmds into a Claude pane corrupts turn-state. Driving an IDLE prompt with a prompt+Enter avoids both; residual trigger = send-keys onto a permission dialog -> Herald's §1.2 gate (observe idle first + low-dialog mode) is exactly right.
+- **Reusable asset:** `designs/new/migration-probe-harness/harness.sh` (tmux_send/tmux_capture) = codified reference impl; PO channel is a GENERALIZATION of WS3b, not net-new. `tmux-direct-brief` skill = canonical mechanics but NOT in local ~/.claude/skills (rc-host/operator env -- provisioning flag).
+- **tmux>screen decisively** (capture-pane->stdout vs screen hardcopy->file; -l literal for secrets; -r RO attach). Concur Herald §6 Q1.
+- **Gotchas to promote into Herald's contract:** paste+Enter-in-one-ssh SILENTLY no-ops (use 3-separate-invocation rule); P6 proactive-wake uncharacterized on never-attached pane (non-blocking, don't lean on background wake).
+- Coordinated with Herald (already shipped protocols.md today; my §6 grounds his §1.2 empirically). Herald folded all 3 reinforcements into protocols.md (§1.0 crash-class grounding + WS3b existence proof; §1.2 3-invocation rule + `-l`; §4 item 8 provision tmux-direct-brief skill).
+
+## [DEFERRED S60] capture-pane IDLE/BUSY/DIALOG sentinel tokens -- acceptance-test deliverable
+Herald's §1.3 open gap: exact capture-pane sentinel strings for the current CLI version. PROVISIONAL (from probe scope doc `teams-migration-probe-container-scope-2026-06-17.md:89`): idle = `❯` prompt visible; busy = "shimmering"/processing indicator. AUTHORITATIVE version-pinned tokens require a LIVE session on the target CLI version -> belongs to the over-real-ssh acceptance test (WS3b harness re-run), not derivable from the local repo. Gave Herald the provisional; flagged authoritative pin as acceptance-test output. If a probe runs, capture the three exact states and hand to Herald for §1.3.
+
 ## [GOTCHA S44] Stale task_assignment replays -- verify status before acting
 
 Twice this session a `task_assignment` for an already-completed task (#1, #5) arrived as a structured message with the ORIGINAL assign-timestamp (12:34 / 14:17), surfacing LATE -- not new scope. Pattern: on any task_assignment, TaskGet first; if status=completed and the timestamp predates your completion, it's a replay → send a no-op confirmation (per requirement-ack discipline, so it's not read as silent absorption), do NOT redo. Also: messages cross in flight (Cal's asks, team-lead's line-10 fix both arrived after I'd already answered) -- check timestamps before assuming a request is new.
