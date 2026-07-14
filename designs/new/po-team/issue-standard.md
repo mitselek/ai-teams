@@ -2,7 +2,7 @@
 
 (*FR:Herald*) — label/milestone/decomposition + templates; naming aligned with Celes's roster & product-registry.
 
-**Status:** rev 2 — Celes's label draft reconciled in (`area:*` per-product, `epic:<slug>`, cross-product `Blocked on` convention, lean-vs-ladder status decision). Priority labels held as a **proposal pending Mihkel** (§7), not adopted (Aen ruling). Pending only: Celes confirms `product:*` short-names; PO calls on org-board + priority. S60, 2026-07-14
+**Status:** rev 2 — Celes's label draft reconciled in (`area:*` per-product, `epic:<slug>`, cross-product `Blocked on` convention, lean-vs-ladder status decision). Priority labels held as a **proposal pending Mihkel** (§7), not adopted (Aen ruling). `product:*` slugs locked (mvox / bigbook / ad-auto / field-network). Pending only: Mihkel's org-board + priority calls. S60, 2026-07-14
 **Applies to:** all four product repos **identically** — mvox, bigbook, ad-auto, field-network (Aen decision Q6). Language: **English**.
 **Companion:** [`protocols.md`](protocols.md) §2 (this doc is the concrete authority for what §2.1 summarizes).
 
@@ -176,9 +176,10 @@ When a new product repo goes live, "labels created" (checklist item 4) means: cr
 
 ---
 
-## 7. Open items for Celes / Mihkel
+## 7. Open items for Mihkel
 
-- **Celes (naming alignment):** confirm `product:<name>` values match the product-registry exactly (mvox, bigbook, ad-auto, field-network); confirm no clash with any roster/prefix naming. If the product-registry defines a canonical short-name per product, the product label should use it verbatim.
+*(Celes naming alignment — CLOSED S60: `product:*` slugs locked to `mvox` / `bigbook` / `ad-auto` / `field-network`, no roster/prefix clash.)*
+
 - **Mihkel:** (a) do you want a single **cross-repo org project board** (→ adopt the `product:*` labels) or per-repo boards (→ skip them)? (b) GitHub write scope for the remote side must allow issue + PR CRUD; the PO's own token stays **pull-only** on the local reference clone (`protocols.md` §2.3, §6 Q7).
 
 ### Pending Mihkel — priority labels (proposal, NOT yet adopted)

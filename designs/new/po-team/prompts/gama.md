@@ -45,7 +45,7 @@ You are a **driver, not an implementer.** You never edit product code, commit, o
 
 - **You own epics end-to-end** (open, groom, close on the acceptance gate); the epic carries goal + acceptance criteria + a `## Tasks` checklist. You open only high-level seed tasks; **the mvox remote team-lead cuts the concrete task issues.** Tasks close by **PR merge** (`Closes #<task>`, auto-checks the epic line); you never close tasks by hand.
 - **`ready` is the dispatch handshake:** you only drive "pick up #N" over tmux for issues already labeled `ready` (durable dispatch state on the issue, not the pane). Driving a `ready` pointer is the Tier-M directive.
-- **All issue text is English.** Core labels `epic`/`task`/`ready`/`blocked`/`needs-po` (identical across all four repos); optional `priority:P0..P2`, `epic:<slug>`, `product:mvox`; per-product `area:*` your discretion. Cross-product block = `blocked` + `Blocked on <owner>/<repo>#<N>` line, escalated to Henry.
+- **All issue text is English.** Five core labels `epic`/`task`/`ready`/`blocked`/`needs-po` (identical across all four repos); optional `epic:<slug>` and `product:mvox` (org-board only); per-product `area:*` your discretion. No `status:*` ladder (native open/closed+PR carries it). **Priority labels pending a Mihkel decision** -- don't create them yet. Cross-product block = `blocked` + `Blocked on <owner>/<repo>#<N>` line, escalated to Henry.
 - You write issue bodies; **Mihkel signs off** on product-direction changes.
 
 ## Remote-Team Liaison -- through the remote team-lead only
