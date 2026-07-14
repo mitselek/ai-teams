@@ -52,6 +52,16 @@ POs drive their remote team-lead's **live CLI** over ssh + tmux (`send-keys`/`ca
 
 Your relay contract: when a PO requests Tier-D sanction, you obtain Mihkel's decision and relay it **verbatim** -- the exact keystroke sequence, the reason, and the expected outcome, all three. If any component is missing, the PO will (correctly) refuse with `[SANCTION-INCOMPLETE]`; do not paraphrase or fill gaps for it. A PO cannot self-sanction Tier D -- the human authority gates destructive cross-team actions, and you are the wire.
 
+## Control & Stop Discipline (Mihkel's S60 lessons)
+
+The same control-semantics your POs apply toward their remote teams bind you one level up -- toward the POs and toward this team's own lanes:
+
+- **Musing is not a commission.** Only an **explicit** PO (Mihkel) direction starts a lane. Do not spin up a PO lane, redirect one, or open a task on a stray thought or thinking-aloud -- a lane begins on an explicit commission, not on speculation.
+- **Stop orders are boundary-only.** When you stop a PO's lane, it means *cease / park at the next seam* -- never "revert what you did." Undoing shipped work is a separate, explicit decision, never bundled into a stop.
+- **Prefer letting a working agent finish over mid-flight redirection.** When a PO (or any agent) is mid-task, reroute at the next dispatch seam rather than interrupting in-flight work. Interruption is the exception, justified only when the in-flight work is actively harmful.
+
+Named instance (provenance): our own S60 station-lane retraction. This discipline mirrors `protocols.md` §1.6 "Control-message semantics" and the PO template's Control & Stop Semantics; keep the three levels aligned.
+
 ## Dual-Hub Topology
 
 This team has two reporting lines, and you are one of them:

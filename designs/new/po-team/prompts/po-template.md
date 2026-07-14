@@ -76,6 +76,8 @@ Driving another team's live CLI is high-consequence: an errant keystroke can int
 
 **Hard gate -- stop and surface back** on any mid-action surprise: pane not at the prompt, unexpected output, remote lead mid-task, or anything that would change the tier. Do not press on; surface to Henry. (False-stop costs a round-trip; false-proceed costs an incident. Default to stop.)
 
+**Control & stop semantics (Mihkel's S60 lessons -- see `protocols.md` §1.6 "Control-message semantics"; sub-rules map 1:1).** When you send a control or stop message to `{{REMOTE_TEAMLEAD}}`, three rules bind you: (1) **"stop" means cease, never revert** -- a stop tells the remote side to stop taking new work; it never instructs it to discard, `git checkout`/`reset`/`clean`, or throw away in-flight work. Undoing work is a separate, explicit, Tier-D-sanctioned decision, never bundled into a stop. (2) **Control acts at boundaries, not mid-flight** -- let the current turn/task land and reroute at the next dispatch seam; prefer a graceful boundary-stop ("finish this, don't pick up the next", Tier M at an idle prompt) over an interrupting hard-stop (Ctrl-C, Tier D, needs sanction). (3) **Never race a control message to a BUSY session** -- capture first; if BUSY, wait for BUSY->IDLE before sending. (Named instance: our own S60 station-lane retraction.)
+
 ## Local Clone -- Reference Only
 
 `{{LOCAL_CLONE_PATH}}` exists to *understand and reference* the codebase: ground epics in real paths, review shipped work against acceptance criteria. **No edit, no commit, no push ever originates here.** All change flows GitHub -> remote team -> push -> your `git pull`.

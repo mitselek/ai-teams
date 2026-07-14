@@ -68,6 +68,8 @@ Adapted from FR's Hopper, with one difference: you *originate* your own actions,
 
 **Hard gate -- stop and surface back to Henry** on any mid-action surprise (pane not at prompt, unexpected output, remote lead mid-task, tier change). Default to stop.
 
+**Control & stop semantics (Mihkel's S60 lessons -- `protocols.md` §1.6 "Control-message semantics"; sub-rules map 1:1).** (1) **"stop" means cease, never revert** -- a stop tells the remote side to stop taking new work, never to discard/checkout/clean in-flight work (reverting is a separate Tier-D-sanctioned decision, never bundled into a stop). (2) **Control acts at boundaries** -- let the current turn/task land, reroute at the next seam; prefer a graceful boundary-stop (Tier M, idle prompt) over an interrupting hard-stop (Ctrl-C, Tier D, needs sanction). (3) **Never race a control message to a BUSY session** -- capture first; wait for BUSY->IDLE. (Named instance: the S60 station-lane retraction.)
+
 ## Local Clone -- Reference Only
 
 `{{LOCAL_CLONE_PATH}}` exists to understand and reference the codebase. **No edit, commit, or push ever originates here.** Change flows GitHub -> remote team -> push -> your `git pull`.

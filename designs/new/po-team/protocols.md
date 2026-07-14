@@ -2,7 +2,7 @@
 
 (*FR:Herald*)
 
-**Status:** rev 3 (2026-07-14, S60) — four PO decisions folded in (Q1 tmux, Q3 allowlist-tuned permission mode, Q5 GitHub-only/no-courier, Q6 English issues); §6 tracks resolved vs. still-open. Two-substrate split (tmux driving + GitHub work-of-record) RATIFIED by Aen. Concrete epic/task issue standard: `designs/new/po-team/issue-standard.md` (§2).
+**Status:** rev 4 (2026-07-14, S60) — added §1.6 control-message semantics (stop≠revert; act at boundaries; never race a stop into BUSY), commissioned by Mihkel, cross-ref'd from §3. rev3: four PO decisions folded in (Q1 tmux, Q3 allowlist-tuned permission mode, Q5 GitHub-only/no-courier, Q6 English issues); §6 tracks resolved vs. still-open. Two-substrate split (tmux driving + GitHub work-of-record) RATIFIED by Aen. Concrete epic/task issue standard: `designs/new/po-team/issue-standard.md` (§2).
 **Scope:** the rules of communication and handoff for the new `product-owners` team. Roster/persona composition is Celes's artifact, not this one.
 
 **Channel decision (DECIDED by PO Mihkel, via Aen, 2026-07-14):** the PO<->remote-team-lead channel is **literal interactive tmux/screen CLI driving** (`send-keys` to issue direction, `capture-pane` to read back), NOT message-passing. Finn recommended a ghost-member/stationmaster hub; the PO explicitly chose literal tmux driving. This document specs that channel as the critical path (§1). Message-passing is **out of scope for v1** and appears only as a documented fallback (§7).
@@ -135,6 +135,20 @@ Provisional sentinels below come from the WS3b probe (`teams-migration-probe-con
 5. **Bulk data / file transfer** — use git / GitHub; the channel is a keyboard, not a pipe.
 6. **Cross-product reach** — a PO drives only its own product's session, never another product's.
 
+### 1.6 Control-message semantics (stop, pause, redirect)
+
+A **control message** is an instruction *about* the work rather than a unit of work — stop, pause, hold, drop that, change priority. These are the highest-consequence things a PO sends over the driving channel, and they follow three rules. (Commissioned S60, Mihkel; the station-lane retraction is the named instance of rule 1 — the lane was *stopped* and its draft *preserved*, not reverted.)
+
+1. **"Stop" ≠ "revert." A stop order means CEASE, never destroy.** Never bundle revert, cleanup, or undo into a stop. An untouched uncommitted tree on the remote side is a **decision deferred** — it can be resumed, inspected, or discarded later with full information. A reverted one is **work lost**, irreversibly, before anyone decided it should be. If you want the work gone, that is a separate, explicit, later instruction — never a rider on "stop."
+
+2. **Control messages act at boundaries, not into the running thing.** They mean "don't start the next thing," never "reach in and redirect or unwind what's mid-flight." A PO lets the remote lead's in-flight turn/task reach its natural end and **reroutes at the seam** — the next `ready` dispatch (`issue-standard.md`), the issue thread, the next idle prompt. You change what happens *next*, not what is *already happening*.
+
+3. **Never race a control message to a working session.** Prefer letting the remote lead finish over mid-flight redirection. This composes directly with the §1.3 **BUSY** state: a BUSY pane gets **no** sends at all — *including stops* — except a genuine Tier-D emergency under the sanction rule (Celes's R/M/D model; Tier-D needs team-lead-relayed Mihkel sanction, exact keystrokes + reason). A "stop" fired into a BUSY pane races the lead's own output, garbles the buffer (§1.4 contested/silent-no-op), and often lands as neither a clean stop nor a clean turn. Wait for IDLE, then issue the control message cleanly.
+
+**Why this lives in the driving contract:** these rules bind every channel a PO controls with (tmux most acutely, but the principle is channel-neutral), and they are the safety spine under §3 escalation — a PO handling a stalled remote team applies rule 1 (cease, don't unwind) and rule 2 (reroute at the seam) rather than reaching in. Cross-referenced from §3.
+
+*(Provenance: Mihkel's verbatim S60 lesson. Callimachus is filing the wiki entries in parallel — entry names to be cited here once he reports them.)*
+
 ---
 
 ## 2. GitHub as the durable work-of-record
@@ -187,6 +201,8 @@ Mirrors FR's dual-hub routing (`common-prompt.md`):
 | Opening/closing epics and tasks for the product | Remote team **dead and not self-recoverable** |
 
 **Heuristic:** if the fix is inside the product's own repo and the PO's mandate, handle it; if it needs another team, another host, or a decision above the product, escalate. A remote team raising `needs-po` asks the *owning* PO to handle; a PO raising it to the team-lead asks for something outside the product.
+
+**When handling means telling a remote team to stop or change course, apply the control-message semantics (§1.6):** stop means cease, not revert (an untouched uncommitted tree is a deferred decision, not lost work); reroute at the seam rather than reaching into an in-flight task; and never race a stop into a BUSY pane. This is the safety spine of every intervention a PO makes into a stalled or misdirected remote team.
 
 ---
 
