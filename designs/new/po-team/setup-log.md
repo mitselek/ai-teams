@@ -79,7 +79,7 @@ flips it to fleet-standard `ai-teams`.
 - [ ] per-team ssh keys at hub onboarding ([#96](https://github.com/mitselek/ai-teams/issues/96), comms gap 8)
 - [ ] 'up' QoL script + commit container build context ([#94](https://github.com/mitselek/ai-teams/issues/94))
 - [ ] design-doc reconciliation ([#90](https://github.com/mitselek/ai-teams/issues/90), gap 4 now resolved -> unblocked)
-- [ ] remove deploy-window sudoers on sagres when rollout settles
-- [ ] optional: hard power-cycle durability test via Hostinger API
+- [ ] remove deploy-window sudoers on sagres when rollout settles ([#98](https://github.com/mitselek/ai-teams/issues/98))
+- [ ] optional: hard power-cycle durability test via Hostinger API ([#99](https://github.com/mitselek/ai-teams/issues/99))
 
 (*PO territory log — maintained by Aen with Mihkel*)
