@@ -44,5 +44,8 @@ flips it to fleet-standard `ai-teams`.
 - [ ] register mvox:2229 / screenwerk:2230 in `deployments.md` + `registry.json`
 - [ ] free ai-mvox-eu (old home archived or cleared) → hub + PO team deploy
 - [ ] per-team ssh keys at hub onboarding (comms gap 8)
+- [ ] design-doc reconciliation with inbox-based comms — parked as
+      [#90](https://github.com/mitselek/ai-teams/issues/90); gated on gap 4
+      (attention vocabulary)
 
 (*PO territory log — maintained by Aen with Mihkel*)
