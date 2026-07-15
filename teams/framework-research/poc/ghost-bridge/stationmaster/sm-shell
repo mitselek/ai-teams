@@ -99,20 +99,46 @@ def canonical_id(entry):
     return hashlib.sha256(canon).hexdigest()[:16]
 
 
+# Only Windows cannot fsync a directory handle (os.open(dir, O_RDONLY) is
+# rejected there). That platform is dev-host-only and is NEVER a deploy target
+# -- the hub runs on Debian (os.name == "posix") where directory fsync is a
+# POSIX guarantee. So we degrade to a no-op ONLY on Windows; everywhere else a
+# dir-fsync failure MUST propagate (fail loud) rather than be swallowed into a
+# false "accepted" (protocol Sec.5.2, NO-FALLBACKS).
+_DIR_FSYNC_UNSUPPORTED = (os.name == "nt")
+
+
 def fsync_dir(path: Path):
-    """fsync a directory entry so a create/rename is durable (Sec.5.2).
-    Directory fsync is a POSIX guarantee; Windows raises, so degrade there
-    (dev hosts only -- the deployed hub is Linux and gets the real fsync)."""
-    try:
-        fd = os.open(str(path), os.O_RDONLY)
-    except OSError:
+    """fsync a directory entry so a create/rename/unlink is durable (Sec.5.2).
+    Fails loud on any real error on supported (POSIX) platforms -- notably the
+    deployed Linux hub -- so a durability failure can never be reported as
+    'accepted'. Only Windows dev hosts (which cannot fsync a directory handle)
+    degrade to a no-op, and they are never on the deploy path."""
+    if _DIR_FSYNC_UNSUPPORTED:
         return
+    fd = os.open(str(path), os.O_RDONLY)
     try:
         os.fsync(fd)
-    except OSError:
-        pass
     finally:
         os.close(fd)
+
+
+def makedirs_durable(leaf: Path):
+    """mkdir -p, but fsync the parent of each newly-created directory so the
+    whole directory chain is crash-durable before we report success. Bare
+    mkdir(parents=True) leaves the new dir entries only in the parent's page
+    cache -- on the first consignment of a (to,from) pair that means 'accepted'
+    could precede full durability of the spool path. Idempotent: a fully
+    existing chain creates nothing and fsyncs nothing. (Safe under the coarse
+    hub lock -- no concurrent mkdir race.)"""
+    missing = []
+    p = leaf
+    while not p.exists():
+        missing.append(p)
+        p = p.parent
+    for d in reversed(missing):
+        d.mkdir()
+        fsync_dir(d.parent)
 
 
 # --------------------------------------------------------------------------
@@ -131,10 +157,10 @@ def fsync_dir(path: Path):
 
 def ensure_layout():
     for sub in ("grants", "spool", "dedup"):
-        (STATE_ROOT / sub).mkdir(parents=True, exist_ok=True)
+        makedirs_durable(STATE_ROOT / sub)
     reg = STATE_ROOT / "registry.json"
     if not reg.exists():
-        reg.write_text("{}", encoding="utf-8")
+        store_json(reg, {})
 
 
 _LOCK_FH = None
@@ -164,7 +190,7 @@ def load_json(path: Path, default):
 
 def store_json(path: Path, obj):
     """Atomic durable write: tmp + fsync + rename + dir-fsync."""
-    path.parent.mkdir(parents=True, exist_ok=True)
+    makedirs_durable(path.parent)
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(obj, fh, separators=(",", ":"))
@@ -242,11 +268,17 @@ def dedup_seen(to_team, from_team, cid):
 
 def dedup_record(to_team, from_team, cid):
     p = dedup_path(to_team, from_team)
-    p.parent.mkdir(parents=True, exist_ok=True)
+    makedirs_durable(p.parent)
+    is_new = not p.exists()
     with open(p, "a", encoding="utf-8") as fh:
         fh.write(json.dumps({"id": cid, "ts": now_iso()}) + "\n")
         fh.flush()
         os.fsync(fh.fileno())
+    # On first record for a pair (or right after dedup_compact recreated the
+    # file) the newly-created file's directory entry must be made durable too,
+    # else a crash silently degrades dedup and a courier retry is re-accepted.
+    if is_new:
+        fsync_dir(p.parent)
 
 
 def dedup_compact(to_team, from_team):
@@ -274,6 +306,7 @@ def dedup_compact(to_team, from_team):
 
 
 def store_text(path: Path, text):
+    makedirs_durable(path.parent)
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "w", encoding="utf-8") as fh:
         fh.write(text)
@@ -298,7 +331,7 @@ def spool_write(to_team, from_team, hub_env):
     """Write one hub-enveloped consignment durably. Filename encodes deposit
     order (epoch_ms-seq) so a plain sorted listing is FIFO per pair (Sec.7)."""
     d = pair_spool_dir(to_team, from_team)
-    d.mkdir(parents=True, exist_ok=True)
+    makedirs_durable(d)
     _SEQ[0] += 1
     fname = f"{int(time.time() * 1000):013d}-{_SEQ[0]:04d}-{hub_env['id']}.json"
     store_json(d / fname, hub_env)
@@ -454,6 +487,7 @@ def cmd_ack(team, args, body, reg):
     for path, env in spool_list_for(team):
         by_id[env["id"]] = path
     results = []
+    dirs_touched = set()
     for cid in ids:
         path = by_id.get(cid)
         if path is None:
@@ -461,11 +495,16 @@ def cmd_ack(team, args, body, reg):
             continue
         try:
             path.unlink()
+            dirs_touched.add(path.parent)
             results.append({"id": cid, "status": "deleted"})
         except FileNotFoundError:
             results.append({"id": cid, "status": "already_gone"})
-    # fsync the parent dirs we deleted from, for durability of the deletion.
-    fsync_dir(STATE_ROOT / "spool")
+    # fsync the ACTUAL leaf pair dirs we unlinked from (not the spool root, which
+    # is not the parent of any consignment file) so the deletion is crash-durable
+    # before we report "deleted" -- else acked mail resurrects after a crash.
+    # fsync_dir now raises on a real failure, so a non-durable delete fails loud.
+    for d in dirs_touched:
+        fsync_dir(d)
     emit(ok_env("ack"))
     for r in results:
         emit(r)
