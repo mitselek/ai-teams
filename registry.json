@@ -1,9 +1,11 @@
 {
-  "updatedAt": "2026-03-30",
-  "updatedBy": "Strabo",
+  "updatedAt": "2026-07-15",
+  "updatedBy": "Aen",
   "hosts": {
     "RC": "100.96.54.170",
-    "PROD-LLM": "10.100.136.162"
+    "PROD-LLM": "10.100.136.162",
+    "shipyard": "100.103.189.3",
+    "sagres": "100.102.133.125"
   },
   "registry": [
     {
@@ -114,6 +116,30 @@
       "location": "PROD-LLM",
       "accessMethod": "direct-ssh",
       "containerName": null,
+      "status": "live"
+    },
+    {
+      "num": "10",
+      "teamName": "mvox",
+      "host": "100.103.189.3",
+      "port": 2229,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_tailnet",
+      "location": "shipyard",
+      "accessMethod": "direct-ssh",
+      "containerName": "mvox",
+      "status": "live"
+    },
+    {
+      "num": "11",
+      "teamName": "screenwerk",
+      "host": "100.103.189.3",
+      "port": 2230,
+      "user": "ai-teams",
+      "sshKey": "~/.ssh/id_ed25519_tailnet",
+      "location": "shipyard",
+      "accessMethod": "direct-ssh",
+      "containerName": "screenwerk",
       "status": "live"
     }
   ]

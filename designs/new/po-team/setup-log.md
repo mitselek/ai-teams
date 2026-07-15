@@ -48,9 +48,16 @@ flips it to fleet-standard `ai-teams`.
 
 ## Pending
 
+11. Legacy renames: boxes → **sagres** (ex ai-mvox-eu) + **shipyard** (ex
+    ai-screenwerk-ee) — tailnet names, Hostinger system hostnames
+    (`sagres.hub.internal` / `shipyard.teams.internal`), Mac ssh aliases
+    (`sagres`, `mvox`, `screenwerk`). Legacy `ai.*` public DNS records live at an
+    external provider, serve nothing — retire whenever. Registry rows #10/#11 added.
+    Stray noted for sagres cleanup: unidentified python on `0.0.0.0:55340`.
+
 - [x] mvox transfer → grep → translate → verify ([#91](https://github.com/mitselek/ai-teams/issues/91), closed)
 - [x] remove temp migration key from mvox box `authorized_keys`
-- [ ] register mvox:2229 / screenwerk:2230 in `deployments.md` + `registry.json`
+- [x] register mvox:2229 / screenwerk:2230 in `deployments.md` + `registry.json`
 - [ ] free ai-mvox-eu (old home archived or cleared) → hub + PO team deploy
 - [ ] per-team ssh keys at hub onboarding (comms gap 8)
 - [ ] design-doc reconciliation with inbox-based comms — parked as

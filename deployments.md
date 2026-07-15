@@ -8,6 +8,8 @@ Canonical reference for all live AI team deployments. Source of truth: `~/bin/rc
 |---|---|---|
 | RC | 100.96.54.170 | Remote Claude server (containers + bare metal) |
 | PROD-LLM | 10.100.136.162 | Production LLM server (containers, firewalled) |
+| shipyard | 100.103.189.3 | Product-team containers (Hostinger KVM 2, tailnet; ex ai-screenwerk-ee) |
+| sagres | 100.102.133.125 | Future hub + PO team (Hostinger KVM 2, tailnet; ex ai-mvox-eu) |
 
 ## Fleet
 
@@ -21,6 +23,8 @@ Canonical reference for all live AI team deployments. Source of truth: `~/bin/rc
 | 6 | BT-TRIAGE | PROD-LLM | 2226 | ai-teams | id_ed25519_apex | live |
 | 7 | comms-dev | PROD-LLM | 2227 | ai-teams | id_ed25519_apex | live |
 | 8 | ruth-team | RC | 2228 | ai-teams | id_ed25519_ruth (TBD) | planned |
+| 10 | mvox | shipyard | 2229 | ai-teams | id_ed25519_tailnet (per-team TBD) | live |
+| 11 | screenwerk | shipyard | 2230 | ai-teams | id_ed25519_tailnet (per-team TBD) | live |
 | 0 | hr-devs (bare metal) | RC | 22 | dev | (default) | live |
 | 9 | PROD-LLM (host) | PROD-LLM | 22 | michelek | id_ed25519_apex | live |
 
