@@ -19,8 +19,17 @@ references); scope thinking in the comms gist (link in
    `wiki/decisions/whole-home-volume-per-team.md`).
 7. screenwerk home (1.4 G) migrated into `screenwerk-home`; workspace verified at
    `bd7b51f` (→ `wiki/gotchas/home-copy-clobbers-authorized-keys.md`).
-8. mvox home (~12 G) streaming box-to-box over tailnet via temporary migration key
-   (screenwerk-root → mvox) — **IN FLIGHT**.
+8. mvox home migrated (4.4 G after cache excludes) box-to-box over tailnet via
+   temporary migration key (screenwerk-root → mvox; removed after).
+9. mvox identity flip executed per [#91](https://github.com/mitselek/ai-teams/issues/91)
+   (closed): config set translated, zero residuals, project dirs renamed, workspace
+   git-clean. **Finding:** both git worktrees (josquin, byrd) were already orphaned
+   on the source box (`workspace/.git/worktrees/` absent there too) — pre-existing
+   breakage faithfully preserved; repair is the mvox team's call.
+10. Comms gaps 2 + 4 resolved (gist): Mihkel = hub keeper (telemetry/dashboard =
+    follow-up project); attention signals = free text (daemon parses only the `to:`
+    line). Design-doc reconciliation [#90](https://github.com/mitselek/ai-teams/issues/90)
+    unblocked.
 
 ### mvox identity flip (michelek → ai-teams) — working map
 
@@ -39,8 +48,8 @@ flips it to fleet-standard `ai-teams`.
 
 ## Pending
 
-- [ ] mvox transfer completes → grep `/home/michelek` → translate → verify
-- [ ] remove temp migration key from mvox box `authorized_keys`
+- [x] mvox transfer → grep → translate → verify ([#91](https://github.com/mitselek/ai-teams/issues/91), closed)
+- [x] remove temp migration key from mvox box `authorized_keys`
 - [ ] register mvox:2229 / screenwerk:2230 in `deployments.md` + `registry.json`
 - [ ] free ai-mvox-eu (old home archived or cleared) → hub + PO team deploy
 - [ ] per-team ssh keys at hub onboarding (comms gap 8)
