@@ -63,10 +63,23 @@ chown -R "$SM_USER:$SM_USER" "$SSH_HOME"
 chmod 700 "$SSH_HOME"
 chmod 600 "$SSH_HOME/authorized_keys"
 
-echo "stationmaster hub up: sshd :$SSHD_PORT  state=$STATE_DIR  user=$SM_USER" >&2
+# Optional explicit bind address (POSIX sh -- this script runs under dash).
+# Default (unset) binds all interfaces, matching docker port-publish deployments.
+# On a host-networking deployment (needed where an overlay like Tailscale/WARP
+# conflicts with docker's port-publish path) set SSHD_LISTEN_ADDR to the overlay
+# IP so the hub is reachable ONLY on that interface (e.g. the tailnet IP), never
+# the box's public IP.
+LISTEN_OPT=""
+if [ -n "${SSHD_LISTEN_ADDR:-}" ]; then
+    LISTEN_OPT="-o ListenAddress=${SSHD_LISTEN_ADDR}:${SSHD_PORT}"
+fi
 
+echo "stationmaster hub up: sshd ${SSHD_LISTEN_ADDR:-0.0.0.0}:$SSHD_PORT  state=$STATE_DIR  user=$SM_USER" >&2
+
+# shellcheck disable=SC2086  # LISTEN_OPT must word-split into two args (or none)
 exec /usr/sbin/sshd -D -e \
     -p "$SSHD_PORT" \
+    $LISTEN_OPT \
     -o "HostKey=$HK_DIR/ssh_host_ed25519_key" \
     -o "AuthorizedKeysFile=$SSH_HOME/authorized_keys" \
     -f /etc/ssh/sshd_config.stationmaster

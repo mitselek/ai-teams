@@ -46,6 +46,21 @@ flips it to fleet-standard `ai-teams`.
   (revisit at per-team keys, comms gap 8); `.gitconfig` authorship (`mitselek`)
   decoupled from unix user, stays.
 
+## 2026-07-15 (cont.) — hub deploy (#93) + fsync fix (#97)
+
+12. **#97 fixed** (ultracode analyze/patch/verify): sm-shell durability — `accepted` now
+    means fsync-durable; failure fails loud (no false accept). Windows-only degrade;
+    `makedirs_durable` fsyncs the dir chain; ack fsyncs the real leaf pair dirs.
+    `test_durability.py` proves it by fault injection. Committed.
+13. **Hub LIVE on sagres (#93 done)**: gap 0 root recovery (Mihkel hPanel reset +
+    deploy-window sudoers); Phase A (listener check, snapshot 12:03:40Z, Variant B home
+    clear + full openclaw removal 1.3 G); Phase B docker 29.6.1, artifact to
+    `/opt/stationmaster`, **host-networking** (Tailscale-SSH vs docker port-publish —
+    `wiki/gotchas/tailscale-ssh-blocks-docker-port-publish.md`), sshd tailnet-bound via
+    new `SSHD_LISTEN_ADDR` entrypoint env. Acceptance: 17/17 smoke + mail-survives-restart
+    + **reboot survival** (systemd `stationmaster.service`). Hub wiped pristine after test.
+    Facts: `wiki/references/hub-on-sagres.md`.
+
 ## Pending
 
 11. Legacy renames: boxes → **sagres** (ex ai-mvox-eu) + **shipyard** (ex
@@ -59,9 +74,12 @@ flips it to fleet-standard `ai-teams`.
 - [x] remove temp migration key from mvox box `authorized_keys`
 - [x] register mvox:2229 / screenwerk:2230 in `deployments.md` + `registry.json`
 - [ ] free ai-mvox-eu (old home archived or cleared) → hub + PO team deploy
-- [ ] per-team ssh keys at hub onboarding (comms gap 8)
-- [ ] design-doc reconciliation with inbox-based comms — parked as
-      [#90](https://github.com/mitselek/ai-teams/issues/90); gated on gap 4
-      (attention vocabulary)
+- [x] hub deployed on sagres ([#93](https://github.com/mitselek/ai-teams/issues/93), all acceptance passed)
+- [ ] daemon packaging ([#95](https://github.com/mitselek/ai-teams/issues/95))
+- [ ] per-team ssh keys at hub onboarding ([#96](https://github.com/mitselek/ai-teams/issues/96), comms gap 8)
+- [ ] 'up' QoL script + commit container build context ([#94](https://github.com/mitselek/ai-teams/issues/94))
+- [ ] design-doc reconciliation ([#90](https://github.com/mitselek/ai-teams/issues/90), gap 4 now resolved -> unblocked)
+- [ ] remove deploy-window sudoers on sagres when rollout settles
+- [ ] optional: hard power-cycle durability test via Hostinger API
 
 (*PO territory log — maintained by Aen with Mihkel*)
