@@ -43,11 +43,16 @@ import errno
 import hashlib  # noqa: F401  (kept available for optional local-id debug; hub owns id)
 import json
 import os
+import re
 import subprocess
 import sys
 import time
 import uuid
 from pathlib import Path
+
+# Protocol entry timestamp format: ISO YYYY-MM-DDTHH:MM:SSZ (NOT _utc_stamp()'s
+# filename form). Used at delivery to validate/normalize the inbox entry timestamp.
+_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
 # ===========================================================================
@@ -696,7 +701,19 @@ def rewrite_attribution(entry: dict, from_team: str) -> dict:
     hints S4 attribution duty (protocol S4): derive the injected `from` from the
     hub envelope's from_team -- cross-team convention `<from_team>-courier`. NEVER
     trust a team identity claimed inside entry (spoofable -- T4.b). Rewrite ONLY
-    `from`; body stays verbatim.
+    `from`; body (`text`/`summary`) stays verbatim.
+
+    Delivery-metadata guarantee (surfacing gate, empirically established 2026-07-15):
+    the live Claude harness surfaces an inbox entry only if it carries an unread
+    marker (`read: False`) AND a well-formed `timestamp`; entries lacking either are
+    drained but never surfaced. Real SendMessage-originated entries already carry
+    both; hub-mail arriving here may not. We guarantee them so surfacing never depends
+    on sender hygiene. `read`/`timestamp` are canonical-entry ENVELOPE metadata
+    (§4 shape {from, read, summary, text, timestamp, type}), NOT body -- so the §4
+    verbatim body rule stays intact, exactly as it does for the `from` rewrite. These
+    are local, inbox-bound mutations on a shallow copy: dedup-safe (the hub envelope
+    id was computed remotely at deposit and is only compared as an opaque string --
+    never recomputed here) and never re-sent to the hub.
 
     Channel-naming note (S53, adopted from apex-research): a remote team's mail is
     attributed to a single `<remote-team>-courier` channel name -- the SAME name
@@ -706,8 +723,20 @@ def rewrite_attribution(entry: dict, from_team: str) -> dict:
     the watched outbox disagree, the reply silently dead-letters. The prior local
     convention was `<from_team>-ghost`; `-courier` is now the documented standard.
     """
-    rewritten = dict(entry)  # shallow copy; we touch only the top-level `from`
+    rewritten = dict(entry)  # shallow copy; we touch only top-level envelope metadata
     rewritten["from"] = f"{from_team}-courier"
+    # FORCE unread: a just-delivered inbound message is unread for the recipient by
+    # definition; `read` is recipient-local state, not sender content. Forcing (not
+    # fill-if-missing) also closes the case where a sender deposits read:true.
+    rewritten["read"] = False
+    # VALIDATE-and-normalize the timestamp: keep a present, well-formed protocol stamp
+    # (ordering/preview fidelity); synthesize protocol-format UTC when absent OR
+    # malformed, so surfacing never depends on the exact stamp shipped. Protocol format
+    # is ISO YYYY-MM-DDTHH:MM:SSZ -- _utc_stamp() is a FILENAME stamp (no dashes/colons/
+    # Z) and is deliberately NOT used here.
+    ts = rewritten.get("timestamp")
+    if not (isinstance(ts, str) and _TS_RE.match(ts)):
+        rewritten["timestamp"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     return rewritten
 
 
