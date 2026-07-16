@@ -1,0 +1,18 @@
+# po-team container on sagres (hub + PO team share the box).
+# NO published ssh port: reached via `docker exec` on the sagres host, and by
+# its courier daemon via the shared home volume. (sagres has the Tailscale-SSH
+# vs docker port-publish conflict, and host sshd owns :22 -- a published port
+# is neither needed nor clean here.)
+services:
+  po-team:
+    image: ai-team:latest
+    container_name: po-team
+    hostname: po-team
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Tallinn
+    volumes:
+      - po-team-home:/home/ai-teams
+volumes:
+  po-team-home:
+    name: po-team-home

@@ -1,0 +1,7 @@
+# Keep the build context to exactly what the image needs.
+*
+!Dockerfile
+!entrypoint.sh
+!sm-shell
+!sm-register
+!sshd_config.stationmaster

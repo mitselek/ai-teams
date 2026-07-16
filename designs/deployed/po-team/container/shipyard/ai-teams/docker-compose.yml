@@ -1,0 +1,33 @@
+# Team containers on ai-screenwerk-ee -- mvox (:2229) + screenwerk (:2230)
+# sshd bound to the tailnet IP only; nothing on the public interface.
+services:
+  mvox:
+    build: .
+    image: ai-team:latest
+    container_name: mvox
+    hostname: mvox
+    restart: unless-stopped
+    ports:
+      - "100.103.189.3:2229:22"
+    environment:
+      - AUTHORIZED_KEYS=${AUTHORIZED_KEYS}
+    volumes:
+      - mvox-home:/home/ai-teams
+
+  screenwerk:
+    image: ai-team:latest
+    container_name: screenwerk
+    hostname: screenwerk
+    restart: unless-stopped
+    ports:
+      - "100.103.189.3:2230:22"
+    environment:
+      - AUTHORIZED_KEYS=${AUTHORIZED_KEYS}
+    volumes:
+      - screenwerk-home:/home/ai-teams
+
+volumes:
+  mvox-home:
+    name: mvox-home
+  screenwerk-home:
+    name: screenwerk-home

@@ -1,0 +1,47 @@
+# sshd config for the stationmaster hub.
+# Locked down to a single purpose: authenticated byte pipes into sm-shell.
+# Every customer key carries a forced command (restrict,command="sm-shell <team>")
+# in authorized_keys, so this config is defence-in-depth, not the only gate.
+# (*FR:Brunel*)
+
+# Port is also passed on the command line (-p) by the entrypoint; kept here
+# so a manual sshd start uses the same value.
+Port 2222
+
+# Pubkey only. No passwords, no keyboard-interactive, no host-based.
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+HostbasedAuthentication no
+PermitEmptyPasswords no
+PermitRootLogin no
+
+# Only the sm service account may log in.
+AllowUsers sm
+
+# No interactive surface: the forced command is the whole session.
+PermitTTY no
+X11Forwarding no
+AllowTcpForwarding no
+AllowAgentForwarding no
+AllowStreamLocalForwarding no
+GatewayPorts no
+PermitTunnel no
+
+# Expose the authenticated key info to the forced command so `ping` can
+# report the client's fingerprint. sshd writes it to the file named in
+# $SSH_USER_AUTH (see sshd_config(5) ExposeAuthInfo).
+ExposeAuthInfo yes
+
+# Keep dead pipes from lingering.
+ClientAliveInterval 30
+ClientAliveCountMax 2
+LoginGraceTime 20
+MaxAuthTries 3
+
+# Logging to stderr (entrypoint runs sshd -e -D); the operator sees it in
+# `docker logs`.
+LogLevel VERBOSE
+PidFile none
+UsePAM no
+Subsystem sftp /bin/false

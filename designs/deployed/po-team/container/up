@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+# up -- team-container create-or-attach launcher (issues #94 + #102).
+#
+# Baked into the ai-team image as /usr/local/bin/up (single canonical copy;
+# per-home copies drift). Run as the ai-teams user inside a team container.
+#
+#   up            attach to the team session, or create it and boot claude
+#
+# What it does:
+#   1. Resolves the team name ($TEAM, else hostname -- fleet convention:
+#      tmux session == teamName == containerName == hostname).
+#   2. If NO claude process is running in the container, archives stale
+#      ~/.claude/teams/session-* dirs to ~/.claude/teams-archive/ (mv, never
+#      delete). A claude restart rotates the team dir and orphans the old
+#      session-<id> dirs; leftovers make the courier's resolve_team_dir
+#      ambiguous and it skips every cycle (#102). If a claude IS running we
+#      touch nothing -- those dirs may be live.
+#   3. tmux new-session -A: attach if the session exists, otherwise create it
+#      running claude with a reorient bootstrap prompt. tmux semantics: with
+#      -A, the trailing shell-command is used ONLY when the session is
+#      actually created; on attach it is ignored -- so attaching never spawns
+#      a second claude.
+set -euo pipefail
+
+fail() { printf 'up: %s\n' "$*" >&2; exit 1; }
+
+usage() {
+    cat <<'EOF'
+usage: up
+
+Team-container create-or-attach launcher (issues #94 + #102).
+
+Attaches to the tmux session named after the team ($TEAM, else hostname).
+If the session does not exist it is CREATED, running claude with a reorient
+bootstrap prompt; if it exists, up just attaches -- attaching never spawns a
+second claude. Before starting a fresh claude (and ONLY when no claude
+process is running in the container) it archives stale ~/.claude/teams/
+session-* dirs to ~/.claude/teams-archive/ so the courier can resolve the new
+team dir unambiguously.
+
+Takes no arguments besides -h/--help.
+EOF
+}
+
+# --- arguments ---------------------------------------------------------------
+case "${1:-}" in
+    -h|--help) usage; exit 0 ;;
+    "") ;;
+    *) fail "up takes no arguments (got: '$1') -- see 'up --help'" ;;
+esac
+
+# --- preconditions -----------------------------------------------------------
+[ -t 0 ] || fail "stdin is not a TTY -- tmux attach needs a terminal (run 'up' from an interactive shell / docker exec -it)"
+command -v tmux >/dev/null 2>&1 || fail "tmux not found on PATH"
+command -v claude >/dev/null 2>&1 || fail "claude not found on PATH"
+[ -n "${HOME:-}" ] || fail "HOME is not set"
+[ -n "${TMUX:-}" ] && fail "already inside a tmux session -- detach first (prefix d), nesting is not what you want"
+
+# --- team name: $TEAM || hostname --------------------------------------------
+# Bash's built-in HOSTNAME reflects the docker-assigned hostname (== container
+# == team) and needs no external binary; the hostname(1) binary is not
+# guaranteed in the minimal image, so it is only a guarded fallback.
+team="${TEAM:-${HOSTNAME:-}}"
+[ -n "$team" ] || team="$(hostname 2>/dev/null || true)"
+[ -n "$team" ] || fail "cannot resolve team name: \$TEAM unset, \$HOSTNAME unset, hostname(1) unavailable or empty"
+# The name is embedded in the single-quoted tmux create-command and used as a
+# tmux session name / =-target; restrict it so neither embedding can break.
+[[ "$team" =~ ^[A-Za-z0-9_-]+$ ]] || fail "team name '$team' contains characters unsafe for tmux session names / shell embedding (allowed: A-Za-z0-9_-)"
+
+workspace="$HOME/workspace"
+mkdir -p "$workspace"
+
+# --- #102: archive orphaned team dirs, but only when claude is NOT running ---
+# Detection runs as the ai-teams user; pid 1 is not claude (it is sshd via the
+# entrypoint), so we scan /proc directly for any process whose name (comm) is
+# claude or whose command line carries a claude argv token. Pure bash on
+# purpose: pgrep is deliberately NOT relied on even where procps is installed
+# (newer images) -- currently-RUNNING containers were built without it, and a
+# pgrep exit-127 inside an if reads exactly like "no claude running", which
+# would archive team dirs out from under a LIVE session.
+# Token matching is basename-aware ("claude" or ".../claude") so dot-paths
+# like ~/.claude/... never false-positive, and this script's own cmdline
+# ("bash /usr/local/bin/up") never self-matches. Bias is conservative: any
+# match at all means we leave ~/.claude/teams/ alone.
+claude_running=0
+# Fail CLOSED if /proc is unavailable: with nullglob unset an unmatched glob
+# yields the literal pattern and every read is swallowed, which would look
+# exactly like "no claude running" -- the one thing this gate must never do.
+[ -r /proc/1/cmdline ] || fail "/proc not readable -- cannot verify no claude is running; refusing to touch $HOME/.claude/teams"
+for cmdfile in /proc/[0-9]*/cmdline; do
+    pid_dir="${cmdfile%/cmdline}"
+    [ "$pid_dir" = "/proc/$$" ] && continue
+    comm=""
+    if [ -r "$pid_dir/comm" ]; then
+        IFS= read -r comm < "$pid_dir/comm" || true
+    fi
+    if [ "$comm" = "claude" ]; then
+        claude_running=1
+        break
+    fi
+    cmdline="$(tr '\0' ' ' < "$cmdfile" 2>/dev/null || true)"
+    read -ra argv <<< "$cmdline"
+    for word in "${argv[@]}"; do
+        if [ "$word" = "claude" ] || [ "${word##*/}" = "claude" ]; then
+            claude_running=1
+            break 2
+        fi
+    done
+done
+
+teams_dir="$HOME/.claude/teams"
+archive_dir="$HOME/.claude/teams-archive"
+if [ "$claude_running" -eq 0 ] && [ -d "$teams_dir" ]; then
+    shopt -s nullglob
+    stale=("$teams_dir"/session-*)
+    shopt -u nullglob
+    if [ "${#stale[@]}" -gt 0 ]; then
+        mkdir -p "$archive_dir"
+        stamp="$(date +%Y%m%dT%H%M%S)"
+        for d in "${stale[@]}"; do
+            dest="$archive_dir/$(basename "$d").$stamp"
+            mv -T "$d" "$dest" || fail "could not archive $d -> $dest (destination exists?)"
+            printf 'up: archived stale team dir %s -> %s\n' "$d" "$dest" >&2
+            # A courier cycle mid-outage may have delivered into the stale
+            # dir (or resurrected a bare inboxes/ path); that mail is now in
+            # the archive, invisible to the new session -- say so.
+            shopt -s nullglob
+            inbox_files=("$dest"/inboxes/*.json)
+            shopt -u nullglob
+            for f in "${inbox_files[@]}"; do
+                if grep -q '{' "$f" 2>/dev/null; then
+                    printf 'up: NOTE: archived dir contains undelivered inbox content at %s/inboxes -- check it\n' "$dest" >&2
+                    break
+                fi
+            done
+        done
+    fi
+elif [ "$claude_running" -eq 1 ]; then
+    printf 'up: a claude process is running -- leaving %s untouched\n' "$teams_dir" >&2
+fi
+
+# Edge case worth a loud warning: session exists but claude is dead inside it
+# (e.g. claude exited into a shell). -A will attach WITHOUT running the
+# bootstrap; kill the session (tmux kill-session -t <team>) and rerun up if
+# you wanted a fresh claude.
+if [ "$claude_running" -eq 0 ] && tmux has-session -t "=$team" 2>/dev/null; then
+    printf 'up: WARNING: tmux session %s exists but no claude is running -- attaching without bootstrap; kill-session and rerun up for a fresh claude\n' "$team" >&2
+fi
+
+# The inverse is a hard stop: a claude IS running but not under our session
+# name (legacy launcher, different session name, or started outside tmux).
+# Falling through to new-session would boot a SECOND claude beside the live
+# one -- rotating the team dir and recreating the exact #102 failure chain.
+if [ "$claude_running" -eq 1 ] && ! tmux has-session -t "=$team" 2>/dev/null; then
+    fail "a claude process is already running but tmux session '$team' does not exist -- refusing to start a second claude; find it (tmux ls; grep -l claude /proc/*/comm) and attach to or stop it first"
+fi
+
+# --- bootstrap prompt (#94 reorient + #102 re-establish the team) ------------
+# Fresh conversation, NOT --continue: reorientation comes from role docs +
+# scratchpads + read_mail, not conversation history. Generic across teams --
+# the agent consults its own role/roster docs, no hardcoded teammate names.
+# NOTE: the text must contain no single quotes; it is embedded in single
+# quotes inside the tmux shell-command below.
+prompt="You are waking up after a container or claude restart in team ${team}. Any teammates spawned by the previous session are gone, and its stale team dirs were archived to ~/.claude/teams-archive/. Re-establish yourself now, without waiting for user input: (1) reorient from your role and team docs in ~/workspace -- who you are, what the team does, who your standing teammates are per your roster; (2) respawn each standing teammate with the Agent tool using run_in_background so the team is active again and the courier can deliver mail (it refuses injection into a solo session); (3) then check read_mail on the comms MCP server for anything that arrived while you were down, and act on it."
+
+# --- create-or-attach --------------------------------------------------------
+# The env var is set inline in the session command so it is scoped to the
+# claude process (no reliance on tmux server environment inheritance or the
+# tmux -e flag). CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 is required or no
+# team dir / inboxes materialize. The command string is run by the session's
+# default shell via -c; $workspace and $prompt are expanded HERE and embedded
+# single-quoted (both are single-quote-free by construction: the prompt text
+# above, and workspace is $HOME/workspace in fleet homes).
+exec tmux new-session -A -s "$team" \
+    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude '$prompt'"

@@ -1,0 +1,16 @@
+services:
+  mvox-courier:
+    image: ai-team:latest
+    container_name: mvox-courier
+    restart: unless-stopped
+    pid: "container:mvox"
+    user: "1000:1000"
+    entrypoint: ["python3","/opt/company-courier/company-courier.py","--config","/etc/company-courier/config.json"]
+    volumes:
+      - mvox-home:/home/ai-teams
+      - /opt/company-courier:/opt/company-courier:ro
+      - /opt/ai-teams/mvox-courier-config.json:/etc/company-courier/config.json:ro
+volumes:
+  mvox-home:
+    external: true
+    name: mvox-home

@@ -1,0 +1,14 @@
+{
+  "team": "po-team",
+  "ssh_target": "sm@100.102.133.125",
+  "ssh_key": "~/.ssh/sm_po-team",
+  "ssh_opts": ["-p","2222","-o","BatchMode=yes","-o","StrictHostKeyChecking=accept-new","-o","UserKnownHostsFile=~/.ssh/known_hosts_hub","-o","ConnectTimeout=15"],
+  "inboxes_dir": "auto",
+  "claude_home": "~/.claude",
+  "ghost_outboxes": ["outbox"],
+  "target_inbox": "team-lead",
+  "state_dir": "~/.stationmaster/po-team",
+  "poll_interval_s": 12,
+  "collect_limit": 100,
+  "reference_courier": "/opt/company-courier/stationmaster-courier.py"
+}

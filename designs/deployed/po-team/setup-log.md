@@ -218,6 +218,24 @@ mark status inline instead of letting prose imply confidence.
     [#102](https://github.com/mitselek/ai-teams/issues/102) (restart lifecycle: archive
     stale dirs, respawn the standing teammate, wiki gotcha; ties into #94 'up' script).
 
+## 2026-07-16 (cont.) — #94+#102: 'up' launcher built, deployed, acceptance-proven
+
+30. **`up` built** (ultracode: implementer + 3 adversarial lenses + fixer; the shell lens
+    died on an API error and was re-run standalone — its 2 majors applied by hand: team-name
+    validation for the shell/tmux embedding, fail-closed /proc guard). Canonical copy:
+    `container/up`; baked into both Dockerfiles as `/usr/local/bin/up`. Key blocker caught
+    in review: pgrep is absent in the running containers → the live-claude interlock would
+    have FAILED OPEN and archived dirs under a live session; replaced with a pure-bash
+    /proc scan (fail-closed).
+31. **Build contexts committed** (were only on the boxes): `container/shipyard/` +
+    `container/sagres/` mirror `/opt/` verbatim (ai-teams image ctx, courier, stationmaster
+    hub ctx). `container/README.md` documents deploy + hot-install (no container restarts).
+32. **Deployed + proven:** hot-installed into mvox/screenwerk/po-team (live sessions
+    untouched); images rebuilt on both boxes (next recreate has it baked). Acceptance in
+    screenwerk (clean first-boot path): `up` → session `screenwerk`, stale `session-2a8803ab`
+    archived with timestamp, fresh team dir, exactly 1 claude; second `up` → attach only,
+    still 1 claude, no re-archive (interlock held). #94 + #102 closed.
+
 ## Pending
 
 11. Legacy renames: boxes → **sagres** (ex ai-mvox-eu) + **shipyard** (ex

@@ -1,0 +1,16 @@
+services:
+  po-team-courier:
+    image: ai-team:latest
+    container_name: po-team-courier
+    restart: unless-stopped
+    pid: "container:po-team"
+    user: "1000:1000"
+    entrypoint: ["python3","/opt/company-courier/company-courier.py","--config","/etc/company-courier/config.json"]
+    volumes:
+      - po-team-home:/home/ai-teams
+      - /opt/company-courier:/opt/company-courier:ro
+      - /opt/ai-teams/po-team-courier-config.json:/etc/company-courier/config.json:ro
+volumes:
+  po-team-home:
+    external: true
+    name: po-team-home

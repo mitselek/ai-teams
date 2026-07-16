@@ -1,0 +1,11 @@
+# sagres has a PUBLIC IPv4 on-interface AND runs Tailscale SSH, whose nftables
+# rules conflict with docker port-publish (docker-proxy cannot bind the tailnet
+# IP:2222 though the kernel allows a plain bind). Use host networking and bind
+# sshd to the tailnet IP only -- reachable on the tailnet, never the public IP.
+services:
+  stationmaster:
+    network_mode: host
+    environment:
+      SSHD_LISTEN_ADDR: "100.102.133.125"
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import socket,sys; s=socket.socket(); s.settimeout(3); sys.exit(0 if s.connect_ex((\x27100.102.133.125\x27,2222))==0 else 1)\""]
