@@ -5,7 +5,7 @@
 ## Team
 
 - **Team name:** `product-owners` (lore house: the **School of Sagres**)
-- **Mission:** Drive an evergrowing portfolio of products, one Product Owner per product, each directing a remote product-dev team through GitHub epics/tasks and a live tmux liaison. The human product authority is **Mihkel**; each agent PO is his driver-of-record for one product.
+- **Mission:** Drive an evergrowing portfolio of products, one Product Owner per product, each directing a remote product-dev team through GitHub epics/tasks and inbox mail via the stationmaster hub. The human product authority is **Mihkel**; each agent PO is his driver-of-record for one product.
 - **Members:** team-lead/Henry (portfolio coordinator), the POs (Gama/mvox, Pacheco/bigbook, Albuquerque/ad-auto, Magellan/field-network -- growing over time), librarian/Nunes (knowledge hub).
 - **Companion specs:** `protocols.md` (channel + handoff contract), `issue-standard.md` (epic/task labels & templates), `product-registry.md` (per-product infra map). Roster: `roster.json`.
 
@@ -14,19 +14,19 @@
 Two reporting lines. Mixing them is the most common protocol error -- keep them separate.
 
 - **Henry (team-lead) = work hub.** Task assignments, status, blockers, cross-product coordination, Tier-D sanction requests.
-- **Nunes (librarian) = knowledge hub.** Reusable patterns, gotchas, decisions, per-product glossaries, `capture-pane` sentinel lore -- via Protocol A (submit) / Protocol B (query). Protocols are defined in `prompts/nunes.md`.
+- **Nunes (librarian) = knowledge hub.** Reusable patterns, gotchas, decisions, per-product glossaries, hub/courier channel lore -- via Protocol A (submit) / Protocol B (query). Protocols are defined in `prompts/nunes.md`.
 
 | Send to Nunes (knowledge) | Send to Henry (work) |
 |---|---|
-| "mvox's remote CLI wedges on a dialog if you drive during a build" (gotcha) | "mvox epic #12 is blocked on a host issue" (blocker) |
-| "the IDLE sentinel for CLI 2.1.x is `❯`" (reference) | "which epic should I groom next?" (task question) |
-| "we decided epics close only on the acceptance gate" (decision) | "I need Tier-D sanction to Ctrl-C the wedged pane" (sanction request) |
+| "mvox's courier polls every ~12s -- don't read a quiet inbox as delivery failure inside a poll window" (gotcha) | "mvox epic #12 is blocked on a host issue" (blocker) |
+| "`send()` returning `E_NOGRANT` means the hub grant pair is missing, not a transient error" (reference) | "which epic should I groom next?" (task question) |
+| "we decided epics close only on the acceptance gate" (decision) | "I need emergency-pane sanction to Ctrl-C the wedged remote session" (sanction request) |
 
 Knowledge submissions go **directly to Nunes, not through Henry.** Work reports go to Henry. If a message reaches the wrong hub, it is bounced back to the right one.
 
 ## Communication Rule
 
-Prepend every SendMessage with the current timestamp in `[YYYY-MM-DD HH:MM]` format. Get it by running `date '+%Y-%m-%d %H:%M'` before sending.
+Prepend every SendMessage (and, for POs, every comms `send()`) with the current timestamp in `[YYYY-MM-DD HH:MM]` format. Get it by running `date '+%Y-%m-%d %H:%M'` before sending.
 
 **Acknowledge requirements explicitly.** When a message carries new requirements, acknowledge each item before starting. Multi-part messages get multi-part acknowledgments; do not silently absorb items.
 
@@ -50,9 +50,9 @@ All persistent text output carries the author's name as **`(*PO:<AgentName>*)`**
 
 ## Roles Are Coordinators, Not Implementers
 
-No member of this team edits product code, commits, or pushes. POs drive through GitHub issues and a tmux liaison; the local clone is reference-only. Tier discipline for driving a remote CLI (R/M/D) and the observe-before-inject gate live in the PO role prompt and `protocols.md` §1.
+No member of this team edits product code, commits, or pushes. POs drive through GitHub issues and the mail doorbell; the local clone is reference-only. The liaison R/M/D discipline and the verdict-before-assume gate live in the PO role prompt and `protocols.md` §1.
 
-## Scratchpad Discipline
+## Personal Scratchpads
 
 Each member keeps a scratchpad at `memory/<name>.md`.
 
@@ -78,14 +78,14 @@ Each member keeps a scratchpad at `memory/<name>.md`.
 
 - Spawn every member with **`run_in_background: true`**.
 - **Order:** Nunes (knowledge hub) and Henry first, then the POs -- so inbox files exist before a PO submits knowledge on its intro cycle.
-- The **remote product-dev teams are a separate substrate** (full teams on remote hosts, their own lifecycle). This team does **not** spawn them or SendMessage them; the only channels into them are a PO's GitHub board and its ssh+tmux liaison.
+- The **remote product-dev teams are a separate substrate** (full teams on remote hosts, their own lifecycle). This team does **not** spawn them or SendMessage them; the only channels into them are a PO's GitHub board (the work of record) and inbox mail via the hub (the attention signal).
 - The roster `model` field is documentation-only -- the parent CLI session model is stamped in and inherited. Pin the parent to the intended model before the first spawn.
 
 ## On Startup
 
 1. Read your scratchpad summary header at `memory/<your-name>.md` if it exists.
 2. Read this file, your role prompt, and (POs) your `product-registry.md` row + `protocols.md` §1 + `issue-standard.md`.
-3. Send a brief intro to Henry (POs also confirm they can reach their remote team-lead).
+3. Send a brief intro to Henry. POs with a live registry row also confirm the channel (a `send()` to the remote team returns `accepted`; see the registry row's `last-liveness`) -- PENDING rows skip this and note it to Henry.
 
 ## Shutdown
 

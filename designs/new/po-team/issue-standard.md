@@ -31,11 +31,11 @@ Keep it small. Five core labels do the work; two optional families are for scale
 |---|---|---|---|
 | `epic` | purple | This issue is a PO-owned initiative | PO at open |
 | `task` | blue | This issue is a remote-team deliverable under an epic | opener |
-| `ready` | green | Groomed and open for pickup: an epic with acceptance criteria + a seeded task list, or a task with a clear done-definition | PO (epics) / remote lead (tasks) |
+| `ready` | green | Groomed and open for pickup: an epic with acceptance criteria + a seeded task list, or a task with a clear done-definition | PO (epics + the seed tasks it opens) / remote lead (tasks it cuts) |
 | `blocked` | red | Work stalled; the blocker is named in a comment | anyone; cleared by whoever unblocks |
 | `needs-po` | orange | Remote team needs a PO decision — the escalation pull-signal (`protocols.md` §3) | remote team |
 
-`ready` is the load-bearing workflow signal: it is the tmux-channel handshake made durable. A PO drives "pick up #47" over tmux (`protocols.md` §1.2) **only** for issues already labeled `ready` — so a dropped/rebuilt session never loses the "this is dispatchable" state; it is on the issue, not in the pane.
+`ready` is the load-bearing workflow signal: it is the mail-dispatch handshake made durable. A PO mails "pick up #47" (`protocols.md` §1.1 `send()`) **only** for issues already labeled `ready` — so a dropped/rebuilt session never loses the "this is dispatchable" state; it is on the issue, not in anyone's inbox.
 
 ### Optional (adopt when a repo's volume warrants — same names if adopted)
 
@@ -106,7 +106,7 @@ Use GitHub's task-list linkage so progress is mechanical:
 3. **A task closes by PR merge** (`Closes #123`), which **auto-checks** its line in the epic — so the epic's progress advances with zero manual bookkeeping, and the two-level completion check (`protocols.md` §1.3) has a durable signal.
 4. **The PO closes the epic** when the checklist is complete *and* acceptance criteria are met — the checklist being all-checked is necessary, not sufficient; acceptance is the PO's judgment.
 
-**Dispatch binding:** the tmux instruction points at the issue number; the issue is the contract (`protocols.md` §2.1, mirroring CCR "the PR is the contract"). Keystrokes never carry the spec.
+**Dispatch binding:** the dispatch mail points at the issue number; the issue is the contract (`protocols.md` §2.1, mirroring CCR "the PR is the contract"). Mail never carries the spec.
 
 ---
 
@@ -180,7 +180,7 @@ When a new product repo goes live, "labels created" (checklist item 4) means: cr
 
 *(Celes naming alignment — CLOSED S60: `product:*` slugs locked to `mvox` / `bigbook` / `ad-auto` / `field-network`, no roster/prefix clash.)*
 
-- **Mihkel:** (a) do you want a single **cross-repo org project board** (→ adopt the `product:*` labels) or per-repo boards (→ skip them)? (b) GitHub write scope for the remote side must allow issue + PR CRUD; the PO's own token stays **pull-only** on the local reference clone (`protocols.md` §2.3, §6 Q7).
+- **Mihkel:** (a) do you want a single **cross-repo org project board** (→ adopt the `product:*` labels) or per-repo boards (→ skip them)? (b) GitHub write scope: the remote side needs issue + PR CRUD; the PO side needs **issue-write** on the repo (epic create/label/close is the PO's Tier-M work — `henry.md` add-a-PO step 2: do not spawn a PO that cannot drive its board). Separately, the PO's *git* access to the local reference clone stays **pull-only** — push disabled per `protocols.md` §2.3, §6 Q7.
 
 ### Pending Mihkel — priority labels (proposal, NOT yet adopted)
 

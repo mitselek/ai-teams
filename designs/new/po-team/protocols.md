@@ -2,158 +2,149 @@
 
 (*FR:Herald*)
 
-**Status:** rev 4 (2026-07-14, S60) — added §1.6 control-message semantics (stop≠revert; act at boundaries; never race a stop into BUSY), commissioned by Mihkel, cross-ref'd from §3. rev3: four PO decisions folded in (Q1 tmux, Q3 allowlist-tuned permission mode, Q5 GitHub-only/no-courier, Q6 English issues); §6 tracks resolved vs. still-open. Two-substrate split (tmux driving + GitHub work-of-record) RATIFIED by Aen. Concrete epic/task issue standard: `designs/new/po-team/issue-standard.md` (§2).
+**Status:** rev 5 (2026-07-16) — §1 rewritten to the ratified inbox comms architecture (#90, ratified 2026-07-15): comms MCP `send`/`read_mail`, outbox `to:`-convention, per-team courier daemon + stationmaster hub; tmux demoted to persistence (layer 4) with an emergency-access appendix. rev 4 (2026-07-14, S60): added §1.6 control-message semantics (stop≠revert; act at boundaries), commissioned by Mihkel, cross-ref'd from §3. rev3: four PO decisions folded in; §6 tracks resolved vs. still-open. Concrete epic/task issue standard: `designs/new/po-team/issue-standard.md` (§2).
 **Scope:** the rules of communication and handoff for the new `product-owners` team. Roster/persona composition is Celes's artifact, not this one.
 
-**Channel decision (DECIDED by PO Mihkel, via Aen, 2026-07-14):** the PO<->remote-team-lead channel is **literal interactive tmux/screen CLI driving** (`send-keys` to issue direction, `capture-pane` to read back), NOT message-passing. Finn recommended a ghost-member/stationmaster hub; the PO explicitly chose literal tmux driving. This document specs that channel as the critical path (§1). Message-passing is **out of scope for v1** and appears only as a documented fallback (§7).
+**Channel decision (SUPERSEDED 2026-07-15; see #90):** the 2026-07-14 decision for literal interactive tmux driving (`send-keys`/`capture-pane`) was reversed by the ratified inbox-based comms architecture. The PO<->remote-team channel is now **native-inbox message-passing** over the stationmaster hub — §1 specs it as the critical path. tmux survives only as the **persistence layer** (the remote session's process supervisor), never as a channel a PO types into in normal operation. The retired driving contract is preserved in git history; emergency pane access is Appendix A.
 
 ## 0. The team in one picture
 
 ```
-                 LOCAL (product-owners team)                    REMOTE (per product)
-    ┌───────────────────────────────────────────┐
-    │  team-lead (work hub)                       │
-    │     ├── PO:mvox ───────────┐                │  ssh exec:      ┌────────────────────┐
-    │     ├── PO:bigbook ────────┼── DRIVE ───────┼── send-keys ───▶│ remote team-lead   │
-    │     ├── PO:ad-auto ────────┤   (direction)  │  capture-pane ◀─┤  claude CLI, running
-    │     ├── PO:field-network ──┘   + READ-BACK  │  (read-back)    │  as the foreground │
-    │     │                                       │                 │  process of a named│
-    │     └── librarian (knowledge hub)           │                 │  tmux session      │
-    │                                             │                 │   + remote team    │
-    │  local clone (READ-ONLY reference) ◀────────┼──── git fetch ──┴─────────┬──────────┘
-    └───────────────────────────────────────────┘         GitHub             │
-                                                    (durable work-of-record) ◀┘
-                                                     epics / tasks / PRs
+  sagres (PO team + hub)                                      shipyard (per-product containers)
+ ┌─────────────────────────────┐                             ┌──────────────────────────────────┐
+ │ team-lead (work hub)        │      ┌─────────────────┐    │ courier daemon (per team)        │
+ │   ├── PO:mvox ──────┐       │      │ stationmaster   │    │   IN:  collect+ack ──▶ inject    │
+ │   ├── PO:...        ├─ send()──▶───│ hub (sm@2222)   │◀───│        into live session inboxes │
+ │   │    (comms MCP)  │       │      │ per-team spool  │    │   OUT: outbox ghost drop ──▶     │
+ │   └── librarian     │       │      │ + grants        │    │        parse to: ──▶ deposit     │
+ │  (knowledge hub)    │       │      └───────┬─────────┘    │ remote team-lead + team          │
+ │                             │              │              │  (claude session, tmux = layer-4 │
+ │ courier daemon (PO team) ◀──┼─ collect+ack ┘ (poll)       │   persistence only)              │
+ │   └─ inject ──▶ team-lead   │                             └────────────────┬─────────────────┘
+ │      inbox (V1: ALL inbound │                                              │
+ │      lands in team-lead)    │                                              │
+ │                             │                                              │
+ │ local clone (READ-ONLY) ◀───┼── git fetch ──┐                              │
+ └─────────────────────────────┘               │                              │
+                                            GitHub ◀──────────────────────────┘
+                                  (durable work-of-record)
+                                     epics / tasks / PRs
 ```
 
 **Two channels, two jobs:**
 
 | Channel | Substrate | Carries | Property |
 |---|---|---|---|
-| **Direction + read-back** | ssh + tmux/screen: `send-keys` / `capture-pane` into the remote CLI | instructions to the remote lead; read-back of accept/busy/done state | interactive, no structured ack, **heuristic** completion — see §1.3 |
+| **Attention** | native inboxes, via the comms MCP `send` tool + per-team courier daemons + the stationmaster hub | "new task" out, "task delivered" back — pointers into GitHub, free-text correspondence | asynchronous; deposit confirmed only after on-disk (safe to retry); synchronous hub verdict on every MCP `send()` (the ghost-drop path's feedback is a parse-fail bounce to the sender's inbox, §1.2); every failure loud, back to the initiator |
 | **Work-of-record** | GitHub (epics, tasks, PRs) | the durable work item, its acceptance criteria, the merged result | durable, auditable, versioned; the single source of truth |
 
-**The relationship between them (load-bearing):** the tmux channel *drives* the remote lead; GitHub *records* the work. A well-formed instruction over tmux is usually "pick up epic #47" — the specification lives in the issue, the keystrokes just point the remote lead at it and confirm it started. **Completion is confirmed at two levels:** the pane read-back tells you the remote lead's *turn* finished (§1.3); the GitHub issue/PR tells you the *work* is done. The pane is never the system of record — if the remote container is rebuilt or the tmux server dies, nothing durable is lost because the work lives in GitHub.
+**The relationship between them (load-bearing):** mail *points at* the work; GitHub *records* it. A well-formed message is usually "pick up epic #47" — the specification lives in the issue, the mail just rings the doorbell. **Completion is confirmed at two levels:** the reply mail tells you the remote lead *heard* and *reports* done; the GitHub issue/PR tells you the *work* is done. The inbox is never the system of record — on any mismatch between mail and record, **the record wins**. If the remote container is rebuilt or the session dies, nothing durable is lost because the work lives in GitHub and undelivered mail sits visibly on the hub (`deposited_uncollected`, §1.4).
 
 ---
 
-## 1. PO <-> remote-team-lead channel -- literal tmux/screen driving (CRITICAL PATH)
+## 1. PO <-> remote-team channel -- inbox comms over the stationmaster hub (CRITICAL PATH)
 
-**This is net-new engineering.** Finn's precedent research (`research-precedent.md` §1c) confirms: no agent in this repo has ever driven a live `claude` REPL via `send-keys`/`capture-pane`. Every proven agent<->agent channel to date is inbox message-passing. This section therefore specifies the contract from scratch and §4 gates it behind an over-real-ssh acceptance test.
+**Participants:** one PO (sender/owner of the product relationship) and the remote team's lead, each a live `claude` session with native inboxes. Nobody types into anybody else's pane in normal operation.
 
-**Participants:** one PO (the driver/writer) and one remote team-lead's live `claude` CLI (the driven session), running as the foreground process of a named tmux/screen session on the remote host. Other POs and the team-lead may read the pane (`capture-pane`) but must not `send-keys` to a session they don't own (§1.4, contested input).
+**The four layers (#90, ratified):**
 
-**Substrate reality (`registry.json` + Finn `research-precedent.md` §1a):** remote teams live in containers on two hosts. Command shapes:
-- **direct-ssh (RC, 100.96.54.170, ports 2222+):** `ssh -t -i ~/.ssh/id_ed25519_<team> -p <port> ai-teams@100.96.54.170`
-- **proxyjump (PROD-LLM, 10.100.136.162, firewalled):** `ssh -t -i <key> -o "ProxyCommand=ssh -i <key> -W %h:%p michelek@10.100.136.162" -p <port> ai-teams@localhost`
+1. **Work of record** — GitHub epics/issues. Everything below carries signals *about* this layer, never content.
+2. **Attention** — "new task" out / "task delivered" back, via native inboxes.
+3. **Transport** — per-team courier daemon. IN: the daemon polls the hub (`collect+ack` — nothing lost between), injects into the live session's inboxes. OUT: a member drops a message on the outbox ghost member, the daemon parses the `to:` line and deposits to the hub. Poll interval (currently 12s) is the attention-latency knob.
+4. **Persistence** — tmux, demoted to keeping the remote session alive. A PO never types into a remote pane in normal operation (§1.7, Appendix A).
 
-The four PO products (`mvox`, `bigbook`, `ad-auto`, `field-network`) are **not yet in the registry**; adding them is step 1 of the growth protocol (§4). Note (Finn §5 Q2): substrate ownership is heterogeneous — mvox is a non-FR substrate — so a PO cannot assume FR owns the remote host.
+**Hub (protocol v1.0.0, live on sagres — `sm@100.102.133.125:2222`):** one ssh connection per exchange, JSON request/reply. The per-team ssh key **is** the identity (`~/.ssh/sm_<team>`). Verbs: `deposit` (send — confirmed only after on-disk; safe to retry), `collect`+`ack` (receive), `grant` (per-team allow-list), `status` (both directions of health, incl. `deposited_uncollected`). The hub is pull-only; daemons poll. The PO team and the hub share the box (sagres); product-team containers live on shipyard.
 
-### 1.0 Launch vs. drive -- the rule that sidesteps the #60 crash class
+### 1.1 Sending -- the comms MCP `send` tool (primary interface)
 
-The crash class has **two documented modes** (Finn `research-precedent.md` §6), and both are avoided by driving an already-running IDLE session with *prompts*:
-- **Mode (i) -- launch+dialog coupling (#60 / apex Session-17):** a repeatable crash when a permission dialog renders in a `claude` CLI that was **launched by `tmux send-keys`** into a pane.
-- **Mode (ii) -- shell-into-Claude turn corruption (runbook §16):** `send-keys` of **shell commands** into a live Claude pane corrupts its turn-state.
-
-Neither fires when you `send-keys` a **prompt** at an **idle prompt**. **Existence proof this method is safe:** Hopper's WS3b probe (S54/S55) drove live Claude sessions via remote `send-keys` + `capture-pane` — including a full OAuth login — with no crash. So driving is proven; the design's job is to stay inside the safe envelope. Two rules do that:
-
-1. **The PO never launches the remote CLI.** The remote team-lead's `claude` process is started by the remote side's own startup (a human `ssh -t` + `claude`, or the team's startup script) as the **foreground process of its tmux session** — not by the PO `send-keys`-ing a `claude ...` command into a bare shell pane. The PO attaches to / drives an **already-running** session only. "Launched normally, then observed/driven" — never "launched under tmux driving."
-2. **The PO never `send-keys` onto a permission dialog.** Because the CLI still runs inside tmux, dialogs still render there. The read-back gate (§1.3) requires a `capture-pane` check *before every* `send-keys`: if the pane shows a permission/confirmation dialog, that is an exceptional state — **stop, do not type, escalate/observe** (§1.4).
-
-   **Permission posture (DECIDED, §6 Q3): allowlist-tuned.** Remote CLIs run with **curated per-team allowlists** that suppress the *common* dialogs, so the pane is usually IDLE and safe to drive. This does **not** eliminate the DIALOG state — a command outside the allowlist still raises a prompt. The allowlist lowers the *frequency* of the risk, not its *existence*. Therefore the observe-before-inject gate is **MANDATORY on every send, not best-effort** — the design must never assume "the allowlist means no dialogs." The residual-dialog case is a first-class path, not an edge case (§1.3 DIALOG row, §1.4 DIALOG recovery).
-
-### 1.1 Session discovery & attach discipline
-
-Never blind-drive. The sequence is **discover -> read -> (maybe) drive**.
-
-1. **Connect** with the registry row's exact command shape (above). Read values from `registry.json`; never hard-code.
-2. **Discover before driving.** `ssh <target> tmux ls` (or `screen -ls`). Convention `[CONV]`: **session name == teamName == containerName**. Empty/errored `tmux ls` = dead session → §1.4, do **not** start typing into a fresh shell.
-3. **Read the pane first.** `ssh <target> "tmux capture-pane -p -t <session>"` snapshots the current screen. Classify its state (§1.3) — IDLE / BUSY / DIALOG — before deciding whether to drive.
-4. **Two ways to drive** (both are legitimate; pick per §1.2):
-   - **One-shot ssh exec (primary for an agent):** `ssh <target> "tmux send-keys -t <session> ..."` and `ssh <target> "tmux capture-pane -p -t <session>"` as discrete commands. No interactive attach; cleanest for programmatic driving; each call is auditable.
-   - **Interactive attach (human-in-the-loop):** `tmux attach -t <session>` (read-only `-r` for observers). For a human PO or hand-driving; not the agent's default.
-
-### 1.2 Issuing direction (`send-keys` contract)
+Every team session runs an MCP server `comms` (#100, deployed and live-proven both directions 2026-07-16). The primary agent-facing send is:
 
 ```
-# 1. read-back gate: confirm IDLE (see §1.3) — MANDATORY before every send
-ssh <target> "tmux capture-pane -p -t <session>"      # must classify IDLE, not BUSY/DIALOG
-# 2. type the instruction literally (-l prevents key-name interpretation of the text)
-ssh <target> "tmux send-keys -t <session> -l 'pick up epic #47, acceptance criteria are in the issue'"
-# 3. submit as a SEPARATE call (a bare Enter key, not part of the -l literal)
-ssh <target> "tmux send-keys -t <session> Enter"
-# 4. confirm acceptance: re-capture, expect IDLE -> BUSY transition (§1.3)
-ssh <target> "tmux capture-pane -p -t <session>"
+send(to, message)
 ```
 
-**Discipline:**
-- **`-l` (literal) for the text, separate `Enter` for submit.** A prompt injected without a submit key just sits in the buffer and the next reader mistakes it for the lead's own draft. Never fold the newline into the literal. (This exact shape is already codified in `designs/new/migration-probe-harness/harness.sh`: `tmux_send() { send-keys -t <pane> -l "<text>"; send-keys -t <pane> Enter; }` — reuse it, §4.)
-- **Single-line vs. multi-line submit differ — a silent footgun (Finn §6).** Single-line is safe as above. For **multi-line** input, chaining `paste-buffer` + `Enter` in **one** ssh invocation **silently fails to submit** — the newline is swallowed. Multi-line therefore needs the **three-separate-invocation rule:** (1) `scp` the text over → (2) `tmux load-buffer` + `paste-buffer` into the pane → (3) a **separate** ssh call issuing `send-keys Enter`. Prefer single-line instructions (a pointer to an issue is naturally one line); reach for the multi-line dance only when unavoidable.
-- **`-l` is also the safe primitive for a literal that must not be key-interpreted** (Finn §6). The channel carries no secrets (§1.5) — but if an interactive login/OAuth step on the remote is ever unavoidable, `send-keys -l '<literal>'` is the documented way to send it without echo or key-name interpretation.
-- **Point at the work, don't respecify it.** The instruction is normally a pointer to a GitHub epic/task (§2); the specification lives in the issue. If a PO finds itself typing a paragraph of requirements into the pane, that paragraph belongs in an issue, not in keystrokes (keystrokes are unauditable and lost on session death).
-- **One instruction per idle turn.** Do not queue multiple `send-keys` while the lead is BUSY; the REPL has no input queue you can trust, and stacked input races the lead's own output.
+- **`to`** — `<team>` or `<agent>@<team>` (§1.2 addressing rules). Validated before anything leaves the session.
+- Deposits **directly to the hub** via the team key and returns the **synchronous hub verdict**: `{status: accepted | duplicate | rejected (+error code, e.g. E_NOGRANT, E_UNKNOWN_TEAM) | error}`.
+- `accepted` means on-disk at the hub — the message will be collected by the target's courier or show up in `deposited_uncollected` (§1.4); it cannot silently vanish.
+- `duplicate` is the retry-safe answer: re-sending after an ambiguous failure is always safe.
+- `rejected`/`error` come back **in the same call** — the PO knows immediately, acts immediately. No fire-and-forget, no queue to wonder about.
 
-### 1.3 Reading back (`capture-pane` contract) -- how a PO knows an instruction landed
+Native `SendMessage` cannot reach the outbox; `send` is the send path. The outbox ghost drop (§1.2) remains as the daemon-side convention and the alternate path for members without the MCP tool.
 
-A REPL emits **no structured ack**. Read-back is therefore a **poll over `capture-pane` snapshots**, classifying the pane into states by sentinel tokens. This is the core net-new contract and it is **heuristic by nature** — flagged as such.
+**Point at the work, don't respecify it.** The message is normally a pointer to a GitHub epic/task (§2); the specification lives in the issue. If a PO finds itself writing a paragraph of requirements into a mail body, that paragraph belongs in an issue, not in mail (mail is attention, not record — §1.3).
 
-Provisional sentinels below come from the WS3b probe (`teams-migration-probe-container-scope-2026-06-17.md:89`, Finn `research-precedent.md` §6); IDLE/BUSY are usable now, but all three MUST be re-pinned live on the target CLI version during the §4 acceptance test — they are version-fragile (§6 Q2).
+### 1.2 Addressing & the outbox convention
 
-| State | Sentinel in the captured pane (`capture-pane -p \| tail -N`) | Meaning | PO action |
-|---|---|---|---|
-| **IDLE / READY** | the prompt glyph **`❯`** at the bottom, no activity indicator *(provisional — WS3b)* | ready / turn done | safe to `send-keys` |
-| **BUSY / RUNNING** | a **"shimmering" activity indicator** rendering; streaming output *(provisional — WS3b)* | a turn is in progress | wait; poll again |
-| **DIALOG** | a permission/confirmation prompt ("Do you want to proceed?", numbered options) — **NO stable sentinel captured yet** | blocked on a dialog | **do NOT send-keys** (§1.0 rule 2); escalate/observe |
-| **DEAD** | shell prompt, no CLI TUI at all / `tmux ls` gone | session/process gone | §1.4 recovery |
+**Address forms:** `to: <team>` (lands in the team-lead's inbox) or `to: <agent>@<team>`. Unknown agent → team-lead inbox. Names: alnum start, `[A-Za-z0-9._-]`, max 64. The hub routes and grants **per team only**; the agent part is receiving-side routing.
 
-**The DIALOG sentinel is the open, load-bearing one.** No probe has captured a stable DIALOG token, and it is exactly the state the §1.2 injection gate keys on. It is also dialog-type-dependent (permission vs. trust vs. login/theme prompts render differently), so it **must** be captured live during the §4 acceptance test — the gate cannot be considered proven until it is. Until then, the safe fallback holds: if the pane is not confidently classifiable as IDLE (the `❯` glyph clean, no shimmer), treat it as not-safe-to-drive and do not `send-keys`.
+**Outbox convention (ratified 2026-07-15), for the ghost-drop path:** first line `to: <team>` or `to: <agent>@<team>`; the rest of the message is the body, forwarded **verbatim**. The daemon parses **exactly one line ever** — the `to:` line. Daemon rule: parse → deposit; parse-fail → **bounce to the sender's own inbox**. Exactly two outcomes, nothing silent.
 
-**The three-phase confirmation of an instruction:**
-1. **Pre-send:** capture → must be IDLE.
-2. **Accepted:** after submit, capture → IDLE→BUSY transition (or fresh echoed input) = the lead took the turn.
-3. **Turn done:** poll capture until BUSY→IDLE with new output present = the lead's *turn* completed.
+**Known V1 limitations (accepted, not bugs to route around):** delivered `from:` shows the courier (e.g. `mvox-courier`), not the origin agent — sign the body if identity matters; agent-level receive routing currently all lands in `team-lead.json`.
 
-**Completion is two-level and this is deliberate.** The pane read-back only tells you the **turn** finished — it cannot tell you the **work** succeeded (a REPL returning to idle looks identical whether the lead did the task, misunderstood it, or errored). The **durable** confirmation that the work is done is on **GitHub**: the task issue closed, the PR opened/merged, the epic checklist advanced (§2). A PO treats the pane as "did the lead hear me and finish thinking," and GitHub as "did the work actually happen." Never report work complete off the pane alone.
+### 1.3 Receiving -- inbox surfacing, `read_mail`, and the attention vocabulary
 
-### 1.4 Failure modes & recovery
+**Surfacing:** a session with an active team (≥2 members) surfaces inbound mail automatically. A **solo session never auto-surfaces its inbox** — it must call the second comms tool, `read_mail()`: a non-destructive pull of the team's inbound inbox. A solo PO working a product builds `read_mail` into its working rhythm (start of a work block, before reporting status); an unread inbox on a solo session is the one place this architecture can go quiet, and the habit is the guard.
 
-| Failure | Symptom | Recovery |
+**Attention vocabulary (Gap 4, ratified 2026-07-15): FREE TEXT.** There is no signal grammar. The daemon parses exactly one line ever (`to:`); the body is free-form correspondence, conversations included. "Signals, not content" survives as **prompt-level discipline, not enforcement**:
+
+- The record holds the work; mail points at it; on mismatch **the record wins**.
+- The conscious risk is mail drifting into a second work record. The guards are role-prompt norms and the grooming habit: anything in a mail thread that turned out to be load-bearing gets promoted into the issue it belongs to, and the thread ends with a pointer.
+
+**Completion is two-level and this is deliberate.** A "done" mail tells you the remote lead *says* it is done. The **durable** confirmation is on **GitHub**: the task issue closed, the PR merged, the epic checklist advanced (§2). Never report work complete off mail alone.
+
+### 1.4 Failure semantics -- everything loud, everything back to the initiator
+
+**NO FALLBACKS.** Every failure fails loud, back to the initiator. The full failure surface:
+
+| Failure | How it surfaces | Where it lands |
 |---|---|---|
-| **Dead session** | `tmux ls` empty / `connection refused` / container restarted | Remote side re-launches the CLI in its named session (remote startup — §1.0 rule 1; infra/team-lead concern, never the PO `send-keys`-ing a launch). **No work lost** — reconcile from GitHub. |
-| **Detached / orphaned pane** | Session exists but no `claude` process (`pgrep -f claude` empty) | Remote side relaunches the CLI as the session's foreground process; agent state restores per the remote team's own startup. |
-| **Permission DIALOG** | `capture-pane` shows a dialog | Never `send-keys` onto it (§1.0 rule 2). Escalate to a human/observer, or wait for the remote side's own auto-handling if the permission posture provides it (§6 Q3). Treat a wedged dialog as a dead session after a timeout. |
-| **Contested input** | Two writers `send-keys` to one session; keystrokes interleave and garble the prompt | tmux is **last-writer-wins on input — no lock**. **Single-writer discipline:** one PO owns each session (1 PO : 1 product). Observers use `capture-pane` / `attach -r` only. When >1 PO could reach a session, the writer seat is coordinated through the team-lead (§6 Q8). |
-| **Silent no-op** | Text typed but never submitted (missing `Enter`), or sent to the wrong session/pane target | Always re-`capture-pane` after every send (§1.3 phase 2). Never fire-and-forget; a send with no observed IDLE→BUSY transition did not land. |
-| **Read-back false-negative** | Pane looks IDLE but the lead is briefly between render frames | Poll ≥2 samples spaced by a short interval before concluding IDLE; one snapshot is not a state. |
+| **Bad address / no grant / unknown team** | `send` returns `rejected` + error code (`E_NOGRANT`, `E_UNKNOWN_TEAM`, ...) synchronously | the sender, in the same call |
+| **Malformed outbox drop** | daemon parse-fail → **bounce** into the sender's own inbox | the sender |
+| **Hub unreachable / ambiguous send** | `send` returns `error`; retry is safe (`duplicate` on re-send of a landed message) | the sender |
+| **Target team's courier down / session dead** | message sits at the hub; visible in `status` as `deposited_uncollected` (both directions of health) | the sender (and infra), on inspection — nothing is dropped |
+| **Delivered but never acted on** | an **unanswered item in the record**: the epic/task sits without movement, no reply mail | the initiator, via the record — silence is visible because the work of record is the truth |
+
+There is no state in which a message is silently gone: it was rejected in-hand, bounced back, is countably parked at the hub, or was delivered — and past delivery, the work-of-record layer makes non-response visible. Escalation from there is §3.
 
 ### 1.5 What NEVER goes over this channel
 
-1. **Durable work specification** — requirements, acceptance criteria, scope decisions. (GitHub.) Keystrokes are unauditable and die with the session.
-2. **Secrets / credentials** — tokens, keys, passwords. tmux scrollback (and any pane logging) persists them in plaintext.
-3. **`send-keys` onto a permission dialog** (§1.0 rule 2).
-4. **A CLI-launch command** — the PO never launches the remote CLI via send-keys (§1.0 rule 1).
-5. **Bulk data / file transfer** — use git / GitHub; the channel is a keyboard, not a pipe.
-6. **Cross-product reach** — a PO drives only its own product's session, never another product's.
+1. **Durable work specification** — requirements, acceptance criteria, scope decisions. (GitHub. Mail points, the issue specifies.)
+2. **Work content / results** — diffs, documents, deliverables. The PR is the delivery; mail says "delivered, see #N."
+3. **Secrets / credentials** — tokens, keys, passwords. Mail spools persist in plaintext on the hub and in inboxes.
+4. **Bulk data / file transfer** — use git / GitHub; the channel is a doorbell, not a pipe.
+5. **Cross-product reach** — a PO corresponds with its own product's team, never another PO's product.
 
 ### 1.6 Control-message semantics (stop, pause, redirect)
 
-A **control message** is an instruction *about* the work rather than a unit of work — stop, pause, hold, drop that, change priority. These are the highest-consequence things a PO sends over the driving channel, and they follow three rules. (Commissioned S60, Mihkel. Origin instance: the S60 station-lane retraction — see the provenance note below; the failure it records is exactly what these rules prevent.)
+A **control message** is an instruction *about* the work rather than a unit of work — stop, pause, hold, drop that, change priority. These are the highest-consequence things a PO sends, and they follow three rules. (Commissioned S60, Mihkel. Origin instance: the S60 station-lane retraction — see the provenance note below; the failure it records is exactly what these rules prevent.)
 
 1. **"Stop" ≠ "revert." A stop order means CEASE, never destroy.** Never bundle revert, cleanup, or undo into a stop. An untouched uncommitted tree on the remote side is a **decision deferred** — it can be resumed, inspected, or discarded later with full information. A reverted one is **work lost**, irreversibly, before anyone decided it should be. If you want the work gone, that is a separate, explicit, later instruction — never a rider on "stop."
 
-2. **Control messages act at boundaries, not into the running thing.** They mean "don't start the next thing," never "reach in and redirect or unwind what's mid-flight." A PO lets the remote lead's in-flight turn/task reach its natural end and **reroutes at the seam** — the next `ready` dispatch (`issue-standard.md`), the issue thread, the next idle prompt. You change what happens *next*, not what is *already happening*.
+2. **Control messages act at boundaries, not into the running thing.** They mean "don't start the next thing," never "reach in and redirect or unwind what's mid-flight." A PO lets the remote lead's in-flight turn/task reach its natural end and **reroutes at the seam** — the next `ready` dispatch (`issue-standard.md`), the issue thread, the next inbox read. You change what happens *next*, not what is *already happening*.
 
-3. **Never race a control message to a working session.** Prefer letting the remote lead finish over mid-flight redirection. This composes directly with the §1.3 **BUSY** state: a BUSY pane gets **no** sends at all — *including stops* — except a genuine Tier-D emergency under the sanction rule (Celes's R/M/D model; Tier-D needs team-lead-relayed Mihkel sanction, exact keystrokes + reason). A "stop" fired into a BUSY pane races the lead's own output, garbles the buffer (§1.4 contested/silent-no-op), and often lands as neither a clean stop nor a clean turn. Wait for IDLE, then issue the control message cleanly.
+3. **Do not fight the channel's asynchrony — use it.** Mail cannot interrupt an in-flight turn: a control message deposited mid-turn surfaces at the remote lead's next boundary *by construction*, which is exactly where rule 2 wants it to act. The residual temptation is escalating to **emergency pane access** (Appendix A) to force a mid-flight stop — that re-imports every hazard the retired driving channel had, and is reserved for genuine Tier-D emergencies under the sanction rule (Celes's R/M/D model; Tier-D needs team-lead-relayed Mihkel sanction, exact action + reason + expected outcome). Absent that, send the control message, let it land at the seam.
 
-**Why this lives in the driving contract:** these rules bind every channel a PO controls with (tmux most acutely, but the principle is channel-neutral), and they are the safety spine under §3 escalation — a PO handling a stalled remote team applies rule 1 (cease, don't unwind) and rule 2 (reroute at the seam) rather than reaching in. Cross-referenced from §3.
+**Why this lives in the channel contract:** these rules bind every channel a PO controls with (the principle is channel-neutral), and they are the safety spine under §3 escalation — a PO handling a stalled remote team applies rule 1 (cease, don't unwind) and rule 2 (reroute at the seam) rather than reaching in. Cross-referenced from §3.
 
 *(Provenance: Mihkel's verbatim S60 formulation, filed as [`wiki/process/control-signal-semantics-at-authority-boundaries.md`](../../../teams/framework-research/wiki/process/control-signal-semantics-at-authority-boundaries.md). The origin instance is honest in both directions: in the S60 station-lane retraction the parked draft was correctly preserved-not-deleted (rule 1 upheld for that artifact), while a completed §7 edit was over-reverted when a plain "cease" would have left it intact — rule 1 violated for that artifact, the very hazard this section exists to prevent. Same stop, two artifacts, opposite outcomes: cease-not-destroy is decided **per artifact at execution time**, not once for the whole halt (the wiki entry files this under its sub-lesson 2, "stop is not revert"). The wiki entry is the durable record and adds sub-lesson 1 (musing ≠ commission) for the reading side of the same mechanism.)*
+
+### 1.7 tmux -- persistence only (layer 4)
+
+tmux remains on every remote box for exactly one job: keeping the team's `claude` session alive as the foreground process of a named session (convention `[CONV]`: session name == teamName == containerName), surviving ssh disconnects and giving infra a place to relaunch after a container restart. **It is not a channel.** A PO never attaches to drive, never `send-keys`, in normal operation. Dead-session recovery is the remote side's own startup (infra/team-lead concern); **no work is lost** — reconcile from GitHub, and undelivered mail waits at the hub (§1.4).
+
+#### Appendix A -- emergency pane access (explicitly out-of-band)
+
+For genuine Tier-D emergencies only (session wedged on a dialog, comms stack itself down), under team-lead-relayed Mihkel sanction (§1.6 rule 3):
+
+- **Look before touching:** `ssh <target> "tmux capture-pane -p -t <session>"` is always safe and is the diagnostic of first resort. Observers use `capture-pane` / `attach -r` (read-only) only.
+- **If typing is sanctioned:** `send-keys -l '<text>'` for the literal, a **separate** `send-keys Enter` to submit; never type onto a rendering permission dialog; never launch the CLI itself via `send-keys` (the #60 crash class lives there — `research-precedent.md` §6).
+- Every emergency use gets reported to the team-lead and, if it exposed a comms-stack gap, filed as an issue. Routine use of this appendix is a design failure, not a workflow.
 
 ---
 
 ## 2. GitHub as the durable work-of-record
 
-The PO drives development through **GitHub epic issues**, sometimes **task issues**. The remote team does the actual work and syncs it back through GitHub. The PO's local clone is **read-only reference**. (GitHub is the work-of-record channel — this is not the message-passing/hub that §7 rules out; it is where the work item lives.)
+The PO drives development through **GitHub epic issues**, sometimes **task issues**. The remote team does the actual work and syncs it back through GitHub. The PO's local clone is **read-only reference**. (GitHub is the work-of-record channel — the attention channel of §1 only ever points into it; the work item lives here.)
 
 ### 2.1 Issue conventions
 
@@ -164,11 +155,11 @@ The PO drives development through **GitHub epic issues**, sometimes **task issue
 | **Epic** | `epic` | **PO** | Goal, acceptance criteria, a checklist of child tasks, target product | **PO**, when acceptance criteria are met |
 | **Task** | `task` | **Remote team-lead** (PO opens only the high-level seed tasks) | `Part of #<epic>`, one concrete deliverable, done-definition | Remote team, via a merged PR that says `Closes #<task>` |
 
-Coordination labels: `blocked` (names the blocker), `needs-po` (remote team needs a PO decision — the pull-signal for escalation, §3), and a `product:<name>` label per repo. `[CONV]` — label names are conventions; rename freely.
+Coordination labels: `ready` (the dispatch handshake — a task is dispatched only once it carries `ready`; `issue-standard.md` §2), `blocked` (names the blocker), `needs-po` (remote team needs a PO decision — the pull-signal for escalation, §3), and optionally a `product:<name>` label (org-board only, not per-repo — `issue-standard.md` §2). `[CONV]` — label names are conventions; rename freely.
 
 **Rule of ownership:** POs own epics end-to-end (open, groom, close on the acceptance gate). Remote teams own tasks and PRs (open under an epic, implement, close by merge). A PO closing a *task* by hand, or a remote team closing an *epic*, means the acceptance gate was skipped — a smell.
 
-**Issue <-> dispatch binding (Finn §4, net-new):** the tmux instruction and the issue are bound by reference — a `send-keys` says "pick up #47"; the issue #47 is the contract. This mirrors CCR's "the PR is the contract; the coordination message only points at it" (`topics/11`). The keystrokes never carry the change.
+**Issue <-> dispatch binding (Finn §4):** the dispatch mail and the issue are bound by reference — a `send` says "pick up #47"; the issue #47 is the contract. This mirrors CCR's "the PR is the contract; the coordination message only points at it" (`topics/11`). The mail never carries the change.
 
 ### 2.2 How remote work syncs back
 
@@ -179,7 +170,7 @@ Coordination labels: `blocked` (names the blocker), `needs-po` (remote team need
 
 **Rule: GitHub -> local, never local -> GitHub.** The PO keeps the product repo cloned locally *for reference only* — to read code and ground an epic against real files (matches mvox's existing reference-clone convention, Finn §4). The PO **never** commits or pushes from the local clone.
 
-- **Sync:** `git fetch` / `git pull` only. Define a staleness discipline (pull before a driving session) — clones drift because work lands from the remote side (Finn §5 Q5).
+- **Sync:** `git fetch` / `git pull` only. Define a staleness discipline (pull before a grooming/dispatch session) — clones drift because work lands from the remote side (Finn §5 Q5).
 - **Enforcement (recommended, §6 Q7):** convention alone is fragile at N products — harden with a read-only token or `git remote set-url --push origin DISABLED`, so an accidental push fails loudly instead of forking truth.
 
 ---
@@ -189,20 +180,20 @@ Coordination labels: `blocked` (names the blocker), `needs-po` (remote team need
 Mirrors FR's dual-hub routing (`common-prompt.md`):
 
 - **Team-lead = work hub.** POs report status, blockers, and cross-product coordination here. Assignment of POs to products and cross-product priorities route through the team-lead. (Adopt the Hopper rule, Finn §3: a PO is tasked by the **team-lead**, not human-direct.)
-- **Local librarian = knowledge hub.** Patterns, gotchas, decisions discovered while driving a product go to the librarian (the PO-team's Callimachus), scoped to **cross-product PO knowledge** (recurring epic patterns, per-remote-team quirks, `capture-pane` sentinel lore) — *not* code knowledge, which lives in each remote team's own wiki (Finn §5 Q3). "mvox's remote CLI wedges on a dialog if you drive during a build" is a gotcha for the librarian; "mvox epic #12 is blocked on a host issue" is a blocker for the team-lead.
+- **Local librarian = knowledge hub.** Patterns, gotchas, decisions discovered while running a product go to the librarian (the PO-team's Callimachus), scoped to **cross-product PO knowledge** (recurring epic patterns, per-remote-team quirks, comms/courier lore) — *not* code knowledge, which lives in each remote team's own wiki (Finn §5 Q3). "mvox's courier lags when the container is under a build" is a gotcha for the librarian; "mvox epic #12 is blocked on a host issue" is a blocker for the team-lead.
 
 ### Handle vs. escalate
 
 | Handle it (PO, directly with the remote team) | Escalate to team-lead |
 |---|---|
 | In-scope direction, grooming, re-prioritizing within the product | **Cross-product dependency** (product A blocked on product B) |
-| A blocker the remote team can resolve with a decision the PO owns | **Host / infra / registry** problem (dead container, ssh key, port, wedged dialog needing infra) |
-| Restarting a stalled turn, re-pointing the lead at the right issue | **Scope change** / new-product request (needs a PO+team pair — §4) |
+| A blocker the remote team can resolve with a decision the PO owns | **Host / infra / registry** problem (dead container, hub grant, courier down, `deposited_uncollected` piling up) |
+| Re-dispatching a stalled task, re-pointing the lead at the right issue | **Scope change** / new-product request (needs a PO+team pair — §4) |
 | Opening/closing epics and tasks for the product | Remote team **dead and not self-recoverable** |
 
 **Heuristic:** if the fix is inside the product's own repo and the PO's mandate, handle it; if it needs another team, another host, or a decision above the product, escalate. A remote team raising `needs-po` asks the *owning* PO to handle; a PO raising it to the team-lead asks for something outside the product.
 
-**When handling means telling a remote team to stop or change course, apply the control-message semantics (§1.6):** stop means cease, not revert (an untouched uncommitted tree is a deferred decision, not lost work); reroute at the seam rather than reaching into an in-flight task; and never race a stop into a BUSY pane. This is the safety spine of every intervention a PO makes into a stalled or misdirected remote team.
+**When handling means telling a remote team to stop or change course, apply the control-message semantics (§1.6):** stop means cease, not revert (an untouched uncommitted tree is a deferred decision, not lost work); reroute at the seam rather than reaching into an in-flight task; and let the mail land at the boundary rather than forcing a mid-flight interrupt. This is the safety spine of every intervention a PO makes into a stalled or misdirected remote team.
 
 ---
 
@@ -210,18 +201,18 @@ Mirrors FR's dual-hub routing (`common-prompt.md`):
 
 An ever-growing team means adding pairs is routine, so preconditions must be a checklist, not tribal knowledge. **All of the following before the pair is declared live:**
 
-1. **Registry entry** in `registry.json`: `teamName`, `host`, `port`, `user`, `sshKey`, `location`, `accessMethod` (+ ProxyJump host if PROD-LLM), `containerName`, `status: live`. (Registry keeper — Strabo/infra; the PO supplies product name + requests it. Note heterogeneous substrate ownership, Finn §5 Q2.)
-2. **ssh key** generated and installed: private key local/PO side, public key in the remote's `authorized_keys`. **Per-team key** (registry convention `id_ed25519_<team>`), not a shared key (§6 Q7).
-3. **Remote CLI session** up: the remote team-lead's `claude` running as the **foreground process** of a tmux/screen session named `== teamName` (§1.0), verified by `ssh <target> tmux ls`.
-4. **Product repo on GitHub**, labels created (`epic`, `task`, `blocked`, `needs-po`, `product:<name>`).
+1. **Registry entry** in `registry.json`: `teamName`, `host`, `port`, `user`, `sshKey`, `location`, `accessMethod`, `containerName`, `status: live`. (Registry keeper — Strabo/infra; the PO supplies product name + requests it. Note heterogeneous substrate ownership, Finn §5 Q2.)
+2. **ssh keys** generated and installed — two distinct keys, two distinct jobs: the **hub identity key** (`~/.ssh/sm_<team>` — the per-team key *is* the identity to the stationmaster hub) and the **container admin key** (registry convention `id_ed25519_<team>`) for infra/persistence access. Per-team keys, never shared (§6 Q7).
+3. **Comms stack live for the team:** hub `grant` issued for the team; the courier daemon running in the team's container (IN-injection + OUT `to:`-parse both); the comms MCP server (`send`/`read_mail`) configured in the team session. Remote lead's `claude` session running under its named tmux session (persistence layer, §1.7), verified alive.
+4. **Product repo on GitHub**, labels created (`epic`, `task`, `ready`, `blocked`, `needs-po` — the five core labels, `issue-standard.md` §6; `product:<name>` is optional, org-board only, `issue-standard.md` §2).
 5. **Local clone** present as read-only reference (push disabled, §2.3).
 6. **Epic backlog seed:** ≥1 `epic` issue open with real acceptance criteria and a task checklist — the remote team needs something to pull on day one.
-7. **Over-real-ssh acceptance test PASSED (go-live gate).** Against the actual remote session, demonstrate the full §1 loop end-to-end: `tmux ls` discovery → `capture-pane` classifies IDLE → `send-keys -l` an instruction + separate `Enter` → `capture-pane` confirms IDLE→BUSY→IDLE → the instructed action shows up on GitHub. Explicitly exercise the **DIALOG** path (confirm the read-back detects a permission dialog and the driver refuses to type). This gate retires the #60 crash-class risk *for this pair on its real substrate* — it is not assumed away by the design. **Pin the exact `capture-pane` sentinel tokens here, and the librarian (Nunes) records them in a versioned card keyed by CLI version** (Aen decision Q2) — capturing all three states, especially the live **DIALOG** dump (§1.3). Nunes re-pins the card at every acceptance-test run and on any remote CLI upgrade. Reuse `designs/new/migration-probe-harness/harness.sh` (`tmux_send`/`tmux_capture`) as the drive-loop primitive — the PO channel is a generalization of it, so the test should not reinvent the mechanics.
-8. **PO-side drive tooling provisioned:** the driving PO actually has the send-keys/capture-pane mechanics available — the `tmux-direct-brief` skill (canonical mechanics doc) and/or the `harness.sh` primitives. Note (Finn §6): `tmux-direct-brief` lives in the rc-host/operator env and is **NOT** in the local `~/.claude/skills`, so a new PO does not get it for free — provisioning it is a real step, not an assumption.
+7. **End-to-end comms acceptance test PASSED (go-live gate).** Against the real infra, demonstrate the full §1 loop: PO `send(to, ...)` → `accepted` verdict → courier delivers into the remote lead's inbox → remote lead replies (outbox or `send`) → the reply surfaces PO-side (auto-surface, or `read_mail` for a solo session) → the instructed action shows up on GitHub. Explicitly exercise the **failure paths**: a malformed outbox drop bounces to the sender; a send to an ungranted team returns `rejected`/`E_NOGRANT` synchronously; a message deposited while the target courier is stopped shows in `status` as `deposited_uncollected` and delivers when the courier resumes. Nothing silent = pass.
+8. **PO-side tooling provisioned:** the PO session has the `comms` MCP server configured with the team's hub key, and the solo-session `read_mail` habit is in the PO's role prompt.
 9. **Librarian registration:** the product entered in the PO-team knowledge index.
 10. **Roster:** the PO persona exists in the PO-team roster — **Celes's artifact**; this checklist depends on it, does not define it.
 
-A pair missing any of 1–8 is a draft, not live. Item 3 is the one most likely to silently regress (a container restart kills the session) — see §1.4 dead-session.
+A pair missing any of 1–8 is a draft, not live. Item 3 is the one most likely to silently regress (a container restart kills the courier/session) — the §1.4 `deposited_uncollected` signal and the `status` verb are the watch on it.
 
 ---
 
@@ -235,33 +226,35 @@ A pair missing any of 1–8 is a draft, not live. Item 3 is the one most likely 
 
 ## 6. Open questions & resolutions
 
-### Resolved (Aen, S60, 2026-07-14 — PO decisions in)
+> **Supersession note (2026-07-16):** the S60 channel decision (literal tmux driving) and its dependents (Q1 multiplexer-as-channel, Q3 allowlist-as-driving-smoothness, Q5 no-courier) were **reversed on 2026-07-15** by the ratified inbox architecture (#90). The entries below are kept as the historical decision record; where a resolution conflicted with #90, §1 (rev 5) is authoritative.
 
-- **Channel (was the top question):** **RESOLVED — literal tmux/screen driving**, not message-passing (PO Mihkel). Whole doc built on it; §7 keeps message-passing as a v2 fallback only.
-- **Q1 — Multiplexer standard:** **RESOLVED — tmux.** `send-keys`, `capture-pane`, `-r` read-only attach, and one-shot ssh-exec driving are all first-class; `screen` read-back is clumsier. The §1 contract assumes tmux.
-- **Q3 — Remote CLI permission posture:** **RESOLVED — allowlist-tuned** (curated per-team allowlists). Suppresses common dialogs so the pane is usually IDLE; does **not** remove the DIALOG state, so the observe-before-inject gate stays **mandatory** (§1.0 rule 2). This is the biggest determinant of how smoothly driving runs.
-- **Q5 — Durable async channel:** **RESOLVED — GitHub-only, no courier bridge in v1** (Aen ratifying the recommendation). Message-passing substrate stays documented in §7 as a v2 fallback.
+### Resolved (Aen, S60, 2026-07-14 — PO decisions in; channel entries since superseded, see note above)
+
+- **Channel (was the top question):** was resolved as literal tmux driving (PO Mihkel, 2026-07-14); **reversed 2026-07-15** — the ratified channel is inbox comms over the stationmaster hub (#90, §1).
+- **Q1 — Multiplexer standard:** **tmux** — still the answer, but its role shrank to layer-4 persistence (§1.7); it is no longer a channel contract.
+- **Q3 — Remote CLI permission posture:** **allowlist-tuned** (curated per-team allowlists) — still holds for the remote sessions' own smooth running; no longer load-bearing for a driving gate (there is no driving). A wedged dialog is now an emergency-access case (Appendix A), not a channel state.
+- **Q5 — Durable async channel:** originally "GitHub-only, no courier bridge in v1"; **superseded** — the courier/hub stack is now the ratified attention transport (#90). GitHub remains the only durable *work* channel (§2); the distinction that survived is signals-vs-content, not courier-vs-no-courier.
 - **Q6 — GitHub issue language:** **RESOLVED — English** (applies identically across all four product repos; see the issue standard, §2 / sibling doc).
 
 ### Resolved as design calls (Herald, S60 — not Mihkel-blocking)
 
 - **Q4 — Task-issue ownership:** **RESOLVED in the epic/task issue standard** (§2 + `issue-standard.md`): the remote team-lead opens task issues under an epic; the PO opens epics.
-- **Q5b — Driving mode:** **RESOLVED (Aen) — one-shot ssh-exec is the agent default** (§1.1 step 4): auditable, no attach-session state. Interactive attach is reserved for humans and debugging.
-- **Q8 — Contested-writer arbitration:** **RESOLVED for v1 — single-writer-by-convention** (1 PO : 1 product, §1.4). An explicit attach-lock is deferred to v2, needed only once >1 PO can reach the same session.
-- **Q2 — `capture-pane` sentinel-token ownership:** **RESOLVED (Aen) — the librarian (Nunes) owns the sentinel-token card**, versioned per CLI version, re-pinned at every §4-item-7 acceptance-test run and on any remote CLI upgrade. The *empirical* pin (esp. the live DIALOG dump) remains an acceptance-test deliverable — an accepted honest boundary of the design, not a gap.
+- **Q5b — Driving mode:** moot — retired with the driving channel; emergency access (Appendix A) uses one-shot ssh-exec for auditability when sanctioned.
+- **Q8 — Contested-writer arbitration:** moot for the channel (inboxes serialize; the hub confirms deposits). The 1 PO : 1 product ownership rule survives as §1.5 item 5 (cross-product reach) and applies to emergency pane access.
+- **Q2 — `capture-pane` sentinel-token ownership:** moot for the channel — sentinels were the read-back heuristic of the retired driving contract. If emergency access (Appendix A) ever needs pane-state lore, it goes to the librarian as a gotcha, not a versioned contract.
 
 ### Still open — genuinely Mihkel's (infra values / GH scopes); do NOT block v1 design
 
-- **Q7 — Read-only clone enforcement & ssh keys:** convention-only vs. hard-enforced (read-only token / push-disabled remote)? Per-team ssh keys (recommended) vs. a shared key (registry currently reuses `id_ed25519_apex` across several PROD-LLM teams)? Plus the concrete registry infra values per product (host, port, key path) and GitHub write scopes for the remote side.
+- **Q7 — Read-only clone enforcement & ssh keys:** convention-only vs. hard-enforced (read-only token / push-disabled remote)? Per-team keys are now partly settled by the hub design (the per-team hub key *is* the identity, §1); still open for container admin keys and the GitHub write scopes for the remote side.
 
 ---
 
-## 7. Documented fallback (NOT part of v1 — ratified by Aen, S60)
+## 7. Channel history (the fallback that became the architecture)
 
-Per the PO decision (Q5), message-passing is **not** built into v1 — GitHub is the only durable async channel. Recorded only so the alternative is not lost: FR has a mature, proven inbox/hub stack (**stationmaster** post-office hub + **courier** + **ghost-member** transports; Finn `research-precedent.md` §3, `poc/ghost-bridge/`). If literal tmux driving proves too fragile in practice — e.g. the DIALOG state or read-back heuristics cause repeated missed instructions — the fallback is to register each remote team as a **ghost-member** with an `ssh-tunnel`/`stationmaster` transport, turning "drive my remote lead" into a durable, at-least-once `SendMessage`. That is a v2 pivot requiring its own design; it is deliberately out of scope here.
+For the record: v1 as designed at S60 made literal tmux driving the channel and documented FR's inbox/hub stack (**stationmaster** + **courier** + **ghost-member**; Finn `research-precedent.md` §3, `poc/ghost-bridge/`) as the v2 fallback in this section. On **2026-07-15 that fallback was ratified as the architecture** (#90) — for the reasons this section itself anticipated (dialog states and read-back heuristics made driving fragile) — and §1 now specs it as the critical path. The direction of the fallback has therefore inverted: message-passing is v1; literal pane driving survives only as sanctioned emergency access (Appendix A), and there is no automated fallback between them — a broken comms stack fails loud (§1.4) and gets fixed, not routed around.
 
 ---
 
-*Cross-refs:* Finn precedent research (`designs/new/po-team/research-precedent.md`); tmux-pane #60 crash class (`teams/framework-research/docs/tmux-spawn-guide.md`); CCR "PR is the contract" (`topics/11-deployment-lifecycle.md`); Hopper operator boundary discipline (`designs/deployed/operator-role/design-spec.md`); dual-hub routing (`common-prompt.md`); message-passing fallback substrate (`poc/ghost-bridge/stationmaster-protocol.md`). Roster/personas: Celes.
+*Cross-refs:* inbox comms architecture ratification (#90); comms MCP tools (#100); courier daemon (#95); Finn precedent research (`designs/new/po-team/research-precedent.md`); stationmaster protocol (`poc/ghost-bridge/stationmaster-protocol.md`); tmux-pane #60 crash class (`teams/framework-research/docs/tmux-spawn-guide.md`) — now relevant only to Appendix A; CCR "PR is the contract" (`topics/11-deployment-lifecycle.md`); Hopper operator boundary discipline (`designs/deployed/operator-role/design-spec.md`); dual-hub routing (`common-prompt.md`). Roster/personas: Celes.
 
 (*FR:Herald*)

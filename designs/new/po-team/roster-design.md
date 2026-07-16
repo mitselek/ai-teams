@@ -2,6 +2,8 @@
 
 *(*FR:Celes*) -- S60, 2026-07-14. Design package for the new `product-owners` team. Output is a role-definition package; the team-lead decides whether to hire, and the PO (Mihkel) rules on the infra/authority items flagged at the end.*
 
+> **SUPERSEDED (channel model) -- 2026-07-15.** The ssh + tmux/screen driving channel described throughout this document was superseded by the ratified inbox-based comms architecture (#90): GitHub remains the work of record; the live channel is now inbox mail via the stationmaster hub (`send()` / `read_mail()`); tmux is demoted to persistence only -- a PO never types into a remote pane in normal operation. **`protocols.md` rev 5 §1 is authoritative.** In this document the channel-bearing passages -- notably §0 fact 2 and its two boundary-discipline paragraphs, §1's add-a-PO checklist (registry/liveness steps) and registry schema, §2's template spec -- instance parameters, liaison duties, tool restrictions, and R/M/D gate -- §6's channel list, and §7 item 1 -- are the historical S60 design, preserved as a record; the live add-a-PO procedure and liveness measure are `prompts/henry.md` and `product-registry.md` (last-liveness = hub round-trip, not ssh reachability). `prompts/po-template.md` (seven slots; comms MCP `send()`/`read_mail()`; ssh/tmux = Tier D emergency-only) is the authoritative template.
+
 ---
 
 ## 0. The shape of the thing (read this first)
@@ -46,13 +48,15 @@ The team-lead runs the **portfolio**, not any single product. It never drives a 
 - **Portfolio composition** -- which products get a PO; when to onboard a new PO (the add-a-PO procedure below) and when to retire/pause one.
 - **Cross-product arbitration** -- priority conflicts when two POs contend for the same scarce resource (Mihkel's attention, a shared remote host, a shared dependency). Cross-product dependencies (mvox needs an ad-auto capability) are brokered here.
 - **Standards** -- the PO role template, the epic/task-issue conventions, the escalation rules to Mihkel, the reporting cadence up to Mihkel.
-- **The product registry** -- owns `product-registry.md` (the per-product infra map: repo, clone path, remote host/ssh target, tmux/screen session, remote team-lead name). Additions happen through the add-a-PO procedure.
+- **The product registry** -- owns `product-registry.md` (the per-product infra map: github-repo, local-clone-path, remote-teamName -- the hub comms address, doubling as the registry.json key resolving the emergency persistence host -- and last-liveness). Additions happen through the add-a-PO procedure. *(Field list updated 2026-07-15 to the ratified #90 schema; the S60 original carried ssh target / tmux session / remote-team-lead-name fields, now retired with the driving channel.)*
 
 ### Delegates (pushed down)
 - **All product-specific judgment** -> the product's PO. Epic backlog, grooming, domain calls, remote-team liaison, "is this shippable" -- the PO owns it end to end and escalates to Mihkel (not the team-lead) on genuine product-authority questions.
 - **Knowledge curation** -> the librarian (Protocol A/B; see §3).
 
 ### The add-a-PO procedure (the "evergrowing" requirement, designed in, not bolted on)
+
+> **Superseded (2026-07-15, #90).** The 6-step checklist below is the historical S60 procedure -- six parameters including a tmux/screen session slot and a remote-team-lead-name slot, ssh/tmux liveness, remote-lead reachability over the pane. The ratified procedure is the **7-step checklist in `prompts/henry.md` ("Add-a-PO Procedure")**: seven slots (agent-name; remote-team as hub comms address; remote-host persistence-only), a "bring the comms stack live" step with STOP-and-escalate on grant/courier failure, and an end-to-end comms acceptance test (incl. E_NOGRANT and bounce paths); last-liveness = hub round-trip. Preserved here as a record.
 
 Because the roster grows structurally, onboarding a PO is a **first-class, repeatable team-lead procedure**, not an ad-hoc event. One parameterized template (§2) + a fixed 6-step checklist:
 
@@ -190,7 +194,7 @@ Distinct from FR's classical-polymath theme; each name domain-fitted to its prod
 ```json
 {
   "name": "product-owners",
-  "description": "A coordinator-of-coordinators team: an evergrowing roster of product owners, each driving one product's development through GitHub epic/task issues and a remote product-dev team (reached via ssh + tmux/screen through that team's remote team-lead), plus a local librarian. POs hold each product repo cloned locally for reference only; all work syncs through GitHub from the remote side. Human product authority is Mihkel; each agent PO is his driver-of-record for one product. Lore house: the School of Sagres.",
+  "description": "A coordinator-of-coordinators team: an evergrowing roster of product owners, each driving one product's development through GitHub epic/task issues and inbox mail via the stationmaster hub (addressed to the remote product-dev team's team-lead), plus a local librarian. POs hold each product repo cloned locally for reference only; all work syncs through GitHub from the remote side. Human product authority is Mihkel; each agent PO is his driver-of-record for one product. Lore house: the School of Sagres.",
   "_substrate_note": "The per-member `model` field is documentation-only -- the parent CLI session model is stamped into runtime config.json regardless, and all spawned members inherit it. To pin the team to fable-5, switch the parent CLI via `/model claude-fable-5[1m]` BEFORE spawning. The Agent-tool spawn `model` param accepts only family-level overrides (opus/sonnet/haiku), not a specific pin. Spawn all members with run_in_background: true. Spawn order: librarian + team-lead first (service/knowledge hubs), then POs.",
   "commonPromptFile": "common-prompt.md",
   "workDir": "$HOME/Documents/github/ai-teams",
@@ -294,7 +298,7 @@ Distinct from FR's classical-polymath theme; each name domain-fitted to its prod
 ## 7. Decisions that belong to team-lead / Mihkel (not me)
 
 **For Mihkel (product / infra / authority):**
-1. **Remote infra values** -- the actual `remote-host` ssh targets, keys, and `tmux/screen` session names for the four remote teams. I provide the registry *schema*; Mihkel fills the values. Authorizing ssh from the PO-team host into four remote hosts is his call.
+1. **Remote infra values** -- the actual `remote-host` ssh targets, keys, and `tmux/screen` session names for the four remote teams. I provide the registry *schema*; Mihkel fills the values. Authorizing ssh from the PO-team host into four remote hosts is his call. *(Superseded 2026-07-15, #90: the infra values Mihkel now supplies are the hub grant pair + the remote team's comms address (`remote-teamName`); the per-team key `~/.ssh/sm_<team>` is the identity, and session names derive from teamName (`protocols.md` §1.7). Remote-host ssh is emergency persistence access only -- `henry.md` intake step 1.)*
 2. **GitHub write scope** -- confirm the team's GitHub account has **issue-write** on `mitselek/mvox`, `bigbook`, `ad-auto`, and the mikrotik/field-network repo. If any is **pull-only** for the account (the known `mitselek is pull-only on some repos -> can't open issues by that route` gotcha, e.g. the Arhitecture repo), that PO cannot drive epics -> needs a write-capable account or a different route. **Flag before spawning.**
 3. **Name approval** -- ratify the six proposed names (or pick from the alternates in §4).
 

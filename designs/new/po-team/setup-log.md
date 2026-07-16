@@ -100,8 +100,10 @@ flips it to fleet-standard `ai-teams`.
 - **Live Claude sessions LEFT RUNNING:** `mvox` (tmux `mvox`, has teammate `echo` → active team, surfaces),
   `po-team` (tmux `po-team`, solo). Both authed. Started with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
 - Registered+granted on hub: `mvox` ↔ `po-team` (reciprocal). Keys: `~/.ssh/sm_<team>` in each container.
-- **PROVEN live:** PO→mvox message travels outbox→po-team-courier→hub→mvox-courier→mvox inbox and
-  **surfaces to the mvox agent** (verified in the mvox pane).
+- ~~**PROVEN live:** PO→mvox message travels outbox→po-team-courier→hub→mvox-courier→mvox inbox and
+  **surfaces to the mvox agent** (verified in the mvox pane).~~ **RETRACTED 2026-07-16 (Mihkel):
+  false — we never had a working outbox.** End-to-end send remains UNPROVEN until the MCP
+  `send` live-test (#100).
 
 ### NEXT SESSION — deploy + live-test the MCP server (#100)
 1. Ship `comms-mcp.py` + `stationmaster-courier.py` + `company-courier.py` into each team
@@ -117,6 +119,64 @@ flips it to fleet-standard `ai-teams`.
 5. Then reverse (mvox `send` → po-team) — note po-team is solo, so use `read_mail()` there to
    confirm receipt (won't auto-surface).
 - Then: reconcile design docs (#90), 'up' script + commit build context (#94), sudoers removal (#98).
+
+## 2026-07-16 — #100 deployed + live-tested: first PROVEN end-to-end send
+
+Epistemic labels from here on: **proven** (directly observed), **unknown**, **speculative** —
+mark status inline instead of letting prose imply confidence.
+
+18. **MCP comms server deployed** to both team containers: `~/comms/` (comms-mcp.py +
+    both reference couriers, sibling-resolved) + `~/comms/config.json` (sidecar-config
+    shape, `reference_courier` repointed to `~/comms/`). Registered user-scope
+    (`claude mcp add --scope user comms ...` → `~/.claude.json`; no project `.mcp.json`,
+    avoids the trust prompt). Stdio smoke test passed in both. Sessions restarted with
+    `claude --continue` (env `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`) — resume kept the
+    conversations; mvox's teammate `echo` survived the restart (**proven** — it drained
+    + surfaced post-restart).
+19. **PROVEN, both directions** (first real end-to-end send — the 07-15 "PROVEN live"
+    outbox claim was retracted as false):
+    - po-team agent `send(to=mvox)` → hub verdict `{"status":"accepted","id":"30c5b0f157ef43a1"}`
+      (synchronous, in the tool result) → mvox-courier `injected+acked` 06:59:17Z →
+      **surfaced to the mvox agent** (read + acknowledged in its pane; inbox drained to `[]`).
+    - mvox agent `send(to=po-team)` → `{"status":"accepted","id":"737b5f5423a623d4"}` →
+      po-team-courier `injected+acked` 07:02:44Z → did NOT auto-surface (solo session,
+      as predicted) → `read_mail()` returned the entry (`from: mvox-courier`, `read: false`).
+    - First `send` in a session hits a permission prompt; answered "don't ask again"
+      in mvox. po-team pre-approved it interactively earlier (**unknown** exactly when).
+20. Ops notes: shipyard host reachable as `root@shipyard.tailccff13.ts.net` (tailnet
+    key); sagres docker still via `sudo -n` (#98 window). `from:` shows the courier
+    (`mvox-courier`), not the origin agent — attribution passthrough is a known V1
+    limitation, fine for now (**speculative**: worth fixing when agent-level routing lands).
+
+## 2026-07-16 (cont.) — #90 reconciliation: PO-team docs rewritten to the inbox architecture
+
+21. **Design-doc reconciliation executed** (ultracode: 4 rewriters, 8 adversarial verifiers,
+    1 cross-doc judge, 5 fixers). Rewritten in the working tree (**proven** = reviewed, not
+    yet committed): `protocols.md` (§1 tmux contract → inbox channel: MCP `send()` +
+    verdicts, outbox `to:` convention, free-text gap-4 vocabulary, loud-failure table;
+    tmux → §1.7 persistence note + emergency Appendix A; superseded decisions annotated,
+    not deleted), `prompts/po-template.md` + `gama.md` (R/M/D reframed off pane-driving:
+    R=reads/read_mail, M=send()+gh, D=ANY pane touch; verdict-before-assume gate; gama's
+    infra slots filled with live values), `prompts/henry.md` (Tier-D relay → sanctioned
+    emergency pane access; add-a-PO now provisions the attention layer), `product-registry.md`
+    (live rows; `last-liveness` redefined as hub round-trip, blocker fixed).
+22. **Out-of-scope drift found by the cross-doc judge** in the issue's do-not-touch set
+    (reported only, not edited): `common-prompt.md` (Mission still says POs drive panes,
+    4 spots), `prompts/nunes.md` (sentinel-token card duty serves the retired channel),
+    `roster-design.md` (predates #90 throughout), `issue-standard.md` (2 stale channel
+    sentences). → Mihkel extended #90 to cover them; rounds 2–3 below.
+23. **Rounds 2–3 (same day): the whole package reconciled.** Round 2 (21 agents):
+    `common-prompt.md` (team law — Mission/Roles/Spawn Rule now GitHub + hub mail, aligned
+    verbatim with henry.md; sentinel examples → comms-era), `nunes.md` (sentinel card →
+    supersession note), `roster-design.md` (supersession banner + the deployable roster.json
+    description string rechanneled; history preserved annotated), `issue-standard.md`
+    (2 sentences; ready-before-dispatch intact) + the 14 round-1 minors swept (half were
+    already incidentally fixed) + whole-package judge (5 majors found+fixed, incl. the
+    hub-name seam: **hub routing name `po-team`** vs **roster name `product-owners`** — now
+    stated explicitly). Round 3 (8 agents): all 18 remaining minors resolved (15 applied,
+    3 already fixed). Totals: 47 agents, ~1.45M tokens, 3 rounds converging (blocker+16
+    majors → 5 majors → 0). **Proven** = adversarially reviewed twice + judged; uncommitted.
+    Untouched as historical record: `research-precedent.md`, `setup-log.md`, `wiki/`.
 
 ## Pending
 
@@ -141,6 +201,6 @@ flips it to fleet-standard `ai-teams`.
 - [x] sidecar courier built + deployed ([#95](https://github.com/mitselek/ai-teams/issues/95))
 - [x] mvox + po-team onboarded (keys + reciprocal grants) ([#96](https://github.com/mitselek/ai-teams/issues/96) partial)
 - [x] surfacing fix (read:false + timestamp on delivery) committed
-- [ ] **MCP server ([#100](https://github.com/mitselek/ai-teams/issues/100)): built + committed; DEPLOY to containers + live-test = next session's first task**
+- [x] **MCP server ([#100](https://github.com/mitselek/ai-teams/issues/100)): deployed to both containers + live-tested both directions 2026-07-16 (closed)**
 
 (*PO territory log — maintained by Aen with Mihkel*)
