@@ -236,6 +236,29 @@ mark status inline instead of letting prose imply confidence.
     archived with timestamp, fresh team dir, exactly 1 claude; second `up` → attach only,
     still 1 claude, no re-archive (interlock held). #94 + #102 closed.
 
+## 2026-07-16/17 — #99: hard power-cycle durability test PASSED (+ full recovery drill)
+
+33. **Durability proven on the real substrate:** snapshot taken (expires 07-17 20:15Z);
+    scratch teams ptest-a/b registered; marker deposited (`accepted`, id
+    `a582435695b69154`); **hard power-cycle of sagres via Hostinger API** (20:17:32Z,
+    ~40s down); post-boot collect as ptest-b returned the marker intact — `accepted`
+    means fsync-durable through a real power cut, closing #97's last open question.
+    Gotcha: the reboot wiped the scratch client keys in host /tmp (hub state unaffected);
+    ptest-b was re-registered to collect. Scratch teams revoked after; registry pristine
+    (mvox, po-team).
+34. **Recovery drill (the #94/#102 path, first real reboot):** all 3 containers
+    self-started (restart: unless-stopped), hub healthy on boot; mvox-courier logged
+    exactly ONE loud transport failure during the outage and self-recovered next poll.
+    `up` in po-team: archived the pre-cycle team dir, fresh claude, **bootstrap ran
+    autonomously** — Henry reoriented, respawned Nunes + Gama, read_mail'd, and rebuilt
+    state from scratchpads (Gama's mvox board survey survived). Friction found: fresh
+    session in `~/workspace` = new permission scope → prompts re-appear (read_mail,
+    memory edits, gh issue — approved persistently); **speculative**: bake
+    `--permission-mode` or pre-seeded approvals into `up`/settings to remove this seam.
+35. Henry surfaced the first real product decision to Mihkel (mvox board taxonomy:
+    adopt-theirs vs impose-standard vs hybrid) — the escalation surface working as
+    designed; dialog left open in his pane for Mihkel.
+
 ## Pending
 
 11. Legacy renames: boxes → **sagres** (ex ai-mvox-eu) + **shipyard** (ex
