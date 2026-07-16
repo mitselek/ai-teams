@@ -3,3 +3,4 @@ teams/*/sensitive/
 
 # Per-machine Claude-CLI permission allowlist (paths and grants are machine-local)
 .claude/settings.local.json
+.DS_Store

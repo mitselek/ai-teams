@@ -19,6 +19,7 @@ Doc-index signpost (Tier 2 navigation). Per-team configuration designs, split by
 - esl-legal/ -- ESL Legal team config
 - mvox_v4e_web/ -- mvox web team (cloned/refactored from polyphony-dev), deployment index
 - operator-role/ -- Hopper deployment-operator role design-spec
+- po-team/ -- product-owners team (Henry/Nunes/Gama live on sagres 2026-07-16; protocols, prompts, registry, wiki)
 - uikit-dev/ -- uikit-dev team (embedded-token fix recipe)
 
 ## Other

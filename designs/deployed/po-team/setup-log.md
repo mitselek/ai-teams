@@ -178,6 +178,25 @@ mark status inline instead of letting prose imply confidence.
     majors → 5 majors → 0). **Proven** = adversarially reviewed twice + judged; uncommitted.
     Untouched as historical record: `research-precedent.md`, `setup-log.md`, `wiki/`.
 
+## 2026-07-16 (cont.) — #101: PO team DEPLOYED and live
+
+24. **Package shipped** to the po-team container (`~/po-team/`: full package + `roster.json`
+    extracted from roster-design §5, workDir fixed to `/home/ai-teams`). Session pinned to
+    Fable 5 (`/model claude-fable-5[1m]`) before spawning, per the substrate note; permission
+    mode → auto (isolated container, matches fleet practice).
+25. **Roster spawned** (partial by design): Henry (team-lead), Nunes (librarian, gold),
+    Gama (PO mvox, cyan) — service roles first per the standing rule. pacheco/albuquerque/
+    magellan deferred: prompt files don't exist and their registry rows are PENDING; they
+    arrive via Henry's add-a-PO procedure. Henry logged the deferral as a decision.
+26. **Acceptance test passed (proven):** mvox → `send(to=po-team)` → surfaced live to Henry
+    (active team ≥2 members — the solo-session gap is closed). Henry matched it to Gama's
+    own in-flight hello to mvox, relayed it, and recorded "channel proven end-to-end".
+    Unprompted team behavior observed: Gama had already introduced itself to mvox over the
+    hub; Nunes audited the wiki (found the 9 FR-era entries); Henry escalated Gama's PENDING
+    registry slots (github-repo, local-clone-path) to Mihkel — **that hand-off is now the
+    live blocker for Gama's day-1 work.**
+27. Package moves `designs/new/` → `designs/deployed/` with this commit (#101 closed).
+
 ## Pending
 
 11. Legacy renames: boxes → **sagres** (ex ai-mvox-eu) + **shipyard** (ex
