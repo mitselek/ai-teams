@@ -131,8 +131,13 @@ mark status inline instead of letting prose imply confidence.
     (`claude mcp add --scope user comms ...` → `~/.claude.json`; no project `.mcp.json`,
     avoids the trust prompt). Stdio smoke test passed in both. Sessions restarted with
     `claude --continue` (env `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`) — resume kept the
-    conversations; mvox's teammate `echo` survived the restart (**proven** — it drained
-    + surfaced post-restart).
+    conversations. ~~mvox's teammate `echo` survived the restart (**proven** — it drained
+    + surfaced post-restart)~~ **RETRACTED same day: false — the restart rotated the team
+    dir and dropped `echo`; the drain/surface I cited happened pre-restart. Post-restart
+    mvox is SOLO. Worse: the orphaned old session dir made the courier's team-dir
+    resolution ambiguous → mvox-courier skipped every cycle until the stale dir was
+    archived (see item 28). Restart lesson: `--continue` keeps the CONVERSATION, not the
+    TEAM — teammates must be respawned, and stale `session-*` dirs must be cleaned.**
 19. **PROVEN, both directions** (first real end-to-end send — the 07-15 "PROVEN live"
     outbox claim was retracted as false):
     - po-team agent `send(to=mvox)` → hub verdict `{"status":"accepted","id":"30c5b0f157ef43a1"}`
@@ -196,6 +201,22 @@ mark status inline instead of letting prose imply confidence.
     registry slots (github-repo, local-clone-path) to Mihkel — **that hand-off is now the
     live blocker for Gama's day-1 work.**
 27. Package moves `designs/new/` → `designs/deployed/` with this commit (#101 closed).
+
+## 2026-07-16 (cont.) — post-deploy: gh identity + the restart gotcha (#102)
+
+28. **gh identity delivered** to the po-team container (mvox's pattern: OAuth token as
+    `mitselek`, `~/.config/gh/hosts.yml`; verified with API + issue list; git identity set).
+    `mitselek/mvox` does not exist — Mihkel's call: **Gama asks the mvox team over the hub**
+    which repo is the work of record (answer, via Mihkel in the mvox pane:
+    `mvox-dev/mvox_v4e_web` — awaiting delivery through the designed channel).
+29. **Incident (proven, root-caused):** Gama's hello to mvox stalled. The earlier mvox
+    restart had (a) dropped teammate `echo` (solo again), (b) orphaned the old session dir
+    → courier ambiguity → every cycle skipped. Archiving the stale dir recovered the
+    courier, which then correctly REFUSED to inject into the contested solo inbox (no
+    drainer) and left the mail at the hub for redelivery — no-silent-loss held at every
+    step. Receive path is down until mvox has ≥2 members again. Filed as
+    [#102](https://github.com/mitselek/ai-teams/issues/102) (restart lifecycle: archive
+    stale dirs, respawn the standing teammate, wiki gotcha; ties into #94 'up' script).
 
 ## Pending
 
