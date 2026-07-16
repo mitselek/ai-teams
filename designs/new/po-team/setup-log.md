@@ -61,6 +61,63 @@ flips it to fleet-standard `ai-teams`.
     + **reboot survival** (systemd `stationmaster.service`). Hub wiped pristine after test.
     Facts: `wiki/references/hub-on-sagres.md`.
 
+## 2026-07-15/16 (cont.) — comms stack end-to-end (daemon, onboarding, surfacing, MCP)
+
+14. **Sidecar courier built + deployed** (#95): `company-courier.py` reuses the reference
+    wire/dedup/inbound, rewrites outbound for the `to:`-line convention. ultracode-built,
+    fixed (flock lock, bounce-on-reject, batched bounces). Deployed as **sidecar containers**
+    `mvox-courier` (shipyard) + `po-team-courier` (sagres), reusing `ai-team:latest`,
+    co-mounting the team home volume. **Gotcha fixed:** sidecar needs `pid: "container:<team>"`
+    so its liveness check can see the team container's claude pid (separate PID namespace
+    otherwise → "ambiguous team dir"). See `wiki/references/company-courier-daemon.md`.
+15. **Onboarding done for mvox + po-team** (#96 partial): per-team hub keys generated
+    in-container (`~/.ssh/sm_<team>`), registered on the hub (`sm-register`), **reciprocal
+    grants** set. Cross-box reachability proven (shipyard→sagres tailnet `ping`).
+16. **Surfacing fix** (committed): `stationmaster-courier.py` `rewrite_attribution` now
+    FORCES `read:false` + normalizes `timestamp` on inbound delivery — the live harness
+    only surfaces entries that have both. Benefits FR too.
+17. **MCP send/read server built** (#100): `comms-mcp.py` — stdio JSON-RPC, `send(to,message)`
+    (deposits directly, synchronous accept/bounce) + `read_mail()` (non-destructive local read).
+    ultracode-built + 3-lens verify; fixes applied (stable entry for retry-dedup-safety,
+    team-only routing, UTF-8, error detail). Unit + stdio-smoke tested. **Committed, NOT yet
+    deployed to the containers.**
+
+### KEY EMPIRICAL FINDINGS (hard-won, tested — do not re-derive)
+- **Receiving/surfacing requires an ACTIVE TEAM (≥2 members).** A lone/solo Claude session
+  does NOT drain/surface its inbox; a session with ≥1 spawned teammate does. So: no live
+  comms in solo sessions (accepted). `read_mail()` exists to pull mail in the solo case.
+- **Team dir + inboxes only materialize with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`** set
+  before launching claude. Without it, no `teams/session-<id>/config.json`.
+- **Native `SendMessage` cannot reach the outbox** — routes only to REGISTERED agents;
+  pre-creating the outbox inbox file does NOT help. → pivoted send to the MCP tool (#100).
+- **The receive inbox is a plain file drop** — no roster/member validation on delivery
+  (surfacing depends on read:false+timestamp + active team, NOT on the sender being a member).
+
+### LIVE INFRA STATE at handoff
+- Hub: `stationmaster` container on **sagres**, healthy, systemd + tailnet-bound (`sm@100.102.133.125:2222`).
+- Sidecars: `mvox-courier` (shipyard), `po-team-courier` (sagres) — both running, `pid:container:<team>`.
+- Team containers: `mvox` (shipyard :2229), `screenwerk` (:2230), `po-team` (sagres, portless — `docker exec`).
+- **Live Claude sessions LEFT RUNNING:** `mvox` (tmux `mvox`, has teammate `echo` → active team, surfaces),
+  `po-team` (tmux `po-team`, solo). Both authed. Started with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
+- Registered+granted on hub: `mvox` ↔ `po-team` (reciprocal). Keys: `~/.ssh/sm_<team>` in each container.
+- **PROVEN live:** PO→mvox message travels outbox→po-team-courier→hub→mvox-courier→mvox inbox and
+  **surfaces to the mvox agent** (verified in the mvox pane).
+
+### NEXT SESSION — deploy + live-test the MCP server (#100)
+1. Ship `comms-mcp.py` + `stationmaster-courier.py` + `company-courier.py` into each team
+   container (e.g. `~/comms/`), plus a per-team config (same shape as `<team>-courier-config.json`:
+   team, ssh_target `sm@100.102.133.125`, ssh_key `~/.ssh/sm_<team>`, ssh_opts `-p 2222 ...`,
+   inboxes_dir `auto`, target_inbox `team-lead`, state_dir, claude_home).
+2. Add `.mcp.json` in the session workdir (`~/`): `{"mcpServers":{"comms":{"command":"python3",
+   "args":["/home/ai-teams/comms/comms-mcp.py","--config","/home/ai-teams/comms/config.json"]}}}`.
+   Or `claude mcp add comms -- python3 .../comms-mcp.py --config .../config.json`.
+3. Reload the session's MCP (restart claude, or `/mcp`).
+4. **Live test:** drive the po-team agent to call the `send` tool → to `mvox` → watch it
+   surface in the mvox pane (mvox is an active team). Confirm the synchronous verdict.
+5. Then reverse (mvox `send` → po-team) — note po-team is solo, so use `read_mail()` there to
+   confirm receipt (won't auto-surface).
+- Then: reconcile design docs (#90), 'up' script + commit build context (#94), sudoers removal (#98).
+
 ## Pending
 
 11. Legacy renames: boxes → **sagres** (ex ai-mvox-eu) + **shipyard** (ex
@@ -81,5 +138,9 @@ flips it to fleet-standard `ai-teams`.
 - [ ] design-doc reconciliation ([#90](https://github.com/mitselek/ai-teams/issues/90), gap 4 now resolved -> unblocked)
 - [ ] remove deploy-window sudoers on sagres when rollout settles ([#98](https://github.com/mitselek/ai-teams/issues/98))
 - [ ] optional: hard power-cycle durability test via Hostinger API ([#99](https://github.com/mitselek/ai-teams/issues/99))
+- [x] sidecar courier built + deployed ([#95](https://github.com/mitselek/ai-teams/issues/95))
+- [x] mvox + po-team onboarded (keys + reciprocal grants) ([#96](https://github.com/mitselek/ai-teams/issues/96) partial)
+- [x] surfacing fix (read:false + timestamp on delivery) committed
+- [ ] **MCP server ([#100](https://github.com/mitselek/ai-teams/issues/100)): built + committed; DEPLOY to containers + live-test = next session's first task**
 
 (*PO territory log — maintained by Aen with Mihkel*)
