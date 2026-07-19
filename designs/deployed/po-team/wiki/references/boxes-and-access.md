@@ -16,7 +16,19 @@ whenever convenient.
 
 ## Containers (on shipyard, build context `/opt/ai-teams/`)
 
-Mac ssh aliases (in `~/.ssh/config`): `sagres`, `mvox`, `screenwerk`.
+Mac ssh aliases (in `~/.ssh/config`): `sagres`, `mvox`, `screenwerk` — all with
+`ServerAliveInterval 15` keepalives (half-dead connections cut in ~45 s).
+
+**Operator convenience functions** (Mac `~/.zshrc`, added 2026-07-19): `mvox`,
+`screenwerk`, `po` — bare call lands in the team's claude tmux session via the
+container's `up` launcher (`container/up`; create-or-attach, stale-team-dir
+archiving, UTF-8 locale export); `-i` gives a plain interactive shell instead.
+All wrap `sshc`, an ssh wrapper that resets terminal modes on exit (mouse
+reporting, focus events, bracketed paste) — tmux/claude enable mouse reporting
+and a dropped connection never disables it, so without the reset the local
+terminal leaks `35;87;24M…` on mouse movement. Locale gotcha: `docker exec`
+paths carry no locale env (`LC_CTYPE=POSIX`) so tmux renders multibyte glyphs
+as underscores; fixed in `up` + image `ENV LANG=C.UTF-8`.
 
 | Container | ssh (tailnet only) | Volume |
 |---|---|---|
