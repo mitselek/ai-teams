@@ -22,6 +22,16 @@
 #      a second claude.
 set -euo pipefail
 
+# UTF-8 or tmux mangles multibyte glyphs (the claude prompt renders as
+# underscores): docker exec paths carry NO locale env (LC_CTYPE=POSIX),
+# unlike the container-sshd path whose AcceptEnv passes the client's LANG.
+# tmux decides UTF-8 per attaching client from its LC_CTYPE, so setting it
+# here fixes rendering even against an already-running session server.
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
+    *[Uu][Tt][Ff]*) ;;
+    *) export LANG=C.UTF-8 LC_ALL=C.UTF-8 ;;
+esac
+
 fail() { printf 'up: %s\n' "$*" >&2; exit 1; }
 
 usage() {

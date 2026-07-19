@@ -39,6 +39,7 @@ RUN mkdir -p /run/sshd && ssh-keygen -A \
     && sed -i 's/^#\?UsePAM.*/UsePAM no/'                            /etc/ssh/sshd_config
 
 ENV HOME=/home/ai-teams
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 COPY entrypoint.sh /entrypoint.sh
 COPY up /usr/local/bin/up
 RUN chmod +x /entrypoint.sh /usr/local/bin/up
