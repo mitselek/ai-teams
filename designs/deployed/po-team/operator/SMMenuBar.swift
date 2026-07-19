@@ -29,7 +29,8 @@ struct SMStatus {
 
 @main
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate,
+                         NSUserNotificationCenterDelegate {
 
     // NSApplication.delegate is unretained -- hold the delegate here.
     static var shared: AppDelegate?
@@ -53,7 +54,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var timer: Timer?
     var runningProcs: [Process] = [] // retain async smc runs until they exit
 
+    // Banner-once dedup, persisted so a restart does not re-banner old mail.
+    // This app owns notifications (not smc's osascript): banners carry OUR
+    // bundle identity, so clicking one opens the inbox -- osascript banners
+    // belong to Script Editor and clicking them opened an empty editor.
+    let banneredPath = NSString(
+        string: "~/.stationmaster-operator/bannered.json").expandingTildeInPath
+    var bannered: Set<String> = []
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        loadBannered()
+        NSUserNotificationCenter.default.delegate = self
         statusItem = NSStatusBar.system.statusItem(
             withLength: NSStatusItem.variableLength)
         let menu = NSMenu()
@@ -73,6 +84,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc func timerFired() { refresh() }
+
+    // ---------------------------------------------------------- notifications
+
+    func loadBannered() {
+        guard let data = FileManager.default.contents(atPath: banneredPath),
+              let arr = try? JSONSerialization.jsonObject(with: data)
+                as? [String] else { return }
+        bannered = Set(arr)
+    }
+
+    func saveBannered() {
+        guard let data = try? JSONSerialization.data(
+            withJSONObject: Array(bannered).sorted()) else { return }
+        try? data.write(to: URL(fileURLWithPath: banneredPath), options: .atomic)
+    }
+
+    /// Post ONE banner covering all not-yet-bannered waiting messages.
+    /// Summaries appear only in notification text fields -- never in any
+    /// shell/AppleScript string (same rule as menu titles).
+    func maybeBanner() {
+        guard let status = lastGood else { return }
+        let waitingIds = Set(status.waiting.map { $0.id }.filter { !$0.isEmpty })
+        let fresh = status.waiting.filter {
+            !$0.id.isEmpty && !bannered.contains($0.id) }
+        // Prune acked/gone ids so the set cannot grow unboundedly.
+        let pruned = bannered.intersection(waitingIds)
+        if fresh.isEmpty {
+            if pruned != bannered { bannered = pruned; saveBannered() }
+            return
+        }
+        let n = NSUserNotification()
+        if fresh.count == 1, let m = fresh.first {
+            n.title = "Mail from \(m.fromTeam)"
+            n.informativeText = String(m.summary.prefix(140))
+        } else {
+            n.title = "\(fresh.count) new messages"
+            n.informativeText = fresh.map { "\($0.fromTeam): \($0.summary)" }
+                .joined(separator: " · ").prefix(140).description
+        }
+        NSUserNotificationCenter.default.deliver(n)
+        bannered = pruned.union(fresh.map { $0.id })
+        saveBannered()
+    }
+
+    // Show banners even while this (accessory) app is frontmost.
+    nonisolated func userNotificationCenter(
+        _ center: NSUserNotificationCenter,
+        shouldPresent notification: NSUserNotification) -> Bool { true }
+
+    // Clicking a banner opens the inbox in Terminal.
+    nonisolated func userNotificationCenter(
+        _ center: NSUserNotificationCenter,
+        didActivate notification: NSUserNotification) {
+        Task { @MainActor in AppDelegate.shared?.openInbox() }
+    }
 
     // ---------------------------------------------------------------- state
 
@@ -104,6 +170,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
             lastGood = SMStatus(checkedAt: checkedAt, waiting: waiting,
                                 unseen: obj["unseen"] as? Int ?? 0)
+            maybeBanner()
         } catch {
             // Loud in the log, calm in the UI: keep the last good state.
             NSLog("SMMenuBar: malformed status.json, keeping last good state: %@",
