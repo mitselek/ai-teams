@@ -1,0 +1,562 @@
+#!/usr/bin/env python3
+# smc -- stationmaster message centre for the operator (Mihkel's Mac).
+#
+# One ssh conversation per hub exchange (stationmaster protocol v1):
+# write NDJSON request lines to stdin, read an envelope line + payload
+# lines from stdout, connection closes. Identity is the channel: the
+# ~/.ssh/sm_operator key is bound to team "operator" on the hub.
+#
+# Design rules (fleet-wide): loud failures, no silent fallbacks. Every
+# message seen is archived locally BEFORE it is acked -- mail is unlosable.
+#
+# stdlib only. Python 3.9 compatible (launchd runs /usr/bin/python3).
+
+import fcntl
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
+
+STATE_DIR = Path(os.environ.get("SMC_STATE_DIR",
+                                os.path.expanduser("~/.stationmaster-operator")))
+ARCHIVE = STATE_DIR / "archive.jsonl"
+SEEN = STATE_DIR / "seen.json"
+
+DEFAULT_HUB_CMD = (
+    "ssh -T -o BatchMode=yes -p 2222 "
+    "-o UserKnownHostsFile=~/.ssh/known_hosts_hub "
+    "-o ConnectTimeout=10 "
+    "-i ~/.ssh/sm_operator sm@100.102.133.125"
+)
+
+BOLD, DIM, RED, GREEN, YELLOW, RESET = (
+    "\033[1m", "\033[2m", "\033[31m", "\033[32m", "\033[33m", "\033[0m")
+
+
+def use_color():
+    return sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+
+
+def c(code, text):
+    return code + text + RESET if use_color() else text
+
+
+class HubDown(Exception):
+    """Transport failed (network down, ssh error). Not a protocol error."""
+
+
+class HubError(Exception):
+    """The hub answered with ok:false."""
+
+
+# --------------------------------------------------------------------------
+# Transport
+# --------------------------------------------------------------------------
+
+def hub_exchange(request_lines):
+    """One conversation: send NDJSON lines, return (envelope, payloads).
+
+    request_lines: list of dicts (first is the request envelope).
+    Raises HubDown on transport failure, HubError on ok:false.
+    """
+    cmd = os.environ.get("SMC_HUB_CMD", DEFAULT_HUB_CMD)
+    stdin_data = "".join(
+        json.dumps(l, separators=(",", ":")) + "\n" for l in request_lines)
+    try:
+        proc = subprocess.run(
+            cmd, shell=True, input=stdin_data.encode("utf-8"),
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+    except subprocess.TimeoutExpired:
+        raise HubDown("hub conversation timed out after 60s")
+    except OSError as exc:
+        raise HubDown("could not run hub command: %s" % exc)
+    if proc.returncode != 0:
+        err = proc.stderr.decode("utf-8", "replace").strip()
+        raise HubDown("hub unreachable (exit %d): %s"
+                      % (proc.returncode, err or "no stderr"))
+    lines = [l for l in proc.stdout.decode("utf-8", "replace").splitlines()
+             if l.strip()]
+    if not lines:
+        raise HubDown("hub returned no output")
+    try:
+        envelope = json.loads(lines[0])
+        payloads = [json.loads(l) for l in lines[1:]]
+    except ValueError as exc:
+        raise HubDown("hub spoke non-JSON: %s" % exc)
+    if not envelope.get("ok"):
+        e = envelope.get("error", {})
+        raise HubError("hub error %s: %s"
+                       % (e.get("code", "?"), e.get("detail", "")))
+    return envelope, payloads
+
+
+def die(msg, code=1):
+    sys.stderr.write(c(RED, "smc: %s" % msg) + "\n")
+    sys.exit(code)
+
+
+# --------------------------------------------------------------------------
+# Local state: archive.jsonl (append-only) + seen.json (notifier cache)
+# --------------------------------------------------------------------------
+
+def ensure_state_dir():
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@contextmanager
+def state_lock():
+    """Exclusive lock serialising read-modify-write of local state, so the
+    launchd notifier and an interactive smc can't race each other into
+    duplicate archive lines or double notifications."""
+    ensure_state_dir()
+    fd = os.open(str(STATE_DIR / "lock"), os.O_WRONLY | os.O_CREAT, 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        os.close(fd)
+
+
+def archive_load():
+    """All archived records, oldest first. Tolerates a torn last line."""
+    records = []
+    keys = set()
+    try:
+        with open(ARCHIVE, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except ValueError:
+                    sys.stderr.write("smc: warning: skipping corrupt archive "
+                                     "line\n")
+                    continue
+                # Dedup by (direction, id): a historic concurrent-append race
+                # could double a line; never show a message twice.
+                key = (rec.get("direction"),
+                       rec.get("envelope", {}).get("id"))
+                if key[1] is not None:
+                    if key in keys:
+                        continue
+                    keys.add(key)
+                records.append(rec)
+    except FileNotFoundError:
+        pass
+    return records
+
+
+def archived_received_ids():
+    return {r["envelope"]["id"] for r in archive_load()
+            if r.get("direction") == "received" and r.get("envelope", {}).get("id")}
+
+
+def archive_append(direction, envelope):
+    """Append one record as a single atomic-ish write() of one line.
+    Safe against a concurrent appender (notifier vs interactive smc):
+    O_APPEND + one write() per line never interleaves partial lines."""
+    ensure_state_dir()
+    rec = {"direction": direction,
+           "archived_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+           "envelope": envelope}
+    line = json.dumps(rec, separators=(",", ":"), ensure_ascii=False) + "\n"
+    fd = os.open(str(ARCHIVE), os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+    try:
+        os.write(fd, line.encode("utf-8"))
+    finally:
+        os.close(fd)
+
+
+def archive_new_received(messages):
+    """Archive every not-yet-archived received message. Returns the newly
+    archived ones. ALWAYS call before displaying or acking."""
+    with state_lock():
+        have = archived_received_ids()
+        new = [m for m in messages if m.get("id") not in have]
+        for m in new:
+            archive_append("received", m)
+    return new
+
+
+def seen_load():
+    try:
+        return set(json.loads(SEEN.read_text(encoding="utf-8")))
+    except (FileNotFoundError, ValueError):
+        return set()
+
+
+def seen_store(ids):
+    ensure_state_dir()
+    fd, tmp = tempfile.mkstemp(dir=str(STATE_DIR), prefix="seen.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(sorted(ids), fh)
+        os.replace(tmp, str(SEEN))
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
+# --------------------------------------------------------------------------
+# Hub operations
+# --------------------------------------------------------------------------
+
+def collect():
+    """Non-destructive: returns waiting messages (hub keeps them until ack)."""
+    _, payloads = hub_exchange([{"v": 1, "cmd": "collect"}])
+    return payloads
+
+
+def fmt_time(iso):
+    """Hub timestamps are UTC ...Z; show local time."""
+    try:
+        dt = datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ")
+        from datetime import timezone
+        return dt.replace(tzinfo=timezone.utc).astimezone().strftime(
+            "%Y-%m-%d %H:%M")
+    except (ValueError, TypeError):
+        return str(iso)
+
+
+def print_message(msg, number=None, full=False):
+    entry = msg.get("entry", {})
+    head = "%s  %s" % (fmt_time(msg.get("deposited_at")),
+                       msg.get("from_team", "?"))
+    num = "No.%d  " % number if number is not None else ""
+    print("")
+    print("%s%s  %s" % (num, c(BOLD, head),
+                        c(DIM, "id " + str(msg.get("id")))))
+    text = entry.get("text", "")
+    for line in text.splitlines() or [""]:
+        print("    " + line)
+    if full:
+        if entry.get("summary") and entry["summary"] != text[:len(entry["summary"])]:
+            print(c(DIM, "    summary: %s" % entry["summary"]))
+        if entry.get("type"):
+            print(c(DIM, "    type: %s" % entry["type"]))
+        if entry.get("from") and entry["from"] != msg.get("from_team"):
+            print(c(DIM, "    entry.from: %s" % entry["from"]))
+
+
+# --------------------------------------------------------------------------
+# Subcommands
+# --------------------------------------------------------------------------
+
+def cmd_inbox(args):
+    msgs = collect()
+    archive_new_received(msgs)          # archive FIRST, always
+    if not msgs:
+        print("inbox empty")
+        return 0
+    for i, m in enumerate(msgs, 1):
+        print_message(m, number=i)
+    print("")
+    print("%d message(s) waiting -- `smc ack <id...|all>` to clear "
+          "(archived locally either way)" % len(msgs))
+    return 0
+
+
+def resolve_ids(tokens, msgs):
+    """Map id prefixes / inbox numbers to full ids. Loud on ambiguity."""
+    ids = []
+    for tok in tokens:
+        if re.fullmatch(r"[0-9]{1,3}", tok):
+            # A bare number is ONLY an inbox ordinal (1-based). Never fall
+            # through to hex-prefix matching: a stale "0" or out-of-range
+            # number must not silently resolve to some other message.
+            n = int(tok)
+            if 1 <= n <= len(msgs):
+                ids.append(msgs[n - 1]["id"])
+                continue
+            die("inbox number %s out of range (1..%d) -- re-run smc inbox, "
+                "or use an id" % (tok, len(msgs)))
+        matches = [m["id"] for m in msgs if m["id"].startswith(tok)]
+        if len(matches) == 1:
+            ids.append(matches[0])
+        elif len(matches) > 1:
+            die("id prefix %r is ambiguous (%s)" % (tok, ", ".join(matches)))
+        else:
+            ids.append(tok)             # let the hub answer already_gone
+    return ids
+
+
+def cmd_read(args):
+    if not args:
+        die("usage: smc read <id|No.>")
+    msgs = collect()
+    archive_new_received(msgs)
+    wanted = resolve_ids(args[:1], msgs)[0]
+    for i, m in enumerate(msgs, 1):
+        if m["id"] == wanted:
+            print_message(m, number=i, full=True)
+            return 0
+    # Not waiting -- maybe already archived.
+    for r in reversed(archive_load()):
+        if r.get("envelope", {}).get("id") == wanted:
+            print(c(DIM, "(no longer waiting on the hub; from local archive)"))
+            print_message(r["envelope"], full=True)
+            return 0
+    die("no message with id %r (not waiting, not in archive)" % wanted)
+
+
+def cmd_ack(args):
+    if not args:
+        die("usage: smc ack <id...|all>")
+    msgs = collect()
+    newly = archive_new_received(msgs)   # archive-then-ack, never the reverse
+    if args == ["all"]:
+        ids = [m["id"] for m in msgs]
+        if not ids:
+            print("nothing waiting -- nothing to ack")
+            return 0
+    else:
+        # Ordinal safety: inbox numbers are positional and the hub's collect
+        # order shifts when new mail arrives -- a stale No. would ack a
+        # message the user never looked at.
+        if newly and any(re.fullmatch(r"[0-9]{1,3}", t) for t in args):
+            die("inbox changed since you looked (%d new message(s)) -- "
+                "re-run smc inbox or ack by id" % len(newly))
+        ids = resolve_ids(args, msgs)
+    # Safety: refuse to ack anything not in the local archive.
+    have = archived_received_ids()
+    unarchived = [i for i in ids if i not in have]
+    if unarchived:
+        die("refusing to ack unarchived id(s): %s" % ", ".join(unarchived))
+    by_id = {m["id"]: m for m in msgs}
+    _, results = hub_exchange([{"v": 1, "cmd": "ack", "args": {"ids": ids}}])
+    for r in results:
+        status = r.get("status", "?")
+        mark = c(GREEN, "acked") if status == "deleted" else c(YELLOW, status)
+        m = by_id.get(r.get("id"))
+        desc = ""
+        if m:
+            desc = "  " + c(DIM, "%s: %s" % (
+                m.get("from_team", "?"),
+                m.get("entry", {}).get("summary", "")))
+        print("%s  %s%s" % (r.get("id"), mark, desc))
+    if newly:
+        print(c(DIM, "(%d message(s) archived before ack)" % len(newly)))
+    return 0
+
+
+def stamp():
+    return datetime.now().strftime("[%Y-%m-%d %H:%M] ")
+
+
+def cmd_send(args):
+    if not args:
+        die("usage: smc send <team> <text...>   (or pipe body on stdin)")
+    team = args[0]
+    if len(args) > 1:
+        text = " ".join(args[1:])
+    else:
+        if sys.stdin.isatty():
+            sys.stderr.write("smc: composing to %s -- type the message, "
+                             "end with Ctrl-D\n" % team)
+        text = sys.stdin.read().strip()
+    if not text:
+        die("empty message -- nothing sent")
+    summary = text[:80]
+    stamped = stamp() + text
+    entry = {"from": "operator", "text": stamped, "summary": summary}
+    _, results = hub_exchange([
+        {"v": 1, "cmd": "deposit"},
+        {"to": team, "entry": entry},
+    ])
+    if not results:
+        die("hub accepted the conversation but returned no verdict")
+    r = results[0]
+    status = r.get("status", "?")
+    if status == "accepted":
+        archive_append("sent", {"id": r.get("id"), "to_team": team,
+                                "deposited_at": datetime.utcnow().strftime(
+                                    "%Y-%m-%dT%H:%M:%SZ"),
+                                "entry": entry})
+        print("%s -> %s  %s  %s"
+              % (c(GREEN, "accepted"), c(BOLD, team),
+                 c(DIM, "id " + str(r.get("id"))), summary))
+        return 0
+    if status == "duplicate":
+        print("%s -> %s  (NOT redelivered; hub saw this exact message "
+              "within its 7-day dedup window)"
+              % (c(YELLOW, "duplicate"), team))
+        return 2                        # distinct from rejected (1)
+    err = r.get("error", {})
+    die("rejected by hub: %s %s" % (err.get("code", "?"),
+                                    err.get("detail", "")))
+
+
+def cmd_log(args):
+    n = 20
+    if args:
+        try:
+            n = int(args[0])
+        except ValueError:
+            die("usage: smc log [N]   (N >= 1)")
+        if n < 1:
+            die("usage: smc log [N]   (N >= 1)")
+    records = archive_load()[-n:]
+    if not records:
+        print("archive empty (%s)" % ARCHIVE)
+        return 0
+    for r in records:
+        env = r.get("envelope", {})
+        entry = env.get("entry", {})
+        if r.get("direction") == "sent":
+            arrow, peer = c(GREEN, "->"), env.get("to_team", "?")
+        else:
+            arrow, peer = c(YELLOW, "<-"), env.get("from_team", "?")
+        print("%s %s %s  %s" % (
+            c(DIM, fmt_time(env.get("deposited_at"))),
+            arrow, c(BOLD, "%-12s" % peer),
+            entry.get("summary") or entry.get("text", "")[:80]))
+    print(c(DIM, "\n%d of %d archived (%s)"
+            % (len(records), len(archive_load()), ARCHIVE)))
+    return 0
+
+
+def cmd_teams(args):
+    _, payloads = hub_exchange([{"v": 1, "cmd": "status"}])
+    if not payloads:
+        die("hub status returned no payload")
+    st = payloads[0]
+    waiting = st.get("waiting_for_me", {})
+    out = st.get("grants_out", [])
+    inn = st.get("grants_in", [])
+    print(c(BOLD, "You can mail (they granted operator):"))
+    for g in out or []:
+        print("  %-14s %s" % (g.get("to"), c(DIM, "since " + fmt_time(g.get("since")))))
+    if not out:
+        print(c(DIM, "  nobody yet"))
+    print(c(BOLD, "Can mail you (operator granted them):"))
+    for g in inn or []:
+        w = waiting.get(g.get("from"), 0)
+        extra = c(YELLOW, "  %d waiting" % w) if w else ""
+        print("  %-14s %s%s" % (g.get("from"),
+                                c(DIM, "since " + fmt_time(g.get("since"))), extra))
+    if not inn:
+        print(c(DIM, "  nobody yet"))
+    # Reserved hub identities (stationmaster/sm) may deposit WITHOUT a grant:
+    # surface waiting mail from teams that have no grants_in entry.
+    granted_in = {g.get("from") for g in inn or []}
+    for team in sorted(waiting):
+        if team not in granted_in and waiting[team]:
+            print("  %-14s %s" % (team, c(YELLOW, "%d waiting (no grant -- "
+                                          "hub identity)" % waiting[team])))
+    unc = st.get("deposited_uncollected", {})
+    if unc:
+        print(c(BOLD, "Sent but not yet collected:"))
+        for team, info in sorted(unc.items()):
+            print("  %-14s %d (oldest %s)" % (team, info.get("count", 0),
+                                              fmt_time(info.get("oldest"))))
+    return 0
+
+
+def notify_macos(title, message):
+    """Post one notification. Text goes through argv into an AppleScript run
+    handler -- never interpolated into the script source (no injection)."""
+    script = ('on run argv\n'
+              'display notification (item 1 of argv) with title (item 2 of argv)\n'
+              'end run')
+    proc = subprocess.run(["/usr/bin/osascript", "-e", script, "--",
+                           message[:200], title],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                          timeout=15)
+    if proc.returncode != 0:
+        raise RuntimeError("osascript exit %d: %s"
+                          % (proc.returncode,
+                             proc.stderr.decode("utf-8", "replace").strip()))
+
+
+def cmd_check(args):
+    do_notify = "--notify" in args
+    try:
+        msgs = collect()
+    except HubDown as exc:
+        # launchd runs offline sometimes -- quiet exit, note on stderr only.
+        sys.stderr.write("smc check: hub unreachable, skipping (%s)\n" % exc)
+        return 0
+    archive_new_received(msgs)
+    with state_lock():
+        seen = seen_load()
+        new = [m for m in msgs if m.get("id") not in seen]
+        if not new:
+            # Silent on stdout: launchd's notify.log stays an event log
+            # instead of growing a "no new mail" line every 120 seconds.
+            return 0
+        print("%d new message(s):" % len(new))
+        for m in new:
+            print("  %s: %s" % (m.get("from_team"),
+                                m.get("entry", {}).get("summary", "")))
+        notified = True
+        if do_notify:
+            first = new[0]
+            detail = "%s: %s" % (first.get("from_team"),
+                                 first.get("entry", {}).get("summary", ""))
+            if len(new) > 1:
+                detail += "  (+%d more)" % (len(new) - 1)
+            title = "Stationmaster: %d new message(s)" % len(new)
+            try:
+                notify_macos(title, detail)
+            except Exception as exc:
+                notified = False
+                sys.stderr.write("smc check: notification failed "
+                                 "(will retry next run): %s\n" % exc)
+        # Only mark seen when the operator was actually notified (or no
+        # notification was requested) -- a failed banner must retry.
+        if notified:
+            seen_store(seen | {m["id"] for m in msgs if m.get("id")})
+    return 0
+
+
+USAGE = """\
+smc -- stationmaster message centre (operator identity)
+
+  smc [inbox]            list waiting mail (archives everything it sees)
+  smc read <id|No.>      full message (id prefix or inbox number)
+  smc ack <id...|all>    archive-then-ack; refuses to ack unarchived mail
+  smc send <team> <text> send (timestamp auto-prepended); stdin if no text
+  smc log [N]            last N archived messages, sent + received (default 20)
+  smc teams              who you can mail / who can mail you
+  smc check [--notify]   poll for new mail; --notify posts one macOS banner
+
+State: ~/.stationmaster-operator/ (archive.jsonl, seen.json)
+Env:   SMC_HUB_CMD overrides the ssh transport (testing)
+       SMC_STATE_DIR overrides the state dir (testing)
+"""
+
+
+def main(argv):
+    cmd = argv[0] if argv else "inbox"
+    args = argv[1:]
+    handlers = {
+        "inbox": cmd_inbox, "read": cmd_read, "ack": cmd_ack,
+        "send": cmd_send, "log": cmd_log, "teams": cmd_teams,
+        "check": cmd_check,
+    }
+    if cmd in ("-h", "--help", "help"):
+        print(USAGE, end="")
+        return 0
+    handler = handlers.get(cmd)
+    if handler is None:
+        sys.stderr.write(USAGE)
+        die("unknown subcommand %r" % cmd)
+    try:
+        return handler(args)
+    except HubDown as exc:
+        die(str(exc))                    # interactive: fail LOUD
+    except HubError as exc:
+        die(str(exc))
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

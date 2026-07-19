@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Stationmaster mail notifier: polls the hub every 2 minutes as team
+       'operator' and posts one macOS notification when new mail arrives.
+       Absolute paths throughout: launchd has no login PATH. Interpreter is
+       the system python3 (verified 3.9.6) because /usr/bin/env resolution
+       under launchd is not the login shell's. Offline runs exit 0 quietly
+       (smc check is launchd-aware); real errors land in notify.err. -->
+  <key>Label</key>
+  <string>com.mitselek.sm-notify</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/michelek/.local/bin/smc</string>
+    <string>check</string>
+    <string>--notify</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>120</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/michelek/.stationmaster-operator/notify.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/michelek/.stationmaster-operator/notify.err</string>
+</dict>
+</plist>

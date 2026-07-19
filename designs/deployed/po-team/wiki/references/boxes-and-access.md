@@ -33,10 +33,16 @@ as underscores; fixed in `up` + image `ENV LANG=C.UTF-8`.
 **Operator hub identity** (registered 2026-07-19): team `operator`, key
 `~/.ssh/sm_operator` on the Mac — Mihkel's own mail identity on the
 stationmaster, reciprocal grants with `po-team` and `mvox` (round-trip proven
-same day). Mac functions: `smail <team> <msg…>` (send, synchronous verdict),
-`sminbox` (collect, non-destructive), `smack <id…>` (ack). Teams reach Mihkel
-asynchronously via `send(to: operator)`; he reads on his own schedule — no
-courier, no live session needed. Mail `from: operator` is Mihkel.
+same day). Mac tooling: `smc` (`~/.local/bin/smc`, canonical copy
+`designs/deployed/po-team/operator/`) — inbox / read / ack / send / log /
+teams / check. Every message seen is archived to
+`~/.stationmaster-operator/archive.jsonl` before any ack (mail is unlosable);
+sends get the fleet's `[YYYY-MM-DD HH:MM]` timestamp prefix automatically. A
+launchd agent (`com.mitselek.sm-notify`, every 2 min) posts a macOS
+notification on new mail. Old names live on as aliases: `smail`→`smc send`,
+`sminbox`→`smc inbox`, `smack`→`smc ack`. Teams reach Mihkel asynchronously
+via `send(to: operator)`; he reads on his own schedule — no courier, no live
+session needed. Mail `from: operator` is Mihkel.
 
 | Container | ssh (tailnet only) | Volume |
 |---|---|---|
