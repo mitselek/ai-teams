@@ -416,21 +416,37 @@ def stamp():
     return datetime.now().strftime("[%Y-%m-%d %H:%M] ")
 
 
+_NAME_RE = r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}"
+
+
 def cmd_send(args):
     if not args:
-        die("usage: smc send <team> <text...>   (or pipe body on stdin)")
-    team = args[0]
+        die("usage: smc send <team | agent@team> <text...>   (or pipe body on stdin)")
+    dest = args[0]
+    # agent@team: the hub routes per TEAM only; the agent part travels as the
+    # ratified "to:" first line (protocols.md sect.1.2) and the receiving
+    # team-lead relays -- V1 delivers all inbound to the team-lead regardless.
+    agent = None
+    team = dest
+    if "@" in dest:
+        agent, team = dest.split("@", 1)
+        if not re.fullmatch(_NAME_RE, agent):
+            die("bad agent name %r (allowed: alnum start, then [A-Za-z0-9._-], max 64)" % agent)
+    if not re.fullmatch(_NAME_RE, team):
+        die("bad team name %r (allowed: alnum start, then [A-Za-z0-9._-], max 64)" % team)
     if len(args) > 1:
         text = " ".join(args[1:])
     else:
         if sys.stdin.isatty():
             sys.stderr.write("smc: composing to %s -- type the message, "
-                             "end with Ctrl-D\n" % team)
+                             "end with Ctrl-D\n" % dest)
         text = sys.stdin.read().strip()
     if not text:
         die("empty message -- nothing sent")
     summary = text[:80]
     stamped = stamp() + text
+    if agent:
+        stamped = "to: %s\n%s" % (dest, stamped)
     entry = {"from": "operator", "text": stamped, "summary": summary}
     _, results = hub_exchange([
         {"v": 1, "cmd": "deposit"},
@@ -441,12 +457,12 @@ def cmd_send(args):
     r = results[0]
     status = r.get("status", "?")
     if status == "accepted":
-        archive_append("sent", {"id": r.get("id"), "to_team": team,
+        archive_append("sent", {"id": r.get("id"), "to_team": dest,
                                 "deposited_at": datetime.utcnow().strftime(
                                     "%Y-%m-%dT%H:%M:%SZ"),
                                 "entry": entry})
         print("%s -> %s  %s  %s"
-              % (c(GREEN, "accepted"), c(BOLD, team),
+              % (c(GREEN, "accepted"), c(BOLD, dest),
                  c(DIM, "id " + str(r.get("id"))), summary))
         return 0
     if status == "duplicate":

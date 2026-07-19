@@ -56,6 +56,10 @@ case "$first" in
     case "$rest" in
       *'"to":"nosuch"'*)
         echo '{"id":null,"to":"nosuch","status":"rejected","error":{"code":"E_UNKNOWN_TEAM","detail":"not registered"}}' ;;
+      *'"to":"gama@po-team"'*)
+        # real hub knows only TEAMS -- an agent@team in the deposit "to"
+        # field means smc failed to split; reject like the hub would
+        echo '{"id":null,"to":"gama@po-team","status":"rejected","error":{"code":"E_UNKNOWN_TEAM","detail":"not registered"}}' ;;
       *'dupe-me'*)
         echo '{"id":"dddd000011112222","to":"po-team","status":"duplicate"}' ;;
       *) echo '{"id":"cccc777788889999","to":"po-team","status":"accepted"}' ;;
@@ -172,6 +176,16 @@ t "sent in archive"       0 grep -c '"sent"' "$SMC_STATE_DIR/archive.jsonl"
 expect "sent archived" "1"
 t "sent text timestamped" 0 grep -cE '\[20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}\] hello from the test rig' "$SMC_STATE_DIR/archive.jsonl"
 expect "timestamp prefix" "1"
+
+# ---- send: agent@team DM (deposit to bare TEAM, ratified to:-line in body) ----
+t "send agent@team"       0 "$SMC" send gama@po-team please survey the board
+expect "dm verdict shows dest"  "gama@po-team"
+t "dm to-line in body"    0 grep -c '"text":"to: gama@po-team' "$SMC_STATE_DIR/archive.jsonl"
+expect "dm to-line" "1"
+t "dm archived under dest" 0 grep -c '"to_team":"gama@po-team"' "$SMC_STATE_DIR/archive.jsonl"
+expect "dm archive dest" "1"
+t "send bad agent name"   1 "$SMC" send 'bad name@po-team' hi
+expect "bad agent rejected"     "bad agent name"
 
 # ---- send: stdin compose mode ----
 printf 'body from stdin\n' > "$WORK/body.txt"
