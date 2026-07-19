@@ -90,6 +90,21 @@ t "inbox rerun"           0 "$SMC" inbox
 t "archive still 2"       0 grep -c '"received"' "$SMC_STATE_DIR/archive.jsonl"
 expect "no dup archive" "2"
 
+# ---- status.json: written on inbox, nothing seen yet -> unseen 2 ----
+t "status after inbox"    0 python3 - <<PYEOF
+import json
+s = json.load(open("$SMC_STATE_DIR/status.json"))
+assert len(s["waiting"]) == 2, s
+assert s["unseen"] == 2, s
+assert s["waiting"][0]["id"] == "aaaa111122223333", s
+assert s["waiting"][0]["from_team"] == "po-team", s
+assert s["waiting"][0]["summary"] == "daemon is live", s
+assert s["waiting"][1]["from_team"] == "mvox", s
+assert "checked_at" in s, s
+print("status.json ok: 2 waiting, 2 unseen")
+PYEOF
+expect "status inbox content"   "2 waiting, 2 unseen"
+
 # ---- read by inbox number and id prefix ----
 t "read by number"        0 "$SMC" read 2
 expect "read shows full body"   "second line"
@@ -115,6 +130,16 @@ else
   echo "ok   check silent after seen"
 fi
 
+# ---- status.json: after check marks seen -> unseen 0, still 2 waiting ----
+t "status after check"    0 python3 - <<PYEOF
+import json
+s = json.load(open("$SMC_STATE_DIR/status.json"))
+assert len(s["waiting"]) == 2, s
+assert s["unseen"] == 0, s
+print("status.json ok: 2 waiting, 0 unseen")
+PYEOF
+expect "status seen content"    "2 waiting, 0 unseen"
+
 # ---- check with hub down: quiet exit 0 ----
 SMC_HUB_CMD="false" t "check offline exit 0" 0 "$SMC" check
 expect "check offline notes stderr" "hub unreachable"
@@ -125,6 +150,16 @@ SMC_HUB_CMD="false" t "inbox offline fails loud" 1 "$SMC" inbox
 # ---- ack all (messages are archived, so allowed) ----
 t "ack all"               0 "$SMC" ack all
 expect "ack reports deleted"    "acked"
+
+# ---- status.json: ack must prune acked ids so the badge clears ----
+t "status after ack"      0 python3 - <<PYEOF
+import json
+s = json.load(open("$SMC_STATE_DIR/status.json"))
+assert s["waiting"] == [], s
+assert s["unseen"] == 0, s
+print("status.json ok: pruned to empty")
+PYEOF
+expect "status ack pruned"      "pruned to empty"
 
 # after ack the fake hub spool is empty
 t "inbox empty after ack" 0 "$SMC" inbox

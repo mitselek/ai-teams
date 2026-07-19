@@ -39,7 +39,11 @@ teams / check. Every message seen is archived to
 `~/.stationmaster-operator/archive.jsonl` before any ack (mail is unlosable);
 sends get the fleet's `[YYYY-MM-DD HH:MM]` timestamp prefix automatically. A
 launchd agent (`com.mitselek.sm-notify`, every 2 min) posts a macOS
-notification on new mail. Old names live on as aliases: `smail`→`smc send`,
+notification on new mail. A menu bar indicator (`SMMenuBar.app`, launchd agent
+`com.mitselek.sm-menubar`) shows an envelope + waiting count: it only renders
+`~/.stationmaster-operator/status.json`, which every smc command refreshes — the
+poller stays the sole scheduled hub client. Rebuild with
+`designs/deployed/po-team/operator/build-menubar.sh` after editing `SMMenuBar.swift`. Old names live on as aliases: `smail`→`smc send`,
 `sminbox`→`smc inbox`, `smack`→`smc ack`. Teams reach Mihkel asynchronously
 via `send(to: operator)`; he reads on his own schedule — no courier, no live
 session needed. Mail `from: operator` is Mihkel.

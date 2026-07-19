@@ -26,6 +26,7 @@ STATE_DIR = Path(os.environ.get("SMC_STATE_DIR",
                                 os.path.expanduser("~/.stationmaster-operator")))
 ARCHIVE = STATE_DIR / "archive.jsonl"
 SEEN = STATE_DIR / "seen.json"
+STATUS = STATE_DIR / "status.json"
 
 DEFAULT_HUB_CMD = (
     "ssh -T -o BatchMode=yes -p 2222 "
@@ -191,13 +192,15 @@ def seen_load():
         return set()
 
 
-def seen_store(ids):
+def atomic_json_write(path, obj):
+    """tempfile + rename so readers never see a torn file."""
     ensure_state_dir()
-    fd, tmp = tempfile.mkstemp(dir=str(STATE_DIR), prefix="seen.", suffix=".tmp")
+    fd, tmp = tempfile.mkstemp(dir=str(STATE_DIR), prefix=path.name + ".",
+                               suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            json.dump(sorted(ids), fh)
-        os.replace(tmp, str(SEEN))
+            json.dump(obj, fh, ensure_ascii=False)
+        os.replace(tmp, str(path))
     except BaseException:
         try:
             os.unlink(tmp)
@@ -206,12 +209,57 @@ def seen_store(ids):
         raise
 
 
+def seen_store(ids):
+    atomic_json_write(SEEN, sorted(ids))
+
+
+def status_store(msgs, collected_at=None):
+    """Write status.json -- the menu bar app's only input. Caller MUST hold
+    state_lock. Called wherever we learn the current waiting set, so the
+    menu bar badge always mirrors reality without extra hub traffic.
+
+    collected_at (UTC "%Y-%m-%dT%H:%M:%SZ"): when the caller's collect()
+    actually ran. A slow process (multi-second hub trip) must not overwrite
+    a snapshot some faster process wrote from FRESHER data -- e.g. an ack
+    pruning the set while a check was still in flight. Strictly-newer
+    existing snapshot wins; missing/malformed existing file never blocks."""
+    collected_at = (collected_at or _LAST_COLLECT_AT
+                    or datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    try:
+        with open(STATUS) as f:
+            existing = json.load(f)
+        if str(existing.get("checked_at", "")) > collected_at:
+            return
+    except (OSError, ValueError):
+        pass
+    seen = seen_load()
+    waiting = []
+    for m in msgs:
+        entry = m.get("entry", {})
+        waiting.append({
+            "id": m.get("id"),
+            "from_team": m.get("from_team", "?"),
+            "deposited_at": m.get("deposited_at"),
+            "summary": entry.get("summary") or entry.get("text", "")[:80],
+        })
+    atomic_json_write(STATUS, {
+        "checked_at": collected_at,
+        "waiting": waiting,
+        "unseen": len([m for m in msgs if m.get("id") not in seen]),
+    })
+
+
 # --------------------------------------------------------------------------
 # Hub operations
 # --------------------------------------------------------------------------
 
+_LAST_COLLECT_AT = None  # UTC stamp of this process's last collect()
+
+
 def collect():
     """Non-destructive: returns waiting messages (hub keeps them until ack)."""
+    global _LAST_COLLECT_AT
+    _LAST_COLLECT_AT = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     _, payloads = hub_exchange([{"v": 1, "cmd": "collect"}])
     return payloads
 
@@ -254,6 +302,8 @@ def print_message(msg, number=None, full=False):
 def cmd_inbox(args):
     msgs = collect()
     archive_new_received(msgs)          # archive FIRST, always
+    with state_lock():
+        status_store(msgs)
     if not msgs:
         print("inbox empty")
         return 0
@@ -294,6 +344,8 @@ def cmd_read(args):
         die("usage: smc read <id|No.>")
     msgs = collect()
     archive_new_received(msgs)
+    with state_lock():
+        status_store(msgs)
     wanted = resolve_ids(args[:1], msgs)[0]
     for i, m in enumerate(msgs, 1):
         if m["id"] == wanted:
@@ -313,6 +365,8 @@ def cmd_ack(args):
         die("usage: smc ack <id...|all>")
     msgs = collect()
     newly = archive_new_received(msgs)   # archive-then-ack, never the reverse
+    with state_lock():
+        status_store(msgs)
     if args == ["all"]:
         ids = [m["id"] for m in msgs]
         if not ids:
@@ -333,6 +387,16 @@ def cmd_ack(args):
         die("refusing to ack unarchived id(s): %s" % ", ".join(unarchived))
     by_id = {m["id"]: m for m in msgs}
     _, results = hub_exchange([{"v": 1, "cmd": "ack", "args": {"ids": ids}}])
+    # The hub no longer holds these -- clear them from status.json so the
+    # menu bar badge drops immediately (already_gone counts: not waiting).
+    gone = {r.get("id") for r in results
+            if r.get("status") in ("deleted", "already_gone")}
+    with state_lock():
+        # Stamp with ACK time, not collect time: the pruned set reflects
+        # post-ack reality and must win over any in-flight pre-ack snapshot.
+        status_store([m for m in msgs if m["id"] not in gone],
+                     collected_at=datetime.utcnow().strftime(
+                         "%Y-%m-%dT%H:%M:%SZ"))
     for r in results:
         status = r.get("status", "?")
         mark = c(GREEN, "acked") if status == "deleted" else c(YELLOW, status)
@@ -492,6 +556,7 @@ def cmd_check(args):
         if not new:
             # Silent on stdout: launchd's notify.log stays an event log
             # instead of growing a "no new mail" line every 120 seconds.
+            status_store(msgs)
             return 0
         print("%d new message(s):" % len(new))
         for m in new:
@@ -515,6 +580,7 @@ def cmd_check(args):
         # notification was requested) -- a failed banner must retry.
         if notified:
             seen_store(seen | {m["id"] for m in msgs if m.get("id")})
+        status_store(msgs)               # after seen_store: unseen reflects it
     return 0
 
 
@@ -529,7 +595,7 @@ smc -- stationmaster message centre (operator identity)
   smc teams              who you can mail / who can mail you
   smc check [--notify]   poll for new mail; --notify posts one macOS banner
 
-State: ~/.stationmaster-operator/ (archive.jsonl, seen.json)
+State: ~/.stationmaster-operator/ (archive.jsonl, seen.json, status.json)
 Env:   SMC_HUB_CMD overrides the ssh transport (testing)
        SMC_STATE_DIR overrides the state dir (testing)
 """
