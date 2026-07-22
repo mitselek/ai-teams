@@ -49,7 +49,7 @@ RUN \
     chown 1000:1000 /home/ai-teams
 
 # Install Claude Code globally (Node.js version from npm)
-ARG CLAUDE_VERSION=latest
+ARG CLAUDE_VERSION=2.1.217
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} 2>&1 | tail -5
 
 ENV HOME=/home/ai-teams
