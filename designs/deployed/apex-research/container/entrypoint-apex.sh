@@ -11,14 +11,14 @@
 # 7. Drop privileges and exec
 #
 # Required env vars:
-#   GITHUB_TOKEN      -- PAT with read access to both repos (same org)
-#   ANTHROPIC_API_KEY -- Claude Code CLI
-#   SSH_PUBLIC_KEY    -- PO's public key for SSH access
+#   GITHUB_TOKEN      — PAT with read access to both repos (same org)
+#   ANTHROPIC_API_KEY — Claude Code CLI
+#   SSH_PUBLIC_KEY    — PO's public key for SSH access
 #
 # Optional env vars:
-#   REPO_URL          -- research repo URL (default: Eesti-Raudtee/apex-migration-research)
-#   SOURCE_REPO_URL   -- source data repo URL (default: Eesti-Raudtee/vjs_apex_apps)
-#   TEAM_NAME         -- team name (default: apex-research)
+#   REPO_URL          — research repo URL (default: Eesti-Raudtee/apex-migration-research)
+#   SOURCE_REPO_URL   — source data repo URL (default: Eesti-Raudtee/vjs_apex_apps)
+#   TEAM_NAME         — team name (default: apex-research)
 set -e
 
 CONTAINER_USER="ai-teams"
@@ -42,20 +42,20 @@ clone_or_pull() {
     auth_url=$(echo "$repo_url" | sed "s|https://|https://${GITHUB_TOKEN}@|")
 
     if [ -d "${target_dir}/.git" ]; then
-        echo "[entrypoint] ${target_dir} exists -- running git pull..."
+        echo "[entrypoint] ${target_dir} exists — running git pull..."
         gosu "${CONTAINER_USER}" git -C "${target_dir}" remote set-url origin "${auth_url}"
         gosu "${CONTAINER_USER}" git -C "${target_dir}" pull --ff-only || {
             echo "[entrypoint] WARNING: git pull failed for ${target_dir} (non-fast-forward or network). Using existing state."
         }
     else
-        echo "[entrypoint] First run -- cloning ${repo_url} to ${target_dir}..."
+        echo "[entrypoint] First run — cloning ${repo_url} to ${target_dir}..."
         mkdir -p "${target_dir}"
         chown "${CONTAINER_UID}:${CONTAINER_GID}" "${target_dir}"
         gosu "${CONTAINER_USER}" git clone "${auth_url}" "${target_dir}"
     fi
 }
 
-# supervise <name> <command...>  -- relaunch the service whenever it exits.
+# supervise <name> <command...>  — relaunch the service whenever it exits.
 # Mirrors the sshd background-launch precedent (Step 7) but with a restart loop.
 # Runs as the ai-teams user via gosu; backgrounded so PID 1 stays bash and reaps it.
 supervise() {
@@ -70,10 +70,10 @@ supervise() {
         while true; do
             echo "[supervisor] starting ${name}..."
             # Service output goes to a durable per-service logfile on the persistent
-            # ~/.claude volume (not the shared docker-logs stream) -- survives detach
+            # ~/.claude volume (not the shared docker-logs stream) — survives detach
             # and container recreate, and is not interleaved with other services.
             # The [supervisor] status lines stay on the main stream. Boot pre-creates
-            # the logs dir (Step 9e). (CCR review item 5 -- durable output.)
+            # the logs dir (Step 9e). (CCR review item 5 — durable output.)
             gosu "${CONTAINER_USER}" bash -lc "$*" >> "/home/ai-teams/.claude/logs/${name}.log" 2>&1
             rc=$?
             echo "[supervisor] ${name} exited (rc=${rc}); restarting in 5s"
@@ -96,14 +96,19 @@ fi
 # (set in docker-compose.yml) instead of the system store.
 WARP_CA="/opt/warp-ca.pem"
 if [ -f "$WARP_CA" ]; then
-    cp "$WARP_CA" /usr/local/share/ca-certificates/warp-ca.crt
-    update-ca-certificates --fresh > /dev/null 2>&1
-    echo "[entrypoint] WARP CA added to system CA store."
+    # Non-fatal (*FR:Brunel*): a cert-store write/refresh failure must not abort
+    # boot before sshd (Step 7). Guard as a condition so set -e is exempted.
+    if cp "$WARP_CA" /usr/local/share/ca-certificates/warp-ca.crt \
+        && update-ca-certificates --fresh > /dev/null 2>&1; then
+        echo "[entrypoint] WARP CA added to system CA store."
+    else
+        echo "[entrypoint] WARNING: WARP CA install failed; continuing."
+    fi
 fi
 
 # ── Step 1: Fix volume ownership ────────────────────────────────────────────────
 # Docker creates named volumes owned by root. Fix on every start.
-# SOURCE_DATA excluded -- its ownership is managed by step 4 (locked to root after clone).
+# SOURCE_DATA excluded — its ownership is managed by step 4 (locked to root after clone).
 for DIR in "$CLAUDE_DIR" "$WORKSPACE"; do
     if [ -d "$DIR" ]; then
         OWNER=$(stat -c '%u' "$DIR")
@@ -137,9 +142,12 @@ if [ -d "${SOURCE_DATA}/.git" ]; then
         echo "[entrypoint] WARNING: git pull failed for source-data. Using existing state."
     }
 elif [ -z "$(ls -A "${SOURCE_DATA}" 2>/dev/null)" ]; then
-    clone_or_pull "$SOURCE_REPO_URL" "$SOURCE_DATA"
+    # Non-fatal (*FR:Brunel*): a source-data FIRST-clone failure (GitHub SSO/network)
+    # must not abort boot before sshd (Step 7). Step 8 already downgrades missing
+    # source-data to a WARN, and the cached inventory in the workspace stays usable.
+    clone_or_pull "$SOURCE_REPO_URL" "$SOURCE_DATA" || echo "[entrypoint] WARNING: source-data first-clone failed (GitHub SSO/network); continuing without cached inventory this boot (Step 8 downgrades to WARN)."
 else
-    echo "[entrypoint] source-data has content but no .git -- using as-is."
+    echo "[entrypoint] source-data has content but no .git — using as-is."
 fi
 
 # Lock down source-data: owned by root, read+execute only for others.
@@ -163,8 +171,17 @@ else
     # Remove broken venv if present
     rm -rf "${VENV_DIR}"
     gosu "${CONTAINER_USER}" python3 -m venv "${VENV_DIR}"
-    gosu "${CONTAINER_USER}" "${VENV_DIR}/bin/pip" install --quiet -e "${WORKSPACE}[dev]"
-    echo "[entrypoint] Python venv created and deps installed."
+    # Non-fatal pip (*FR:Brunel*): a transient PyPI/network failure must not abort
+    # boot before sshd (Step 7). `if` exempts it from set -e. On FAILURE, remove the
+    # half-provisioned venv so the NEXT boot rebuilds it (the Step 6 guard only tests
+    # for ${VENV_DIR}/bin, which `python3 -m venv` already created — without this rm
+    # a dep-incomplete venv would be sticky and never self-heal).
+    if gosu "${CONTAINER_USER}" "${VENV_DIR}/bin/pip" install --quiet -e "${WORKSPACE}[dev]"; then
+        echo "[entrypoint] Python venv created and deps installed."
+    else
+        echo "[entrypoint] WARNING: pip install failed (PyPI/network); removing venv so it rebuilds next boot. Python deps incomplete this boot."
+        rm -rf "${VENV_DIR}"
+    fi
 fi
 
 # ── Step 6b: Jira MCP server (first run only) ────────────────────────────────
@@ -176,16 +193,33 @@ if [ ! -f "${JIRA_MCP_DIR}/dist/index.js" ]; then
     echo "[entrypoint] Installing Jira MCP server..."
     JIRA_TMP=$(mktemp -d)
     AUTH_URL=$(echo "$JIRA_MCP_REPO" | sed "s|https://|https://${GITHUB_TOKEN}@|")
-    git clone --depth 1 --sparse "${AUTH_URL}" "${JIRA_TMP}"
-    git -C "${JIRA_TMP}" sparse-checkout set jira-mcp-server
-    cp -r "${JIRA_TMP}/jira-mcp-server" "${JIRA_MCP_DIR}"
+    # NON-FATAL install (*FR:Brunel*). The entrypoint runs under `set -e`, so an
+    # unguarded failure of the dev-toolkit clone/build — e.g. GitHub SAML-SSO 403
+    # or network down — would abort the WHOLE entrypoint here, BEFORE sshd starts
+    # (Step 7): the container never reaches stable-running, :2222 never binds, and
+    # Docker restart-loops it. The Jira MCP server is NON-ESSENTIAL to liveness.
+    # Wrapping the fetch chain as an `if` condition exempts it from errexit (bash
+    # disables `set -e` inside condition contexts): a failure logs a WARNING and boot
+    # proceeds to sshd + core services. `rm -rf "${JIRA_MCP_DIR}"` before the copy
+    # prevents a clone-succeeds/build-fails retry from nesting the tree into an
+    # existing dir (cp -r into an existing dir yields ${JIRA_MCP_DIR}/jira-mcp-server,
+    # so dist/index.js would never appear). Retry is automatic on the next boot once
+    # GitHub auth/network is restored (dist/index.js absent → this block re-runs).
+    if git clone --depth 1 --sparse "${AUTH_URL}" "${JIRA_TMP}" \
+        && git -C "${JIRA_TMP}" sparse-checkout set jira-mcp-server \
+        && rm -rf "${JIRA_MCP_DIR}" \
+        && cp -r "${JIRA_TMP}/jira-mcp-server" "${JIRA_MCP_DIR}"; then
+        # `|| true` keeps the npm subshell non-fatal regardless of global shell
+        # options (defends against a future `set -o pipefail`, which would otherwise
+        # make `... | tail -2` fatal and reintroduce the crash-loop).
+        ( cd "${JIRA_MCP_DIR}" && npm install --quiet 2>&1 | tail -2 ) || true
+    fi
     rm -rf "${JIRA_TMP}"
-    cd "${JIRA_MCP_DIR}" && npm install --quiet 2>&1 | tail -2
     cd "${WORKSPACE}"
     if [ -f "${JIRA_MCP_DIR}/dist/index.js" ]; then
         echo "[entrypoint] Jira MCP server installed."
     else
-        echo "[entrypoint] WARNING: Jira MCP server build failed."
+        echo "[entrypoint] WARNING: Jira MCP server install/build did not complete — likely GitHub SSO/SAML 403 or network failure fetching dev-toolkit. Core services unaffected (sshd + workspace up); retry automatic next boot once auth/network is restored."
     fi
 else
     echo "[entrypoint] Jira MCP server exists."
@@ -199,15 +233,19 @@ fi
 # volume, generate-if-absent): keep the host keys on the PERSISTENT volume
 # (~/.claude, st_dev 65024), generate once on first boot, and copy them into
 # /etc/ssh BEFORE sshd starts (Step 7). Stable identity across all future rebuilds.
-# SECURITY: the host PRIVATE keys live ONLY here on the persistent volume -- never
+# SECURITY: the host PRIVATE keys live ONLY here on the persistent volume — never
 # baked into an image layer. Dir is root:root 700 so the agent (uid 1000) can't
 # read them, even though it's under the ai-teams home volume.
 HOSTKEY_DIR="/home/ai-teams/.claude/ssh-host-keys"
 install -d -m 700 -o root -g root "${HOSTKEY_DIR}"
 for kt in ed25519 rsa ecdsa; do
     if [ ! -f "${HOSTKEY_DIR}/ssh_host_${kt}_key" ]; then
-        ssh-keygen -q -t "${kt}" -N "" -f "${HOSTKEY_DIR}/ssh_host_${kt}_key" \
-            && echo "[entrypoint] generated persistent sshd ${kt} host key (first boot)."
+        # Non-fatal (*FR:Brunel*): a keygen failure must not abort boot before sshd.
+        if ssh-keygen -q -t "${kt}" -N "" -f "${HOSTKEY_DIR}/ssh_host_${kt}_key"; then
+            echo "[entrypoint] generated persistent sshd ${kt} host key (first boot)."
+        else
+            echo "[entrypoint] WARNING: host key generation failed for ${kt}; continuing."
+        fi
     fi
     # Restore the persistent key into /etc/ssh (overwrites the build-time ephemeral one).
     if [ -f "${HOSTKEY_DIR}/ssh_host_${kt}_key" ]; then
@@ -246,7 +284,7 @@ if [ "$KEY_COUNT" -gt 0 ]; then
     /usr/sbin/sshd -p 2222
     echo "[entrypoint] sshd started on port 2222."
 else
-    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set -- SSH access disabled."
+    echo "[entrypoint] WARNING: No SSH_PUBLIC_KEY* vars set — SSH access disabled."
 fi
 
 # ── Step 7b: Seed courier key into ephemeral ~/.ssh (*FR:Brunel*) ────────────────
@@ -254,7 +292,7 @@ fi
 # source is the build-baked seed on the image FS (Dockerfile build-secret RUN).
 # Copy once per start; same key every build (seed generated once) => no hub-side churn.
 # Key filename matches the name the live courier.json already dials (~/.ssh/stationmaster_apex)
-# so no courier.json edit is needed -- the hub registers by pubkey content, not filename.
+# so no courier.json edit is needed — the hub registers by pubkey content, not filename.
 if [ -f /home/ai-teams/.ssh-seed/stationmaster_apex ] && [ ! -f /home/ai-teams/.ssh/stationmaster_apex ]; then
     install -d -m 700 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh
     install -m 600 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.ssh-seed/stationmaster_apex \
@@ -268,7 +306,7 @@ fi
 # NOT survive rebuild), so the known_hosts must be re-provisioned each start or the
 # courier can't TRUST the hub → collect leg fails (ssh rc=255, "No ED25519 host key
 # is known"). The host PUBLIC key is not secret, so we PIN it inline here (NOT a
-# blind ssh-keyscan -- that would defeat StrictHostKeyChecking). This key is verified:
+# blind ssh-keyscan — that would defeat StrictHostKeyChecking). This key is verified:
 # SHA256:CNcFjOxr8vREOueOS8nxJN8W3LaQHet62du+PHyK13U for [10.100.136.162]:2222.
 # To rotate: update this line if the hub's host key changes (it persists on the
 # hub's state volume, so it's stable across hub restarts).
@@ -290,7 +328,7 @@ PYTHON_VERSION=$(python3 --version 2>&1 | grep -oP '\d+\.\d+')
 PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
 PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
 if [ "$PYTHON_MAJOR" -lt 3 ] || { [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 11 ]; }; then
-    echo "  FAIL: Python ${PYTHON_VERSION} < 3.11 -- aborting." >&2
+    echo "  FAIL: Python ${PYTHON_VERSION} < 3.11 — aborting." >&2
     exit 1
 fi
 echo "  OK: Python ${PYTHON_VERSION}"
@@ -298,14 +336,14 @@ echo "  OK: Python ${PYTHON_VERSION}"
 # Node.js version check (hard gate: 20+)
 NODE_VERSION=$(node --version 2>&1 | grep -oP '\d+' | head -1)
 if [ "$NODE_VERSION" -lt 20 ]; then
-    echo "  FAIL: Node.js v${NODE_VERSION} < 20 -- aborting." >&2
+    echo "  FAIL: Node.js v${NODE_VERSION} < 20 — aborting." >&2
     exit 1
 fi
 echo "  OK: Node.js v${NODE_VERSION}"
 
 # Claude check (hard gate)
 if ! command -v claude >/dev/null 2>&1; then
-    echo "  FAIL: claude not found -- aborting." >&2
+    echo "  FAIL: claude not found — aborting." >&2
     exit 1
 fi
 echo "  OK: claude available"
@@ -314,14 +352,14 @@ echo "  OK: claude available"
 if [ -d "${WORKSPACE}/.git" ]; then
     echo "  OK: apex-migration-research repo"
 else
-    echo "  FAIL: workspace has no .git -- aborting." >&2
+    echo "  FAIL: workspace has no .git — aborting." >&2
     exit 1
 fi
 
 if [ -d "${SOURCE_DATA}/.git" ] || [ -d "${SOURCE_DATA}/db" ]; then
     echo "  OK: vjs_apex_apps source data"
 else
-    echo "  WARN: vjs_apex_apps not available -- cached inventory still usable."
+    echo "  WARN: vjs_apex_apps not available — cached inventory still usable."
 fi
 
 # Oracle dev-DB tunnel check (soft: container starts regardless).
@@ -330,7 +368,7 @@ fi
 if command -v nc >/dev/null 2>&1 && nc -z -w3 127.0.0.1 11521 2>/dev/null; then
     echo "  OK: DB tunnel up (127.0.0.1:11521 -> VJSDBTEST)"
 else
-    echo "  WARN: DB tunnel down -- run 'bash .claude/bin/open-db-tunnels.sh' on your Windows machine"
+    echo "  WARN: DB tunnel down — run 'bash .claude/bin/open-db-tunnels.sh' on your Windows machine"
 fi
 
 echo "[entrypoint] All gates passed. Starting..."
@@ -373,7 +411,7 @@ if ! grep -q 'aliases.sh' "$BASHRC" 2>/dev/null; then
 fi
 
 # ── Step 9a2: tmux config ────────────────────────────────────────────────────
-# .tmux.conf is on container filesystem -- recreate on every start.
+# .tmux.conf is on container filesystem — recreate on every start.
 for user_home in "${HOME_DIR}" /home/michelek; do
     cat > "${user_home}/.tmux.conf" << 'TMUX_EOF'
 set -g default-terminal "tmux-256color"
@@ -400,7 +438,7 @@ gosu "${CONTAINER_USER}" git config --global user.email "mihkel.putrinsh@evr.ee"
 
 # ── Step 9c: Claude settings ─────────────────────────────────────────────────
 # Pre-configure permission allow-list and model if settings.json doesn't exist yet.
-# If it exists (persisted in volume), don't overwrite -- PO may have customized it.
+# If it exists (persisted in volume), don't overwrite — PO may have customized it.
 SETTINGS_FILE="${CLAUDE_DIR}/settings.json"
 if [ ! -f "$SETTINGS_FILE" ]; then
     cat > "$SETTINGS_FILE" << 'SETTINGS_EOF'
@@ -466,10 +504,60 @@ MCP_EOF
     echo "[entrypoint] MCP config (mcp.json) created with Jira server."
 fi
 
+# ── Step 9d2: Restore/seed ~/.claude.json across container recreate (*FR:Hopper*) ─
+# ~/.claude.json lives at the HOME ROOT (${HOME_DIR}/.claude.json), OUTSIDE the
+# persistent ~/.claude volume, so every container recreate WIPES it — losing the
+# Claude CLI's onboarding/auth/project state. Durable backups are kept ON the
+# persistent volume at ~/.claude/backups/.claude.json.backup.<epoch-ms>.
+# SELF-SEEDING: when the home-root file is present, copy a fresh backup onto the
+# persistent volume; when it is absent (a recreate), restore the newest VALID
+# backup BEFORE claude is first invoked (the Step 10 privilege-drop exec launches
+# the interactive/tmux session that first reads ~/.claude.json; nothing earlier
+# reads it). Safe here: the ~/.claude volume is guaranteed present+owned since
+# Step 1, and python3 is validated present since Step 8.
+CLAUDE_JSON="${HOME_DIR}/.claude.json"
+CLAUDE_JSON_BACKUP_DIR="${CLAUDE_DIR}/backups"
+if [ ! -f "$CLAUDE_JSON" ]; then
+    # Newest backup by epoch-ms in the FILENAME (not mtime), via find so a no-match
+    # is empty and safe regardless of nullglob (a bare glob under `shopt -s nullglob`
+    # would let `ls` list the CWD and restore an unrelated file). `|| true` keeps the
+    # assignment non-fatal even under a future `set -o pipefail`.
+    LATEST_BACKUP=$(find "${CLAUDE_JSON_BACKUP_DIR}" -maxdepth 1 -type f -name '.claude.json.backup.*' 2>/dev/null | sort | tail -1 || true)
+    # Restore only a NON-EMPTY backup that parses as JSON. A truncated/corrupt backup
+    # (e.g. writer SIGKILLed mid-copy) is skipped, leaving the file absent so a later
+    # boot can retry once a good backup exists — rather than stickily restoring
+    # garbage that the [ ! -f ] guard would then never re-attempt.
+    if [ -n "$LATEST_BACKUP" ] && [ -s "$LATEST_BACKUP" ] \
+        && python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$LATEST_BACKUP" 2>/dev/null; then
+        cp "$LATEST_BACKUP" "$CLAUDE_JSON"
+        chown "${CONTAINER_UID}:${CONTAINER_GID}" "$CLAUDE_JSON"
+        chmod 600 "$CLAUDE_JSON"
+        echo "[entrypoint] Restored ~/.claude.json from backup: ${LATEST_BACKUP}"
+    else
+        echo "[entrypoint] WARNING: ~/.claude.json absent and no valid backup in ${CLAUDE_JSON_BACKUP_DIR}; continuing without restore (Claude CLI will re-init fresh state)."
+    fi
+else
+    # File present → seed a durable backup so the NEXT recreate can restore it.
+    # This is what makes the mechanism self-seeding (no external writer required).
+    install -d -m 700 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" "${CLAUDE_JSON_BACKUP_DIR}"
+    BACKUP_DEST="${CLAUDE_JSON_BACKUP_DIR}/.claude.json.backup.$(date +%s%3N)"
+    if cp "$CLAUDE_JSON" "$BACKUP_DEST" 2>/dev/null; then
+        chown "${CONTAINER_UID}:${CONTAINER_GID}" "$BACKUP_DEST"
+        chmod 600 "$BACKUP_DEST"
+        echo "[entrypoint] ~/.claude.json present; seeded backup ${BACKUP_DEST}."
+        # Prune to the newest 10 backups (best-effort) so the volume can't grow
+        # without bound across recreates. `|| true` keeps the pipeline non-fatal.
+        find "${CLAUDE_JSON_BACKUP_DIR}" -maxdepth 1 -type f -name '.claude.json.backup.*' 2>/dev/null \
+            | sort | head -n -10 | while IFS= read -r f; do rm -f "$f"; done || true
+    else
+        echo "[entrypoint] WARNING: ~/.claude.json present but backup copy failed; continuing."
+    fi
+fi
+
 # ── Step 9e: Supervise long-lived services (dashboard + courier) (*FR:Brunel*) ──
 # Previously launched session-side (startup.md 4e/5); did NOT survive a container
 # restart. Supervised here so they come up on every boot and relaunch on exit.
-# Backgrounded -- PID 1 stays bash (mirrors the sshd Step 7 precedent).
+# Backgrounded — PID 1 stays bash (mirrors the sshd Step 7 precedent).
 # Single-owner: apex drops the session-side launches as part of the cutover.
 
 # Durable per-service logs dir on the persistent ~/.claude volume (*FR:Brunel*).
@@ -480,14 +568,14 @@ install -d -m 755 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" /home/ai-teams/.cl
 
 supervise dashboard 'cd /home/ai-teams/workspace/dashboard && npx vite --host 0.0.0.0 --port 5173'
 
-# Courier config path: in-container-confirmed (Hopper find-sweep, S52) -- single
+# Courier config path: in-container-confirmed (Hopper find-sweep, S52) — single
 # file, no alternates. Overridable via COURIER_CONFIG env. The guard below still
 # degrades gracefully (loud warn, no crash-loop) if the script/config goes missing.
 COURIER_SCRIPT="/home/ai-teams/workspace/teams/apex-research/stationmaster/stationmaster-courier.reference.py"
 COURIER_CONFIG="${COURIER_CONFIG:-/home/ai-teams/workspace/teams/apex-research/stationmaster/courier.json}"
 
 # Pre-create the courier inboxes_dir (boot-order fix, *FR:Brunel* S52).
-# The supervised courier now launches at container BOOT -- earlier than apex's
+# The supervised courier now launches at container BOOT — earlier than apex's
 # agent session, which previously created this dir. The courier's validate_startup
 # requires inboxes_dir to EXIST (files auto-create inside it, but the DIR must be
 # present) and to be on the SAME VOLUME as state_dir. Both live under ~/.claude
@@ -507,7 +595,7 @@ install -d -m 755 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" "${COURIER_INBOXES
 # BEFORE the supervised courier launches, so any lock present here is necessarily
 # a prior-container artifact (no live courier can hold it yet) = stale by
 # definition. Same boot-setup class as the inboxes_dir pre-create above.
-# (The durable general fix -- a container-instance discriminator in the lock —
+# (The durable general fix — a container-instance discriminator in the lock —
 # is Herald's courier.reference.py follow-up; this closes the apex case now.)
 COURIER_LOCK="/home/ai-teams/.claude/teams/apex-research/stationmaster-state/courier.lock"
 rm -f "${COURIER_LOCK}"
@@ -515,7 +603,7 @@ rm -f "${COURIER_LOCK}"
 if [ -f "${COURIER_SCRIPT}" ] && [ -f "${COURIER_CONFIG}" ]; then
     supervise courier "python3 ${COURIER_SCRIPT} --config ${COURIER_CONFIG}"
 else
-    echo "[entrypoint] WARNING: courier NOT supervised -- script or config missing (${COURIER_SCRIPT} / ${COURIER_CONFIG})."
+    echo "[entrypoint] WARNING: courier NOT supervised — script or config missing (${COURIER_SCRIPT} / ${COURIER_CONFIG})."
 fi
 
 # ── Step 10: Drop privileges and exec ──────────────────────────────────────────
