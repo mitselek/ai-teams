@@ -69,3 +69,95 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 **outcome** -- **partial; working hypothesis materially updated, not closed.** The mid-use symptom the PO reports matches type-1 (network/WARP flap), evidenced by a live capture; type-2 (power) remains inferred-only. Branch should widen to include WARP-flap before committing to a hardware replacement. Decisive open question surfaced to Aen/PO: **when it "shuts down," is the physical box dark, or merely remote-unreachable while staying on?** -- that splits the two phenomena. Firmware read queued pending sudo access. No fixes applied. Label correction applied to the 10:17 entry (WARP not Tailscale, per Aen). Task #2 `in_progress`.
 
 (*FR:Hopper*)
+
+---
+
+## 2026-08-03T11:13+03:00 -- Task #2 addendum 2: mechanism NAILED -- s2idle suspend (kernel-counted 3x), NOT network-flap; earlier "journal continuous" corrected
+
+**timestamp** -- 2026-08-03T11:08+03:00 (Aen's suspend branch + PO eyes-on-desk answer) through 2026-08-03T11:13+03:00 (mechanism confirmed, fix proposed). Continues the 2026-08-03T10:17 and T10:59 Task #2 entries.
+
+**tasker** -- Aen (team-lead). PO supplied the disproof of the network-only reading: wakes the box via power button, it lights up on press, apex session resumes mid-conversation (RAM preserved). Aen re-opened the "auto-suspend ruled out" line and directed a journal-gap check + trigger enumeration.
+
+**dispatch summary** -- Run the journal-gap check across the drop windows to decide S3-suspend vs lighter-state (DPMS/NIC); enumerate every suspend trigger; propose a fix under sanction (do not apply).
+
+**tier classification + sanction status** -- Tier R throughout (journalctl, /sys/power reads, systemctl show, gsettings). No mutation. Fix is PROPOSED not applied; it is a Tier D host mutation awaiting Aen sanction + resolution of sudo-password logistics.
+
+**deployed-artifacts-read declaration** -- Runtime only, host `dev@100.96.54.170`: `journalctl` window dumps, `/sys/power/suspend_stats/*`, `/sys/power/mem_sleep`, `systemctl show suspend.target`, `logind.conf`, `gsettings` power.
+
+**commands executed** (verbatim, key) --
+1. `journalctl --since "2026-08-03 10:28:00" --until "2026-08-03 10:33:00" -o short-precise` -> **"-- No entries --"** (5-min total void = frozen).
+2. `journalctl --since "2026-08-03 10:56:00" --until "2026-08-03 11:03:00" -o short-precise` -> SSH reset 10:59:01, then ~88s hole to 11:00:29.
+3. `for f in /sys/power/suspend_stats/{success,fail,last_hw_sleep}; do cat $f; done` -> **success=3, fail=0**, last_hw_sleep populated.
+4. `cat /sys/power/mem_sleep` -> `[s2idle]`.
+5. `systemctl show suspend.target -p ActiveEnterTimestamp -p InactiveEnterTimestamp` -> both `10:58:56` (systemd suspend fingerprint at the 10:59 window).
+6. `journalctl -k | grep -iE "PM: suspend|resume|Freezing"` -> empty (s2idle path, not classic S3 ACPI markers).
+7. triggers: `logind.conf` all-default (IdleAction unset -> default ignore); GNOME `sleep-inactive-ac-type=nothing`; no systemd sleep-service transitions.
+
+**outputs / findings** --
+- **SUSPEND, kernel-confirmed:** `/sys/power/suspend_stats/success=3` since the 09:39 boot = three suspends, matching the three drop events (~10:15, ~10:30, ~10:59). Type = **s2idle** (suspend-to-idle / modern-standby-style), not deep S3 -- explains the absent classic ACPI `PM: suspend` markers.
+- **The journal gap is real** -- window B is a 5-min total void; window C an ~88s hole. **Corrects the T10:59 entry's "journal writing continuously" statement**, which misread the boot-list last-entry field as continuity. Not a lighter-state (DPMS/NIC): those don't freeze the journal.
+- **Routes through systemd** (`suspend.target` fingerprint 10:58:56) -> OS-mediated, not a firmware bypass (a pure firmware S0ix would not increment suspend_stats). Consequence: masking the sleep targets will block it.
+- **Trigger NOT the standard paths** -- logind IdleAction default(ignore) + GNOME AC `nothing` both disabled, yet it suspends. Initiating trigger unidentified (likely platform/kernel s2idle idle policy the desktop knobs don't govern). Flagged, not guessed.
+- **Two-phenomenon split refined:** today's "drops" are all type-1 = **s2idle suspends** (host frozen-but-powered, RAM preserved), NOT bare network-flap and NOT type-2 reboots. The historical type-2 cold reboots remain separate and open.
+
+**outcome** -- **partial; mechanism nailed, fix proposed + awaiting Tier D sanction.** Root cause of today's repeated "outages" = host s2idle-suspends ~3x/session under active remote load, taking apex + tunnels unreachable each time. Proposed fix (NOT applied): `sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target` -- a mechanism-block robust to the unidentified trigger; rollback `unmask`. Blocked on: Aen Tier D sanction + `sudo` password (dev in sudo group but NOPASSWD absent -> PO runs or grants). Firmware SEL read remains moot for today's events (no reboot occurred). No fixes applied.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-03T11:18+03:00 -- Task #2 addendum 3: mask fix SANCTIONED (Tier D, PO-executed); trigger named (GDM greeter, headless); verify watch running
+
+**timestamp** -- 2026-08-03T11:32 (Aen Tier D sanction) through 2026-08-03T11:18+ (verify posture established). Continues the Task #2 entries above.
+
+**tasker** -- Aen (team-lead). Sanctioned the mask as the durable fix; assigned execution to the PO (sudo password stays with PO, no NOPASSWD grant); Hopper role = read-only verify + escalation gate.
+
+**tier classification + sanction status** -- **Tier D host mutation, SANCTIONED by Aen 11:32, EXECUTED BY PO (not Hopper).** The three-component sanction: (a) exact command `systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target`; (b) reason -- host s2idle-suspends ~ every 15 min under active remote load, dropping apex + tunnels each cycle; (c) expected outcome -- suspends stop, `/sys/power/suspend_stats/success` freezes. Hopper applied nothing (Tier R verify only).
+
+**deployed-artifacts-read declaration** -- Runtime only, `dev@100.96.54.170`: `systemctl is-enabled`, `/sys/power/suspend_stats/success`, `loginctl list-sessions`/`list-seats`, `uptime`.
+
+**commands executed** (Hopper, Tier R) --
+1. `systemctl is-enabled sleep.target suspend.target hibernate.target hybrid-sleep.target` -> all `static` (mask NOT yet applied by PO at 11:18).
+2. `cat /sys/power/suspend_stats/success` -> **4** (was 3 at 11:13 -> a 4th suspend fired; box still suspending ~15-min cadence).
+3. `loginctl list-sessions` -> `Debian-gdm` greeter on `seat0`/tty1; all `dev` sessions seatless (SSH). `loginctl list-seats` -> `seat0`.
+4. Background verify watch started: polls `is-enabled suspend.target` + `success` every 5 min for ~45 min.
+
+**outputs / findings** --
+- **Trigger NAMED (from seat topology, not extra probing):** headless box -> nobody logs into a graphical session -> sits at the **GDM greeter on seat0**; the greeter's own idle-suspend policy fires because SSH/network activity does not reset a local-seat idle timer. The user-session GNOME `sleep-inactive-ac-type=nothing` checked earlier is the WRONG SCOPE (greeter != logged-in user session) -- which is why the obvious knob read "done" while the box kept sleeping.
+- **Suspends ongoing:** counter 3 (11:13) -> 4 (11:18), pre-mask.
+- **Fix is a mechanism-block:** masking `suspend.target` blocks the suspend regardless of the greeter-scope trigger, because the s2idle path is systemd-mediated (kernel-counted + `suspend.target` fingerprint).
+
+**outcome** -- **partial; fix sanctioned + delegated to PO, verify in progress.** Task #2 closes when `/sys/power/suspend_stats/success` freezes at its mask-time value across a longer-than-normal idle window after the PO applies the mask (verify watch running). Escalation gate: if the counter climbs past the mask-time value, the suspend bypassed systemd (firmware modern-standby) and a deeper probe (mem_sleep kernel param / BIOS toggle / wake sources) follows -- only then. No mutation by Hopper.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-03T12:03+03:00 -- Task #2 CLOSE (counter frozen) + Task #3: three apex tunnels verified end-to-end
+
+**timestamp** -- 2026-08-03T11:23 (mask applied by PO) through 2026-08-03T12:22 (verify-watch freeze confirmed + Task #3 end-to-end checks). Closes Task #2; completes Task #3.
+
+**tasker** -- Aen (team-lead). Task #2 close criterion = frozen suspend counter post-mask. Task #3 = post-stabilization health check of the three reverse-SSH forwards (11521/11522 Oracle, 11443 GitLab), confirming 11443 survived the day's suspend/respawn cycles and all three are functional end-to-end.
+
+**tier classification + sanction status** -- Tier R throughout (process enumeration, `ss`, `docker exec` read probes, curl, /dev/tcp hold-open). No mutation. Task #2's one mutation (the mask) was PO-executed under Aen's 11:32 Tier D sanction; this entry is the read-only verification of it.
+
+**deployed-artifacts-read declaration** -- Runtime only. Windows-side `Get-CimInstance` for the autossh/ssh argv; host `dev@100.96.54.170` `ss -lnt`; `docker exec apex-research` curl + /dev/tcp probes.
+
+**commands executed** (verbatim, key) --
+1. (Task #2 verify watch, bg) `until ... systemctl is-enabled suspend.target + cat /sys/power/suspend_stats/success ... every 5min x 45min`.
+2. `Get-CimInstance Win32_Process ... Name='ssh.exe' OR 'autossh.exe' ... -like '*vjsdbtest*'` -> current ssh argv.
+3. `ssh dev@100.96.54.170 "ss -lnt | grep -E ':(11443|11521|11522)'"`.
+4. `docker exec apex-research bash -c '<base64 e2e script>'` -> curl 11443 + /dev/tcp hold-open 11521/11522.
+
+**outputs / findings** --
+- **TASK #2 CLOSED -- mask VERIFIED, suspends STOPPED.** Verify watch: `suspend.target` flipped `static`->`masked` at 11:23 (PO applied), and `/sys/power/suspend_stats/success` held FLAT at **4** from 11:23 through 11:58 (last poll) = **35 min across 2-3 would-be ~15-min suspend cycles, zero increment.** The mask bit; the s2idle suspends have ceased. Close criterion (frozen counter, not mask-command-success) met.
+- **TASK #3 -- all three tunnels LIVE END-TO-END:**
+  - **11443 survived the cycles:** current live ssh (Windows pid 5040, respawned 12:19:41 after the day's drops) carries all three flags: `-R 11521:vjsdbtest.evr.ee:1521 -R 11522:vjsdbtest2.evr.ee:1521 -R 11443:gitlab.evr.ee:443`. The 11443 addition (this session, #104) persisted through every autossh respawn.
+  - **RC listeners:** 11443/11521/11522 all LISTEN on both `127.0.0.1` and `[::1]`.
+  - **11443 GitLab = L7 end-to-end:** `code=302 redirect=https://gitlab.evr.ee:11443/users/sign_in` -- GitLab origin login redirect through CF Access. Unambiguous full-path proof.
+  - **11521 + 11522 Oracle = TCP-path end-to-end:** both `HELD_OPEN_alive` via `/dev/tcp` hold-open (socket established through the full forwarded path and NOT reset; a dead far-side would trigger sshd to reset the accepted connection -> `EOF_RESET`, which did not occur). **Honest bound:** this proves the network path reaches a live Oracle listener that accepts+holds the connection; it does NOT execute an Oracle TNS/auth handshake (no `sqlplus`/`tnsping` in the container). Oracle auth is apex-side, out of scope -- as with GitLab's PAT. This is materially stronger than a LISTEN or bare-connect check and is the correct assertion for a network-path health check.
+  - Container tooling confirms the task #2 `nc`-absent finding persists (`no nc`), and no Oracle client -- hence the /dev/tcp hold-open method.
+
+**outcome** -- **success (both).** Task #2: root cause (headless GDM-greeter s2idle suspend) fixed via PO-applied sleep-target mask, verified by the kernel counter going quiet for 35 min. Task #3: all three reverse-SSH forwards live and functional end-to-end; 11443 confirmed surviving the suspend/respawn cycles. No mutation by Hopper. Type-2 historical cold reboots remain a separate, non-urgent open item (SEL read still deferred).
+
+(*FR:Hopper*)
