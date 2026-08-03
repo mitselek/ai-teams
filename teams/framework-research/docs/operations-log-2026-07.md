@@ -177,3 +177,48 @@ Task #1 remains `in_progress` pending the PO's verify results.
 **Unrelated files:** the five dirty files in `apex-migration-research` (`.dockerignore`, `.gitignore`, `Dockerfile.apex`, `docker-compose.yml`, `entrypoint-apex.sh`) were not staged, stashed, reverted or committed. FR's footprint remains one line in one file.
 
 (*FR:Hopper*)
+
+---
+
+## 2026-07-24T17:04+03:00 -- GH #104: both outward artifacts RELEASED; FR courier transport outage surfaced and resolved
+
+**timestamp** -- 2026-07-24T17:04+03:00 (release begun) through 2026-07-24T17:36+03:00 (delivery independently confirmed). Closing entry for the dispatch opened 2026-07-24T16:28+03:00.
+
+**tasker** -- Aen (team-lead). Release authority delegated to Hopper at 17:24: *"You revise, and you release -- no further approval gate."* Specification and correction authorship were already Hopper's.
+
+**dispatch summary** -- Apply the measured redirect correction to both outward artifacts, then send the stationmaster reply to apex-research and post the GH #104 comment. Three mandated inclusions: the corrected redirect claim marked as superseding the earlier framing; the real outage figure unsoftened; the `nc` finding carrying the mid-rewrite caveat.
+
+**tier classification + sanction status** -- **Tier R / outward-communication.** No substrate mutation. Release authority explicit and quoted above; no further gate required by the tasker's own instruction.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 / 2 / 3 (tunnel substrate):** no reads this phase -- the substrate change was complete and verified at 17:00. This phase is communication only.
+- **Comms substrate (read before dispatch):** `inter-team-comms` skill; `fr-courier.config.auto.json` (`ghost_outboxes=['apex-research-courier']`, `state_dir=~/.stationmaster/framework-research`); live runtime team dir resolved to `session-f2dff9d4` (config members `team-lead`, `hopper`); hub `ping` + `status` over the customer channel.
+- **Audit-trail artifacts (this repo):** this entry; the 16:28 / 16:52 / 16:58 entries; scratchpad Cal submission queue.
+
+**commands executed** (verbatim) --
+1. `Get-ScheduledTask -TaskName 'FrameworkResearch-Courier'` -> `Disabled` (expected, S58 Tier-D disable; registration retained) + live daemon pid 25296 on `.auto.json`
+2. `printf '%s\n' '{"v":1,"cmd":"ping"}' | ssh -T -i ~/.ssh/sm_framework-research -p 2222 sm@10.100.136.162` -> `ok:true`, fingerprint `SHA256:nkmhWNcc…DpyQ`
+3. same with `{"v":1,"cmd":"status"}` -> `grants_out` includes `apex-research`; `waiting_for_me:{}`; `deposited_uncollected:{}`
+4. registered ghost outbox `apex-research-courier` in `session-f2dff9d4/config.json` + created its inbox file (documented skill procedure)
+5. `SendMessage` to `apex-research-courier` -- the revised apex reply
+6. `gh issue comment 104 -F <comment file>` -> https://github.com/mitselek/ai-teams/issues/104#issuecomment-5070722020
+7. (post-send verification) `tail` of `fr-courier.log.err`; `head`/`grep -c` over the same for first-failure time and failure count; `ls` of `~/.stationmaster/framework-research/spool/`; `Get-CimInstance` on courier pid 25296 for parent/session
+8. (post-fix confirmation) `ls` spool -> empty; `tail` `fr-courier.log.err`; hub `status`
+
+**outputs** --
+- **#104 comment posted** -- durable record live at the URL above, carrying all three mandated inclusions.
+- **Stationmaster reply initially FAILED TO DELIVER.** Courier consumed it from the outbox into `spool/20260724T140508210286-d16776c3.json` (8333 bytes) at 14:05:08Z, then logged `deposit transport failure (no response envelope (ssh rc=3221225794); stderr: <empty>); will retry` on that and every subsequent 30s cycle.
+- **`ssh rc=3221225794` = `0xC0000142` = `STATUS_DLL_INIT_FAILED`** -- the daemon could not spawn its ssh subprocess at all.
+- **The courier had never worked this session.** Up at 13:24:35Z; first failure 13:26:37Z; **83 of 85 log lines transport failures, zero successful collect or deposit in the entire log.** Courier start predates Hopper's spawn (16:28 local) by ~4 minutes and the tunnel operation (16:52-16:59) by ~28 minutes; the tunnel straggler sweep targeted seven named PIDs, none of them 25296. Chronology and PID list both exclude FR's tunnel work as a cause.
+- **Hub, key, network and grant all healthy throughout** -- Hopper's own manual `ping`/`status` succeeded at 14:03Z against the same hub the daemon could not reach.
+- Courier pid 25296 found **orphaned** (parent 25996 absent), session 1, 341 processes on the box.
+- **ROOT CAUSE (Aen, self-reported 17:34):** the startup Step-3.5 courier restart ran under a **2-minute tool timeout**; the wrapper was killed at the deadline and the daemon was orphaned. Courier-up 13:24:35Z -> first failure 13:26:37Z = **2m02s**, matching the timeout rather than coinciding with it. Confirmed by the fix: a drain-once run as a *fresh* process with a live parent deposited on the first attempt against the same hub, key and network that had failed for 45 minutes.
+- **RESOLVED.** Aen restarted the courier: `spool 20260724T140508210286-d16776c3.json: deposited 1/1 (accepted/duplicate); removed`; new courier pid 4360 up 14:08:37Z. **Independently confirmed by Hopper:** spool directory empty, `fr-courier.log.err` shows only the fresh startup line with no subsequent failures, hub `status` returns `deposited_uncollected:{}`. Note on that last signal: `deposited_uncollected:{}` reads identically before a deposit and after collection, so it is not sufficient alone -- the conclusion rests on the conjunction of the deposit log line, the emptied spool, and the hub view.
+
+**outcome** -- **success.** Both outward artifacts released: GH #104 comment posted and the stationmaster reply delivered to apex-research. All three of apex's deliverables answered from measurement. No data was lost at any point -- the consignment was spool-durable throughout the outage and delivered on the first attempt after the transport was restored.
+
+**Process finding -- the session's fourth instance of one failure shape, and the second by a different agent.** Before dispatching, Hopper verified Scheduled-Task state, live daemon process, hub `ping` and hub `status` -- all green -- and concluded the link was live, **without opening the courier's own log**, the only artifact showing 83 consecutive failures. Aen had made the same class of error at 16:24, checking process-alive/lock-held/ledger-non-empty and opening `fr-courier.log`, which is **stdout and was zero bytes**, while every failure line went to `fr-courier.log.err` -- an empty log beside a live process read as healthy, and the courier was certified green to the operator who then relied on it. Aen's formulation, retained for the wiki entry: ***"Absence of error is not evidence of function when you are reading the wrong stream."*** The check that would have caught both is *does this process's log show a successful operation*, not *does this process exist*. Because the shape recurred across two agents, four substrates and both roles in a single session, it is a property of how these systems report health rather than one operator's discipline lapse.
+
+**Cal catalogue decision (Hopper's call; Aen accepted it over his own proposal).** The session's misses are **two genera, not one**: *verification narrower than it appears* (submission 1 -- the `-R` TCP probe as canonical technical instance, plus the two health-check misses above) and *control narrower than its name* (submission 4 -- a running loop ignoring an on-disk edit, and `Stop-ScheduledTask` orphaning its descendant tree). Cross-linked, **not merged**: merging would collapse the observe/act distinction, which Cal's dedup protocol warns against for claims that merely look alike. Submission 3's WARP clause moved to `high` **scoped explicitly to this workstation, this WARP enrolment and this CF Access policy** -- a successful production path is not an experiment and does not license generalisation.
+
+(*FR:Hopper*)
