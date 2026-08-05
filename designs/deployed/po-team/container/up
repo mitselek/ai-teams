@@ -62,7 +62,14 @@ esac
 # --- preconditions -----------------------------------------------------------
 [ -t 0 ] || fail "stdin is not a TTY -- tmux attach needs a terminal (run 'up' from an interactive shell / docker exec -it)"
 command -v tmux >/dev/null 2>&1 || fail "tmux not found on PATH"
-command -v claude >/dev/null 2>&1 || fail "claude not found on PATH"
+# Prefer the per-team native install (~/.local/bin, home-volume persisted,
+# self-updating as ai-teams) over the image's root-owned npm copy -- the npm
+# copy cannot self-update ("Auto-update failed: no write permission to npm
+# prefix"). Explicit path: the tmux command runs in a non-login shell whose
+# PATH may not include ~/.local/bin.
+claude_bin="$HOME/.local/bin/claude"
+[ -x "$claude_bin" ] || claude_bin="claude"
+[ "$claude_bin" != "claude" ] || command -v claude >/dev/null 2>&1 || fail "claude not found (no ~/.local/bin/claude, none on PATH)"
 [ -n "${HOME:-}" ] || fail "HOME is not set"
 [ -n "${TMUX:-}" ] && fail "already inside a tmux session -- detach first (prefix d), nesting is not what you want"
 
@@ -215,4 +222,4 @@ fi
 # single-quoted (both are single-quote-free by construction: the prompt text
 # above, and workspace is $HOME/workspace in fleet homes).
 exec tmux new-session -A -s "$team" \
-    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude '$prompt'"
+    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 '$claude_bin' '$prompt'"
