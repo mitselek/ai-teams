@@ -191,6 +191,21 @@ fi
 # quotes inside the tmux shell-command below.
 prompt="You are waking up after a container or claude restart in team ${team}. Any teammates spawned by the previous session are gone, and its stale team dirs were archived to ~/.claude/teams-archive/. Re-establish yourself now, without waiting for user input: (1) reorient from your role and team docs in ~/workspace -- who you are, what the team does, who your standing teammates are per your roster; (2) respawn each standing teammate with the Agent tool using run_in_background so the team is active again and the courier can deliver mail (it refuses injection into a solo session); (3) then check read_mail on the comms MCP server for anything that arrived while you were down, and act on it."
 
+# Per-team wake override: a team may own its wake-up procedure (e.g. a
+# /wake skill maintained beside its role docs) by putting the exact claude
+# input -- one line, e.g. "/po-wake" -- in ~/.claude/up-wake. Requested by
+# po-team 2026-08-05; keeps up generic while teams evolve their own recovery.
+wake_file="$HOME/.claude/up-wake"
+if [ -f "$wake_file" ]; then
+    IFS= read -r wake < "$wake_file" || true
+    [ -n "$wake" ] || fail "wake file $wake_file exists but its first line is empty"
+    case $wake in
+        *"'"*) fail "wake file $wake_file must not contain single quotes (it is embedded single-quoted in the tmux command)" ;;
+    esac
+    printf 'up: using team wake input from %s: %s\n' "$wake_file" "$wake" >&2
+    prompt="$wake"
+fi
+
 # --- create-or-attach --------------------------------------------------------
 # The env var is set inline in the session command so it is scoped to the
 # claude process (no reliance on tmux server environment inheritance or the
