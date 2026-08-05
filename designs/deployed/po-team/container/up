@@ -161,8 +161,16 @@ fi
 # name (legacy launcher, different session name, or started outside tmux).
 # Falling through to new-session would boot a SECOND claude beside the live
 # one -- rotating the team dir and recreating the exact #102 failure chain.
+# Seen once (2026-08-05, mvox) where the session DID exist and a rerun
+# attached fine -- cause unknown (transient has-session failure?). Retry
+# once after 2s and, if it still fails, include the tmux evidence in the
+# message so the next occurrence is diagnosable instead of a mystery.
 if [ "$claude_running" -eq 1 ] && ! tmux has-session -t "=$team" 2>/dev/null; then
-    fail "a claude process is already running but tmux session '$team' does not exist -- refusing to start a second claude; find it (tmux ls; grep -l claude /proc/*/comm) and attach to or stop it first"
+    sleep 2
+    if ! tmux has-session -t "=$team" 2>/dev/null; then
+        tmux_evidence="$(tmux ls 2>&1 || true)"
+        fail "a claude process is already running but tmux session '$team' does not exist (checked twice, 2s apart) -- refusing to start a second claude. tmux ls says: ${tmux_evidence:-<nothing>}. Find the claude (grep -l claude /proc/*/comm) and attach to or stop it first"
+    fi
 fi
 
 # --- bootstrap prompt (#94 reorient + #102 re-establish the team) ------------
