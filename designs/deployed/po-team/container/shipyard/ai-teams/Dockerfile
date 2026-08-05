@@ -40,6 +40,9 @@ RUN mkdir -p /run/sshd && ssh-keygen -A \
 
 ENV HOME=/home/ai-teams
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+# Terminfo for terminals the operator actually uses (ssh forwards TERM)
+COPY xterm-ghostty.terminfo /tmp/
+RUN tic -x /tmp/xterm-ghostty.terminfo && rm /tmp/xterm-ghostty.terminfo
 COPY entrypoint.sh /entrypoint.sh
 COPY up /usr/local/bin/up
 RUN chmod +x /entrypoint.sh /usr/local/bin/up

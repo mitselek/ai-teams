@@ -66,6 +66,16 @@ command -v claude >/dev/null 2>&1 || fail "claude not found on PATH"
 [ -n "${HOME:-}" ] || fail "HOME is not set"
 [ -n "${TMUX:-}" ] && fail "already inside a tmux session -- detach first (prefix d), nesting is not what you want"
 
+# --- TERM sanity -------------------------------------------------------------
+# ssh forwards the client's TERM; if the container lacks its terminfo, every
+# tmux CLIENT command fails ("missing or unsuitable terminal") -- including
+# has-session, which made the second-claude guard misfire (seen live with
+# xterm-ghostty, 2026-08-05). Degrade loudly to a universal entry.
+if [ -n "${TERM:-}" ] && ! infocmp "$TERM" >/dev/null 2>&1; then
+    printf 'up: TERM=%s has no terminfo in this container -- using xterm-256color for this session\n' "$TERM" >&2
+    export TERM=xterm-256color
+fi
+
 # --- team name: $TEAM || hostname --------------------------------------------
 # Bash's built-in HOSTNAME reflects the docker-assigned hostname (== container
 # == team) and needs no external binary; the hostname(1) binary is not
