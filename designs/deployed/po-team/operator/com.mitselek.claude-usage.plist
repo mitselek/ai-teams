@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Claude usage-limit recorder: every 30 min, snapshot the same
+       rate-limit data /usage shows. Runs in the user's GUI session
+       (gui/<uid> domain) so it can reach the login keychain to read the
+       OAuth token Claude Code refreshes there. Absolute paths throughout:
+       launchd has no login PATH. Interpreter is the system python3
+       (verified 3.9.6). --quiet => soft-fail, exit 0, ok:false row on
+       error so a failed fetch is a visible gap, not a silent one.
+
+       IMPORTANT: the script path is the INSTALLED copy in ~/.local/bin,
+       NOT the repo copy under ~/Documents. A launchd agent has no TCC
+       grant for ~/Documents, so pointing it there fails with "Operation
+       not permitted" before the script even runs. This mirrors the
+       com.mitselek.sm-notify agent, which likewise runs ~/.local/bin/smc.
+       Install with:  cp usage-snapshot usage-log ~/.local/bin/ -->
+  <key>Label</key>
+  <string>com.mitselek.claude-usage</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/michelek/.local/bin/usage-snapshot</string>
+    <string>--quiet</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>1800</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/michelek/.claude-usage/snapshot.out</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/michelek/.claude-usage/snapshot.err</string>
+</dict>
+</plist>

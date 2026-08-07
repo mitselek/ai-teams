@@ -1,0 +1,389 @@
+#!/usr/bin/env python3
+# usage-snapshot -- record one snapshot of Claude Code's usage/rate-limit data.
+#
+# One run = fetch GET https://api.anthropic.com/api/oauth/usage + append one
+# record to ~/.claude-usage/usage.jsonl (machine log) and ~/.claude-usage/
+# usage.csv (flat, one row per limit). This is the same data /usage shows.
+#
+# The OAuth access token is read FRESH from the macOS login keychain every
+# run (Claude Code refreshes it there during normal use). It is never cached
+# in this script or any config file.
+#
+# Modes:
+#   default            interactive -- loud, NONZERO exit on any failure.
+#   --quiet            scheduled  -- soft-fail, exit 0, still write an
+#                      ok:false jsonl row so a failed fetch is a VISIBLE gap,
+#                      not indistinguishable from "the scheduler never ran".
+#
+# Env overrides (testing):
+#   USAGE_TOKEN        skip the keychain, use this bearer token.
+#   USAGE_ENDPOINT     override the API URL (point at a fake).
+#   USAGE_STATE_DIR    override ~/.claude-usage.
+#
+# NOTE: /api/oauth/usage is an UNDOCUMENTED endpoint used internally by the
+# Claude Code CLI. Its shape may change between CLI versions. Treat shape
+# drift as expected: parse limits[] generically and fail soft.
+#
+# stdlib only. Python 3.9 compatible (launchd runs /usr/bin/python3).
+
+import fcntl
+import json
+import os
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+
+STATE_DIR = os.environ.get(
+    "USAGE_STATE_DIR", os.path.expanduser("~/.claude-usage"))
+JSONL = os.path.join(STATE_DIR, "usage.jsonl")
+CSV = os.path.join(STATE_DIR, "usage.csv")
+ERRLOG = os.path.join(STATE_DIR, "snapshot.err")
+LOCKFILE = os.path.join(STATE_DIR, "lock")
+
+DEFAULT_ENDPOINT = "https://api.anthropic.com/api/oauth/usage"
+KEYCHAIN_SERVICE = "Claude Code-credentials"
+# Match what the CLI sends. anthropic-beta gates the oauth surface.
+BETA_HEADER = "oauth-2025-04-20"
+USER_AGENT = "claude-cli/2.1.220"
+CSV_HEADER = "ts_utc,kind,model,percent,resets_at\n"
+
+
+class SnapshotError(Exception):
+    """A run that produced no usable data. Carries a short reason."""
+
+
+def now_utc():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def ensure_state_dir():
+    os.makedirs(STATE_DIR, exist_ok=True)
+
+
+# --------------------------------------------------------------------------
+# Token: fresh from the keychain every run (never cached).
+# --------------------------------------------------------------------------
+
+def read_credentials():
+    """Return (access_token, subscription_type) from a SINGLE keychain read.
+
+    The keychain is touched exactly once per run -- one `security` subprocess,
+    one parse -- to minimise the TCC/keychain-access surface in a scheduled
+    (launchd) context. A second independent read could be denied/prompt even
+    when the first succeeded; folding both fields into one payload removes
+    that whole class of half-succeeded run.
+
+    USAGE_TOKEN wins (testing) and skips the keychain entirely, with
+    subscription taken from USAGE_SUBSCRIPTION.
+
+    Loud on any failure -- a missing token is not something we paper over. If
+    the keychain item advertises an already-past expiresAt (ms epoch), fail
+    early with a clear message rather than making a doomed 401 round-trip; the
+    token self-heals the next time Claude Code refreshes the keychain."""
+    env = os.environ.get("USAGE_TOKEN")
+    if env:
+        return env, os.environ.get("USAGE_SUBSCRIPTION")
+    try:
+        raw = subprocess.run(
+            ["security", "find-generic-password", "-s", KEYCHAIN_SERVICE, "-w"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=15)
+    except OSError as exc:
+        raise SnapshotError("could not run /usr/bin/security: %s" % exc)
+    except subprocess.TimeoutExpired:
+        raise SnapshotError("keychain read timed out (prompt? denied access?)")
+    if raw.returncode != 0:
+        err = raw.stderr.decode("utf-8", "replace").strip()
+        raise SnapshotError(
+            "keychain read failed (exit %d): %s -- scheduled context may be "
+            "denied keychain access" % (raw.returncode, err or "no stderr"))
+    try:
+        creds = json.loads(raw.stdout.decode("utf-8", "replace"))
+        oauth = creds["claudeAiOauth"]
+        token = oauth["accessToken"]
+    except (ValueError, KeyError, TypeError) as exc:
+        raise SnapshotError("keychain item not in expected shape: %s" % exc)
+    if not token:
+        raise SnapshotError("keychain returned an empty accessToken")
+    # Cheap pre-check: an obviously-expired token would only earn a 401. Give
+    # a clearer error instead. Best-effort -- a missing/garbage expiresAt just
+    # falls through to the network call, where the 401 path handles it safely.
+    expires_at = oauth.get("expiresAt")
+    if isinstance(expires_at, (int, float)) and expires_at > 0:
+        if expires_at < time.time() * 1000:
+            when = datetime.fromtimestamp(
+                expires_at / 1000, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            raise SnapshotError(
+                "access token expired at %s per keychain -- will self-heal "
+                "next Claude Code use" % when)
+    subscription = None
+    if isinstance(oauth, dict):
+        subscription = oauth.get("subscriptionType")
+    return token, subscription
+
+
+# --------------------------------------------------------------------------
+# Fetch + parse
+# --------------------------------------------------------------------------
+
+def fetch_usage(token):
+    """GET the usage endpoint. Raises SnapshotError on 401/5xx/network/shape.
+    401 is called out explicitly: it means a stale token, which self-heals
+    the next time Mihkel uses Claude Code (the CLI refreshes the keychain)."""
+    url = os.environ.get("USAGE_ENDPOINT", DEFAULT_ENDPOINT)
+    req = urllib.request.Request(url, headers={
+        "Authorization": "Bearer %s" % token,
+        "anthropic-beta": BETA_HEADER,
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            body = resp.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as exc:
+        if exc.code == 401:
+            raise SnapshotError(
+                "401 unauthorized -- access token is stale/expired; it will "
+                "self-heal next time Claude Code refreshes the keychain "
+                "(no OAuth refresh is attempted here)")
+        detail = ""
+        try:
+            detail = exc.read().decode("utf-8", "replace")[:200]
+        except Exception:
+            pass
+        raise SnapshotError("HTTP %d from endpoint: %s" % (exc.code, detail))
+    except urllib.error.URLError as exc:
+        raise SnapshotError("network error reaching endpoint: %s" % exc.reason)
+    except OSError as exc:
+        raise SnapshotError("i/o error reaching endpoint: %s" % exc)
+    try:
+        return json.loads(body)
+    except ValueError as exc:
+        raise SnapshotError("endpoint returned non-JSON: %s" % exc)
+
+
+def parse_usage(data):
+    """Turn the raw response into our normalised record fields. Generic over
+    limits[] -- never hardcodes a model name or a fixed set of kinds. Tolerates
+    missing/null fields (shape drift) rather than crashing."""
+    if not isinstance(data, dict):
+        raise SnapshotError("endpoint payload was not a JSON object")
+    limits_in = data.get("limits")
+    if not isinstance(limits_in, list):
+        raise SnapshotError("payload had no limits[] array (shape drift?)")
+    limits = []
+    for item in limits_in:
+        if not isinstance(item, dict):
+            continue
+        scope = item.get("scope") or {}
+        model = None
+        if isinstance(scope, dict):
+            m = scope.get("model") or {}
+            if isinstance(m, dict):
+                model = m.get("display_name")
+        limits.append({
+            "kind": item.get("kind"),
+            "group": item.get("group"),
+            "percent": item.get("percent"),
+            "severity": item.get("severity"),
+            "resets_at": item.get("resets_at"),
+            "model": model,
+        })
+
+    def util(block):
+        b = data.get(block)
+        if isinstance(b, dict):
+            return b.get("utilization")
+        return None
+
+    return {
+        "limits": limits,
+        "five_hour_pct": util("five_hour"),
+        "seven_day_pct": util("seven_day"),
+    }
+
+
+# --------------------------------------------------------------------------
+# Append (atomic-ish: O_APPEND + one write() per line never interleaves).
+# --------------------------------------------------------------------------
+
+def append_line(path, line):
+    ensure_state_dir()
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+    try:
+        # os.write() is a thin POSIX wrapper: it may write FEWER bytes than
+        # requested (e.g. ENOSPC/disk-full, signal interruption) and does not
+        # loop. Drain the buffer so each line is written whole-or-fails; a
+        # partial write must never leave a newline-less fragment that the next
+        # O_APPEND record concatenates onto, fusing two records into one
+        # unparseable line (the reader can skip a corrupt line but cannot
+        # recover a good record merged into it).
+        data = line.encode("utf-8")
+        mv = memoryview(data)
+        n = 0
+        while n < len(data):
+            n += os.write(fd, mv[n:])
+    finally:
+        os.close(fd)
+
+
+def csv_escape(value):
+    s = "" if value is None else str(value)
+    if any(ch in s for ch in (",", '"', "\n", "\r")):
+        return '"' + s.replace('"', '""') + '"'
+    return s
+
+
+def ensure_csv_header():
+    """Write the header once, on first creation. Concurrent snapshotters are
+    not expected (single scheduler), so a plain check-then-write is fine."""
+    ensure_state_dir()
+    if not os.path.exists(CSV) or os.path.getsize(CSV) == 0:
+        append_line(CSV, CSV_HEADER)
+
+
+def write_success(ts, subscription, parsed):
+    # JSONL is the source of truth; the CSV is a best-effort derived view.
+    # JSONL is written first so that if an OSError strikes between the two
+    # writes we keep the authoritative record. A resulting jsonl-with-no-csv
+    # row is a known, tolerated divergence (rebuild the csv from jsonl if ever
+    # needed) -- never the reverse.
+    rec = {
+        "ts_utc": ts,
+        "ok": True,
+        "limits": parsed["limits"],
+        "five_hour_pct": parsed["five_hour_pct"],
+        "seven_day_pct": parsed["seven_day_pct"],
+        "subscription": subscription,
+    }
+    append_line(JSONL, json.dumps(rec, ensure_ascii=False,
+                                  separators=(",", ":")) + "\n")
+    ensure_csv_header()
+    rows = []
+    for lim in parsed["limits"]:
+        rows.append(",".join(csv_escape(v) for v in (
+            ts, lim.get("kind"), lim.get("model"),
+            lim.get("percent"), lim.get("resets_at"))) + "\n")
+    if rows:
+        append_line(CSV, "".join(rows))
+
+
+def write_failure(ts, reason):
+    """An ok:false jsonl row so a failed fetch is a visible marker, never a
+    silent gap. No CSV row (CSV is data-only; grep jsonl for ok:false)."""
+    rec = {"ts_utc": ts, "ok": False, "error": reason,
+           "limits": [], "five_hour_pct": None, "seven_day_pct": None,
+           "subscription": None}
+    append_line(JSONL, json.dumps(rec, ensure_ascii=False,
+                                  separators=(",", ":")) + "\n")
+
+
+def log_err(ts, reason):
+    append_line(ERRLOG, "%s  %s\n" % (ts, reason))
+
+
+# --------------------------------------------------------------------------
+# Main
+# --------------------------------------------------------------------------
+
+def acquire_lock():
+    """Non-blocking exclusive flock, consistent with smc's state_lock. Returns
+    the held fd on success, or None if another run already holds it (a slow or
+    hung snapshot overlapping a RunAtLoad reload). Cheap insurance against two
+    overlapping runs interleaving jsonl vs csv writes."""
+    ensure_state_dir()
+    fd = os.open(LOCKFILE, os.O_WRONLY | os.O_CREAT, 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        os.close(fd)
+        return None
+    return fd
+
+
+def run_snapshot():
+    """Do one snapshot. Returns on success; raises SnapshotError on failure."""
+    token, subscription = read_credentials()
+    data = fetch_usage(token)
+    parsed = parse_usage(data)
+    write_success(now_utc(), subscription, parsed)
+    return parsed
+
+
+USAGE = """\
+usage-snapshot -- record one Claude usage/rate-limit snapshot
+
+  usage-snapshot            interactive: loud, NONZERO exit on failure
+  usage-snapshot --quiet    scheduled:  soft-fail, exit 0, ok:false row on error
+
+State: ~/.claude-usage/  (usage.jsonl, usage.csv, snapshot.err)
+Env:   USAGE_TOKEN     skip keychain (testing)
+       USAGE_ENDPOINT  override API url (testing)
+       USAGE_STATE_DIR override state dir (testing)
+"""
+
+
+def main(argv):
+    quiet = False
+    for a in argv:
+        if a in ("--quiet", "-q"):
+            quiet = True
+        elif a in ("-h", "--help", "help"):
+            sys.stdout.write(USAGE)
+            return 0
+        else:
+            sys.stderr.write("usage-snapshot: unknown arg %r\n" % a)
+            sys.stderr.write(USAGE)
+            return 2
+    ts = now_utc()
+    try:
+        lockfd = acquire_lock()
+    except OSError as exc:
+        # Even opening the lockfile failed (dir perms, read-only volume).
+        sys.stderr.write("usage-snapshot: could not open lockfile: %s\n" % exc)
+        return 0 if quiet else 1
+    if lockfd is None:
+        # Another run holds the lock -- do not write, exit cleanly.
+        sys.stderr.write("usage-snapshot: another run in progress -- skipping\n")
+        return 0
+    try:
+        try:
+            parsed = run_snapshot()
+        except Exception as exc:
+            # SnapshotError covers the expected network/keychain/shape cases;
+            # a broad catch guarantees an unexpected failure (e.g. OSError from
+            # write_success on a full/read-only disk) can NEVER escape as an
+            # uncaught nonzero traceback in --quiet/launchd mode nor leave an
+            # invisible gap -- every failure becomes a visible ok:false row.
+            if isinstance(exc, SnapshotError):
+                reason = str(exc)
+            else:
+                reason = "unexpected %s: %s" % (type(exc).__name__, exc)
+            # Always record the failure loudly to the err log + an ok:false row,
+            # in BOTH modes -- the difference is only the exit code.
+            try:
+                write_failure(ts, reason)
+                log_err(ts, reason)
+            except OSError as io:
+                sys.stderr.write("usage-snapshot: FATAL could not even log the "
+                                 "failure: %s (original: %s)\n" % (io, reason))
+                return 0 if quiet else 1
+            if quiet:
+                sys.stderr.write("usage-snapshot: soft-fail (%s)\n" % reason)
+                return 0
+            sys.stderr.write("usage-snapshot: FAILED -- %s\n" % reason)
+            return 1
+    finally:
+        os.close(lockfd)
+    n = len(parsed["limits"])
+    # Success summary goes to STDOUT so snapshot.err (which the plist wires to
+    # stderr) holds only real failures instead of filling with success noise.
+    sys.stdout.write("usage-snapshot: ok -- %d limit(s), 5h=%s%% 7d=%s%%\n" % (
+        n, parsed["five_hour_pct"], parsed["seven_day_pct"]))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

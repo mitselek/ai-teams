@@ -1,0 +1,212 @@
+#!/usr/bin/env python3
+# usage-log -- view Claude usage snapshots recorded by usage-snapshot.
+#
+#   usage-log             pretty-print the latest snapshot (bars like /usage,
+#                         reset times in local tz)
+#   usage-log history [N] last N snapshots as a compact table (ts + 3 percents)
+#   usage-log csv         print the path to the flat csv
+#
+# Reads ~/.claude-usage/usage.jsonl (override with USAGE_STATE_DIR). Handles a
+# missing/empty log gracefully. stdlib only, Python 3.9 compatible.
+
+import json
+import os
+import sys
+from datetime import datetime, timezone
+
+STATE_DIR = os.environ.get(
+    "USAGE_STATE_DIR", os.path.expanduser("~/.claude-usage"))
+JSONL = os.path.join(STATE_DIR, "usage.jsonl")
+CSV = os.path.join(STATE_DIR, "usage.csv")
+
+BOLD, DIM, RED, GREEN, YELLOW, RESET = (
+    "\033[1m", "\033[2m", "\033[31m", "\033[32m", "\033[33m", "\033[0m")
+
+
+def use_color():
+    return sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+
+
+def c(code, text):
+    return code + text + RESET if use_color() else text
+
+
+def load_records():
+    """All records, oldest first. Skips (warns on) corrupt lines."""
+    records = []
+    try:
+        with open(JSONL, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    records.append(json.loads(line))
+                except ValueError:
+                    sys.stderr.write("usage-log: skipping corrupt log line\n")
+    except FileNotFoundError:
+        pass
+    return records
+
+
+def fmt_local(iso):
+    """Parse an ISO-8601 timestamp (with or without offset / fractional
+    seconds / trailing Z) and render it in the local timezone."""
+    if not iso:
+        return "?"
+    s = str(iso).replace("Z", "+00:00")
+    dt = None
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S"):
+            try:
+                dt = datetime.strptime(s, fmt)
+                break
+            except ValueError:
+                continue
+    if dt is None:
+        return str(iso)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone().strftime("%Y-%m-%d %H:%M")
+
+
+def sev_color(severity, text):
+    if severity == "warning":
+        return c(YELLOW, text)
+    if severity in ("critical", "error"):
+        return c(RED, text)
+    return c(GREEN, text)
+
+
+def bar(percent, severity=None, width=24):
+    try:
+        p = float(percent)
+    except (TypeError, ValueError):
+        return c(DIM, "  ?%  (no data)")
+    p = max(0.0, min(100.0, p))
+    filled = int(round(p / 100.0 * width))
+    b = "#" * filled + "-" * (width - filled)
+    label = "%3d%%" % int(round(p))
+    return "%s %s" % (sev_color(severity, "[" + b + "]"),
+                      sev_color(severity, label))
+
+
+def cmd_latest(records):
+    if not records:
+        print("no snapshots yet (%s)" % JSONL)
+        print(c(DIM, "run  usage-snapshot  to record one"))
+        return 0
+    rec = records[-1]
+    ok = rec.get("ok")
+    ts = fmt_local(rec.get("ts_utc"))
+    sub = rec.get("subscription")
+    head = "Claude usage  --  %s" % ts
+    if sub:
+        head += "   (%s)" % sub
+    print(c(BOLD, head))
+    if not ok:
+        print(c(RED, "  last snapshot FAILED: %s" % rec.get("error", "?")))
+        # Fall back to the most recent successful snapshot, if any.
+        for prev in reversed(records[:-1]):
+            if prev.get("ok"):
+                print(c(DIM, "  showing last good snapshot from %s:"
+                        % fmt_local(prev.get("ts_utc"))))
+                rec = prev
+                break
+        else:
+            return 0
+    print("")
+    fh = rec.get("five_hour_pct")
+    sd = rec.get("seven_day_pct")
+    print("  %-22s %s" % ("session (5h)", bar(fh)))
+    print("  %-22s %s" % ("weekly (7d)", bar(sd)))
+    print("")
+    for lim in rec.get("limits", []):
+        kind = lim.get("kind") or "?"
+        model = lim.get("model")
+        name = kind if not model else "%s (%s)" % (kind, model)
+        reset = fmt_local(lim.get("resets_at"))
+        line = "  %-22s %s" % (name[:22], bar(lim.get("percent"),
+                                              lim.get("severity")))
+        print(line + c(DIM, "  resets %s" % reset))
+    return 0
+
+
+def pct(v):
+    try:
+        return "%3d" % int(round(float(v)))
+    except (TypeError, ValueError):
+        return "  -"
+
+
+def cmd_history(records, args):
+    n = 20
+    if args:
+        try:
+            n = int(args[0])
+        except ValueError:
+            sys.stderr.write("usage: usage-log history [N]\n")
+            return 2
+        if n < 1:
+            sys.stderr.write("usage: usage-log history [N]  (N >= 1)\n")
+            return 2
+    if not records:
+        print("no snapshots yet (%s)" % JSONL)
+        return 0
+    tail = records[-n:]
+    print(c(BOLD, "%-18s  %4s  %4s  %s" % ("when", "5h%", "7d%", "status")))
+    for rec in tail:
+        when = fmt_local(rec.get("ts_utc"))
+        if rec.get("ok"):
+            status = c(GREEN, "ok")
+            fh, sd = pct(rec.get("five_hour_pct")), pct(rec.get("seven_day_pct"))
+        else:
+            status = c(RED, "FAIL: " + str(rec.get("error", "?"))[:48])
+            fh, sd = "  -", "  -"
+        print("%-18s  %4s  %4s  %s" % (when, fh, sd, status))
+    print(c(DIM, "\n%d of %d snapshots (%s)"
+            % (len(tail), len(records), JSONL)))
+    return 0
+
+
+def cmd_csv():
+    print(CSV)
+    if not os.path.exists(CSV):
+        sys.stderr.write("usage-log: note: csv does not exist yet\n")
+        return 0
+    return 0
+
+
+USAGE = """\
+usage-log -- view Claude usage snapshots
+
+  usage-log               pretty-print the latest snapshot (bars, reset times)
+  usage-log history [N]   last N snapshots as a compact table (default 20)
+  usage-log csv           print the path to the flat csv
+
+State: ~/.claude-usage/usage.jsonl   (override: USAGE_STATE_DIR)
+"""
+
+
+def main(argv):
+    cmd = argv[0] if argv else "latest"
+    args = argv[1:]
+    if cmd in ("-h", "--help", "help"):
+        sys.stdout.write(USAGE)
+        return 0
+    if cmd == "csv":
+        return cmd_csv()
+    records = load_records()
+    if cmd in ("latest", "now"):
+        return cmd_latest(records)
+    if cmd == "history":
+        return cmd_history(records, args)
+    sys.stderr.write("usage-log: unknown subcommand %r\n" % cmd)
+    sys.stderr.write(USAGE)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

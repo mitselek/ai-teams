@@ -1,0 +1,26 @@
+# Claude usage-limit recorder -- crontab equivalent of the launchd agent.
+# Install with:  crontab -e   (append the line below)
+# Every 30 minutes, snapshot usage in scheduled (soft-fail) mode.
+
+# NOTE: runs the INSTALLED copy in ~/.local/bin, not the repo copy under
+# ~/Documents -- a scheduled job has no TCC grant for ~/Documents and would
+# fail with "Operation not permitted". Install: cp usage-snapshot ~/.local/bin/
+*/30 * * * * /usr/bin/python3 /Users/michelek/.local/bin/usage-snapshot --quiet >> /Users/michelek/.claude-usage/snapshot.out 2>> /Users/michelek/.claude-usage/snapshot.err
+
+# --------------------------------------------------------------------------
+# WHY launchd IS PREFERRED ON macOS (keychain / TCC)
+# --------------------------------------------------------------------------
+# The snapshotter must read the OAuth token from the login keychain every
+# run. On modern macOS the classic cron daemon runs in a bare, non-GUI
+# context: it is not part of the user's Aqua/login session, so it commonly
+# either cannot unlock the login keychain (errSecInteractionNotAllowed) or
+# triggers a TCC/keychain prompt that never gets answered under cron -- the
+# snapshot then fails with a keychain error every 30 minutes. A launchd
+# USER AGENT loaded into the gui/<uid> domain (RunAtLoad + StartInterval,
+# see com.mitselek.claude-usage.plist) runs inside the logged-in GUI
+# session and, in practice on this Mac, CAN reach the login keychain -- this
+# was verified live by kickstarting the agent and confirming an ok:true row
+# landed in ~/.claude-usage/usage.jsonl. launchd is also consistent with the
+# other operator agents (com.mitselek.sm-notify). Use launchd; this crontab
+# line is documented only as a fallback / for portability, and its keychain
+# access is NOT guaranteed on macOS.

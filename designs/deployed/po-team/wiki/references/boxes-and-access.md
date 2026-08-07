@@ -48,6 +48,20 @@ poller stays the sole scheduled hub client. Rebuild with
 via `send(to: operator)`; he reads on his own schedule — no courier, no live
 session needed. Mail `from: operator` is Mihkel.
 
+**Claude usage-limit recorder** (added 2026-08-07): `usage-snapshot` +
+`usage-log` (`~/.local/bin/`, canonical copy `designs/deployed/po-team/operator/`,
+full docs in that dir's `README.md`). A launchd agent
+(`com.mitselek.claude-usage`, every 30 min) snapshots the same rate-limit data
+`/usage` shows — GET `api.anthropic.com/api/oauth/usage` with the OAuth token
+read fresh from the login keychain each run — into `~/.claude-usage/usage.jsonl`
+(one row per run) + `usage.csv` (one row per limit). `usage-log` renders the
+latest snapshot as bars, `usage-log history [N]` shows the trend. Failures are
+visible `ok:false` rows, never silent gaps. Keychain-from-launchd was verified
+live (ok:true row written from the scheduled context); the agent MUST run the
+`~/.local/bin` copy, not the `~/Documents` repo copy — launchd has no TCC grant
+for `~/Documents`. Uses an UNDOCUMENTED endpoint that may drift between CLI
+versions; fails soft by design.
+
 | Container | ssh (tailnet only) | Volume |
 |---|---|---|
 | mvox | `ssh mvox` = `-p 2229 ai-teams@shipyard.tailccff13.ts.net` | `mvox-home` |
