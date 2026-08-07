@@ -190,6 +190,14 @@ if [ "$claude_running" -eq 1 ] && ! tmux has-session -t "=$team" 2>/dev/null; th
     fi
 fi
 
+# --- environment id ----------------------------------------------------------
+# Team statuslines (e.g. mvox's statusline-command.sh) want CLAUDE_ENV_ID.
+# Teams set it in ~/.bashrc, but this launch path never sources bashrc (and
+# Ubuntu's interactive guard would skip it anyway), so derive it here:
+# existing env wins, else uppercase team name (mvox -> MVOX). Team name is
+# already validated to [A-Za-z0-9_-], safe for single-quote embedding.
+env_id="${CLAUDE_ENV_ID:-$(printf '%s' "$team" | tr '[:lower:]' '[:upper:]')}"
+
 # --- bootstrap prompt (#94 reorient + #102 re-establish the team) ------------
 # Fresh conversation, NOT --continue: reorientation comes from role docs +
 # scratchpads + read_mail, not conversation history. Generic across teams --
@@ -222,4 +230,4 @@ fi
 # single-quoted (both are single-quote-free by construction: the prompt text
 # above, and workspace is $HOME/workspace in fleet homes).
 exec tmux new-session -A -s "$team" \
-    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 '$claude_bin' '$prompt'"
+    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 CLAUDE_ENV_ID='$env_id' '$claude_bin' '$prompt'"
