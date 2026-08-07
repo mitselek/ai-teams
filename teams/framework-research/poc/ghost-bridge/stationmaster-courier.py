@@ -614,6 +614,63 @@ def _read_inbox_entries(path: Path) -> list | None:
     return data if isinstance(data, list) else None
 
 
+# ---------------------------------------------------------------------------
+# AGENT-LEVEL INBOUND ROUTING (#106)
+# ---------------------------------------------------------------------------
+# The to: line grammar (protocols.md sect.1.2): first line of entry["text"]
+# matching "to: [<agent>@]<team>".  Reused from company-courier's parse_to_line
+# pattern -- kept as a module-level regex so process_inbound can resolve the
+# agent part without importing company-courier (the reference courier must be
+# self-contained).
+_AGENT_NAME = r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}"
+_INBOUND_TO_RE = re.compile(
+    rf"^to:\s*(?:(?P<agent>{_AGENT_NAME})@)?(?P<team>{_AGENT_NAME})\s*$",
+    re.IGNORECASE,
+)
+
+
+class _InboxTarget:
+    """Duck-typed Config view overriding ONLY target_inbox, so inject_batch()
+    is reused VERBATIM to deliver into an agent-specific inbox instead of the
+    default team-lead inbox.  Same pattern as company-courier's _InboxTarget
+    (bounce routing)."""
+
+    def __init__(self, cfg, inbox_name: str):
+        object.__setattr__(self, "_cfg", cfg)
+        object.__setattr__(self, "target_inbox", inbox_name)
+
+    def __getattr__(self, name):
+        return getattr(self._cfg, name)
+
+
+def _resolve_inbound_target(cfg: Config, entry: dict, env_id: str) -> object:
+    """Determine which inbox to deliver an inbound entry into.
+
+    Returns cfg itself (team-lead) or an _InboxTarget override (agent inbox).
+    SAFETY: routes to an agent inbox ONLY when that file already exists -- never
+    creates phantom inboxes.  Falls back to cfg.target_inbox otherwise.
+    """
+    text = entry.get("text")
+    if not isinstance(text, str) or not text:
+        info(f"inbound {env_id}: routing to {cfg.target_inbox}.json (no text body)")
+        return cfg
+
+    first_line = text.split("\n", 1)[0].strip()
+    m = _INBOUND_TO_RE.match(first_line)
+    if not m or not m.group("agent"):
+        info(f"inbound {env_id}: routing to {cfg.target_inbox}.json (no agent address)")
+        return cfg
+
+    agent = m.group("agent")
+    agent_inbox = cfg.inboxes_dir / f"{agent}.json"
+    if agent_inbox.exists():
+        info(f"inbound {env_id}: routing to {agent}.json (agent address)")
+        return _InboxTarget(cfg, agent)
+    else:
+        info(f"inbound {env_id}: routing to {cfg.target_inbox}.json (agent inbox not found)")
+        return cfg
+
+
 def inject_batch(cfg: Config, batch_entries: list[dict], max_rounds: int = 50) -> None:
     """
     hints S4: deliver a batch of (already attribution-rewritten) entries into the
@@ -793,12 +850,17 @@ def process_inbound(cfg: Config, ledger: Ledger) -> None:
 
         injected = rewrite_attribution(c["entry"], from_team)
 
+        # Agent-level inbound routing (#106): if the entry carries a
+        # "to: agent@team" address AND that agent's inbox file exists,
+        # deliver into the agent's inbox instead of the default team-lead.
+        inject_target = _resolve_inbound_target(cfg, injected, env_id)
+
         try:
             # D11 inject. A multi-entry "batch" here is a single consignment's
             # entry, injected as one message. (collect returns one entry per
             # consignment; we inject per consignment to keep the ledger 1:1 with
             # envelope ids -- the dedup key.)
-            inject_batch(cfg, [injected])
+            inject_batch(inject_target, [injected])
         except InjectError as exc:
             # Did NOT durably write -> custody NOT transferred -> we must NOT ack
             # this id (protocol S5.4). Drop it from the ack list; the hub redelivers

@@ -19,9 +19,10 @@ Usage:
     company-courier.py --config <cfg> --ping
 
 V1 LIMITATIONS (documented, low-risk; see #95 follow-ups):
-  - Agent-level RECEIVING routing is not implemented: `to: <agent>@<team>` is
-    parsed and forwarded verbatim, but the far side delivers to the team's
-    default inbox (team-lead), not the named agent. Team-level delivery only.
+  - Agent-level RECEIVING routing (#106): implemented in the reference courier
+    (stationmaster-courier.py _resolve_inbound_target). Inbound mail addressed
+    `to: <agent>@<team>` is delivered to `<agent>.json` when that inbox file
+    exists (agent is spawned); falls back to team-lead otherwise.
   - PASS-2 deposit results are matched to consignments POSITIONALLY. Safe while
     the hub echoes one result line per consignment in order (it does); a future
     id-keyed match would harden against a dropped malformed line.

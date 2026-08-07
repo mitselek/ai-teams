@@ -34,9 +34,11 @@ TOOLS
                       Bad `to` -> validation error, NO deposit. Never silent.
 
   read_mail()         NON-DESTRUCTIVE pull of the team's local inbound. Resolves
-                      the live session-<id> inboxes dir and reads ONLY
-                      <target_inbox>.json (the single file the sidecar injects
-                      into). Does NOT hub-collect -- that would race/ack-double
+                      the live session-<id> inboxes dir and reads ALL inbox .json
+                      files (excluding ghost outbox files), merges entries, and
+                      returns them sorted by timestamp. V1: all inboxes visible
+                      to all callers (cooperative team model; agent-level isolation
+                      deferred). Does NOT hub-collect -- that would race/ack-double
                       the always-running sidecar courier, which owns the
                       collect->inject->ack cycle. read_mail is a pure read of the
                       sidecar's output; it is most valuable in a solo session,
@@ -251,26 +253,60 @@ def _resolve_inboxes_dir(cfg):
     return cfg.inboxes_dir
 
 
-def tool_read_mail(cfg):
-    """Returns (payload_dict, is_error). Reads ONLY <target_inbox>.json -- NOT a
-    glob of inboxes/*.json (that dir also holds the team's OUTBOUND ghost outbox).
-    Pure read: never mutates the harness-watched file (THE ONE RULE)."""
-    inboxes_dir = _resolve_inboxes_dir(cfg)  # may raise RuntimeError (no live dir)
-    path = inboxes_dir / f"{cfg.target_inbox}.json"
-    entries = sm._read_inbox_entries(path)  # read-without-write; None if absent/mid-write
-    # _read_inbox_entries returns None for BOTH "absent" and "transiently unreadable"
-    # (the sidecar's rename-aside->exclusive-create window, or a mid-write). If the
-    # path exists but read None, briefly retry so a single unlucky pull doesn't
-    # report "no mail" while mail is momentarily unreadable.
+def _read_with_retry(path):
+    """Read an inbox file with brief retry on transient mid-write failures."""
+    entries = sm._read_inbox_entries(path)
     if entries is None and path.exists():
         for _ in range(3):
             time.sleep(0.06)
             entries = sm._read_inbox_entries(path)
             if entries is not None:
                 break
-    if entries is None:
-        entries = []
-    return {"inbox": cfg.target_inbox, "count": len(entries), "entries": entries}, False
+    return entries
+
+
+def tool_read_mail(cfg):
+    """Returns (payload_dict, is_error). Reads ALL inbox .json files in the
+    inboxes dir (excluding ghost outbox files), merges entries, and returns them
+    sorted by timestamp.
+
+    V1 design choice (#106): read_mail returns entries from ALL inbox files
+    (team-lead + any agent inboxes). This matches the cooperative team model
+    where the team-lead sees everything. Agent-level isolation (an optional
+    "agent" parameter) is deferred to V2 if needed.
+
+    Pure read: never mutates any harness-watched file (THE ONE RULE)."""
+    inboxes_dir = _resolve_inboxes_dir(cfg)  # may raise RuntimeError (no live dir)
+
+    # Collect names to EXCLUDE from the inbox glob: ghost outboxes live in the
+    # same directory but are outbound files, not inboxes.
+    ghost_names = set(getattr(cfg, "ghost_outboxes", []) or [])
+
+    all_entries = []
+    sources = []
+
+    if inboxes_dir.is_dir():
+        for inbox_file in sorted(inboxes_dir.glob("*.json")):
+            stem = inbox_file.stem
+            if stem in ghost_names:
+                continue  # skip outbound ghost outbox files
+            entries = _read_with_retry(inbox_file)
+            if entries:
+                all_entries.extend(entries)
+                sources.append(stem)
+    else:
+        # No inboxes dir yet -- nothing to read.
+        pass
+
+    # Sort by timestamp (ISO format sorts lexicographically). Entries without a
+    # timestamp sort to the end.
+    all_entries.sort(key=lambda e: e.get("timestamp", "9999"))
+
+    return {
+        "inbox": "+".join(sources) if sources else cfg.target_inbox,
+        "count": len(all_entries),
+        "entries": all_entries,
+    }, False
 
 
 # ---------------------------------------------------------------------------
