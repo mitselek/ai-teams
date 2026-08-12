@@ -34,6 +34,18 @@ amendments:
 
 # Inbox Drained on Spawn, Cleared Without Deliver
 
+> ## `[TTL-EXPIRED]` -- do not trust this as current harness behaviour without re-verification
+>
+> **TTL expired 2026-08-07.** Flagged 2026-08-12 (5 days past expiry), on the scheduled scan that S67 predicted this expiry for.
+>
+> **NOT re-verified, deliberately -- and here the staleness risk is concrete, not theoretical.** This entry is version-coupled harness substrate: `last-verified: 2026-05-12`, when the local CLI was in the 2.1.17x range. The CLI has since moved through several releases (2.1.193 as of 2026-06-26, autoupdater enabled), and this wiki already documents one **unannounced** flip in inbox semantics between adjacent CLI versions (`inbox-retention-flip-pending-only-queue`). A spawn-handshake behaviour is exactly the kind of thing that changes without a release note.
+>
+> **Re-verification requires a live spawn experiment, not a wiki read**: write messages into a member's inbox file pre-spawn, spawn the member, and check whether the messages arrive in the conversation channel or the file merely drains to `[]`. A librarian cannot run that; it needs an agent with harness access on a named CLI version.
+>
+> **Owner: team-lead**, to route. Until re-verified, treat as a **2026-05-12 observation on a superseded CLI**. Note the practical consequence is mild: the documented workaround (team-lead folds queued content into the spawn prompt) is safe whether or not the bug still exists, so this flag is about the entry's truth claim, not about restoring a broken practice.
+>
+> An entry flagged stale is safe; an entry silently trusted is not.
+
 When an Agent-tool team member is spawned with messages already on disk in their inbox file, the spawn handshake **drains the inbox file to `[]` without delivering the queued messages into the spawned agent's conversation channel**. The agent comes online with an empty conversation backlog and no awareness that messages were waiting; the messages are lost.
 
 This is a **distinct sub-shape** from `worktree-spawn-asymmetry-message-delivery.md`. That entry covers messages dispatched **after** spawn across a worktree boundary. This entry covers messages **on disk before** spawn that the spawn process clears without delivering.

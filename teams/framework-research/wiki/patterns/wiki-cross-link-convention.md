@@ -51,7 +51,7 @@ Wiki entries live at `teams/framework-research/wiki/<subdir>/<file>.md` -- **4 l
 ## What NOT to link
 
 - Bare text inside fenced code blocks (e.g., a code example that happens to mention `dual-team-dir-ambiguity`) -- linkifying changes the literal example text.
-- The structured-link layer in frontmatter -- already captured via `source-files`, `source-commits`, `source-issues`, `related`. The convention is about prose, not frontmatter.
+- ~~The structured-link layer in frontmatter -- already captured via `source-files`, `source-commits`, `source-issues`, `related`. The convention is about prose, not frontmatter.~~ **SUPERSEDED 2026-08-12 (team-lead ruling): frontmatter IS in scope.** This carve-out is what let 561 frontmatter refs go unaudited. It contradicted the normative frontmatter claim under [Re-verification](#re-verification) below, and the contradiction is resolved **in favour of governing frontmatter**. See [Frontmatter reference base](#frontmatter-reference-base--canonical-form) for the canonical form. The *prose linking* guidance in this section still applies to prose only -- frontmatter is a structured field, not linkified text; what changed is that its **resolution base is now specified and checkable**.
 - Section anchors that don't yet exist (forward references to TBD content).
 - Transient artifacts (in-flight branches, throwaway scratchpads, working directories that won't survive the next session).
 
@@ -76,9 +76,44 @@ Path math is **per-wiki-layout**. Apex's wiki is also 4 levels deep, but a path 
 
 Recorded as a team-lead policy decision 2026-04-29 in response to the (a)-vs-(b) question raised when this entry was filed.
 
+## Frontmatter reference base -- canonical form
+
+**`[DECISION]` team-lead, 2026-08-12.** The reference-bearing frontmatter fields (`related`, `source-files`) are **keyed on repo-root-relative paths**, and cross-repo references are written **`<repo>:<repo-root-relative-path>`** (bare = this repo).
+
+```yaml
+related:
+  - teams/framework-research/wiki/gotchas/dual-team-dir-ambiguity.md   # this repo
+  - apex-migration-research:inventory/dokosign-battle-test-report.md   # another repo
+```
+
+**Why a repo dimension was added.** The field was a bare *path* field with no slot for "which repo," so authors facing a cross-repo reference invented notations: bare foreign paths, a space-separated repo prefix, and **two literal unexpanded `$REPO/` strings committed as-is** in `gotchas/dual-team-dir-ambiguity.md`. People reached for the form because the form was needed; there was no notation. Now there is. A field that forces invention will get it.
+
+**Measured state at the time of the ruling (Finn, 2026-08-12, 561 refs across 354 files)** -- the base was never enforced, so it accumulated one private dialect per author:
+
+| Base actually used | Count | Share |
+|---|---|---|
+| repo-root (**now canonical**) | 183 | 33% |
+| wiki-root relative (`patterns/foo.md`) | 245 | 44% |
+| same-dir bare filename | 43 | 8% |
+| citing-dir relative (`../patterns/foo.md`) | 16 | 3% |
+| resolvable under no base (incl. ~35 cross-repo) | ~50 | 9% |
+
+**NO NORMALISATION SWEEP** (team-lead ruling, same day). A mass rewrite across 561 durable citations is precisely the pathology [`../gotchas/citation-orphaning-by-housekeeping-sweep.md`](../gotchas/citation-orphaning-by-housekeeping-sweep.md) warns about -- the cure would inflict the disease. **Normalise on touch:** when you edit an entry for any other reason, convert its refs to the canonical form. The backlog drains through ordinary work.
+
+**The generalisable finding, filed separately:** a reference field with no *enforced* resolution base accumulates one private base per author -- declaring the base in prose is not enough, because nothing resolves the reference at write time. See [`../gotchas/frontmatter-reference-field-without-enforced-resolution-base.md`](../gotchas/frontmatter-reference-field-without-enforced-resolution-base.md).
+
 ## Re-verification
 
-If `wiki/` directory structure changes -- new subdir added, files moved, anything that affects relative paths -- the link convention's path anchoring needs to update. The `related` frontmatter field is keyed on bare paths from repo root (`teams/framework-research/wiki/<subdir>/<file>.md`), which doesn't break on subdir restructures; the markdown-prose links DO break. Audit when the structure shifts.
+If `wiki/` directory structure changes -- new subdir added, files moved, anything that affects relative paths -- the link convention's path anchoring needs to update.
+
+**`[CORRECTED 2026-08-12]` The durability claim previously made here was false, and it is corrected rather than narrowed.** This section used to say the `related` field is keyed on repo-root paths "**which doesn't break on subdir restructures**". Two things were wrong with that:
+
+1. **It described 33% of the field as though it described all of it.** The other 67% resolve under other bases, and a wiki-root-relative or same-dir ref *does* break on a subdir move -- exactly the failure the sentence claimed immunity from.
+2. **Repo-root-relative survives *wiki-internal* moves only -- not moves elsewhere in the repo.** Disproved for the canonical form itself: [`control-signal-semantics-at-authority-boundaries.md`](../process/control-signal-semantics-at-authority-boundaries.md) cites `designs/new/po-team/protocols.md`, and po-team subsequently moved `designs/new/` → `designs/deployed/`. The path was repo-root-relative and correct when written, and it is broken now. **No path base is durable against a rename upstream of the path; repo-root-relative merely moves the fragile joint further out.**
+
+The markdown-prose links break on structural moves too, and visibly (a broken link announces itself).
+
+**"Audit when the structure shifts" was the trigger this section already carried -- and the instrument was never built.** A trigger with no instrument is a written intention; it detected nothing for four months and the drift above accumulated underneath it. Finn is persisting a reference-integrity instrument into the repo so the trigger has something to fire. **Related but distinct failure:** a resolver only ever finds the *announcing* break -- see the coverage boundary in [`stale-snapshot-trusted-as-current.md`](stale-snapshot-trusted-as-current.md), because a link that resolves can still support a dead claim.
 
 The same caution applies after any team-name rename or workspace move -- the 4-level depth is invariant for our current layout but could change.
 

@@ -1,7 +1,8 @@
 ---
-title: "Inbox Drained on Spawn, Cleared Without Deliver"
+title: "[TTL-EXPIRED] Inbox Drained on Spawn, Cleared Without Deliver"
 directory: gotchas
 status: active
+ttl-status: expired-2026-08-07-flagged-2026-08-12
 confidence: medium
 source-agents: [team-lead, callimachus]
 discovered: 2026-05-07
@@ -9,10 +10,12 @@ last-verified: 2026-05-12
 stage-2: pending
 ttl: 2026-08-07
 related: [relay-to-primary-artifact-fidelity-discipline.md, worktree-spawn-asymmetry-message-delivery.md, substrate-invariant-mismatch.md, dual-team-dir-ambiguity.md, inbox-file-write-as-wake-mechanism.md]
-tags: [inbox, spawn, drain-not-deliver, harness, relay-fold, architectural-fact, substrate-loss]
+tags: [inbox, spawn, drain-not-deliver, harness, relay-fold, architectural-fact, substrate-loss, ttl, ttl-expired, needs-substrate-reverify]
 ---
 
 ## TLDR
+
+> **`[TTL-EXPIRED]` 2026-08-07, flagged 2026-08-12.** NOT re-verified, deliberately -- this is version-coupled harness substrate last verified 2026-05-12 on a CLI several releases old, and this wiki already records one **unannounced** inbox-semantics flip between adjacent versions (`inbox-retention-flip-pending-only-queue`). Re-verification needs a live pre-spawn-inbox spawn experiment on a named CLI version, which a librarian cannot run. **Owner: team-lead** to route. Treat as a 2026-05-12 observation on a superseded CLI. The documented workaround (spawn-prompt relay-fold) is safe either way, so the flag concerns the truth claim, not current practice.
 
 When an Agent-tool team member is spawned with messages already on disk in their inbox file, the spawn handshake drains the inbox file to `[]` without delivering the queued messages into the conversation channel. The agent comes online with an empty backlog and no awareness messages were waiting; the messages are lost. The defect: drain ≠ deliver.
 

@@ -14,6 +14,16 @@ ttl: 2026-07-10
 
 # Cross-Team Model Inventory Baseline
 
+> ## `[TTL-EXPIRED]` -- do not trust these figures without re-verification
+>
+> **TTL expired 2026-07-10.** Flagged 2026-08-03 (24 days past expiry, carried unremarked since S60).
+>
+> **This entry has NOT been re-verified, deliberately.** Model inventory is substrate truth -- it lives in deployed rosters and team configs, and cannot be checked from inside the wiki. A librarian re-reading this page would only confirm that the page still says what it said, which is not verification (see [`stale-snapshot-trusted-as-current.md`](stale-snapshot-trusted-as-current.md) -- the snapshot was once accurate and nothing about reading it signals it has aged).
+>
+> **Owner: team-lead**, to route to a specialist with substrate access. Until then, treat every figure below as a **2026-04-10 historical snapshot**, not current state.
+>
+> An entry flagged stale is safe; an entry silently trusted is not.
+
 Reference data: model distribution across all deployed and designed teams as of 2026-04-10.
 
 ## Inventory (68 agent slots, 9 teams)
