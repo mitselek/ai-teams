@@ -1,5 +1,13 @@
 # VEO-78 Gateway Worker — an explainer
 
+> ## `[TICKET CLOSED 2026-08-11]` — read this as background, not as a live decision aid
+>
+> **Verified against Jira 2026-08-19 via Atlassian MCP** (*FR:Finn*). VEO-78 is `Closed`, archived by the PO on 2026-08-11 as obsolete in its current form. The abstraction idea was explicitly kept and returns under a **new ticket**, reframed against the VEO-140 menu-management line. A second premise also fell: *AR:Schliemann* refuted the ORDS-20.2-lacks-`:body` assumption on 2026-08-18.
+>
+> The explanatory content stands — the `aud`-versus-`iss` distinction, cookie-versus-header, and §6's confused-deputy problem are properties of the architecture, not of the ticket. **The decision this document was written to inform has already been made.**
+>
+> This document's own header warned *"this document will itself go stale — re-check the marked claims before acting on them."* It did, within eight days, and nobody re-checked, because the standing team record described VEO-78 as blocked on Atlassian access that in fact worked. **Writing the warning is not the same as building the check.**
+
 **For:** Mihkel Putrinsh (the ticket's reporter) · **Written:** 2026-08-03 (*FR:Finn*)
 **Subject:** [VEO-78](https://eestiraudtee.atlassian.net/browse/VEO-78) — *Gateway Worker — CF Worker vahekiht rumba ja ORDS vahel*
 **Purpose:** comprehension, not decision. This is written to be read once and then argued with.

@@ -1,7 +1,19 @@
 # VEO-78 "Gateway Worker" — Actionability Assessment + Team-Competence Mapping
 
+> ## `[SUPERSEDED BY TICKET STATE]` — VEO-78 was CLOSED on 2026-08-11. Do not action this assessment.
+>
+> **Verified against Jira 2026-08-19 via Atlassian MCP** (*FR:Finn*). The ticket is `Closed` / category `done`, last updated 2026-08-18, and carries **2 comments** — not the `Planned` / 0-comment state recorded in the header below, which was accurate on 2026-08-03 and is now eight days stale.
+>
+> **The PO archived it 2026-08-11** as *"pilet praegusel kujul aegunud"* — obsolete in its current form, no longer reflecting current direction — while explicitly keeping the idea: *"Abstraktsiooni idee ise — vahekiht Rumba ja andmeallikate vahel — on väärt hoidmist ja vajab edasist tõukamist"* (the abstraction itself is worth keeping and needs pushing further). It returns **under a new ticket**, reframed against the VEO-140 menu-management line.
+>
+> **A second premise fell independently.** *AR:Schliemann* commented 2026-08-18 refuting the ticket's own rationale: the PoC-era assumption that ORDS 20.2 lacks `:body`/`:status` binds is **wrong** — Oracle's 20.2 documentation has `:body` from ORDS 2.0 and `:body_text`/`:status_code` from 18.3, and IBMU production endpoints on the same nvagun use `:body_text` today. The archive decision stands regardless, because the Worker was never a workaround for that limit.
+>
+> **What survives:** §6 (the design problem VEO-78 acquired) and the protocol-abstraction re-grade. The PO's archive note reaches the same conclusion this document reached at S62 — abstraction is the durable part, identity was never the driver. **What does not survive:** any reading of this as a live actionability assessment. It is now a record of how the ticket was analysed, not advice about what to do.
+>
+> §2.1 of this document diagnosed the ticket as suffering "staleness with no re-check gate." This document then acquired the same defect, for the same reason, and it was caught only because someone tested a blocker nobody had tested. **The gate is still missing; this banner is not one.**
+
 **Subject:** [VEO-78](https://eestiraudtee.atlassian.net/browse/VEO-78) — *Gateway Worker — CF Worker vahekiht rumba ja ORDS vahel*  
-**Project:** VEO / VJS2 · **Type:** Story · **Status:** Planned · **Priority:** Medium  
+**Project:** VEO / VJS2 · **Type:** Story · **Status:** ~~Planned~~ **Closed 2026-08-11** · **Priority:** Medium  
 **Assignee:** Valeri Kuzmin · **Reporter:** Mihkel Putrinsh  
 **Created:** 2026-06-01 11:32 · **Last updated:** 2026-06-01 11:37 · **Comments:** 0 · **Links:** none · **Labels/components/fixVersions:** none  
 **Assessment date / author:** 2026-08-03 (*FR:Finn*)  
