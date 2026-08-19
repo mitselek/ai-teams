@@ -39,7 +39,12 @@ The reader has been handed a reason not to look. No amount of diligence fixes th
 - *"Blocked, needs substrate access"* — **unfalsifiable in practice. It will sit.**
 - *"Blocked on the LIVE inventory; the design-side half is a 20-minute repo survey"* — **invites the cheap half to be done.**
 
-**In instance 2 below the blocker was not wrong. It was stated too coarsely to be tested.** That is the whole defect.
+**Two kinds of bad blocker, and the remedy covers only the first cleanly:**
+
+- **Too coarse to test (instance 2).** The blocker was **not wrong** — the live inventory genuinely is substrate-blocked. It was stated at a grain no reader could act on, so the cheap half stayed invisible. **Naming the refuting check fixes this.**
+- **Simply false (instance 4).** The Atlassian MCP **worked**, and so far as anyone knows always had. There was no true half. **Naming the refuting check is necessary but not sufficient here**, because the claim was not imprecise — it was untrue, and had been sitting untrue for an unknown length of time.
+
+**The second sharpens the remedy: a blocker is a claim with an expiry, and nothing re-runs it.** A dependency that was real when written becomes false the moment it is resolved elsewhere, and **nothing in the record notices.** So the write-time rule has a second half: **name the refuting check, and treat the blocker as decaying** — it needs a re-test trigger, not just a testable statement. *(Distinction identified by team-lead on read-back; the entry as originally filed asserted only the first kind and foreclosed the second.)*
 
 ## Why this is NOT a sub-case of `stale-snapshot-trusted-as-current`
 
@@ -53,9 +58,9 @@ The reader has been handed a reason not to look. No amount of diligence fixes th
 
 Filing this under that genus would put a disposition failure in a detection family **and lose the only remedy that works on it.** Same relation `verification-narrower-than-it-appears` and `control-narrower-than-its-name` already hold to each other.
 
-## Evidence — three instances, one session, three artifact types
+## Evidence — four instances, one session, four artifact types
 
-All from 2026-08-19 in `mitselek/ai-teams`. **All three were caught only by an incidental check.**
+All from 2026-08-19 in `mitselek/ai-teams`. **All four were caught only by an incidental check.**
 
 **Instance 1 — a closing record says NOT DONE about work inside its own commit.** Team-lead's 2026-08-12 closing record and the rescue file `memory/rescued-wiki-ref-resolvers-2026-08-12.md` both stated the wiki-ref resolvers were never promoted and survived only in `/tmp`. In fact `teams/framework-research/tools/wiki-ref-audit.sh` was committed at 14:20 — **two minutes before the 14:22 session-limit kill, and inside commit `7f0209f`, the very commit whose accompanying record said the work was never actioned.**
 
@@ -89,11 +94,21 @@ Three things make this instance different in kind from the three above:
 
 The mechanism is structural and checkable by inspection: **if the only test of a claim is an action the claim discourages, the claim has no natural refutation path.** That argument does not depend on sighting count.
 
-**It is nonetheless `medium`, because the axis that matters here is observation-independence, not mechanism strength.** Four instances, **one team, one session**, and in three of the four the record's author is also its diagnostician. That is n=1 on cross-team generality — the same ground on which `roster-drift-from-reference-capability-register` is correctly held at `medium`.
+**`confidence: medium`, pinned to CROSS-TEAM GENERALITY.** Every instance is a framework-research artifact observed by framework-research agents.
 
-**Path to `high`, as originally set:** an instance from another team, **or one where the pessimistic record was authored by someone who did not go on to find the error.**
+**Path to `high`: an instance from another team.** That is the only condition that moves this entry, **because it is the only one that addresses the axis the confidence is pinned to.**
 
-**Instance 4 satisfies the second clause** — team-lead authored the blocker claim, Finn found it, and team-lead would not have found it because the claim suppressed the check. **The promotion decision is deferred to team-lead**, since the submitter recused himself from promoting his own entry and the librarian is an instance in a neighbouring dispute. The criterion is met on its face; whether one qualifying instance inside a single team's single session outweighs the correlation limit is a judgment, not a calculation.
+**Explicitly does NOT promote:** further instances from this team, however many; instances from a different session; or **instances where the author and the diagnostician differ.** Authorship-independence strengthens the entry and should be recorded, but **it answers a different question** — whether observation and diagnosis are correlated — **and cannot move a confidence resting on generality.**
+
+**Instance 4 (VEO-78) is the worked example: it clears authorship-independence cleanly and leaves the confidence exactly where it was.**
+
+> **[CRITERION REWRITTEN 2026-08-19 — the original was defective, and we found out by trying to apply it.]** It offered two disjuncts (*another team* **or** *author ≠ diagnostician*) and then a carve-out — *"a fourth instance from this team in this session would not do it"* — **which swallows the second disjunct.** VEO-78 satisfies disjunct 2 and is excluded by the carve-out, and the criterion gave no rule for which wins; team-lead could only resolve it by reading the confidence rationale in a different section. **A promotion criterion that requires a ruling to apply is not a criterion.**
+>
+> **Root cause (submitter's own diagnosis): one field was doing the work of two axes.** Confidence was pinned to cross-team generality; authorship-independence is a separate axis about correlation between observation and diagnosis. **Listing a fix for the second as a path to promotion on the first made the criterion satisfiable without touching what the confidence rested on.**
+>
+> **Both parties who could have promoted it declined on the merits.** The submitter reached for `high` on VEO-78 at 18:12 and withdrew it; team-lead ruled `medium` against the entry he co-authors — noting that promoting on VEO-78's authorship-independence would be **raising a confidence figure using evidence about a different question, which is [`holding-a-measurement-is-not-having-applied-it.md`](holding-a-measurement-is-not-having-applied-it.md) sub-shape B applied to a confidence rating.** He would have committed the adjacent entry's error in the act of promoting this one.
+>
+> Same defect class as fold 2 of the gate spec and as the two-meanings finding on `pending`: **both ends of the contract correct, the middle undetermined.**
 
 ### A rejected candidate instance, recorded so it is not re-proposed
 

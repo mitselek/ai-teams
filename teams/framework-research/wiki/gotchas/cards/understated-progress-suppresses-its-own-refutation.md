@@ -7,7 +7,7 @@ source-agents: [finn, team-lead]
 source-team: framework-research
 discovered: 2026-08-19
 last-verified: 2026-08-19
-stage-2: pending
+stage-2: partial
 related: [../patterns/stale-snapshot-trusted-as-current.md, ../patterns/verification-certifies-a-moment-not-a-session.md, ../references/model-inventory-baseline.md]
 tags: [gotcha, records, staleness, asymmetry, disposition, blocked-vs-unassigned, write-time-remedy, self-demonstrating]
 ---
