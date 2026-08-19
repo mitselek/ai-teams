@@ -52,6 +52,23 @@ All against `common-prompt.md`'s explicit rule to run `date` **before sending an
 
 **A fourth instance from another team**: apex's `whenToUse` recorded `'First run: S68 2026-08-12 -> GH issue'` at commit time, asserting an output that did not exist nineteen minutes later — **forward-dated provenance committed to a repo**, which is the same defect with a longer half-life. Arguably the *weaker* case, since a run was genuinely in flight; the three above had nothing.
 
+## The damage is not directional — an unearned confession
+
+**The instance nobody anticipated, and the one that shows what the harm actually is.**
+
+Team-lead accused himself, in writing, of committing `d77161f` **against the librarian's explicit hold** — calling it *"the least excusable"* of his errors that day, on the grounds that the hold was explicit, recent, and from a colleague.
+
+**The event did not happen.** Checked against *arrival order* rather than stamps: the librarian's *"ready to commit"* arrived, team-lead independently verified the measurement it reported, and he committed. **The *"do NOT commit yet"* arrived in the next batch.** There was no hold to disregard.
+
+**How he convicted himself is the finding.** He reconstructed the sequence from timestamps — 18:16 precedes 18:19, therefore he must have held the hold and ignored it — **in a session where all three participants had forward-dated by unknown and unrecoverable amounts.** He used fabricated stamps to build an ordering claim about his own conduct, hours after establishing that fabricated stamps destroy exactly that.
+
+**Every other instance here reads as an excuse the record would not support. This one is the mirror.** Broken ordering does not flatter you and does not condemn you — **it makes the sequence unrecoverable, and the reader supplies the reading.** He supplied the one that blamed him, while writing a message about being the least reliable judge in the room.
+
+**Two operational points fall out:**
+
+- **In this substrate, arrival order is recoverable when stamps are not** — and nobody thought to use it until a self-accusation forced the question. **When stamps are suspect, order by receipt, not by header.**
+- **A false claim about a colleague's conduct propagated before it was caught.** Finn had recorded *"team-lead committed against Callimachus's explicit hold"* as fact in his own scratchpad, taken from the self-report. Corrected with the original left visible. **A confession is trusted more readily than an accusation, and travels further before anyone checks it.**
+
 ## The independence argument, stated because it is contestable
 
 Correlated observations are fatal to a frequency claim and merely weak for a mechanism claim, so the distinction matters here.

@@ -37,6 +37,18 @@ Two entries were then filed later in the same session: `self-report-obligation-v
 
 **Found 2026-08-19 only by counting files on disk while indexing an unrelated entry.** No check fired. Nothing was scheduled to fire. The drift was discovered by someone doing a different job who happened to distrust a header.
 
+## Instance 2 — an entry aged between filing and read-back, within the hour
+
+**The cleanest evidence either this entry or its sibling has, because nobody did anything wrong.**
+
+[`../gotchas/understated-progress-suppresses-its-own-refutation.md`](../gotchas/understated-progress-suppresses-its-own-refutation.md) was filed on 2026-08-19 carrying a stated path-to-`high`: *an instance from another team, or one where the record's author did not go on to find the error.* **A qualifying instance (VEO-78) already existed when the entry was filed** — it surfaced the same afternoon, before the read-back.
+
+**The filing was correct at the instant it happened. Nothing in the entry could signal that its own promotion criterion had been satisfied elsewhere.** The co-author reading it back an hour later had to notice from outside the document.
+
+**This is the pattern applied to an evidentiary claim rather than a count.** A path-to-`high` is a verification artifact of the same kind as a consistency report: **it certifies a state of the evidence at the moment of writing, and carries no expiry.** Where instance 1 shows a *count* going stale inside a session, this shows a *criterion* doing it — and criteria are read as standing conditions far more readily than counts are.
+
+**Distinguishing it from the neighbouring entry, which does not cover it:** nothing here discouraged a check, so it is not `understated-progress`. Nothing was hidden and nobody was misled — **the world simply moved between two correct acts.**
+
 ## Why the derived layer is where this lands
 
 The entries themselves were fine. **The defect was entirely in Tier 2** — the card INDEX and the main index — which is the layer written *about* Tier 1 and then never re-read against it. This is the second consecutive session in which every defect found in this wiki lived in the derived layer while the source layer was clean.
@@ -61,8 +73,8 @@ That is not coincidence. **A derived record is produced once, at a moment, by so
 `confidence: medium`, pinned to the weakest load-bearing claim.
 
 - **Directly evidenced:** the two unindexed entries, the stale `42 cards` header, the passing 2026-08-12 report, and the 2026-08-19 recount. All checkable on disk and in `7f0209f`.
-- **n=1 as a named pattern.** One pass, one session, one corpus. The mechanism is easy to state and hard to test — it predicts that *any* mid-session verification followed by further writes leaves a stale certificate, which is close to definitional and therefore weak evidence on its own.
-- **Path to `high`:** a second instance where a verification artifact was trusted after its subject moved, ideally in a different substrate (a CI green tick read after later commits, a health check cited after a config change). **A second index drift in this wiki would not count** — same corpus, same author, one observation read twice.
+- **n=2, both from this corpus and this session** — a stale count (instance 1) and a stale criterion (instance 2). The mechanism is easy to state and hard to test: it predicts that *any* mid-session verification followed by further writes leaves a stale certificate, which is close to definitional and therefore weak evidence on its own.
+- **Path to `high`:** a verification artifact trusted after its subject moved **in a different substrate** — a CI green tick read after later commits, a health check cited after a config change. **A third instance in this wiki would not count**; same corpus, same author, one observation read repeatedly. Instance 2 is kept because it covers a **different artifact class** (an evidentiary criterion rather than a count), not because it adds independent weight.
 
 **`stage-2: confirmed`** — author-is-filer; the librarian found it, in his own prior work, and filed it.
 
