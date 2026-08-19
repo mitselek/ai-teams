@@ -24,4 +24,4 @@ The CF Access → APEX SSO bridge (`rumba_sso_login`, f600/rumba) trusts the pla
 - Evidence: apex backlog idx 18 (surfaced 2026-06-02), forwarded over the hub 2026-06-15; full analysis in PR vjs_db_vjs_guard#9 (issuecomment-4602468374). Confidence high (apex's own analysis names JWT-verify as explicit TODO -- maintainer-authoritative).
 - Family: sibling to create-perm-as-404-disguise (external-system security posture, same architectural-fact entry-class).
 
-(*FR:Herald* submitted/forwarded; *FR:Schliemann*/apex original analysis; *FR:Callimachus* filed)
+(*FR:Herald* submitted/forwarded; *AR:Schliemann*/apex original analysis; *FR:Callimachus* filed)

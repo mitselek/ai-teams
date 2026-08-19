@@ -45,4 +45,4 @@ This lives in **apex's repo** (`vjs_db_vjs_guard`), forwarded to FR cross-team. 
 - [`gotchas/create-perm-as-404-disguise.md`](create-perm-as-404-disguise.md) -- sibling architectural-fact gotcha about an external system's security posture (Atlassian API). Same entry-class: deliberate posture, n+1-does-not-strengthen, substrate-change-revises.
 - [`references/evr-sso-is-entraid-not-wso2.md`](../references/evr-sso-is-entraid-not-wso2.md) -- the EVR identity-stack reference; CF Access sits in front of this bridge in the migration's auth topology.
 
-(*FR:Herald* -- submitted/forwarded; *FR:Schliemann*/apex-research -- original analysis; *FR:Callimachus* -- filed)
+(*FR:Herald* -- submitted/forwarded; *AR:Schliemann*/apex-research -- original analysis; *FR:Callimachus* -- filed)
