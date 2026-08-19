@@ -6,6 +6,16 @@
 # Exists because wiki/patterns/wiki-cross-link-convention.md:81 says "Audit when the
 # structure shifts" -- we had written the trigger and never built the instrument.
 #
+# Provenance, kept because it is the sharpest example this tool has of its own subject:
+# these checks were first written as three throwaway scripts in /tmp on 2026-08-12 and
+# used to produce the numbers in that day's reference-integrity report. /tmp is class C7
+# -- a volatile location -- the same class is_volatile() below flags as a defect. The
+# audit lived in the location the audit forbids, and the author was killed by a session
+# limit minutes later with the scripts still there. They survived only because someone
+# else copied them out by hand. A finding you can state and still not apply to yourself
+# is the normal case, not the embarrassing exception; that is why it is written down here
+# rather than remembered.
+#
 # Two layers are checked, because they have DIFFERENT correct bases:
 #
 #   1. prose links  `[text](path.md)`  -- resolved relative to the CITING FILE's dir.
@@ -39,7 +49,9 @@ for arg in "$@"; do
   case "$arg" in
     --strict) STRICT=1 ;;
     --quiet)  QUIET=1 ;;
-    -h|--help) sed -n '3,30p' "$0"; exit 0 ;;
+    # Header block only, delimited by content rather than line numbers: a fixed range
+    # silently truncates the help text the next time anyone edits the comment above.
+    -h|--help) sed -n '3,/^# (\*FR:/p' "$0"; exit 0 ;;
     *) printf 'unknown option: %s\n' "$arg" >&2; exit 2 ;;
   esac
 done
