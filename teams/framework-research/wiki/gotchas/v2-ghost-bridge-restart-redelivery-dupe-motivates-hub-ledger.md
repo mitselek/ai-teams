@@ -37,6 +37,12 @@ Together: durable custody + delete-on-ack + id-keyed ledger = **at-least-once-wi
 
 This is **not** the same finding as [`patterns/read-flag-replication-discipline-for-external-cli.md`](../patterns/read-flag-replication-discipline-for-external-cli.md). That pattern is the **consumer-side DISCIPLINE** (flip `read: false → true` under the same flock as the read, so the harness display + other consumers stay coordinated). This entry is the **daemon-restart FAILURE-MODE** that the discipline alone does **not** prevent -- the v2 daemon *did* flip the flag, but flipping-without-deleting plus a restart re-scan still re-delivered. The read-flag pattern itself notes (under "What this discipline does NOT cover") that it is "not a guarantee against double-processing across consumer restarts" and "not a substitute for protocol-level dedup." This entry is the empirical incident that exercises exactly that gap, and the hub's delete-on-ack + ledger are the protocol-level dedup the pattern points to.
 
+## The inverse failure the cure introduced
+
+The hub's delete-on-ack + custody + id-keyed ledger genuinely eliminates the duplication described above. It also creates the opposite failure: [`at-least-once-without-age-alarm-hides-unbounded-latency.md`](at-least-once-without-age-alarm-hides-unbounded-latency.md) records three messages that arrived **once, two months late**, because an un-acked consignment is retained and retried indefinitely and nothing alarms on the age of the oldest undelivered item.
+
+**Read the two together.** This entry is the loud failure (recipients counted duplicates; caught in one session); that one is the quiet failure (indistinguishable from an empty queue; survived two months). **The cure for this defect is the cause of that one** — which is not an argument against the cutover, since loss and duplication were correctly priced as the worse outcomes, but it is the reason the design needs a latency signal it does not yet have.
+
 ## Evidence
 
 - **The 06-10 dupe-root-cause exchange:** `apex-fr-backlog-copy.json` idx 22–32 -- the Schliemann ↔ FR count-reports ("arrived 5 times", "8 times", "4 times", then fresh-name "exactly 1 time"); idx 32 = apex's ack of the root cause + the fr-bridge fresh-name contingency. Read-only triage copy at `~/.stationmaster-t4/apex-fr-backlog-copy.json`.

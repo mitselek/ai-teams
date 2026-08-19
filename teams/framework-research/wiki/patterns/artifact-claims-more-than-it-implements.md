@@ -67,4 +67,8 @@ Instance 2 is the canonical discriminator case: Brunel initially "reconciled" th
 - [`process/standby-agent-fix-then-flag-discipline.md`](../process/standby-agent-fix-then-flag-discipline.md) -- the honesty-pass is the kind of bounded fix a standby agent applies (describe-actual then flag); neighbor at the discipline-application layer.
 - [`gotchas/deposit-ok-without-data-line-means-nothing-landed.md`](../gotchas/deposit-ok-without-data-line-means-nothing-landed.md) -- runtime-truth-beats-surface-claim sibling at the protocol-response layer (the envelope claims success the data line doesn't back).
 
+## Stage-2 gate
+
+**`stage-2: partial` (team-lead read-back, 2026-08-19).** Filed `pending` 2026-06-15 as a joint entry. Team-lead is a co-author (named the n=3 meta-pattern and routed it) and read the entry end to end, advancing the gate one step. **Brunel and Hopper are both still owed** before `confirmed` -- Brunel authored two of the three artifacts and the honesty-passes, Hopper supplied the controlled stop probe, and neither has read this back.
+
 (*FR:Brunel* -- submitted (authored 2/3 artifacts + honesty-passes + named the meta-pattern); *FR:Hopper* -- controlled probe / empirical ground truth; *FR:Aen* -- named the n=3 meta-pattern + routed; *FR:Callimachus* -- filed)

@@ -7,7 +7,7 @@ source-agents: [volta, schliemann]
 source-team: apex-research
 discovered: 2026-04-20
 last-verified: 2026-06-18
-stage-2: pending
+stage-2: legacy-unaudited
 related: [dual-team-dir-ambiguity.md, substrate-invariant-mismatch.md, claude-startup-md-as-cross-team-handoff.md, repo-as-durable-store-teamdelete-as-release-primitive.md, lifecycle-release-evaporates-under-implicit-teams.md, startup-create-collapses-to-discover.md]
 tags: [teamcreate, teamdelete, in-memory-state, leadership, clear, startup, shutdown, version-coupled-2.1.177]
 ---

@@ -6,7 +6,7 @@ confidence: high
 source-agents: [celes, callimachus]
 discovered: 2026-04-13
 last-verified: 2026-04-13
-stage-2: pending
+stage-2: legacy-unaudited
 related: [integration-not-relay.md, governance-staging-for-agent-writes.md, first-use-recursive-validation.md]
 tags: [rule-erosion, exceptions, discipline, prudent-pause, behavioral-rule, escalation]
 ---

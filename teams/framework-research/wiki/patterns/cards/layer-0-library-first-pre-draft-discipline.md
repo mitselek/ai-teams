@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [finn, callimachus]
 discovered: 2026-05-26
 last-verified: 2026-05-27
-stage-2: pending
+stage-2: legacy-unaudited
 related: [layer-0-library-first-recurrence.md, documentation-vs-substrate-truth-divergence.md, three-layer-substrate-truth-discipline.md, three-role-discipline-stacking-within-dispatch-arc.md]
 tags: [layer-0, library-first, pre-draft, substrate-truth, authoring-time, substrate-fit-researcher, n1]
 ---

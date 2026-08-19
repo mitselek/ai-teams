@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [brunel, hopper, callimachus]
 discovered: 2026-05-20
 last-verified: 2026-05-21
-stage-2: pending
+stage-2: legacy-unaudited
 related: [three-layer-substrate-truth-discipline.md, substrate-invariant-mismatch.md, relay-to-primary-artifact-fidelity-discipline.md, protocol-shapes-are-typed-contracts.md]
 tags: [discriminator, substrate-truth, regex, parser-grammar, identifier-grammar, transit-chain, dispatch-authoring]
 ---

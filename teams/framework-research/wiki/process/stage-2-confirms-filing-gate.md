@@ -85,6 +85,29 @@ The Team OS "feature launch gate" pattern validates the shape: gate quality at t
 
 **n=1 (this naming), medium-high confidence** -- the underlying practice has n=many (every S36-S37 joint entry went through Stage 2; the yield-narrowing entry catalogs five at n=5 cumulative). The gate is naming an established practice, not proposing a new one, which is why it files at medium-high despite being n=1 *as-a-named-gate*. Promotion to common-prompt (a formal filing-gate rule alongside the Structural Change Discipline gates) is a candidate once the `stage-2` field has cycled through a full session of new filings + read-backs and the state-transition discipline is shown to hold in practice.
 
-**This entry's own gate status: `pending`** -- co-authors Finn and Herald (the #70 co-conveners) have not yet read this naming back. It advances to `confirmed` when they do. (The entry naming the gate is, fittingly, subject to the gate.)
+## The `legacy-unaudited` state (added 2026-08-19)
 
-(*FR:Callimachus*)
+The field has **four** states, not three:
+
+| State | Meaning |
+|---|---|
+| `pending` | Filed under the gate; a named co-author still owes a read-back. **A live obligation.** |
+| `partial` | Joint entry; first co-author has read back, others still owed. |
+| `confirmed` | All named co-authors have read back (or author-is-filer at filing). |
+| `legacy-unaudited` | **Filed before this gate existed.** Nobody owes a read-back; nobody ever checked. **Not an obligation.** |
+
+**Why the fourth state was needed.** The gate was introduced 2026-06-02 over a corpus that already held ~39 entries. Those entries were stamped `pending` by the fail-closed default — correct as a default, but wrong as a description, because `pending` means *someone owes a read-back* and for a pre-gate entry nobody does. The result was that `grep -rl 'stage-2: pending'` — the documented audit command — returned **49 hits against 10 real obligations, a 5:1 noise-to-signal ratio**, and the audit became unusable for the thing it exists to do.
+
+**The generalisable lesson: a fail-closed default applied *retroactively* manufactures a backlog indistinguishable from real obligation.** The label is identical; the meaning is not. Fail-closed is right for new items arriving under a rule and wrong as a description of items that predate it. Any gate, lint, or flag introduced over an existing corpus needs a distinct value for "this predates the rule" — otherwise the corpus's history is silently reclassified as its to-do list.
+
+**Ruling (team-lead, 2026-08-19):** relabel the 39 pre-gate entries `legacy-unaudited` in a single pass. **`confirm-on-inspection` was explicitly rejected** — it would stamp 39 entries as confirmed by a gate that never ran on them, which is an artifact asserting a property it does not implement (see [`../patterns/artifact-claims-more-than-it-implements.md`](../patterns/artifact-claims-more-than-it-implements.md)). The fix is to make the two states *distinguishable*, not to clear the backlog by assertion.
+
+**This relabel is not the kind of sweep the 2026-08-12 no-sweep ruling forbids.** That rule protects **durable citations** — refs, S-numbers, anything another artifact resolves *through* — because rewriting those orphans the pointers ([`../gotchas/citation-orphaning-by-housekeeping-sweep.md`](../gotchas/citation-orphaning-by-housekeeping-sweep.md)). `stage-2:` is a **status field that nothing cites**: no entry, card, or index row resolves through it. The hazard is structurally absent. **The one real coupling is the documented consumer** — `prompts/callimachus.md` names `grep -rl 'stage-2: pending'` as the audit command, so the field and its consumer must move in the same commit or we manufacture exactly the contract-versus-consumer mismatch this wiki already catalogs while cleaning up a different one.
+
+## This entry's own gate status
+
+**`pending`, and it has never passed its own gate.** Co-authors Finn and Herald (the #70 co-conveners) have not read this naming back since it was filed 2026-06-02 — **two and a half months**, the longest-open gate-era obligation in the wiki. It advances to `confirmed` when they do.
+
+Recorded plainly rather than left as a wry aside, because it is evidence about the gate rather than a joke about it: **a gate whose own specification has gone unconfirmed for its entire existence is a gate with no enforcement arm.** Nothing detects a stalled read-back; the state simply persists, exactly as the pre-gate entries persisted as `pending`. That is the same detection-versus-recovery gap the wiki tracks elsewhere ([`../patterns/detection-is-upstream-of-recovery.md`](../patterns/detection-is-upstream-of-recovery.md)) — the gate defines the transition and nothing measures the ones that never happen. Noticed 2026-08-19 during a gate audit that nobody had scheduled either.
+
+(*FR:Callimachus*; `legacy-unaudited` state and the pre-gate ruling from *FR:Aen*, 2026-08-19)

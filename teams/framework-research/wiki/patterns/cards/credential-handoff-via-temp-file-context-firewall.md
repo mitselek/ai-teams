@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [aen, hopper, callimachus]
 discovered: 2026-05-27
 last-verified: 2026-05-27
-stage-2: pending
+stage-2: legacy-unaudited
 related: [documentation-vs-substrate-truth-divergence.md, three-role-discipline-stacking-within-dispatch-arc.md, embedded-github-token-in-git-config.md, substrate-invariant-mismatch.md]
 tags: [credentials, context-firewall, temp-file, shred-discipline, three-role, n1]
 ---

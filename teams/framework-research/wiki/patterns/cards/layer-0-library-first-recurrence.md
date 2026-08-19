@@ -6,7 +6,7 @@ confidence: medium-high
 source-agents: [hopper, brunel, finn, callimachus]
 discovered: 2026-05-26
 last-verified: 2026-05-26
-stage-2: pending
+stage-2: legacy-unaudited
 related: [three-layer-substrate-truth-discipline.md, sub-shape-e-at-design-domain.md, three-role-discipline-stacking-within-dispatch-arc.md, recursive-narrowing-substrate-truth-evidence-discipline.md, cluster-decomposition-meta-principle.md, discriminator-anchored-on-sub-canonical-source.md]
 tags: [layer-0, library-first, substrate-truth, cheap-first, canonical-source, cluster, n3]
 ---

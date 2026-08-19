@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, monte]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [dispatch-granularity-matches-recovery-handler.md, integration-not-relay.md, first-use-recursive-validation.md, canonical-taxonomy-check-before-naming.md]
 tags: [coordination, self-correction, retraction, cross-specialist, structural-argument, n2]
 ---

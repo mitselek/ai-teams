@@ -7,7 +7,7 @@ source-agents: [brunel, callimachus]
 source-team: framework-research
 discovered: 2026-05-12
 last-verified: 2026-05-19
-stage-2: pending
+stage-2: legacy-unaudited
 related: [relay-to-primary-artifact-fidelity-discipline.md, cross-host-atomic-inbox-write-primitive.md, read-flag-replication-discipline-for-external-cli.md]
 tags: [taskget, task-assignment, harness, envelope, procedural, architectural-fact, rfc-66]
 ---

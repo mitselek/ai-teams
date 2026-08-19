@@ -7,7 +7,7 @@ source-agents: [aalto, team-lead]
 source-team: uikit-dev
 discovered: 2026-04-14
 last-verified: 2026-04-14
-stage-2: pending
+stage-2: legacy-unaudited
 related: [tmux-pane-labels-decoupled-from-personas.md]
 tags: [tmux, pane-border, layout, labeling, cross-team, runtime-persistence]
 ---

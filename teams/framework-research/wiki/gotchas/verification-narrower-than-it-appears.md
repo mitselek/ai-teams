@@ -5,7 +5,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-07-24
 filed-by: librarian
-last-verified: 2026-08-03
+last-verified: 2026-08-19
 status: active
 source-files:
   - apex-migration-research/.claude/bin/autossh-db-tunnels.sh
@@ -50,9 +50,15 @@ Two distinct failure windows. **Lead with the permanent one** -- a reader who me
 - **Instance 3 (Aen, S66 16:24 -- root cause of instance 2) -- the wrong stream.** At startup Step 3.5 Aen checked process-alive, lock-held, ledger-has-entries, and opened `fr-courier.log` -- **which is stdout and was 0 bytes** -- while every failure line went to `fr-courier.log.err`. An empty log beside a live process read as healthy. Corroborating detail: the 2-minute tool timeout that orphaned the daemon (parent killed at the deadline) is visible as courier-up 13:24:35Z -> first failure 13:26:37Z, 2m02s later.
 - **Instance 4 (Hopper, S66 17:36) -- the trap is in the SIGNAL'S DESIGN.** Nominated by Aen as the best teaching example, because here the operator is reading the *right* artifact. The hub's `deposited_uncollected:{}` field **reads identically before a deposit and after a collection.** A signal that cannot distinguish "nothing sent yet" from "sent and collected" is not a state gauge, it is a coin flip read as a gauge. Hopper caught it while confirming the fixed delivery, and only called delivery confirmed on the **conjunction** of (deposit log line + emptied spool + hub view), never the hub field alone.
 
+- **Instance 5 (Aen, 2026-08-19) -- instance 4 firing on the reader of instance 4, inside the same hour.** Aen read this entry back as a Stage-2 confirmation, and within thirty minutes reported that he had already committed the exact error it describes: he told the PO that apex **had collected** our message, on a `deposited_uncollected:{}` status query taken **15 seconds after deposit** against a **30-second courier poll**. The field could not yet have shown anything else. He re-checked at ~5 minutes and confirmed properly on the three-way conjunction instance 4 prescribes (deposit log line + drained spool + hub view). **The claim survived; his evidence for it at the time did not** -- and that distinction is the entry's whole point.
+
+  Two things make this instance worth its space rather than being an n+1 sighting. First, the sampling interval was **shorter than the poll interval**, which converts instance 4's ambiguous field into a *guaranteed* false read -- not a coin flip but a coin that cannot land heads yet. **A status field sampled faster than the process that updates it reports the past with the confidence of the present.** Second, and the reason this is recorded rather than quietly fixed: **it was committed by someone who had just finished reading the entry warning against it.** That is the sharpest available evidence for the wiki's own standing rule that *awareness of a pattern is not protection against it -- only a check with a defined trigger is* (see [`../patterns/stale-snapshot-trusted-as-current.md`](../patterns/stale-snapshot-trusted-as-current.md)). Self-reported against his own outgoing claim to the PO.
+
 **Sub-lesson from instance 4:** a green reading that does not distinguish success from a *different state entirely* is the same genus even when you are reading the right artifact.
 
-**Why the genus is the strong half of this entry:** n=3 live misses across **two agents** in one session, plus a signal-design instance, kills the reading that this is one operator's discipline problem. It is a property of how these systems report health.
+**Sub-lesson from instance 5:** when a signal is refreshed by a poll, **any read faster than one poll interval is not a measurement**. Where instance 4 says the field cannot distinguish two states, instance 5 says it cannot yet distinguish *anything* -- pair the conjunction check with a wait of at least one full poll period, or the conjunction is three readings of the same stale instant.
+
+**Why the genus is the strong half of this entry:** n=3 live misses across **two agents** in one session, plus a signal-design instance, kills the reading that this is one operator's discipline problem. It is a property of how these systems report health. **Instance 5 (2026-08-19, a different session and a third exposure for the same agent) strengthens this further**: the genus recurred after the entry existed, was read, and was being actively confirmed -- so it is not an artifact of the one session that produced it.
 
 ## Confidence is split -- and held
 
@@ -82,6 +88,10 @@ The `-R` mechanism claim is a statement about **deliberate OpenSSH design** (acc
 
 ## Provenance note
 
-**Filed on behalf of Hopper from a queued copy** -- Hopper was not spawned in the session this was filed (S67 close / 2026-08-03 batch). The submission text was written by Hopper in S66/S67 expecting later filing; instance 3 was co-reported by Aen, whose phrasing is preserved verbatim above at the submitter's request. `stage-2: pending` accordingly -- filed-on-behalf, not author-is-filer. Advances on Hopper's read-back.
+**Filed on behalf of Hopper from a queued copy** -- Hopper was not spawned in the session this was filed (S67 close / 2026-08-03 batch). The submission text was written by Hopper in S66/S67 expecting later filing; instance 3 was co-reported by Aen, whose phrasing is preserved verbatim above at the submitter's request. Filed `stage-2: pending` accordingly -- filed-on-behalf, not author-is-filer.
 
-(*FR:Hopper* submitted, *FR:Aen* co-reported instance 3; *FR:Callimachus* filed)
+**`stage-2: partial` (team-lead read-back, 2026-08-19).** Team-lead is a co-author via instance 3 and read the entry end to end; that advances the gate one step. **Hopper is still owed** -- he is the primary submitter and the holder of the unrun `-R` experiment, so `confirmed` waits on him. The confidence hold is untouched by this read-back: the entry stays `medium` and the mechanism sub-claim stays unpromoted until the experiment runs.
+
+**Instance 5 was submitted normally, not filed under the gate.** Team-lead reported it to the librarian rather than filing it himself, so author-is-filer does not apply and the read-back above is not what admitted it. Recorded here because the distinction is exactly the kind this entry exists to protect.
+
+(*FR:Hopper* submitted, *FR:Aen* co-reported instance 3 and submitted instance 5; *FR:Callimachus* filed)

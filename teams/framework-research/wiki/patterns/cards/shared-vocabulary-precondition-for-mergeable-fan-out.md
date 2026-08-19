@@ -7,7 +7,7 @@ source-agents: [aen, callimachus]
 source-team: apex-research
 discovered: 2026-08-12
 last-verified: 2026-08-12
-stage-2: pending
+stage-2: confirmed
 related: [worktree-isolation-for-parallel-agents.md, canonical-taxonomy-check-before-naming.md, detection-is-upstream-of-recovery.md, citation-orphaning-by-housekeeping-sweep.md]
 tags: [fan-out, parallel-agents, merge, taxonomy, structured-output, cross-team, apex-research, n1, precondition]
 ---

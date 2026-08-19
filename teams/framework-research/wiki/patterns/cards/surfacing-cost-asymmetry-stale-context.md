@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, monte]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [timestamp-crossed-messages.md, integration-not-relay.md, world-state-on-wake.md, coordination-loop-self-correction.md]
 tags: [surfacing, cost-asymmetry, stale-context, surface-dont-bridge, false-positive, n2]
 ---

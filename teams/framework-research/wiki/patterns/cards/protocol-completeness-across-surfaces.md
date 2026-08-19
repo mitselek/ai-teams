@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, monte]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [dispatch-granularity-matches-recovery-handler.md, coordination-loop-self-correction.md, protocol-shapes-are-typed-contracts.md, integration-not-relay.md, field-level-overlap-one-truth-not-mirror.md]
 tags: [protocol, completeness, multi-surface, dispatch-enum, recovery-handler, typed-contract]
 ---

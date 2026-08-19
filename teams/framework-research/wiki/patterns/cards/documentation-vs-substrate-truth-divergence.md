@@ -6,7 +6,7 @@ confidence: medium-high
 source-agents: [aen, hopper, callimachus]
 discovered: 2026-05-27
 last-verified: 2026-06-02
-stage-2: pending
+stage-2: legacy-unaudited
 related: [three-layer-substrate-truth-discipline.md, three-role-discipline-stacking-within-dispatch-arc.md, recursive-narrowing-substrate-truth-evidence-discipline.md, layer-0-library-first-recurrence.md, discriminator-anchored-on-sub-canonical-source.md, substrate-invariant-mismatch.md]
 tags: [substrate-truth, authoring-tier, inferred-property, substrate-adjacency, disambiguator, cloudflare-pilot, agent-tool-architecture]
 ---

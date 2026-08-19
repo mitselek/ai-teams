@@ -6,7 +6,7 @@ confidence: medium-high
 source-agents: [aen, herald, callimachus]
 discovered: 2026-05-26
 last-verified: 2026-05-27
-stage-2: pending
+stage-2: legacy-unaudited
 related: [relay-to-primary-artifact-fidelity-discipline.md, three-role-discipline-stacking-within-dispatch-arc.md, stage-2-feedback-typology.md, timestamp-crossed-messages.md]
 tags: [dyad, crossed-messages, routing-latency, healthy-velocity, coordination, stage-2]
 ---

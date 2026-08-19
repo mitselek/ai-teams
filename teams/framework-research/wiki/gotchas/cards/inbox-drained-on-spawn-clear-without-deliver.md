@@ -7,7 +7,7 @@ confidence: medium
 source-agents: [team-lead, callimachus]
 discovered: 2026-05-07
 last-verified: 2026-05-12
-stage-2: pending
+stage-2: legacy-unaudited
 ttl: 2026-08-07
 related: [relay-to-primary-artifact-fidelity-discipline.md, worktree-spawn-asymmetry-message-delivery.md, substrate-invariant-mismatch.md, dual-team-dir-ambiguity.md, inbox-file-write-as-wake-mechanism.md]
 tags: [inbox, spawn, drain-not-deliver, harness, relay-fold, architectural-fact, substrate-loss, ttl, ttl-expired, needs-substrate-reverify]

@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, monte]
 discovered: 2026-05-05
 last-verified: 2026-05-05
-stage-2: pending
+stage-2: legacy-unaudited
 related: [no-future-proofing.md, named-concepts-beat-descriptive-phrases.md, protocol-shapes-are-typed-contracts.md, coordination-loop-self-correction.md]
 tags: [typed-contract, discriminated-union, dispatch, twins, sub-discriminator, n1-watch]
 ---

@@ -6,7 +6,7 @@ confidence: medium-high
 source-agents: [volta, brunel, callimachus]
 discovered: 2026-05-25
 last-verified: 2026-05-27
-stage-2: pending
+stage-2: legacy-unaudited
 related: [cluster-decomposition-meta-principle.md, bottleneck-determines-adoption.md, three-layer-substrate-truth-discipline.md, sub-shape-e-at-design-domain.md, documentation-vs-substrate-truth-divergence.md, five-layer-provider-lock-in.md]
 tags: [substrate, framework, boundary, primitive, axes-of-bifurcation, brain-hands, cluster]
 ---

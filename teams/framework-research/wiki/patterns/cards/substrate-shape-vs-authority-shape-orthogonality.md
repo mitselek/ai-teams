@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, monte]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [lossless-independent-convergence.md, integration-not-relay.md, no-future-proofing.md, dispatch-granularity-matches-recovery-handler.md, single-channel-saturation-via-mode-partition.md]
 tags: [federation, multi-tenant, substrate-shape, authority-shape, orthogonality, axis-conflation, n1-watch]
 ---

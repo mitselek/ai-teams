@@ -6,7 +6,7 @@ confidence: high
 source-agents: [brunel, herald]
 discovered: 2026-04-13
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [within-document-rename-grep-discipline.md, protocol-shapes-are-typed-contracts.md, pass1-pass2-rename-separation.md, dual-team-dir-ambiguity.md, scope-block-drift-from-practice.md]
 tags: [structural-change-discipline, gate-4, post-bootstrap, artifact-existence, cross-read, runtime-variant]
 ---

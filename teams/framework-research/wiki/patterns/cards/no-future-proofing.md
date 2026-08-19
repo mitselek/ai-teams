@@ -6,7 +6,7 @@ confidence: high
 source-agents: [team-lead, finn, brunel, callimachus]
 discovered: 2026-04-15
 last-verified: 2026-05-05
-stage-2: pending
+stage-2: legacy-unaudited
 related: [oss-thin-integration-anti-extension-signal.md, first-use-recursive-validation.md, integration-not-relay.md, dispatch-granularity-matches-recovery-handler.md]
 tags: [no-future-proofing, yagni, no-pre-allocation, no-fallback-chains, design-discipline]
 ---

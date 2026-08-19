@@ -7,7 +7,7 @@ source-agents: [finn, montesquieu]
 source-team: framework-research
 discovered: 2026-04-15
 last-verified: 2026-04-15
-stage-2: pending
+stage-2: legacy-unaudited
 related: [world-state-on-wake.md, dual-team-dir-ambiguity.md, convention-as-retroactive-telemetry.md, governance-staging-for-agent-writes.md]
 tags: [bootstrap, session-birth, in-band-signal, durable-state, cross-team, xireactor, external]
 ---

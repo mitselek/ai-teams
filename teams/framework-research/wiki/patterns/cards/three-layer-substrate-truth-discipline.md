@@ -7,7 +7,7 @@ source-agents: [brunel, callimachus]
 source-team: framework-research
 discovered: 2026-05-12
 last-verified: 2026-05-26
-stage-2: pending
+stage-2: legacy-unaudited
 related: [discriminator-anchored-on-sub-canonical-source.md, substrate-invariant-mismatch.md, sub-shape-e-at-design-domain.md, cluster-decomposition-meta-principle.md, dual-team-dir-ambiguity.md]
 tags: [substrate-truth, three-layer, docker, drift, operator-defense, cluster, hopper-amendment-4]
 ---

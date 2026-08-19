@@ -6,7 +6,7 @@ confidence: high
 source-agents: [celes, team-lead]
 discovered: 2026-04-14
 last-verified: 2026-04-14
-stage-2: pending
+stage-2: legacy-unaudited
 related: [within-document-rename-grep-discipline.md, prompt-to-artifact-cross-verification.md, first-use-recursive-validation.md, dual-team-dir-ambiguity.md]
 tags: [scope-block, prompt-drift, structural-change-discipline, gate-1, gate-2, may-write]
 ---

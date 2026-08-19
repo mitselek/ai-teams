@@ -8,7 +8,7 @@ source-agents: [brunel, hopper, aen]
 source-team: framework-research
 discovered: 2026-06-15
 last-verified: 2026-06-15
-stage-2: pending
+stage-2: partial
 related: [prompt-to-artifact-cross-verification.md, citation-backed-beats-posture-backed-when-fact-is-subtle.md, substrate-invariant-mismatch.md, standby-agent-fix-then-flag-discipline.md, deposit-ok-without-data-line-means-nothing-landed.md]
 tags: [pattern, anti-pattern, honesty-pass, probe-not-infer, aspirational-claim, TESTED-tag, completed-flag-evidence, framework-grade, cross-team]
 ---

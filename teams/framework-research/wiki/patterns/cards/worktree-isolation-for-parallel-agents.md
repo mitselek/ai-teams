@@ -6,7 +6,7 @@ confidence: high
 source-agents: [brunel, monte, herald]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [integration-not-relay.md, dispatch-granularity-matches-recovery-handler.md, coordination-loop-self-correction.md, substrate-invariant-mismatch.md, worktree-spawn-asymmetry-message-delivery.md]
 tags: [git-worktree, parallel-agents, shared-clone, isolation, recovery-primitive, protocol-c-candidate]
 ---

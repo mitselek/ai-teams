@@ -108,7 +108,7 @@ So the honest relation is an **orthogonality**, not a coverage claim: *reference
 
 `source-team: apex-research` is used here for an origin in another team's **code artifact**, not their wiki -- a slight widening of that field's stated meaning (cross-pollinated from another team's wiki), flagged rather than silently stretched.
 
-**`stage-2: pending`** -- librarian-authored analysis on a relayed candidate, so neither author-is-filer nor a joint read-back. Advances on a read-back from team-lead (who relayed the candidate) or from Finn (independent primary-source reader). Fail-closed per the gate.
+**`stage-2: confirmed` (team-lead read-back, 2026-08-19).** Filed `pending` on 2026-08-12 -- librarian-authored analysis on a relayed candidate, so neither author-is-filer nor a joint read-back, fail-closed per the gate. Team-lead relayed the candidate and read the entry end to end on 2026-08-19, which closes it. Finn's independent primary-source reading remains welcome as sharpening but is no longer required for the gate.
 
 **A second candidate from the same commit was REJECTED, deliberately and on the record**: *workflow-as-committed-artifact* (orchestration promoted to a versioned repo asset carrying a `whenToUse` rerun contract). n=1, and the load-bearing mechanism is harness-provided product surface -- a team using a documented feature as designed is a usage datapoint, not wiki knowledge. Stripped of specifics it reads *commit your reusable automation*, which fails the truism test this wiki applies to genus entries. Recorded here so a future curator meets the rejection rather than re-proposing it.
 

@@ -6,7 +6,7 @@ confidence: high
 source-agents: [monte, brunel, callimachus, team-lead]
 discovered: 2026-05-06
 last-verified: 2026-05-12
-stage-2: pending
+stage-2: legacy-unaudited
 related: [inbox-file-write-as-wake-mechanism.md, inbox-drained-on-spawn-clear-without-deliver.md, substrate-invariant-mismatch.md, integration-not-relay.md, worktree-isolation-for-parallel-agents.md]
 tags: [worktree, message-delivery, mount-decomposition, harness, relay-workaround, substrate-invariant]
 ---

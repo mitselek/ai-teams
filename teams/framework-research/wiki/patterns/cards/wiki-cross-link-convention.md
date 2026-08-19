@@ -7,7 +7,7 @@ source-agents: [schliemann, team-lead]
 source-team: apex-research
 discovered: 2026-04-29
 last-verified: 2026-04-29
-stage-2: pending
+stage-2: legacy-unaudited
 related: [service-team-topology.md, named-concepts-beat-descriptive-phrases.md]
 tags: [wiki, cross-link, markdown, provenance, cross-team, path-anchoring, source-team]
 ---

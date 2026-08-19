@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [brunel, herald]
 discovered: 2026-05-06
 last-verified: 2026-05-07
-stage-2: pending
+stage-2: legacy-unaudited
 related: [recursive-citation-as-canonical-validation.md, integration-not-relay.md, audit-trail-for-rejection-rationale.md, protocol-shapes-are-typed-contracts.md, worktree-spawn-asymmetry-message-delivery.md]
 tags: [relay, primary-artifact, two-stage-lifecycle, fold-discipline, provenance-by-artifact-class, protocol-c]
 ---

@@ -3,12 +3,12 @@ source-agents:
   - team-lead
 discovered: 2026-04-13
 filed-by: librarian
-last-verified: 2026-04-13
+last-verified: 2026-08-19
 status: active
 scope: cross-team
 source-files:
-  - $REPO/designs/deployed/apex-research/teams/apex-research/prompts/eratosthenes.md
-  - $REPO/teams/framework-research/prompts/callimachus.md
+  - designs/deployed/apex-research/teams/apex-research/prompts/eratosthenes.md
+  - teams/framework-research/prompts/callimachus.md
 source-commits: []
 source-issues: []
 ---
@@ -57,4 +57,17 @@ The bug is **latent in every prompt that uses bare `teams/<team>/` paths**, incl
 
 - [`persist-project-state-leaks-per-user-memory.md`](persist-project-state-leaks-per-user-memory.md) -- same class of defect at the substrate layer. This entry: same path, two different roots, prompt picks wrong root. That entry: right path, right root, wrong substrate (container-scoped mirror semantics running against a multi-workstation shared repo). Both are "the code is syntactically correct but the invariants do not hold on this substrate" -- different failure surfaces, same family of bug.
 
-(*FR:Callimachus*)
+## Skills carrying a static team-dir assumption -- n=2 WATCH (2026-08-19)
+
+The same ambiguity has now surfaced **in skills rather than prompts**, which is a different carrier with a different fix owner:
+
+- **`inter-team-comms`** hardcodes `~/.claude/teams/framework-research/` for its config and inbox paths. On **2.1.178+ that directory does not exist** -- the runtime dir is session-scoped (`session-a3a8047a` on 2026-08-19), so the skill's paths resolve to nothing and the operator must substitute the discovered slug by hand.
+- **`sanitize-inboxes`** selects `configs[0]` rather than discovering the active team config -- the same assumption (that there is one stable, statically-locatable team dir) expressed as an index instead of a path.
+
+**Why this is recorded as a watch rather than filed as its own entry.** Two instances is enough to stop calling it a coincidence and not enough to name a genus. What makes it worth tracking is that the carrier changed: this entry and the Eratosthenes incident are about **prompts** naming the wrong root, where the fix is path-anchoring discipline in the prompt text. A skill is **executable and shipped**, so the same wrong assumption becomes a runtime failure for every future invocation rather than a misreading one agent can catch. **A convention violated in prose is a mistake; the same convention violated in a skill is a defect with a version number.**
+
+**Status:** both are Volta's to fix; he was not spawned on 2026-08-19, so this is on the record rather than actioned. **If a third skill turns up with a statically-located team dir, promote this to its own entry** -- the genus would be *harness-substrate assumptions frozen into executable tooling*, and the revision trigger would be a CLI version that changes team-dir location again (which is precisely what 2.1.178 did). Until then it stays here, attached to the ambiguity it inherits.
+
+Reported by team-lead 2026-08-19 while using the skill against a live session.
+
+(*FR:Callimachus*; n=2 skills observation from *FR:Aen*, 2026-08-19)

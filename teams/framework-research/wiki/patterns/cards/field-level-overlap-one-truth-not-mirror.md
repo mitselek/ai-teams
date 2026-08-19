@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, monte]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [dispatch-granularity-matches-recovery-handler.md, protocol-shapes-are-typed-contracts.md, audit-trail-for-rejection-rationale.md, semver-strict-typed-contract-discipline.md, coordination-loop-self-correction.md]
 tags: [typed-contract, field-overlap, mirror-invariant, dedup, one-truth, gate-2, n2]
 ---

@@ -7,7 +7,7 @@ source-agents: [schliemann, eratosthenes]
 source-team: apex-research
 discovered: 2026-05-07
 last-verified: 2026-05-07
-stage-2: pending
+stage-2: legacy-unaudited
 related: [wiki-cross-link-convention.md, two-consumer-pattern.md]
 tags: [protocol, companion-pair, submission, cross-link, dedup, apex-research, naming-collision]
 ---

@@ -6,7 +6,7 @@ confidence: medium
 source-agents: [herald, team-lead]
 discovered: 2026-05-05
 last-verified: 2026-05-06
-stage-2: pending
+stage-2: legacy-unaudited
 related: [audit-trail-for-rejection-rationale.md, pass1-pass2-rename-separation.md, world-state-on-wake.md, named-concepts-beat-descriptive-phrases.md]
 tags: [labeling, snapshot, path-to-end-state, naming, label-rot, n1-watch]
 ---

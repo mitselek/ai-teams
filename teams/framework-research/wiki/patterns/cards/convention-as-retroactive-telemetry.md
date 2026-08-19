@@ -6,7 +6,7 @@ confidence: high
 source-agents: [celes, callimachus]
 discovered: 2026-04-13
 last-verified: 2026-04-13
-stage-2: pending
+stage-2: legacy-unaudited
 related: [bootstrap-preamble-as-in-band-signal-channel.md, timestamp-crossed-messages.md, audit-trail-for-rejection-rationale.md]
 tags: [convention, telemetry, instrumentation, byproduct, enforcement, dual-sourced]
 ---

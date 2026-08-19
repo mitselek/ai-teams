@@ -6,7 +6,7 @@ confidence: high
 source-agents: [team-lead, brunel, herald, montesquieu, callimachus]
 discovered: 2026-04-15
 last-verified: 2026-04-16
-stage-2: pending
+stage-2: legacy-unaudited
 related: [protocol-shapes-are-typed-contracts.md, rule-erosion-via-reasonable-exceptions.md, external-synthesis-overreach.md, coordination-loop-self-correction.md]
 tags: [integration, relay, time-indexed-state, citation-time, meta-trap, coordination, bidirectional]
 ---

@@ -6,7 +6,7 @@ confidence: medium-high
 source-agents: [finn, callimachus]
 discovered: 2026-05-26
 last-verified: 2026-05-27
-stage-2: pending
+stage-2: legacy-unaudited
 ttl: 2026-11-27
 related: [layer-0-library-first-recurrence.md, layer-0-library-first-pre-draft-discipline.md, documentation-vs-substrate-truth-divergence.md, discriminator-anchored-on-sub-canonical-source.md, substrate-invariant-mismatch.md, recursive-narrowing-substrate-truth-evidence-discipline.md]
 tags: [substrate, connectivity-model, inverted-trigger, poll-based, antipattern, cross-substrate]

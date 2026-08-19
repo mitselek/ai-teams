@@ -6,7 +6,7 @@ confidence: high
 source-agents: [monte, callimachus]
 discovered: 2026-05-06
 last-verified: 2026-05-07
-stage-2: pending
+stage-2: legacy-unaudited
 related: [first-use-recursive-validation.md, relay-to-primary-artifact-fidelity-discipline.md, two-consumer-pattern.md, protocol-completeness-across-surfaces.md, inbox-drained-on-spawn-clear-without-deliver.md]
 tags: [recursive-validation, canon, citation, indexability, author-as-consumer, n1-watch]
 ---

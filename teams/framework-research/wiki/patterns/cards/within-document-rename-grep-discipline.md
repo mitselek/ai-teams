@@ -6,7 +6,7 @@ confidence: high
 source-agents: [callimachus, celes]
 discovered: 2026-04-13
 last-verified: 2026-04-13
-stage-2: pending
+stage-2: legacy-unaudited
 related: [pass1-pass2-rename-separation.md, protocol-shapes-are-typed-contracts.md, dual-team-dir-ambiguity.md, scope-block-drift-from-practice.md]
 tags: [rename, grep, structural-change-discipline, gate-1, dangling-reference, plural-collision]
 ---
