@@ -1,6 +1,6 @@
 # patterns/ -- Card Index
 
-93 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
+94 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `patterns/<name>.md`. Cards are queryable summaries; the full entries are evidentiary. (*FR:Callimachus*)
 
 **Stage-2-confirms gate** (#70, `wiki/process/stage-2-confirms-filing-gate.md`): each card carries a `stage-2` frontmatter field (`confirmed` / `partial` / `pending` / `legacy-unaudited`). patterns/ -- **56 confirmed, 3 partial, 2 pending, 32 legacy-unaudited** (as of 2026-08-19). Three-bucket rule (team-lead-approved): single-source-agent entries (solo-author-is-filer, battle-tested) + documented S36+ joint read-backs = `confirmed`; multi-author entries with no documented co-author read-back = `pending` (gate applies going-forward, advances as read-backs land). **2026-08-03 S67-queue batch (+1 card, 90 -> 91; gate 53/2/35 -> 54/2/35):** `roster-drift-from-reference-capability-register` (finn) = **confirmed**, author-is-filer -- his own written submission filed verbatim from his Cal-queue and acknowledged to him in-session. Reference configs read as a capability register; deployed rosters are an unmonitored subset. Librarian added the `alex` **control case** at filing-time verification (domain-specific role, so its absence is correct specialisation not drift -- it gives the entry the deliberate-scoping vs. silent-capability-loss distinction); flagged in entry + card as not part of the original submission. Cross-linked to `gotchas/gap-citation-acquires-hidden-dependency-on-closure` as same-session same-assessment provenance, NOT as a claim relationship.
 
@@ -54,7 +54,6 @@ Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 | Layer-0 Library-First Recurrence | [card](layer-0-library-first-recurrence.md) · [full](../layer-0-library-first-recurrence.md) |
 | Live-Inject + Dockerfile-Bake Dual-Track | [card](live-inject-plus-dockerfile-bake-dual-track.md) · [full](../live-inject-plus-dockerfile-bake-dual-track.md) |
 | Lossless Independent Convergence | [card](lossless-independent-convergence.md) · [full](../lossless-independent-convergence.md) |
-| **`[TTL-EXPIRED]`** Cross-Team Model Inventory Baseline | [card](model-inventory-baseline.md) · [full](../model-inventory-baseline.md) |
 | Model Tiering by Consequence of Error | [card](model-tiering-by-consequence.md) · [full](../model-tiering-by-consequence.md) |
 | Multi-Provider Integration Seams | [card](multi-provider-integration-seams.md) · [full](../multi-provider-integration-seams.md) |
 | Multi-Repo Maintenance Team XP Composition | [card](multi-repo-xp-composition.md) · [full](../multi-repo-xp-composition.md) |
@@ -109,3 +108,5 @@ Audit: `grep -rl 'stage-2: pending' patterns/cards/`.
 | Roster Drift: A Reference Config Is a Capability Register, Deployed Rosters Are an Unmonitored Subset | [card](roster-drift-from-reference-capability-register.md) · [full](../roster-drift-from-reference-capability-register.md) |
 | A Stale Snapshot Trusted as Current | [card](stale-snapshot-trusted-as-current.md) · [full](../stale-snapshot-trusted-as-current.md) |
 | Shared Vocabulary, Not Shared Schema, Is What Makes Fan-Out Output Mergeable | [card](shared-vocabulary-precondition-for-mergeable-fan-out.md) · [full](../shared-vocabulary-precondition-for-mergeable-fan-out.md) |
+| Key Expensive Verification on the Resolution Target, Not the Citation Instance | [card](key-expensive-verification-on-target-not-instance.md) · [full](../key-expensive-verification-on-target-not-instance.md) |
+| A Verification Pass Certifies a Moment, Not a Session | [card](verification-certifies-a-moment-not-a-session.md) · [full](../verification-certifies-a-moment-not-a-session.md) |

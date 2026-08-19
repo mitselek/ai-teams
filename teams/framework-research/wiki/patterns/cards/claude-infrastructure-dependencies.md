@@ -7,7 +7,7 @@ source-agents: [team-lead]
 discovered: 2026-04-10
 last-verified: 2026-04-10
 stage-2: confirmed
-related: [five-layer-provider-lock-in.md, platform-vs-provider-lock-in.md, multi-provider-integration-seams.md, model-inventory-baseline.md]
+related: [five-layer-provider-lock-in.md, platform-vs-provider-lock-in.md, multi-provider-integration-seams.md, ../references/model-inventory-baseline.md]
 tags: [claude-code, infrastructure, provider-lock-in, dependency-layers, sendmessage, teamcreate]
 ---
 

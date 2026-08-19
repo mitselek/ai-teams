@@ -70,4 +70,15 @@ The same ambiguity has now surfaced **in skills rather than prompts**, which is 
 
 Reported by team-lead 2026-08-19 while using the skill against a live session.
 
+### Startup.md defect list — a related running tally (2026-08-19)
+
+Collected here because they share the substrate and the owner (Volta), not because they are instances of the ambiguity above. **Four open:**
+
+1. **`team-lead.model` is `null` in `config.json` on CLI 2.1.235** — so startup.md **Step 0.5's premise is false**: it states the parent session model is stamped into runtime `config.json`, and **the check it prescribes cannot be performed as written.** Found while resolving a roster-drift conflict; see [`../patterns/roster-drift-from-reference-capability-register.md`](../patterns/roster-drift-from-reference-capability-register.md).
+2. **Step 3.5 needs `-SessionPid`** — bare liveness is ambiguous when two sessions are live, which happened again on 2026-08-19 — **and must run backgrounded.**
+3. **`restore-inboxes.sh` derives `$PPID` = 1 under Git Bash**, so the team dir must be pinned via `FR_COURIER_TEAM_DIR_NAME`.
+4. The two skills above (`inter-team-comms`, `sanitize-inboxes`).
+
+**Item 1 is the same class as the WATCH above** — an assumption about where the harness keeps state, frozen into a procedure, invalidated by a CLI version. That is now the third carrier for this assumption: prompts, skills, and startup procedures.
+
 (*FR:Callimachus*; n=2 skills observation from *FR:Aen*, 2026-08-19)

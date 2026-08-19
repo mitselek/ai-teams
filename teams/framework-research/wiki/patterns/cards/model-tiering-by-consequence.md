@@ -7,7 +7,7 @@ source-agents: [team-lead]
 discovered: 2026-04-10
 last-verified: 2026-04-10
 stage-2: confirmed
-related: [model-inventory-baseline.md, multi-repo-xp-composition.md, cathedral-trigger-quality-teams.md]
+related: [../references/model-inventory-baseline.md, multi-repo-xp-composition.md, cathedral-trigger-quality-teams.md]
 tags: [model-tiering, opus, sonnet, consequence-of-error, governance, t09]
 ---
 

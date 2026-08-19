@@ -7,7 +7,7 @@ source-agents: [brunel]
 discovered: 2026-04-10
 last-verified: 2026-04-10
 stage-2: confirmed
-related: [integration-seam-governance-impact.md, framework-participating-vs-service-roles.md, ghost-member-as-universal-integration-surface.md, model-inventory-baseline.md]
+related: [integration-seam-governance-impact.md, framework-participating-vs-service-roles.md, ghost-member-as-universal-integration-surface.md, ../references/model-inventory-baseline.md]
 tags: [multi-provider, integration-seam, container, eilama, mcp, daemon, peer]
 ---
 

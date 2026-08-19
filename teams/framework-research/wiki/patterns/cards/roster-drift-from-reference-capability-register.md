@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-08-03
 last-verified: 2026-08-03
 stage-2: confirmed
-related: [operational-team-archetype.md, service-team-topology.md, model-inventory-baseline.md, scope-block-drift-from-practice.md, documentation-vs-substrate-truth-divergence.md, ../gotchas/gap-citation-acquires-hidden-dependency-on-closure.md]
+related: [operational-team-archetype.md, service-team-topology.md, ../references/model-inventory-baseline.md, scope-block-drift-from-practice.md, documentation-vs-substrate-truth-divergence.md, ../gotchas/gap-citation-acquires-hidden-dependency-on-closure.md]
 tags: [roster, reference-config, capability-register, competence-coverage, team-design, assignment-time, drift, veo-78, n1]
 ---
 

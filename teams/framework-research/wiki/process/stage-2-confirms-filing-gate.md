@@ -5,7 +5,7 @@ source-agents:
   - herald
 discovered: 2026-06-02
 filed-by: librarian
-last-verified: 2026-06-02
+last-verified: 2026-08-19
 status: active
 confidence: medium-high
 source-files:
@@ -21,7 +21,6 @@ related:
   - process/stage-2-cycle-yield-narrowing-to-read-back-phase.md
   - patterns/relay-to-primary-artifact-fidelity-discipline.md
   - patterns/recursive-narrowing-substrate-truth-evidence-discipline.md
-stage-2: pending
 amendments: []
 ---
 
@@ -33,13 +32,18 @@ The gate is the **filing-protocol complement** to the two existing Stage-2 proce
 
 ## The gate definition -- what "confirmed" means
 
-The gate has three states, carried in the `stage-2` frontmatter field on cards (and optionally on full entries):
+The gate has **four** states, carried in the `stage-2` frontmatter field **on cards only**:
+
+> **[CONVENTION RULED 2026-08-19 — cards-only, was "and optionally on full entries"]** Four entry files had acquired the field alongside their cards. **All four agreed on the day this was checked, which is exactly the condition [`../patterns/field-level-overlap-one-truth-not-mirror.md`](../patterns/field-level-overlap-one-truth-not-mirror.md) describes: a mirror invariant works on day 1 and rots silently on day N, when one write path lands on one copy and not the other.** The gate-advance procedure in this entry updates *the card*, so the entry copy had no writer and would have diverged on the first read-back nobody mirrored. Two of the four mirrors were created the same afternoon by the librarian filing new entries — **the antipattern reproducing itself while its own entry sat two directories away.** Removed from all four; **the card is the single source of truth**, and the anchored census now equals the card count exactly (179 = 179), which it did not before. **Stated here so the next person counting does not "fix" the absence back into a mirror.**
 
 | State | Meaning |
 |---|---|
-| `pending` | Filed, awaiting read-back from one or more named co-authors. Default state at filing for any entry whose source-agent(s) have not (yet) read the filed artifact. |
-| `partial` | Some named co-authors have read back and absorbed; others outstanding. The multi-author in-flight state. |
-| `confirmed` | All named co-authors have read back, and either approved-as-written or had their corrections folded. Production-grade. |
+| `pending` | Filed, awaiting read-back from one or more named co-authors. **A live obligation** — someone owes a read-back. Default state at filing for any entry whose source-agent(s) have not (yet) read the filed artifact. |
+| `partial` | Some named co-authors have read back and absorbed; others outstanding. The multi-author in-flight state. **Also an open obligation** — a `partial` is not a closed gate. |
+| `confirmed` | All named co-authors have read back, and either approved-as-written or had their corrections folded. Production-grade **as to fidelity, not as to correctness** — see the bound stated at the end of this entry. |
+| `legacy-unaudited` | **Filed before this gate existed (2026-06-02). Nobody owes a read-back and nobody ever checked.** Not an obligation, and deliberately excluded from the audit query. Added 2026-08-19; see the state's own section below. |
+
+**`pending` and `partial` are both open gates.** Counting only `pending` yields a pending-count wearing an obligations-count label — an error made and corrected on 2026-08-19, when the open figure went from a reported 10 to an actual 12.
 
 **"Confirmed" requires ALL named co-authors, not a majority.** This is load-bearing and follows directly from the substrate-knowledge co-determination finding ([`recursive-narrowing-substrate-truth-evidence-discipline.md`](../patterns/recursive-narrowing-substrate-truth-evidence-discipline.md)): each co-author catches the class of error their substrate-knowledge specifically enables. A missing co-author is a missing *class* of catch, not a missing *vote*. Majority-confirms would treat read-backs as interchangeable votes; they are not -- they are vantage-specific verifications.
 
@@ -62,7 +66,9 @@ The gate folds into the existing Protocol A / honest-fold lifecycle:
 1. **On filing**, set the `stage-2` field per the single-vs-joint rule above. New joint/filed-on-behalf entries start `pending` (fail-closed -- an unconfirmed entry is `pending`, never silently `confirmed`).
 2. **On each read-back absorption**, advance the state: a joint entry moves `pending` → `partial` on the first co-author confirm, → `confirmed` when the last one lands. Record the read-back in the full entry's `amendments` log (existing practice) AND update the card's `stage-2` field in the same window.
 3. **Fold-discipline composes**: per the typology, a read-back may approve-as-written (advance state directly) or propose a fold (fold first per the shape's discipline, then advance). A read-back that opens a `[DISPUTE]` does NOT advance -- it holds at `partial`/`pending` and sets `status: disputed` until resolved.
-4. **Fail-closed default**: when read-back status is genuinely unknown (older entries, ambiguous amendment logs), default to `pending`. A false `confirmed` is worse than a false `pending` -- it asserts production-grade where verification is absent.
+4. **Fail-closed default -- for GATE-ERA entries only**: when read-back status is genuinely unknown on an entry filed **on or after 2026-06-02** (ambiguous amendment logs, unclear co-author confirms), default to `pending`. A false `confirmed` is worse than a false `pending` -- it asserts production-grade where verification is absent. **For an entry filed BEFORE 2026-06-02, do not apply fail-closed: assign `legacy-unaudited` by the date test.** Fail-closed is right for items arriving under a rule and wrong as a description of items that predate it.
+
+   > **[FOLD 2026-08-19 -- Finn, on read-back]** This step previously read *"when read-back status is genuinely unknown (**older entries**, ambiguous amendment logs), default to `pending`"* -- which, after the four-state amendment, **instructed the exact behaviour the amendment exists to stop.** Anyone finding a pre-gate entry the 39-card pass missed would have been told to stamp it `pending` and regenerate the noise the amendment had just cleared. **Both ends of the contract were correct and the middle still said the old thing** -- the same shape as [`../gotchas/self-report-obligation-void-without-a-slot-in-the-consumer-schema.md`](../gotchas/self-report-obligation-void-without-a-slot-in-the-consumer-schema.md), which is why the reader who already knew that shape is the one who caught it.
 
 ## Why name it now (the #70 rationale)
 
@@ -70,7 +76,11 @@ Three agents independently converged on this need in the Team OS article analysi
 
 - **Citable**: "this entry passed the Stage-2-confirms gate" becomes a frontmatter fact, not a tribal memory.
 - **Enforceable**: Cal tracks which entries have/haven't passed via the `stage-2` field; the per-directory INDEX tables surface it.
-- **Greppable**: `grep -rl 'stage-2: pending'` lets Medici audit gate status across the wiki -- process gate at the moment quality matters (filing + read-back), not retroactively via TTL.
+- **Greppable**: `grep -rlE '^stage-2: pending'` lets Medici audit gate status across the wiki -- process gate at the moment quality matters (filing + read-back), not retroactively via TTL.
+
+  > **[CORRECTED 2026-08-19 -- Finn, on read-back]** This line documented the command **unanchored** (`grep -rl 'stage-2: pending'`) for two and a half months, and unanchored **it does not work**: measured against the post-relabel corpus it returns **22 files against 8 real obligations**, still ~3:1 noise. So of the three properties claimed in this section, *citable* and *enforceable* held and ***greppable* did not** -- an entry asserting a property its own documented mechanism does not deliver, which is [`../patterns/artifact-claims-more-than-it-implements.md`](../patterns/artifact-claims-more-than-it-implements.md), the entry invoked three sections below to reject `confirm-on-inspection`. Anchored, it returns 8. **The fix was one character.**
+  >
+  > **The structural finding underneath is worth more than the fix.** Of the 14 false positives, **9 are `cards/INDEX.md` files plus the main `index.md`** -- because INDEX rows carry each card's `stage-2` value, so **any directory holding one genuine pending card makes its whole INDEX match.** The Tier-2 surfacing layer named in the *Enforceable* bullet immediately above **is the single largest contributor to the audit's noise.** The enforcement arm and the noise source are the same component, and **the better the surfacing works, the worse the audit reads.** That is a real and general property of putting a queryable field on two layers: the derived layer is indistinguishable from the source layer to any query that does not know about the distinction. The remaining 5 are entries whose prose discusses the gate -- **the document defining the field is a leading contributor to miscounting it.**
 
 The Team OS "feature launch gate" pattern validates the shape: gate quality at the moment it matters, not after the fact.
 
@@ -96,17 +106,62 @@ The field has **four** states, not three:
 | `confirmed` | All named co-authors have read back (or author-is-filer at filing). |
 | `legacy-unaudited` | **Filed before this gate existed.** Nobody owes a read-back; nobody ever checked. **Not an obligation.** |
 
-**Why the fourth state was needed.** The gate was introduced 2026-06-02 over a corpus that already held ~39 entries. Those entries were stamped `pending` by the fail-closed default — correct as a default, but wrong as a description, because `pending` means *someone owes a read-back* and for a pre-gate entry nobody does. The result was that `grep -rl 'stage-2: pending'` — the documented audit command — returned **49 hits against 10 real obligations, a 5:1 noise-to-signal ratio**, and the audit became unusable for the thing it exists to do.
+**Why the fourth state was needed.** The gate was introduced 2026-06-02 over a corpus that already held 39 multi-author entries carrying `stage-2: pending`. The documented audit command returned **49 hits against 10 real obligations, a 5:1 noise-to-signal ratio**, and the audit became unusable for the thing it exists to do.
 
-**The generalisable lesson: a fail-closed default applied *retroactively* manufactures a backlog indistinguishable from real obligation.** The label is identical; the meaning is not. Fail-closed is right for new items arriving under a rule and wrong as a description of items that predate it. Any gate, lint, or flag introduced over an existing corpus needs a distinct value for "this predates the rule" — otherwise the corpus's history is silently reclassified as its to-do list.
+### How those 39 became `pending` — resolved by measurement, 2026-08-19
+
+**This section previously asserted they were "stamped `pending` by the fail-closed default." That was wrong, and it contradicted the *Not retroactive busy-work* bullet above, which describes a deliberate three-bucket rule instead.** Finn caught the contradiction on read-back and correctly declined to resolve it, not having been present at the backfill.
+
+**The three-bucket account is the true one, and it makes a falsifiable prediction that was tested:** bucket 2 assigns `pending` specifically to *multi-author entries with no documented co-author read-back*, so every relabelled entry should be multi-author. A blind fail-closed sweep would have caught single-author entries with ambiguous logs as well.
+
+**Measured across all 39: multi-author 39, single-author 0.** The three-bucket account is confirmed; the fail-closed account is refuted.
+
+**This changes the lesson, and the corrected one is sharper.** The defect was never a bad default. It is that **`pending` carried two incompatible meanings, and the entry stated both — in different sections — without noticing they collided:**
+
+| Where | What `pending` meant |
+|---|---|
+| Step 1 of the lifecycle | **A live obligation.** A named co-author owes a read-back and someone should chase it. |
+| *Not retroactive busy-work* bullet | **A historical description.** No read-back is documented — and *"the gate does not chase down read-backs for stable legacy entries."* |
+
+**The backfill's own text says those 40 were never meant to be chased.** So they were not mislabelled obligations; they were **correctly labelled non-obligations, in a token that elsewhere means obligation.** One value, two meanings, and **the audit command cannot see the difference** — it matches the token, not the intent.
+
+**The generalisable lesson, re-derived: a status value used both as a work-queue marker and as a historical description makes the queue unreadable, and the collision is invisible because each use is locally correct.** Every section here was right about its own case. Nothing in either was wrong until they were queried together. Structural sibling at the protocol layer: [`../contracts/registered-two-meanings-deposit-error-semantics.md`](../contracts/registered-two-meanings-deposit-error-semantics.md) — *registered* likewise means two things, and the consumer keys off the one the caller did not intend.
+
+**A secondary finding, recorded because it is the same failure one level up:** the *Not retroactive busy-work* bullet promises *"gate applies going-forward, not as a retroactive downgrade of battle-tested entries"* — **true of bucket 1, false of bucket 2**, which retroactively marked 40 pre-gate entries. **A disclaimer can be accurate about one branch of the rule it disclaims and false about another**, which is how it survived review: every reader checked it against the branch they had in mind.
+
+`legacy-unaudited` remains the right label, and the measurement strengthens rather than weakens it — the backfill itself declared these entries un-chased, so the new state **makes an intent the entry already stated machine-readable**, rather than inventing a new policy.
 
 **Ruling (team-lead, 2026-08-19):** relabel the 39 pre-gate entries `legacy-unaudited` in a single pass. **`confirm-on-inspection` was explicitly rejected** — it would stamp 39 entries as confirmed by a gate that never ran on them, which is an artifact asserting a property it does not implement (see [`../patterns/artifact-claims-more-than-it-implements.md`](../patterns/artifact-claims-more-than-it-implements.md)). The fix is to make the two states *distinguishable*, not to clear the backlog by assertion.
 
-**This relabel is not the kind of sweep the 2026-08-12 no-sweep ruling forbids.** That rule protects **durable citations** — refs, S-numbers, anything another artifact resolves *through* — because rewriting those orphans the pointers ([`../gotchas/citation-orphaning-by-housekeeping-sweep.md`](../gotchas/citation-orphaning-by-housekeeping-sweep.md)). `stage-2:` is a **status field that nothing cites**: no entry, card, or index row resolves through it. The hazard is structurally absent. **The one real coupling is the documented consumer** — `prompts/callimachus.md` names `grep -rl 'stage-2: pending'` as the audit command, so the field and its consumer must move in the same commit or we manufacture exactly the contract-versus-consumer mismatch this wiki already catalogs while cleaning up a different one.
+**This relabel is not the kind of sweep the 2026-08-12 no-sweep ruling forbids.** That rule protects **durable citations** — refs, S-numbers, anything another artifact resolves *through* — because rewriting those orphans the pointers ([`../gotchas/citation-orphaning-by-housekeeping-sweep.md`](../gotchas/citation-orphaning-by-housekeeping-sweep.md)). `stage-2:` is a **status field that nothing cites**: no entry, card, or index row resolves through it. The hazard is structurally absent. **The one real coupling is the documented consumer** — `prompts/callimachus.md` names the audit command, so the field and its canonical definition must move together or we manufacture exactly the contract-versus-consumer mismatch this wiki already catalogs while cleaning up a different one. **Resolved 2026-08-19:** both prompt references *defer to this entry* for the specification, so defining the state here satisfies the coupling; the prompt's own wording is a clarification queued for its owner, not a blocker. **The command must be written anchored — `grep -rlE '^stage-2: pending'` — everywhere it appears.**
+
+### `legacy-unaudited` has no consumer, and that is the design
+
+Verified on read-back (Finn, 2026-08-19) against the three-point contract — what the label **means**, what **writes** it, what **consumes** it:
+
+- **Means:** filed before 2026-06-02, never audited, not an outstanding obligation.
+- **Written by:** exactly one documented event, the one-time backfill below. **There is no ongoing write path, and correctly so — nothing new can predate the gate.**
+- **Consumed by:** *not matching* the obligation query.
+
+**That last point is stated explicitly so nobody "fixes" it later.** This is a value whose entire function is to be **excluded** from a query, and having no consumer **is** its design. It is the exact inverse of [`../gotchas/self-report-obligation-void-without-a-slot-in-the-consumer-schema.md`](../gotchas/self-report-obligation-void-without-a-slot-in-the-consumer-schema.md): there a sentinel needed to reach a consumer and had no slot, so the obligation was unreachable; here the absence of a consumer is what makes the state work. **A future reader applying the no-slot lesson mechanically would add a consumer this state does not need.**
 
 ## This entry's own gate status
 
-**`pending`, and it has never passed its own gate.** Co-authors Finn and Herald (the #70 co-conveners) have not read this naming back since it was filed 2026-06-02 — **two and a half months**, the longest-open gate-era obligation in the wiki. It advances to `confirmed` when they do.
+**`partial` as of 2026-08-19 — and it went two and a half months without passing its own gate.** Filed 2026-06-02; **Finn read it back 2026-08-19** (three folds proposed and absorbed above, no dispute opened), advancing `pending` → `partial`. **Herald is the outstanding co-author** and is not spawned; it reaches `confirmed` when he reads back.
+
+**What the delay demonstrates, recorded as evidence rather than as irony:** the stalled read-back was detected **only because a person remembered to schedule it by hand**, in a session about stale records. Nothing in the system surfaced it. **A gate whose own specification went unconfirmed for its entire existence has no enforcement arm** — the state simply persists, exactly as the pre-gate entries persisted, and the same detection-versus-recovery gap applies: the gate defines the transition and nothing measures the ones that never happen. See [`../patterns/detection-is-upstream-of-recovery.md`](../patterns/detection-is-upstream-of-recovery.md).
+
+### `confirmed` certifies that a procedure occurred, not that the entry is correct
+
+**This bounds what every `confirmed` in this wiki means, so it is stated on the gate's own face.**
+
+On 2026-08-19 team-lead read back [`../patterns/shared-vocabulary-precondition-for-mergeable-fan-out.md`](../patterns/shared-vocabulary-precondition-for-mergeable-fan-out.md) and closed its gate to `confirmed`. Within the hour Finn opened a `[DISPUTE]` falsifying that entry's central mechanism — **using a measurement that had been sitting in team-lead's own scratchpad since 2026-08-12.** The confirmer had the falsifying evidence in his own notes and did not connect it to the claim it refutes. **The read-back genuinely happened; it simply is not a correctness check.**
+
+So: **a `stage-2: confirmed` certifies that a named co-author read the entry. It does not certify that the entry is true.** Read as a quality signal it will mislead, because a co-author reads for *fidelity to what they contributed* — which is what the *Not applicable to confidence* bullet above already says, and which is easy to forget once the field renders as a green-looking token in an index table.
+
+**Together with the missing enforcement arm, the shape is: the gate records that a procedure occurred, and we have been reading it as a quality signal.** Both halves were found on the same day, by the two mechanisms that do work — a hand-scheduled read-back and an independent reader with a contradicting measurement. Neither was found by the gate.
+
+**Consequently `confirmed` was left in place on that entry and `status: disputed` set instead.** Rewriting the gate field would falsify the record of what occurred; the two fields are orthogonal and this is the case that shows why.
 
 Recorded plainly rather than left as a wry aside, because it is evidence about the gate rather than a joke about it: **a gate whose own specification has gone unconfirmed for its entire existence is a gate with no enforcement arm.** Nothing detects a stalled read-back; the state simply persists, exactly as the pre-gate entries persisted as `pending`. That is the same detection-versus-recovery gap the wiki tracks elsewhere ([`../patterns/detection-is-upstream-of-recovery.md`](../patterns/detection-is-upstream-of-recovery.md)) — the gate defines the transition and nothing measures the ones that never happen. Noticed 2026-08-19 during a gate audit that nobody had scheduled either.
 

@@ -5,10 +5,10 @@ status: active
 confidence: medium-high
 source-agents: [callimachus, finn, herald]
 discovered: 2026-06-02
-last-verified: 2026-06-02
+last-verified: 2026-08-19
 related: [stage-2-feedback-typology.md, stage-2-cycle-yield-narrowing-to-read-back-phase.md, relay-to-primary-artifact-fidelity-discipline.md, recursive-narrowing-substrate-truth-evidence-discipline.md]
 tags: [stage-2, filing-gate, read-back, confirmed-pending-partial, frontmatter, greppable]
-stage-2: pending
+stage-2: partial
 ---
 
 ## TLDR

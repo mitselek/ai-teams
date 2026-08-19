@@ -15,7 +15,7 @@ source-issues: []
 related:
   - operational-team-archetype.md
   - service-team-topology.md
-  - model-inventory-baseline.md
+  - ../references/model-inventory-baseline.md
   - scope-block-drift-from-practice.md
   - documentation-vs-substrate-truth-divergence.md
   - ../gotchas/gap-citation-acquires-hidden-dependency-on-closure.md
@@ -118,4 +118,20 @@ Finn's own framing on accepting the hold, worth preserving because it names the 
 
 - **2026-08-03, same session as filing (Finn read-back).** Finn confirmed the `alex` control case should stay and supplied two upgrades, both verified before folding: (1) the **mechanical discriminator** -- *does the shed role's own prompt cite the shedding team's domain?* -- replacing what had been a judgement call, with the `harmony` prompt quotes showing it is the most hr-devs-specific role in the source roster and was nonetheless dropped; (2) a **second, within-team delta** (`medici`, `eilama` -- hr-devs' own reference vs. deployed), which required naming which baseline the entry means and broadened "reference config" to any upstream register. Confidence deliberately held at `medium` per the reasoning above; Finn flagged the second delta as input rather than arguing for a bump and left the calibration to the Librarian. `stage-2` remains `confirmed` (author-is-filer; this read-back reinforced rather than opened a gate).
 
-(*FR:Finn* submitted; *FR:Callimachus* filed)
+- **2026-08-19 (Finn, submitted; team-lead resolved the open conflict). A SECOND AXIS: design-repo roster vs LIVE RUNTIME.** The entry as filed compares a **reference roster against a deployed roster** — two static artifacts. These instances sit on a different axis, and it has a mechanism the first does not.
+
+  **Instance A — the roster was right at both ends and wrong in the middle, and nothing in it moved.** `teams/framework-research/roster.json` pins `claude-fable-5[1m]` for all 10 slots. Sessions S60–S62 ran on **Opus 5** — three consecutive sessions off-pin, PO aware, roster deliberately unchanged; S63 is back on Fable 5, again with no roster edit. **The artifact was not the controlling input at any point, so its *agreement* with reality carries no information either.** A survey sampling once and finding a match scores this team "no drift" — and would have been wrong on three of the last four sessions. **A matching roster is not evidence of a controlling roster.**
+
+  The mechanism is documented inside the file itself: `roster.json`'s `_substrate_note` records that on Agent-tool architecture the per-member `model` field is **documentation-only** — TeamCreate stamps the parent CLI session model into runtime `config.json` regardless, and the Agent tool's spawn `model` parameter accepts only family-level overrides (opus/sonnet/haiku), so **it cannot express a version pin at all.** **The field cannot control what runs, by design**, which makes drift the expected steady state rather than a defect. **Reframing of what the survey should measure: not which teams drifted, but anywhere the field is *believed* to control something.**
+
+  **Instance B — RESOLVED, and the resolution is a third mechanism neither axis predicts.** Finn reported his own runtime as `claude-opus-5` against his `claude-fable-5[1m]` pin, flagged it uncertain, and could not discriminate between three readings. **Team-lead resolved it: he spawned both specialists with an explicit family-level `model: "opus"` override and did not record it.** `config.json` stamps `"model": "opus"` for both, against a roster pinning `claude-fable-5[1m]` for every member. **The specialists ran off-pin by the team-lead's own hand, undocumented, in the session cataloguing roster drift.**
+
+  **This is the sharp finding of the amendment: the divergence is introduced at SPAWN TIME, so no survey of `roster.json` — however thorough — could ever surface it.** Both artifacts are internally consistent; the discrepancy lives in an unrecorded runtime argument. **The instrument the survey needs is a three-way comparison** — roster pin vs stamped runtime `config.json` vs what each agent reports about itself — **and nobody has built it.**
+
+  **A coverage defect the survey hits before anything else.** Of 7 dirs under `designs/deployed/`, only 5 carry model data and **2 of those keep it in files `find -name roster.json` never matches** (`po-team/roster-design.md`, `operator-role/roster-entry.json`); `mvox_v4e_web` has a README only; `uikit-dev` has one recipe file and has been uncountable for four months. So a survey run by enumerating `roster.json` **silently skips two teams that do declare models and never sees two more.** **"No declared roster" is the strongest drift finding available, not a gap in the data** — a team with no design-side record of its models is drifted by definition and by an unbounded amount. Another gauge that cannot distinguish two states.
+
+  **NO promotion off `medium`.** These instances are also framework-research, authored and observed by us; they add a new axis and a new mechanism but **do not touch the axis the confidence is pinned to** (n=1 on cross-team generality). The submitter argued this against his own finding. **If anything Instance B argues for lowering confidence in any single observation until the three-way check is run.**
+
+  Related: [`../references/model-inventory-baseline.md`](../references/model-inventory-baseline.md) (the coverage measurements and the design-repo-vs-deployed caveat).
+
+(*FR:Finn* submitted and measured both instances; *FR:Aen* resolved Instance B by disclosing the undocumented spawn override; *FR:Callimachus* filed)
