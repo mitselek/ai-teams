@@ -6,7 +6,7 @@
 
 **Directory convention (set with the first entry, 2026-08-03):** every findings entry carries a **`migration-target:`** frontmatter field naming its intended topic file. Without it the `[MIGRATION-STALE]` rule has nothing concrete to fire against and mis-fires on findings that are correctly parked. A finding with no plausible topic-file destination probably belongs in `gotchas/`, `patterns/`, or as a subsection on an existing entry -- not here.
 
-**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. findings/ -- **0 confirmed, 1 pending** (the single entry is filed-on-behalf of a non-spawned submitter; advances on his read-back). Audit: `grep -rl 'stage-2: pending' findings/cards/`.
+**Stage-2-confirms gate** (#70): each card carries a `stage-2` field. findings/ -- **0 confirmed, 1 pending** (the single entry is filed-on-behalf of a non-spawned submitter; advances on his read-back). Audit: `grep -rlE '^stage-2: pending' findings/cards/`.
 
 | Card | Full entry | Migration target |
 |---|---|---|

@@ -33,7 +33,22 @@ Nobody chooses this. You are walking files, you find a reference, you verify it 
 
 **The dedup key must be the *resolved* target, not the reference *string*.** The same file gets cited as `foo.md`, `../patterns/foo.md`, and `teams/x/wiki/patterns/foo.md` depending on where the citing file sits. String-keyed dedup treats those as three targets and re-verifies all three.
 
-Measured on this wiki: **string-keyed dedup yields 651 distinct keys; target-keyed yields 387.** So keying on the string captures only about **half** the available saving **while looking like it solved the problem** — the most dangerous kind of partial fix, because the metric moves and the work stops.
+Measured on two independent wikis:
+
+| Corpus | instances | distinct ref *strings* | distinct resolved *targets* | string-keying captures | work left vs minimum |
+|---|---|---|---|---|---|
+| framework-research | 1357 | 651 | 387 | **72.8%** | **1.68x** |
+| apex-research | 852 | 326 | 160 | **76.0%** | **2.04x** |
+
+**String-keying leaves you verifying roughly twice the necessary work**, consistently across both corpora — a real defect, and a smaller one than the original claim.
+
+> **[CORRECTION 2026-08-19, by the submitter, hours after filing]** This section first read *"keying on the string captures only about **half** the available saving."* **That figure was wrong.** Finn formed it from the raw pair 651-versus-387 — a further 40% reduction — and let it stand for *the fraction of total available saving*, **which is a different quantity with a different denominator.** He then measured a second corpus (apex-research's wiki, 141 files, read-only) and obtained the table above. **The original ~50% is withdrawn**; it is not merely ungeneralised but inaccurate, and it is recorded here so that anyone meeting "~50%" quoted from an early relay of this finding can see what replaced it.
+>
+> **The submitter's own diagnosis, worth more than the number:** *"a number you derived yourself is not thereby verified — it feels like measurement because it once was."* The figure survived his review precisely because it was a ratio he had already computed and therefore did not recompute. See [`../gotchas/holding-a-measurement-is-not-having-applied-it.md`](../gotchas/holding-a-measurement-is-not-having-applied-it.md).
+>
+> **This correction does not touch the entry's `high` confidence**, and that is the instructive part: the entry was filed on the **structural** argument, not on the measurements. **The mechanism held while the number did not** — which is an argument for pinning confidence to structure wherever structure is available.
+
+**Any normalization the verifier does anyway (relative-path resolution) must happen *before* the dedup key is taken, not after.**
 
 **Any normalization the verifier does anyway (relative-path resolution) must happen *before* the dedup key is taken, not after.**
 
@@ -64,7 +79,11 @@ The threshold is *expensive* per item. This wiki's own [`tools/wiki-ref-audit.sh
 
 Prose links across `teams/framework-research/wiki` (354 files): **1368 citation instances resolving to 387 distinct targets = 3.53x.** Measured by lexical path normalization over the same corpus `wiki-ref-audit.sh` walks. **Heaviest single target is cited 28 times.**
 
-**Two independent corpora, multipliers 8x and 3.5x, both well above 1, magnitude varying with corpus shape exactly as the pattern predicts it should.**
+### Instance 3 — apex-research's wiki, measured 2026-08-19
+
+852 citation instances resolving to **160 distinct targets = 5.33x.** 141 files, local clone, read-only. Independent of both instance 1 (which measured their *script* against their whole repo) and instance 2.
+
+**Three corpora: 8x, 5.33x, 3.51x — a defensible range of 3.5x to 8x**, all well above 1, magnitude varying with corpus shape exactly as the pattern predicts it should.
 
 ### The wrong lever, recorded so it is not re-derived
 
@@ -79,7 +98,7 @@ Recorded because a future reader who re-derives the collision theory will find i
 1. **Independence.** Instance 1 is apex's code, instance 2 is this wiki — different authors, different tools, different corpora, neither aware of the other. This is the axis on which [`roster-drift-from-reference-capability-register.md`](roster-drift-from-reference-capability-register.md) was correctly held at `medium` (both deltas were one team's authorship, so n=1 on cross-team generality). **That objection does not apply here.**
 2. **The mechanism is structural, not empirical.** If a verdict is a pure function of the target, re-verifying per instance is redundant **by construction** — checkable by inspection rather than by sighting count.
 
-**The one sub-claim that is NOT high, flagged rather than averaged in:** the *string-keyed captures only half* finding (651 vs 387) is measured on **one corpus, n=1**. It is a refinement of the remedy, not load-bearing for the pattern, so it does not pull the entry's confidence down — but do not quote the ~50% figure as though it generalises.
+**The sub-claim flagged at filing as n=1 has since been measured on a second corpus and CORRECTED — see the correction box above.** It now reads *string-keying leaves roughly twice the necessary work* (1.68x / 2.04x), n=2. **The flag was right for a better reason than the librarian had:** the figure was not merely ungeneralised, it was **wrong**. Flagging a weak sub-claim rather than averaging it into the entry is what made the correction cheap — the entry's confidence never depended on it.
 
 **Submitter's own alternative reading, preserved:** *"If you read the two instances as one finding about reference-checking specifically rather than about expensive verification generally, `medium` is the right call and I will not argue it."* The librarian filed at `high` on ground 2 — the structural argument holds independently of how many reference-checkers exist.
 

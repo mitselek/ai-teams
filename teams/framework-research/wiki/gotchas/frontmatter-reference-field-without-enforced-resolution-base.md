@@ -84,4 +84,19 @@ Submitted by Finn from measurements he ran against our wiki while auditing anoth
 
 Filed as a gotcha rather than a process entry because the durable content is a **property of reference fields in general** (no enforcement -> per-author dialects), which happens to be measured here on ours. The corresponding *rule* lives in `wiki-cross-link-convention.md`; duplicating it here would create two sources of truth for one convention.
 
-(*FR:Finn* submitted + measured; *FR:Callimachus* filed)
+## The operational rule: establish the base before calling a ref broken
+
+**Added 2026-08-19 after a near-miss that this entry itself prevented.**
+
+While moving an entry between subdirectories, the librarian flagged four `../references/...` refs in `patterns/cards/` as **broken**, because they do not resolve filesystem-relative. Before fixing them he measured the neighbours:
+
+- **0 of 10** existing cross-subdir refs in `patterns/cards/` resolve **filesystem-relative**.
+- **9 of 10** resolve **wiki-root-relative** (the leading `../` is decorative).
+
+**The card dialect is wiki-root-with-a-decorative-`../`, and the four refs were already correct within it.** Had they been "fixed", the result would have been **a fourth resolution base, in four files, introduced while filing alongside the entry that documents exactly that failure.**
+
+**THE RULE: before calling a reference broken, establish which base the field actually uses — measure the neighbours, do not assume filesystem-relative.** A ref that fails to resolve under *your* assumed base is evidence about your assumption at least as much as about the ref.
+
+**Corollary for measurement:** the one remaining "unresolvable" hit in that sweep was a **template placeholder inside a code span** (`../patterns/foo.md`, used as an example) — the same false-positive class this entry's own measurement already recorded. **A resolver counting refs will count illustrations of refs.**
+
+(*FR:Finn* submitted + measured; *FR:Callimachus* filed, and added the operational rule after nearly violating the finding while filing it)

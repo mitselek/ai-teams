@@ -65,7 +65,23 @@ All from 2026-08-19 in `mitselek/ai-teams`. **All three were caught only by an i
 
 **Instance 3 — a work report understates completed work, 20 minutes after the fact.** Finn's own report stated the working-tree changes were *"still uncommitted; still yours."* Team-lead had committed them as `73ff090`. He caught it only because he happened to run `git status` for an unrelated reason. **This is the failure committed inside the report diagnosing it**, roughly thirty minutes after its author named the mechanism — the same self-demonstration `stale-snapshot-trusted-as-current` records, and recorded here for the same reason: **awareness of a pattern is not protection against it.**
 
-**Three artifact types — a closing record, a staleness flag, a work report — one mechanism, one session.**
+**Instance 4 — the one with real consequences, and the only one where author and diagnostician differ.** The team carried **VEO-78** as its oldest outstanding commitment since S61 — pre-committed, displaced twice, named in the carry-forward twice. The recorded reason for not starting it, across at least three sessions, was *"blocked on the Atlassian MCP, still unverified."*
+
+Finn tested the blocker instead of inheriting it. **The MCP works — three calls, no auth dance. And the ticket has been `Closed` since 2026-08-11**, archived by the PO as obsolete in its current form. Our records still described it as `Planned`, last updated 2026-06-01, zero comments; it has two comments and was updated the day before.
+
+**The blocker did not delay the work. It concealed that the work had been cancelled.**
+
+Three things make this instance different in kind from the three above:
+
+1. **The record was right in form and wrong only in its reason.** VEO-78 genuinely was unactioned — the *status* was accurate. The falsehood lived entirely in the `blocked on X` clause. **That clause is the one nobody audits, because it reads as an explanation rather than a claim.** A status anyone can check sat next to a reason nobody did, in the same sentence, for three sessions.
+2. **The consequence was a phantom commitment, not wasted effort.** Nothing was duplicated and no work was lost. Instead the team's forward plan carried an item that **had ceased to exist**, and would have kept carrying it — spending planning attention every session, and eventually real effort resuming an assessment of a closed ticket.
+3. **Author and diagnostician differ.** The blocker claim was authored by team-lead and found by Finn. **Team-lead did not go on to discover it and would not have, because the claim discouraged exactly the check that refutes it.**
+
+**This instance confirms rather than revises the write-time remedy.** *"Blocked on the Atlassian MCP"* fails the test precisely: it names a dependency without naming a test, **and the test turned out to cost under a minute.** A version reading *"blocked on the Atlassian MCP; verify with one `atlassianUserInfo` call"* would have died the first time anyone read it.
+
+**The self-demonstration here is unusually exact.** The two documents affected are Finn's own. His assessment's §2.1 diagnosed VEO-78 as suffering *"staleness with no re-check gate."* The companion explainer's header reads, verbatim, *"this document will itself go stale — re-check the marked claims before acting on them."* **Both went stale within eight days and neither was re-checked**, and what finally triggered the check was unrelated — he was testing a blocker for a different reason. **Writing the warning is not building the check.** That is the sharpest available form of the awareness-is-not-protection clause, because here awareness was not merely insufficient: **it was documented in the artifact that then failed, and that changed nothing.**
+
+**Four artifact types — a closing record, a staleness flag, a work report, and a blocker clause in a carry-forward — one mechanism, one session.**
 
 ## Confidence
 
@@ -73,9 +89,15 @@ All from 2026-08-19 in `mitselek/ai-teams`. **All three were caught only by an i
 
 The mechanism is structural and checkable by inspection: **if the only test of a claim is an action the claim discourages, the claim has no natural refutation path.** That argument does not depend on sighting count.
 
-**It is nonetheless `medium`, because the axis that matters here is observation-independence, not mechanism strength.** Three instances, **one team, one session, and two of the three are the artifacts of the people who then diagnosed them.** That is n=1 on cross-team generality — the same ground on which `roster-drift-from-reference-capability-register` is correctly held at `medium`.
+**It is nonetheless `medium`, because the axis that matters here is observation-independence, not mechanism strength.** Four instances, **one team, one session**, and in three of the four the record's author is also its diagnostician. That is n=1 on cross-team generality — the same ground on which `roster-drift-from-reference-capability-register` is correctly held at `medium`.
 
-**Path to `high`:** an instance from another team, or one where the pessimistic record was authored by someone who did **not** go on to find the error. **A fourth instance from this team in this session would not do it.**
+**Path to `high`, as originally set:** an instance from another team, **or one where the pessimistic record was authored by someone who did not go on to find the error.**
+
+**Instance 4 satisfies the second clause** — team-lead authored the blocker claim, Finn found it, and team-lead would not have found it because the claim suppressed the check. **The promotion decision is deferred to team-lead**, since the submitter recused himself from promoting his own entry and the librarian is an instance in a neighbouring dispute. The criterion is met on its face; whether one qualifying instance inside a single team's single session outweighs the correlation limit is a judgment, not a calculation.
+
+### A rejected candidate instance, recorded so it is not re-proposed
+
+The librarian's model-inventory error — correcting a submitter's accurate claim from a team-lead scratchpad that was wrong when read — **was proposed as an instance meeting the same criterion and is rejected on mechanism, not on authorship.** This genus is **suppression of a check**. There, no check was suppressed: **he checked.** Consulting a source before altering a submitter's words is the correct discipline, and the failure was *which artifact he consulted*, not that a record talked him out of consulting one. **Counting it would import a different mechanism, which corrupts the claim rather than merely padding the count** — a worse failure than ordinary n-inflation. It belongs at the junction of `stale-snapshot-trusted-as-current` (a summary read as a source) and `artifact-claims-more-than-it-implements` (the record's authoring side), and is recorded there.
 
 ## Filing note
 
