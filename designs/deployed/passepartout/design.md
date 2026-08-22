@@ -2,7 +2,7 @@
 
 *(*FR:Celes*) -- S63, 2026-08-22. Design package for the PO's private-life personal assistant -- the private-side sibling of the Sagres/po-team package. Architecture was brainstormed with the PO this session and approved section by section; this document captures it faithfully. My commission on top: name + lore, project directory, launch aliases, model-tier ruling. The PO (Mihkel) rules on the open parameters in §11.*
 
-**Status: rev 3 (2026-08-22)** -- §11.1 **RATIFIED: Passepartout** (PO); §11.2-6 deferred to the PA's own early sessions (PO ruling); package moves to `designs/deployed/passepartout/` on commit. rev 2 (same date) -- six third-party review findings folded in, all PO-sanctioned: mail-suppression gate + archived-visibility (§3), draft provenance (§3), hub egress rule (§4 amendment, PO-approved explicitly), memory freshness rule (§3, FR S62 TTL ruling applied), monthly restore drill (§3/§6), confirmation-semantics recommended default (§4/§11.6). rev 1 = initial package, same date.
+**Status: rev 4 (2026-08-22)** -- §2 alias purpose-split, PO-ratified after install test-run: `passe` = greeting launch carrying an initial session-start prompt (substrate opens silent, no auto-greeting turn); `pp` = bare launch. rev 3 (same date) -- §11.1 **RATIFIED: Passepartout** (PO); §11.2-6 deferred to the PA's own early sessions (PO ruling); package moved to `designs/deployed/passepartout/`. rev 2 (same date) -- six third-party review findings folded in, all PO-sanctioned: mail-suppression gate + archived-visibility (§3), draft provenance (§3), hub egress rule (§4 amendment, PO-approved explicitly), memory freshness rule (§3, FR S62 TTL ruling applied), monthly restore drill (§3/§6), confirmation-semantics recommended default (§4/§11.6). rev 1 = initial package, same date.
 
 ---
 
@@ -63,11 +63,11 @@ The current state of `~` on the box is input, not backdrop. Survey findings (Aen
 
   ```bash
   # Passepartout -- household assistant (appended <date>)
-  alias passe='cd "$HOME/passepartout" && claude'
+  alias passe='cd "$HOME/passepartout" && claude "Session start: introduce yourself briefly, then run your execution order and present the agenda."'
   alias pp='cd "$HOME/passepartout" && claude'
   ```
 
-  `passe` is the charming primary; `pp` is the two-keystroke convenience. Both are the same launch; keep both or drop `pp` at the PO's taste.
+  The pair is **purpose-split** (PO-ratified 2026-08-22, after a test-run found the session opens silent -- the substrate produces no auto-greeting turn): `passe` is the **greeting launch** -- it carries an initial prompt so the valet opens the door, runs its execution order, and presents the agenda unbidden; `pp` is the **bare launch** for when Mihkel wants to type his own agenda straight away.
 
 ---
 
