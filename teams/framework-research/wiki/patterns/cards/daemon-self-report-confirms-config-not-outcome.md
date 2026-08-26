@@ -7,7 +7,7 @@ source-agents: [brunel, team-lead]
 source-team: framework-research
 discovered: 2026-08-26
 last-verified: 2026-08-26
-stage-2: pending
+stage-2: partial
 related: [../gotchas/verification-narrower-than-it-appears.md, ../gotchas/control-narrower-than-its-name.md, ../gotchas/docker-port-empty-under-network-mode-host.md, ../gotchas/coordinator-supplied-material-anchors-the-delegation.md, documentation-vs-substrate-truth-divergence.md]
 tags: [pattern, verification, migration, config-relocation, docker, containerd, data-root, self-report, outcome-check, silent-partial-success, rc-host]
 ---
@@ -26,6 +26,6 @@ A daemon's self-report of its own relocated config proves **the setting was appl
 - **Sibling gotcha filed separately at submitter's request**: `docker-port-empty-under-network-mode-host` -- same root category (verification method must match the actual mechanism, not the most obvious command), narrower fact.
 - **Catch provenance**: surfaced by team-lead's review question, confirmed structurally by Brunel -- the review itself is evidence self-reports alone wouldn't have caught it. Evidence quoted verbatim in the entry (the briefing lives in a prunable session scratchpad + PO artifact).
 - **Confidence high**: mechanism substrate-verified + measured sizes + independent cross-substrate instance.
-- **stage-2 pending** -- filed-on-behalf; Brunel's and team-lead's read-backs owed.
+- **stage-2 partial** -- filed pending (filed-on-behalf); **team-lead read back 2026-08-26 17:33, CONFIRMED no corrections**. **Brunel still owed.** Read-back also confirmed the quote-not-cite call the hard way: the PO deleted (parked) the briefing artifact minutes later -- the verbatim quotes in the entry are now the only durable copy.
 
 (*FR:Brunel* submitted; *FR:Aen* co-source via review catch; *FR:Callimachus* filed)
