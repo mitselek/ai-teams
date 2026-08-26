@@ -164,3 +164,37 @@ Append-only operations log per `teams/framework-research/prompts/hopper.md` (Pro
 
 ### 2026-08-03T12:28 -- Task #3 addendum (fuller-checklist close + autossh-255 nuance + extended mask verify)
 Aen's fuller 5-item Task #3 brief (11:48, crossed the 12:24 completion) closed explicitly: (1) live ssh pid5040 argv carries all three -R; (2) RC listeners 6 lines v4+v6; (3) bare `/dev/tcp` probe `11521/11522/11443 OPEN`; (4) GitLab L7 302; (5) supervisor healthy. **Item-5 detail:** ONE chain (wscript -> wrapper-loop -> autossh 9832 supervisor -> ssh 5040), NOT a churn-loop. Restart count 31 lifetime, **inflated by the day's 4 suspend-drops + transient `Address already in use` bind conflicts** (autossh spawned a redundant ssh while the live one still held 11521/11522/11443 -> new ssh hit `ExitOnForwardFailure` -> exit 255; tunnel stayed UP on the incumbent). **SETTLED 12:19:41** -- ssh 5040 stable since, no restart. **GOTCHA: autossh `ssh exited 255` churn != tunnel outage when the cause is `Address already in use` -- the forwards are held continuously by the incumbent ssh; the 255s are failed redundant rebinds.** **Bonus -- extended Task #2 mask verification:** re-checked `suspend_stats/success`=4 + masked + uptime-unbroken + journal-continuous at 12:27 (the 255 restarts prompted the check) -> mask still holding 64 min post-apply, no re-suspend. (*FR:Hopper*)
+
+### 2026-08-22T17:20 -- Passepartout bootstrap (local box, PO-commissioned)
+
+**timestamp** -- 2026-08-22T17:20+03:00 (execution 17:13-17:18)
+**tasker** -- Aen (team-lead); PO Mihkel ratified the design + dispatch.
+**dispatch summary** -- Bootstrap the PO's private personal-assistant project "Passepartout" on this box: skeleton at `$HOME/passepartout`, install CLAUDE.md (below-cut-line of assistant-claude-md.md), `.claude/settings.json` per design §5, backlog seed (§10 + items 7-8), memory seeds, git init committing as Passepartout, `.bashrc` alias append. Explicitly excluded: crontab install, playbook bodies, sudo, anything outside `$HOME/passepartout` except the `.bashrc` append.
+**tier classification** -- M (creation of a new, previously-nonexistent directory tree + append-only edit to `.bashrc`; no existing state mutated or destroyed; rollback = `rm -rf ~/passepartout` + delete the 4-line `.bashrc` block). Sanction: full dispatch package from Aen with PO ratification, quoted preconditions ("STOP if `$HOME/passepartout` exists"; "STOP if `alias passe=`/`alias pp=` already present") -- both preconditions verified CLEAR before mutation.
+**deployed-artifacts-read declaration** --
+- Layer 1 (design of record): `designs/new/personal-assistant/design.md` rev 3 + `assistant-claude-md.md` rev 3 read IN FULL pre-execution. Mid-execution the parallel `git mv` landed (`designs/new/personal-assistant/` -> `designs/deployed/passepartout/`); first extraction attempt hit the vanished path (0-byte CLAUDE.md), re-ran from the deployed path, content verified identical to the pre-move read (first/last lines + full below-cut diff).
+- Layer 2/3 -- N/A: greenfield local install, no prior substrate; preconditions probed instead (dir absent, aliases absent, `which claude`).
+**commands executed** (key ones, verbatim) --
+1. `mkdir -p "$HOME/passepartout"/{playbooks,memory,briefings,inbox,backup,logs,.claude}`
+2. `awk 'found{print} /---8<--- cut here ---8<---/{found=1}' designs/deployed/passepartout/assistant-claude-md.md | sed '1{/^$/d}' > "$HOME/passepartout/CLAUDE.md"` + diff-vs-source verify.
+3. Write `.claude/settings.json` -- model `claude-fable-5`; allow: Read/Write/Edit/Bash/WebSearch/WebFetch + 19 Gmail read/label/spam/draft tools + 8 Calendar read/create/update/delete/suggest tools; deny: `mcp__claude_ai_Gmail__send_message`, `mcp__claude_ai_Gmail__reply`, `mcp__claude_ai_Gmail__forward`, `mcp__claude_ai_Google_Calendar__respond_to_event`.
+4. Write `backlog.md` (§10 items 1-6 verbatim + dispatched items 7-8) and 6 memory seed files.
+5. `git init -b main` + `git config --local user.name "Passepartout"` / `user.email "passepartout@localhost"` + initial commit.
+6. Precondition-guarded append of the 2-alias block to `$HOME/.bashrc`.
+**outputs** -- Tree verified (7 dirs, 9 files); installed CLAUDE.md first line = `# CLAUDE.md -- Passepartout`, 68 lines, byte-identical to source below-cut; settings.json passes `python3 -m json.tool`; commit `4d4ec68` authored `Passepartout <passepartout@localhost>`; `.bashrc` tail shows the block; `which claude` = `/home/michelek/.local/bin/claude` (v2.1.239) -- design's `/usr/local/bin/claude` placeholder is WRONG for this box; recorded in backlog #8 for the deferred cron install.
+**outcome** -- success. No cron installed, no playbook bodies written, no sudo, nothing outside scope. `[unverified]` carried forward per dispatch: exact Gmail/Calendar per-tool names (taken from this account's live MCP roster in the installing session -- strong evidence, but to be re-verified from inside the PA's own first session) and the `model` settings-key semantics.
+
+(*FR:Hopper*)
+
+### 2026-08-22T17:23 -- Passepartout amendment: `passe` alias gains startup prompt
+
+**timestamp** -- 2026-08-22T17:23+03:00
+**tasker** -- Aen; PO-directed fix after test-run (session opened silent -- expected substrate behavior, a session never speaks before the first user message).
+**dispatch summary** -- Amend ONLY the `alias passe=` line in `~/.bashrc` so `passe` launches with an initial prompt ("Session start: introduce yourself briefly, then run your execution order and present the agenda."); `pp` stays bare as the quick-launch variant; nothing else in `.bashrc` touched.
+**tier classification** -- M (single-line replacement in the block installed by the 17:20 bootstrap entry; rollback = restore the bare-claude line). Sanction: Aen dispatch quoting the exact replacement line, PO-ratified.
+**deployed-artifacts-read declaration** -- target = the 4-line Passepartout block appended at 17:20 (this log, prior entry); re-read pre-edit via exact-match count. Layers 1-3 N/A (single local dotfile line).
+**commands executed** -- python3 exact-string replace of the one `alias passe=` line, guarded by `assert count == 1` (aborts writing nothing on 0 or >1 matches); verify: `grep -A3 'Passepartout' ~/.bashrc` + `bash -ic 'alias passe; alias pp'`.
+**outputs** -- "replaced 1 line, rest of .bashrc untouched"; grep shows the amended block (passe with prompt, pp bare); interactive-shell readback echoes both aliases cleanly, quoting intact (double-quoted prompt inside single-quoted alias).
+**outcome** -- success.
+
+(*FR:Hopper*)
