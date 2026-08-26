@@ -5,7 +5,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-07-24
 filed-by: librarian
-last-verified: 2026-08-19
+last-verified: 2026-08-26
 status: active
 source-files:
   - apex-migration-research/.claude/bin/autossh-db-tunnels.sh
@@ -54,7 +54,13 @@ Two distinct failure windows. **Lead with the permanent one** -- a reader who me
 
   Two things make this instance worth its space rather than being an n+1 sighting. First, the sampling interval was **shorter than the poll interval**, which converts instance 4's ambiguous field into a *guaranteed* false read -- not a coin flip but a coin that cannot land heads yet. **A status field sampled faster than the process that updates it reports the past with the confidence of the present.** Second, and the reason this is recorded rather than quietly fixed: **it was committed by someone who had just finished reading the entry warning against it.** That is the sharpest available evidence for the wiki's own standing rule that *awareness of a pattern is not protection against it -- only a check with a defined trigger is* (see [`../patterns/stale-snapshot-trusted-as-current.md`](../patterns/stale-snapshot-trusted-as-current.md)). Self-reported against his own outgoing claim to the PO.
 
+- **Instance 6 (Aen, 2026-08-26) -- the AUTHORING face: a success predicate you wrote yourself measures only what you chose to measure.** Resolving a real two-way scratchpad divergence at S64 startup, Aen hand-rolled a merge script that joined `ours_summary + theirs_summary + ours_S62_header` and **re-attached neither the text before the conflict region nor the text after it.** Everything outside the conflicted hunk vanished on both sides -- ~29 non-blank lines, including the file's own "this file is not a source" banner, one side's entire S62 transcript and NEXT-SESSION BOOT block, and the other side's entire S63 transcript. The script printed `markers left: 0` throughout, and that was read as done. **It only ever proved the thing it measured.** The loss surfaced by luck: a later, unrelated edit anchored on a string inside the deleted region and threw. Had that edit not been made, a truncated scratchpad would have been the authoritative startup record for every future session. Recovered by rebuilding from the last good commit plus explicit re-insertion.
+
+  What distinguishes this from instances 1-5: there the operator *read* a signal someone else designed (sshd's listener, a hub field, a log stream). Here the operator **designed the signal**, and designed it around the hunk -- because the conflict markers frame attention on the hunk, **which is precisely where the danger was not.** A conflict-resolution script's blast radius is the whole file. Self-reported by Aen in his scratchpad; filed here on the librarian's judgment at his request. **Correlation flagged**: third Aen instance (3, 5, 6), but a different session and substrate from instance 5 and a face no other instance carries, so recorded rather than counted as n+1.
+
 **Sub-lesson from instance 4:** a green reading that does not distinguish success from a *different state entirely* is the same genus even when you are reading the right artifact.
+
+**Sub-lesson from instance 6:** the success condition for a hand-rolled merge is **a diff against both parents**, not the absence of markers. Generalised: when you author the check as well as the change, the check inherits the change's blind spot -- **write the success predicate in terms of the outcome you want, never in terms of the mutation you performed.** Same shape as Brunel's independent observation the same day, recorded in his scratchpad after team-lead's review of the RC data-root plan: *a daemon's self-report of its own relocated config confirms the setting was applied, not that the outcome happened* -- two agents, one session, two substrates.
 
 **Sub-lesson from instance 5:** when a signal is refreshed by a poll, **any read faster than one poll interval is not a measurement**. Where instance 4 says the field cannot distinguish two states, instance 5 says it cannot yet distinguish *anything* -- pair the conjunction check with a wait of at least one full poll period, or the conjunction is three readings of the same stale instant.
 
