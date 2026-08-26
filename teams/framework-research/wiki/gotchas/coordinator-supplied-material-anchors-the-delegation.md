@@ -16,6 +16,8 @@ source-commits:
   - 1a7ee44
 source-issues: []
 related:
+  - docker-port-empty-under-network-mode-host.md
+  - ../patterns/daemon-self-report-confirms-config-not-outcome.md
   - ../patterns/recursive-narrowing-substrate-truth-evidence-discipline.md
   - ../process/soft-verdict-discipline-on-substrate-mapping-briefs.md
   - ../patterns/three-role-discipline-stacking-within-dispatch-arc.md
@@ -38,7 +40,7 @@ The cost is not duplicated effort. It is **a defect the coordinator cannot see, 
 1. `prompts/aeneas.md` forbids the coordinator reading reference material to work things out himself. The rationalisation -- *one quick lookup saves the agent a step* -- is the standard on-ramp to the coordinator doing the specialist's work.
 2. The PO's sharper point: **team-lead could have just asked.** The PO, or Brunel, might already have held the answer -- and asking is the move that leaves the specialist's own copy intact.
 
-The real demonstration arrived only after team-lead sent Brunel one more line: *the outline is a floor, not a ceiling.* Brunel then found, from his own build-knowledge, that **`docker port` returns empty for `network_mode: host` containers even when they are perfectly healthy** -- and three of the containers on that host run `network_mode: host`. The verification step the coordinator's outline specified would therefore have read a *fully successful* migration as a **failure**. Working inside the outline would have shipped that defect. The coordinator could not have seen it; only the specialist's knowledge of what he had built could, and only once he was licensed to step outside the outline. (Brunel's own account of the `docker port` finding is the same event from the other side -- see the cross-link when it is filed.)
+The real demonstration arrived only after team-lead sent Brunel one more line: *the outline is a floor, not a ceiling.* Brunel then found, from his own build-knowledge, that **`docker port` returns empty for `network_mode: host` containers even when they are perfectly healthy** -- and three of the containers on that host run `network_mode: host`. The verification step the coordinator's outline specified would therefore have read a *fully successful* migration as a **failure**. Working inside the outline would have shipped that defect. The coordinator could not have seen it; only the specialist's knowledge of what he had built could, and only once he was licensed to step outside the outline. (Brunel's own account is filed as [`docker-port-empty-under-network-mode-host.md`](docker-port-empty-under-network-mode-host.md) -- the same event from the other side -- and the verification-design claim it demonstrates as [`../patterns/daemon-self-report-confirms-config-not-outcome.md`](../patterns/daemon-self-report-confirms-config-not-outcome.md).)
 
 ## Recorded withdrawal -- read before citing instance (b)
 
@@ -69,6 +71,6 @@ Not merged with [`../patterns/recursive-narrowing-substrate-truth-evidence-disci
 
 ## Provenance note
 
-Submitted by team-lead 2026-08-26 as a Protocol-A submission naming `team-lead`, `brunel`, `celes` as substantive contributors. Filed by the librarian, not the author, so **`stage-2: pending`** -- joint entry, three read-backs owed. Celes's contribution is as the anchored party in instance (a); a record of her judgment should not stand without her having read it. Brunel is live this session and holds the `docker port` finding; team-lead authored the submission. `discovered` is the date of instance (a), the earlier of the two.
+Submitted by team-lead 2026-08-26 as a Protocol-A submission naming `team-lead`, `brunel`, `celes` as substantive contributors. Filed by the librarian, not the author, so **`stage-2: pending`** -- joint entry, three read-backs owed. Celes's contribution is as the anchored party in instance (a); a record of her judgment should not stand without her having read it. Brunel is live this session and holds the `docker port` finding; team-lead authored the submission. `discovered` is the date of instance (a), the earlier of the two. **Stage-2 advance: team-lead read the filed entry back 2026-08-26 17:08 and confirmed it with no corrections -- `partial` on the card; Brunel's and Celes's read-backs remain owed.**
 
 (*FR:Aen* submitted; *FR:Brunel* and *FR:Celes* co-sources; *FR:Callimachus* filed)

@@ -7,7 +7,7 @@ source-agents: [team-lead, brunel, celes]
 source-team: framework-research
 discovered: 2026-08-22
 last-verified: 2026-08-26
-stage-2: pending
+stage-2: partial
 related: [../patterns/recursive-narrowing-substrate-truth-evidence-discipline.md, ../process/soft-verdict-discipline-on-substrate-mapping-briefs.md, ../patterns/three-role-discipline-stacking-within-dispatch-arc.md, ../patterns/stale-snapshot-trusted-as-current.md, verification-narrower-than-it-appears.md]
 tags: [gotcha, delegation, briefing, anchoring, coordinator, specialist, team-lead, po-feedback, held-confidence, withdrawal-recorded]
 ---
@@ -27,6 +27,6 @@ A coordinator who puts material **into** a delegation -- looked-up facts, framin
 - **Lean brief != license.** A leaner brief protects delegated judgment, but contradiction has to be explicitly permitted; instance (b)'s defect surfaced *after* the floor sentence, not before.
 - **Confidence medium, held**: same coordinator both times and the PO is the single catching vantage -- correlated. Path to high: an instance from a second coordinator, or from a delegation the PO did not review.
 - **Not merged with `recursive-narrowing-substrate-truth-evidence-discipline`** -- that says each vantage catches its own error class; this says the brief can switch the vantage off. Sibling posture from the specialist side: `soft-verdict-discipline-on-substrate-mapping-briefs` (map, not verdict).
-- **stage-2 pending** -- filed by the librarian from team-lead's submission; joint, three read-backs owed (team-lead, Brunel, Celes -- Celes as the anchored party in (a)).
+- **stage-2 partial** -- filed pending (joint, librarian-filed); **team-lead read back 2026-08-26 17:08, CONFIRMED no corrections**, advancing one step. **Brunel and Celes still owed** (Celes as the anchored party in (a)).
 
 (*FR:Aen* submitted; *FR:Brunel* and *FR:Celes* co-sources; *FR:Callimachus* filed)
