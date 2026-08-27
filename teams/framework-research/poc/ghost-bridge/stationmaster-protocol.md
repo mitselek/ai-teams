@@ -4,7 +4,7 @@
 
 **Version:** `1.0.0` (SemVer per [`playbooks/version-typed-contract.md`](../../playbooks/version-typed-contract.md); breaking change = major bump)
 
-**Status:** RATIFIED -- PO review completed section-by-section, S49 (2026-06-12)
+**Status:** RATIFIED -- PO review completed section-by-section, S49 (2026-06-12). Clarifying errata (no version bump) are enumerated in §11; the wire shape is unchanged since ratification.
 
 **Provenance:** Derives from `SPEC-v3.md` disciplines (D1, D2, D9, D11) and the S49 post-office pivot (PO-ratified in dialogue, 2026-06-12). Substrate citations refer to [`TRUTHS.md`](TRUTHS.md). Rules tagged **`[CONV]`** are *conventions* -- judgment values we chose, not behaviour the substrate forces (no T-number backs them); they may be changed freely at the cost of a version bump, no re-testing required (marker defined in [`SPEC-v3.md`](SPEC-v3.md), provenance discipline).
 
@@ -14,7 +14,7 @@
 
 This contract defines everything a **customer courier** may say to the **stationmaster hub**, and everything the hub promises back. It is the single load-bearing interface: the onboarding guide and the courier implementation hints both derive from this document.
 
-- **Hub** -- the stationmaster container (prod-llm). Listens on one ssh port. Never initiates connections. Holds no customer credentials, only registered public keys.
+- **Hub** -- the stationmaster container. Listens on one ssh port. Never initiates connections. Holds no customer credentials, only registered public keys. *(The hub's deployment location is an instance fact and lives in the deployment runbook, not in this contract -- errata E2, §11.)*
 - **Courier** -- any customer-side process that implements this contract. The courier is a **pattern, not a product**: the reference implementation is Python, but any implementation honoring this contract is a citizen. Local file disciplines (consume-by-rename, inject) are the courier's duty and are specified in the courier hints document, not here.
 - **Assumed capability:** outbound `ssh` only. No sftp, no rsync, no persistent tunnel required.
 
@@ -186,3 +186,29 @@ FIFO per directed pair `(from_team → to_team)`: deposit order = collect order.
 `stationmaster` and `sm` are reserved team names (hub self-identity, §9 alerts). Registration of either is refused.
 
 **Hub mail needs no grant.** Mail with `from_team: "stationmaster"` flows to every registered team from the moment of registration. This is not a default grant and is not revocable -- it is not represented in the grant model at all, merely documented here (PO decision, S49): the hub owns the spool and performs the consent checks, so a grant gating its own mail would be unenforceable. Filtering hub notices, if a team ever wants that, is a receiving-courier convention, not a protocol feature.
+
+## 11. Errata and changelog
+
+(*FR:Herald*)
+
+This section is the contract's own record of what changed after ratification and why no version bump was taken. Stewardship rule (adopted with the consolidation of the convention under framework-research, GH #108, 2026-08-27): **every post-ratification edit to this document lands here as a dated line**, classified as one of:
+
+- **Erratum (E-n)** -- clarifying; pins something conformant producers/consumers already did, or removes text that was never a wire fact. No version bump. The `[CONV]` marker (header) is the sibling mechanism for convention values.
+- **Minor (x.y+1.0)** -- new optional response field or new transport binding; existing consumers unaffected (§8).
+- **Major (x+1.0.0)** -- envelope shape, command removal, or semantics change (§8).
+
+An erratum is never silent: it is written at the point it applies (inline, as §4 already does) **and** listed here, so the backlog is enumerable without re-reading the whole contract.
+
+| # | Date | Class | Where | What | Provenance |
+|---|---|---|---|---|---|
+| E1 | 2026-06-15 (S51) | Erratum | §4 | Renderable-body field pinned to `text`: an entry carrying its body elsewhere is forwarded verbatim and accepted but renders as `undefined` on the recipient; compliance sits with the sender; couriers MUST NOT remap. `SendMessage`-originated entries already complied. | apex-research CR-7; onboarding Step 5 (*FR:Herald*) |
+| E2 | 2026-08-27 (S65) | Erratum | §1 | Struck the hardcoded hub location "(prod-llm)" from the Hub definition. Where the hub runs is an instance fact (runbook), not a contract fact; the literal had drifted -- two hub instances were live on 2026-08-27 and the contract named only the older one. | GH #108 assessment A3 (*FR:Herald*) |
+
+### Erratum backlog (open -- candidates, not yet applied)
+
+Items the #108 assessment identified as contract-shaped but HELD pending the A1 hub-topology decision or a version decision. Listed so the backlog has a home; each moves to the table above when applied.
+
+- **`waiting_for_me` lacks `oldest`** (§5.6): only `deposited_uncollected` carries an age, so the *receiving* team -- whose courier is the one failing to inject -- cannot compute oldest-unacked age from `status`. Candidate **minor 1.1.0** (new optional field). Motivated by `wiki/gotchas/at-least-once-without-age-alarm-hides-unbounded-latency` (n=6). (#108 A4)
+- **Canonical verb table** (§5): the eight verbs are stated here once and paraphrased differently in onboarding and in po-team `protocols.md` §1; consolidation mirrors one table verbatim into both. No wire change. (#108 A2)
+- **Agent-level addressing** (§9, `<agent>@<team>`): live in the comms MCP `send` and in the reference courier's inbound `entry.to` routing (#106), while §9 still reads "a future major may interpret `@`". Hub is untouched (the agent part never reaches the wire), so the resolution is a courier-hints `[CONV]` or a strike -- not a contract change -- but §9's wording must stop describing as future what is deployed. (#108 A6)
+- **Two binding layers** (§3.2/§9): the deployed comms MCP is an *agent-facing* binding (tool -> ssh conversation), distinct from the deferred *hub-verb-per-tool* MCP binding §9 describes. §3.2 should name both layers. (#108 A13 / Brunel)
