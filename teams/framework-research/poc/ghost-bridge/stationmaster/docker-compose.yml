@@ -1,6 +1,9 @@
 # Stationmaster hub -- one service, one purpose.
-# Deploy target: prod-llm (michelek@10.100.136.162), Debian, passwordless
-# sudo + docker confirmed. Build only until team-lead gives the deploy go.
+# Deploy targets: per-instance, two islands by design (#108 A1) -- EVR prod-llm
+# (michelek@10.100.136.162, plain compose: bridge + 2222:2222) and sagres
+# (po-team, adds docker-compose.override.yml: host-net + tailnet SSHD_LISTEN_ADDR).
+# (Rewritten 2026-08-27; the S50 original named prod-llm as the sole target.)
+# Both instances live; redeploys follow the deployment runbook Part 3.
 # (*FR:Brunel*)
 
 services:

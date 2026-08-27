@@ -1,120 +1,93 @@
-# Stationmaster Hub -- Container Build & Deployment Runbook
+# Stationmaster Hub — Deployment Runbook (two instances by design)
 
 (*FR:Brunel*)
 
-**Status:** Build complete + locally smoke-tested (S50, 2026-06-12). **NOT deployed** -- awaiting team-lead go for prod-llm.
-
-**Artifacts:** `teams/framework-research/poc/ghost-bridge/stationmaster/`
-**Implements:** `stationmaster-protocol.md` v1.0.0 (RATIFIED), VERBATIM. Onboarding + courier-hints are the customer-side counterparts.
+**Status:** LIVE DOCUMENT — rewritten 2026-08-27 (S65, #108 Stage 2 item 2) to deployed reality. Supersedes the S50 build-order runbook, whose header still said "NOT deployed" about a network that had been live for months (#108 §6). The old §8 open questions are closed or carried in Part 4.
+**Authority:** contract = [`stationmaster-protocol.md`](../poc/ghost-bridge/stationmaster-protocol.md) v1.0.0; topology = #108 A1 ruling: **two islands by design, no federation, git is the bridge.**
+**Ownership (§7 split):** FR stewards this runbook, the contract, and the reference implementation. Each island's **operator** executes procedures on its host — today Mihkel operates both. FR agents never execute against either hub host.
 
 ---
 
-## 1. Design rationale
+## Part 1 — Deployed reality (2026-08-27)
 
-The hub is a **single-purpose OpenSSH post-office**. One service, one port, one job: accept authenticated byte pipes and run `sm-shell` against an operator-owned spool. Every design choice follows from three protocol invariants:
+### 1.1 EVR island — prod-llm (primary instance for this repo's teams)
 
-- **The channel is the identity (§2).** Team name reaches the hub *only* through the `command="sm-shell <team>"` forced command in `authorized_keys`. No client input can change it. This is why there is no app-level auth, no token, no login surface -- the SSH key + forced command *is* the whole identity system.
-- **The hub holds no customer credentials (§9 post-office model).** It stores registered public keys and a spool, nothing it could leak. So the image is minimal (Debian slim + openssh + python3-stdlib), runs unprivileged, and `no-new-privileges`.
-- **`sm-shell` is per-conversation, not a daemon.** sshd forks it once per connection; it reads one conversation from stdin, replies on stdout, exits. No long-lived hub process to leak state or accumulate (the S48 zombie-daemon failure mode cannot recur here -- sshd is the only persistent process, and it is visible + killable + `restart: unless-stopped`).
-
-**Why Debian, not Ubuntu:** SPEC-v3 D10 amendment. The T6.a exclusive-create race was only proven on Windows; the deployment-substrate re-run (Task #3) is owed on Debian. Building on Debian keeps the substrate honest -- but note the hub's spool discipline does **not** depend on T6.a at all (see §6).
-
-## 2. Architecture -- what's in the image vs. mounted vs. runtime
-
-| Layer | Contents | Lifecycle |
-|---|---|---|
-| **Image** | Debian bookworm-slim, openssh-server, python3, `sm-shell`, `sm-register`, `entrypoint.sh`, `sshd_config.stationmaster` | Rebuilt from Dockerfile; carries no state |
-| **Named volume `sm-state`** (`/var/lib/stationmaster`) | `registry.json`, `grants/<team>.json`, `spool/<to>/<from>/*.json`, `dedup/<to>/<from>.jsonl`, `ssh_host_keys/`, `authorized_keys`, `started_at` | Survives container replacement -- registrations, host-key fingerprint, and undelivered mail persist |
-| **Runtime** | sshd in foreground (PID 1 child of entrypoint), one `sm-shell` per connection | Ephemeral; dies with the connection |
-
-The host keys live on the volume on purpose: a rebuild must **not** change the hub fingerprint, or every registered courier trips `StrictHostKeyChecking`. (Carry-forward gotcha: rebuild regenerates host keys → clients must `ssh-keygen -R`. Persisting them on the volume avoids that entirely.)
-
-## 3. Build
-
-```sh
-cd teams/framework-research/poc/ghost-bridge/stationmaster
-docker compose build          # produces image stationmaster:1.0.0
-```
-
-## 4. Deploy to prod-llm (michelek@10.100.136.162) -- OPERATOR STEP, after team-lead go
-
-This is a deployment operation against a remote substrate -- **Hopper's domain, not Brunel's**. The commands below are the dispatch shape; Hopper validates and executes per her own discipline.
-
-```sh
-# On prod-llm, in the deployed copy of the repo:
-cd <repo>/teams/framework-research/poc/ghost-bridge/stationmaster
-docker compose up -d           # restart: unless-stopped is in the compose file
-docker compose ps              # healthcheck should report healthy within ~10s
-docker compose logs --tail=20  # expect "stationmaster hub up: sshd :2222 ..."
-```
-
-The compose file publishes `2222:2222`. Confirm the host firewall allows inbound 2222 from customer-team egress IPs (org-internal).
-
-## 5. Register the first customer (framework-research -- Task #4)
-
-```sh
-# Customer generates a key (their host):
-ssh-keygen -t ed25519 -f ~/.ssh/sm_framework-research -N "" -C "framework-research"
-
-# Operator registers the PUBLIC key inside the container:
-docker compose exec stationmaster \
-    sm-register framework-research "$(cat sm_framework-research.pub)"
-
-# Customer verifies:
-printf '%s\n' '{"v":1,"cmd":"ping"}' \
-    | ssh -T -i ~/.ssh/sm_framework-research -p 2222 sm@10.100.136.162
-# expect: {"team":"framework-research","fingerprint":"SHA256:...","protocol":1}
-```
-
-`sm-register` is idempotent (re-registering a team replaces its key line), refuses reserved names (`stationmaster`, `sm`), and enforces the §2.4 team-name regex. `sm-register --list` shows bindings; `sm-register --revoke <team>` removes them.
-
-## 6. State map -- what survives `docker stop`
-
-| Path (on `sm-state` volume) | Survives stop/rebuild? | Notes |
-|---|---|---|
-| `spool/<to>/<from>/*.json` | **Yes** | Undelivered mail. No TTL, no drops (§6). Deleted only by `ack` or operator. |
-| `grants/<team>.json` | **Yes** | Receive-consent. |
-| `registry.json` | **Yes** | Team list + last_seen. |
-| `dedup/<to>/<from>.jsonl` | **Yes** | Per-pair dedup ledger (7 days / 10k IDs). |
-| `ssh_host_keys/` | **Yes** | Stable fingerprint across rebuilds. |
-| `authorized_keys` | **Yes** | Registrations. Operator-managed. |
-| `started_at` | Rewritten each start | Drives `status.hub.uptime_s`. |
-| running `sm-shell` process | No | Per-conversation; nothing to survive. |
-
-**`accepted` = fsync-durable before the reply line** (§5.2): `sm-shell` writes the consignment with tmp-file + `fsync` + atomic `rename` + parent-dir `fsync`, *then* emits `"status":"accepted"`. A crash after the client reads `accepted` cannot lose the consignment.
-
-**Hub spool needs no T6.a discipline.** The courier-side in-place-write ban (and the exclusive-create race T6.a guards) exists because the *harness* contends for inbox files with no lock. The hub owns its spool exclusively; `sm-shell` takes one coarse `flock` (`hub.lock`) for the whole conversation, serialising all writers. Correct over clever for v1, low org-internal volume.
-
-### Volume-layout decision (explicit -- load-bearing for rename atomicity)
-
-Per courier-hints §"Spool placement" (line 54): **rename atomicity is per-volume.** `sm-shell`'s durability write is tmp-file → `os.replace(tmp, final)` inside the spool subtree; that rename is atomic *only* if tmp and final are on the same filesystem.
-
-- **Decision:** ONE named volume `sm-state` mounted at `/var/lib/stationmaster` carries the *entire* state subtree (`spool/`, `dedup/`, `grants/`, `registry.json`, `ssh_host_keys/`, `authorized_keys`). Every tmp file and its final target are therefore co-located by construction. There is no inbox-vs-spool split to misconfigure on the hub side -- the hub has no harness-watched inbox (that split is the *courier's* concern, on the customer host).
-- **Named volume, not bind-mount:** hub state is hub-private with no host-side editing workflow (registrations go through `sm-register` inside the container). A named volume keeps all state on one docker-managed filesystem, survives container replacement, and avoids host-FS uid/permission drift. A bind mount would invite cross-device layouts and uncoordinated host edits -- wrong for this substrate. If host-visible backups are later needed, use a bind mount to a *single* host filesystem and keep the assertion below.
-- **Enforced at startup:** `entrypoint.sh` runs a `stat -c %d` device-equality check across `STATE_DIR`, `spool/`, and `dedup/` and **refuses to start** if they span filesystems (the same "validate at startup; refuse otherwise" discipline courier-hints:54 mandates for the courier). So a future misconfiguration that breaks the invariant fails loud at boot, not silently at the first durability write.
-
-This is the exact filesystem layout the T6.a gate-of-record validates: the gate (when run hub-side) exercises exclusive-create on the `sm-state` volume's filesystem; when run courier-side it exercises the customer host's inbox-dir filesystem (the gate's true subject -- see §8 item 1).
-
-## 7. Failure modes
-
-| Event | Behaviour |
+| Fact | Value |
 |---|---|
-| Container OOM / crash | `restart: unless-stopped` brings it back; volume state intact; in-flight conversation lost (client sees no envelope → retries, every command idempotent/retry-safe §3). |
-| `docker stop` mid-deposit | Consignments fsync-ed before `accepted` survive; un-replied ones the client retries (`duplicate` on the redeposit). |
-| Disk full | `deposit` write fails → `sm-shell` returns `E_INTERNAL` for that consignment; client retries. **Operator must watch hub disk** -- no TTL means uncollected mail accumulates (§6); `status.deposited_uncollected` is the visibility signal. |
-| Rebuild | Image replaced; host keys + registrations + spool persist on the volume → no client-visible change. |
-| Bad/forged `from` inside `entry` | Ignored -- `from_team` is stamped from the authenticated channel, never from content (§4). Closes the C4 spoofing hole at the hub boundary. |
-| Unregistered customer connects | `Permission denied (publickey)` -- never reaches `sm-shell`. |
-| Registered key, malformed request | Authoritative error envelope (`E_MALFORMED` / `E_VERSION`), not silence. Silence is reserved for transport failure. |
+| Address | `sm@10.100.136.162:2222` (EVR LAN; bridge network, compose publishes `2222:2222`) |
+| Host-key fingerprint | `SHA256:CNcFjOxr8vREOueOS8nxJN8W3LaQHet62du+PHyK13U` — INVARIANT across redeploys (keys on volume); apex bakes it (`entrypoint-apex.sh:314`) |
+| Customers | `framework-research` (Windows dev box courier), `apex-research` (RC-host container courier) |
+| Deploy dir | `~/stationmaster` in `michelek@`'s home (no git clone on host — artifact transferred) |
+| State | named volume `stationmaster_sm-state` → `/var/lib/stationmaster` |
+| Boot/crash posture | container `restart: unless-stopped`; **no systemd unit** (host reboot ⇒ docker's restart policy brings it back when the daemon starts) |
+| Running image | **built at reference `f022fed` (2026-06-12), container up since — PRE-#97.** Formation upgrade PENDING: [`evr-island-hub-formation-spec-2026-08-27.md`](evr-island-hub-formation-spec-2026-08-27.md). *Flip this row when the PO executes it.* |
+| Scratch registrations | `alpha`, `beta`, `fr-test` still registered — removed by formation §7 |
+| Operator | Mihkel |
 
-## 8. Open questions / owed work
+### 1.2 Personal island — sagres (po-team's instance; cite, don't restate)
 
-1. **T6.a Debian re-run (Task #3)** -- owed on the deployment substrate before couriers rely on inbound injection. *Operator-owned; not gated on this hub artifact* -- the hub spool doesn't use exclusive-create (§6), but the customer courier's inbox injection does.
-2. **CLI 2.1.170 → 2.1.175 drift** -- TRUTHS.md substrate facts (S3 retention flip especially) were stamped at 2.1.170. The hub doesn't touch the harness inbox so it's insensitive to this, but the *courier* side is. Re-validate the courier against 2.1.175 on the deployment host.
-3. **Firewall scope for port 2222** -- who-can-reach-the-hub is an org-network decision (PO). Pubkey + forced command is the auth gate; network reachability is defence-in-depth.
-4. **`stationmaster`-as-sender alert path (§10)** -- deferred in v1; `sm-shell` refuses reserved names at the bound-team check, so the consent-bypass branch in `deposit` is intentionally dormant until the §9 alert path lands.
-5. **Backups** -- the `sm-state` volume is the single source of truth. A volume backup cadence (operator) protects undelivered mail and registrations.
+Facts are **owned by po-team**; authoritative records: `designs/deployed/po-team/wiki/references/hub-on-sagres.md` and `designs/deployed/po-team/setup-log.md`. Summary for orientation only: `sm@100.102.133.125:2222`, **tailnet-only** (`network_mode: host` + `SSHD_LISTEN_ADDR` via `docker-compose.override.yml`), live since 2026-07-15 (#93), image includes #97, systemd oneshot unit waits for the tailnet IP then `compose up -d`; customers po-team, mvox, screenwerk, Passepartout. Operator: Mihkel.
 
-## 9. Local verification record (S50, 2026-06-12)
+### 1.3 Topology: islands, bridged by git
 
-`sm-shell` unit-smoke-tested on this host (Windows, Python 3.14, `fcntl` degraded to no-op for single-process tests; deployed hub is Linux with real `flock`). Verified: ping identity + fingerprint plumbing; grant-gated deposit; accepted/duplicate dedup; non-destructive collect; ack-deletes + idempotent re-ack; FIFO per pair; revoke blocks new but keeps queued mail collectable; size caps (256 KiB entry, 100 consignments, 1 MiB conversation); partial-success per consignment; `E_VERSION`/`E_MALFORMED`/`E_UNKNOWN_TEAM`/`E_NOGRANT`/`E_TOOBIG`; reserved-name refusal; `sm-register` add/list/revoke + idempotency + reserved/regex refusal. `smoke-test.sh` is the over-real-ssh acceptance for post-deploy (operator runs it once the hub is up + two scratch keys registered).
+The two hubs share **code** (one reference, Part 3) and **nothing else** — separate registries, grants, spools, keys. EVR will not join the tailnet (A1); no federation is planned (S49 decision stands). Cross-island coordination travels through this repo: FR is a two-box team (EVR Windows box + p2rtela6, which reaches sagres), and session commits are the transport. A team needing BOTH islands registers on both independently (a1.1: FR may register on sagres opportunistically from the home box — Herald's spec).
+
+## Part 2 — Operator procedures (recurring)
+
+All hub-side commands run in the instance's deploy dir (`cd ~/stationmaster` on prod-llm; `/opt/stationmaster` on sagres).
+
+**Register a team** (v1 human step, contract §2): receive the pubkey line + team name (regex `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`; `stationmaster`/`sm` refused):
+
+```sh
+docker compose exec stationmaster sm-register <team> '<pubkey line>'
+docker compose exec stationmaster sm-register --list     # verify binding
+```
+
+`sm-register` is idempotent (re-register replaces the key). Reply to the team with the hub address AND the host-key fingerprint out-of-band (they must pin it — onboarding Step 3).
+
+**Revoke / remove a team:** `docker compose exec stationmaster sm-register --revoke <team>`. Verify from any registered key: `{"v":1,"cmd":"registry"}` no longer lists it.
+
+**Health check** (from any registered courier key — this is the outcome-level check; `docker ps` alone is the self-report):
+
+```sh
+printf '%s\n' '{"v":1,"cmd":"ping"}'   | ssh -T -i <team_key> -p 2222 sm@<hub>   # identity + fingerprint
+printf '%s\n' '{"v":1,"cmd":"status"}' | ssh -T -i <team_key> -p 2222 sm@<hub>   # uptime, grants, backlog
+```
+
+**Backlog / disk watch (monthly, and on suspicion):** `status.deposited_uncollected` per team (a far-side dead courier shows here — the sender-side `oldest` field is the age signal); host-side `df -h /var/lib/docker`. No TTL exists by design (contract §6): accumulation is a visibility problem, never auto-deleted. The receiving courier's stale-inbound WARN (courier-hints §6a) is the automatic complement.
+
+**Backups (weekly cron, retain 4; owner = operator):** see formation spec §5 for the exact `tar` command and crontab line. The irreplaceable state: `authorized_keys`, `registry.json`, `ssh_host_keys/` (fingerprint stability). Restore = untar into the volume with the container stopped, then `up -d`.
+
+**Reading hub logs:** `docker compose logs --tail=50` — sshd runs `-e -D`, so everything (connections, auth, `sm-shell` stderr) is in the container log stream. `LogLevel VERBOSE` shows which key authenticated.
+
+## Part 3 — Build & redeploy (per instance)
+
+**Reference (single source, FR-stewarded):** `teams/framework-research/poc/ghost-bridge/stationmaster/` — `Dockerfile`, `docker-compose.yml`, `entrypoint.sh`, `sm-shell`, `sm-register`, `sshd_config.stationmaster`, `smoke-test.sh`, `test_durability.py`. Hub changes land HERE first; islands redeploy on their own cadence (A2). The deployed sagres copy is vendored at `designs/deployed/po-team/container/sagres/stationmaster/` (verified identical modulo CRLF, 2026-08-27).
+
+Redeploy sequence (any instance) — the formation spec §§4–6 is the worked, stop-conditioned version of exactly this:
+
+1. **Transfer** the reference dir to the host (`scp` to a `-new` staging dir, never onto the live one).
+2. **Normalize CRLF** if the checkout was Windows: `sed -i 's/\r$//' <files>` + `chmod +x` + verify zero `\r`. (CRLF in `entrypoint.sh`/`sm-shell` breaks execution — standing gotcha.)
+3. **Currency-check BEFORE overwrite:** `diff --strip-trailing-cr` old-deployed vs new-reference per file; every hunk must be explainable by a reference commit; an unexplained host-side hunk = STOP, fold it into the reference or discard on record. **Never compare with md5 across Windows/Linux checkouts** — CRLF makes it lie (measured 2026-08-27: 5 "differing" files, 0 real changes).
+4. **Swap** staging into place (keep the old dir aside as rollback), `docker compose build`.
+5. **`docker compose up -d --force-recreate`** — plain `up -d` does NOT adopt a rebuilt image under an unchanged compose file (S52 gotcha).
+6. **Verify outcomes, not self-reports:** healthcheck healthy; `ping` shows the SAME fingerprint (host keys on volume — a changed fingerprint strands every pinned courier, apex hardest); `status.hub.uptime_s` is SMALL (proof the recreate happened); `python3 test_durability.py` for any change touching the durability path.
+7. **Rollback:** old dir aside → `compose up -d --force-recreate` from it; the state volume is never part of the swap.
+
+Instance deltas: **prod-llm** = plain compose (bridge + `2222:2222`, `SSHD_LISTEN_ADDR` unset ⇒ 0.0.0.0 in-container). **sagres** = plus `docker-compose.override.yml` (host-net + tailnet `SSHD_LISTEN_ADDR`) and the systemd unit — po-team's files; do not transfer the override to prod-llm or vice versa.
+
+## Part 4 — Closed-questions ledger (the old §8, answered)
+
+| # | Old open question (S50) | Disposition |
+|---|---|---|
+| 1 | T6.a exclusive-create re-run on the Debian deploy substrate | **CLOSED 2026-06-12** — Hopper re-ran the gate on prod-llm Debian 13: tmpfs `/tmp` AND ext4-on-LVM, Python + bash, 50/50 rounds each, 0 anomalies (ops-log-2026-06, evidence `~/t6a-gate/evidence-t6a-prodllm-20260612.log`). The hub spool never needed T6.a (coarse `flock`); the gate's true subject — each customer's inbox filesystem — is the standing onboarding Step 6 per-substrate check, not a hub item. |
+| 2 | CLI 2.1.170 → 2.1.175 drift re-validation | **SUPERSEDED by standing discipline** — substrate facts are per-version datapoints (T1.b sheet; latest: 2.1.247 A13, `SendMessage`-to-ghost-outbox refused). The hub is insensitive; couriers re-validate per onboarding Step 6. Never "closed" — permanently recurring, owned by each courier's team. |
+| 3 | Firewall scope for port 2222 (who can reach the hub) | **OPEN, carried** — org-network decision, PO's. Unchanged by the A1 formation. |
+| 4 | `stationmaster`-as-sender alert path | **DEFERRED, unchanged** — contract §9/§10; the consent-bypass branch stays dormant. |
+| 5 | Backup cadence for `sm-state` | **CLOSED 2026-08-27** — formation spec §5: pre-upgrade snapshot + weekly cron retain-4, operator-owned. |
+| 6 | *(new, was undocumented)* Two hubs existed with no doc naming both | **CLOSED by A1** — two islands by design; this runbook is the doc. |
+| 7 | *(new)* EVR image currency (pre-#97 false-accept risk) | **PENDING execution** — formation spec is the closure instrument; flip Part 1.1 and this row when run. |
+
+---
+
+*Sources: #108 A1 ruling (issuecomment-5439161208); [`evr-island-hub-formation-spec-2026-08-27.md`](evr-island-hub-formation-spec-2026-08-27.md); `operations-log-2026-06.md` (deploy record + T6.a gate); po-team `hub-on-sagres.md` + `setup-log.md` (sagres facts, cited not restated); `git log -- poc/ghost-bridge/stationmaster/`; contract v1.0.0. The S50 runbook this replaces recorded the build rationale and image/volume architecture — those sections remain correct and live on in the reference dir's own files; git history holds the original.*
