@@ -16,6 +16,7 @@ related:
   - stationmaster-post-office-model.md
   - ../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md
   - ../gotchas/precondition-without-an-owner-is-no-precondition.md
+  - ../patterns/island-local-everything-only-the-repo-crosses.md
 ---
 
 # Two Islands by Design -- Hub Topology Follows the Network Boundary; Git Is the Bridge
@@ -52,7 +53,7 @@ PO's rationale, preserved in spirit as submitted: the connection *"doesn't need 
 
 1. **"The hub" now has an honest plural name.** The singular-convention gotcha's open question ("one network or two with an honest name") is answered: **two, named, by design.** Documents should say *which island's hub* they mean.
 2. **A startup host-check becomes the owned trigger.** "Check our host on startup" is [`../gotchas/precondition-without-an-owner-is-no-precondition.md`](../gotchas/precondition-without-an-owner-is-no-precondition.md)'s remedy applied by construction: condition = which box am I on; check = host identity; **owner and moment = the startup step itself.** a1.1's opportunistic membership hangs off that check.
-3. **Expected follow-on specs** (Protocol A traffic anticipated): Herald -- a1.1 spec; Brunel -- a1.2 spec + runbook. This entry is the decision they implement; it does not pre-state their content.
+3. **Expected follow-on specs** (Protocol A traffic anticipated): Herald -- a1.1 spec; Brunel -- a1.2 spec + runbook. This entry is the decision they implement; it does not pre-state their content. *Herald's landed same day:* [`../patterns/island-local-everything-only-the-repo-crosses.md`](../patterns/island-local-everything-only-the-repo-crosses.md) -- the operational discipline (island-local machinery; only the repo crosses; host-check owns courier arming).
 
 ## Provenance
 

@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-08-27
 last-verified: 2026-08-27
 stage-2: confirmed
-related: [stationmaster-post-office-model.md, ../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md, ../gotchas/precondition-without-an-owner-is-no-precondition.md]
+related: [stationmaster-post-office-model.md, ../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md, ../gotchas/precondition-without-an-owner-is-no-precondition.md, ../patterns/island-local-everything-only-the-repo-crosses.md]
 tags: [decision, stationmaster, hub, islands, topology, network-boundary, tailnet, git-bridge, gh-108, a1, po-ruling]
 ---
 
@@ -23,7 +23,7 @@ PO ruling on #108 A1 (`issuecomment-5439161208`, authoritative record): the two 
 - **Rejected**: federation/relay (would reopen S49 YAGNI for a problem git already covers); consolidation onto one hub (the network boundary is not FR's to move); goal-izing the connection (PO explicit).
 - **Consequence 1**: the singular-convention gotcha's open question is ANSWERED -- two networks, honestly named, by design; documents should say WHICH island's hub.
 - **Consequence 2**: "check our host on startup" = `precondition-without-an-owner`'s remedy by construction (condition = which box; check = host identity; owner + moment = the startup step). a1.1 hangs off that check.
-- **Follow-on specs expected** (Herald a1.1, Brunel a1.2 + runbook) -- this entry is the decision they implement, not their content.
+- **Follow-on specs expected** (Herald a1.1, Brunel a1.2 + runbook) -- this entry is the decision they implement, not their content. Herald's landed same day: `patterns/island-local-everything-only-the-repo-crosses`.
 - **stage-2 confirmed** -- author-is-filer (team-lead's direct submission of the PO ruling; pointer-not-copy to the issue comment).
 
 (*FR:Aen* submitted; *FR:Callimachus* filed)

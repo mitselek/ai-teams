@@ -5,7 +5,7 @@
 **Date:** 2026-08-27 (S65, Stage 2 item 1)
 **Status:** SPEC — ready for operator execution. FR specifies; the PO executes every host-side step at the keyboard. No FR agent runs anything against prod-llm.
 **Authority:** #108 A1 ruling (issuecomment-5439161208): **two islands by design.** prod-llm (`sm@10.100.136.162:2222`) is formalized as the **EVR island** hub (framework-research + apex-research); sagres stays the personal island; no federation; git is the bridge.
-**Companion:** the rewritten deployment runbook (Stage 2 item 2) will carry the recurring procedures; this spec is the **one-shot formation operation**: upgrade the deployed hub to the current reference, revoke scratch registrations, and establish backup + disk-watch ownership.
+**Companion:** the rewritten deployment runbook ([`designs/deployed/stationmaster/stationmaster-hub-deployment-runbook.md`](../../../designs/deployed/stationmaster/stationmaster-hub-deployment-runbook.md), Stage 2 item 2) carries the recurring procedures; this spec is the **one-shot formation operation**: upgrade the deployed hub to the current reference, revoke scratch registrations, and establish backup + disk-watch ownership.
 
 ---
 
