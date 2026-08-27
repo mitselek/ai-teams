@@ -138,6 +138,7 @@ The fourth row is the accepted at-least-once cost (SPEC-v3 D2), and dictates the
 
 - **POSIX:** `os.rename()` within one volume is atomic; `open(path, 'x')` is the exclusive-create.
 - **Windows:** rename onto an existing path fails instead of replacing -- which is exactly the semantics §4 step 3 wants; sharing violations on rename are routine, treat as retry-next-poll (§3.4).
+- **Reading the log (all platforms, bites on Windows):** the reference courier writes EVERY log line to **stderr** (`log()`), nothing to stdout. A launcher that redirects the two streams to separate files (the FR `start-fr-courier.ps1` does: stdout -> `fr-courier.log`, stderr -> `fr-courier.log.err`) therefore produces a `.log` that is **0 bytes by construction** and a `.err` that holds the actual log, INFO lines included. An empty `.log` beside a live pid is not a fault and not silence -- open the sibling. Two FR sessions (S64, S65) read the empty file as a defect before anyone opened `.err`. If you write a launcher: merge the streams, or name the files by content. (*FR:Brunel*)
 - **Git Bash `$HOME` gotcha:** resolves empty in some setups -- derive paths from `Path.home()` / `%USERPROFILE%`, not `$HOME` (startup.md gotcha #2).
 - **Poll interval:** 5-60 s [CONV]. End-to-end latency ≈ sender interval + receiver interval. The hub does not rate-limit polling in v1; be a good citizen.
 
