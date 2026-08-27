@@ -71,6 +71,8 @@ Injecting into a **live, contested** inbox. Blind overwrite can erase native ent
 2. **If an empty file exists, rename it aside first.** If it gained native entries in the race window, the rename captures them losslessly -- prepend them to your inject batch (ride-along delivery, T6.b).
 3. **Exclusive-create** (`open(..., O_CREAT|O_EXCL)` / `'x'` mode) the path with the batch. Atomic; cannot clobber a file the harness recreated in the gap (T6.a, 50/50 race rounds clean). On failure: harness got there first -- loop to 1 and merge.
 4. The loop terminates fast: harness writes per file are seconds-apart events; your window is sub-second.
+5. **Bounded wait -- `inject_patience_s` = 10 s [CONV] -- then refuse-and-retain.** If the target stays occupied (non-empty and not draining) for the whole patience window, give up *for this cycle*: log it, do **not** write, do **not** `ack` -- custody stays with the hub, which redelivers on the next `collect`. The reference courier implements the window as 50 rounds x 0.2 s in the occupied branch (`inject_batch`, `max_rounds`). A target that never drains is a real deployment state, not a bug: a solo session with no live harness drains nothing (protocols.md §1.3; #108 §5.4), and a team session drains late right after an inbox restore. The bound is what turns "stuck inside one cycle forever" into "retry every cycle, visibly." **Corollary for participant-side drainers** (a solo-session watcher that empties the inbox itself): its interval MUST be shorter than `inject_patience_s`, or every inject after the first exhausts the window. The two parameters are coupled; this line is where the coupling is named.
+   (*FR:Brunel*)
 
 A multi-entry batch delivers as separate messages, in batch order (T6.b). **Owed before production reliance:** T6.a's race harness was run on Windows; re-run on the deployment platform (SPEC-v3 D10 note).
 
@@ -95,10 +97,20 @@ loop every INTERVAL:
   for spool files oldest-first: deposit; delete spool entry on accepted/duplicate
   # inbound
   collect
+  age check: WARN if now - min(deposited_at) > stale threshold (§6a)
   for each entry: if id in ledger -> skip inject; else inject (D11) THEN ledger.append
   ack ALL collected ids (including the skipped ones -- a re-ack repays a lost ack)
   sleep
 ```
+
+### 6a. Stale-inbound age alarm [CONV: threshold 1 h]
+
+Refuse-and-retain (§4.5) is correct and lossless -- and that is exactly the problem: every failed inject becomes a transient, individually-recoverable log line, and the sum of them has no upper bound. Three apex consignments dated 2026-06-16 were delivered on 2026-08-19 and three more on 2026-08-26, each batch only after a courier restart; no rule was broken and nothing alarmed (n=6; [`wiki/gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md`](../../wiki/gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md)).
+
+The receiving courier is the only place the age is known: every consignment `collect` returns carries the hub's `deposited_at` (contract §4). `status.waiting_for_me` cannot substitute -- it is count-only; only the *sender-side* `deposited_uncollected` carries `oldest` (contract §5.6), so the sender can see the stall but the party whose courier is failing cannot.
+
+Rule: after every `collect`, compute `now - min(deposited_at)` over the returned consignments. If it exceeds the threshold, log **WARN** with the count and the oldest age -- once per cycle, not per message -- and repeat the check at startup (the restart is when the backlog surfaces). This is a detection arm only; it changes nothing about custody, ack order, or the ledger. A contract minor (`waiting_for_me[*].oldest`) would let a non-courier observer see the same signal; it is not required for this rule.
+(*FR:Brunel*)
 
 Crash anywhere; the design absorbs it:
 
@@ -131,4 +143,4 @@ The fourth row is the accepted at-least-once cost (SPEC-v3 D2), and dictates the
 
 ## 9. Reference implementation
 
-`stationmaster-courier.py` *(forthcoming)* -- single file, stdlib only, embodies every rule above. Run it as-is, or read it side-by-side with this document; section numbers appear as code comments.
+`stationmaster-courier.py` (this directory; landed S50) -- single file, stdlib only, embodies every rule above. Run it as-is, or read it side-by-side with this document; section numbers appear as code comments.

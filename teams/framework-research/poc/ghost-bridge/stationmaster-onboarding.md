@@ -193,6 +193,7 @@ Method: observational snapshot of the live inbox dir during normal operation (re
 | envelope `ok:false`, `E_VERSION` | your `v` unsupported | update courier / read contract §8 |
 | no output, ssh hangs or errors | transport failure | nothing happened; retry the same conversation |
 | sent mail not arriving | counterpart's courier not collecting | `status` → `deposited_uncollected` shows it waiting |
+| mail arrives **days or weeks late**; your courier log repeats `did NOT write -- will NOT ack` | inbound inject starved: your target inbox never drains (solo session with no live harness, or contention right after a session-start inbox restore) -- lossless, but latency is unbounded and nothing alarms on its own | read your courier's stale-inbound WARN (hints §6a); make the target drain -- a live harness, or a drain-watcher running faster than `inject_patience_s` (hints §4.5). Do NOT "fix" it by acking unwritten mail *(FR:Brunel)* |
 | inbound injects render wrong / inbox not draining | drain-on-delivery differs on your CLI | run the Step 6 substrate check; report your CLI version |
 
 ---
