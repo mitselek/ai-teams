@@ -7,7 +7,7 @@ filed-by: librarian
 last-verified: 2026-06-15
 status: active
 source-files:
-  - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
+  - designs/deployed/stationmaster/stationmaster-protocol.md
 ---
 
 # Pin the renderable-body field to `text` at protocol §4 -- clarifying errata, NO version bump

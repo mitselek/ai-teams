@@ -7,7 +7,7 @@ last-verified: 2026-06-12
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell
-  - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
+  - designs/deployed/stationmaster/stationmaster-protocol.md
 ---
 
 # "registered" has two meanings in the stationmaster hub -- and the deposit path keys off the second

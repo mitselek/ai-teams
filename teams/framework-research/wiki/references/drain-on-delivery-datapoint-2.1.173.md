@@ -9,7 +9,7 @@ last-verified: 2026-06-15
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/TRUTHS.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-onboarding.md
+  - designs/deployed/stationmaster/stationmaster-onboarding.md
 ttl: 2026-09-15
 ---
 

@@ -9,6 +9,7 @@ status: active
 confidence: high
 source-files:
   - teams/framework-research/wiki/decisions/two-islands-by-design-hub-topology-follows-network-boundary.md
+  - designs/deployed/stationmaster/fr-dual-homing-spec.md
   - teams/framework-research/poc/ghost-bridge/restart-fr-courier-with-pid.ps1
   - teams/framework-research/docs/2026-08-27-stationmaster-consolidation-proposal.md
 source-commits: []
@@ -55,7 +56,7 @@ Both halves of this pattern have their failure mode on file, which is what earns
 
 ## Confidence
 
-**High, as submitted** -- the discipline is design-ratified (decision + accepted spec) and both anti-instances are independently on file. The spec-acceptance details (15:33/15:36, §8 rulings) are recorded as submitted by the spec's author; the spec document itself had not yet landed in the tree at filing time -- when it lands, add it to `source-files`.
+**High, as submitted** -- the discipline is design-ratified (decision + accepted spec) and both anti-instances are independently on file. The spec-acceptance details (15:33/15:36, §8 rulings) are recorded as submitted by the spec's author. *(Update, same hour: the spec landed at `designs/deployed/stationmaster/fr-dual-homing-spec.md` in the 15:41 move batch -- byte-identical accepted v0.1 with the §8 rulings appended, per its own provenance line; verified present and added to `source-files`.)*
 
 ## Provenance
 

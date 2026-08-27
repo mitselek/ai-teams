@@ -8,7 +8,7 @@ last-verified: 2026-08-27
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster-courier.py
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
   - teams/framework-research/docs/2026-08-27-stationmaster-consolidation-proposal.md
 ---
 

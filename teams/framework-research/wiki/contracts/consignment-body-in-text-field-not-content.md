@@ -7,9 +7,9 @@ filed-by: librarian
 last-verified: 2026-06-15
 status: active
 source-files:
-  - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-onboarding.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-protocol.md
+  - designs/deployed/stationmaster/stationmaster-onboarding.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
 source-issues: []
 ---
 

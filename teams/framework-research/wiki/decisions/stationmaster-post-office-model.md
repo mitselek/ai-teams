@@ -7,15 +7,15 @@ filed-by: librarian
 last-verified: 2026-08-27
 status: active
 source-files:
-  - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-onboarding.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-protocol.md
+  - designs/deployed/stationmaster/stationmaster-onboarding.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
   - teams/framework-research/poc/ghost-bridge/SPEC-v3.md
 ---
 
 # Stationmaster: the post-office model for inter-team mail
 
-**Pointer entry, not a copy.** The authoritative contract is [`poc/ghost-bridge/stationmaster-protocol.md`](../../poc/ghost-bridge/stationmaster-protocol.md) v1.0.0 (RATIFIED S49, PO read section-by-section 2026-06-12). This entry records *what was chosen and why, including the rejected alternatives* -- the decision rationale that the contract states but does not argue. Read the protocol for the wire shape; read this for why it is shaped that way.
+**Pointer entry, not a copy.** The authoritative contract is [`designs/deployed/stationmaster/stationmaster-protocol.md`](../../../../designs/deployed/stationmaster/stationmaster-protocol.md) v1.0.0 (RATIFIED S49; canonical home since 2026-08-27, contract erratum E4 §11 -- forwarding stub at the old `poc/ghost-bridge/` path through >=2026-09-27, PO read section-by-section 2026-06-12). This entry records *what was chosen and why, including the rejected alternatives* -- the decision rationale that the contract states but does not argue. Read the protocol for the wire shape; read this for why it is shaped that way.
 
 *Stage-2 confirmed 2026-06-12 (Aen read-back): five sub-decisions + six rejected alternatives verified faithful to the S49 record; one correction folded -- onboarding doc status ACCEPTED not DRAFT (commit `87ef7d4`); reference courier landed S50.*
 
@@ -50,6 +50,10 @@ The courier is a **customer-side pattern, not a product**: it does the local fil
 - This supersedes the ghost-bridge v2 daemon (kept alive until cutover, then decommissioned). **Why v2 was failing** (the motivating defect): v2 forwarded by flipping the `read` flag without deleting, so each daemon restart (it crashed/restarted repeatedly -- no supervisor) re-scanned and re-forwarded the outbox, multiply-delivering. This design's **delete-on-ack** (sub-decision 1) + the **courier delivered-ledger** (id-keyed dedup) are the direct antidote. Full incident + provenance: [`gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md`](../gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md).
 
 ## Amendments
+
+### 2026-08-27 -- canonical home move (contract erratum E4 §11)
+
+The convention package (contract + onboarding + courier-hints + runbook + README + dual-homing spec) moved to **`designs/deployed/stationmaster/`** per #108 §7. `MOVED` stubs stand at the four old paths through >=2026-09-27, removed only on a zero-inbound repo-wide grep -- executed per [`../patterns/relocation-manufactures-inbound-pointer-drift-leave-forwarding-stub.md`](../patterns/relocation-manufactures-inbound-pointer-drift-leave-forwarding-stub.md). Code, `TRUTHS.md`, and `SPEC-v3.md` remain in `poc/ghost-bridge/`. This entry's pointer and `source-files` repointed the same day.
 
 ### 2026-08-27 -- rejected alternative 4 ("Mail over MCP") superseded for the outbound leg (Herald, Protocol A; #108 amendment A5)
 

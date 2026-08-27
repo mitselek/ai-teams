@@ -7,7 +7,7 @@ last-verified: 2026-06-15
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster-courier.py
-  - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
+  - designs/deployed/stationmaster/stationmaster-protocol.md
   - teams/framework-research/memory/herald.md
 ---
 

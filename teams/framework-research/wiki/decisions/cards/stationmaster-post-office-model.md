@@ -13,7 +13,7 @@ tags: [decision, inter-team-comms, stationmaster, post-office, ghost-bridge, pro
 
 ## TLDR
 
-Pointer to `poc/ghost-bridge/stationmaster-protocol.md` v1.0.0 (RATIFIED S49). Inter-team mail moves through a central hub on a post-office model: customers dial OUT (outbound ssh only); hub holds NO credentials, only registered pubkeys; never initiates connections. Records the rationale + rejected alternatives the contract states but doesn't argue.
+Pointer to `designs/deployed/stationmaster/stationmaster-protocol.md` v1.0.0 (RATIFIED S49; canonical home since 2026-08-27, E4 §11 -- stub at the old `poc/ghost-bridge/` path through >=2026-09-27). Inter-team mail moves through a central hub on a post-office model: customers dial OUT (outbound ssh only); hub holds NO credentials, only registered pubkeys; never initiates connections. Records the rationale + rejected alternatives the contract states but doesn't argue.
 
 ## Key ideas (five named sub-decisions)
 

@@ -9,8 +9,8 @@ last-verified: 2026-08-27
 status: active
 confidence: medium
 source-files:
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-onboarding.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-onboarding.md
   - teams/framework-research/startup.md
   - teams/framework-research/memory/team-lead.md
 source-commits:

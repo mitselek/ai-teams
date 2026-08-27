@@ -9,9 +9,9 @@ status: active
 confidence: medium
 source-files:
   - teams/framework-research/docs/2026-08-27-stationmaster-consolidation-proposal.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-onboarding.md
+  - designs/deployed/stationmaster/stationmaster-protocol.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-onboarding.md
 source-commits: []
 source-issues:
   - 108
@@ -56,6 +56,12 @@ The mechanism is [`../gotchas/citation-orphaning-by-housekeeping-sweep.md`](../g
 - [`stale-snapshot-trusted-as-current.md`](stale-snapshot-trusted-as-current.md) instance 3 (*IDs stable, paths not*) and instance 8 (#108 §6 "London-time") are the **symptom** this pattern's move is meant to cure -- and the symptom it re-creates if done without the stub. This entry is the remedy-side rule; that entry is the genus.
 - [`../gotchas/frontmatter-reference-field-without-enforced-resolution-base.md`](../gotchas/frontmatter-reference-field-without-enforced-resolution-base.md) -- the wiki's own `source-files:` fields are among the inbound pointers; their resolution base is unenforced, so a move breaks them silently rather than loudly.
 - [`../references/model-inventory-baseline.md`](../references/model-inventory-baseline.md) -- the in-scope move that needed no stub; the control case for the discriminating claim.
+
+## The move executed (2026-08-27 15:41 -- this pattern applied to its own measured case)
+
+Brunel's move batch relocated the convention package (the three docs + runbook + README + dual-homing spec) to **`designs/deployed/stationmaster/`**, following this entry's rule: **(1)** the inventory above was the pre-move step; **(2)** 3-line `MOVED` stubs stand at all four old paths, each carrying the retirement condition verbatim (*"Stub kept through at least 2026-09-27; remove when a repo-wide grep shows zero inbound references"*); **(3)** the wiki's own citers were repointed by the librarian in the same pass -- **29 path references across 16 wiki files** (25 `source-files:`/prose full paths plus 4 link/pointer citations; 13 bare-name or historical mentions deliberately left as written; one repointed citation's line number had also drifted with the same day's edits -- hints spool rule `:54` -> `:64`, re-verified); **(4)** stub retirement awaits the zero-inbound grep. Durable record of the move: contract erratum **E4 (§11)**. Out-of-repo and non-wiki citers are the movers' scope, not this pass's.
+
+**Confidence consequence: still medium.** The path-to-high condition is *stub used AND retired on a zero-inbound grep*; the first half happened today, the second is a >=2026-09-27 event. Do not promote on the move alone.
 
 ## Confidence
 

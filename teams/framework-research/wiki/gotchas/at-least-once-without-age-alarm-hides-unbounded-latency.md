@@ -10,7 +10,7 @@ status: active
 source-files:
   - teams/framework-research/startup.md
   - teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
 source-commits: []
 source-issues: []
 related:

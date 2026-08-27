@@ -7,7 +7,7 @@ last-verified: 2026-06-12
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell
-  - teams/framework-research/docs/stationmaster-hub-deployment-runbook.md
+  - designs/deployed/stationmaster/stationmaster-hub-deployment-runbook.md
 ---
 
 # Per-connection forced-command shell beats a resident daemon for hub-style services
@@ -47,7 +47,7 @@ The coarse-lock simplification holds **only because the hub's spool is exclusive
 
 ## Evidence
 
-- Catalyzing artifact: `teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell` + `teams/framework-research/docs/stationmaster-hub-deployment-runbook.md` §1, §6 (S50, 2026-06-12).
+- Catalyzing artifact: `teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell` + `designs/deployed/stationmaster/stationmaster-hub-deployment-runbook.md` §1, §6 (S50, 2026-06-12).
 - Negative instance (the failure this counters): S48 ghost-bridge daemon -- 11 accumulated instances, N× duplicate forwarding, liveness-probe blindness on Git-Bash.
 - Confidence: medium-high. n=1 concrete positive instance (sm-shell), but the structural argument (state-on-disk + transport-supervised single process = accumulation-impossible-by-construction) is independent of the sample. **2026-06-12: sm-shell now BUILD-VERIFIED on the Debian substrate (Hopper prod-llm build, exit 0, S50) -- the catalyzing artifact is deploy-validated, not just design-grade.** Confidence held at medium-high (build-verification strengthens the instance; an n=2 distinct positive instance is what would bump to high).
 

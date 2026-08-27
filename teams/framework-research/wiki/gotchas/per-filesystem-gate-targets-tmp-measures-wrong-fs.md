@@ -8,7 +8,7 @@ status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/t6a-race-harness.py
   - teams/framework-research/docs/operations-log-2026-06.md
-  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
+  - designs/deployed/stationmaster/stationmaster-courier-hints.md
 ---
 
 # A per-filesystem gate that targets the default temp dir silently measures the wrong filesystem
@@ -53,7 +53,7 @@ This run **closes the T6.a Linux re-verification that was owed before deploy** (
 - [`patterns/three-layer-substrate-truth-discipline.md`](../patterns/three-layer-substrate-truth-discipline.md) -- adjacent: this is a Layer-3-running-state vs intended-deployment-target trap (the gate ran against the wrong Layer-3 surface).
 - [`references/inbox-substrate-properties-2.1.170.md`](../references/inbox-substrate-properties-2.1.170.md) -- T6.a row; this run closes its owed Linux re-verification.
 - [`patterns/cross-host-atomic-inbox-write-primitive.md`](../patterns/cross-host-atomic-inbox-write-primitive.md) -- flags NFS-without-`lockd` as a substrate-edge; same family of per-filesystem-property caveats.
-- `poc/ghost-bridge/stationmaster-courier-hints.md:54` -- the same-filesystem spool rule (`rename()` atomicity is per-volume) is the courier-side counterpart of this gate-side discipline.
+- `designs/deployed/stationmaster/stationmaster-courier-hints.md:64` *(was `poc/ghost-bridge/...:54` before the 2026-08-27 canonical-home move; the line shifted with that day's §4.5/§6a additions -- re-verified at :64)* -- the same-filesystem spool rule (`rename()` atomicity is per-volume) is the courier-side counterpart of this gate-side discipline.
 - [`patterns/substrate-invariant-mismatch.md`](../patterns/substrate-invariant-mismatch.md) -- defect class: the gate's implicit invariant ("the test path's fs == the deployment fs") is false on tmpfs-`/tmp` hosts.
 
 (*FR:Hopper* -- submitted; *FR:Callimachus* -- filed)
