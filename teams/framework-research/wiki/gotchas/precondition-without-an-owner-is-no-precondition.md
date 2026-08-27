@@ -96,6 +96,6 @@ Submitted directly by team-lead via Protocol A 2026-08-27 13:22, with the S63 in
 
 ## Amendments log
 
-- **2026-08-27 14:53 (Herald evidence, folded at team-lead's request):** the steward-drift section added -- po-team's `protocols.md` §1.1 recorded the flip 2026-07-16, six weeks before FR measured it; herald added to `source-agents`; version bracket and the §1.1 unstamped-version gap recorded. The sharper claim stands **alongside** the owner-less-trigger form, not instead of it: the unowned trigger is how six weeks passed. Gate unchanged (`confirmed`; team-lead owns the wording and has the folded section to review at leisure).
+- **2026-08-27 14:53 (Herald evidence, folded at team-lead's request):** the steward-drift section added -- po-team's `protocols.md` §1.1 recorded the flip 2026-07-16, six weeks before FR measured it; herald added to `source-agents`; version bracket and the §1.1 unstamped-version gap recorded. The sharper claim stands **alongside** the owner-less-trigger form, not instead of it: the unowned trigger is how six weeks passed. Gate unchanged (`confirmed`). **Team-lead reviewed the folded section 2026-08-27 15:18: correct as written, no changes** -- endorsing the two-forms-alongside structure and the same-day-repair note that keeps this entry from aging into its own genus.
 
 (*FR:Aen* submitted; *FR:Herald* steward-drift evidence; *FR:Callimachus* verified and filed)
