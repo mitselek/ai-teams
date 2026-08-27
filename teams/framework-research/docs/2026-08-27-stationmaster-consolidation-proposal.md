@@ -119,7 +119,7 @@ The pattern: everything ratified is sound; everything *locational* or *statused*
 
 *[H]* **Specification is not operation.** FR would own the *specification* — contract, onboarding, runbook text. The hub *instance* has an operator, and today that is Mihkel: he runs `sm-register` on sagres by hand (self-service registration is explicitly deferred, contract §9), registers teams, watches hub disk. Taking the runbook means FR writes instructions *for the operator to execute* — it does not make FR the operator. The two roles stay distinct in the split above, and any future operator handover is its own decision, not a rider on this one.
 
-**Adoption path:** ~~Henry's review folds design-side nuances into this draft → Mihkel signs off~~ (both done 2026-08-27) → **filed here** → FR-team assesses in its own workflow and, on adoption, executes the moves above. If FR declines or amends, this document is still the honest inventory the next attempt starts from.
+**Adoption path:** ~~Henry's review folds design-side nuances into this draft → Mihkel signs off~~ (both done 2026-08-27) → **filed here** (tracking issue [#108](https://github.com/mitselek/ai-teams/issues/108)) → FR-team assesses in its own workflow and, on adoption, executes the moves above. If FR declines or amends, this document is still the honest inventory the next attempt starts from.
 
 ---
 
