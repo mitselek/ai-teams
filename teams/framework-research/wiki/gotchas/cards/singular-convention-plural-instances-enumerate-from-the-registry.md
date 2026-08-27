@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-08-27
 last-verified: 2026-08-27
 stage-2: confirmed
-related: [../decisions/stationmaster-post-office-model.md, at-least-once-without-age-alarm-hides-unbounded-latency.md, file-state-claims-have-no-layer-dimension.md, negative-probe-result-underdetermined-absence-read-as-permanent.md, ../patterns/stale-snapshot-trusted-as-current.md]
+related: [../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md, ../decisions/stationmaster-post-office-model.md, at-least-once-without-age-alarm-hides-unbounded-latency.md, file-state-claims-have-no-layer-dimension.md, negative-probe-result-underdetermined-absence-read-as-permanent.md, ../patterns/stale-snapshot-trusted-as-current.md]
 tags: [gotcha, stationmaster, hub, multi-instance, partition, registry, no-slot, singular, gh-108, cross-team, e-unknown-team]
 ---
 
@@ -23,7 +23,7 @@ tags: [gotcha, stationmaster, hub, multi-instance, partition, registry, no-slot,
 - **Falsifier = one read-only call**: `printf '{"v":1,"cmd":"registry"}' | ssh -T -i <key> -p 2222 sm@<hub>`. Team absent from the list => different network, not a misspelling.
 - **Rule**: before adopting or documenting "the" shared service, **enumerate instances from the service's own registry, not from the docs of the instance you use** -- ask every hub you know of; treat expected-but-absent as a partition.
 - **Corollary**: `E_UNKNOWN_TEAM` is a negative result underdetermined between "no such team" and "not on this hub" -- `negative-probe-result-underdetermined...` as a hazard.
-- **#108 consequence**: §3 needs the second hub; consolidation needs a one-network-or-two decision the proposal lacks (migrate, add the declined relay, or two honestly-named networks). Filed as amendment A1, gated to the PO.
+- **#108 consequence -- RESOLVED same day (PO)**: **two networks with an honest name, by design** -- `decisions/two-islands-by-design-hub-topology-follows-network-boundary` (EVR declines tailnet; topology follows the network boundary; no federation; git repo = the inter-island bridge). This gotcha's rule survives unchanged: the plurality is legitimate, and documents still must say WHICH island's hub.
 - **Confidence high** as submitted; registry/status output quoted as returned (ephemeral), file evidence re-verified.
 - **stage-2 confirmed** -- author-is-filer (Herald's direct submission).
 

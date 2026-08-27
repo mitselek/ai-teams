@@ -26,6 +26,7 @@ related:
   - ../references/teams-substrate-2.1.179-implicit-teams.md
   - ../decisions/courier-must-runtime-discover-team-name.md
   - session-wake-on-inbox-write-two-unstamped-claims-contradict.md
+  - ../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md
 ---
 
 # A Precondition With No Owner Is Indistinguishable From No Precondition -- Writing the Trigger Is Not Owning It

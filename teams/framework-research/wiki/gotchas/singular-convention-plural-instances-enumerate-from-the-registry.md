@@ -22,6 +22,7 @@ related:
   - file-state-claims-have-no-layer-dimension.md
   - negative-probe-result-underdetermined-absence-read-as-permanent.md
   - ../patterns/stale-snapshot-trusted-as-current.md
+  - ../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md
 ---
 
 # A Convention Described in the Singular Can Have N Deployed Instances -- and Every Per-Instance Document Reads True
@@ -65,6 +66,8 @@ Corollary for error reading: `E_UNKNOWN_TEAM` is a **negative result underdeterm
 ## Consequence for #108
 
 The proposal's §3 needs the second hub, and the consolidation needs a decision it does not yet contain: one network (migrate one hub's teams onto the other, or add the relay the S49 card declined) or two networks with an honest name. Reported to team-lead as #108 amendment **A1** (Herald, 13:26) and gated to the PO.
+
+**RESOLVED same day (PO, #108 `issuecomment-5439161208`): two networks with an honest name -- by design.** EVR declines tailnet, so the hub topology follows the network boundary; no federation, S49 no-relay unopened; **the git repo is the inter-island bridge.** Full record: [`../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md`](../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md). This gotcha's rule (enumerate instances from the registry; name which hub) survives the resolution unchanged -- the plurality is now legitimate, and documents still must say which island they mean.
 
 ## Confidence
 
