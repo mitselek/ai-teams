@@ -1,0 +1,799 @@
+<title>RC Docker Root Relocation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #F2F4F6;
+    --bg-raised: #FFFFFF;
+    --bg-code: #E7EBEF;
+    --bg-code-out: #EEF1F4;
+    --ink: #1A2028;
+    --ink-2: #4A5563;
+    --ink-3: #75808C;
+    --rule: #D3D9DF;
+    --accent: #1E6A85;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #D9E9F0;
+    --ok: #2D7A4E;
+    --ok-soft: #DDF0E4;
+    --stop: #B12A22;
+    --stop-soft: #F8DEDB;
+    --stop-ink: #FFFFFF;
+    --warn: #9A6700;
+    --warn-soft: #FBEFD0;
+    --gauge-track: #DDE2E7;
+    --shadow: 0 1px 2px rgba(20,30,40,.06), 0 6px 20px rgba(20,30,40,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171C;
+      --bg-raised: #1A2027;
+      --bg-code: #0E1216;
+      --bg-code-out: #161C22;
+      --ink: #E4E9EE;
+      --ink-2: #A7B1BC;
+      --ink-3: #7B8692;
+      --rule: #2B343D;
+      --accent: #5DB2CD;
+      --accent-ink: #0B1620;
+      --accent-soft: #163241;
+      --ok: #5CC489;
+      --ok-soft: #14301F;
+      --stop: #F0857B;
+      --stop-soft: #3A1815;
+      --stop-ink: #1A0A08;
+      --warn: #E3B341;
+      --warn-soft: #3A2E12;
+      --gauge-track: #2A333C;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171C;
+    --bg-raised: #1A2027;
+    --bg-code: #0E1216;
+    --bg-code-out: #161C22;
+    --ink: #E4E9EE;
+    --ink-2: #A7B1BC;
+    --ink-3: #7B8692;
+    --rule: #2B343D;
+    --accent: #5DB2CD;
+    --accent-ink: #0B1620;
+    --accent-soft: #163241;
+    --ok: #5CC489;
+    --ok-soft: #14301F;
+    --stop: #F0857B;
+    --stop-soft: #3A1815;
+    --stop-ink: #1A0A08;
+    --warn: #E3B341;
+    --warn-soft: #3A2E12;
+    --gauge-track: #2A333C;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+    font-size: 16.5px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px;
+  }
+  code, pre, kbd { font-family: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  code { font-size: .88em; background: var(--bg-code); padding: .08em .35em; border-radius: 3px; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  strong { font-weight: 700; }
+
+  h1, h2, h3, h4 {
+    font-family: "Archivo", "Segoe UI", system-ui, sans-serif;
+    text-wrap: balance;
+    line-height: 1.15;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+  h1 { font-size: clamp(1.9rem, 3.4vw, 2.6rem); font-weight: 700; }
+  h2 { font-size: 1.55rem; font-weight: 700; }
+  h3 { font-size: 1.15rem; font-weight: 600; }
+  h4 { font-size: 1rem; font-weight: 600; }
+
+  .eyebrow {
+    font-family: "Archivo", sans-serif;
+    font-size: .72rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+  @media (min-width: 980px) {
+    .shell { grid-template-columns: 220px minmax(0, 1fr); gap: 48px; }
+  }
+
+  nav.toc {
+    display: none;
+  }
+  @media (min-width: 980px) {
+    nav.toc {
+      display: block;
+      position: sticky; top: 28px; align-self: start;
+      padding-top: 44px;
+      font-size: .86rem;
+    }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+    nav.toc a {
+      display: block; padding: 5px 10px; color: var(--ink-2); text-decoration: none;
+      border-left: 2px solid var(--rule); border-radius: 0 3px 3px 0;
+    }
+    nav.toc a:hover { color: var(--ink); background: var(--bg-raised); }
+    nav.toc a.sub { padding-left: 22px; font-size: .8rem; }
+    nav.toc a.stop { color: var(--stop); }
+    nav.toc .eyebrow { padding: 0 10px 8px; }
+  }
+
+  main { min-width: 0; }
+
+  header.hero {
+    padding: 44px 0 28px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero .meta {
+    display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px;
+    font-size: .86rem; color: var(--ink-2);
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-raised); border: 1px solid var(--rule);
+    padding: 3px 10px; border-radius: 999px; font-size: .82rem;
+  }
+  .chip code { background: none; padding: 0; }
+  .hero .lede { max-width: 66ch; margin-top: 18px; color: var(--ink-2); font-size: 1.05rem; }
+
+  .gauges {
+    display: grid; gap: 14px; margin-top: 26px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) { .gauges { grid-template-columns: 1fr 1fr; } }
+  .gauge {
+    background: var(--bg-raised); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 14px 16px 16px; box-shadow: var(--shadow);
+  }
+  .gauge .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .gauge .name { font-family: "Archivo", sans-serif; font-weight: 600; }
+  .gauge .pct { font-family: "Archivo", sans-serif; font-weight: 700; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .gauge .pct.bad { color: var(--stop); }
+  .gauge .pct.good { color: var(--ok); }
+  .gauge .track { height: 10px; background: var(--gauge-track); border-radius: 5px; margin: 10px 0 8px; overflow: hidden; }
+  .gauge .fill { height: 100%; border-radius: 5px; background: var(--accent); }
+  .gauge .fill.bad { background: var(--stop); }
+  .gauge .fill.good { background: var(--ok); }
+  .gauge .fill.after { background: var(--accent); opacity: .5; }
+  .gauge .sub { display: flex; justify-content: space-between; font-size: .82rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  section { padding-top: 44px; }
+  section > h2 { padding-bottom: 10px; border-bottom: 1px solid var(--rule); margin-bottom: 22px; }
+  .sec-label { display: flex; align-items: baseline; gap: 12px; }
+  .sec-label .num {
+    font-family: "Archivo", sans-serif; font-weight: 700; color: var(--accent);
+    font-size: 1.1rem; font-variant-numeric: tabular-nums;
+  }
+  p { margin: 0 0 14px; max-width: 72ch; }
+  ul, ol { margin: 0 0 14px; padding-left: 1.3em; max-width: 72ch; }
+  li { margin-bottom: 6px; }
+  li > ul { margin-top: 6px; }
+  h3 { margin: 30px 0 12px; }
+  h4 { margin: 20px 0 8px; }
+
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 14px 18px; border-radius: 0 6px 6px 0;
+    margin: 18px 0 20px; max-width: 78ch;
+  }
+  .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+  .callout .eyebrow { color: var(--accent); margin-bottom: 4px; display: block; }
+  .callout.catch { border-color: var(--warn); background: var(--warn-soft); }
+  .callout.catch .eyebrow { color: var(--warn); }
+
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; font-variant-numeric: tabular-nums; }
+  .tbl-wrap { overflow-x: auto; margin: 0 0 18px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg-raised); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: "Archivo", sans-serif; font-weight: 600; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); background: var(--bg); }
+  tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; }
+  td .bad { color: var(--stop); font-weight: 700; }
+  td .good { color: var(--ok); font-weight: 700; }
+
+  /* Steps */
+  .step {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 14px;
+    margin: 22px 0; position: relative;
+  }
+  .step .n {
+    font-family: "Archivo", sans-serif; font-weight: 700; font-size: .95rem;
+    color: var(--accent-ink); background: var(--accent);
+    width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; margin-top: 1px;
+    font-variant-numeric: tabular-nums;
+  }
+  .step .body { min-width: 0; }
+  .step .body > h4 { margin: 3px 0 10px; }
+  .step p { margin-bottom: 10px; }
+
+  .cmd { position: relative; margin: 10px 0; }
+  .cmd pre {
+    margin: 0; background: var(--bg-code); border: 1px solid var(--rule);
+    border-radius: 6px; padding: 12px 52px 12px 14px;
+    font-size: .86rem; line-height: 1.55; overflow-x: auto;
+    color: var(--ink);
+  }
+  .cmd pre .c { color: var(--ink-3); }
+  .cmd .copy {
+    position: absolute; top: 8px; right: 8px;
+    font-family: "Archivo", sans-serif; font-size: .72rem; font-weight: 600; letter-spacing: .04em;
+    background: var(--bg-raised); color: var(--ink-2); border: 1px solid var(--rule);
+    padding: 4px 9px; border-radius: 4px; cursor: pointer;
+  }
+  .cmd .copy:hover { color: var(--ink); border-color: var(--ink-3); }
+  .cmd .copy.done { color: var(--ok); border-color: var(--ok); }
+
+  .out {
+    margin: 8px 0 12px; padding: 10px 14px; border-radius: 6px;
+    font-size: .92rem; max-width: 78ch;
+    border-left: 3px solid var(--ok); background: var(--ok-soft);
+  }
+  .out .lbl { font-family: "Archivo", sans-serif; font-weight: 600; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ok); margin-right: 8px; }
+  .out.stop { border-left-color: var(--stop); background: var(--stop-soft); }
+  .out.stop .lbl { color: var(--stop); }
+  .out.note { border-left-color: var(--ink-3); background: var(--bg-raised); }
+  .out.note .lbl { color: var(--ink-3); }
+  .out p:last-child { margin: 0; }
+  .out pre { margin: 6px 0 0; font-size: .82rem; background: var(--bg-code-out); padding: 8px 10px; border-radius: 4px; overflow-x: auto; }
+
+  .barrier {
+    margin: 34px 0 26px; padding: 16px 20px; border-radius: 8px;
+    background: var(--stop); color: var(--stop-ink);
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center;
+  }
+  .barrier .mark { font-family: "Archivo", sans-serif; font-weight: 700; font-size: 1.5rem; line-height: 1; }
+  .barrier h4 { color: inherit; margin: 0 0 3px; }
+  .barrier p { color: inherit; margin: 0; opacity: .92; }
+  .barrier.soft { background: var(--warn-soft); color: var(--ink); border: 1px solid var(--warn); }
+  .barrier.soft .mark { color: var(--warn); }
+  .barrier.soft p { opacity: 1; color: var(--ink-2); }
+
+  .checklist { list-style: none; padding: 0; margin: 12px 0 0; max-width: 78ch; }
+  .checklist li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; margin-bottom: 10px; }
+  .checklist input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); }
+  .checklist label { cursor: pointer; }
+  .checklist li.done label { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+
+  .cols { display: grid; gap: 18px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .cols { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--bg-raised); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .card h4 { margin: 0 0 8px; }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+  .card ul { padding-left: 1.1em; }
+
+  details { border: 1px solid var(--rule); border-radius: 6px; background: var(--bg-raised); margin: 12px 0; }
+  summary { cursor: pointer; padding: 10px 14px; font-family: "Archivo", sans-serif; font-weight: 600; font-size: .95rem; }
+  details > div { padding: 0 14px 14px; }
+  details pre { background: var(--bg-code); border-radius: 5px; padding: 10px 12px; font-size: .8rem; overflow-x: auto; margin: 8px 0; }
+
+  footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: .85rem; color: var(--ink-3); max-width: 78ch; }
+  footer p { margin-bottom: 6px; }
+  .small { font-size: .88rem; color: var(--ink-2); }
+</style>
+
+<div class="shell">
+<nav class="toc" aria-label="Sections">
+  <span class="eyebrow">Contents</span>
+  <ol>
+    <li><a href="#situation">1 · Current situation</a></li>
+    <li><a href="#catch" class="sub">The catch: two daemons</a></li>
+    <li><a href="#outcome">2 · Desired outcome</a></li>
+    <li><a href="#runbook">3 · Runbook</a></li>
+    <li><a href="#why" class="sub">3.1 Why two limbs</a></li>
+    <li><a href="#migrate" class="sub">3.3 Migration</a></li>
+    <li><a href="#verify" class="sub">3.5 Verification</a></li>
+    <li><a href="#gate" class="sub stop">3.6 Delete gate</a></li>
+    <li><a href="#rollback" class="sub">3.7 Rollback</a></li>
+    <li><a href="#impact" class="sub">3.8 Team impact</a></li>
+    <li><a href="#appendix">Appendix · evidence</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <span class="eyebrow">Runbook · manual execution with root</span>
+  <h1 style="margin-top:8px">Move Docker and containerd storage off root onto <code style="font-size:.8em">/home</code></h1>
+  <div class="meta">
+    <span class="chip">host <code>paarisprogemis-fyysiline</code></span>
+    <span class="chip"><code>dev@100.96.54.170</code></span>
+    <span class="chip">Debian 13 · Docker 29.3.0 · containerd 2.2.2</span>
+    <span class="chip">surveyed 2026-08-26, read-only</span>
+  </div>
+  <p class="lede">Root is at 93% with under 4 GB left. Docker and containerd storage is <strong>43 GB</strong> of the 52 GB on it — measured, not estimated. This page records what was measured, what "done" looks like, and the exact sequence to type — with what you should see after each step, and where to stop if you don't see it.</p>
+
+  <div class="gauges" aria-label="Disk usage">
+    <div class="gauge">
+      <div class="row"><span class="name"><code>/</code> — vg-root</span><span class="pct bad">93%</span></div>
+      <div class="track"><div class="fill bad" style="width:93%"></div></div>
+      <div class="sub"><span>52G used of 58G</span><span>3.9G free</span></div>
+      <div class="track" style="margin-top:6px"><div class="fill after" style="width:15.5%"></div></div>
+      <div class="sub"><span>after move: ~9G used</span><span>≈ 15% · measured 16:52</span></div>
+    </div>
+    <div class="gauge">
+      <div class="row"><span class="name"><code>/home</code> — vg-home</span><span class="pct good">21%</span></div>
+      <div class="track"><div class="fill good" style="width:21%"></div></div>
+      <div class="sub"><span>79G used of 393G</span><span>295G free</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 1. SITUATION ============ -->
+<section id="situation">
+  <h2><span class="sec-label"><span class="num">1</span> Current situation — measured, not assumed</span></h2>
+
+  <h3>Disk layout</h3>
+  <p>Single NVMe disk, LVM on top. Two logical volumes matter, both ext4:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Mount</th><th>Logical volume</th><th>Size</th><th>Used</th><th>Avail</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>/</code></td><td><code>paarisprogemis--fyysiline--vg-root</code></td><td class="num">58G</td><td class="num">52G</td><td class="num"><span class="bad">3.9G</span></td><td class="num"><span class="bad">93%</span></td></tr>
+      <tr><td><code>/home</code></td><td><code>paarisprogemis--fyysiline--vg-home</code></td><td class="num">393G</td><td class="num">79G</td><td class="num"><span class="good">295G</span></td><td class="num">21%</td></tr>
+    </tbody>
+  </table></div>
+  <p><code>/var/lib/docker</code> is a plain directory on the root LV — not a separate mount, not a symlink, no bind-mount tricks in <code>/etc/fstab</code>. <code>findmnt</code> shows exactly two real mount points, <code>/</code> and <code>/home</code>.</p>
+
+  <h3>Docker configuration</h3>
+  <ul>
+    <li><strong>Storage driver:</strong> <code>overlayfs</code> via the containerd snapshotter (<code>io.containerd.snapshotter.v1</code>) — not the classic <code>overlay2</code> graphdriver. This turns out to matter a great deal; see the catch below.</li>
+    <li><strong>Docker Root Dir:</strong> <code>/var/lib/docker</code> — no <code>data-root</code> override set. <code>/etc/docker/daemon.json</code> does not exist. No <code>docker.service.d/</code> drop-ins.</li>
+    <li><strong>Live Restore:</strong> disabled. Stopping <code>docker.service</code> stops every running container.</li>
+  </ul>
+  <p>A clean, unmodified default install. Nothing has been relocated before.</p>
+
+  <div class="callout catch" id="catch">
+    <span class="eyebrow">The catch — found in review, would have silently defeated the plan</span>
+    <p><strong>containerd is a separate daemon with its own storage root, and that is where most of the bytes live.</strong> On this host containerd is the system <code>containerd.io</code> package running as its own enabled systemd unit (PID 1367, up 3 weeks, one <code>containerd-shim-runc-v2</code> per container). <code>docker.service</code> is merely a client of it (<code>Wants=</code>/<code>After=containerd.service</code>). Its config, <code>/etc/containerd/config.toml</code>, has <code>#root = "/var/lib/containerd"</code> commented out, so it runs on that default.</p>
+    <p>With the snapshotter driver, <strong>image layers and container writable layers belong to containerd</strong>, under <code>/var/lib/containerd</code> — a measured <strong>21 G</strong> of the 43 G total (the other 22 G is Docker's own tree, fattened by container logs). Docker's own <code>data-root</code> holds volumes, network config and metadata.</p>
+    <p>So the obvious fix — set <code>data-root</code> in <code>daemon.json</code>, move <code>/var/lib/docker</code> — would <em>complete cleanly, pass every Docker-level check, show the new path in <code>docker info</code></em>, and leave root at roughly 55%. Asking a daemon where its root is confirms the configuration, not the disk. <strong>The plan therefore has two limbs, and the primary success check is <code>df -hT /</code>, not anything Docker reports about itself.</strong></p>
+  </div>
+
+  <h3>Docker's footprint</h3>
+  <p><code>du</code> on either directory needs root, and the survey connection had no TTY for <code>sudo</code>. Docker's own accounting (<code>docker system df</code>) was the initial proxy; the measured figures below supersede it.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Category</th><th>Count</th><th>Size</th><th>Which daemon owns it</th></tr></thead>
+    <tbody>
+      <tr><td>Images</td><td class="num">15</td><td class="num">21.87 GB</td><td>containerd (snapshotter)</td></tr>
+      <tr><td>Containers, writable layers</td><td class="num">9</td><td class="num">7.44 GB</td><td>containerd (snapshotter)</td></tr>
+      <tr><td>Local volumes</td><td class="num">15</td><td class="num">7.77 GB</td><td>Docker <code>data-root</code></td></tr>
+      <tr><td>Build cache</td><td class="num">48</td><td class="num">3.62 GB</td><td>uncertain — either</td></tr>
+      <tr><td><strong>Proxy total</strong></td><td></td><td class="num"><strong>≈ 40.7 GB</strong></td><td>Docker's own accounting — superseded below</td></tr>
+      <tr><td><strong>Measured <code>du</code> — <code>/var/lib/docker</code></strong></td><td></td><td class="num"><strong>22 G</strong></td><td>Docker <code>data-root</code> · 16:52, via the pre-flight grant</td></tr>
+      <tr><td><strong>Measured <code>du</code> — <code>/var/lib/containerd</code></strong></td><td></td><td class="num"><strong>21 G</strong></td><td>containerd root</td></tr>
+      <tr><td><strong>Measured total</strong></td><td></td><td class="num"><strong>43 G</strong></td><td>of 52 G used on root; the 9 G residual is the OS</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><strong>Why the measured total exceeds Docker's own figure:</strong> <code>docker system df</code> never counts container JSON logs (<code>/var/lib/docker/containers/&lt;id&gt;/*.log</code>). Eight containers up three-plus weeks, several running verbose sessions, plausibly explain why <code>/var/lib/docker</code> is 22 G rather than the ~11 G that volumes + build cache would predict. Unconfirmed — the per-subdirectory <code>du</code> was blocked (next paragraph). The docker/containerd split is closer to 50/50 than the 28/72 the proxy suggested; the conclusion is unchanged: <em>half the bytes are containerd's, and <code>data-root</code> alone does not move them</em>.</p>
+  <p class="small"><strong>Why the per-subdirectory breakdown didn't work from the grant:</strong> <code>sudo -n du -sh /var/lib/docker/*</code> failed with "No such file or directory" for a file literally named <code>*</code>. The directory is <code>0710</code>, so the unprivileged shell cannot enumerate it; bash passes the unexpanded glob through, and sudo elevates the final command, not the expansion that preceded it. A working breakdown needs root's own shell to expand — a broader grant than a bare <code>du</code>, so it was not added. Your interactive root session has no such problem.</p>
+  <p class="small">Container writable layers are unusually large (uikit-dev 2.38 GB, entu-research 1.22 GB, backlog-triage 1.02 GB, apex-research 1.03 GB) — the Claude-team containers are accumulating state in their writable layer rather than a volume. Worth a separate look; not blocking here.</p>
+
+  <h3>Containers, volumes, bind mounts</h3>
+  <p>9 containers, 8 running, 1 stopped (<code>cortex-db</code>, exited 3 weeks ago — pre-existing). 15 named volumes, all under <code>/var/lib/docker/volumes/</code>, referenced by name — they move transparently with <code>data-root</code>.</p>
+  <p><strong>No bind mount anywhere references <code>/var/lib/docker</code> or <code>/var/lib/containerd</code> by path.</strong> Every bind mount points into <code>/home/dev/…</code>, <code>/usr/local/share/ca-certificates/</code>, or <code>/home/docker-data/xireactor/pgdata</code> (cortex-db's Postgres data — already on the <code>/home</code> LV, a working precedent). Moving the roots is invisible to every container's own mount table; nothing on the container side needs reconfiguring.</p>
+  <p>The three team containers — <strong>apex-research :2222, polyphony-dev :2223, entu-research :2224</strong> — all run <code>network_mode: host</code>. Their sshd binds directly to the host; Docker publishes no ports for them. That simplifies the restart and <em>breaks the obvious verification command</em> (see 3.9).</p>
+
+  <h3>Not determinable from the survey — closed in pre-flight</h3>
+  <ul>
+    <li><s>Exact byte size of <code>/var/lib/docker</code> and <code>/var/lib/containerd</code></s> — <strong>measured 16:52: 22 G + 21 G.</strong> Their internal breakdown needs an interactive root shell (the glob issue noted above).</li>
+    <li>Whether BuildKit's 3.62 GB cache is Docker- or containerd-managed — either way, it moves with one of the two limbs.</li>
+    <li><s>LVM free-extent state</s> — <strong>measured: <code>VFree 0</code>.</strong> The 475 G volume group is fully allocated (home 400 G, root 59 G, swap 16 G). Growing root was never available without shrinking <code>/home</code> first — strictly more invasive than this plan. Changes nothing: the plan uses <code>/home</code>'s <em>filesystem</em> headroom, not VG free space.</li>
+    <li>Container restart policies — decides what comes back by itself → checked in pre-flight; see 3.4.</li>
+  </ul>
+</section>
+
+<!-- ============ 2. OUTCOME ============ -->
+<section id="outcome">
+  <h2><span class="sec-label"><span class="num">2</span> Desired outcome — what "done" looks like</span></h2>
+  <ol>
+    <li><strong>Both</strong> Docker's data root <em>and</em> containerd's root physically reside on the <code>vg-home</code> LV. Moving only one is an incomplete migration, not a smaller complete one.</li>
+    <li><code>docker info</code> reports the new <code>Docker Root Dir</code> and <code>config.toml</code> reports the new <code>root</code> — but the <code>df -hT /</code> delta is what proves the outcome.</li>
+    <li>All 15 images, 9 containers (identical IDs) and 15 volumes present and functional. Nothing re-pulled, re-cloned or re-created.</li>
+    <li>All eight running containers reachable and working as before, after one planned restart.</li>
+    <li><strong><code>/</code> usage lands around 15%.</strong> Measured: 52 G used − 43 G moved = 9 G on 58 G ≈ 15.5% (call it 14–17% for <code>du -sh</code>'s whole-gigabyte rounding). <span class="small">Earlier drafts said "~20% at best" from the 40.7 GB proxy; the real total is larger because the proxy omits container logs, so more moves and root lands lower.</span></li>
+    <li>The old directories on root are <strong>not deleted</strong> until success is independently verified and the hold period has passed. Until then they are the rollback path, not scratch space.</li>
+    <li>No compose file, container config or bind-mount path changes anywhere.</li>
+  </ol>
+</section>
+
+<!-- ============ 3. RUNBOOK ============ -->
+<section id="runbook">
+  <h2><span class="sec-label"><span class="num">3</span> Runbook — at the keyboard, with root</span></h2>
+  <p>A literal sequence to type, in order — pre-flight is already done. Each step says what you should see. Where a wrong result means stop, it is marked. Nobody is standing beside you, so the expected-output and stop lines are load-bearing, not decoration.</p>
+  <div class="callout">
+    <span class="eyebrow">Conventions</span>
+    <ul>
+      <li><span class="out" style="display:inline;padding:2px 8px;margin:0"><span class="lbl">Expected</span></span> — what a correct result looks like. Proceed.</li>
+      <li><span class="out stop" style="display:inline;padding:2px 8px;margin:0"><span class="lbl">Stop</span></span> — what an incorrect result looks like, and what to do instead of continuing.</li>
+      <li>Red full-width bars are hard boundaries. Do not scroll past one without meeting its condition.</li>
+    </ul>
+  </div>
+
+  <!-- pre-flight: completed 2026-08-26, section removed at PO request -->
+  <div class="callout">
+    <span class="eyebrow">Pre-flight — completed 2026-08-26</span>
+    <p>Measured 2026-08-26 via the read-only grant: <code>/var/lib/docker</code> <strong>22 G</strong>, <code>/var/lib/containerd</code> <strong>21 G</strong>, total <strong>43 G</strong>; <code>/</code> 52 G used / 3.9 G free, <code>/home</code> 79 G used / 295 G free; volume group <code>VFree 0</code>. Window and hold period are the owner's decision.</p>
+    <p><strong>Whoever executes: run this 30-second check first, as <code>dev</code>.</strong> Step 9 diffs against these snapshot files; if they are missing, take them now (nothing has changed on the host since the survey, so a fresh snapshot is equally valid).</p>
+    <div class="cmd"><pre><code>ls -la ~/pre-migration-docker-*.txt 2&gt;/dev/null || {
+  docker ps -a --format '{{.ID}} {{.Names}}' | sort &gt; ~/pre-migration-docker-ps.txt
+  docker images --format '{{.ID}} {{.Repository}}:{{.Tag}}' | sort &gt; ~/pre-migration-docker-images.txt
+  docker volume ls --format '{{.Name}}' | sort &gt; ~/pre-migration-docker-volumes.txt
+  echo "snapshots taken"; }
+docker inspect --format '{{.Name}} {{.HostConfig.RestartPolicy.Name}}' $(docker ps -aq)
+df -hT / /home</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Three snapshot files present (or "snapshots taken"). Nine restart-policy lines — <strong>note any that are not <code>always</code>/<code>unless-stopped</code></strong>; you will <code>docker start</code> those by hand in 3.4. Write down the two <code>df</code> lines; step 8 compares against them.</div>
+    <div class="out note"><span class="lbl">Note</span><code>sudo</code> will prompt for the <code>dev</code> password on the containerd steps (an existing passwordless grant covers Docker commands only). That prompt is expected, not a failure.</div>
+  </div>
+
+  <!-- 3.1 -->
+  <h3 id="why">3.1 Why two limbs, not one — read once</h3>
+  <p>Docker and containerd are separate daemons with separately configured storage roots (see <a href="#catch">the catch</a>). Relocating only Docker's <code>data-root</code> moves the volumes and possibly the build cache, but leaves the image and container layers — a measured <strong>21 G</strong>, about half the bytes — on root under <code>/var/lib/containerd</code>. Every Docker-level check would pass. <code>df -hT /</code> would not move. That is why <code>df</code> is the primary pass/fail signal in 3.5.</p>
+  <p><strong>Mechanism for both:</strong> a config-file root relocation — <code>data-root</code> in <code>daemon.json</code>, <code>root</code> in <code>config.toml</code> — rather than a bind mount over the original path. Neither daemon has any systemd customisation to fight, and the bind-mount failure mode (a daemon racing an unmounted directory at boot and silently repopulating an empty one on root) is exactly the silent-divergence class this estate has already been bitten by. Config-file relocation has no such race.</p>
+
+  <!-- 3.2 -->
+  <h3>3.2 Copy primitive — <code>rsync -aHAX</code>, never <code>cp</code></h3>
+  <p>Snapshotter storage depends on <strong>hardlinks</strong> (layers shared between images, containers and snapshots) and <strong>extended attributes</strong> (overlayfs whiteout markers for deleted files). <code>cp -r</code> breaks the hardlinks — bloating disk and corrupting shared-layer bookkeeping — and drops the xattrs, so deleted files reappear inside containers that <em>look</em> copied correctly. <code>-a</code> archive, <code>-H</code> hardlinks (the load-bearing flag), <code>-A</code> ACLs, <code>-X</code> xattrs, <code>--numeric-ids</code> keeps raw <code>0:0</code> ownership.</p>
+
+  <!-- 3.3 -->
+  <h3 id="migrate">3.3 The migration — literal commands, in order</h3>
+
+  <div class="step"><div class="n">1</div><div class="body">
+    <h4>Phase 1 — live copy. No downtime yet; both daemons keep running.</h4>
+    <div class="cmd"><pre><code>sudo mkdir -p /home/docker-data/lib-docker /home/docker-data/lib-containerd
+sudo rsync -aHAX --numeric-ids /var/lib/docker/     /home/docker-data/lib-docker/
+sudo rsync -aHAX --numeric-ids /var/lib/containerd/ /home/docker-data/lib-containerd/</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Both complete with no error output. With 43 G to copy this will take a while — fine, nothing is down. <strong>Time it</strong>; phase 2 will be a small fraction of this.</div>
+    <div class="out stop"><span class="lbl">Stop</span>If either rsync reports errors, <strong>do not stop any service.</strong> Re-run the failing rsync (it is safe to re-run and resumes) until it completes clean.</div>
+  </div></div>
+
+  <div class="barrier">
+    <div class="mark">▼</div>
+    <div><h4>Downtime window starts here</h4><p>Containers go down at step 2. Confirm the teams have been told and the window is now.</p></div>
+  </div>
+
+  <div class="step"><div class="n">2</div><div class="body">
+    <h4>Stop Docker — this stops all 8 running containers</h4>
+    <div class="cmd"><pre><code>sudo systemctl stop docker.socket
+sudo systemctl stop docker.service
+systemctl status containerd.service</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>The <code>containerd-shim-runc-v2</code> lines for your containers are gone or going from the <code>containerd.service</code> status output.</div>
+    <div class="out stop"><span class="lbl">Stop</span>If shim processes are still listed after ~30 seconds, <strong>do not stop containerd yet.</strong> Find out why a container did not fully stop first. Stopping containerd out from under a live shim turns a clean migration into a mess.</div>
+  </div></div>
+
+  <div class="step"><div class="n">3</div><div class="body">
+    <h4>Stop containerd — only now that nothing runs under it</h4>
+    <div class="cmd"><pre><code>sudo systemctl stop containerd.service
+systemctl status containerd.service</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span><code>inactive (dead)</code>.</div>
+  </div></div>
+
+  <div class="step"><div class="n">4</div><div class="body">
+    <h4>Phase 2 — delta copy. Catches drift since phase 1; this is the actual outage.</h4>
+    <div class="cmd"><pre><code>sudo rsync -aHAX --delete --numeric-ids /var/lib/docker/     /home/docker-data/lib-docker/
+sudo rsync -aHAX --delete --numeric-ids /var/lib/containerd/ /home/docker-data/lib-containerd/</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Fast — seconds to low minutes. Only the drift copies.</div>
+  </div></div>
+
+  <div class="step"><div class="n">5</div><div class="body">
+    <h4>Reconfigure Docker</h4>
+    <div class="cmd"><pre><code>sudo tee /etc/docker/daemon.json &gt; /dev/null &lt;&lt;'EOF'
+{
+  "data-root": "/home/docker-data/lib-docker"
+}
+EOF
+cat /etc/docker/daemon.json</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>The file echoes back exactly as written. (It did not exist before — that matters for rollback.)</div>
+  </div></div>
+
+  <div class="step"><div class="n">6</div><div class="body">
+    <h4>Reconfigure containerd</h4>
+    <div class="cmd"><pre><code>sudo sed -i 's|^#root = "/var/lib/containerd"|root = "/home/docker-data/lib-containerd"|' /etc/containerd/config.toml
+grep '^root' /etc/containerd/config.toml</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span><code>root = "/home/docker-data/lib-containerd"</code></div>
+    <div class="out stop"><span class="lbl">Stop</span>If the <code>grep</code> prints nothing, the <code>sed</code> pattern did not match (whitespace may differ from what the survey saw). <strong>Do not guess.</strong> Open the file — <code>sudo nano /etc/containerd/config.toml</code> — and set the <code>root</code> line by hand, then re-run the <code>grep</code>.</div>
+  </div></div>
+
+  <div class="step"><div class="n">7</div><div class="body">
+    <h4>Start back up — containerd first, Docker needs it to connect to</h4>
+    <div class="cmd"><pre><code>sudo systemctl start containerd.service
+sleep 2
+sudo systemctl start docker.socket
+sudo systemctl start docker.service
+systemctl status containerd.service docker.service --no-pager | grep -E 'Active:'</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Two <code>active (running)</code> lines, no errors.</div>
+    <div class="out stop"><span class="lbl">Stop</span>If either fails to start → go straight to <a href="#rollback">3.7 Rollback</a>. Do not try to fix forward.</div>
+  </div></div>
+
+  <!-- 3.4 -->
+  <h3>3.4 Restart-policy cleanup</h3>
+  <p>For any container whose restart policy you noted in pre-flight as <em>not</em> <code>always</code> / <code>unless-stopped</code>:</p>
+  <div class="cmd"><pre><code>docker start &lt;name&gt;</code></pre><button class="copy" type="button">Copy</button></div>
+
+  <!-- 3.5 -->
+  <h3 id="verify">3.5 Verification — before touching the old copies</h3>
+
+  <div class="step"><div class="n">8</div><div class="body">
+    <h4>Primary check — did the data actually move?</h4>
+    <div class="cmd"><pre><code>df -hT /
+df -hT /home</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Compared to your pre-flight baseline, <code>/</code> dropped by roughly 43 G (to about 9 G used, ≈15%), and <code>/home</code> grew by roughly the same.</div>
+    <div class="out stop"><span class="lbl">Stop — this is the one that matters most</span>If <code>/</code> did not drop meaningfully — less than ~20 G — the data was <strong>not</strong> relocated; most likely containerd's root did not take effect. Every check below may still pass. <strong>Treat it as a failed migration, do not touch the delete gate, go to <a href="#rollback">3.7 Rollback</a>.</strong></div>
+  </div></div>
+
+  <div class="step"><div class="n">9</div><div class="body">
+    <h4>Daemon-level checks — necessary, not sufficient</h4>
+    <div class="cmd"><pre><code>docker info | grep "Docker Root Dir"
+grep '^root' /etc/containerd/config.toml
+diff &lt;(docker ps -a --format '{{.ID}} {{.Names}}' | sort) ~/pre-migration-docker-ps.txt &amp;&amp; echo "containers: identical"
+diff &lt;(docker images --format '{{.ID}} {{.Repository}}:{{.Tag}}' | sort) ~/pre-migration-docker-images.txt &amp;&amp; echo "images: identical"
+diff &lt;(docker volume ls --format '{{.Name}}' | sort) ~/pre-migration-docker-volumes.txt &amp;&amp; echo "volumes: identical"</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span><code>/home/docker-data/lib-docker</code> · <code>root = "/home/docker-data/lib-containerd"</code> · then three <code>identical</code> lines with no diff output above them. Same 9 container IDs, 15 image IDs, 15 volume names.</div>
+    <div class="out note"><span class="lbl">Note</span>If containerd's new root were empty or wrong, <code>docker images</code> would show 0 images and containers would fail outright, not run degraded. So "images identical" plus a real <code>df</code> drop together are strong evidence both limbs took.</div>
+  </div></div>
+
+  <div class="step"><div class="n">10</div><div class="body">
+    <h4>Functional check on the three team containers — do <em>not</em> use <code>docker port</code></h4>
+    <p class="small">These run <code>network_mode: host</code>, so <code>docker port</code> returns nothing <em>even when healthy</em>. An empty result there is not a failure signal. Check the host's listeners instead, then probe for real.</p>
+    <div class="cmd"><pre><code>ss -tlnp | grep -E ':(2222|2223|2224)\b'</code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Three listening entries.</div>
+    <div class="cmd"><pre><code><span class="c"># from your own machine, with the key you normally use for each team (user is ai-teams per deployments.md)</span>
+ssh -T -i ~/.ssh/id_ed25519_apex      -p 2222 ai-teams@100.96.54.170 true   <span class="c"># apex-research</span>
+ssh -T -i ~/.ssh/id_ed25519_polyphony -p 2223 ai-teams@100.96.54.170 true   <span class="c"># polyphony-dev</span>
+ssh -T -i ~/.ssh/id_ed25519_entu      -p 2224 ai-teams@100.96.54.170 true   <span class="c"># entu-research</span></code></pre><button class="copy" type="button">Copy</button></div>
+    <div class="out"><span class="lbl">Expected</span>Each returns silently with exit 0. Then: allerk reachable; cortex-api (8010) and cortex-mcp (8011) responding.</div>
+  </div></div>
+
+  <div class="callout">
+    <span class="eyebrow">If apex-research specifically does not come back — read before deciding to roll back</span>
+    <div class="cmd"><pre><code>docker inspect apex-research --format 'RestartCount={{.RestartCount}}'
+docker logs apex-research --tail 60</code></pre><button class="copy" type="button">Copy</button></div>
+    <p><strong>Pre-existing, not migration-caused, fires only on an empty volume — which this migration does not create.</strong> apex-research's entrypoint (<code>/entrypoint-apex.sh</code>) has a known crash-loop bug: a <code>git clone</code> step before sshd binds, under <code>set -e</code>, that aborts on a network or auth failure (diagnosed and patched in <code>apex-migration-research</code> PRs #182/#183). It triggers only when the persistent volume is fresh. This migration copies the volumes intact, so the guarded code path should run.</p>
+    <p>A <em>climbing</em> <code>RestartCount</code> on apex-research alone, with the other seven fine and <code>df</code> having dropped, matches that bug's signature — not a storage problem. Investigate via the logs. Rolling back would not fix an entrypoint bug and would undo a migration that worked.</p>
+  </div>
+
+  <!-- 3.6 -->
+  <div class="barrier" id="gate">
+    <div class="mark">■</div>
+    <div>
+      <h4>3.6 Do-not-delete gate — a separate step, on a later day</h4>
+      <p>Run only when every check in 3.5 passed — the <code>df</code> delta specifically — <em>and</em> the hold period you decided in pre-flight has elapsed. Default 24–48 h of normal operation. There is no space pressure: <code>/home</code> holds both copies of both directories comfortably.</p>
+    </div>
+  </div>
+  <div class="cmd"><pre><code>sudo rm -rf /var/lib/docker
+sudo rm -rf /var/lib/containerd</code></pre><button class="copy" type="button">Copy</button></div>
+  <div class="out stop"><span class="lbl">Irreversible</span>This is the only step in the runbook that cannot be undone. Once it has run, 3.7 no longer applies.</div>
+
+  <!-- 3.7 -->
+  <h3 id="rollback">3.7 Rollback — run this instead of the gate if verification fails</h3>
+  <p>The old directories are never modified before 3.6, so rollback is near-instant and no data was ever at risk.</p>
+  <div class="cmd"><pre><code>sudo systemctl stop docker.service
+sudo systemctl stop docker.socket
+sudo systemctl stop containerd.service
+
+sudo rm /etc/docker/daemon.json
+sudo sed -i 's|^root = "/home/docker-data/lib-containerd"|#root = "/var/lib/containerd"|' /etc/containerd/config.toml
+grep -n 'root' /etc/containerd/config.toml
+
+sudo systemctl start containerd.service
+sleep 2
+sudo systemctl start docker.socket
+sudo systemctl start docker.service
+
+docker ps -a</code></pre><button class="copy" type="button">Copy</button></div>
+  <div class="out"><span class="lbl">Expected</span><code>grep</code> shows <code>#root = "/var/lib/containerd"</code> commented again; then the original 9 containers with their original IDs, running on the untouched originals.</div>
+  <div class="out stop"><span class="lbl">Always roll back both</span>Even if only one daemon looked like the problem. Docker on the old root with containerd still pointed at a possibly incomplete new location is a new untested configuration, not a return to known-good.</div>
+  <p class="small">If a phase 1 or phase 2 rsync itself failed — before you touched either config — there is nothing to roll back. The originals are still authoritative; fix and re-run the rsync.</p>
+
+  <!-- 3.8 / 3.9 -->
+  <h3 id="impact">3.8 Team impact</h3>
+  <div class="cols">
+    <div class="card">
+      <h4>Downtime</h4>
+      <p>One window: phase 2 delta rsync + both daemon restarts + container restart. The bulk moved live in phase 1, so the outage is drift-only — likely well under 15 minutes. <strong>Time your own phase 1 before promising a number to the teams.</strong></p>
+    </div>
+    <div class="card">
+      <h4>Who to tell</h4>
+      <ul>
+        <li>apex-research · polyphony-dev · entu-research — SSH on 2222/2223/2224 unreachable during the window</li>
+        <li>allerk users</li>
+        <li>anything depending on cortex-mcp (8011) / cortex-api (8010)</li>
+      </ul>
+      <p class="small" style="margin-top:8px">Nothing on their side changes. No compose edits, no path changes.</p>
+    </div>
+  </div>
+
+  <h3>3.9 Why <code>network_mode: host</code> cuts both ways</h3>
+  <ul>
+    <li><strong>Simpler restart.</strong> Bridge-networked containers need their virtual bridge, veth pairs and iptables DNAT rules torn down and rebuilt across a daemon restart. These three have none of that — sshd binds straight to the host NIC the moment the container process starts.</li>
+    <li><strong>Broken obvious check.</strong> <code>docker port</code> is empty for them by design, healthy or not. 3.5 uses <code>ss -tlnp</code> plus a real SSH probe instead.</li>
+    <li><strong>No sidecar to sequence.</strong> None run a cloudflared or reverse-proxy sidecar, so a clean SSH probe on the bound port is a complete functional check by itself.</li>
+  </ul>
+</section>
+
+<!-- ============ APPENDIX ============ -->
+<section id="appendix">
+  <h2><span class="sec-label"><span class="num">A</span> Appendix — raw evidence, trimmed</span></h2>
+  <p class="small">Every claim above traces to one of these. Collected 2026-08-26 over <code>ssh -T dev@100.96.54.170</code>, read-only.</p>
+
+  <details><summary><code>lsblk -f</code> and <code>df -hT</code></summary><div><pre>NAME                                     FSTYPE      FSVER  FSAVAIL FSUSE% MOUNTPOINTS
+nvme0n1
+├─nvme0n1p1                              vfat        FAT32   939.5M     4% /boot/efi
+├─nvme0n1p2                              ext4        1.0     491.6M    41% /boot
+└─nvme0n1p3                              LVM2_member LVM2 001
+  ├─paarisprogemis--fyysiline--vg-root   ext4        1.0       3.9G    89% /
+  ├─paarisprogemis--fyysiline--vg-swap_1 swap        1                     [SWAP]
+  └─paarisprogemis--fyysiline--vg-home   ext4        1.0     294.6G    20% /home
+
+Filesystem                                     Type  Size  Used Avail Use% Mounted on
+/dev/mapper/paarisprogemis--fyysiline--vg-root ext4   58G   52G  3.9G  93% /
+/dev/mapper/paarisprogemis--fyysiline--vg-home ext4  393G   79G  295G  21% /home</pre></div></details>
+
+  <details><summary><code>docker info</code> key fields · <code>daemon.json</code> · <code>stat /var/lib/docker</code></summary><div><pre>Server Version: 29.3.0
+Storage Driver: overlayfs
+ driver-type: io.containerd.snapshotter.v1
+Docker Root Dir: /var/lib/docker
+Live Restore Enabled: false
+Kernel Version: 6.12.74+deb13+1-amd64
+Operating System: Debian GNU/Linux 13 (trixie)
+
+/etc/docker/daemon.json: (file does not exist)
+
+  File: /var/lib/docker
+Device: 254,0   Inode: 2094282   Links: 12
+Access: (0710/drwx--x---)  Uid: (0/root)  Gid: (0/root)</pre></div></details>
+
+  <details><summary>containerd findings — <code>stat</code>, <code>config.toml</code>, <code>systemctl status</code>, dependency graph, package</summary><div><pre>$ stat /var/lib/containerd
+  File: /var/lib/containerd
+Device: 254,0   Inode: 2093109   Links: 13
+Access: (0700/drwx------)  Uid: (0/root)  Gid: (0/root)
+Change: 2026-08-03 09:39:27.120000222 +0300
+
+$ cat /etc/containerd/config.toml
+disabled_plugins = ["cri"]
+
+#root = "/var/lib/containerd"
+#state = "/run/containerd"
+#subreaper = true
+#oom_score = 0
+
+$ systemctl status containerd.service
+● containerd.service - containerd container runtime
+     Loaded: loaded (/usr/lib/systemd/system/containerd.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-08-03 09:39:27 EEST; 3 weeks 2 days ago
+   Main PID: 1367 (containerd)
+     CGroup: /system.slice/containerd.service
+             ├─   1367 /usr/bin/containerd
+             ├─   2513 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 90c6807845ca... (uikit-dev)
+             ├─   2514 ...ab49daa71ceb...  (polyphony-dev)
+             ├─   2515 ...4ae288844be6...  (backlog-triage)
+             ├─   2516 ...7fa2f2dd64d7...  (entu-research)
+             ├─   2517 ...5b9bd74055e4...  (apex-research)
+             ├─   2520 ...a79f1000f23d...  (cortex-mcp)
+             ├─   2524 ...ad42e52fd338...  (cortex-api)
+             └─3231145 ...24e0a0ccece3...  (allerk)
+
+$ systemctl show docker.service | grep -E '^(Requires|Wants|After)='
+Requires=sysinit.target system.slice docker.socket
+Wants=network-online.target containerd.service
+After=... containerd.service ...
+
+$ dpkg -S /usr/bin/containerd
+containerd.io: /usr/bin/containerd
+
+$ ls -la /run/containerd/containerd.sock
+srw-rw---- 1 root root 0 Aug  3 09:39 /run/containerd/containerd.sock</pre></div></details>
+
+  <details><summary><code>docker system df</code> · <code>docker ps -a</code></summary><div><pre>TYPE            TOTAL  ACTIVE  SIZE     RECLAIMABLE
+Images          15     9       21.87GB  20.24GB (92%)
+Containers      9      8       7.443GB  20.48kB (0%)
+Local Volumes   15     14      7.773GB  184.6kB (0%)
+Build Cache     48     0       3.62GB   688.7MB
+
+CONTAINER ID   IMAGE                          NAMES            STATUS
+24e0a0ccece3   allerk:latest                  allerk           Up About an hour
+5b9bd74055e4   apex-research-claude:latest    apex-research    Up 3 weeks
+a79f1000f23d   xireactor-brilliant-mcp        cortex-mcp       Up 3 weeks
+ad42e52fd338   xireactor-brilliant-api        cortex-api       Up 3 weeks
+68212c507f08   pgvector/pgvector:pg16         cortex-db        Exited (255) 3 weeks ago
+90c6807845ca   uikit-dev-claude:latest        uikit-dev        Up 3 weeks
+4ae288844be6   backlog-triage-claude:latest   backlog-triage   Up 3 weeks
+7fa2f2dd64d7   entu-research-claude:latest    entu-research    Up 3 weeks
+ab49daa71ceb   polyphony-dev-claude:latest    polyphony-dev    Up 3 weeks</pre></div></details>
+
+  <details><summary>Mounts (non-obvious ones) · compose working dirs · <code>docker port</code></summary><div><pre>apex-research: volume apex-research-repo   -> /home/ai-teams/workspace
+               volume apex-claude-home     -> /home/ai-teams/.claude
+               volume apex-source-data     -> /home/ai-teams/source-data
+               bind   /usr/local/share/ca-certificates/managed-warp.pem -> /opt/warp-ca.pem (RO)
+polyphony-dev: volume polyphony-claude-home -> /home/ai-teams/.claude
+               volume polyphony-repo        -> /home/ai-teams/workspace
+               bind   managed-warp.pem      -> /opt/warp-ca.pem (RO)
+entu-research: volume entu-claude-home     -> /home/ai-teams/.claude
+               volume entu-repo            -> /home/ai-teams/workspace
+               bind   managed-warp.pem     -> /opt/warp-ca.pem (RO)
+cortex-db:     bind   /home/docker-data/xireactor/pgdata -> /var/lib/postgresql/data
+(none reference /var/lib/docker or /var/lib/containerd by host path)
+
+apex-research  -> /home/dev/github/apex-migration-research
+polyphony-dev  -> /home/dev/polyphony-deploy
+entu-research  -> /home/dev/entu-research
+
+$ docker port apex-research ; docker port polyphony-dev ; docker port entu-research
+(all three empty — network_mode: host)</pre></div></details>
+
+  <details><summary>Permission-blocked attempts (read-only survey, not worked around)</summary><div><pre>$ sudo du -sh /var/lib/docker
+sudo: a terminal is required to read the password; either use the -S option
+      to read from standard input or configure an askpass helper
+sudo: a password is required
+
+$ sudo -n true
+sudo: a password is required        # no passwordless sudo
+
+$ vgs / lvs / pvs
+WARNING: Running as a non-root user. Functionality may be unavailable.
+/run/lock/lvm/P_global:aux: open failed: Permission denied</pre></div></details>
+</section>
+
+<footer>
+  <p>Survey and runbook by Brunel (<em>FR:Brunel</em>), framework-research team, 2026-08-26. Reviewed and published by team-lead (<em>FR:Aen</em>). The containerd two-limb finding came out of review; the arithmetic in outcome 5 was corrected in review; the identity snapshot/diff (pre-flight and step 9) was narrowed to ID+name by the publisher so the check is meaningful; real <code>du</code>/LVM figures were measured 16:52 after the PO installed the read-only pre-flight grant, replacing the proxy estimate throughout.</p>
+  <p>Read-only survey: nothing on the host was changed to produce this page.</p>
+</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  // Copy buttons
+  document.querySelectorAll('.cmd').forEach(function (box) {
+    var btn = box.querySelector('.copy'), pre = box.querySelector('pre');
+    if (!btn || !pre) return;
+    btn.addEventListener('click', function () {
+      var text = Array.prototype.map.call(pre.querySelectorAll('code'), function (c) { return c.textContent; }).join('\n') || pre.textContent;
+      // drop comment-only lines and trailing inline comments so pasted commands are clean
+      text = text.split('\n').filter(function (l) { return !/^\s*#/.test(l); })
+                 .map(function (l) { return l.replace(/\s+#[^'"]*$/, ''); }).join('\n');
+      function ok() { btn.textContent = 'Copied'; btn.classList.add('done'); setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1400); }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, function () {});
+    });
+  });
+  // Pre-flight checklist persistence (per viewer, best-effort)
+  var KEY = 'rc-docker-preflight';
+  var boxes = document.querySelectorAll('#preflight-list input[type=checkbox]');
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+    boxes.forEach(function (b) { if (saved[b.id]) { b.checked = true; b.parentElement.classList.add('done'); } });
+  } catch (e) {}
+  boxes.forEach(function (b) {
+    b.addEventListener('change', function () {
+      b.parentElement.classList.toggle('done', b.checked);
+      try {
+        var s = JSON.parse(localStorage.getItem(KEY) || '{}'); s[b.id] = b.checked;
+        localStorage.setItem(KEY, JSON.stringify(s));
+      } catch (e) {}
+    });
+  });
+})();
+</script>
