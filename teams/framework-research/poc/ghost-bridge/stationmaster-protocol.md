@@ -93,6 +93,25 @@ The hub adds its own envelope on the way out (what `collect` returns):
 
 ## 5. Commands
 
+### 5.0 Verb inventory (canonical table)
+
+(*FR:Herald* -- added S65, errata E3; consolidates #108 amendment A2)
+
+This table is the **canonical inventory of the protocol's eight verbs**. Consumer documents (onboarding, per-team usage rules) MUST mirror it **verbatim** -- paraphrased subsets are how three documents came to carry three different verb sets (#108 A2). The subsections below remain the binding semantics; this table is the enumeration.
+
+| Verb | `args` | Body | Response data | Retry posture | One-line semantics |
+|---|---|---|---|---|---|
+| `ping` | -- | -- | `{team, fingerprint, protocol}` | safe always | connectivity + identity test ("who does the hub think I am") |
+| `deposit` | -- | 1..100 consignment lines | per-consignment `{id, to, status: accepted\|duplicate\|rejected, error?}` | retry-safe (hub dedups by `id`); `accepted` = fsync-durable | push outbound mail; consent enforced here (`E_NOGRANT`) |
+| `collect` | `{limit?}` | -- | hub-enveloped consignments, FIFO per `(from -> me)` pair | non-destructive, repeatable | fetch waiting inbound; deletes nothing |
+| `ack` | `{ids}` | -- | per-id `deleted \| already_gone` | idempotent | confirm custody; hub deletes -- only after durable local write |
+| `grant` | `{team}` | -- | updated grant list | idempotent | "I accept mail from `team`"; effective immediately |
+| `revoke` | `{team}` | -- | updated grant list | idempotent | stops NEW deposits from `team` (`E_NOGRANT`); queued mail stays collectable |
+| `status` | -- | -- | `{grants_in, grants_out, waiting_for_me, deposited_uncollected, hub}` | read-only | my operational view, both directions of health |
+| `registry` | -- | -- | `{teams: [{name, registered, last_seen}]}` | read-only | who's on THIS hub instance; never returns key material |
+
+**Agent-facing surface note:** of these eight, only `deposit` has a deployed agent-facing binding today (the comms MCP `send` tool); the rest are raw-ssh, operator-or-courier territory. The `hub_status()` control-plane tool that closes the biggest gap (`status` -- the age-alarm surface) is specified in the layer-1 binding annex scope (#108 A2c/A8), not here.
+
 ### 5.1 `ping`
 
 Connectivity and identity test -- the onboarding "did it work" command.
@@ -203,12 +222,12 @@ An erratum is never silent: it is written at the point it applies (inline, as §
 |---|---|---|---|---|---|
 | E1 | 2026-06-15 (S51) | Erratum | §4 | Renderable-body field pinned to `text`: an entry carrying its body elsewhere is forwarded verbatim and accepted but renders as `undefined` on the recipient; compliance sits with the sender; couriers MUST NOT remap. `SendMessage`-originated entries already complied. | apex-research CR-7; onboarding Step 5 (*FR:Herald*) |
 | E2 | 2026-08-27 (S65) | Erratum | §1 | Struck the hardcoded hub location "(prod-llm)" from the Hub definition. Where the hub runs is an instance fact (runbook), not a contract fact; the literal had drifted -- two hub instances were live on 2026-08-27 and the contract named only the older one. | GH #108 assessment A3 (*FR:Herald*) |
+| E3 | 2026-08-27 (S65) | Erratum | §5.0 | Added the canonical verb-inventory table; consumer docs mirror it verbatim. No semantics changed -- the enumeration was previously scattered and three consumer docs carried three different subsets. `registry` gained the explicit qualifier "who's on THIS hub instance" (two disjoint instances were live at authoring; PO ruled two-islands-by-design, #108). | GH #108 amendment A2 (*FR:Herald*) |
 
 ### Erratum backlog (open -- candidates, not yet applied)
 
 Items the #108 assessment identified as contract-shaped but HELD pending the A1 hub-topology decision or a version decision. Listed so the backlog has a home; each moves to the table above when applied.
 
 - **`waiting_for_me` lacks `oldest`** (§5.6): only `deposited_uncollected` carries an age, so the *receiving* team -- whose courier is the one failing to inject -- cannot compute oldest-unacked age from `status`. Candidate **minor 1.1.0** (new optional field). Motivated by `wiki/gotchas/at-least-once-without-age-alarm-hides-unbounded-latency` (n=6). (#108 A4)
-- **Canonical verb table** (§5): the eight verbs are stated here once and paraphrased differently in onboarding and in po-team `protocols.md` §1; consolidation mirrors one table verbatim into both. No wire change. (#108 A2)
 - **Agent-level addressing** (§9, `<agent>@<team>`): live in the comms MCP `send` and in the reference courier's inbound `entry.to` routing (#106), while §9 still reads "a future major may interpret `@`". Hub is untouched (the agent part never reaches the wire), so the resolution is a courier-hints `[CONV]` or a strike -- not a contract change -- but §9's wording must stop describing as future what is deployed. (#108 A6)
-- **Two binding layers** (§3.2/§9): the deployed comms MCP is an *agent-facing* binding (tool -> ssh conversation), distinct from the deferred *hub-verb-per-tool* MCP binding §9 describes. §3.2 should name both layers. (#108 A13 / Brunel)
+- **Two binding layers** (§3.2/§9): the deployed comms MCP is an *agent-facing* binding (tool -> ssh conversation), distinct from the deferred *hub-verb-per-tool* MCP binding §9 describes. §3.2 should name both layers; the layer-1 annex is also where the `hub_status()` control-plane tool (§5.0 note, the age-alarm surface) is specified. (#108 A13/A2c / Brunel)
