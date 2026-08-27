@@ -21,6 +21,7 @@ related:
   - gotchas/orphan-courier-holds-lock-across-sessions-wrapper-cannot-reclaim.md
   - gotchas/courier-restart-needs-inboxes-dir-step25-before-step3.md
   - contracts/courier-rotation-contract-has-teardown-half-reap-before-acquire.md
+  - gotchas/precondition-without-an-owner-is-no-precondition.md
 ttl: 2026-09-18
 ---
 

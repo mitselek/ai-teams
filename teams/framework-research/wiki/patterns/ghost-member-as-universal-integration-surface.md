@@ -21,6 +21,7 @@ related:
   - patterns/service-team-topology.md
   - patterns/multi-provider-integration-seams.md
   - patterns/framework-participating-vs-service-roles.md
+  - gotchas/precondition-without-an-owner-is-no-precondition.md
 amendments:
   - date: 2026-05-14
     note: "Confidence medium → high. Both upgrade triggers satisfied: (1) ghost-bridge v1 daemon (commit 9c5bf83) implements the local-fs plugin demonstrating end-to-end FR↔apex flow on the deployment-substrate family; (2) n=2 cross-substrate verification (FR Windows-Git-Bash + apex Linux/Docker, 2026-05-14) of mid-session `members[]` edits being honored without restart -- see new sibling reference `members-array-edit-honored-mid-session.md`. OQ #2 (member-list cache window) closed."
@@ -29,6 +30,8 @@ amendments:
 ---
 
 # Ghost-Member as Universal Integration Surface
+
+> **Version-coupled caveat (2026-08-27).** The **harness-native leg** of this pattern -- `SendMessage` to a ghost name registered only in `config.json` `members[]` -- **is refused on CLI 2.1.247** (*"No agent named '<name>' is reachable. Use ListAgents"*; the harness now resolves targets from the live agent registry, not `members[]`). It worked on 2.1.179/2.1.181. The pattern's **file-write leg** (a canonical entry written into the ghost's outbox by temp-file + atomic replace) is unaffected and live-proven the same day. The abstraction survives; one of its two transports is now a per-version datapoint. Record + the owner-less re-validation trigger that let this go unnoticed for four CLI bumps: [`../gotchas/precondition-without-an-owner-is-no-precondition.md`](../gotchas/precondition-without-an-owner-is-no-precondition.md).
 
 **Separating interface from mechanism for team integration**: a *ghost member* is a regular entry in a team's `members[]` array whose backend is not a Claude agent but a pluggable transport. From inside the team, sending to a ghost is the same SendMessage call agents already use; behind the ghost, a daemon (or pair of daemons) carries messages between two inbox files via any chosen mechanism -- shared filesystem, TCP, Cloudflare WSS, GitHub Issues, e2e-encrypted relay.
 

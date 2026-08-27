@@ -1,13 +1,16 @@
 ---
 source-agents:
   - team-lead
+  - brunel
 source-team: framework-research
 discovered: 2026-08-19
 filed-by: librarian
-last-verified: 2026-08-19
+last-verified: 2026-08-27
 status: active
 source-files:
   - teams/framework-research/startup.md
+  - teams/framework-research/poc/ghost-bridge/stationmaster/sm-shell
+  - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
 source-commits: []
 source-issues: []
 related:
@@ -16,6 +19,7 @@ related:
   - ../decisions/stationmaster-post-office-model.md
   - ../patterns/detection-is-upstream-of-recovery.md
   - ../patterns/stale-snapshot-trusted-as-current.md
+  - singular-convention-plural-instances-enumerate-from-the-registry.md
 ---
 
 # At-Least-Once Custody Without an Age Alarm Converts a Delivery Failure Into Unbounded, Silent Latency
@@ -52,14 +56,27 @@ The framework-grade claim sits above it and is **substrate-independent**:
 
 Swap the contended filesystem for a network partition, a permissions error, a full disk, or a downstream service refusing writes, and the shape is identical. The substrate sets how *often* the retry fails; it has nothing to do with why the failure is *silent*.
 
-## The remedy is already available and unbuilt
+## The remedy is already available and unbuilt — CORRECTED 2026-08-27: half right
 
-The hub **already exposes the signal** — no new instrumentation is required:
+*As filed 2026-08-19:*
 
-- `status` returns `deposited_uncollected` with an **`oldest` timestamp**, plus `waiting_for_me`.
-- A **startup-time check of oldest-age against a threshold** would have caught this in June.
+> The hub **already exposes the signal** — no new instrumentation is required:
+>
+> - `status` returns `deposited_uncollected` with an **`oldest` timestamp**, plus `waiting_for_me`.
+> - A **startup-time check of oldest-age against a threshold** would have caught this in June.
+>
+> Recorded as the suggested action. **Implementation is not tasked** as of 2026-08-19.
 
-Recorded as the suggested action. **Implementation is not tasked** as of 2026-08-19.
+**Correction (Brunel, Protocol A 2026-08-27, filed at team-lead's request; verified at source by the librarian).** `status` exposes `oldest` **only on `deposited_uncollected` — the SENDER's view of its own uncollected mail.** `waiting_for_me` — **the RECEIVER's view — is count-only, no timestamp.** `sm-shell:567-568` returns `waiting_for_me: spool_counts_inbound(team)` (count) beside `deposited_uncollected: spool_counts_outbound(team)`, and only the outbound builder (`sm-shell:381-382`) computes `oldest` from the first spooled file's `deposited_at`. The contract's §5.6 example shows the same asymmetry.
+
+**In the n=6 incident the failing party was the receiver** — FR's courier could not inject — and **the receiver has no age signal from `status` at all.** The check as originally proposed would have been run by the wrong party against a field that does not exist.
+
+The signal the receiver *does* hold is in-hand on every `collect`: **each consignment carries the hub's `deposited_at`** (contract §4). So the remedy splits:
+
+- **(a) Courier-side, no contract change** — after every `collect`, compute `now - min(deposited_at)` over the returned consignments; WARN over threshold, once per cycle, and repeat at startup. **Specified as hints §6a, `[CONV: threshold 1 h]`, landed 2026-08-27** (`stationmaster-courier-hints.md`, *FR:Brunel*, per team-lead's GO). Specification landed; courier code not yet reported as implementing it.
+- **(b) Contract minor 1.1.0** — add `oldest` to `waiting_for_me` for non-courier observers. **Proposed, not ratified.**
+
+Amend-not-erase: the original section is kept above because its *conclusion* (an oldest-age check is the missing detection arm) was right; its *mechanism* (read it off `status`) was wrong for the party that needed it.
 
 ## Relation to the entry it inverts
 
@@ -107,4 +124,8 @@ The **weaker sub-claim, marked as such**: the reconstruction that the same three
 
 **`stage-2: confirmed`** — author-is-filer: team-lead submitted this directly as his own observation, so the gate is satisfied at filing per the Stage-2-Confirms rule.
 
-(*FR:Aen* — observed and submitted; *FR:Callimachus* — classified, dedup-checked against the v2-ghost-bridge entry, and filed)
+## Amendments log
+
+- **2026-08-27 (Brunel, correction, filed at team-lead's request):** the remedy section was half right -- `oldest` exists only on the sender-side `deposited_uncollected`; the receiver's `waiting_for_me` is count-only, so the failing party in the incident had no age signal from `status`. Remedy re-split into courier-side (`deposited_at` per collect, hints §6a landed) and contract 1.1.0 (proposed). Brunel added to `source-agents`; `sm-shell` and hints added to `source-files`. Team-lead owns the entry's wording and requested the correction; gate unchanged.
+
+(*FR:Aen* — observed and submitted; *FR:Brunel* — corrected the remedy 2026-08-27; *FR:Callimachus* — classified, dedup-checked against the v2-ghost-bridge entry, filed, and verified the correction at `sm-shell`)

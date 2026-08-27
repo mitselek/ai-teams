@@ -1,9 +1,10 @@
 ---
 source-agents:
   - team-lead
+  - herald
 discovered: 2026-06-12
 filed-by: librarian
-last-verified: 2026-06-12
+last-verified: 2026-08-27
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster-protocol.md
@@ -37,7 +38,7 @@ The courier is a **customer-side pattern, not a product**: it does the local fil
 - **Hub-pull / hub-initiated delivery** -- rejected: would require the hub to hold customer credentials and dial into customer networks. Reachability was empirically strictly one-way (rc→prod-llm only); the post-office model makes the asymmetry moot by assuming outbound-only.
 - **True-mirror inbox replication** (SPEC-v2) -- rejected at SPEC-v3 §3.2: drain-back wipe race + contested-target ambiguity. Replication unit is the **entry**, never file state -- proceeds from [`gotchas/inbox-retention-flip-pending-only-queue.md`](../gotchas/inbox-retention-flip-pending-only-queue.md).
 - **Co-sign / mutual-signature consent ceremony** -- rejected (PO reframing): unilateral receive-grants over the authenticated channel kill the ceremony; channel auth already is the signature.
-- **Mail over MCP** -- rejected: MCP is control-plane only (grant/revoke/status/registry). Mail never flows over MCP because wake semantics (C3) and the durability chain live on the inbox path. MCP ships phase 2; the protocol is designed for it now (rides ssh stdio, same key auth, no new port).
+- **Mail over MCP** -- rejected: MCP is control-plane only (grant/revoke/status/registry). **[AMENDED 2026-08-27 -- superseded for the OUTBOUND leg since #100; see "Amendments" below. The rest of this bullet is the S49 record as written.]** Mail never flows over MCP because wake semantics (C3) and the durability chain live on the inbox path. MCP ships phase 2; the protocol is designed for it now (rides ssh stdio, same key auth, no new port).
 - **Relaying / multi-hop** -- left out as YAGNI.
 - **Stationmaster silent grant** (hub→customer mail, `from_team: stationmaster`) -- needs no grant and is not revocable; not modeled in the grant system at all, only documented (protocol §10), since the hub runs the consent checks itself and a grant gating its own mail would be unenforceable.
 
@@ -47,6 +48,20 @@ The courier is a **customer-side pattern, not a product**: it does the local fil
 - **Registration is a human step in v1** (operator edits `authorized_keys`); self-service is deferred.
 - Doc set statuses at S49 close: protocol v1.0.0 RATIFIED; onboarding ACCEPTED (commit `87ef7d4`, hub address placeholder until deployment); courier-hints ACCEPTED (field usage expected to expose shortcomings). Reference courier `stationmaster-courier.py` was owed at S49 close and **landed S50** (Herald, Task #2).
 - This supersedes the ghost-bridge v2 daemon (kept alive until cutover, then decommissioned). **Why v2 was failing** (the motivating defect): v2 forwarded by flipping the `read` flag without deleting, so each daemon restart (it crashed/restarted repeatedly -- no supervisor) re-scanned and re-forwarded the outbox, multiply-delivering. This design's **delete-on-ack** (sub-decision 1) + the **courier delivered-ledger** (id-keyed dedup) are the direct antidote. Full incident + provenance: [`gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md`](../gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md).
+
+## Amendments
+
+### 2026-08-27 -- rejected alternative 4 ("Mail over MCP") superseded for the outbound leg (Herald, Protocol A; #108 amendment A5)
+
+**What changed in the world.** Since #100 (2026-07-16) every team session runs the `comms` MCP, whose primary send path `send(to, message)` **deposits mail to the hub via an MCP tool call** (transport still ssh; hub verdict returned synchronously). Verified 2026-08-27: `poc/ghost-bridge/comms-mcp.py` `tool_send` (line 146) deposits via `sm.cmd_deposit`; the tool list is `send` (line 317) and `read_mail` (line 342) -- nothing else. `designs/deployed/po-team/protocols.md:72`: *"Native `SendMessage` cannot reach the outbox; `send` is the send path."* **Outbound mail therefore DOES flow through MCP.**
+
+**What survives.** The S49 rationale -- *wake semantics (C3) and the durability chain live on the inbox path* -- holds for the **INBOUND** leg only: `read_mail` is a non-destructive local read, never a hub `collect`; the courier still owns collect -> inject -> ack. **The retained invariant is: inbound mail never over MCP; the courier owns the durability chain.** "Control-plane-only" is retired as a description of MCP's role.
+
+**Secondary finding.** The same bullet sanctions MCP for `grant/revoke/status/registry`. **None of that has been built** -- the comms MCP exposes `send` + `read_mail` only. So the card described a control plane that exists in decision and not in code. This matters now because the age-alarm remedy discussed in [`../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md`](../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md) (`status`-side `oldest`) has **no agent-facing surface today**.
+
+**Multi-instance caveat (same day).** The decision speaks of "the hub"; see [`../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md`](../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md) -- two hubs are deployed with no relay between them, which this card's YAGNI exclusion of relaying makes a partition.
+
+*Amend-not-erase: the original bullet stands as the S49 record; the amendment records what the deployed system does now and which half of the rationale it preserves. Pointer discipline unchanged -- the protocol remains authoritative for the wire; `protocols.md` rev 5 §1.1 for the deployed send path.*
 
 ## Related
 

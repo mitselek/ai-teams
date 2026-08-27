@@ -21,6 +21,7 @@ related:
   - ../gotchas/coordinator-supplied-material-anchors-the-delegation.md
   - documentation-vs-substrate-truth-divergence.md
   - ../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md
+  - ../gotchas/log-file-empty-by-construction-when-launcher-splits-streams.md
 ---
 
 # A Daemon's Self-Report Confirms the Config, Not the Outcome -- Make an Independent Outcome Check the Primary Pass/Fail
@@ -51,6 +52,14 @@ Cross-substrate confirmation from the same day, different agent, different subst
 
 Also adjacent, act-side: the single-limb plan is [`../gotchas/control-narrower-than-its-name.md`](../gotchas/control-narrower-than-its-name.md) in migration form -- "move Docker's storage" names a total move and performs a partial one, succeeding and reporting success.
 
+## Outcome instance -- the migration ran (2026-08-27, Brunel; approximates, does not close)
+
+The RC migration was executed the morning of 2026-08-27 by a third party (A. Lerko). Evidence reported back: **inside-container view** -- overlay served from `/home/docker-data/lib-containerd`, `/` on `vg-home` 393G total / 266G free / 29%.
+
+Brunel's reading, adopted here: that **is** an outcome-level instrument (the kernel's view of where the overlay lives, not a daemon self-report), and it **confirms limb 2** -- containerd's root relocated. **It does not close the runbook's primary check.** A container's `/` is the overlay, not the host root LV -- it is silent on limb 1 (Docker's `data-root`: volumes and network state, mounted separately) and silent on **the operator's actual goal**, host root back to ~15%. **Host `df -hT /` remains owed -- one Tier R read.**
+
+**Refinement to the pattern:** the independent instrument must also be pointed at **the level where the goal lives.** A right-kind check one level down *approximates* the outcome; it does not close it. Recorded as "approximates, not closes" so that the confirmation is not later read as the primary check having passed.
+
 ## Sibling gotcha, same investigation
 
 [`../gotchas/docker-port-empty-under-network-mode-host.md`](../gotchas/docker-port-empty-under-network-mode-host.md) -- `docker port` returns empty for `network_mode: host` containers even when healthy. Same root category (**the verification method must match the actual mechanism, not the most obvious command**) but a distinct, narrower architectural fact -- filed separately at the submitter's request, per dedup outcome 3.
@@ -61,10 +70,11 @@ Also adjacent, act-side: the single-limb plan is [`../gotchas/control-narrower-t
 
 ## Provenance note
 
-Submitted by Brunel via Protocol A 2026-08-26; team-lead co-credited as the reviewer whose question surfaced the containerd limb (Brunel then confirmed it structurally). The full writeup lives in a session-scratchpad briefing published to the PO as a Claude artifact -- **a prunable store, so the load-bearing lines are quoted above verbatim** rather than cited by path. Filed by the librarian: **`stage-2: pending`** -- Brunel's and team-lead's read-backs owed.
+Submitted by Brunel via Protocol A 2026-08-26; team-lead co-credited as the reviewer whose question surfaced the containerd limb (Brunel then confirmed it structurally). The full writeup lives in a session-scratchpad briefing published to the PO as a Claude artifact -- **a prunable store, so the load-bearing lines are quoted above verbatim** rather than cited by path. Filed by the librarian `stage-2: pending` (filed-on-behalf). **Team-lead read back 2026-08-26 17:33 -> `partial`; Brunel read back 2026-08-27 13:30, confirmed no corrections, quoted survey lines verbatim his -> `confirmed`.** Both co-authors in; gate closed.
 
 ## Amendments log
 
+- **2026-08-27 (Brunel read-back + outcome instance).** Brunel read the entry back in full, CONFIRMED, no corrections -- gate `partial` -> **`confirmed`**. Added the "Outcome instance" section above at his submission (approximates-not-closes refinement; host `df -hT /` still owed). Cross-linked the new sibling `../gotchas/log-file-empty-by-construction-when-launcher-splits-streams.md` (verification reads the wrong sink -- same class).
 - **2026-08-27 (correction, Tier-2 only).** The card's gate bullet had recorded, after team-lead's 2026-08-26 read-back, that the PO deleted/parked the briefing artifact -- offered as the quote-not-cite call "confirmed the hard way". **False.** The watch's "artifact not found" was team-lead's own expired auth token; `/login` restored it the next morning and the artifact is live, org-shared and current. This entry body never carried the claim (the provenance note says only that the artifact is a prunable store, which is true as a class and is the actual ground for quoting). Card amended struck-not-erased; the error's shape -- a transient absence generalised into a permanent state, and then used as evidence -- is filed as [`../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md`](../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md), instance 2. Gate state unchanged (`partial`, Brunel owed).
 
 (*FR:Brunel* submitted; *FR:Aen* co-source via review catch; *FR:Callimachus* filed)

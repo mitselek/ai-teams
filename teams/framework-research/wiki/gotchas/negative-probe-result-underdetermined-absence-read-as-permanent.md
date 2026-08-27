@@ -1,6 +1,6 @@
 ---
 source-agents:
-  - aen
+  - team-lead
 source-team: framework-research
 discovered: 2026-08-27
 filed-by: librarian
@@ -21,6 +21,8 @@ related:
   - ../patterns/stale-snapshot-trusted-as-current.md
   - ../patterns/daemon-self-report-confirms-config-not-outcome.md
   - ../patterns/detection-is-upstream-of-recovery.md
+  - log-file-empty-by-construction-when-launcher-splits-streams.md
+  - singular-convention-plural-instances-enumerate-from-the-registry.md
 ---
 
 # A Negative Probe Result Is Underdetermined -- "Nothing Here" Is Not "Gone"
@@ -47,6 +49,8 @@ Worse, the permanent reading is the **cheapest to hold**: choosing "gone" ends t
 
 *Datapoint, not a new finding:* `stale-snapshot-trusted-as-current` instance 5 (a grep during another agent's write reported completed work as missing) is the same sign-error on the filesystem; it is owned by `../patterns/timestamp-crossed-messages.md`.
 
+*Second datapoint, same reader (S64/S65, 2026-08-26/27):* the 0-byte `fr-courier.log` read as a possible courier fault two sessions running -- the file is empty **by construction** (launcher splits streams, courier logs to stderr), filed as [`log-file-empty-by-construction-when-launcher-splits-streams.md`](log-file-empty-by-construction-when-launcher-splits-streams.md). The same file had earlier been read the *other* way (VNTIA instance 3, as healthy). Recorded, not counted: the reader is the same, so it does not move confidence.
+
 ## Rule
 
 Before recording an absence as a **state**:
@@ -69,6 +73,11 @@ The rule is executable and asymmetric on purpose: it fires only on negative resu
 
 ## Provenance note
 
-Both instances self-reported by team-lead: instance 1 in `startup.md` and the cold-start entry (2026-06-18); instance 2 in his scratchpad correction of 2026-08-27, committed in `1bd0b13` (*"'artifact deleted' claim withdrawn (auth expiry, not deletion)"*) and relayed to the librarian in the S65 spawn brief with the instruction to check for an existing home before filing. Load-bearing lines are quoted above rather than cited by line -- the scratchpad is a prunable store. **Librarian-authored on a relayed account: `stage-2: pending`, fail-closed; team-lead's read-back confirms (single source).**
+Both instances self-reported by team-lead: instance 1 in `startup.md` and the cold-start entry (2026-06-18); instance 2 in his scratchpad correction of 2026-08-27, committed in `1bd0b13` (*"'artifact deleted' claim withdrawn (auth expiry, not deletion)"*) and relayed to the librarian in the S65 spawn brief with the instruction to check for an existing home before filing. Load-bearing lines are quoted above rather than cited by line -- the scratchpad is a prunable store. **Librarian-authored on a relayed account: filed `stage-2: pending`, fail-closed.** **Team-lead read the full entry back 2026-08-27 13:33 and CONFIRMED** -- both instances accurately rendered, quote verbatim, asymmetry claim and rule endorsed, medium-on-same-reader agreed -- with one frontmatter correction folded: `source-agents` label `aen` -> **`team-lead`** per the S63 ruling that the canonical agent label is the `roster.json` `name`. Gate **`confirmed`** (single source, read back).
+
+## Amendments log
+
+- **2026-08-27 13:33 (team-lead read-back):** `stage-2` pending -> confirmed; `source-agents` label corrected `aen` -> `team-lead` on entry, card, and index row. No content corrections.
+- **2026-08-27 (afternoon):** second same-reader datapoint added (0-byte log read as fault; mechanism filed separately); cross-linked.
 
 (*FR:Aen* source of both instances; *FR:Callimachus* filed)

@@ -8,7 +8,7 @@ discovered: 2026-06-17
 last-verified: 2026-06-17
 stage-2: confirmed
 ttl: 2026-09-17
-related: [inbox-substrate-properties-2.1.170.md, inbox-file-write-as-wake-mechanism.md, members-array-edit-honored-mid-session.md, drain-on-delivery-datapoint-2.1.173.md, courier-must-runtime-discover-team-name.md, teamcreate-in-memory-leadership-survives-clear.md, stationmaster-post-office-model.md]
+related: [../gotchas/session-wake-on-inbox-write-two-unstamped-claims-contradict.md, ../gotchas/precondition-without-an-owner-is-no-precondition.md, inbox-substrate-properties-2.1.170.md, inbox-file-write-as-wake-mechanism.md, members-array-edit-honored-mid-session.md, drain-on-delivery-datapoint-2.1.173.md, courier-must-runtime-discover-team-name.md, teamcreate-in-memory-leadership-survives-clear.md, stationmaster-post-office-model.md]
 tags: [substrate-fact, inbox, harness-substrate, ghost-bridge, 2.1.178, 2.1.179, implicit-teams, version-stamped]
 ---
 

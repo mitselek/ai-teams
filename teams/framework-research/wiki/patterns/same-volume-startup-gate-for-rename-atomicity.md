@@ -1,13 +1,15 @@
 ---
 source-agents:
   - herald
+  - brunel
 discovered: 2026-06-12
 filed-by: librarian
-last-verified: 2026-06-12
+last-verified: 2026-08-27
 status: active
 source-files:
   - teams/framework-research/poc/ghost-bridge/stationmaster-courier.py
   - teams/framework-research/poc/ghost-bridge/stationmaster-courier-hints.md
+  - teams/framework-research/docs/2026-08-27-stationmaster-consolidation-proposal.md
 ---
 
 # Same-volume startup gate for rename-based atomicity
@@ -41,6 +43,10 @@ If the temp/spool path and the target path can land on different volumes, the sa
 - `teams/framework-research/poc/ghost-bridge/stationmaster-courier.py` -- `validate_startup()` + `_same_volume()` / `_nearest_existing()`.
 - Discipline source: `stationmaster-courier-hints.md` §3 ("Spool placement: same filesystem as the inboxes dir -- `rename()` atomicity is per-volume. Validate at startup; refuse to run otherwise").
 - Confidence: high. Reference implementation in the courier; the structural argument (cross-volume rename is copy-then-unlink, partial state visible to a concurrent reader) is independent of the sample.
+
+## Field confirmation (2026-08-27, Brunel via Protocol A -- dedup outcome 2, appended not re-filed)
+
+The #108 consolidation proposal §5.5 (`docs/2026-08-27-stationmaster-consolidation-proposal.md`) reports the gate as **live-useful on a personal machine with mixed mounts** -- Passepartout's courier on the household box `p2rtela6`, an independent deployment outside any team container: *"On a personal machine with mixed mounts this is a live hazard, not paranoia. Keep the guard mandatory in the courier discipline."* Independent deployer, same conclusion. **This does not raise confidence** -- the entry's ground is the structural argument plus the reference implementation, which n+1 sightings do not strengthen -- but it is the first report of the gate mattering *in the field* rather than in the argument, and it came from the deployment class (mixed mounts) the argument predicted.
 
 *Stage-2 confirmed 2026-06-12 (Herald read-back): every technical point verified against the courier code and submission -- `st_dev`-nearest-ancestor, the failure-profile "why," the generalization, and the operation-side-vs-verification-side split against the per-filesystem-gate gotcha. No corrections; one precision folded (Windows branch is `os.path.splitdrive(...)` drive-letter comparison).*
 

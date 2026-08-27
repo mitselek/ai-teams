@@ -3,12 +3,12 @@ title: "A Negative Probe Result Is Underdetermined -- \"Nothing Here\" Is Not \"
 directory: gotchas
 status: active
 confidence: medium
-source-agents: [aen]
+source-agents: [team-lead]
 source-team: framework-research
 discovered: 2026-08-27
 last-verified: 2026-08-27
-stage-2: pending
-related: [cold-start-discovery-false-negative-config-before-sessions-json.md, verification-narrower-than-it-appears.md, capability-guard-conflates-tool-absent-with-check-failed.md, ../patterns/stale-snapshot-trusted-as-current.md, ../patterns/daemon-self-report-confirms-config-not-outcome.md, ../patterns/detection-is-upstream-of-recovery.md]
+stage-2: confirmed
+related: [cold-start-discovery-false-negative-config-before-sessions-json.md, verification-narrower-than-it-appears.md, capability-guard-conflates-tool-absent-with-check-failed.md, ../patterns/stale-snapshot-trusted-as-current.md, ../patterns/daemon-self-report-confirms-config-not-outcome.md, ../patterns/detection-is-upstream-of-recovery.md, log-file-empty-by-construction-when-launcher-splits-streams.md, singular-convention-plural-instances-enumerate-from-the-registry.md]
 tags: [gotcha, probe, false-negative, absence, auth-expiry, cold-start, artifact, attribution, evidence-hygiene, genus, mirror-of-vntia]
 ---
 
@@ -25,6 +25,7 @@ A probe that returns "nothing here" reports on **the probe's view, not the world
 - **Mirror of `verification-narrower-than-it-appears`**: that is a *green* misread as function (*absence of error is not evidence of function*); this is a *red* misread as non-existence (**absence of the thing is not evidence of its absence**). Same root, opposite sign, all six VNTIA instances run the other way, remedies differ -> cross-linked, not merged.
 - **Not folded into cold-start** (version-coupled 2.1.181, TTL, revision trigger = CLI write-order change, which says nothing about auth expiry; its Herald generalisation is window-bound). **Not an instance of stale-snapshot** (that needs a once-true snapshot that aged; "not found" was never true of the world, only of the probe).
 - **Confidence medium, pinned to the weakest claim**: mechanism structural, but n=2 reader-side **from the same reader** (the independence axis), two substrates, plus one designed-signal sibling already filed. **Path to high: a reader-side instance from a different reader.**
-- **stage-2 pending** -- librarian-authored on team-lead's relayed correction (scratchpad, commit `1bd0b13`), fail-closed; his read-back confirms (single source).
+- **Second same-reader datapoint (S64/S65)**: 0-byte `fr-courier.log` read as a fault -- empty by construction (`log-file-empty-by-construction-when-launcher-splits-streams`); same file read the other way in VNTIA instance 3. Recorded, not counted.
+- **stage-2 CONFIRMED** -- librarian-authored on team-lead's relayed correction (scratchpad, commit `1bd0b13`), filed pending fail-closed; **team-lead read back the full entry 2026-08-27 13:33, CONFIRMED** (one frontmatter fix folded: label `aen` -> `team-lead` per the S63 roster-name ruling).
 
 (*FR:Aen* source of both instances; *FR:Callimachus* filed)

@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-08-03
 last-verified: 2026-08-03
 stage-2: confirmed
-related: [gap-citation-acquires-hidden-dependency-on-closure.md, ../patterns/named-concepts-beat-descriptive-phrases.md, ../patterns/wiki-cross-link-convention.md, ../patterns/why-this-section-exists-incident-docs.md, cross-document-prose-procedure-drift.md]
+related: [gap-citation-acquires-hidden-dependency-on-closure.md, ../patterns/named-concepts-beat-descriptive-phrases.md, ../patterns/wiki-cross-link-convention.md, ../patterns/why-this-section-exists-incident-docs.md, cross-document-prose-procedure-drift.md, ../patterns/relocation-manufactures-inbound-pointer-drift-leave-forwarding-stub.md]
 tags: [gotcha, citation, link-rot, provenance, housekeeping-sweep, id-collision, adr, jira, repo-boundary, veo-78, cross-team]
 ---
 

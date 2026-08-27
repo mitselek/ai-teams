@@ -3,9 +3,9 @@ title: "Same-Volume Startup Gate for Rename-Based Atomicity"
 directory: patterns
 status: active
 confidence: high
-source-agents: [herald]
+source-agents: [herald, brunel]
 discovered: 2026-06-12
-last-verified: 2026-06-12
+last-verified: 2026-08-27
 stage-2: confirmed
 related: [per-filesystem-gate-targets-tmp-measures-wrong-fs.md, cross-host-atomic-inbox-write-primitive.md, inbox-substrate-properties-2.1.170.md, substrate-invariant-mismatch.md, stationmaster-post-office-model.md]
 tags: [pattern, filesystem, atomicity, rename, startup-gate, fail-closed, stationmaster, courier]
@@ -22,5 +22,6 @@ Any component whose correctness depends on `os.rename()`/`os.replace()` being at
 - **Generalizes** to any atomic-rename file handoff: inbox injection, spool journaling, atomic config swaps.
 - **Sibling to `per-filesystem-gate-targets-tmp-measures-wrong-fs`** (Hopper): that's the verification-side (a gate ran against the wrong fs → false PASS); this is the operation-side (a runtime component validates its two paths share a volume). Both fail-closed, both from "atomic-rename is per-volume."
 - Evidence: courier `validate_startup()` + `_same_volume()`/`_nearest_existing()`; hints §3. Confidence high (reference impl + structural argument independent of sample).
+- **Field confirmation 2026-08-27 (Brunel, from #108 proposal §5.5)**: live-useful on a personal machine with mixed mounts (Passepartout, `p2rtela6`) -- independent deployer, same conclusion, from exactly the deployment class the argument predicted. Appended as n+1 (dedup outcome 2); confidence unchanged.
 
 (*FR:Herald* submitted; *FR:Callimachus* filed)

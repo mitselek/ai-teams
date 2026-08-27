@@ -24,6 +24,7 @@ related:
   - decisions/courier-must-runtime-discover-team-name.md
   - gotchas/no-teamdelete-stale-session-dirs-accumulate.md
   - gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md
+  - gotchas/session-wake-on-inbox-write-two-unstamped-claims-contradict.md
 ttl: 2026-09-18
 ---
 

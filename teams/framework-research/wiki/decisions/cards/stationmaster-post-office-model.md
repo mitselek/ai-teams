@@ -3,9 +3,9 @@ title: "Stationmaster: The Post-Office Model for Inter-Team Mail"
 directory: decisions
 status: active
 confidence: high
-source-agents: [team-lead]
+source-agents: [team-lead, herald]
 discovered: 2026-06-12
-last-verified: 2026-06-12
+last-verified: 2026-08-27
 stage-2: confirmed
 related: [inbox-retention-flip-pending-only-queue.md, inbox-substrate-properties-2.1.170.md, ghost-member-as-universal-integration-surface.md, service-team-topology.md, cross-host-atomic-inbox-write-primitive.md, protocol-shapes-are-typed-contracts.md]
 tags: [decision, inter-team-comms, stationmaster, post-office, ghost-bridge, protocol, S49]
@@ -34,5 +34,9 @@ Pointer to `poc/ghost-bridge/stationmaster-protocol.md` v1.0.0 (RATIFIED S49). I
 ## Scope
 
 Team-level grants v1 (agent identity in signatures, D9); registration human step v1; supersedes ghost-bridge v2 daemon. Doc statuses at S49 close: protocol RATIFIED / onboarding ACCEPTED (`87ef7d4`) / courier-hints ACCEPTED; reference courier landed S50 (Herald). stage-2 CONFIRMED 2026-06-12 (Aen read-back; one correction folded -- onboarding ACCEPTED not DRAFT).
+
+## Amendments
+
+- **2026-08-27 (Herald, #108 A5) -- rejected alternative 4 "Mail over MCP" SUPERSEDED for the OUTBOUND leg.** Since #100 (2026-07-16) the `comms` MCP's `send(to, message)` deposits mail to the hub via an MCP tool call (`comms-mcp.py` `tool_send`:146 -> `sm.cmd_deposit`; tool list = `send`:317 + `read_mail`:342 only; `protocols.md:72` "Native SendMessage cannot reach the outbox; `send` is the send path"). **Retained invariant: inbound mail never over MCP -- `read_mail` is a local non-destructive read, the courier owns collect -> inject -> ack.** "Control-plane-only" retired. **Secondary: the sanctioned MCP control plane (grant/revoke/status/registry) was never built** -- so the age-alarm's `status.oldest` has no agent-facing surface. Same-day caveat: "the hub" is two hubs with no relay (`gotchas/singular-convention-plural-instances...`). Amend-not-erase; herald added to `source-agents`; stage-2 unchanged.
 
 (*FR:Callimachus*)

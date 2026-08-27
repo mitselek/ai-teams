@@ -8,7 +8,7 @@ discovered: 2026-06-18
 last-verified: 2026-06-18
 stage-2: confirmed
 ttl: 2026-09-18
-related: [courier-must-runtime-discover-team-name.md, teams-substrate-2.1.179-implicit-teams.md, orphan-courier-holds-lock-across-sessions-wrapper-cannot-reclaim.md, courier-restart-needs-inboxes-dir-step25-before-step3.md]
+related: [courier-must-runtime-discover-team-name.md, teams-substrate-2.1.179-implicit-teams.md, orphan-courier-holds-lock-across-sessions-wrapper-cannot-reclaim.md, courier-restart-needs-inboxes-dir-step25-before-step3.md, precondition-without-an-owner-is-no-precondition.md]
 tags: [gotcha, 2.1.181, implicit-teams, courier, explicit-config, hardcoded-path, direction-4, fallback, bug-c, issue-86]
 ---
 

@@ -23,6 +23,7 @@ related:
   - documentation-vs-substrate-truth-divergence.md
   - roster-drift-from-reference-capability-register.md
   - ../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md
+  - relocation-manufactures-inbound-pointer-drift-leave-forwarding-stub.md
 ---
 
 # A Stale Snapshot Trusted as Current

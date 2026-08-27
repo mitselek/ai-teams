@@ -16,6 +16,7 @@ related:
   - teams/framework-research/wiki/patterns/shared-vocabulary-precondition-for-mergeable-fan-out.md
   - teams/framework-research/wiki/gotchas/verification-narrower-than-it-appears.md
   - teams/framework-research/wiki/patterns/detection-is-upstream-of-recovery.md
+  - teams/framework-research/wiki/gotchas/precondition-without-an-owner-is-no-precondition.md
 ---
 
 # A Self-Report Obligation Is Void Unless the Consumer's Schema Has a Slot to Carry It

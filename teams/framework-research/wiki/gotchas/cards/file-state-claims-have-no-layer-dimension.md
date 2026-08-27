@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-08-19
 last-verified: 2026-08-19
 stage-2: pending
-related: [dual-team-dir-ambiguity.md, frontmatter-reference-field-without-enforced-resolution-base.md, holding-a-measurement-is-not-having-applied-it.md, ../patterns/three-layer-substrate-truth-discipline.md]
+related: [dual-team-dir-ambiguity.md, frontmatter-reference-field-without-enforced-resolution-base.md, holding-a-measurement-is-not-having-applied-it.md, ../patterns/three-layer-substrate-truth-discipline.md, singular-convention-plural-instances-enumerate-from-the-registry.md, session-wake-on-inbox-write-two-unstamped-claims-contradict.md]
 tags: [gotcha, git, head-vs-worktree, no-slot-family, notation, cross-agent-claims, layer-ambiguity]
 ---
 

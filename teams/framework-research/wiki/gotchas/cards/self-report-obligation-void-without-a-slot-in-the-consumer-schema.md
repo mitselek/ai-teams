@@ -8,7 +8,7 @@ source-team: apex-research
 discovered: 2026-08-12
 last-verified: 2026-08-12
 stage-2: confirmed
-related: [shared-vocabulary-precondition-for-mergeable-fan-out.md, verification-narrower-than-it-appears.md, detection-is-upstream-of-recovery.md]
+related: [shared-vocabulary-precondition-for-mergeable-fan-out.md, verification-narrower-than-it-appears.md, detection-is-upstream-of-recovery.md, precondition-without-an-owner-is-no-precondition.md]
 tags: [pipeline, fan-out, schema, out-of-band-signal, truncation, silent-failure, cross-team, apex-research, structural]
 ---
 

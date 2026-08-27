@@ -17,6 +17,7 @@ related:
   - ../patterns/wiki-cross-link-convention.md
   - ../patterns/why-this-section-exists-incident-docs.md
   - cross-document-prose-procedure-drift.md
+  - ../patterns/relocation-manufactures-inbound-pointer-drift-leave-forwarding-stub.md
 ---
 
 # Citation Orphaning by Housekeeping Sweep (and Document-Local IDs Cited Across Document Boundaries)

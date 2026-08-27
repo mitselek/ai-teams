@@ -8,7 +8,7 @@ discovered: 2026-06-18
 last-verified: 2026-06-18
 stage-2: confirmed
 ttl: 2026-09-18
-related: [teams-substrate-2.1.179-implicit-teams.md, sessions-pid-json-not-gc-status-idle-lingers.md, startup-create-collapses-to-discover.md, courier-must-runtime-discover-team-name.md, no-teamdelete-stale-session-dirs-accumulate.md, negative-probe-result-underdetermined-absence-read-as-permanent.md]
+related: [teams-substrate-2.1.179-implicit-teams.md, sessions-pid-json-not-gc-status-idle-lingers.md, startup-create-collapses-to-discover.md, courier-must-runtime-discover-team-name.md, no-teamdelete-stale-session-dirs-accumulate.md, negative-probe-result-underdetermined-absence-read-as-permanent.md, session-wake-on-inbox-write-two-unstamped-claims-contradict.md]
 tags: [gotcha, substrate, 2.1.181, implicit-teams, sessions-json, cold-start, discovery, false-negative, v4-window, s57-halt, issue-86]
 ---
 

@@ -17,6 +17,8 @@ related:
   - frontmatter-reference-field-without-enforced-resolution-base.md
   - holding-a-measurement-is-not-having-applied-it.md
   - ../patterns/three-layer-substrate-truth-discipline.md
+  - singular-convention-plural-instances-enumerate-from-the-registry.md
+  - session-wake-on-inbox-write-two-unstamped-claims-contradict.md
 ---
 
 # "The File Says X" Has No Slot for Which Layer
