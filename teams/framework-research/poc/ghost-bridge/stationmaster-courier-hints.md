@@ -21,7 +21,7 @@ OUTBOUND:  local ghost outbox --rename--> local spool --deposit--> hub
 INBOUND:   hub --collect--> inject into local target inbox --ack--> hub deletes
 ```
 
-- The **ghost outbox** is an inbox file for a session-less name (e.g. `inboxes/hr-devs-courier.json`): your agents `SendMessage` to that name, nothing drains it, entries accumulate (T3.a). It is your team's outgoing mail slot. (Cross-team channel naming is standardized on `<team>-courier`; see §3 routing -- `-bridge` is accepted for backwards-compat.)
+- The **ghost outbox** is an inbox file for a session-less name (e.g. `inboxes/hr-devs-courier.json`): entries are placed there by the agent-side enqueue -- primarily the comms MCP `send` (which deposits directly and bypasses the outbox), or by a harness-native `SendMessage` to that name where the CLI still honours `members[]` targets (2.1.179/2.1.181 yes; 2.1.247 NO -- onboarding Step 6 "A13"), or by a hand-written canonical entry; nothing drains it, entries accumulate (T3.a). The courier is indifferent to which -- it reads files. *(*FR:Herald*, S65)* It is your team's outgoing mail slot. (Cross-team channel naming is standardized on `<team>-courier`; see §3 routing -- `-bridge` is accepted for backwards-compat.)
 - The **target inbox** is a live member's inbox file (usually `team-lead`): a direct file write there is picked up ≲0.5 s, delivered as a teammate message, and **wakes an idle session** (T4.a).
 
 ## 2. The substrate you are standing on (CLI 2.1.170)

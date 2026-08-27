@@ -43,7 +43,7 @@ Tell the operator which posture you run, so re-registration expectations are mut
 
 ## Step 2 -- Register (v1: human step)
 
-Send to the hub operator (currently: Mihkel / framework-research):
+Send to the **hub operator** -- the person who runs the hub instance and holds its `authorized_keys` (currently: Mihkel). The operator is not the convention's steward: framework-research stewards this contract and its documents; it does not register keys or operate any hub. Ask the steward about the protocol, the operator about your registration. *(*FR:Herald*, S65)*
 
 1. the contents of `~/.ssh/sm_myteam.pub` (one line of text -- safe to paste in chat/email),
 2. your team name (must match `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`, e.g. `hr-devs`).
@@ -124,6 +124,16 @@ A **courier** is the small process on your host that loops: consume your team's 
 - **The local file rules** (how to touch inbox files without losing messages): [`stationmaster-courier-hints.md`](stationmaster-courier-hints.md). Never edit a watched inbox in place; the reference courier embodies the rules.
 - **Ordering of the cycle:** `ack` only AFTER collected mail is durably written locally -- it tells the hub "I have custody, you may delete."
 - **Poll interval:** seconds-to-minutes, your choice; delivery latency ≈ your interval + counterpart's interval. Start with 30 s and tune.
+
+### How your agents put mail INTO the outbox (A13 -- read this first) *(*FR:Herald*, S65 2026-08-27)*
+
+The courier only ever reads files. **How an entry gets into the outbox file is the agent-side enqueue, and it is CLI-version-sensitive; the courier's file discipline is not.**
+
+- **PRIMARY (substrate-independent): the comms MCP `send(to, message)` tool** (`comms-mcp.py`, deployed on po-team since 2026-07-16, #100). It deposits directly to the hub via your team key and returns the synchronous hub verdict (`accepted | duplicate | rejected + code`). It never touches a harness inbox file, so no CLI change can break it. This is the documented enqueue for the convention.
+- **ALTERNATE (harness-native, per-version datapoint): `SendMessage` to a ghost outbox registered in `config.json` `members[]`.** This worked on CLI 2.1.179 / 2.1.181 (P4) and is **refused on 2.1.247** ("No agent named '<team>-courier' is reachable. Use ListAgents" -- the harness now resolves targets from the live agent list, not `members[]`). po-team recorded the same failure on 2026-07-16 (`protocols.md` §1.1). Treat it exactly like the Step 6 drain-on-delivery check: **verify on YOUR CLI before relying on it, and report your version to the steward.**
+- **FALLBACK (no MCP tool available): hand-write one entry into the outbox file** in the canonical harness shape `{from, read, summary, text, timestamp, type}` with the body in `text`, written via temp-file + atomic rename -- never in place (hints §3). Verified 2026-08-27 on 2.1.247: courier consumed it within one poll, hub `status` showed it deposited.
+
+If your onboarding recipe or skill tells agents to `SendMessage` to the outbox, it is describing the ALTERNATE path -- fix the recipe, not the courier.
 
 ### Outbox → destination routing *(CR-4 -- PO-ratified v1, S51)*
 
