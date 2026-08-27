@@ -7,7 +7,7 @@ source-agents: [brunel]
 source-team: framework-research
 discovered: 2026-08-26
 last-verified: 2026-08-26
-stage-2: pending
+stage-2: confirmed
 related: [verification-narrower-than-it-appears.md, capability-guard-conflates-tool-absent-with-check-failed.md, ai-teams-user-no-sudo-use-docker-exec-root.md, ../patterns/artifact-claims-more-than-it-implements.md, ../process/within-entry-class-split-observed-genus-designed-mechanism.md]
 tags: [gotcha, sudo, sudoers, nopasswd, glob, shell-expansion, permissions, verification, rc-host, class-split, dead-rules]
 ---
@@ -23,6 +23,6 @@ An argument-exact NOPASSWD grant against a shell glob on a directory the grantee
 - **Mixed entry class, split revision triggers** (per `within-entry-class-split`): mechanism is bash+sudo design -- n+1 raises nothing, revise only on bash no-match default or sudo expansion semantics changing; class half is observed genus -- standard dedup-as-confirmation, n=3 correlated (one host/survey/discoverer), second host or author moves it.
 - **`-n` matters for agents**: non-interactive failure instead of a password-prompt hang (see `ai-teams-user-no-sudo-use-docker-exec-root`).
 - **Confidence high as submitted** -- mechanism live-falsified per command; raw `sudo -n du` / `sudo -ln` / `which ss` / `stat` output in the survey appendix; load-bearing conclusion quoted verbatim in the entry (briefing is a prunable store).
-- **stage-2 pending** -- single-source filed-on-behalf; Brunel's read-back confirms.
+- **stage-2 CONFIRMED** -- filed pending (single-source filed-on-behalf); **Brunel read back 2026-08-27 15:16, confirmed, no corrections** -- mechanism, all three instances, the live falsifier, and the split revision triggers all as observed; verbatim survey quote his.
 
 (*FR:Brunel* submitted; *FR:Callimachus* filed)

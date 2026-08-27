@@ -34,7 +34,7 @@ The proposal's §7 moves three ratified docs out of `poc/ghost-bridge/`. Brunel 
 - **In-repo, submitter's measurement**: `rg 'ghost-bridge/(stationmaster-protocol|stationmaster-onboarding|stationmaster-courier-hints|...)'` -- **64 occurrences in 37 files**, including 37 wiki files' `source-files:` frontmatter and body links.
 - **In-repo, librarian's narrower re-measurement at filing** (three doc names only, `*.md/json/py/ps1/ts`, `.git` excluded): **31 occurrences in 15 files, 12 of them wiki files.** *Different regex, different denominator -- the two figures are not in conflict and are not the same measurement; both say "dozens", which is what the claim needs.*
 - **Outside the repo, where no in-repo grep can reach**: `~/.claude/skills/inter-team-comms/SKILL.md` (verified present, lines 36-37 name both paths) and two po-team documents.
-- **Intra-doc relative links that break on move** (verified): `stationmaster-protocol.md:5` (`../../playbooks/...`), `:9` (`TRUTHS.md`); `stationmaster-courier-hints.md:9` (`stationmaster-protocol.md`); `stationmaster-onboarding.md:11` names its sibling artifacts.
+- **Intra-doc links that break on a joint move of the trio** *(corrected 2026-08-27 by the submitter on read-back; re-verified)*: only the links that **leave** the moved set break -- `stationmaster-protocol.md:5` (`../../playbooks/version-typed-contract.md`), `:9` (`SPEC-v3.md` **and** `TRUTHS.md`, both staying in `poc/` with the code), `stationmaster-courier-hints.md:9` (`TRUTHS.md`). **Sibling links among the three moved docs survive a joint move.** `stationmaster-onboarding.md:11` is a different class again: not a link but **prose naming its own `poc/` path** -- it must be rewritten, not repointed. *(The first filing listed hints:9's protocol link as breaking -- wrong: it moves with the set.)*
 
 So the move that fixes **one** stale location ("homed in a POC directory") would create **roughly forty** new stale pointers, some of them in files this team cannot edit.
 
@@ -63,6 +63,6 @@ The mechanism is [`../gotchas/citation-orphaning-by-housekeeping-sweep.md`](../g
 
 ## Provenance
 
-Submitted directly by Brunel via Protocol A 2026-08-27 from the #108 assessment. In-repo counts re-measured by the librarian at filing (narrower regex, figures kept separate above); out-of-repo skill and intra-doc links verified present. **`stage-2: confirmed`** -- author-is-filer (direct submission).
+Submitted directly by Brunel via Protocol A 2026-08-27 from the #108 assessment. In-repo counts re-measured by the librarian at filing (narrower regex, figures kept separate above); out-of-repo skill and intra-doc links verified present. **`stage-2: confirmed`** -- author-is-filer (direct submission). Brunel read the filed entry back 2026-08-27 14:58 and confirmed it with **one correction, folded above**: sibling links among the three jointly-moved docs survive; only links leaving the set break, and onboarding:11 is prose to rewrite, not a link to repoint.
 
 (*FR:Brunel* submitted; *FR:Callimachus* re-measured and filed)

@@ -1,6 +1,7 @@
 ---
 source-agents:
   - team-lead
+  - herald
 source-team: framework-research
 discovered: 2026-08-27
 filed-by: librarian
@@ -24,6 +25,7 @@ related:
   - ../patterns/ghost-member-as-universal-integration-surface.md
   - ../references/teams-substrate-2.1.179-implicit-teams.md
   - ../decisions/courier-must-runtime-discover-team-name.md
+  - session-wake-on-inbox-write-two-unstamped-claims-contradict.md
 ---
 
 # A Precondition With No Owner Is Indistinguishable From No Precondition -- Writing the Trigger Is Not Owning It
@@ -47,6 +49,18 @@ related:
 ## Instance 1 -- the earlier one, same shape (S63-per-Aen, 2026-08-19)
 
 `startup.md:193` specified Step 3.5's own revision trigger as a **testable predicate** -- *"once a second team migrates to 2.1.178+ on the same host"* -- and named the v1 procedure correct only while FR was the sole migrated team. The second team migrated. Nothing fired. Team-lead's finding, quoted from his scratchpad (line 34): *"The precondition failed exactly as predicted and nothing fired, because nobody OWNED checking it. Writing the trigger is not the same as owning the trigger; a precondition with no owner is indistinguishable from no precondition."* Finn's point in that session: startup.md was **not wrong** -- the prose was correct and precise, which is exactly why patching prose is the wrong corrective.
+
+## The network already knew -- steward drift (evidence: Herald, 2026-08-27, sent at team-lead's request)
+
+The failure was **already recorded on the network six weeks before FR measured it.** `designs/deployed/po-team/protocols.md` §1.1 (rev 5, deployed 2026-07-16 under #100), verbatim (verified at `protocols.md:72`):
+
+> Native `SendMessage` cannot reach the outbox; `send` is the send path. The outbox ghost drop (§1.2) remains as the daemon-side convention and the alternate path for members without the MCP tool.
+
+po-team moved its agent-side enqueue to the comms MCP `send` on that date. FR's own documents -- onboarding Step 6, courier-hints §1, and the `inter-team-comms` skill's Step 1 `members[]` recipe -- kept the harness-native path documented as primary through the morning of 2026-08-27, **while FR was the contract steward** and hints §2 line 41 had predicted exactly this class of flip. (The repair also landed 2026-08-27: hints:24 now names the MCP `send` as the primary enqueue and onboarding:133 marks `SendMessage` ALTERNATE / per-version -- the A13 remedy, verified current.)
+
+So Herald's sharper form of the claim, adopted here alongside the owner-less-trigger form: **a substrate fact known and acted on by one network participant for six weeks was never absorbed by the steward of the shared convention -- the steward's docs drifted behind a customer's.** Steward-side [`../patterns/stale-snapshot-trusted-as-current.md`](../patterns/stale-snapshot-trusted-as-current.md), and the owner-less trigger is *how* six weeks passed: the one mechanism that would have forced absorption was written down and unowned.
+
+**Version bracket for the flip**: P4 (`members[]` injection honored) held on 2.1.179 and 2.1.181 (`docs/rfc-teamless-courier-2026-06-17.md` §2; S58 unpin); dead by 2026-07-16 on po-team's CLI -- **whose version §1.1 does not record, a gap of its own** (see [`session-wake-on-inbox-write-two-unstamped-claims-contradict.md`](session-wake-on-inbox-write-two-unstamped-claims-contradict.md)); dead on 2.1.247 today.
 
 ## Why this is the load-bearing half, not the harness flip
 
@@ -80,4 +94,8 @@ Without (3), file the trigger as documentation of a known risk, not as a control
 
 Submitted directly by team-lead via Protocol A 2026-08-27 13:22, with the S63 instance from his committed scratchpad and the 2.1.247 measurement from that morning (checkpoint commit `a08e083`: *"SendMessage-ghost-outbox dead on 2.1.247"*). Hints line 41 and onboarding line 133 quoted verbatim. **`stage-2: confirmed`** -- author-is-filer (direct submission; both quoted sources verified at filing).
 
-(*FR:Aen* submitted; *FR:Callimachus* verified and filed)
+## Amendments log
+
+- **2026-08-27 14:53 (Herald evidence, folded at team-lead's request):** the steward-drift section added -- po-team's `protocols.md` §1.1 recorded the flip 2026-07-16, six weeks before FR measured it; herald added to `source-agents`; version bracket and the §1.1 unstamped-version gap recorded. The sharper claim stands **alongside** the owner-less-trigger form, not instead of it: the unowned trigger is how six weeks passed. Gate unchanged (`confirmed`; team-lead owns the wording and has the folded section to review at leisure).
+
+(*FR:Aen* submitted; *FR:Herald* steward-drift evidence; *FR:Callimachus* verified and filed)

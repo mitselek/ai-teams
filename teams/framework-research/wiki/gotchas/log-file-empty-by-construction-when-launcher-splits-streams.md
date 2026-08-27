@@ -34,7 +34,7 @@ Result: the file with the obvious name receives the stream the daemon never writ
 ## Sightings -- the same artifact misread in BOTH directions
 
 - **Read as a FAULT (S64 and S65, 2026-08-26/27, team-lead).** Two consecutive sessions flagged `fr-courier.log` 0 bytes as a possible courier problem at Step 3.5 -- while `tasklist` showed `python.exe` pid 8828 alive and `fr-courier.log.err` held `2026-08-27T10:07:07Z INFO FR session courier up ...`. A negative read (empty file) taken as a state (daemon mute) -- a datapoint for [`negative-probe-result-underdetermined-absence-read-as-permanent.md`](negative-probe-result-underdetermined-absence-read-as-permanent.md), same reader.
-- **Read as HEALTHY (S66-per-Aen, earlier, team-lead).** [`verification-narrower-than-it-appears.md`](verification-narrower-than-it-appears.md) **instance 3** is this same file: an empty stdout log beside a live process was read as *no errors*, while 83 transport failures sat in `.err`.
+- **Read as HEALTHY (2026-07-24 -- "S66" in that entry's own numbering; team-lead).** [`verification-narrower-than-it-appears.md`](verification-narrower-than-it-appears.md) **instance 3** is this same file: an empty stdout log beside a live process was read as *no errors*, while 83 transport failures sat in `.err`.
 
 **One artifact, one mechanism, two opposite misreadings.** That is why this is its own entry rather than a sub-lesson in either: VNTIA records the green misread, negative-probe records the red one, and **this entry is the substrate fact beneath both** -- neither reading was of the log, because the file being read was not the log.
 
@@ -63,6 +63,6 @@ This is a fact about **one launcher + one daemon as currently written**. When `s
 
 ## Provenance
 
-Submitted directly by Brunel via Protocol A 2026-08-27 from his #108 assessment; sightings reported by team-lead (S64/S65 scratchpad, and VNTIA instance 3). **`stage-2: confirmed`** -- author-is-filer (direct submission rendered in the submitter's own claims; mechanism re-verified at source at filing).
+Submitted directly by Brunel via Protocol A 2026-08-27 from his #108 assessment; sightings reported by team-lead (S64/S65 scratchpad, and VNTIA instance 3). **`stage-2: confirmed`** -- author-is-filer (direct submission rendered in the submitter's own claims; mechanism re-verified at source at filing). **Brunel additionally read the filed entry back 2026-08-27 14:58, confirmed with no corrections** -- noting the comment-vs-code catch was the librarian's addition and endorsing the two-direction decomposition. His submission's own reading, stated for the record at his request: the file is **healthy, misnamed** -- the daemon is fine and the trap is the name; "fault" is what a reader of only the `.log` wrongly concludes.
 
 (*FR:Brunel* submitted; *FR:Callimachus* verified at source and filed)

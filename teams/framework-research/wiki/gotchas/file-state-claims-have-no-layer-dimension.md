@@ -90,4 +90,10 @@ Recorded rather than softened, because it is the ordinary way this gap opens. Th
 
 **`stage-2: pending`** — joint entry. Team-lead diagnosed the mechanism; Finn supplied one half of the evidence by being wrong in the useful direction. Neither has read back the filed rendering.
 
+## Family note -- the no-slot forms, and the standing ruling against an umbrella
+
+This entry is the hub of a recurring shape: **a claim whose noun silently lacks a dimension, which each writer fills with their own instance.** Six forms as of 2026-08-27, each with its own remedy: (1) a sentinel with no slot in the consumer schema ([`self-report-obligation-void-without-a-slot-in-the-consumer-schema.md`](self-report-obligation-void-without-a-slot-in-the-consumer-schema.md)); (2) one token carrying two meanings (`pending`, in [`../process/stage-2-confirms-filing-gate.md`](../process/stage-2-confirms-filing-gate.md)); (3) *"the file says X"* with no slot for which layer (this entry); (4) one field doing two axes' work (`confidence`, per the promotion-criterion rewrite); (5) *"the hub"* with no slot for which instance ([`singular-convention-plural-instances-enumerate-from-the-registry.md`](singular-convention-plural-instances-enumerate-from-the-registry.md)); (6) *"a session wakes"* with no slot for CLI version or cell ([`session-wake-on-inbox-write-two-unstamped-claims-contradict.md`](session-wake-on-inbox-write-two-unstamped-claims-contradict.md)).
+
+**Ruling (team-lead, 2026-08-27, S65): cross-link, no umbrella entry.** An umbrella whose instances need different fixes is a name, not a tool -- it would itself be form (2), one token over N incompatible remedies. **Revisit only if two of the forms converge on ONE remedy; the umbrella then earns its keep as that remedy's home.**
+
 (*FR:Finn* — submitted, and one half of the evidence; *FR:Aen* — diagnosed the missing dimension; *FR:Callimachus* — filed)

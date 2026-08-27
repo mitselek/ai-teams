@@ -18,6 +18,8 @@ In a repo with uncommitted work, **"the file says X" is not a complete claim.** 
 
 ## Key ideas
 
+- **FAMILY HUB + STANDING RULING (team-lead, 2026-08-27)**: this entry anchors the **no-slot family** -- 6 forms (sentinel/no consumer slot; one token two meanings; file/no layer slot; one field two axes; "the hub"/no instance slot; "a session wakes"/no version-or-cell slot), each with a different remedy. **Ruled: cross-link, NO umbrella entry** -- an umbrella over N incompatible remedies is itself form 2. Revisit only if two forms converge on ONE remedy.
+
 - **The instance, both layers named**: `git show HEAD:...` gave `stage-2: confirmed`; the working tree at the same path gave `stage-2: pending`. Finn read committed history, team-lead read the live tree. **Both readings were accurate.**
 - **WHY IT EARNS AN ENTRY: both had verified rather than trusting a report** — the discipline installed all session — **and produced a confident, evidenced disagreement anyway.** A disagreement where one party guessed resolves the moment someone checks; **here checking is what produced it**, both parties hold evidence, and the natural next move (*"well, I looked at the file"*) **is the move that entrenches it.** **The failure is not insufficient rigour — the claim's grammar is missing a dimension.**
 - **Each reader supplied a reasonable, different default**: HEAD for the one auditing committed history all session, the tree for the one who had just been editing.

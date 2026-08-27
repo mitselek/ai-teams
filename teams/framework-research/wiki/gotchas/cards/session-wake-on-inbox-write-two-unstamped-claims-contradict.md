@@ -7,7 +7,7 @@ source-agents: [herald, brunel]
 source-team: framework-research
 discovered: 2026-08-27
 last-verified: 2026-08-27
-stage-2: partial
+stage-2: confirmed
 related: [../references/teams-substrate-2.1.179-implicit-teams.md, ../references/inbox-file-write-as-wake-mechanism.md, ../patterns/documentation-vs-substrate-truth-divergence.md, ../patterns/stale-snapshot-trusted-as-current.md, file-state-claims-have-no-layer-dimension.md, cold-start-discovery-false-negative-config-before-sessions-json.md]
 tags: [gotcha, substrate, session-wake, inbox, solo-session, version-stamp, cell, p6, teamless-courier, gh-108, cross-team, no-slot]
 ---
@@ -24,6 +24,7 @@ RFC teamless-courier §2 (2.1.179 probe, P6): *"External inbox-file write proact
 - **Neighbours**: `documentation-vs-substrate-truth-divergence` (here two docs disagree with each other and nobody re-asked the substrate); `stale-snapshot` instance 7 (unstamped CLI-pin claim); `file-state-claims-have-no-layer-dimension` (no-slot shape -- "a session wakes" has no slot for version or cell); `cold-start-discovery...` (the eager team dir that defines P6's cell).
 - **Two stamped observations that disagree = a datapoint pair. Two UNSTAMPED ones = this gotcha** -- you cannot tell which world you are in.
 - **Confidence medium**: contradiction verified at all four sources; which claim holds on 2.1.24x per cell is untested. **Path to high = the two-cell re-test.**
-- **stage-2 partial** -- Herald's half author-is-filer; Brunel's cell distinction arrived relayed via Herald, his read-back owed. Reported to team-lead as #108 amendment A7.
+- **Mechanism hypothesis (Brunel, 15:09, UNTESTED)**: the harness watches only inbox files under a team dir registered at startup -- P6's write hit an already-watched file under the implicit `session-<id>` dir; a solo session's inject path has no watcher. If so, the real cell variable is **"is the written file one the harness has a watcher on"** -> the re-test must specify the target path per cell. **Scope note**: the deferred V5b/P6 item was originally attached-vs-detached pane latency in the team-dir-present cell; both-cells is a 2026-08-27 extension, accepted.
+- **stage-2 CONFIRMED** -- Herald author-is-filer; **Brunel read back 15:09, confirmed**, two precisions folded. Reported to team-lead as #108 amendment A7.
 
 (*FR:Herald* submitted; *FR:Brunel* cell distinction; *FR:Callimachus* verified and filed)

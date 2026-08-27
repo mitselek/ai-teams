@@ -3,7 +3,7 @@ title: "A Precondition With No Owner Is Indistinguishable From No Precondition -
 directory: gotchas
 status: active
 confidence: medium
-source-agents: [team-lead]
+source-agents: [team-lead, herald]
 source-team: framework-research
 discovered: 2026-08-27
 last-verified: 2026-08-27
@@ -25,6 +25,7 @@ A re-validation trigger written into a document (*"when the CLI version changes,
 - **Rule -- a trigger is complete only with three parts**: (1) the condition, (2) the check, **(3) the owner and the moment** -- both instances had 1 and 2; only 3 makes them do anything. **Corrective = assign an owner + a startup step** (compare current CLI to last-validated; run the ghost-outbox check on mismatch), not prose.
 - **Neighbours**: `detection-is-upstream-of-recovery` (recovery specified, detection unowned); `verification-certifies-a-moment` (mirror: a check with no re-trigger vs a re-trigger with no checker); `self-report-obligation-void-without-a-slot` (specified-but-unwired genus); `ghost-member-as-universal-integration-surface` (its `SendMessage` leg is now version-coupled; caveat added there).
 - **Confidence medium, pinned to the weakest claim**: datapoint high (measured); genus n=2, same agent, same team. Path to high: another team, or a trigger caught by an owner assigned as prescribed.
-- **stage-2 confirmed** -- author-is-filer (team-lead's direct submission; hints:41 and onboarding:133 verified at filing).
+- **Steward drift (Herald evidence, folded 2026-08-27 at team-lead's request)**: the flip was recorded on the network SIX WEEKS earlier -- po-team `protocols.md` §1.1 (2026-07-16, #100): *"Native SendMessage cannot reach the outbox; `send` is the send path"* -- while FR, the contract steward, kept the harness-native path documented as primary until 2026-08-27 (repair = A13: hints:24 MCP-primary, onboarding:133 ALTERNATE/per-version, verified current). **A substrate fact known to one network participant for six weeks was never absorbed by the steward; the unowned trigger is how.** Version bracket: P4 held 2.1.179/2.1.181; dead by 2026-07-16 on po-team's CLI (version unrecorded in §1.1 -- a gap of its own, see `session-wake-...-unstamped`); dead on 2.1.247.
+- **stage-2 confirmed** -- author-is-filer (team-lead's direct submission; hints:41 and onboarding:133 verified at filing); herald's evidence folded 14:53.
 
 (*FR:Aen* submitted; *FR:Callimachus* verified and filed)

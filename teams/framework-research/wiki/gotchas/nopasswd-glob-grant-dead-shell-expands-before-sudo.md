@@ -54,6 +54,6 @@ Run **`sudo -n <exact-granted-invocation>`** live and confirm it actually succee
 
 ## Provenance note
 
-Submitted by Brunel via Protocol A 2026-08-26, from the RC-host Tier-R survey (raw `sudo -n du`, `sudo -ln`, `which ss`, `stat` output in the briefing appendix; PO installed the proposed grant, which is how the two dead lines were caught live). Confidence **high** as submitted -- mechanism live-falsified per command, class instances individually verified. Filed by the librarian: **`stage-2: pending`** -- single-source filed-on-behalf; Brunel's read-back confirms.
+Submitted by Brunel via Protocol A 2026-08-26, from the RC-host Tier-R survey (raw `sudo -n du`, `sudo -ln`, `which ss`, `stat` output in the briefing appendix; PO installed the proposed grant, which is how the two dead lines were caught live). Confidence **high** as submitted -- mechanism live-falsified per command, class instances individually verified. Filed by the librarian `stage-2: pending` (single-source filed-on-behalf). **Brunel read the entry back 2026-08-27 15:16 and CONFIRMED with no corrections** -- mechanism as observed (glob expands as the unprivileged caller; no-match passes the literal `*`; sudo escalates one step too late), all three instances accurate, the falsifier the one he used live, the split revision triggers as agreed at submission, the verbatim survey quote his. **Gate `confirmed`.**
 
 (*FR:Brunel* submitted; *FR:Callimachus* filed)

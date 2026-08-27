@@ -19,7 +19,7 @@ tags: [gotcha, logging, stderr, stdout, redirection, launcher, courier, start-pr
 ## Key ideas
 
 - **Mechanism verified at both source lines** (2026-08-27). The launcher's own comment says *"Append both streams to the log"*; the code splits them -- `documentation-vs-substrate-truth-divergence` inside one 60-line file.
-- **One artifact, two opposite misreadings**: read as FAULT (S64/S65, team-lead -- datapoint for `negative-probe-result-underdetermined...`, same reader) and read as HEALTHY (`verification-narrower-than-it-appears` instance 3, S66). **This entry is the substrate fact beneath both** -- neither reading was of the log.
+- **One artifact, two opposite misreadings**: read as FAULT (S64/S65, team-lead -- datapoint for `negative-probe-result-underdetermined...`, same reader) and read as HEALTHY (`verification-narrower-than-it-appears` instance 3, 2026-07-24). **This entry is the substrate fact beneath both** -- neither reading was of the log. Submitter's own framing, kept on the record: **healthy, misnamed** -- "fault" is what a reader of only the `.log` wrongly concludes.
 - **Live evidence S65**: `fr-courier.log` 0 bytes; `fr-courier.log.err` holds `2026-08-27T10:07:07Z INFO FR session courier up ...`; `python.exe` pid 8828 alive via tasklist.
 - **Rule**: (1) read the launcher's redirection, (2) read the daemon's sink, (3) then open the file they agree on.
 - **Fix options (Volta owns the launcher)**: merge streams via a wrapper / courier logs to stdout; or name files by content (`.stdout.log` / `.stderr.log`). Either makes the comment true again.
