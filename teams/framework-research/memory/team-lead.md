@@ -79,36 +79,9 @@
 - **WARNING (my own epistemics, n=3 this session):** I asserted apex-authored S38-S42 commits were in OUR repo -- **wrong**, my shell cwd had drifted into the apex clone via an earlier `gh` call. I then guessed FR specialists number on apex's clock -- **disconfirmed** (apex S66 = 08-03, Hopper S66 = 07-24; ~1 apart, a near-miss that reads as a match). And my "our wiki is wikilink-shaped" premise was **wrong** (42 occurrences vs 1347 inline + 561 frontmatter). Pattern: I generalise from a plausible-looking sample before measuring. Finn and Cal both corrected me with counts; both times the count changed the answer.
 
 ---
-## S62 (2026-08-12) -- apex reference-integrity thread
+## S62 apex reference-integrity thread + S62 NEXT-SESSION BOOT -- PRUNED at S64 close
 
-**Trigger:** PO surfaced apex commit `07d272f5` -- `.claude/workflows/reference-integrity-audit.js` (*AR:Schliemann*), a 6-scanner/verify-batch/opus-filer fan-out auditing "references without a path" (classes C1-C8).
-
-**Run state (Finn, primary source):** it **RAN and did not FILE.** apex issue #186 (10:29Z) says verbatim *"Reference-integrity audit (running) will file the C8 worklist separately"*; script committed 10:43Z with subject `preserve`; at 11:02Z no audit issue exists. Bracketing commits are C1/C8 **fixes** (`make kulli-kivi section refs clickable`, `GitHub-compatible heading ids`, `working in-page heading anchors`) -- so the taxonomy was derived from defects they had just been bitten by. **Practice -> artifact**, extraction at the moment of demonstrated value. Alive-vs-dead undeterminable from outside.
-
-**Finn's measurements of OUR wiki (354 .md, 172 entries + 172 cards):**
-- Wikilinks: 42 occurrences / 14 distinct targets. **apex's flagship C4 is near-empty on our surface.**
-- Inline links: 1347, 10 unresolved, 3 are template placeholders in `wiki-cross-link-convention.md` itself -> **7 real breaks**. One is in a file minted THIS session, so we are still producing them.
-- Frontmatter: **561 refs across 4 incompatible bases** (44% wikiroot / 33% reporoot / 8% samedir / 3% citingdir / **9% unresolvable**); ~35 of the broken point into OTHER repos through a field with no repo dimension -- hence two literal unexpanded `$REPO/` strings committed in `gotchas/dual-team-dir-ambiguity.md`.
-- Verdict on "we found the disease, they built the thermometer": **mostly tidy, not vindicating -- the thermometer measures a different disease.** A path resolver only finds the *announcing* kind of break. Both our citation gotchas are **semantic**: referent still exists, its status changed. Live proof: `decisions/courier-must-runtime-discover-team-name.md:50` says "CLI is currently pinned at 2.1.177" and cites a memory file that **still resolves** and whose own text says the autoupdater is on past 2.1.193 -- we are on **2.1.220** today. **The link works; the claim it supports is dead.** No C1-C8 scanner catches this and neither can we cheaply. Naming the gap > building a scanner that cannot close it.
-- Recommendation adopted: **cheap 20% (the resolvers), decline the fan-out port.**
-
-**Cal's contributions beyond the reconciliation:** moved the filed pattern off my second-hand framing -- the schema declares `guessed_class: { type: 'string' }`, **free-form**, so a shared *schema* permits N private vocabularies: **schema constrains shape, taxonomy constrains values, only the second makes counts aggregable.** Found 2 defects in his own Tier-2 layer: a `patterns/cards/INDEX.md` gate line was a **stale snapshot of the entry whose thesis is stale snapshots** (9 days later, on its own INDEX row); and TTL flags lived on entries but not INDEX rows, so Tier-2 readers met no warning. Declined to re-sort mixed-order `patterns/cards/INDEX.md` after checking `gotchas/`+`process/` and finding append-chronological IS the convention -- correct call, a reflexive re-sort would have destroyed filing-order info on a false premise.
-
-**Also:** Hopper's scratch `cal-submission-5-framework-finding.md` **evaporated** -- not on disk, never in git; the finding was filed before it vanished, but a queued submission's only source artifact died within 9 days. Argument for filing promptly; instance of the decay genus.
-
-**Rescued:** Finn's 3 throwaway resolvers survived in `/tmp` after he died; preserved verbatim at `memory/rescued-wiki-ref-resolvers-2026-08-12.md` with known-gaps list. `/tmp` storage was itself apex class C7 -- the audit tool in the location the audit forbids. Finn to promote to `tools/` and delete the rescue file.
-
-### NEXT-SESSION BOOT (re-orient instructions for the session after S62)
-
-1. Read `startup.md` first (always), but **apply the 3 corrections in my WARNING above** -- Step 3.5 needs `-SessionPid`, must run BACKGROUNDED, and don't trust the sanitize skill's team resolution.
-2. **Pull first.** Then `git status` **before** trusting anything in this file -- see the S62 key result. My closing record is intent; the tree is fact.
-3. **Do NOT pre-spawn.** Wait for PO direction.
-4. **Cheapest high-value opener:** respawn **Finn** and **Callimachus** -- both have specific unfinished assignments listed in CARRY-FORWARD (1) and (2), already briefed, no re-explanation needed. Cal's 2 defects are 2-minute fixes.
-5. **VEO-78 is still the oldest untouched commitment** (pre-committed at S61 close, displaced twice). Atlassian MCP reconnect is the blocker; Jira is login-gated so WebFetch/curl hits the sign-in page.
-6. **If PO wants the apex loop closed:** ask Schliemann whether the 2026-08-12 audit run died. If it died, the forward-dated-provenance finding (`whenToUse` recorded `'First run: S68 2026-08-12 -> GH issue'` at commit time, asserting output that did not exist 19 min later) gains a real instance instead of staying structural. Both Finn and Cal reached that salvage independently from different angles -- n=1 artifact, but not idiosyncratic.
-7. Standing: tunnels healthy at S61 close (all 3 live, suspend mask holding, 0 restarts as of this morning) -- no action unless a new drop is reported.
-
-(*FR:Aen*)
+Pruned 2026-08-27 to hold the 100-line limit; superseded by the S64 boot block above. Full text in git: `git show 120064e:teams/framework-research/memory/team-lead.md` lines 82-112. Durable content already in the wiki (apex thread -> `key-expensive-verification-on-target-not-instance`, `frontmatter-reference-field-without-enforced-resolution-base`, `shared-vocabulary-...`).
 
 ## S63 transcript (2026-08-22, home Linux box)
 
