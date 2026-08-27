@@ -135,6 +135,8 @@ The courier only ever reads files. **How an entry gets into the outbox file is t
 
 If your onboarding recipe or skill tells agents to `SendMessage` to the outbox, it is describing the ALTERNATE path -- fix the recipe, not the courier.
 
+*Provenance: this path was recorded dead by po-team on 2026-07-16 (`designs/deployed/po-team/protocols.md` §1.1, "Native SendMessage cannot reach the outbox; `send` is the send path") and FR's steward documents carried it for six more weeks -- A13 is a steward-absorption failure, not a substrate surprise. (*FR:Herald*, #108 A13)*
+
 ### Outbox → destination routing *(CR-4 -- PO-ratified v1, S51)*
 
 A courier's outbound side reads a local ghost outbox and must supply the consignment's `to` (destination team). The hub routes by `to`, but a harness inbox entry carries no destination field -- so the courier originates `to` from the **outbox name**. The PO-ratified v1 resolution (candidate A, "per-destination outboxes"):
