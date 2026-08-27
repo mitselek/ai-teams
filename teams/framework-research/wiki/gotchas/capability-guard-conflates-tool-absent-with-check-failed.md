@@ -15,6 +15,7 @@ related:
   - verification-narrower-than-it-appears.md
   - control-narrower-than-its-name.md
   - cross-msys-argv-mangling.md
+  - negative-probe-result-underdetermined-absence-read-as-permanent.md
 ---
 
 # A `command -v X && X` Guard Conflates "Tool Absent" With "Thing Under Test Is Broken"

@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-07-24
 last-verified: 2026-08-26
 stage-2: partial
-related: [control-narrower-than-its-name.md, capability-guard-conflates-tool-absent-with-check-failed.md, deposit-ok-without-data-line-means-nothing-landed.md, api-gateway-error-vs-actual-server-state.md, rc-host-db-tunnel-architecture.md]
+related: [control-narrower-than-its-name.md, capability-guard-conflates-tool-absent-with-check-failed.md, deposit-ok-without-data-line-means-nothing-landed.md, api-gateway-error-vs-actual-server-state.md, rc-host-db-tunnel-architecture.md, negative-probe-result-underdetermined-absence-read-as-permanent.md]
 tags: [gotcha, verification, health-check, monitoring, reverse-ssh, ssh-forward, silent-failure, genus, cross-team, apex-104, held-confidence]
 ---
 
@@ -31,6 +31,7 @@ A health check that verifies the NEIGHBOURS of a thing -- that a process exists,
 - **Unrun experiment (canonical)**: establish `-R <p>:<unreachable-host>:<port>`, TCP-probe `<p>` remotely. Predict OPEN -> promote to high; CLOSED -> dispute.
 - **Revision trigger (mechanism sub-claim only)**: it's a claim about deliberate OpenSSH design, so n+1 sightings don't raise it -- only the experiment or a change in OpenSSH forwarding semantics. The genus half is observation-based (standard dedup-as-confirmation).
 - **TWO ENTRY CLASSES IN ONE ENTRY**, per the named convention `process/within-entry-class-split-observed-genus-designed-mechanism` -- this entry is its **instance 1 / worked example**. Not an ad-hoc call.
+- **Mirror entry (2026-08-27)**: `negative-probe-result-underdetermined-absence-read-as-permanent` -- same genus, sign reversed (an *absent* reading misread as non-existence, vs the *green* readings here). Cross-linked, not merged.
 - **Evidence**: S66 GH #104; `autossh-db-tunnels.sh:46-53`; `entrypoint-apex.sh:365-372`; baseline `11521 OPEN / 11522 OPEN / 11443 CLOSED`.
 - **stage-2 partial** -- filed `pending` on behalf of Hopper from a queued copy (not spawned at filing); **team-lead read back 2026-08-19** (co-author via instance 3) which advances it one step. **Hopper still owed** for `confirmed` -- he holds the unrun `-R` experiment. The confidence hold is untouched: still `medium`, mechanism sub-claim still unpromoted.
 

@@ -22,6 +22,7 @@ related:
   - timestamp-crossed-messages.md
   - documentation-vs-substrate-truth-divergence.md
   - roster-drift-from-reference-capability-register.md
+  - ../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md
 ---
 
 # A Stale Snapshot Trusted as Current
@@ -75,6 +76,7 @@ Also related:
 
 - **[`timestamp-crossed-messages.md`](timestamp-crossed-messages.md)** -- instance 5's mechanism is already recorded there at n=4, including the standing response (*diff their timestamp against your completion timestamp before re-applying; re-run their grep and send evidence, never a redo*). Instance 5 is cited here as a substrate datapoint, **not** as a new finding.
 - **[`../gotchas/cold-start-discovery-false-negative-config-before-sessions-json.md`](../gotchas/cold-start-discovery-false-negative-config-before-sessions-json.md)** -- the S57-halt sibling: a probe run inside a write window reads absence as fact. Same shape on the substrate-state axis.
+- **[`../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md`](../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md)** (added 2026-08-27) -- the genus the cold-start sibling belongs to, and **deliberately not an instance of this entry**: there the negative read was never true of the world, only of the probe, so nothing "aged". Adjacent in one property -- both deliver a plausible answer that says nothing about its own validity -- but the remedies differ (freshness check at point of use here; cause-disambiguation of a negative result there).
 - **[`documentation-vs-substrate-truth-divergence.md`](documentation-vs-substrate-truth-divergence.md)** -- how a claim comes to diverge from substrate. This entry is about a claim that *was* true and aged, rather than one born wrong. Different origin, same end state.
 - **[`roster-drift-from-reference-capability-register.md`](roster-drift-from-reference-capability-register.md)** -- roster-shaped instance of the same silence (a shed role produces no artifact).
 
@@ -92,6 +94,7 @@ Every claim below was verified against its source by the Librarian before filing
 - **Instance 5:** this session's team-lead transcript, 18:44 and 18:47 verification races against Finn's in-flight edits. Prior art: cold-start false-negative, `teams/framework-research/startup.md` (S57 halt) -- path verified present.
 - **Instance 6:** local `evr-ui-kit/package.json` version **`0.4.0`** vs. rumba `pnpm-workspace.yaml:13` catalog pin **`'@eesti-raudtee/ui-kit': ^0.10.0`** -- both verified on disk. (`pnpm-workspace.yaml:41` additionally allows `0.7.0 || 0.8.0 || 0.9.0 || 0.9.1 || 0.10.0`, which does not include 0.4.0.)
 - **Instance 7 (added 2026-08-12, Finn) -- IN THIS WIKI, and the sharpest case yet, because the citation is intact.** [`../decisions/courier-must-runtime-discover-team-name.md`](../decisions/courier-must-runtime-discover-team-name.md) stated *"The CLI is currently pinned at 2.1.177"* and cited a memory file **that still resolves**. The cited file's own text now records the autoupdater as **enabled** and the CLI carried past **2.1.193** -- and the running CLI is **2.1.220** as of 2026-08-12. **The link works. The claim it supports is dead.** Nothing in the reference announces the change; the citation is not broken, not dangling, and not even pointing at the wrong file. It is pointing at a file that changed its mind. Found while testing whether another team's reference-integrity scanner could detect this class -- see the coverage boundary below. (The false claim itself has been repaired in that entry.)
+- **Instance 8 (added 2026-08-27, cross-team -- Passepartout, Henry/PO team, Mihkel; independently phrased) -- an ops-doc inventory.** `teams/framework-research/docs/2026-08-27-stationmaster-consolidation-proposal.md` §6 audits the stationmaster paperwork and concludes, quoted verbatim: *"everything ratified is sound; everything* locational *or* statused *has drifted. Classic London-time -- precise documents, confidently consulted, wrong by a growing offset."* Concretely: the deployment runbook still reads NOT deployed about a hub live for months (the referent's **status changed** -- instance 1's mechanism, `gap-citation-acquires-hidden-dependency-on-closure`), and the ratified contract is still homed in `poc/ghost-bridge/` (**location drifted, identity did not** -- instance 3's mechanism). Same genus, seventh substrate, named by authors outside this team in their own vocabulary. **"London-time" is now an alias for this genus**: a clock that is precise, confidently read, and offset by an amount that grows with the time since it was last set -- which is exactly *decay-without-a-symptom*. The proposal's own remedy matches this entry's: *"rewrite, not a status flip"* -- re-validate the whole document at point of use rather than patch the one field that announced itself.
 
 ## The strongest evidence for this pattern is what happened to this entry
 
@@ -136,7 +139,7 @@ Instance 7 above is the proof, and it was found by deliberately testing the hope
 
 ## Note
 
-Observation-based, `confidence: high` -- **seven** instances across **six** substrates (six in the originating session plus instance 7 in this wiki, 2026-08-12), all directly observed, with the remedy demonstrated three times (instances 4 and 6 were caught by deliberate checks; instance 7 was found by deliberately testing a hopeful assumption).
+Observation-based, `confidence: high` -- **eight** instances across **seven** substrates (six in the originating session, instance 7 in this wiki 2026-08-12, instance 8 cross-team in an ops-doc inventory 2026-08-27), all directly observed, with the remedy demonstrated three times (instances 4 and 6 were caught by deliberate checks; instance 7 was found by deliberately testing a hopeful assumption).
 
 **On the over-abstraction risk**, raised by the submitter at filing: a genus entry spanning six instances across five substrates *can* be too general to act on. Filed anyway, on two grounds. First, it yields a **specific executable rule** (re-validate at point of use, against the consumer's own expectation) rather than a disposition -- the test for a pattern entry is whether it produces an action, and this one does. Second, its central claim is **discriminating, not a truism**: decay-with-a-symptom and decay-without-a-symptom are different failure classes. An entry that merely said "things go stale" would fail both tests and should not have been filed.
 

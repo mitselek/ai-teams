@@ -8,7 +8,7 @@ source-team: framework-research
 discovered: 2026-07-24
 last-verified: 2026-08-03
 stage-2: pending
-related: [verification-narrower-than-it-appears.md, control-narrower-than-its-name.md, cross-msys-argv-mangling.md]
+related: [verification-narrower-than-it-appears.md, control-narrower-than-its-name.md, cross-msys-argv-mangling.md, negative-probe-result-underdetermined-absence-read-as-permanent.md]
 tags: [gotcha, shell, health-check, silent-failure, capability-guard, nc, dev-tcp, probe-design, cross-team, apex-104]
 ---
 

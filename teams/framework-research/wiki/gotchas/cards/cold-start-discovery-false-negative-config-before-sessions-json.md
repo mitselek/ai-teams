@@ -8,7 +8,7 @@ discovered: 2026-06-18
 last-verified: 2026-06-18
 stage-2: confirmed
 ttl: 2026-09-18
-related: [teams-substrate-2.1.179-implicit-teams.md, sessions-pid-json-not-gc-status-idle-lingers.md, startup-create-collapses-to-discover.md, courier-must-runtime-discover-team-name.md, no-teamdelete-stale-session-dirs-accumulate.md]
+related: [teams-substrate-2.1.179-implicit-teams.md, sessions-pid-json-not-gc-status-idle-lingers.md, startup-create-collapses-to-discover.md, courier-must-runtime-discover-team-name.md, no-teamdelete-stale-session-dirs-accumulate.md, negative-probe-result-underdetermined-absence-read-as-permanent.md]
 tags: [gotcha, substrate, 2.1.181, implicit-teams, sessions-json, cold-start, discovery, false-negative, v4-window, s57-halt, issue-86]
 ---
 
@@ -26,6 +26,7 @@ On CLI 2.1.181, `session-<id>/config.json` is written EAGERLY on session start, 
 - **Sibling, same artifact, opposite end of life:** sessions-pid-json-not-gc-status-idle-lingers is the DEATH hazard (lingers -> false-positive on liveness); this is the BIRTH hazard (absent -> false-negative on discovery). Filed separately, opposite failure directions/fixes, cross-referenced not merged.
 - **Substrate-sheet note:** this is a **2.1.181** datapoint on the sheet's config-eager / sessions-json rows (the write-ORDER between them); cross-referenced, NOT folded into the 2.1.179 sheet (per its revision-trigger discipline).
 - **Version-coupled, 2.1.181.** Revision trigger: a CLI that writes sessions-json synchronously with config.json (closes the window). n+1 sightings don't strengthen (arch-fact dedup on the write-order fact). TTL 2026-09-18.
+- **Genus (added 2026-08-27)**: this is instance 1 of `negative-probe-result-underdetermined-absence-read-as-permanent` -- the substrate-independent rule; instance 2 there is an auth expiry read as an artifact deletion.
 - **stage-2: CONFIRMED** (S58) -- Herald (F1 owner) submitted independently; his Protocol-A submission converged with this prepped-on-behalf entry (dedup outcome-2) AND served as his Stage-2 confirmation. src-agents += herald; his "any substrate-state probe" generalization folded as the Scope section. No corrections to the prior body.
 
 (*FR:Callimachus*)

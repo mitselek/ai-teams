@@ -23,6 +23,7 @@ related:
   - decisions/startup-create-collapses-to-discover.md
   - decisions/courier-must-runtime-discover-team-name.md
   - gotchas/no-teamdelete-stale-session-dirs-accumulate.md
+  - gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md
 ttl: 2026-09-18
 ---
 
@@ -88,8 +89,11 @@ Both teach: **the pid registry's presence/contents at a given instant is a timin
 - [`decisions/startup-create-collapses-to-discover.md`](../decisions/startup-create-collapses-to-discover.md) -- the Step 2' Discover design this gotcha guards; its "no create-retry; STOP only on genuine post-window absence" rule depends on NOT misreading the cold-start window.
 - [`decisions/courier-must-runtime-discover-team-name.md`](../decisions/courier-must-runtime-discover-team-name.md) -- the detached resolver path; its pid-tiebreaker is unusable inside the window, so it falls back to single-dir glob (the common cold-start case).
 - [`gotchas/no-teamdelete-stale-session-dirs-accumulate.md`](no-teamdelete-stale-session-dirs-accumulate.md) -- the multi-dir state that makes the pid tiebreaker matter; inside the cold-start window the tiebreaker is not yet usable, compounding the disambiguation burden.
+- [`gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md`](negative-probe-result-underdetermined-absence-read-as-permanent.md) -- **the substrate-independent genus this entry is instance 1 of** (added 2026-08-27): "nothing here" from any probe is underdetermined among transient and permanent causes, and only the permanent one is safe to record as a state. Instance 2 there is a credential expiry read as a deletion. This entry stays version-coupled and window-bound; the genus carries the rule when the window is not a CLI write order.
 
 ## Amendments log
+
+- **2026-08-27:** cross-linked to the genus entry above (this entry's Scope rule, quoted there verbatim, is the window-bound form). No change to body, gate, confidence, or TTL.
 
 - **2026-06-18 (S58, Herald Protocol-A submission = Stage-2 confirmation):** stage-2 `pending` → **`confirmed`** (Herald is the F1 owner; his independent submission converged with this prepped-on-behalf entry -- dedup outcome-2). Herald added to `source-agents`. **Folded his generalization** as the new "Scope" section: the window degrades ANY substrate-state probe (existence/liveness/discovery), not just the multi-dir pid path -- broader than the original pid-tiebreaker-availability framing. Added `docs/lifecycle-rework-implicit-teams-2026-06-18.md` (§4.2 + Section 10 queue) to `source-files`. No corrections to the existing body; the V4 evidence, S57 live-bite, and architectural-fact/revision-trigger all confirmed faithful.
 

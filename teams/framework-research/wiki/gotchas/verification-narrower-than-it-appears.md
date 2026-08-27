@@ -19,6 +19,7 @@ related:
   - deposit-ok-without-data-line-means-nothing-landed.md
   - api-gateway-error-vs-actual-server-state.md
   - rc-host-db-tunnel-architecture.md
+  - negative-probe-result-underdetermined-absence-read-as-permanent.md
 ---
 
 # Verification Narrower Than It Appears
@@ -32,6 +33,8 @@ The check that would have caught the live instances below is *does this process'
 ## Sibling entry -- read both
 
 This is one of a **pair of genera**, deliberately not merged: this entry is *verification* narrower than it appears (the **observe** side); [`control-narrower-than-its-name.md`](control-narrower-than-its-name.md) is *control* narrower than its name (the **act** side). Merging them collapses the observe/act distinction. Cross-linked, separate.
+
+**Mirror entry (added 2026-08-27):** [`negative-probe-result-underdetermined-absence-read-as-permanent.md`](negative-probe-result-underdetermined-absence-read-as-permanent.md) is this genus with the **sign reversed** -- a *red/absent* reading misread as non-existence, where every instance below is a *green* reading misread as function. Same root (a probe read as measuring more than it does), opposite direction, different remedy. Cross-linked, not merged.
 
 ## Canonical technical instance -- TCP-connect probe on an `-R` forward
 

@@ -20,6 +20,7 @@ related:
   - ../gotchas/docker-port-empty-under-network-mode-host.md
   - ../gotchas/coordinator-supplied-material-anchors-the-delegation.md
   - documentation-vs-substrate-truth-divergence.md
+  - ../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md
 ---
 
 # A Daemon's Self-Report Confirms the Config, Not the Outcome -- Make an Independent Outcome Check the Primary Pass/Fail
@@ -61,5 +62,9 @@ Also adjacent, act-side: the single-limb plan is [`../gotchas/control-narrower-t
 ## Provenance note
 
 Submitted by Brunel via Protocol A 2026-08-26; team-lead co-credited as the reviewer whose question surfaced the containerd limb (Brunel then confirmed it structurally). The full writeup lives in a session-scratchpad briefing published to the PO as a Claude artifact -- **a prunable store, so the load-bearing lines are quoted above verbatim** rather than cited by path. Filed by the librarian: **`stage-2: pending`** -- Brunel's and team-lead's read-backs owed.
+
+## Amendments log
+
+- **2026-08-27 (correction, Tier-2 only).** The card's gate bullet had recorded, after team-lead's 2026-08-26 read-back, that the PO deleted/parked the briefing artifact -- offered as the quote-not-cite call "confirmed the hard way". **False.** The watch's "artifact not found" was team-lead's own expired auth token; `/login` restored it the next morning and the artifact is live, org-shared and current. This entry body never carried the claim (the provenance note says only that the artifact is a prunable store, which is true as a class and is the actual ground for quoting). Card amended struck-not-erased; the error's shape -- a transient absence generalised into a permanent state, and then used as evidence -- is filed as [`../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md`](../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md), instance 2. Gate state unchanged (`partial`, Brunel owed).
 
 (*FR:Brunel* submitted; *FR:Aen* co-source via review catch; *FR:Callimachus* filed)
