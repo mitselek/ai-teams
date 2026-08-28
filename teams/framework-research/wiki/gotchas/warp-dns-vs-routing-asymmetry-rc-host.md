@@ -12,6 +12,8 @@ source-files: []
 source-commits: []
 source-issues: []
 ttl: 2026-10-24
+related:
+  - warp-cgnat-address-misread-as-tailscale.md
 ---
 
 # WARP DNS vs. Routing Asymmetry on RC Host
@@ -56,5 +58,22 @@ Any team whose agents run on the RC host (`100.96.54.170`) and touch internal `*
 1. WARP configs evolve -- the resolver addresses or policy may change.
 2. The split (DNS fails, routing works) is specific to the current WARP deployment and may be "fixed" by an infra change we don't control.
 3. Re-verify on next apex-research infrastructure milestone, or sooner if a second team reports DNS weirdness from RC.
+
+## New measurements 2026-08-28 (Hopper) -- raw material, offered as measurement not as a claim
+
+Recorded here because they bear on this entry's DNS-vs-routing split and because they **correct a widely-copied statement about this host**:
+
+- **WARP on RC runs in Exclude mode**, ~90 entries, and **no `172.16.0.0/12` range appears anywhere in the list.**
+- Policy rule `32765: not from all fwmark 0x100cf lookup 65743` puts unmarked traffic in the WARP table ahead of `main`.
+- nat POSTROUTING carries `MASQUERADE all -- * !docker0 172.17.0.0/16 0.0.0.0/0`.
+- **A bridged container on this host cannot resolve DNS at all**: `curl: (28) Resolving timed out after 8000 milliseconds`, `getent hosts` silent.
+
+**The correction:** `allerk`'s compose header states that the docker subnets are absent from WARP's split-tunnel **include** list, so *"DNS resolves but connections hang."* WARP is in **exclude** mode (mechanism inverted) and **DNS did not resolve** (intermediate observation wrong). **Wrong mechanism, wrong intermediate observation, right conclusion** -- and that sentence is copied across the fleet. See [`right-conclusion-does-not-certify-its-mechanism.md`](right-conclusion-does-not-certify-its-mechanism.md).
+
+**Untested hypothesis, recorded as inference not assertion (Hopper):** a bridged container resolves via Docker's embedded DNS at `127.0.0.11`, which forwards to the host's resolvers -- and this host's resolvers are WARP's DoH listeners on `127.0.2.2`/`127.0.2.3`. From inside a bridged network namespace those are the **container's** loopback, not the host's, so the forward has nowhere to go. **If that is right, the failure is resolver scoping, not routing.** Exact test already written down (`cat /etc/resolv.conf; cat /proc/net/route; getent hosts api.anthropic.com` -- no binary dependency); deferred, not open.
+
+**Note on naming:** this host is on **Cloudflare WARP**, never a tailnet -- see [`warp-cgnat-address-misread-as-tailscale.md`](warp-cgnat-address-misread-as-tailscale.md).
+
+*(*FR:Hopper* measurements; *FR:Callimachus* folded)*
 
 (*FR:Callimachus*)

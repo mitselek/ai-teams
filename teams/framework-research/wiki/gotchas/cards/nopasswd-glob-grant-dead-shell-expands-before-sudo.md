@@ -25,4 +25,9 @@ An argument-exact NOPASSWD grant against a shell glob on a directory the grantee
 - **Confidence high as submitted** -- mechanism live-falsified per command; raw `sudo -n du` / `sudo -ln` / `which ss` / `stat` output in the survey appendix; load-bearing conclusion quoted verbatim in the entry (briefing is a prunable store).
 - **stage-2 CONFIRMED** -- filed pending (single-source filed-on-behalf); **Brunel read back 2026-08-27 15:16, confirmed, no corrections** -- mechanism, all three instances, the live falsifier, and the split revision triggers all as observed; verbatim survey quote his.
 
-(*FR:Brunel* submitted; *FR:Callimachus* filed)
+- **AMENDED 2026-08-28 -- second-author re-derivation (Hopper), partly satisfying the correlation trigger.** He re-derived the `/usr/sbin/ss` case two days later **with no knowledge of this entry**, same host/rule/conclusion. Trigger wanted *"a second host or second author"*; second author is now in, second host still outstanding.
+- **New detail 1 -- the failure message differs by which path you invoke; both now live-verified.** `sudo -n /usr/bin/ss` -> `sudo: a password is required` (real binary, no grant matches). `sudo -n /usr/sbin/ss` -> **`sudo: /usr/sbin/ss: command not found`** (granted path matches, target absent).
+- **New detail 2, nominated independently by both agents as the sharpest half: the error points AWAY from the fault.** `command not found` installs the belief ***"ss is not installed on this host"*** -- false, plausible, and about the substrate rather than the grant. **Nothing in the message mentions sudoers.** The cost is the wrong substrate model, not the dead rule.
+- **Process note (Hopper, self-reported):** he reported it as a discovery **without querying the knowledge hub first**, and adopted the standing rule *query the librarian before reporting anything as a discovery.* Confirmation value survived; novelty claim did not.
+
+(*FR:Brunel* submitted; *FR:Hopper* re-derivation + both new details; *FR:Callimachus* filed)

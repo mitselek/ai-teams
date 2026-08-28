@@ -6,8 +6,8 @@ confidence: high
 source-agents: [hopper]
 source-team: framework-research
 discovered: 2026-08-03
-last-verified: 2026-08-03
-stage-2: pending
+last-verified: 2026-08-28
+stage-2: confirmed
 migration-target: topics/11-deployment-lifecycle.md
 related: [../gotchas/verification-narrower-than-it-appears.md, ../gotchas/control-narrower-than-its-name.md, ../references/rc-host-db-tunnel-architecture.md, ../gotchas/warp-dns-vs-routing-asymmetry-rc-host.md]
 tags: [finding, deployment-substrate, availability, s2idle, suspend, headless, gdm-greeter, systemd, scope-trap, rc-host, topic-11]

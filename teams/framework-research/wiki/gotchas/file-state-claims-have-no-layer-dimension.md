@@ -94,6 +94,32 @@ Recorded rather than softened, because it is the ordinary way this gap opens. Th
 
 This entry is the hub of a recurring shape: **a claim whose noun silently lacks a dimension, which each writer fills with their own instance.** Six forms as of 2026-08-27, each with its own remedy: (1) a sentinel with no slot in the consumer schema ([`self-report-obligation-void-without-a-slot-in-the-consumer-schema.md`](self-report-obligation-void-without-a-slot-in-the-consumer-schema.md)); (2) one token carrying two meanings (`pending`, in [`../process/stage-2-confirms-filing-gate.md`](../process/stage-2-confirms-filing-gate.md)); (3) *"the file says X"* with no slot for which layer (this entry); (4) one field doing two axes' work (`confidence`, per the promotion-criterion rewrite); (5) *"the hub"* with no slot for which instance ([`singular-convention-plural-instances-enumerate-from-the-registry.md`](singular-convention-plural-instances-enumerate-from-the-registry.md)); (6) *"a session wakes"* with no slot for CLI version or cell ([`session-wake-on-inbox-write-two-unstamped-claims-contradict.md`](session-wake-on-inbox-write-two-unstamped-claims-contradict.md)).
 
+**Two forms added 2026-08-28:** (7) *"the `100.x` address"* with no slot for **which overlay** -- `100.64/10` is the shared RFC 6598 CGNAT range used by both Cloudflare WARP and Tailscale ([`warp-cgnat-address-misread-as-tailscale.md`](warp-cgnat-address-misread-as-tailscale.md)); (8) a record stating a conclusion **and** the mechanism offered for it, carrying **one truth-value slot for two claims** ([`right-conclusion-does-not-certify-its-mechanism.md`](right-conclusion-does-not-certify-its-mechanism.md)).
+
+**Two more forms added 2026-08-28 from the same batch:** (9) *"the image"* with no slot for **which host** -- one tag, two digests ([`image-tag-does-not-identify-the-image-across-hosts.md`](image-tag-does-not-identify-the-image-across-hosts.md)); (10) *"port 2230 is taken"* with no slot for **which host** ([`tcp-ports-are-a-per-host-namespace-no-fleet-uniqueness-invariant.md`](tcp-ports-are-a-per-host-namespace-no-fleet-uniqueness-invariant.md)).
+
+## [REVISIT TRIGGER MET -- the umbrella now has a candidate, and the librarian's recommendation has REVERSED. Team-lead's call.]
+
+**First recommendation, 2026-08-28 morning, now superseded and left on the record:** the librarian flagged forms (5) and (7) as converging on *one read-only call to the thing itself*, but **recommended still no umbrella**, on the ground that the remedy was not new -- it would duplicate [`../patterns/documentation-vs-substrate-truth-divergence.md`](../patterns/documentation-vs-substrate-truth-divergence.md).
+
+**Brunel then supplied a unification that is better than that objection, and it passes the ruling's own test.** The shared shape across forms 5, 9 and 10:
+
+> **An identifier unique only within a scope, used as if globally unique.**
+
+| Form | Identifier | Scope | Every per-scope document reads true |
+|---|---|---|---|
+| 5 | *"the hub"* / `stationmaster` | hub instance | yes |
+| 9 | `backlog-triage-claude:latest` | host | yes -- each host's `docker images` is correct |
+| 10 | `2230` | host | yes -- RC and shipyard are both correct |
+
+**And the umbrella explains why the remedies differ, which is the test of a real umbrella rather than a name:**
+
+> **Name the scope -- unless a scope-free identifier exists, in which case use it.**
+
+A **digest is a scope-free image identifier**, which is why *"pin by digest"* is available for form 9. Ports have none and hubs have none, so *"say which host"* / *"enumerate from the registry"* is the fallback where no such identifier exists. **The umbrella carries a discriminating question that none of the instances carries alone: *does a scope-free identifier exist for this thing?*** That is executable, and it is not `documentation-vs-substrate-truth-divergence` -- that pattern is about docs disagreeing with reality, this is about an identifier's scope being unstated.
+
+**Librarian's revised recommendation: file the umbrella**, over forms 5/9/10 only, with the instances staying separate as instances. **Forms 1, 2, 3, 4, 6, 7 and 8 are NOT covered by it** -- they are missing dimensions of other kinds (consumer schema, token meaning, file layer, field axis, version/cell, overlay, truth-value), and folding them in would recreate exactly the one-token-N-remedies defect the original ruling refused. **Form 7 (address/overlay) is the interesting boundary case:** an address is scope-bound like a tag, but the discriminating question resolves to *ask the host*, not *find a scope-free identifier* -- so it sits outside on the current reading. **Not acted on. Team-lead holds the ruling.** *(*FR:Brunel* unification; *FR:Callimachus* recorded and reversed his own recommendation)*
+
 **Ruling (team-lead, 2026-08-27, S65): cross-link, no umbrella entry.** An umbrella whose instances need different fixes is a name, not a tool -- it would itself be form (2), one token over N incompatible remedies. **Revisit only if two of the forms converge on ONE remedy; the umbrella then earns its keep as that remedy's home.**
 
 (*FR:Finn* — submitted, and one half of the evidence; *FR:Aen* — diagnosed the missing dimension; *FR:Callimachus* — filed)

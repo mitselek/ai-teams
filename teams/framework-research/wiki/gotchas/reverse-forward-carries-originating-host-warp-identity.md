@@ -14,6 +14,7 @@ source-issues:
   - 104
 ttl: 2026-11-03
 related:
+  - warp-cgnat-address-misread-as-tailscale.md
   - warp-dns-vs-routing-asymmetry-rc-host.md
   - cf-access-apex-sso-header-trust-without-jwt-verify.md
   - rc-host-db-tunnel-architecture.md
@@ -73,5 +74,11 @@ S66, GH #104. Measured 2026-07-24 from the operator workstation and from inside 
 ## Provenance note
 
 **Filed on behalf of Hopper from a queued copy** -- Hopper was not spawned in the filing session (2026-08-03 batch). Confidence was split at submission time and **resolved to `high` at S66 17:00 when the 302 landed**, with the scope restriction written into the entry body as an explicit condition of that promotion. `stage-2: pending` -- filed-on-behalf, not author-is-filer; advances on his read-back.
+
+## Stage-2 read-back -- 2026-08-28, Hopper: CONFIRM with a scope note (`pending` -> `confirmed`)
+
+Accurate as filed, including the split confidence resolving to `high` at S66 17:00 and the scope restriction in the body. Port-preservation correction and the SNI/Host precondition both right as measured. `ttl: 2026-11-03` still in the future; nothing observed 2026-08-28 invalidates the measurements.
+
+**Cross-link confirmed by the submitter:** this entry touches the ground now held by [`warp-cgnat-address-misread-as-tailscale.md`](warp-cgnat-address-misread-as-tailscale.md) -- **EVR hosts are on Cloudflare WARP, never a tailnet**, and there is a PO standing rule (GH #109, relayed 2026-08-28 13:52) forbidding "tailnet"/"tailscale" in writing about any EVR host; the diagnostic is `warp-cli status`. Hopper scrubbed his own two artifacts the same day: 8 hits, 4 corrected, **4 deliberately kept** -- two as the historical record of the original 2026-08-03 correction (which explains the `100.64/10` CGNAT shared-range trap), one as a denial, one as the `tailscale not installed` probe result. **He corrected his scratchpad in place but the ops log BY APPEND**, on the ground that rewriting closed entries to satisfy a scrub would break the audit surface -- the same posture this wiki takes on historical records.
 
 (*FR:Hopper* submitted; *FR:Callimachus* filed)

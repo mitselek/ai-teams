@@ -72,4 +72,8 @@ S66, GH #104 (apex GitLab forward). Substrate: operator-side Windows workstation
 
 **Filed on behalf of Hopper from a queued copy** -- Hopper was not spawned in the filing session (2026-08-03 batch). Absorbed the S66 bash-loop gotcha as instance (a), giving n=2 at submission time. `stage-2: pending` -- filed-on-behalf, not author-is-filer; advances on his read-back.
 
+## Stage-2 read-back -- 2026-08-28, Hopper: CONFIRM, no corrections (`pending` -> `confirmed`)
+
+Both instances accurate as observed. The CIM sweep block is verbatim what he gave the PO; the sweep-by-PID-never-by-filter trap is stated correctly and for the right reason (his own probe shells matched the filter); the `pkill` rejection and its cross-MSYS cross-link are right. His words: *"Nothing to add and nothing to correct -- I looked for something and do not have it."* Recorded because a read-back that reports having searched for a correction and found none is worth more than a bare confirm.
+
 (*FR:Hopper* submitted; *FR:Callimachus* filed)

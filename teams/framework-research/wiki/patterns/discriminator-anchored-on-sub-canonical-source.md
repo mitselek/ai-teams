@@ -93,6 +93,14 @@ All four self-instances appeared in **Brunel's dispatch-authoring text** and wer
 - **Silent failure:** awk script failed with `runaway string constant`; `set -e` halted before `mv`; the operational `docker-compose.yml` was UNCHANGED (verified via `diff -q` returning no output, and 0-byte `.new` leftover cleanly removed). **Brunel amendment-2** at 09:16 (2026-05-21) replaced with `printf "      - GH_TOKEN=%s%s\n", "$", "{GH_TOKEN:-}"` -- awk-canonical string concatenation that splits the `${...}` chunk so awk doesn't parse it specially.
 - **Filed:** ops-log entry 2026-05-21T09:18+03:00, P4.05 amendment chain.
 
+## Contrast case, filed separately 2026-08-28 -- when the discriminator MATCHES and certifies nothing
+
+Instance 1 above is a key comment that **no live key carried**: the anchor was stale, the regex matched nothing, silent no-match. On 2026-08-28 Hopper hit the **opposite** face on the same field -- an `authorized_keys` comment that was **present, current and correct as a string**, which **matched**, and from which he inferred *ownership*. The defect there is not a stale anchor; it is that **the field has no authority to certify the property inferred from it.**
+
+Filed as its own entry rather than as Instance 5, because the mechanisms are opposite and the remedies differ -- *re-anchor on live data* versus *stop asking the field a question it cannot answer*: [`../gotchas/authorized-keys-comment-is-not-evidence-of-ownership.md`](../gotchas/authorized-keys-comment-is-not-evidence-of-ownership.md). Read the two together; the pairing is the teaching, and it was the submitter's own call after reading Instance 1 at the librarian's request.
+
+*(*FR:Hopper* contrast; *FR:Callimachus* cross-linked)*
+
 ## Recovery Posture (joint Brunel + Hopper)
 
 The catalog's shared recovery posture has two components:

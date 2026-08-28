@@ -7,7 +7,7 @@ source-agents: [team-lead, brunel, celes]
 source-team: framework-research
 discovered: 2026-08-22
 last-verified: 2026-08-26
-stage-2: partial
+stage-2: confirmed
 related: [../patterns/recursive-narrowing-substrate-truth-evidence-discipline.md, ../process/soft-verdict-discipline-on-substrate-mapping-briefs.md, ../patterns/three-role-discipline-stacking-within-dispatch-arc.md, ../patterns/stale-snapshot-trusted-as-current.md, verification-narrower-than-it-appears.md]
 tags: [gotcha, delegation, briefing, anchoring, coordinator, specialist, team-lead, po-feedback, held-confidence, withdrawal-recorded]
 ---
@@ -17,6 +17,9 @@ tags: [gotcha, delegation, briefing, anchoring, coordinator, specialist, team-le
 A coordinator who puts material **into** a delegation -- looked-up facts, framing, an outline, candidate answers -- anchors the specialist to it, and a specialist working inside that framing **will not surface defects the framing itself contains.** The brief carries authority, the coordinator's copy displaces the specialist's own, and nothing signals that a displacement happened. Remedy is two-part and both parts are required: **ask rather than fetch**, and **say the outline is a floor, not a ceiling** -- that sentence is what licenses contradiction.
 
 ## Key ideas
+
+- **stage-2 CONFIRMED 2026-08-28 (gate CLOSED, 3 of 3).** Celes read back: **CONFIRM, no corrections -- and RECORD, not recollection.** She is a respawn; her scratchpad holds the S63 outcome but **not which candidates were in team-lead's brief nor the PO's call-out**, so she confirms instance (a) is *consistent with* her written record, not that she recalls it. **Recorded as the weaker confirmation it is rather than counted as equivalent.**
+- **Second remedy-effectiveness datapoint (Celes, 2026-08-28), correctly declined as confidence evidence by its own supplier.** Her commission carried floor-not-ceiling; its safety-rule text **paraphrased a mechanism the live code contradicts** (endpoint described *"never configurable"* vs an env-configurable `SK_ENDPOINT` behind a substring guard; reserved-range check removed by `faa287e`), and **she read the branch at source and encoded the rail as built, not as briefed.** Same coordinator, so it does **not** move confidence -- the remedy working under the entry's own conditions. **Two such datapoints now, both declined by the agents who supplied them.**
 
 - **Instance (a), creative -- 2026-08-22.** PO delegated a naming choice to Celes; team-lead floated candidates in her brief anyway; she picked his #1; PO called it out. The un-anchored candidate was the genuinely-hers one.
 - **Instance (b), factual -- 2026-08-26.** Team-lead grepped the repo for an RC host's SSH details before briefing Brunel (PO: *"you could have just asked"*). `prompts/aeneas.md` already forbids the coordinator reading reference material to work things out himself.

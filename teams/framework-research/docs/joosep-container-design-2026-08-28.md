@@ -10,6 +10,17 @@ boundary"* verbatim; **`[PO-12]` reframed** -- key comments on this host are doc
 the decision is "identify all four keys by fingerprint, *then* decide", not "revoke Joosep's key";
 §2.4 corrects allerk's stated WARP mechanism and adopts Hopper's probe amendment; §2.2 pins the
 npm-vs-native collision rule; §3.3 gains the three-PATH-sources finding; new `[PO-14]`.
+**v3.5** (16:02) `[PO-18]` **CLOSED** -- no provisioning-side connector step; it is the team's second
+assignment. **Corrected a wrong claim in `FIRST-TASKS.md`** against the apex-research response
+(`34f2f310`, read at source): "the team must not exceed its principal" is false for `rumba`, where
+Joosep holds **GitHub admin over an unprotected `main`**. The PAT instruction is now *deliberate
+least-privilege* -- grant your agents less than you hold -- which is a different and harder ask.
+Safety section reframed: he **authored** `39f16a83`, so it no longer explains his own code back to him.
+**v3.4** (15:34) `[PO-12]` **CLOSED -- revoke Joosep's key from `dev`.** The fingerprint check ran and
+confirmed the label (one key, his, line 3); same key keeps opening his container, no re-key. Added as
+runbook **Step 9d**, sequenced after container access is proven, with a held-open second session and
+STOPs on match-count and on file mtime. §2.8/§2.9 conditional discharged: the scoping claims now
+describe his actual reach, though the container still is not a boundary.
 **v3.3** (14:32) `[PO-3]`/`[PO-4]` **CLOSED -- credentials move to the team.** Container now starts
 under-credentialled by design; `.env` requires nothing. New `FIRST-TASKS.md` seeded into the container.
 Atlassian is the **EVR connector**, not an API token -- which **closes the Confluence gap** and removes
@@ -660,15 +671,21 @@ must-not-reach list with "no host user account for Joosep, no host SSH, no host 
 and every team's `.env`. Four keys hold that. So most of v1's list was already reachable through
 channels that predate this design.
 
-> **Precision correction, and it matters for `[PO-12]`.** v2 said "Joosep already has SSH access."
-> That overstates the evidence. allerk's README (§2.8 quote below is a different section) documents
-> that **key comments on this host do not identify their owner** -- the key labelled `hr-platform` in
-> that same file is in fact the PO's own Windows client key. Hopper raised this against his own earlier
-> report. So the defensible statement is: **a key labelled `joosep.madar@evr.ee` is installed on
-> `dev`**, and whose key it actually is requires a fingerprint comparison, not a reading of the comment.
-> The posture conclusion is unchanged -- four keys have root-equivalent host access either way -- but
-> the *decision* must be framed as "identify all four by fingerprint, then decide", not "revoke
-> Joosep's key."
+> **Precision correction, then RESOLVED.** v2 said "Joosep already has SSH access", which overstated
+> the evidence: allerk's README documents that **key comments on this host do not identify their
+> owner** (the key commented `hr-platform` in that same file is the PO's own Windows client key), so
+> the defensible claim was only that *a key labelled* `joosep.madar@evr.ee` was installed. Hopper
+> raised that against his own earlier report and I reframed `[PO-12]` as "identify by fingerprint,
+> *then* decide."
+>
+> **That check ran and the label was accurate.** Hopper byte-matched the key Joosep supplied to `dev`'s
+> `authorized_keys` **line 3**, fingerprint
+> `SHA256:g9kExnzOJyjyMGgqfGbecWDwZpGR2g/e5DoR49jKY70`. So it is one key, and it is his.
+>
+> Worth keeping the sequence rather than collapsing it to "we were right all along": the comment
+> happened to be truthful, but we did not know that until it was measured, and the intervening
+> decision would have been made about an unknown. **The check was cheap and the label being correct
+> this time is not evidence that labels can be trusted next time.**
 
 Stating the honest posture:
 
@@ -677,6 +694,21 @@ Stating the honest posture:
 > can be rebuilt or thrown away without touching anything else, with its own credentials and its own
 > state. Presenting it as a containment control would be theatre, and worse, would let real questions
 > about host access go unasked because a container "handles" them.
+
+> **The paragraph above is still true about containers, and the specific gap it was written about is
+> now closed** -- `[PO-12]`, PO decision 2026-08-28 15:27: **Joosep's key is revoked from `dev`**
+> (runbook Step 9d, after his container access is proven). He does not manage containers, so he needs
+> no host account. The container becomes his only path.
+>
+> That does two things worth separating. It makes the **scoping** claims in the table below actually
+> load-bearing for him rather than decorative -- there is no longer a parallel route around them. It
+> does **not** turn the container into a security boundary: `dev` is still in the `docker` group, and
+> anyone who has it still has root-equivalent host access. What changed is who holds that, not what a
+> container is.
+>
+> The honest framing after the revoke: **this is a scoped workspace whose scope now describes his
+> actual reach**, which is the most a container can offer. `[PO-14]` (rootless Docker or separate
+> Linux accounts) remains the only answer if a real boundary is ever wanted.
 
 **It was already written down, and more bluntly.** allerk's README, verbatim:
 
@@ -718,13 +750,29 @@ rather than a lock. Given §2.8's honest posture, withholding sudo buys very lit
 Aen asked for a recommendation between (a) leave the `dev` key and add a container key, and (b)
 container-only, revoke from `dev`.
 
+> ## `[PO-12]` CLOSED 2026-08-28 15:27 -- (b), revoke
+>
+> **Step 0 ran and resolved the unknown.** Hopper byte-matched the supplied key to `dev`'s
+> `authorized_keys` line 3, fingerprint `SHA256:g9kExnzOJyjyMGgqfGbecWDwZpGR2g/e5DoR49jKY70`. One key,
+> his. The conditional below is therefore discharged rather than hanging.
+>
+> **PO decision: revoke.** He will not manage containers, so no host access is needed. Because it is
+> the *same* key, it keeps opening his container -- **no re-key, no second credential.**
+>
+> Executed as **runbook Step 9d**, deliberately sequenced *after* Step 9 proves his container access
+> works: revoking before that would remove one path without having confirmed the other. Matched by
+> fingerprint rather than comment, with a second `dev` session held open throughout, a STOP if the
+> fingerprint match count is anything but 1, and a STOP if the file's mtime differs from Hopper's read
+> (which would mean the line-3 finding is stale).
+
 **Step 0, before either: identify all four keys on `dev` by fingerprint.** Comments on this host are
 documented-unreliable (§2.8), so "the key labelled `joosep.madar@evr.ee`" is a label, not an
 attribution. Concretely: `ssh-keygen -lf` each line of `/home/dev/.ssh/authorized_keys`, then compare
 against a key each claimed owner attests to. Until that is done, (a) and (b) are decisions about an
 unknown. This is Tier R and cheap; it should precede the PO conversation, not follow it.
 
-**Recommendation once identified: (b), conditional.** Reasons:
+**Recommendation once identified: (b), conditional** -- *retained below as the reasoning of record; the
+condition is now discharged.* Reasons:
 
 1. `dev` + `docker` group is root-equivalent on RC. If the intent is that Joosep's working surface is
    his container, a key on `dev` makes every control in §2.8 decorative -- and worse, makes the design
@@ -970,12 +1018,63 @@ is the one that changes the container:
    > reachable from the agent session. This is the one place in this design where a container-level
    > control is doing real safety work rather than convenience-scoping.
 
+   > ### CORRECTION 2026-08-28 16:20 -- the brief is stale here in the same way it warns about
+   >
+   > Celes read the live branch; I verified at source (`origin/feat/VJS1-826-elron-test`). Two claims
+   > above are wrong.
+   >
+   > **(i) The endpoint IS configurable.** `send-request.ts:85` is
+   > `const endpoint = env.SK_ENDPOINT ?? DEFAULT_TEST_ENDPOINT`. What blocks a PROD send is a
+   > **substring guard**, `if (!endpoint.includes('EvrSK_test'))`, in **three copies** (`:87`, `:181`,
+   > `:266`). The rail is **variable + guard**, not a hidden URL. The container withholding
+   > `SK_ENDPOINT` is a **second layer on top of that guard**, not the guard itself — worth having,
+   > but it must not be described as the mechanism.
+   >
+   > **(ii) "Range enforcement must be non-bypassable" describes a check that no longer exists
+   > anywhere in the tool.** `faa287e` (2026-08-27, JoosepM-565) removed it *"from the client and the
+   > server (both actions)"* — its own commit message. **Correction to my first reading, from Celes:**
+   > I took `timetable.ts:10` (*"enforced server-side"*) as evidence the check had been **delegated**
+   > to the message centre. It was not. The "server" that docstring means is the **SvelteKit server
+   > action**, which no longer checks either — the comment simply **survived the deletion**.
+   >
+   > **That is worse than delegated-and-unverified, because a reader takes a stale guarantee as a live
+   > one.** Net: nothing in the tool enforces the ranges; whether the message centre does is unverified
+   > and unverifiable from here. The ranges are now **team discipline, not a tool constraint** — and
+   > *the tool's permissiveness is not the team's permission* (Celes's phrasing, `common-prompt.md`
+   > rule 4, which is authoritative for the agent-facing wording).
+   >
+   > **The instructive part.** The brief corrected the `isTest` removal, warning in terms that a team
+   > told to rely on it *"would believe itself protected by a mechanism hard-coded to the unsafe
+   > value"* — and then, one line later, leaned on **range enforcement**, which had been removed the
+   > day before the brief was written. **Same failure class, one line apart, inside the document that
+   > names the class.** A guardrail inventory goes stale at the speed of the code, not the speed of
+   > the review; and correcting one item in such an inventory does not re-date the others.
+   >
+   > **Accurate as of 2026-08-28: one client-side rail, not two.** A substring guard on a configurable
+   > variable, triplicated, plus a server-side range check nobody here has confirmed. The container's
+   > contribution — withholding `SK_ENDPOINT` — is worth more, not less, given that the rail is
+   > thinner than the brief describes.
+
 2. **No Cloudflare deploy credentials** -- VJS2 releases via GitFlow with PR review as the gate; the
    team observes the gate, it must not pass through it. *(Confirms my `[PO-3]`: no `CLOUDFLARE_*`.)*
 3. **No merge/push rights to `main` on any repo.** `HES-integration-tests` accepts direct-to-`main`
    pushes with no PR history -- **the absence of a guardrail is not permission.** Branch + PR only. He
    is **not** in `vjs-code-reviewers`, so the team cannot approve merges and must not be given a path
    that lets it.
+
+   > **This one is NOT a ceiling, and that distinction is load-bearing** (apex-research response
+   > `34f2f310`, verified via `gh api`): VJS2-team membership gives Joosep **GitHub admin on `rumba`**,
+   > over an **unprotected `main`**, plus write on `HES-integration-tests`. So for these two repos the
+   > constraint is not "the team must not exceed its principal" -- his principal *has* the rights. It
+   > is **deliberate least-privilege: grant the agents strictly less than the human holds.**
+   >
+   > That matters because it is the one instruction in the package a well-intentioned person will
+   > silently over-satisfy. Ticking "Contents: Read and write" on the PAT form is not overreach from
+   > his point of view; it is his own access. `FIRST-TASKS.md` task 1 has been rewritten to say so
+   > explicitly and to name the feeling ("this will seem unnecessary while you are clicking through
+   > the form"), because a rule whose rationale is wrong gets discarded the first time it is
+   > inconvenient. **Item 4 below IS a genuine ceiling** (he requested Jira admin and does not have
+   > it) -- the two are different kinds of constraint and the package now distinguishes them.
 4. **No Jira admin rights** -- he requested them (ITSD-39812) and does not have them. The team must not
    exceed its principal.
 5. **No Jira/Confluence write outside VEO-98, his own VJS1 issues, and the VJS2 space.** Hygiene
@@ -1051,7 +1150,7 @@ Acceptance checks for whoever executes the build (not me):
 | **PO-17** | *(deferred, not open)* Is bridge networking recoverable via an explicit `dns:` setting? The probe's failure was resolver-scoped, and the routing question was never exercised | **Do not pursue now.** One cheap probe if isolation is ever wanted for a named reason; the exact command is in §2.4 | -- |
 | ~~**PO-3**~~ | ~~GitHub token scope~~ | **DECIDED 14:24 (PO): scope as recommended, but CREATED BY Joosep's team as task 1**, not supplied by the PO (§2.6a) | ~~open~~ **CLOSED** |
 | ~~**PO-4**~~ | ~~Atlassian credential owner~~ | **DECIDED 14:24 (PO): EVR connector, no API token at all.** Closes the Confluence gap as a side effect (§2.6a) | ~~open~~ **CLOSED** |
-| **PO-18** | The EVR connector's exact install/enable step inside a container | **Unknown to me and deliberately not guessed** -- `FIRST-TASKS.md` task 2 says so and gives three verifications instead. PO supplies the step at hand-over | hand-over |
+| ~~**PO-18**~~ | ~~The EVR connector's exact install/enable step~~ | **DECIDED 15:52 (PO): there is no provisioning-side step.** Enabling the connector is the team's **second assignment** -- his agents steer him through it interactively, which is the shape `FIRST-TASKS.md` task 2 already had. Runbook Step 13 rewritten from "owed by the PO" to "resolved by team task" | ~~open~~ **CLOSED** |
 | **PO-5** | Anthropic auth -- whose account funds it | OAuth at first run; confirm the account | first run |
 | **PO-6** | Python 3 in the image? | omit in v1; add if the brief shows a need | image |
 | **PO-7** | Join the stationmaster mail network? | **no** in v1; add later if a real correspondent exists. EVR island = prod-llm hub only | later |
@@ -1060,7 +1159,7 @@ Acceptance checks for whoever executes the build (not me):
 | **PO-10** | Resource ceilings -- and whether a **second** container promised 12/20 cores + 40/62 GiB is right | match allerk (12 / 40G) and accept the overcommit; add `pids_limit: 512`. Alternatives (lower-and-asymmetric, or fleet-wide reservations) costed in §2.5 | build |
 | **PO-13** | WARP CA: bind-mount the host file (apex) or bake a copy into the image (allerk) | **bind-mount** -- a stale baked CA fails silently as fake network errors; a moved host path fails loudly at boot (§2.2) | build |
 | **PO-11** | In-container `sudo`? | **grant it**, matching allerk; treat reproducibility as convention, not a lock (§2.8) | build |
-| **PO-12** | **Four keys on host `dev`** (docker group = root-equivalent), one labelled `joosep.madar@evr.ee` | **First identify all four by fingerprint** -- comments on this host are documented-unreliable, so the label is not an attribution (§2.8). *Then* revoke/container-only, conditional on the key not serving an active purpose; if it does, keep it and drop the isolation framing instead (§2.9) | posture |
+| ~~**PO-12**~~ | ~~Four keys on host `dev`, one labelled `joosep.madar@evr.ee`~~ | **DECIDED 15:27 (PO): REVOKE.** Fingerprint check ran first and confirmed the label -- one key, his, line 3. Same key keeps opening his container, so no re-key. Executed as runbook **Step 9d**, after Step 9 proves container access (§2.9) | ~~open~~ **CLOSED** |
 | **PO-14** | Does the PO want a *real* boundary between users? | Out of scope here, but allerk's README names the only two answers that work: **rootless Docker, or separate Linux accounts.** Nothing short of those is a boundary | -- |
 | ~~**PO-15**~~ | ~~Is Joosep's contract renewed past 31.08.2026?~~ | **DECIDED 2026-08-28 14:06 (PO): permanent (stationary) colleague.** Not a mandate-contract question. No undo risk on provisioning (§4.1) | ~~gate~~ **CLOSED** |
 | **PO-16** | Roster size -- 7 candidate roles against a 6-role reference shape, sizing basis withdrawn | Not mine. Infra needs only the final count, for tmux geometry; does not gate the build (§4.4) | team design |

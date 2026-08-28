@@ -14,6 +14,7 @@ source-files:
 source-commits:
   - b37b938
 related:
+  - gotchas/warp-cgnat-address-misread-as-tailscale.md
   - gotchas/warp-dns-vs-routing-asymmetry-rc-host.md
   - gotchas/ai-teams-user-no-sudo-use-docker-exec-root.md
   - references/rc-host-db-tunnel-architecture.md

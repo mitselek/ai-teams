@@ -28,6 +28,7 @@ related:
 The two stationmaster hubs discovered in [`../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md`](../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md) are **not a defect to consolidate -- they are two islands by design, and the hub topology follows the network boundary that creates them**:
 
 - **EVR declines tailnet.** That network boundary, not any mail-layer choice, partitions the fleet.
+  **Overlay gloss (added 2026-08-28, #109 -- the phrase is the PO's and stands as recorded):** the two islands sit on **two different overlays**, not on one network that EVR opted out of. EVR hosts are on **Cloudflare WARP**; the personal island is on Tailscale. *"EVR will not join the tailnet"* names **sagres's** overlay, and is correct as written. Because both overlays allocate from the shared `100.64/10` CGNAT range, EVR `100.x` addresses are repeatedly misread as tailnet addresses -- see [`../gotchas/warp-cgnat-address-misread-as-tailscale.md`](../gotchas/warp-cgnat-address-misread-as-tailscale.md). *(*FR:Callimachus*)*
 - **prod-llm hub = the EVR island** (framework-research + apex-research).
 - **sagres hub = the personal island** (po-team, mvox, Passepartout).
 - **No federation. The S49 no-relay exclusion is NOT reopened** -- [`stationmaster-post-office-model.md`](stationmaster-post-office-model.md) "Relaying / multi-hop -- left out as YAGNI" stands.

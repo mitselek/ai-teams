@@ -56,4 +56,15 @@ Run **`sudo -n <exact-granted-invocation>`** live and confirm it actually succee
 
 Submitted by Brunel via Protocol A 2026-08-26, from the RC-host Tier-R survey (raw `sudo -n du`, `sudo -ln`, `which ss`, `stat` output in the briefing appendix; PO installed the proposed grant, which is how the two dead lines were caught live). Confidence **high** as submitted -- mechanism live-falsified per command, class instances individually verified. Filed by the librarian `stage-2: pending` (single-source filed-on-behalf). **Brunel read the entry back 2026-08-27 15:16 and CONFIRMED with no corrections** -- mechanism as observed (glob expands as the unprivileged caller; no-match passes the literal `*`; sudo escalates one step too late), all three instances accurate, the falsifier the one he used live, the split revision triggers as agreed at submission, the verbatim survey quote his. **Gate `confirmed`.**
 
-(*FR:Brunel* submitted; *FR:Callimachus* filed)
+## Amendment 2026-08-28 -- independent second-author re-derivation, and two new details (Hopper)
+
+**The correlation half of this entry's revision trigger is now partly satisfied.** The trigger reads: *"n=3 on one host, one survey, one discoverer -- correlated; an instance from a second host or second author moves it."* **Hopper independently re-derived the `/usr/sbin/ss` case two days later with no knowledge of this entry** -- same host, same rule, same conclusion -- and reported it to team-lead and Brunel as a live find before discovering it was already filed. He is a **second author**, which is one of the two conditions the trigger names. The second host is still outstanding.
+
+Two details from his run, neither previously recorded:
+
+1. **The failure message differs by which path you invoke, and both are now live-verified.** This entry records `sudo -n /usr/bin/ss -tlnp` -> `sudo: a password is required` (name the real binary, no grant matches). Hopper hit the other face: `sudo -n /usr/sbin/ss -ltnp` -> **`sudo: /usr/sbin/ss: command not found`** (name the granted path, the grant matches and the target does not exist).
+2. **The second-order point, and it is why this is a durable gotcha rather than a typo -- nominated independently by both agents as the sharpest half: the error message points AWAY from the actual fault.** An operator who runs it once and reads `command not found` concludes ***"`ss` is not installed on this host"*** -- a false and entirely plausible belief about the substrate -- rather than *"my grant names a path that does not exist."* **Nothing in the message mentions sudoers.** The diagnostic cost is not the dead rule; it is the wrong substrate model the failure installs.
+
+**Process note, self-reported by Hopper and worth carrying:** he presented the finding as a discovery **without first querying the librarian**, and adopted a standing rule from it -- *query the knowledge hub before reporting anything as a discovery.* The confirmation value survived; the novelty claim did not.
+
+(*FR:Brunel* submitted; *FR:Hopper* independent re-derivation and both new details; *FR:Callimachus* filed)

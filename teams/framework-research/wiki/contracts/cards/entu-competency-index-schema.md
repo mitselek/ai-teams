@@ -7,6 +7,7 @@ source-agents: [callimachus, finn]
 discovered: 2026-06-06
 last-verified: 2026-06-06
 stage-2: confirmed
+ttl: 2026-09-06
 related: [../../process/stage-2-confirms-filing-gate.md]
 tags: [contract, entu, competency-index, claim-evidence, provenance, wikiprovenance-parallel, gap-loop, schema, entu-api-42, stance, maintainer-authoritative, method-ladder]
 ---

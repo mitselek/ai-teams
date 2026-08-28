@@ -33,11 +33,13 @@ related:
 
 | | prod-llm hub | sagres hub |
 |---|---|---|
-| Address | `sm@10.100.136.162:2222` | `sm@100.102.133.125:2222` (tailnet) |
+| Address | `sm@10.100.136.162:2222` (RFC 1918 -- **not** CGNAT) | `sm@100.102.133.125:2222` (tailnet -- **document-supported, not probed**, see note) |
 | Up since | 2026-06-12 (`status` `hub.uptime_s: 6552057` at 10:23Z -- 75.8 days, which back-computes to 2026-06-12: the two figures agree) | deployed 2026-07-15 |
 | Registered | `{"teams":[alpha, apex-research, beta, fr-test, framework-research]}` | po-team, mvox, passepartout |
 | Grants | FR <-> apex only; queues empty | (per po-team docs) |
 | Cited by | FR `fr-courier.config.auto.json` `ssh_target sm@10.100.136.162` (local, gitignored); `~/.claude/skills/inter-team-comms/SKILL.md:31` | `designs/deployed/po-team/setup-log.md:97`; `po-team/wiki/references/hub-on-sagres.md:7-8`; `mvox-courier-config.json:3` |
+
+**Overlay note (added 2026-08-28, #109).** The `(tailnet)` label on the sagres row is **supported by documents, not by a probe** -- the PO's #108 ruling wording, the po-team wiki's `tailnet-only-ports` and `tailscale-ssh-blocks-docker-port-publish` entries, and this table. **No one has run `tailscale status` on that box.** It matters because `100.64/10` is the shared RFC 6598 CGNAT range used by **both** Tailscale and Cloudflare WARP: the address is not evidence of the overlay, and every EVR `100.x` host in this repo is WARP, not tailnet. See [`warp-cgnat-address-misread-as-tailscale.md`](warp-cgnat-address-misread-as-tailscale.md). This is the same defect as the entry above it, one layer down -- **three agreeing documents are not a registry call**, which is what this entry's own rule says. *(*FR:Callimachus*)*
 
 **Neither knows the other exists.** The S49 decision card excludes relaying (*"Relaying / multi-hop -- left out as YAGNI"*, verified), so these are **two mail networks sharing one name.** A team on hub A addressing a team on hub B gets `E_UNKNOWN_TEAM` -- **which reads as a typo, not as a partition.**
 

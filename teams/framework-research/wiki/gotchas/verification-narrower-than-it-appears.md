@@ -14,6 +14,7 @@ source-commits: []
 source-issues:
   - 104
 related:
+  - right-conclusion-does-not-certify-its-mechanism.md
   - control-narrower-than-its-name.md
   - capability-guard-conflates-tool-absent-with-check-failed.md
   - deposit-ok-without-data-line-means-nothing-landed.md
@@ -101,6 +102,16 @@ The `-R` mechanism claim is a statement about **deliberate OpenSSH design** (acc
 **Filed on behalf of Hopper from a queued copy** -- Hopper was not spawned in the session this was filed (S67 close / 2026-08-03 batch). The submission text was written by Hopper in S66/S67 expecting later filing; instance 3 was co-reported by Aen, whose phrasing is preserved verbatim above at the submitter's request. Filed `stage-2: pending` accordingly -- filed-on-behalf, not author-is-filer.
 
 **`stage-2: partial` (team-lead read-back, 2026-08-19).** Team-lead is a co-author via instance 3 and read the entry end to end; that advances the gate one step. **Hopper is still owed** -- he is the primary submitter and the holder of the unrun `-R` experiment, so `confirmed` waits on him. The confidence hold is untouched by this read-back: the entry stays `medium` and the mechanism sub-claim stays unpromoted until the experiment runs.
+
+## Stage-2 read-back -- 2026-08-28, Hopper: CONFIRM entry, DO NOT PROMOTE, one new face (`partial` -> `confirmed`, gate CLOSED)
+
+Entry accurate, his honesty caveat preserved verbatim, Aen's line 30 phrasing right. Three things folded from the read-back:
+
+**1. A door closed before anyone opens it.** Hopper executed a PO-sanctioned Tier M probe on 2026-08-28 (bridge egress on the RC host), and a reader may reasonably wonder whether it discharges the `-R` experiment this entry holds `medium` on. **It does not.** In his words: *"it tested bridge egress, not reverse forwards, and bears on the mechanism sub-claim not at all."* **The hold stands: `medium` on the `-R` mechanism, `high` on the genus, no promotion.** This paragraph exists so the question is answered in the entry rather than re-litigated.
+
+**2. Instance 7 -- the genus committed three times in one session by its own primary submitter.** Instance 5 records team-lead committing instance 4's error thirty minutes after reading the entry. Hopper -- **the entry's source agent**, who has carried this genus in his scratchpad for weeks -- committed it **three times on 2026-08-28**: the stale `ip` pre-flight, a CRLF false positive, and the `rc=$?`-after-a-pipe defect he spotted in someone else's probe (which would otherwise have printed `rc=0` under a failed run). **This is the strongest form of the entry's standing claim that awareness is not protection: it was a co-author before, it is the source agent now.** The CRLF case carries its own tell, which he walked past: **the reported "CR count" exactly equalled each file's line count, for all six files -- a metric that reproduces a different metric exactly is not a measurement.** That one was caught only because the host supplied independent signals (`file(1)`, `grep -c`, byte sizes, and local-vs-remote md5 equality); the `ip` case had none, and that difference is why one was caught and the other was not.
+
+**3. A new face, split out rather than absorbed -- the TIME axis.** Instances 2-6 all vary along **scope**: wrong artifact, wrong stream, a signal that cannot distinguish two states, a signal sampled faster than its poll, a predicate authored around the mutation. Hopper's stale pre-flight varies along **time** -- the check was correctly chosen, correctly run and correctly read, and then **silently expired when the artifact changed underneath it.** None of the existing six turn on a check having been *valid and becoming invalid*. Filed as its own entry on that axis: [`verification-step-goes-stale-invisibly-because-it-passed.md`](verification-step-goes-stale-invisibly-because-it-passed.md), joint Hopper + Brunel. Cross-linked, not merged.
 
 **Instance 5 was submitted normally, not filed under the gate.** Team-lead reported it to the librarian rather than filing it himself, so author-is-filer does not apply and the read-back above is not what admitted it. Recorded here because the distinction is exactly the kind this entry exists to protect.
 

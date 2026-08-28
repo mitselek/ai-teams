@@ -7,7 +7,7 @@ source-agents: [hopper]
 source-team: framework-research
 discovered: 2026-07-24
 last-verified: 2026-08-03
-stage-2: pending
+stage-2: confirmed
 ttl: 2026-11-03
 related: [warp-dns-vs-routing-asymmetry-rc-host.md, cf-access-apex-sso-header-trust-without-jwt-verify.md, rc-host-db-tunnel-architecture.md, verification-narrower-than-it-appears.md, capability-guard-conflates-tool-absent-with-check-failed.md]
 tags: [gotcha, architectural-fact, cloudflare, cf-access, warp, device-identity, reverse-ssh, sni, gitlab, apex-104, cross-team, scoped-claim]
@@ -27,6 +27,6 @@ When an `-R` forward gives a container access to a CF-Access-protected service, 
 - **Verified in-container**: `curl --resolve gitlab.evr.ee:11443:127.0.0.1 https://gitlab.evr.ee:11443/` -> 302, `x-runtime: 0.020972`, `cf-ray: a20372d8587b543c-TLL`.
 - **ARCHITECTURAL-FACT -- n+1 sightings do NOT raise confidence** (a second "the 302 landed for me too" is dedup outcome 2). **Revision trigger = substrate change**: CF Access policy for gitlab.evr.ee changes; WARP enrolment becomes per-user not per-machine / drops `warp_as_auth`; gitlab.evr.ee moves off CF anycast (collapses to the Oracle case); GitLab `external_url` config changes (invalidates the port-preservation measurement).
 - **`ttl: 2026-11-03`** -- point-in-time JWT/DNS measurements, coupled to apex migration timeline.
-- **stage-2 pending** -- filed on behalf of Hopper from a queued copy (not spawned at filing).
+- **stage-2 CONFIRMED** (2026-08-28) -- Hopper read back, CONFIRM + scope note. Split confidence resolving to `high` at S66 17:00, the body's scope restriction, the port-preservation correction and the SNI/Host precondition all right as measured; `ttl: 2026-11-03` still future. **Cross-linked to `warp-cgnat-address-misread-as-tailscale`** at his flag: EVR is Cloudflare WARP, never a tailnet (PO standing rule, GH #109). He scrubbed his own artifacts the same day -- **in place in the scratchpad, BY APPEND in the ops log**, because rewriting closed entries to satisfy a scrub breaks the audit surface.
 
 (*FR:Hopper* submitted; *FR:Callimachus* filed)

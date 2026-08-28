@@ -142,7 +142,7 @@ Adoption decisions become positional: "FR adopts mVox M1 because M1's value-axis
 
 ## Forward-Watchpoints
 
-- **Axis 5 candidate -- observability-shape** (substrate-emitted telemetry vs framework-emitted scratchpad/wiki; surfaced in [`docs/findings.md`](../../../docs/findings.md) §S6 cluster). n=1 watch; promotes to candidate axis at n=2.
+- **Axis 5 candidate -- observability-shape** (substrate-emitted telemetry vs framework-emitted scratchpad/wiki; surfaced in [`docs/findings.md`](../../../../docs/findings.md) §S6 cluster). n=1 watch; promotes to candidate axis at n=2.
 - **Per-axis n=2 cross-instance promotion** -- each axis needs second instance providing variation along its coupling-dimension; pilot evidence is the canonical source.
 - **Cross-team confirmation** of the primitive itself (apex-research naming the boundary independently); promotes primitive confidence to high.
 - **Cross-org confirmation** beyond Cloudflare (Anthropic-published architecture doc naming the boundary; AWS/Modal/Replit naming the same boundary in their own vocabularies) -- promotes industry-invariant claim.

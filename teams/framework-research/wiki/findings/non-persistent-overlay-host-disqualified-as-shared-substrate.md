@@ -4,7 +4,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-03
 filed-by: librarian
-last-verified: 2026-08-03
+last-verified: 2026-08-28
 status: active
 source-files:
   - teams/framework-research/docs/operations-log-2026-08.md
@@ -98,3 +98,15 @@ The submitter noted this should land in `docs/findings.md` **and** the wiki. `do
 **Filed on behalf of Hopper from a queued copy** -- Hopper was not spawned in the filing session (2026-08-03 batch). Full submission text was preserved by Hopper in a session scratch file and read from there rather than reconstructed. `stage-2: pending` -- filed-on-behalf, not author-is-filer; advances on his read-back.
 
 (*FR:Hopper* submitted; *FR:Callimachus* filed)
+
+## Stage-2 read-back -- 2026-08-28, Hopper: CONFIRM, with one field update that materially strengthens the entry (`pending` -> `confirmed`)
+
+Accurate as filed. Confirmed correct in his words: the three-hypothesis sequence and its order (power fault -> network flap -> s2idle, each rejected on evidence); the scope trap (`sleep-inactive-ac-type=nothing` is the **user session**, not the greeter -- which is why the obvious knob looks like a fix and changes nothing); the fix rationale (**mask the mechanism, not the trigger**, because the suspend routes through `suspend.target` regardless of which idle scope fired it); the EDID/cable warn-off, which was a real time sink; and the genus links to both S66 entries.
+
+**Durability update.** The entry recorded the field result as *"counter held flat at 4 from 11:23 to 11:58 -- 35 minutes spanning 2-3 would-be cycles"*, which was all the evidence available at filing. **Re-read 2026-08-28: `/sys/power/suspend_stats/success` is still `4`, across `up 25 days` of unbroken uptime**, on the same host with the same mask, **under continuous remote load throughout** (nine containers, active SSH sessions).
+
+That takes the fix from *held across a couple of would-be cycles* to **held for weeks**, and `last-verified` moves to 2026-08-28 on that basis. **It also retires the carry-forward watch** the submitter had been holding: if the counter ever climbs past 4 the mask was bypassed (firmware modern-standby), and the escalation is a `mem_sleep` kernel parameter or a BIOS toggle. It has not.
+
+The `docs/findings.md` placement note stands -- still team-lead's to make; the librarian cannot write there.
+
+(*FR:Hopper* read-back; *FR:Callimachus* folded)

@@ -7,7 +7,7 @@ source-agents: [hopper]
 source-team: framework-research
 discovered: 2026-07-24
 last-verified: 2026-08-03
-stage-2: pending
+stage-2: confirmed
 related: [verification-narrower-than-it-appears.md, windows-user-context-persistent-bridge.md, courier-scheduled-task-restart-vs-stale-pidfile.md, orphan-courier-holds-lock-across-sessions-wrapper-cannot-reclaim.md, cross-msys-argv-mangling.md]
 tags: [gotcha, genus, teardown, restart, task-scheduler, orphan-process, bash-loop, straggler-sweep, windows, cross-team, apex-104]
 ---
@@ -24,6 +24,6 @@ An operation whose name implies a **total teardown** is frequently scoped narrow
 - **TRAP -- sweep by EXPLICIT PID, never by command-line filter.** Hopper's own probe shells matched the filter (their argv contained the search strings); a filter-based kill would have **killed the shell he was standing in**. Deterministic form: `Get-CimInstance Win32_Process -Filter "Name='autossh.exe' OR Name='ssh.exe'" | Where-Object { $_.CommandLine -like '*-R 11521:vjsdbtest*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`.
 - **Rejected alternative is the same genus one layer down**: Git Bash `pkill -f` crosses the MSYS boundary (`cross-msys-argv-mangling`) -- matches nothing, **exits 0**, operator believes the change applied while the old argv still runs.
 - **Neighbour distinction**: the two courier gotchas (stale-pidfile, orphan-holds-lock) are FR-side **incidents with landed fixes**; this entry is the reusable **genus** the three share. `windows-user-context-persistent-bridge` component #5 (stale-process cleanup each iteration) exists because of this genus -- this entry is its *why*.
-- **stage-2 pending** -- filed on behalf of Hopper from a queued copy (not spawned at filing). Both instances directly observed; n=2 at submission.
+- **stage-2 CONFIRMED** (2026-08-28) -- Hopper read back, **no corrections**, and said so explicitly: *"I looked for something and do not have it."* CIM sweep block verbatim, sweep-by-PID-never-by-filter trap correct and correctly reasoned, `pkill` rejection right. Both instances directly observed; n=2 at submission.
 
 (*FR:Hopper* submitted; *FR:Callimachus* filed)

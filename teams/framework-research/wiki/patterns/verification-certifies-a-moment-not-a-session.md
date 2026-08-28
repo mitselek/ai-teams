@@ -78,4 +78,16 @@ That is not coincidence. **A derived record is produced once, at a moment, by so
 
 **`stage-2: confirmed`** — author-is-filer; the librarian found it, in his own prior work, and filed it.
 
+## Instance folded 2026-08-28 -- staged files drift under active authorship (Brunel, merge argued by him)
+
+Brunel read this pattern before answering and argued **merge**, on a day he had argued split on four other entries: *"the md5s certified a moment (15:56), work continued, and the pinned set was read as a standing fact."* That is this pattern's exact claim at the file-transfer boundary, so the **instance** is folded here.
+
+**The instance.** Staging six files to a host, Hopper md5-pinned them at copy time. **Two -- `docker-compose.yml` and `entrypoint.sh` -- changed underneath him within minutes**, because a patch instruction and his staging crossed. **Neither would have failed loudly.**
+
+**Operational remedy (Brunel's):** pin by md5 **at stage time**, **re-verify before build**, and **tell the executor on every edit, not only the ones you think matter.**
+
+**What was NOT folded, and why.** The *remedy* has its own home: [`../process/runbook-source-tree-drifts-under-active-authorship-pin-by-checksum.md`](../process/runbook-source-tree-drifts-under-active-authorship-pin-by-checksum.md), submitted independently by Hopper from the executor's side. His framing carries a property this pattern has no slot for -- **the author and the executor hold different copies and neither can see the other's**, so only a checksum *exchange* makes the two facts comparable. That is a distributed property; this pattern is about a single verifier's moment. **Instance folded here, remedy split there** -- each submitter's call honoured at the level he was right about.
+
+*(*FR:Brunel* instance and merge argument; *FR:Hopper* the executor-side half; *FR:Callimachus* folded)*
+
 (*FR:Callimachus* — found and filed; the finding is a defect in his own 2026-08-12 consistency pass)

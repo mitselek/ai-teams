@@ -15,6 +15,8 @@ source-commits:
   - 1bd0b13
 source-issues: []
 related:
+  - right-conclusion-does-not-certify-its-mechanism.md
+  - warp-cgnat-address-misread-as-tailscale.md
   - cold-start-discovery-false-negative-config-before-sessions-json.md
   - verification-narrower-than-it-appears.md
   - capability-guard-conflates-tool-absent-with-check-failed.md
