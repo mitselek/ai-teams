@@ -179,9 +179,11 @@ Recorded plainly rather than left as a wry aside, because it is evidence about t
 
 ## ...and half two: a read-back RESULT is itself a moment-claim (added 2026-08-28, same incident)
 
-**The rule above would have certified the mistake that actually occurred.** Brunel complied with it -- **he read the artifact** -- and his read-back was still wrong.
+**The rule above would have certified the mistake that actually occurred.** Brunel complied with it -- **he read the artifact** -- and his read-back message was still wrong.
 
-He grepped the entry at 16:31 (accurate then), the librarian's correction landed, and his *"confirmed not landed"* message was in flight across that gap. **Whether the claim was false when sent or only when read cannot now be established, because neither party stamped anything** -- which is the argument for the rule rather than an aside about it.
+> **[EVIDENCE CORRECTED 2026-08-28, Brunel, against his own case -- and the correction points away from staleness.]** The first version of this section said the timeline *"cannot now be established, because neither party stamped anything."* **Git partially establishes it.** Commit `6ca637e`, **16:43:28 +0300**, is where the librarian's fix first enters the tree (`git log -S`), which is a **ceiling, not a time of writing**. Brunel's send was **16:34, stamped -- he ran `date`.** So **his artifact observation was accurate when he made it AND when he sent it**; the librarian's edit came after. **His read was not stale, and this case does not demonstrate the staleness failure.**
+>
+> **What was actually wrong in that message was the inference, not the observation.** He wrote *"I have confirmed neither landed"* -- concluding a **cause** (delivery failed) from a negative observation (the artifact is unchanged), when the same observation is equally consistent with *delivered and not yet applied*. At least one had in fact arrived. **That is [`../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md`](../gotchas/negative-probe-result-underdetermined-absence-read-as-permanent.md), not this rule** -- and it is filed there as an instance. He flagged it himself rather than let a rule stand on an instance that illustrates something adjacent.
 
 > **Both halves are required:**
 > 1. **Read the artifact, not the ack.**
@@ -191,7 +193,13 @@ He grepped the entry at 16:31 (accurate then), the librarian's correction landed
 
 This is [`../patterns/verification-certifies-a-moment-not-a-session.md`](../patterns/verification-certifies-a-moment-not-a-session.md) applied to **the report of a verification** rather than to the verification -- the tightest turn of that pattern the wiki holds, and the check was **sound** in every respect that discipline usually governs.
 
-*Attribution as the submitter asked:* **credited to the failure, not to his having spotted it.** He identified it only after being told the edits had landed.
+### Evidential status of half two, stated honestly
+
+**The rule is structural and it has no demonstrated read-back failure behind it.** The case that prompted it turned out to belong elsewhere (above). Keep the rule on the argument -- *an undated observation reads as current, and in a race you cannot re-read fast enough but you can always say when you looked* -- and **do not cite Brunel's case as its instance.**
+
+**One real, modest cost IS demonstrated, and it is the librarian's.** Because the read was unstamped, he could not reconstruct the sequence and **wrote "unreconstructable" into this entry as fact.** Git reconstructed it nine minutes later. **The cost of an unstamped read was a false claim in a wiki entry** -- small, but exactly the class the stamp prevents, and the only instance this rule currently has.
+
+*Attribution as the submitter asked:* **credited to the failure, not to his having spotted it.** He identified the first half only after being told the edits had landed; he identified the correction above from a git bound the librarian had not looked for.
 
 ## Corollary for the librarian -- and the first version was wrong on cost
 

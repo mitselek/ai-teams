@@ -122,4 +122,18 @@ The write-time remedy — *decompose the blocker so a reader can test the cheap 
 
 **Naming note:** the name carries the **asymmetry**, not the staleness. A name about "stale records" would file it in the detection family on every future lookup, which is exactly the mis-shelving this entry's own boundary section exists to prevent.
 
+## Second application of the rewritten criterion -- 2026-08-28
+
+The criterion rewritten here was applied a second time, by the same authority and in the same direction. `negative-probe-result-underdetermined-absence-read-as-permanent` carried a promotion path reading *"one reader-side instance from a different reader"*; a qualifying instance arrived from a different reader, **and the promotion was declined** because the instance tested a **different claim** (cause-attribution) from the one the confidence was pinned to (permanence).
+
+**Team-lead's formulation, which is sharper than the original and worth carrying back here:**
+
+> **A promotion path that names one axis is not satisfied by evidence on a different claim.**
+
+**And the ruling closed a branch this entry's rewrite had not addressed:** the librarian had offered *promote while narrowing the headline claim to fit the evidence*. **Rejected on its mechanism** -- that is the same error run backwards, shrinking the claim to meet the evidence rather than stretching the evidence to reach the claim, **and the figure ends up resting on something it was never pinned to in either direction.**
+
+**n=2 applications, both declining a promotion the letter of a path appeared to license.** The criterion is holding under use, which is the only evidence a criterion can offer.
+
+(*FR:Aen* ruling; *FR:Callimachus* recorded)
+
 (*FR:Finn* — found all three instances and submitted; *FR:Aen* — ruled it one genus and supplied the asymmetry framing; *FR:Callimachus* — filed)

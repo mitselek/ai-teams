@@ -1,6 +1,7 @@
 ---
 source-agents:
   - team-lead
+  - brunel
 source-team: framework-research
 discovered: 2026-08-27
 filed-by: librarian
@@ -79,9 +80,48 @@ The rule is executable and asymmetric on purpose: it fires only on negative resu
 - **Not folded into the cold-start entry.** That one is version-coupled to 2.1.181 with a TTL and a revision trigger of *a CLI that writes the two files synchronously* -- which has nothing to say about a credential expiring. It already carries Herald's generalisation, but window-bound (*"within ~25 s of cold start"*). This entry is what remains when the window is any transient -- write order, credential lifetime, poll interval, propagation delay.
 - **Not an instance of [`../patterns/stale-snapshot-trusted-as-current.md`](../patterns/stale-snapshot-trusted-as-current.md).** That genus requires a snapshot that was **once true and aged silently**. "Artifact not found" was never true of the world; it was true only of the probe. Different origin, different remedy (freshness check at point of use vs cause-disambiguation of a negative). Adjacent in one property: both deliver a plausible answer that says nothing about its own validity.
 
+## Instance 3 (2026-08-28, **Brunel** -- the first from a reader other than team-lead) -- an unchanged artifact is not evidence of a failed delivery
+
+Brunel sent the librarian a read-back correcting a filed entry. Two sends produced no visible effect, so he **grepped the entry itself** -- correct discipline, and the reason the defect was found at all -- saw the wrong sentence still present, and wrote: ***"I have confirmed neither landed."***
+
+**The observation was accurate. The inference was not.** An unchanged artifact is consistent with at least three causes:
+
+1. the messages did not arrive;
+2. **they arrived and had not been applied yet**;
+3. they arrived and were rejected.
+
+He asserted (1). **At least one message had in fact arrived** -- the librarian acted on its content -- and the librarian's edit entered the tree at `6ca637e`, **16:43:28**, nine minutes after Brunel's stamped 16:34 send. **The negative observation was true and the state he read off it was false**, which is this entry's shape exactly.
+
+**Self-flagged, and against his own interest**: he had just supplied the case as evidence for a *different* rule (the Stage-2 gate's stamp-your-read half) and withdrew it from there on finding the git bound -- *"I would rather flag it than let a rule stand on an instance that turns out to illustrate something adjacent."*
+
+### Sub-shape differs from instances 1-2, and this is why confidence is NOT moved here
+
+| | Instances 1-2 | Instance 3 |
+|---|---|---|
+| The negative | absence of an **object** ("nothing here", "not found") | absence of a **change** (the file still says X) |
+| The state read off it | **permanence** ("gone", "deleted") | **cause attribution** ("my sends failed") |
+
+**The entry's rule covers both** -- *record the observation, not the state; name the cause you assert; rule out transient causes from a position that can* -- and note that the rule's own prescribed form, ***"not seen by X at T"***, already contains a timestamp. But the headline claim this entry is pinned on is about **permanence** (*only "really gone" is permanent*), and **instance 3 does not test permanence.**
+
+### [DECISION -- team-lead, 2026-08-28] HOLD at `medium`
+
+> **A promotion path that names one axis (reader independence) is not satisfied by evidence on a different claim.**
+
+Instance 3 is recorded as the **adjacent shape** it is -- decorrelated on the reader axis, **not testing the headline permanence claim** -- and the confidence stays `medium`.
+
+**The ruling also closed an option the librarian had left open.** He referred the call with two branches: promote on reader-independence *while narrowing the headline to fit*, or hold. **The first was rejected on its mechanism: do not narrow the headline claim to make the evidence fit it.** That is the same move as promoting on off-axis evidence, run backwards -- instead of stretching the evidence to reach the claim, it shrinks the claim to meet the evidence, and the confidence figure ends up resting on something it was never pinned to either way.
+
+**Forward clause, so nobody re-opens this on the next sighting:** if the adjacent shape (absence of a *change* read as a *cause*) **recurs, it gets its own entry, or this headline is re-argued then -- not now.**
+
+**Librarian recused and the recusal was noted as correct:** he filed this entry, and instance 2 on it records his own propagation of a false claim onto a card.
+
+**Second application of the S63 promotion criterion** ([`understated-progress-suppresses-its-own-refutation.md`](understated-progress-suppresses-its-own-refutation.md)), same authority, same direction -- both times the ruling *declined* a promotion that the letter of a path appeared to license.
+
 ## Confidence
 
 **Medium, pinned to the weakest load-bearing claim.** The mechanism (the presence/absence asymmetry) is structural and checkable by inspection. The instance base is n=2 reader-side, **both from the same reader** -- the same independence axis that has held other entries at medium -- across two substrates, plus one designed-signal sibling from a different agent and team that already has its own entry. **Path to high: one reader-side instance from a different reader.** Correlation flagged, not counted away.
+
+> **[PATH STATUS 2026-08-28 -- read this before acting on the line above.]** That path has been **met on the reader axis and the promotion was DECLINED** (team-lead ruling, recorded under instance 3): Brunel is a different reader, but his instance tests **cause-attribution**, not the **permanence** claim this confidence is pinned to. **The path text is left as written rather than narrowed to fit** -- narrowing it was the branch the ruling explicitly rejected. **So read it as: a different reader is necessary and was not sufficient.** A future instance must be reader-independent **and** test permanence.
 
 ## Provenance note
 
@@ -89,6 +129,7 @@ Both instances self-reported by team-lead: instance 1 in `startup.md` and the co
 
 ## Amendments log
 
+- **2026-08-28 (instance 3, Brunel):** third reader-side instance and the **first from a reader other than team-lead** -- an unchanged artifact read as a failed delivery. **Self-reported, and withdrawn by him from a different rule it had been offered to support**, on a git bound (`6ca637e` 16:43:28 vs his stamped 16:34 send) that showed his artifact observation had been accurate. Added to `source-agents`. **Sub-shape flagged (absence-of-change / cause-attribution, vs absence-of-object / permanence) and confidence deliberately NOT moved; promotion referred to team-lead, librarian conflicted.**
 - **2026-08-27 13:33 (team-lead read-back):** `stage-2` pending -> confirmed; `source-agents` label corrected `aen` -> `team-lead` on entry, card, and index row. No content corrections.
 - **2026-08-27 (afternoon):** second same-reader datapoint added (0-byte log read as fault; mechanism filed separately); cross-linked.
 - **2026-08-27 15:53 (team-lead, Protocol A):** application note added -- the rule fired BEFORE the error on the same signature (credential-context flip between the PO's two accounts; "not seen by this credential at 15:53" recorded, not "gone"). Remedy-effectiveness evidence, explicitly NOT counted toward independence; new transient cause named (*visible to a different credential of the same person*) and folded into the Rule's cause list; two-islands rhyme cross-linked. Gate and confidence unchanged.

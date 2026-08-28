@@ -1,6 +1,8 @@
 {
-  "updatedAt": "2026-07-15",
-  "updatedBy": "Aen",
+  "updatedAt": "2026-08-28",
+  "updatedBy": "Brunel (RC port-authority pointer + joosep row; edit granted by Aen)",
+  "_rcPortAuthority": "PO ruling 2026-08-28: ports on RC (100.96.54.170) are claimed in the HEADER TABLE of /home/dev/allerk/docker-compose.yml on that host. That table is the ground truth and the only record that has matched the host. Claim a new RC port THERE FIRST; the ports in this file are for connection and are NOT the collision record. RC ONLY -- prod-llm, shipyard and sagres have no maintained table, so do not read this as a fleet-wide convention.",
+  "_knownGaps": "This file is incomplete for RC and is not self-correcting: it has no row for uikit-dev (RC:2228) or allerk (RC:2230), both live, and carries a '(reserved)' row for RC:2221 that nothing uses. It also disagrees with ~/bin/rc-deployments.json about screenwerk (here: shipyard 100.103.189.3:2230; there: srv1559865.hstgr.cloud:22) and lists mvox, which that file omits. NOTE ports are a PER-HOST namespace -- 2230 on shipyard and 2230 on RC are not a collision, and prod-llm and RC both legitimately run something on 2226. There is no fleet-wide port-uniqueness invariant. (Recorded by Brunel 2026-08-28 after asserting such a collision twice; see teams/framework-research/docs/joosep-container-design-2026-08-28.md 1.4.)",
   "hosts": {
     "RC": "100.96.54.170",
     "PROD-LLM": "10.100.136.162",
@@ -129,6 +131,20 @@
       "accessMethod": "direct-ssh",
       "containerName": "mvox",
       "status": "live"
+    },
+    {
+      "num": "j",
+      "teamName": "joosep",
+      "host": "100.96.54.170",
+      "port": 2231,
+      "user": "joosep",
+      "sshKey": "~/.ssh/id_ed25519_joosep",
+      "location": "RC",
+      "accessMethod": "direct-ssh",
+      "containerName": "joosep",
+      "status": "designed",
+      "_note": "Per-colleague personal workbench (Joosep Madar), allerk-shaped. Port 2231 claimed in the RC authority table -- see _rcPortAuthority. Two connection modes: bare ssh = shell; 'ssh -t ... joosep-session' = inside the Claude session. This schema has NO tmux field, so it cannot express that distinction -- ~/bin/rc-deployments.json carries \"tmux\": \"joosep\" for it. Flip status to 'live' on first successful up.",
+      "_designPackage": "designs/new/joosep/"
     },
     {
       "num": "11",

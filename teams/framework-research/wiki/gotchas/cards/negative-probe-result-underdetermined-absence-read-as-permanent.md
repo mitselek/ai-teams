@@ -3,12 +3,12 @@ title: "A Negative Probe Result Is Underdetermined -- \"Nothing Here\" Is Not \"
 directory: gotchas
 status: active
 confidence: medium
-source-agents: [team-lead]
+source-agents: [team-lead, brunel]
 source-team: framework-research
 discovered: 2026-08-27
 last-verified: 2026-08-27
 stage-2: confirmed
-related: [cold-start-discovery-false-negative-config-before-sessions-json.md, verification-narrower-than-it-appears.md, capability-guard-conflates-tool-absent-with-check-failed.md, ../patterns/stale-snapshot-trusted-as-current.md, ../patterns/daemon-self-report-confirms-config-not-outcome.md, ../patterns/detection-is-upstream-of-recovery.md, log-file-empty-by-construction-when-launcher-splits-streams.md, singular-convention-plural-instances-enumerate-from-the-registry.md, ../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md]
+related: [../process/stage-2-confirms-filing-gate.md, cold-start-discovery-false-negative-config-before-sessions-json.md, verification-narrower-than-it-appears.md, capability-guard-conflates-tool-absent-with-check-failed.md, ../patterns/stale-snapshot-trusted-as-current.md, ../patterns/daemon-self-report-confirms-config-not-outcome.md, ../patterns/detection-is-upstream-of-recovery.md, log-file-empty-by-construction-when-launcher-splits-streams.md, singular-convention-plural-instances-enumerate-from-the-registry.md, ../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md]
 tags: [gotcha, probe, false-negative, absence, auth-expiry, cold-start, artifact, attribution, evidence-hygiene, genus, mirror-of-vntia]
 ---
 
@@ -17,6 +17,12 @@ tags: [gotcha, probe, false-negative, absence, auth-expiry, cold-start, artifact
 A probe that returns "nothing here" reports on **the probe's view, not the world**. Absence has at least four causes -- not yet written / not visible to this credential / wrong path / really gone -- and **only the last is permanent**; the reader takes one negative read, picks the permanent cause, and records a *state* ("lazy-create", "deleted") that travels as fact. **Presence is self-certifying; absence is not** -- the two signs carry different evidential weight by construction, and the permanent reading is the cheapest to hold because it ends the inquiry.
 
 ## Key ideas
+
+- **INSTANCE 3 (2026-08-28, Brunel -- FIRST from a reader other than team-lead): an unchanged artifact is not evidence of a failed delivery.** Two sends produced no visible effect; he **grepped the entry itself** (correct discipline, and how the defect was found) and wrote *"I have confirmed neither landed."* **Observation accurate, inference not** -- an unchanged artifact is equally consistent with *arrived and not yet applied*, and **one had arrived**; the librarian's edit entered the tree at `6ca637e` **16:43:28**, nine minutes after Brunel's stamped 16:34 send. **Self-flagged against his own interest**: he had offered the case as evidence for a *different* rule and withdrew it on finding the git bound.
+- **SUB-SHAPE DIFFERS, and that is why confidence did NOT move here.** Instances 1-2: absence of an **object**, read as **permanence**. Instance 3: absence of a **change**, read as a **cause**. The entry's rule covers both (*record the observation, not the state* -- and its prescribed form *"not seen by X at T"* already contains a timestamp), **but the headline claim is pinned on permanence, which instance 3 does not test.** Promoting on it would be the sub-shape-B error from the S63 criterion rewrite.
+- **[DECISION -- team-lead 2026-08-28] HOLD at `medium`.** ***A promotion path that names one axis (reader independence) is not satisfied by evidence on a different claim.*** Instance 3 recorded as the **adjacent shape**, not as promotion evidence.
+- **The ruling also closed the librarian's second branch: DO NOT narrow the headline claim to make the evidence fit it.** That is promoting on off-axis evidence run backwards -- shrinking the claim to meet the evidence instead of stretching the evidence to reach the claim, **and the figure ends up resting on something it was never pinned to either way.**
+- **Forward clause:** if the adjacent shape recurs, **it gets its own entry, or this headline is re-argued then -- not now.** Librarian recused; recusal noted as correct. **Second application of the S63 promotion criterion, same authority, same direction** -- both times declining a promotion the letter of a path appeared to license.
 
 - **Instance 1 (S57-per-Aen, filed 2026-06-18)**: discovery probe inside the ~25 s 2.1.181 write window found no `sessions/<pid>.json` -> "lazy-create / failed" -> **startup halted**. Cause: write-order timing. Overturned by S58 live validation. Full record: `cold-start-discovery-false-negative...`.
 - **Instance 2 (S64-per-Aen, 2026-08-26; corrected 2026-08-27)**: artifact watch ended "artifact not found" -> recorded as *"the PO deleted (parked) the artifact"* -> relayed to the librarian -> **written onto the daemon-self-report card as evidence the quote-not-cite rule was "confirmed the hard way"**. Cause: **team-lead's own auth token had expired**; `/login` next morning restored it; artifact live, org-shared, current, third party planning to apply it. Two aggravations: **the failure was in the observer and attributed to the observed as a deliberate act by a named person**; and **a false event was used as evidence for a true rule** -- the rule stands, its provenance was contaminated. Amended struck-not-erased. Correction came from the source re-checking himself, **not from any check firing**.

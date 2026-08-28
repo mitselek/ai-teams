@@ -77,15 +77,26 @@ services:
     # Host is 20 cores / 62 GiB, so two containers at 12/40G are deliberately
     # overcommitted; a ceiling bounds ONE tenant's runaway, not the sum. See
     # [PO-10] in the design doc for the three costed alternatives.
+    #
+    # `pids` is NOT in allerk. A fork-bomb hits the pid ceiling long before a
+    # 40G memory ceiling notices, and an agent-driven container is likelier to
+    # spawn pathologically than a hand-driven one.
+    #
+    # It lives INSIDE this block, not as a top-level `pids_limit:`. Compose
+    # treats `pids_limit` and `deploy.resources.limits.pids` as the SAME setting
+    # expressed two ways, and refuses the whole project if both are present with
+    # distinct values rather than picking one:
+    #   services.joosep: can't set distinct values on 'pids_limit' and
+    #   'deploy.resources.limits.pids': invalid compose project
+    # (Compose v5.1.0 on RC, 2026-08-28. allerk never hit this because it sets
+    # no pid ceiling at all.) Keep all three ceilings here; do not reintroduce a
+    # top-level pids_limit.
     deploy:
       resources:
         limits:
           cpus: '12'
           memory: 40G
-    # Not in allerk. A fork-bomb hits the pid ceiling long before a 40G memory
-    # ceiling notices, and an agent-driven container is likelier to spawn
-    # pathologically than a hand-driven one.
-    pids_limit: 512
+          pids: 512
 
     env_file:
       - path: .env

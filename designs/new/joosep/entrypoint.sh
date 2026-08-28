@@ -275,7 +275,17 @@ cat > /usr/local/bin/joosep-session << 'LAUNCHER_EOF'
 #!/usr/bin/env bash
 # joosep-session -- attach to the team's Claude session, creating it if absent.
 # Detaching (Ctrl-b d) or dropping the connection leaves Claude running.
-S="${TEAM_NAME:-joosep}"
+#
+# Session name is FIXED to the container name and deliberately NOT ${TEAM_NAME}.
+# The tmux session is the human's entry point to this container; the team name
+# is an internal detail that may change (see the design doc 0.1 -- under the
+# person-shaped layout a team rename is a `mv`). Deriving the session name from
+# TEAM_NAME couples them, and a later rename would silently desynchronise this
+# launcher from the `tmux` field in rc-deployments.json -- which is exactly the
+# live defect filed as [PO-9] against apex ("tmux": "apex" in the registry vs a
+# session named apex-research managed by its own launcher; the menu can land in
+# an empty second session). Fixed name, one place to change, no drift.
+S="joosep"
 if tmux has-session -t "$S" 2>/dev/null; then
     exec tmux -u attach -t "$S"
 fi
@@ -295,7 +305,20 @@ chmod 0755 /usr/local/bin/joosep-session
 # off, this becomes THEIR working file. A rebuild must not silently revert their
 # progress. The pristine copy stays at /opt/FIRST-TASKS.md if they ever want to
 # diff against it.
-if [ -f /opt/FIRST-TASKS.md ] && [ ! -f "${HOME_DIR}/FIRST-TASKS.md" ]; then
+# FAIL LOUDLY if the pristine copy is missing (Hopper pre-flight, 2026-08-28).
+# The original guard was `[ -f /opt/... ] && [ ! -f ~/... ]`, which SILENTLY
+# skips seeding when the image lacks the file -- and the file is the container's
+# entire onboarding path, so a silent skip hands Joosep a container with no
+# instructions and no indication anything is wrong. The Dockerfile COPY makes
+# absence a build failure today; this guards the case where someone later drops
+# that COPY line and the failure would otherwise move from build-time to
+# invisible. Loud, but still non-fatal: a missing onboarding doc must not stop
+# sshd from coming up.
+if [ ! -f /opt/FIRST-TASKS.md ]; then
+    echo "[entrypoint] ERROR: /opt/FIRST-TASKS.md is MISSING from the image."
+    echo "[entrypoint]        The Dockerfile should COPY it. Joosep has no onboarding path"
+    echo "[entrypoint]        until this is fixed and the image rebuilt."
+elif [ ! -f "${HOME_DIR}/FIRST-TASKS.md" ]; then
     install -m 644 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" \
         /opt/FIRST-TASKS.md "${HOME_DIR}/FIRST-TASKS.md"
     echo "[entrypoint] seeded ~/FIRST-TASKS.md (first boot)."

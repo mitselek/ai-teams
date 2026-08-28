@@ -55,6 +55,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         vim-tiny \
     && rm -rf /var/lib/apt/lists/*
 
+# ── WARP CA at BUILD time ─────────────────────────────────────────────────────
+# Placed early, before anything that fetches over HTTPS.
+#
+# WHY THIS EXISTS (2026-08-28, Hopper caught it at Step 5): the entrypoint
+# installs this CA at RUNTIME, which is too late for the build. The Claude
+# installer below is `curl ... | bash`, and the script it downloads runs its OWN
+# curl with its OWN flags -- so the `--insecure` on the outer fetch does NOT
+# reach it. That inner curl met WARP's TLS interception with an empty trust
+# store and failed, and the layer still reported DONE (see the pipefail note
+# below). Giving the whole build a real trust store fixes the class, not just
+# the instance.
+#
+# The file is copied into the build context from the host by the provisioning
+# runbook (Step 1: `cp /usr/local/share/ca-certificates/managed-warp.pem
+# ./warp-ca.pem`). It is a public CA certificate, not a secret.
+#
+# NOTE: the `--insecure` flags on the gh/Node layers below are now redundant.
+# They are left in place deliberately -- those layers are proven working and
+# this build is not the moment to change them. Drop them in a later pass.
+COPY warp-ca.pem /usr/local/share/ca-certificates/warp-ca.crt
+RUN update-ca-certificates && echo "[build] WARP CA installed into the build trust store."
+
 RUN sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen \
     && ln -snf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime \
     && echo "Europe/Tallinn" > /etc/timezone \
@@ -81,7 +103,38 @@ RUN curl --insecure -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x
     && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
     && rm /tmp/node.tar.gz \
     && node --version \
-    && npm install -g npm@latest 2>&1 | tail -1
+    && npm --version
+# NOTE: `npm install -g npm@latest` was here and is deliberately GONE.
+#
+# It had NO CONSUMER. It is inherited cargo from the apex/backlog-triage
+# lineage, where npm installed Claude Code globally -- this image installs
+# Claude natively (see below), resolves rumba's deps with pnpm, gets `gh` from
+# apt and Node from a tarball. Nothing in this Dockerfile, the entrypoint, the
+# compose file or the launcher invokes npm. Verified by grep, not assumed.
+#
+# It was also BROKEN, on every build including the 16:07 image: `npm@latest`
+# now resolves to npm 12.x, which requires node ^22.22.2 || ^24.15.0 || >=26,
+# and this image pins Node 22.14.0 -- so the engine check refused and the layer
+# exited 1. `| tail -1` had been swallowing that exit code, so every image
+# shipped with npm 10.9.2 and a silently failed upgrade. Removing the mask did
+# not create this failure; it revealed one that had been there for as long as
+# npm 12 has existed.
+#
+# So the shipped state is now EXPLICIT rather than accidental: whatever npm
+# Node 22.14.0 bundles (10.9.2), which is what every prior image actually had.
+# Do not re-add an upgrade without a consumer that needs it -- and if one ever
+# appears, pin the version, for the same reason pnpm is pinned below.
+# ── pnpm via corepack (Celes, 2026-08-28) ─────────────────────────────────────
+# `rumba` is a pnpm monorepo using `catalog:` deps; npm alone cannot resolve
+# them and `pnpm --filter elron-test test` would fail at first use.
+# Version PINNED rather than @latest: rumba's root package.json has no
+# `packageManager` field, so `@latest` at image-build time is a moving target
+# that can drift from what the repo expects. The durable fix is a
+# `packageManager` pin in rumba itself -- that is the team's to propose, not
+# ours to add. Bump this line deliberately when they do.
+RUN corepack enable \
+    && corepack prepare pnpm@9.12.3 --activate \
+    && pnpm --version
 
 # ── Lock root ─────────────────────────────────────────────────────────────────
 # No root login by any method. The entrypoint runs as root but drops to joosep.
@@ -150,7 +203,29 @@ RUN mkdir -p /run/sshd \
 # discrepancy rather than a PATH bug, which is what makes it expensive to chase.
 # Diagnostic if it ever recurs: `type -a claude`.
 # --insecure for the WARP TLS interception during build.
-RUN gosu joosep bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5
+# NO `| tail`. A trailing pipe makes the RUN report the exit status of `tail`,
+# which is 0 -- so this layer previously printed a TLS failure and reported
+# `DONE 0.6s`, shipping an image with no `claude` in it and a green build.
+# `set -o pipefail` makes the inner `curl | bash` fail honestly too.
+#
+# The `RUN test -x` on the next line is the assertion that would have caught it
+# regardless: a build step that installs a tool should prove the tool exists.
+# The pipefail that matters is the INNER one: `bash -c` is genuinely bash, and
+# the only pipeline in this layer (`curl | bash`) lives inside it.
+#
+# An outer `RUN set -o pipefail && ...` was here and is gone. Docker's default
+# RUN shell is `/bin/sh -c`, and on Debian /bin/sh is dash, which has no
+# `pipefail` -- so it died with `set: Illegal option -o pipefail` (exit 2)
+# before curl ever ran. It was also guarding nothing: there is no pipeline in
+# the outer command. Belt-on-a-belt, and the wrong belt for that shell.
+#
+# Do NOT "fix" this with `SHELL ["/bin/bash", "-o", "pipefail", "-c"]` unless
+# you mean to re-validate every later RUN under bash instead of dash -- that
+# directive changes the shell for the whole rest of the file.
+RUN gosu joosep bash -c 'set -o pipefail; curl -fsSL https://claude.ai/install.sh | bash'
+RUN test -x /home/joosep/.local/bin/claude \
+    && gosu joosep /home/joosep/.local/bin/claude --version \
+    && echo "[build] claude installed and executable."
 
 ENV DEBIAN_FRONTEND=
 

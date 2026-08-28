@@ -37,16 +37,26 @@ A **fine-grained** personal access token on your own account (`JoosepM-565`).
 | Everything else | leave at **No access** |
 | Expiration | pick a date you will actually renew; note it somewhere |
 
-**Deliberately NOT granted, and each for a reason:**
+**Deliberately NOT granted — and note the reason is not the one you might expect:**
 
-- **No write/push anywhere.** `HES-integration-tests` accepts direct-to-`main` pushes with no PR
-  history — *the absence of a guardrail is not permission*. You are not a member of
-  `vjs-code-reviewers`, the separately-gated team that can approve merges, so this team must not be
-  given a path that lets it merge. **The team must not exceed its principal.**
+> **You already hold more than this token will.** Your VJS2 team membership gives you **GitHub admin
+> on `rumba`**, over an unprotected `main`, and write on `HES-integration-tests` (which takes
+> direct-to-`main` pushes with no PR history). So nothing here is a ceiling you are bumping into —
+> **you are being asked to grant your agents deliberately less than you hold yourself.** That is the
+> whole point, and it is the step that will feel unnecessary while you are clicking through the form.
+
+- **No write/push anywhere.** Not because you lack the right, but because an agent with write on an
+  unprotected `main` has no gate between a mistake and the branch everyone builds from. *The absence
+  of a guardrail is not permission.* You are also not in `vjs-code-reviewers` — you are deliberately
+  outside the merge gate on `rumba`, and the team must not acquire what you were not given.
+- **No admin, no org permissions.** Your admin on `rumba` is exactly the thing not to mirror.
 - **No `workflow` scope.** It would let an agent edit CI definitions.
-- **No org or admin permissions.**
-- **Only two repos**, even though your org teams grant reach to 40+. These are the two you have
-  actually committed to. Widen later against a named need, not in advance.
+- **Only two repos**, even though your org teams reach 40+. These are the two you have actually
+  committed to; the whole `hes`-team grant is unexercised. Widen against a named need, not in advance.
+
+If you find yourself thinking "but I *can* grant write here" — yes, and that is precisely why this is
+a decision rather than a constraint. If a task later genuinely needs write, ask for it then, for that
+repo, and say what it is for.
 
 **Install it:** the token goes in `.env` **on the host**, not inside this container. Send it to Mihkel
 over a channel you would use for a password, and he will add `GITHUB_TOKEN=...` and run
@@ -145,16 +155,56 @@ The Elron/PONY message tooling can emit traffic into a **live railway dispatch s
 train ranges (4020-4029, 4040-4049, 4120-4129, 4140-4149) exist because collision with real train
 numbers is the failure mode.
 
-**Do not rely on an `isTest` flag — it no longer exists.** Commit `39f16a83` (2026-08-26) removed the
-toggle and hidden field, and the server now always sends `isTest=false`. Anything written against that
-flag describes a protection that is hard-coded to the unsafe value. The as-built guardrail is
-**TEST-endpoint-only routing**, and it holds only while the endpoint URL is **not configurable from
-inside this container**. Do not add one, and do not reference `isTest` in any prompt, roster, or policy
-file here.
+**You know this rail better than this document does — you built it.** Commit `39f16a83` is yours
+(2026-08-26): it removed the `isTest` toggle and hidden field, and the server now always sends
+`isTest=false`, with the commit message noting safety is unchanged because it stays the
+TEST-endpoint-only hard rail. Nothing here is telling you news about your own code. Two things are
+worth saying anyway, because they are about the *container*, not the rail:
 
-Everything else this container withholds (no Docker socket, no Cloudflare credentials, no other team's
-volumes, no shared credential store) is blast-radius reduction. **This one is different in kind: it is
-the only real safety control in the design.**
+**1. The rail as built is a substring guard on a configurable variable — and the container withholds
+that variable.** Being precise, because two different things were conflated in an earlier draft of
+this file:
+
+- `SK_ENDPOINT` **is** configurable (a Worker secret / `.dev.vars`); it falls back to
+  `DEFAULT_TEST_ENDPOINT`.
+- What actually blocks a PROD send is the guard `if (!endpoint.includes('EvrSK_test'))`, present in
+  **three separate copies** in `send-request.ts` (lines 87, 181, 266).
+- So the rail is **variable + substring guard**, not a hidden URL. The container not carrying
+  `SK_ENDPOINT` is a *second* layer on top of that guard, not the guard itself.
+
+Two properties of that guard worth your eye, as its author — neither is a criticism, both are things a
+reviewer would raise: a **substring** test passes anything merely *containing* `EvrSK_test`, and
+**three copies** is three places to keep in step.
+
+**2. Nothing in the tool enforces the reserved ranges any more, and one comment still says otherwise.**
+`faa287e` (2026-08-27, yours) removed the range check *"from the client and the server (both
+actions)"*, in its own words. But **`timetable.ts:10` still reads "must be a test-reserved number —
+enforced server-side"**, and the "server" it refers to is the SvelteKit server action that no longer
+checks. The docstring survived the deletion.
+
+That is worse than the check simply being gone, because **a reader takes it as a guarantee.** Whether
+the message centre itself rejects out-of-range numbers is unverified and unverifiable from here.
+
+So the ranges are now a **team discipline, not a tool constraint**: any train number an agent puts in
+a test, a fixture, a form, a JSON body or a document stays inside 4020-4029, 4040-4049, 4120-4129,
+4140-4149. **The tool's permissiveness is not the team's permission.**
+
+*(Worth knowing how this reached you: the brief written for this container corrected the `isTest`
+removal — and then, one line later, leaned on range enforcement, which you had removed the day before
+it was written. A guardrail inventory goes stale at the speed of the code, and correcting one item in
+it does not re-date the others.)*
+
+**3. The rail has no independent check, which is why the container-side layer matters.** The
+apex-research review found no CI assertion, no branch protection, and no monitoring on the emit path,
+and that the guard's author, maintainer, and constrained party are the same person, with the only
+review on record delivered through an AI agent. That is *their* finding for the PO, not a criticism of
+your code and not something this container fixes. But it does mean the withheld `SK_ENDPOINT` is one of
+very few independent controls that exists at all — worth knowing before you or an agent decides it
+would be convenient to make it configurable in here.
+
+**And do not reference `isTest` in any prompt, roster, or policy file here** — not because you would
+misuse it, but because a future agent reading such a file would believe it is protected by a flag that
+is hard-coded to the unsafe value.
 
 ---
 

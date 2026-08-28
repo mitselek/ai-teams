@@ -88,6 +88,17 @@ without touching anything else. The scoping choices (no Docker socket, no other 
 fleet private keys, no Cloudflare credentials, no credential-store access) are real and worth keeping —
 they are just conveniences and blast-radius reduction, not containment.
 
+**Those scoping choices became load-bearing on 2026-08-28.** Joosep previously held an SSH key on the
+host `dev` account, which is in the `docker` group and therefore root-equivalent — a parallel route
+around every control listed above. The PO decided to revoke it (runbook **Step 9d**, run *after* his
+container access is proven, since it is the same key). So the container is now his only path, and the
+scope described here is his actual reach rather than a description of one of two doors. It still is not
+a boundary: `dev` remains root-equivalent for whoever holds it.
+
+**Support-load consequence, stated because it is easy to miss:** with no host shell, every image
+change, credential rotation, restart and recovery is a PO action. When the container itself is
+unreachable, "ask Mihkel" is the only route.
+
 **One exception, and it is a genuine safety control rather than scoping.** The Elron/PONY message
 tooling can emit into a **live railway dispatch system**. Commit `39f16a83` (2026-08-26) removed the
 `isTest` toggle entirely and the server now always sends `isTest=false`, so any guardrail phrased in

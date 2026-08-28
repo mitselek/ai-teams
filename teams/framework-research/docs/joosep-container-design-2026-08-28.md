@@ -10,6 +10,11 @@ boundary"* verbatim; **`[PO-12]` reframed** -- key comments on this host are doc
 the decision is "identify all four keys by fingerprint, *then* decide", not "revoke Joosep's key";
 §2.4 corrects allerk's stated WARP mechanism and adopts Hopper's probe amendment; §2.2 pins the
 npm-vs-native collision rule; §3.3 gains the three-PATH-sources finding; new `[PO-14]`.
+**v3.6** (17:12) **CONTAINER IS UP.** Build 4 green after three real defects, all pre-existing and all
+mine — each fix was the instrument that found the next. `[PO-10]` **CLOSED by measurement: ceilings ARE
+enforced** (`12000000000 42949672960 512`), so `deploy.resources.limits` is not Swarm-decorative here.
+New `[PO-19]`: **`allerk` has no pid ceiling** — CPU and memory enforced, `PidsLimit` unset. Host key
+recorded: `SHA256:C8qVyjSQuyiSXPzEBcIOh2tfUwlk9EJtU2WxhAEbO3U`.
 **v3.5** (16:02) `[PO-18]` **CLOSED** -- no provisioning-side connector step; it is the team's second
 assignment. **Corrected a wrong claim in `FIRST-TASKS.md`** against the apex-research response
 (`34f2f310`, read at source): "the team must not exceed its principal" is false for `rumba`, where
@@ -1156,7 +1161,8 @@ Acceptance checks for whoever executes the build (not me):
 | **PO-7** | Join the stationmaster mail network? | **no** in v1; add later if a real correspondent exists. EVR island = prod-llm hub only | later |
 | **PO-8** | **Cloudflare WARP enrolment for Joosep** | required; nothing works without it. Diagnostic `warp-cli status` | prerequisite |
 | **PO-9** | Registry drift (4 defects, §1.4): `allerk` in neither registry; the two registries disagree about `screenwerk`/`mvox`; a **third** and more accurate port record lives in allerk's compose header; apex `tmux` name mismatch | separate ticket -- pre-existing, unrelated to Joosep. Register 2231 in **all three** records | -- |
-| **PO-10** | Resource ceilings -- and whether a **second** container promised 12/20 cores + 40/62 GiB is right | match allerk (12 / 40G) and accept the overcommit; add `pids_limit: 512`. Alternatives (lower-and-asymmetric, or fleet-wide reservations) costed in §2.5 | build |
+| ~~**PO-10**~~ | ~~Resource ceilings, and whether `deploy.resources.limits` is enforced at all~~ | **MEASURED 2026-08-28 17:04: enforced.** `docker inspect` on the live container returns `12000000000 42949672960 512` — the daemon applies all three under a plain `up`. Ceilings match allerk; the overcommit is accepted per §2.5 | ~~open~~ **CLOSED** |
+| **PO-19** | **`allerk` has NO pid ceiling** — measured `12000000000 42949672960 <no value>`. CPU and memory are enforced; `PidsLimit` is unset | **Route to Lerko.** One line (`pids:` under his existing `deploy.resources.limits`). Not ours to edit. A fork-bomb hits a pid ceiling long before a 40 GB memory ceiling notices, and his container has none to hit — on a host shared with ten others | fleet |
 | **PO-13** | WARP CA: bind-mount the host file (apex) or bake a copy into the image (allerk) | **bind-mount** -- a stale baked CA fails silently as fake network errors; a moved host path fails loudly at boot (§2.2) | build |
 | **PO-11** | In-container `sudo`? | **grant it**, matching allerk; treat reproducibility as convention, not a lock (§2.8) | build |
 | ~~**PO-12**~~ | ~~Four keys on host `dev`, one labelled `joosep.madar@evr.ee`~~ | **DECIDED 15:27 (PO): REVOKE.** Fingerprint check ran first and confirmed the label -- one key, his, line 3. Same key keeps opening his container, so no re-key. Executed as runbook **Step 9d**, after Step 9 proves container access (§2.9) | ~~open~~ **CLOSED** |
