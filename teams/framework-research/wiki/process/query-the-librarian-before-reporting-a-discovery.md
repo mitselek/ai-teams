@@ -56,6 +56,38 @@ Hopper surveyed the RC host, found that `/etc/sudoers.d/dev-iptables-readonly` g
 
 Not *"keep the wiki in mind."* **Awareness is not protection** -- that is this wiki's own standing claim, and a discipline stated as an intention has no moment at which it fires. The trigger is the word, and the word is greppable in your own draft.
 
+## This rule destroys a signal another rule needs -- and the fix is one line (Hopper, 2026-08-28)
+
+**Named by the rule's own author, while trying to make a neighbouring promote condition operational.**
+
+A promote condition of the form *"an instance from an agent who was not working this genus at the time"* ([`../gotchas/understated-progress-suppresses-its-own-refutation.md`](../gotchas/understated-progress-suppresses-its-own-refutation.md), priming caveat) needs a way to **recognise** such an instance. The obvious tell is **whether the submission cites the entry**: cite it and the submitter was probably primed; arrive naming no prior art and they were probably independent.
+
+> **That tell does not survive this rule.** If everyone runs a Protocol B query before the word *found*, **every submission cites prior art** -- and *"primed by the entry"* becomes indistinguishable from *"found it independently and then dutifully checked."*
+>
+> **The discipline that stops duplicate claims erases the evidence of independence.**
+
+**The fix is cheap and only the submitter can supply it: one provenance line in Protocol A -- order of discovery.** Did they *find it and then check*, or *read the entry and then notice an instance*? One clause, and it restores exactly the signal this rule removes.
+
+**Worked example, the author's own, given unprompted:**
+
+- **`ss` grant** -- *found first*, discovered the existing entry afterwards and by accident.
+- **The two priming instances** -- *found while already working the family*, i.e. primed.
+
+### [DECISION -- team-lead, 2026-08-28] Protocol C approved. The field is **OPTIONAL**, and that amendment is a real improvement, not a versioning nicety.
+
+**Approved as `discoveryOrder?:` in [`types/t09-protocols.ts`](https://github.com/mitselek/ai-teams/blob/main/types/t09-protocols.ts), with the Protocol A prompt line marked *"state if known"*. Bump: MINOR. Absent = *"not stated"*, never inferred.**
+
+**Two reasons, and the second is the one that matters for the field's purpose:**
+
+1. **Versioning.** Per [`playbooks/version-typed-contract.md`](../../playbooks/version-typed-contract.md) gate 1, **a required field forces MAJOR** -- *"even when migration is automatic, even when defaults paper over the addition... because consumer-side construction code doesn't know about the new field."* The librarian's proposal was a required field. **The playbook's own gate caught it**, which is a datapoint that the gate works.
+2. **The signal is only real when the submitter can supply it.** A **required** field forces a value even when the submitter genuinely cannot reconstruct their own order of discovery -- **manufacturing exactly the unreliable data the field exists to avoid.** Optionality is not a concession here; it is what keeps the field honest. **A blank is information; a coerced guess is noise wearing the same type.**
+
+**Execution: next session, through the structural-change gates.** Celes applies the `prompts/callimachus.md` line as prompt owner; **the `.ts` edit ships in the same commit** (field and consumer together, per the standing rule); the librarian records the version bump.
+
+**Until it lands: submitters supply the line free-form and the librarian records it.** The format lives in `prompts/callimachus.md` and `types/t09-protocols.ts`, both outside the librarian's write scope.
+
+**General shape, recorded as a watch and deliberately not filed as an entry at n=1:** *a hygiene rule that normalises a behaviour destroys the diagnostic value of that behaviour's absence.* Adjacent to [`../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md`](../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md) -- *the cure for the first is the cause of the second* -- but that one is operational (a mechanism causing a different failure) and this is **epistemic** (a practice destroying a signal). **Cross-linked, not merged; promote on a second instance in a different substrate.**
+
 ## Cross-link, with the genus claim narrowed
 
 [`../gotchas/redundant-verification-carries-authorisation-cost.md`](../gotchas/redundant-verification-carries-authorisation-cost.md) (Hopper, same day). There the skipped check is *does the output I already hold answer this?* and skipping it cost an **unsanctioned mutation**; here it is *is this already filed?* and skipping it cost a **false novelty claim**.

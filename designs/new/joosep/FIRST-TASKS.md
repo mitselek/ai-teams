@@ -1,212 +1,263 @@
-# First tasks -- `joosep` container
+# Esimesed ülesanded -- konteiner `joosep`
 
-Tere, Joosep. This container starts **deliberately under-credentialled**: it has no GitHub token and no
-Atlassian access. That is not an oversight — provisioning your own credentials is the first real job for
-you and your agents, so the things this team can reach are things *you* granted it, under *your* name.
+Tere, Joosep. See konteiner käivitub **teadlikult ilma kredentsiaalideta**: siin ei ole GitHubi tokenit
+ega Atlassiani ligipääsu. See ei ole unustus -- oma kredentsiaalide hankimine on esimene päris töö
+sulle ja su agentidele, nii et kõik, milleni see tiim ulatub, on midagi, mille *sina* talle andsid,
+*sinu* nime all.
 
-Work these in order. Each has a **verify** step; do not move on until it passes.
+Tee need järjekorras. Igal ühel on **kontroll**; ära liigu edasi enne, kui see läbib.
+
+> **Keelemärkus:** käsud, failinimed, identifikaatorid ja GitHubi/Atlassiani liidese tekstid on
+> **inglise keeles meelega** -- sa vaatad neid ingliskeelsest liidesest ja ingliskeelsest koodist.
+> Tõlgitud on ainult selgitav osa.
 
 ---
 
-## Task 0 — Claude login (you, once, before anything else)
+## Ülesanne 0 -- Claude'i sisselogimine (sina, üks kord, enne kõike muud)
 
-Nothing below works until Claude is authenticated.
+Miski allpool ei tööta enne, kui Claude on autenditud.
 
 ```bash
 claude
 ```
 
-Follow the OAuth device flow in your own browser. Credentials land in the `joosep_home` volume and
-survive restarts and rebuilds — you will not repeat this.
+Järgi OAuth-i seadmevoogu oma brauseris. Kredentsiaalid salvestuvad `joosep_home` volume'ile ja jäävad
+püsima üle taaskäivituste ja image'i uuesti ehitamiste -- seda sammu ei pea kordama.
 
-**Verify:** `claude --version` prints a version, and a `claude` session starts without prompting to log in.
+**Kontroll:** `claude --version` väljastab versiooni ja `claude` sessioon käivitub ilma
+sisselogimisküsimuseta.
 
 ---
 
-## Task 1 — Create the GitHub PAT
+## Ülesanne 1 -- Loo GitHubi PAT
 
-A **fine-grained** personal access token on your own account (`JoosepM-565`).
+**Fine-grained** personal access token sinu enda kontol (`JoosepM-565`).
 
-**Exact scope — no wider:**
+**Täpne skoop -- mitte laiem:**
 
-| Setting | Value |
+| Säte | Väärtus |
 |---|---|
 | Resource owner | `Eesti-Raudtee` |
-| Repository access | **Only select repositories** → `HES-integration-tests`, `rumba` |
-| Repository permissions | **Contents: Read-only**, **Metadata: Read-only** (metadata is mandatory and auto-selected) |
-| Everything else | leave at **No access** |
-| Expiration | pick a date you will actually renew; note it somewhere |
+| Repository access | **Only select repositories** -> `HES-integration-tests`, `rumba` |
+| Repository permissions | **Contents: Read-only**, **Metadata: Read-only** (metadata on kohustuslik ja valitakse automaatselt) |
+| Kõik muu | jäta **No access** peale |
+| Expiration | vali kuupäev, mida sa päriselt uuendad; pane kuskile kirja |
 
-**Deliberately NOT granted — and note the reason is not the one you might expect:**
+**Teadlikult ANDMATA -- ja põhjus ei ole see, mida sa ilmselt ootad:**
 
-> **You already hold more than this token will.** Your VJS2 team membership gives you **GitHub admin
-> on `rumba`**, over an unprotected `main`, and write on `HES-integration-tests` (which takes
-> direct-to-`main` pushes with no PR history). So nothing here is a ceiling you are bumping into —
-> **you are being asked to grant your agents deliberately less than you hold yourself.** That is the
-> whole point, and it is the step that will feel unnecessary while you are clicking through the form.
+> **Sul endal on juba rohkem õigusi, kui sellel tokenil saab olema.** VJS2 tiimi liikmelisus annab sulle
+> **GitHubi admin-õigused `rumba` peal**, kaitsmata `main`-i kohal, ja kirjutusõiguse
+> `HES-integration-tests`-is (kuhu tehakse otse-`main` push'e, PR-ajaloota). Nii et siin ei ole ühtegi
+> lage, mille vastu sa põrkad -- **sul palutakse anda oma agentidele teadlikult vähem, kui sul endal
+> on.** Selles ongi mõte, ja just see samm tundub vormi täites ebavajalik.
 
-- **No write/push anywhere.** Not because you lack the right, but because an agent with write on an
-  unprotected `main` has no gate between a mistake and the branch everyone builds from. *The absence
-  of a guardrail is not permission.* You are also not in `vjs-code-reviewers` — you are deliberately
-  outside the merge gate on `rumba`, and the team must not acquire what you were not given.
-- **No admin, no org permissions.** Your admin on `rumba` is exactly the thing not to mirror.
-- **No `workflow` scope.** It would let an agent edit CI definitions.
-- **Only two repos**, even though your org teams reach 40+. These are the two you have actually
-  committed to; the whole `hes`-team grant is unexercised. Widen against a named need, not in advance.
+- **Mitte mingit write/push õigust.** Mitte sellepärast, et sul õigust poleks, vaid sellepärast, et
+  agendil, kellel on kirjutusõigus kaitsmata `main`-i peale, ei ole ühtegi väravat vea ja selle haru
+  vahel, millelt kõik teised ehitavad. *Kaitsemehhanismi puudumine ei ole luba.* Sa ei ole ka
+  `vjs-code-reviewers` liige -- sa oled `rumba` merge-värava suhtes teadlikult väljaspool, ja tiim ei
+  tohi omandada seda, mida sulle ei antud.
+- **Mitte admin, mitte org-õigused.** Sinu admin `rumba` peal on täpselt see, mida ei tohi peegeldada.
+- **Mitte `workflow` skoopi.** See laseks agendil CI-definitsioone muuta.
+- **Ainult kaks repot**, kuigi su org-tiimid ulatuvad 40+-ni. Need on kaks, kuhu sa oled päriselt
+  commit'inud; kogu `hes`-tiimi õigus on kasutamata. Laienda nimetatud vajaduse peale, mitte ette.
 
-If you find yourself thinking "but I *can* grant write here" — yes, and that is precisely why this is
-a decision rather than a constraint. If a task later genuinely needs write, ask for it then, for that
-repo, and say what it is for.
+Kui mõtled "aga ma *saan* siin write'i anda" -- jah, ja just seepärast on see otsus, mitte piirang. Kui
+mõni hilisem ülesanne päriselt vajab kirjutusõigust, küsi see siis, selle repo jaoks, ja ütle milleks.
 
-**Install it:** the token goes in `.env` **on the host**, not inside this container. Send it to Mihkel
-over a channel you would use for a password, and he will add `GITHUB_TOKEN=...` and run
-`./joosep.sh restart`. The repos then clone automatically on that boot — no rebuild.
+**Paigaldamine:** token läheb `.env`-i **hostis**, mitte selle konteineri sisse. Saada see Mihklile
+kanalit pidi, mida kasutaksid parooli jaoks; tema lisab `GITHUB_TOKEN=...` ja käivitab
+`./joosep.sh restart`. Repod kloonitakse siis sellel käivitusel automaatselt -- image'it uuesti ehitama
+ei pea.
 
-**Verify (after the restart):**
+**Kontroll (pärast restarti):**
 
 ```bash
 gh auth status
-ls ~/work/           # expect: HES-integration-tests  rumba
+ls ~/work/           # oodatav: HES-integration-tests  rumba
 git -C ~/work/rumba log --oneline -3
 ```
 
-Also confirm the ceiling actually holds — a scope that is wider than intended is the failure worth
-catching now rather than later:
+Kontrolli ka, et lagi päriselt peab -- liiga lai skoop on viga, mida tasub avastada nüüd, mitte hiljem:
 
 ```bash
-gh repo view Eesti-Raudtee/vjs_apex_apps 2>&1 | head -2   # expect: an error / not accessible
+gh repo view Eesti-Raudtee/vjs_apex_apps 2>&1 | head -2   # oodatav: viga / pole ligipääsetav
 ```
 
 ---
 
-## Task 2 — Authenticate the EVR Atlassian connector
+## Ülesanne 2 -- Autendi EVR Atlassiani konnektor
 
-This replaces API tokens entirely — there is no Atlassian secret anywhere in this container, and there
-should never be one. The connector covers **both Jira and Confluence** under your own account, so your
-own permissions apply and every action is attributed to you.
+See asendab API-tokenid täielikult -- selles konteineris ei ole ühtegi Atlassiani saladust ja ei tohigi
+olla. Konnektor katab **nii Jira kui Confluence'i** sinu enda konto all, nii et kehtivad sinu enda
+õigused ja iga tegevus on sinu nimel.
 
-> **The exact install/enable command depends on how the EVR connector is distributed, and I have not
-> verified it from inside a container. Ask Mihkel for the precise step rather than guessing** — a
-> wrong guess here can leave a half-configured MCP entry that fails in confusing ways. What follows is
-> the shape and, more importantly, the verification.
+**See on sinu tiimi teine ülesanne, mitte miski, mida sulle ette seadistatakse.** Hoster-poolset
+paigaldussammu ei ole: su agendid juhendavad sind selle läbi interaktiivselt. Kui midagi jääb kinni,
+küsi Mihklilt -- ära arva, sest vale arvamine jätab poolikult seadistatud MCP-kirje, mis eksitavalt
+katki läheb.
 
-Once it is connected, expect Atlassian tools to be available in your Claude session (the
-`atlassianUserInfo`, `getVisibleJiraProjects`, `getConfluenceSpaces` family).
+Kui konnektor on ühendatud, peaksid oma Claude'i sessioonis nägema Atlassiani tööriistu
+(`atlassianUserInfo`, `getVisibleJiraProjects`, `getConfluenceSpaces` pere).
 
-**Verify — three checks, all cheap:**
+**Kontroll -- kolm asja, kõik odavad:**
 
-1. **Identity:** `atlassianUserInfo` returns **your** account, not a shared one.
-2. **Jira by key, not display name:** `getVisibleJiraProjects` includes `VJS1`, `VEO`, `HES`, `PONY`,
-   `FSM`, `D365`. **Note `VEO` displays as "VJS2"** — always grant and query by the *key*.
-3. **Confluence:** `getConfluenceSpaces` includes `VJS2`. This is the check that proves the connector
-   did something a Jira-only setup could not.
+1. **Identiteet:** `atlassianUserInfo` tagastab **sinu** konto, mitte jagatud konto.
+2. **Jira võtme, mitte kuvanime järgi:** `getVisibleJiraProjects` sisaldab `VJS1`, `VEO`, `HES`,
+   `PONY`, `FSM`, `D365`. **Pane tähele: `VEO` kuvatakse nimega "VJS2"** -- anna õigusi ja päri alati
+   *võtme* järgi.
+3. **Confluence:** `getConfluenceSpaces` sisaldab `VJS2`. Just see kontroll tõestab, et konnektor tegi
+   midagi, mida ainult-Jira seadistus ei suudaks.
 
-**A property worth internalising before you use it:** your credential sees a *different* slice of
-Jira/Confluence than Mihkel's. **An empty result from a search you run is not evidence that the thing
-does not exist** — it may only be evidence that it is not visible to you. When a search comes back
-empty and the answer matters, say "not visible to this account" rather than "does not exist".
+**Üks omadus, mis tasub enne kasutamist selgeks teha:** sinu kredentsiaal näeb Jirast ja Confluence'ist
+*teistsugust* lõiku kui Mihkli oma. **Tühi tulemus sinu tehtud otsingust ei ole tõend, et asja ei ole
+olemas** -- see võib olla tõend ainult selle kohta, et see ei ole sulle nähtav. Kui otsing tuleb tühi ja
+vastus on oluline, ütle "sellele kontole ei ole nähtav", mitte "ei ole olemas".
 
 ---
 
-## Task 3 — Verify the container itself
+## Ülesanne 3 -- Kontrolli konteinerit ennast
 
 ```bash
-type -a claude          # expect exactly ONE path, under ~/.local/bin
-tmux ls                 # from a plain shell: no session (that is correct)
-cat ~/FIRST-TASKS.md    # this file — edit it freely, it is yours now
+type -a claude          # oodatav: TÄPSELT ÜKS tee, ~/.local/bin all
+tmux ls                 # tavalisest shellist: sessiooni ei ole (nii peabki olema)
+cat ~/FIRST-TASKS.md    # see fail -- muuda seda vabalt, see on nüüd sinu oma
 ```
 
-The two connection modes, which are the point of the setup:
+Kaks ühendusviisi, milles ongi kogu mõte:
 
-- `Connect-Joosep` → a plain shell. Good for git, file work, poking around.
-- `Connect-Joosep -Session` → attached to your running Claude session. `Ctrl-b d` detaches and
-  **leaves Claude running**; closing the terminal does the same. Reconnect and the conversation is
-  where you left it.
+- `Connect-Joosep` -> tavaline shell. Hea gitile, failitööks, ringivaatamiseks.
+- `Connect-Joosep -Session` -> kinnitub su töötavasse Claude'i sessiooni. `Ctrl-b d` eraldab ja
+  **jätab Claude'i tööle**; terminali sulgemine teeb sama. Ühendu uuesti ja vestlus on seal, kus jäi.
 
-If `type -a claude` ever shows **two** paths, stop and tell Mihkel — it means a second install crept in,
-and which version you get will then depend on how you logged in.
-
----
-
-## Task 4 — Team roster (after 1–3 pass)
-
-The role set is still an open decision (seven candidates against a six-role reference shape), so this
-task starts with a conversation rather than a config file. Bring to it: which of the three registers of
-your work the team should serve first — E2E test automation, the SvelteKit/Worker service build, or
-release reporting.
-
-Two things your team's prompts must encode from day one, both learned the hard way:
-
-1. **`gh search` only indexes DEFAULT branches.** It demonstrably missed 14 of your 67 commits during
-   the research that shaped this container. Any tooling that surveys activity must enumerate branches
-   via `repos/{owner}/{repo}/branches` then `commits?sha=<branch>`.
-2. **Hygiene findings are reported, never applied.** The roll-up touches five projects you do not own.
-   Bulk-editing another project's Fix Versions or due dates is the single most plausible way this team
-   causes an incident.
+Kui `type -a claude` näitab kunagi **kahte** teed, peatu ja ütle Mihklile -- see tähendab, et teine
+paigaldus on sisse hiilinud, ja siis sõltub saadav versioon sellest, kuidas sa sisse logisid.
 
 ---
 
-## The one hard safety rule
+## Ülesanne 4 -- Tiim (pärast 1--3 läbimist)
 
-**No write path to any VJS / HES / PONY runtime or test environment, and no ability to send messages
-into them.**
+Sinu tiim on `vedur`: kuus agenti, kõik nimetatud raudtee-ajaloo pioneeride järgi. Failid:
+`~/work/vedur/` (roster.json, common-prompt.md, prompts/).
 
-The Elron/PONY message tooling can emit traffic into a **live railway dispatch system**. The reserved
-train ranges (4020-4029, 4040-4049, 4120-4129, 4140-4149) exist because collision with real train
-numbers is the failure mode.
+| Nimi | Roll | Töötab |
+|---|---|---|
+| **Minot** | tiimijuht / dispetšer -- sinu ainus vestluskaaslane, räägib eesti keeles | jagab ülesandeid, ei kirjuta ise koodi |
+| **Trevithick** | teenuse ehitaja | `rumba` / `apps/elron-test` |
+| **Rastrick** | E2E-komplekti hoidja | `HES-integration-tests` -- kirjutab ja triaažib, **ei käivita** (kredentsiaale konteineris pole) |
+| **Saxby** | ülevaataja ja rööpavaht | mõlemad repod; hoiab **ühte kõva ohutusreeglit** |
+| **Bradshaw** | release-kaardistaja | Jira 6 projekti + GitHub, **ainult lugemine**; hügieeniaudit = raporteeritakse, ei rakendata |
+| **Smiles** | kirjutaja | **ainus**, kes Jirasse/Confluence'i kirjutab: VEO-98, sinu VJS1 piletid, VJS2 ruum -- alati pärast sinu ülelugemist |
 
-**You know this rail better than this document does — you built it.** Commit `39f16a83` is yours
-(2026-08-26): it removed the `isTest` toggle and hidden field, and the server now always sends
-`isTest=false`, with the commit message noting safety is unchanged because it stays the
-TEST-endpoint-only hard rail. Nothing here is telling you news about your own code. Two things are
-worth saying anyway, because they are about the *container*, not the rail:
+Alusta: `Connect-Joosep -Session`, siis `claude` kaustas `~/work`. Minot loeb `vedur/startup.md`,
+tervitab sind ja pakub järgmise sammu. **Ta ei spawni kedagi ilma ülesandeta.**
 
-**1. The rail as built is a substring guard on a configurable variable — and the container withholds
-that variable.** Being precise, because two different things were conflated in an earlier draft of
-this file:
+Kaks reeglit, mis on tiimi promptides päevast 1 (õpitud valusalt):
 
-- `SK_ENDPOINT` **is** configurable (a Worker secret / `.dev.vars`); it falls back to
-  `DEFAULT_TEST_ENDPOINT`.
-- What actually blocks a PROD send is the guard `if (!endpoint.includes('EvrSK_test'))`, present in
-  **three separate copies** in `send-request.ts` (lines 87, 181, 266).
-- So the rail is **variable + substring guard**, not a hidden URL. The container not carrying
-  `SK_ENDPOINT` is a *second* layer on top of that guard, not the guard itself.
-
-Two properties of that guard worth your eye, as its author — neither is a criticism, both are things a
-reviewer would raise: a **substring** test passes anything merely *containing* `EvrSK_test`, and
-**three copies** is three places to keep in step.
-
-**2. Nothing in the tool enforces the reserved ranges any more, and one comment still says otherwise.**
-`faa287e` (2026-08-27, yours) removed the range check *"from the client and the server (both
-actions)"*, in its own words. But **`timetable.ts:10` still reads "must be a test-reserved number —
-enforced server-side"**, and the "server" it refers to is the SvelteKit server action that no longer
-checks. The docstring survived the deletion.
-
-That is worse than the check simply being gone, because **a reader takes it as a guarantee.** Whether
-the message centre itself rejects out-of-range numbers is unverified and unverifiable from here.
-
-So the ranges are now a **team discipline, not a tool constraint**: any train number an agent puts in
-a test, a fixture, a form, a JSON body or a document stays inside 4020-4029, 4040-4049, 4120-4129,
-4140-4149. **The tool's permissiveness is not the team's permission.**
-
-*(Worth knowing how this reached you: the brief written for this container corrected the `isTest`
-removal — and then, one line later, leaned on range enforcement, which you had removed the day before
-it was written. A guardrail inventory goes stale at the speed of the code, and correcting one item in
-it does not re-date the others.)*
-
-**3. The rail has no independent check, which is why the container-side layer matters.** The
-apex-research review found no CI assertion, no branch protection, and no monitoring on the emit path,
-and that the guard's author, maintainer, and constrained party are the same person, with the only
-review on record delivered through an AI agent. That is *their* finding for the PO, not a criticism of
-your code and not something this container fixes. But it does mean the withheld `SK_ENDPOINT` is one of
-very few independent controls that exists at all — worth knowing before you or an agent decides it
-would be convenient to make it configurable in here.
-
-**And do not reference `isTest` in any prompt, roster, or policy file here** — not because you would
-misuse it, but because a future agent reading such a file would believe it is protected by a flag that
-is hard-coded to the unsafe value.
+1. **`gh search` indekseerib ainult vaikeharu** -- uuringu käigus jäi 14 sinu 67 commitist märkamata.
+   Harude loend käib `repos/{owner}/{repo}/branches` + `commits?sha=<haru>` kaudu.
+2. **Hügieenileiud raporteeritakse, mitte ei rakendata.** Koondpilt puudutab viit projekti, mis pole
+   sinu omad.
 
 ---
 
-*Prepared by (\*FR:Brunel\*) for the joosep container, 2026-08-28. This file is yours — edit it as you
-work. A pristine copy stays at `/opt/FIRST-TASKS.md`; a rebuild will not overwrite your version.*
+## Ülesanne 5 -- Esimene päris töö (ainult lugemine, PAT-i laiendamata)
+
+Kaks iseseisvat asja, mõlemad vaid loevad:
+
+**5a. Saxby vaatab üle haru `feat/VJS1-826-elron-test`** -- mitte et sulle su enda koodi seletada, vaid
+PR-valmiduse pilguga (mida `vjs-code-reviewers` küsiks) ja rööpa pilguga. Ta toob välja kaks juba teada
+asja, mis on sinu otsustada ja Ruth Türgile viia: guard on alamstringitest `includes('EvrSK_test')`
+kolmes koopias, ja rongi-numbrivahemiku kontroll on tööriistast eemaldatud (`faa287e`). Tiim seda
+**ei paranda** -- raporteerib.
+
+**5b. Bradshaw teeb esimese release-koondpildi** kuue projekti Jirast (VEO võti = kuvanimi "VJS2"),
+koos hügieeni-deltadega su juulikuu mustandi (leht 1928429583) põhjal. Tulemus: mustand
+`~/work/vedur/drafts/`, Smiles kirjutab sellest eestikeelse jutu -- sina loed, siis alles läheb VEO-98
+alla.
+
+**Kontroll:** Saxby raport on Minoti kaudu sinu ees; Bradshaw mustand on olemas ja iga tühi lahter on
+märgitud "andmed puuduvad", mitte "midagi pole".
+
+---
+
+## Ülesanne 6 -- Esimene kirjutamine: VJS1-826 PR-i
+
+Nüüd on esimene **nimeline vajadus** PAT-i laiendamiseks: `rumba` repos **Contents: Read and write** +
+**Pull requests: Read and write**. Ainult see repo, ainult need kaks. Saada uus token Mihklile samamoodi
+kui ülesandes 1; `./joosep.sh restart`.
+
+Siis: Trevithick teeb Saxby leiud haru peal korda -> Saxby CLEAR -> haru push (mitte `main`) ->
+`gh pr create` -> **sina** küsid review'd `vjs-code-reviewers`-ilt. Tiim ei kinnita ega merge'i midagi,
+kunagi.
+
+**Kontroll:** PR on lahti, review küsitud, Smiles on VJS1-826 alla kirjutanud lühikese seisu (pärast
+sinu ülelugemist).
+
+---
+
+## Üks kõva ohutusreegel
+
+**Mitte mingit kirjutusteed ühessegi VJS / HES / PONY runtime'i ega testkeskkonda, ja mitte mingit
+võimalust neisse sõnumeid saata.**
+
+`apps/elron-test` repos `rumba` suudab saata sõnumeid Eesti Raudtee sõnumikeskusesse (EvrSK).
+**Sama koodirada**, mis jõuab TEST-sõnumikeskusesse, jõuaks mujale suunatuna **tootmises töötava
+raudtee liikluskorraldussüsteemini**. Praeguses koodis on ainus kaitse selle vastu
+**kaitserööbas** (routing rail), ja mitte midagi muud:
+
+- endpoint tuleb `SK_ENDPOINT` saladusest, vaikeväärtusega `DEFAULT_TEST_ENDPOINT` failis
+  `apps/elron-test/src/lib/soap.ts`;
+- iga saatmistee failis `apps/elron-test/src/lib/send-request.ts` keeldub, kui endpoint'i string ei
+  sisalda `EvrSK_test`;
+- päris kredentsiaalid (`SK_USER`, `SK_PASSWORD`) asuvad Delinea's ja Worker'i saladustes. **Neid ei
+  ole selles konteineris ja ei tohi kunagi olla.**
+
+**Sa tunned seda rööbast paremini kui see dokument -- sa ehitasid selle.** Commit `39f16a83` on sinu
+(2026-08-26): see eemaldas `isTest` lüliti ja peidetud välja, ja server saadab nüüd alati
+`isTest=false`. Siin ei räägita sulle uudiseid sinu enda koodist. Kaks asja tasub siiski öelda, sest
+need käivad **konteineri**, mitte rööpa kohta:
+
+**1. Konteiner hoiab `SK_ENDPOINT`-i meelega enda käest ära.** Seda ei ole `.env`-is, ei ole
+keskkonnamuutujates, ja seda ei tohi sinna lisada. See on ainus koht kogu selles disainis, kus
+"konteiner ei ulatu selleni" on päris ohutus, mitte kahjuraadiuse vähendamine -- kõik muu, mida see
+konteiner endast eemal hoiab (docker socket, Cloudflare'i kredentsiaalid, teiste tiimide volume'id,
+jagatud saladused), on selle kõrval korrashoid. **Aga täpsuse mõttes: see on teine kiht `EvrSK_test`
+kontrolli peal, mitte kontroll ise.**
+
+Kaks selle kontrolli omadust, mis väärivad su pilku selle autorina -- kumbki ei ole etteheide, mõlemad
+on asjad, mille ülevaataja tõstataks: **alamstringi** test laseb läbi kõik, mis lihtsalt *sisaldab*
+`EvrSK_test`, ja **kolm koopiat** on kolm kohta, mida tuleb sünkroonis hoida.
+
+**2. Reserveeritud ronginumbrid on selle tiimi jaoks siduvad ilma eranditeta -- ja tööriist ise ei
+jõusta neid enam.** Iga ronginumber, mille agent kirjutab testi, fixture'isse, vormi, JSON-kehasse või
+dokumenti, **peab olema** vahemikus 4020-4029, 4040-4049, 4120-4129, 4140-4149. Mitte ükski muu number,
+mitte kunagi.
+
+See kehtib **hoolimata sellest**, et `elron-test` ise lõpetas selle jõustamise: commit `faa287e`
+(2026-08-27) eemaldas vahemikukontrolli kliendist **ja** serverist. Docstring failis `timetable.ts:10`
+väidab endiselt *"enforced server-side"* -- **see on aegunud**: miski tööriistas ei jõusta seda, ja
+keegi meie ahelas ei ole kontrollinud, kas sõnumikeskus ise seda teeb. **See, et tööriist lubab, ei
+tähenda, et tiim tohib.**
+
+*(Tasub teada, kuidas see sinuni jõudis: selle konteineri jaoks kirjutatud briefing parandas ära
+`isTest`-i eemaldamise -- ja tugines siis ühe rea hiljem vahemikukontrollile, mille sina olid
+eemaldanud päev enne selle kirjutamist. Kaitsemehhanismide nimekiri aegub koodi kiirusel, ja ühe kirje
+parandamine ei värskenda ülejäänuid.)*
+
+**3. Rööpal ei ole sõltumatut kontrolli, ja just seepärast loeb konteineri-poolne kiht.**
+apex-research'i ülevaatus ei leidnud saatmisteelt ühtegi CI-kontrolli, haru kaitset ega seiret, ning
+tuvastas, et kaitse autor, hooldaja ja see, keda ta piirab, on sama inimene, ning ainus dokumenteeritud
+ülevaatus tuli AI-agendi kaudu. See on **nende** leid PO-le, mitte etteheide su koodile ega midagi,
+mida see konteiner parandab. Aga see tähendab, et enda käes hoitud `SK_ENDPOINT` on üks väga vähestest
+üldse eksisteerivatest sõltumatutest kontrollidest -- tasub teada enne, kui sina või mõni agent otsustab,
+et seda oleks siin mugav seadistatavaks teha.
+
+**Ja ära viita `isTest`-ile üheski prompti-, roster- ega poliitikafailis siin** -- mitte sellepärast, et
+sina seda vääriti kasutaksid, vaid sellepärast, et tulevane agent, kes sellist faili loeb, usuks end
+olevat kaitstud lipuga, mis on kõvasti seatud ohtlikule väärtusele.
+
+---
+
+*Koostanud (\*FR:Brunel\*) joosep-konteineri jaoks, 2026-08-28. Ülesanded 4--6 ja ohutusreegli sõnastus:
+(\*FR:Celes\*). See fail on sinu oma -- muuda seda töö käigus. Puutumata koopia jääb faili
+`/opt/FIRST-TASKS.md`; image'i uuesti ehitamine sinu versiooni üle ei kirjuta.*
