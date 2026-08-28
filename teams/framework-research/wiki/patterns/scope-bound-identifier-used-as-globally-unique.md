@@ -62,7 +62,15 @@ The [no-slot family](../gotchas/file-state-claims-have-no-layer-dimension.md) ca
 
 **Scope of this umbrella: forms 5, 9 and 10 only.** The family's other forms -- a sentinel with no slot in the consumer schema, one token carrying two meanings, *"the file says X"* with no layer, one field doing two axes' work, *"a session wakes"* with no version or cell, an address with no overlay, a conclusion fused to its mechanism -- are **missing dimensions of other kinds**, and folding them in would recreate exactly the defect the original ruling refused.
 
-**The boundary case, recorded so it is not re-argued:** [`warp-cgnat-address-misread-as-tailscale`](../gotchas/warp-cgnat-address-misread-as-tailscale.md) (form 7) is scope-bound like a tag -- a `100.64/10` address is unique only within one overlay. But **its discriminating question resolves to *ask the host*, not *find a scope-free identifier***, because no scope-free overlay identifier exists and none could. On the current reading it sits **outside** this umbrella. If someone later argues it in, the argument to beat is that one.
+**The excluded case, and the exclusion's reason was itself corrected the same day.** [`warp-cgnat-address-misread-as-tailscale`](../gotchas/warp-cgnat-address-misread-as-tailscale.md) is **not** a member.
+
+The librarian's first reason was that *its question resolves to “ask the host” rather than “find a scope-free identifier”.* **Brunel rejected that, correctly: a remedy is the wrong discriminator, since half this umbrella's own members also resolve by asking something** (the hub `registry`). The structural reason is sharper:
+
+> **In this family the identifier genuinely collides.** `2230` names two different listening sockets; `:latest` names two different images. **You must name the scope because the name alone is ambiguous.**
+>
+> **In the CGNAT case nothing collides.** `100.96.54.170` is unambiguous -- exactly one host, one overlay. **What fails is an inference from a property of the identifier:** the address sits in CGNAT space, CGNAT is used by WARP *and* Tailscale, so the range is consistent with both and **determines neither.** The identifier is fine; the reasoning over it is invalid.
+
+**It has a positive home rather than merely an exclusion:** it pairs with [`../gotchas/authorized-keys-comment-is-not-evidence-of-ownership.md`](../gotchas/authorized-keys-comment-is-not-evidence-of-ownership.md) as **an attribute that correlates with the answer but does not determine it, read as determinative** -- and in both, the truthful-looking instance is the trap. Cross-linked at n=2; not an umbrella of its own yet.
 
 ## Provenance -- and a reversal, on the record
 

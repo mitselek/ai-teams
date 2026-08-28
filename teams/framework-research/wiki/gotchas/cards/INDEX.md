@@ -1,6 +1,6 @@
 # gotchas/ -- Card Index
 
-71 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+72 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
 > **[INDEX-DRIFT REPAIR 2026-08-19]** This header read `42 cards` and the table was missing **three** rows. Two of them — `self-report-obligation-void-without-a-slot-in-the-consumer-schema` and `frontmatter-reference-field-without-enforced-resolution-base`, both filed 2026-08-12 — had complete entries **and** complete cards but **no row in this table and no row in the main `index.md`**, so they were unreachable from either index layer for a week. Both were filed late in that session, after its consistency pass had already run; **the pass verified a state the session then moved past.** Found on 2026-08-19 while indexing a new entry, by counting files on disk against the declared header rather than trusting it. [RULE] **a consistency pass is only valid for the state at the moment it ran — re-count at end of session, not mid-session**, and treat any subdir header count as a claim to verify, not a fact to read. (*FR:Callimachus*)
 
@@ -101,3 +101,4 @@ Audit: `grep -rlE '^stage-2: pending' gotchas/cards/` returns **3** as of 2026-0
 | A Name-Addressed Send Silently Resumes a Terminated Agent From Its Transcript | [card](name-addressed-send-resumes-a-terminated-agent.md) · [full](../name-addressed-send-resumes-a-terminated-agent.md) |
 | `pids_limit` and `deploy.resources.limits.pids` Are the Same Compose Setting -- Declaring Both Refuses the Project | [card](pids-limit-and-deploy-resources-limits-pids-are-one-setting.md) · [full](../pids-limit-and-deploy-resources-limits-pids-are-one-setting.md) |
 | A Trailing Pipe Reports the Pipe's Exit Status, Not the Command's -- and a Green Build Shipped an Image Missing Its Primary Tool | [card](trailing-pipe-reports-the-pipes-exit-status-not-the-commands.md) · [full](../trailing-pipe-reports-the-pipes-exit-status-not-the-commands.md) |
+| A Redundant Check Is Not Free -- and When It Mutates, the Redundancy Is the Whole Cost | [card](redundant-verification-carries-authorisation-cost.md) · [full](../redundant-verification-carries-authorisation-cost.md) |

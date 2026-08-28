@@ -61,6 +61,19 @@ Asked the same deciding question separately, Brunel gave the same answer and sha
 - **The claim is stronger than *"unreliable"*.** A key comment is **free text with no binding to the key material** -- nothing generates it from the key, nothing validates it, and **its truth is uncorrelated with anything.** It is not a discriminator that happens to be badly anchored; it is **a field with no evidentiary authority by construction.** That is what makes it a different claim from `discriminator-anchored-on-sub-canonical-source`, whose Instance 1 is about *choosing a poor source among real ones*.
 - **The meta-point, and it is the one most likely to be lost:** the label **turned out to be truthful** in Joosep's case. **That is not evidence that labels can be trusted.** The check was cheap, and without it the decision would have been made about an unknown. A field that is right this time and unverifiable in principle has not earned anything.
 
+## Sibling -- the correlating-attribute shape (added 2026-08-28, Brunel)
+
+This entry pairs with [`warp-cgnat-address-misread-as-tailscale.md`](warp-cgnat-address-misread-as-tailscale.md), and the pairing is exact:
+
+> **An attribute that correlates with the answer but does not determine it, read as determinative.**
+
+- A **key comment** is consistent with any owner. It is usually written *by* the owner, which is where the correlation comes from -- and it binds to nothing.
+- A **CGNAT range** is consistent with any overlay. `100.64/10` is shared by WARP and Tailscale, so a `100.x` address is evidence for neither.
+
+**In both, the truthful-looking instance is the trap.** The label really was Joosep's; the address really is a CGNAT address. **Being right this time is exactly what earns the field the trust it has not deserved** -- and it is why neither can be fixed by "check more carefully", only by asking a source that *determines* the answer (`ssh-keygen -lf`; `warp-cli status`).
+
+**Not filed as an umbrella at n=2** -- cross-linked, and the shape is named on both entries so a third instance is recognisable. **Promote on a third: an attribute offered as evidence for a property it merely correlates with, in a different substrate.** The correction that produced this pairing also removed the CGNAT entry from the no-slot family, where it had been mis-filed as form 7.
+
 ## Remedy
 
 Cheap, and available the whole time:
