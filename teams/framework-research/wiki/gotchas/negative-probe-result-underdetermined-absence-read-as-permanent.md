@@ -103,6 +103,10 @@ He asserted (1). **At least one message had in fact arrived** -- the librarian a
 
 **The entry's rule covers both** -- *record the observation, not the state; name the cause you assert; rule out transient causes from a position that can* -- and note that the rule's own prescribed form, ***"not seen by X at T"***, already contains a timestamp. But the headline claim this entry is pinned on is about **permanence** (*only "really gone" is permanent*), and **instance 3 does not test permanence.**
 
+> **[CARRY-FORWARD -- team-lead decision 2026-08-28, EXECUTE NEXT SESSION.] This entry is to be restructured on Brunel's proposal:** carry the **general claim** -- *an underdetermined observation read as determinate* -- with **`permanence` and `causation` as named sub-shapes, each holding its own confidence and its own instances.** That resolves the *instance-that-is-not-an-instance* debt **without touching the promotion ruling below.**
+>
+> **Not executed this session:** the librarian's recusal stands (he filed this entry; instance 2 records his own error), and **the restructure needs a read-back from a non-author -- Hopper or Herald, since Brunel proposed it.** Nothing is currently wrong: the sub-shape table below discloses the tension in terms.
+
 ### [DECISION -- team-lead, 2026-08-28] HOLD at `medium`
 
 > **A promotion path that names one axis (reader independence) is not satisfied by evidence on a different claim.**

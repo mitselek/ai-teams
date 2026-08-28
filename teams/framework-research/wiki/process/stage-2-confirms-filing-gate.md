@@ -199,6 +199,14 @@ This is [`../patterns/verification-certifies-a-moment-not-a-session.md`](../patt
 
 **One real, modest cost IS demonstrated, and it is the librarian's.** Because the read was unstamped, he could not reconstruct the sequence and **wrote "unreconstructable" into this entry as fact.** Git reconstructed it nine minutes later. **The cost of an unstamped read was a false claim in a wiki entry** -- small, but exactly the class the stamp prevents, and the only instance this rule currently has.
 
+**And the recovery was luck, which is the half that would otherwise read as *"it worked out"* (Brunel).** **Neither party stamped anything, and the reconstruction came from neither of them** -- it came from **git's commit timestamp, a third mechanism that happened to be keeping the record they did not.** Had the entry been untracked, or the fix still uncommitted, **the sequence would genuinely have been lost.**
+
+That **strengthens the rule rather than softening it**: the instance shows the cost landing *and* shows that what saved it was a system incidentally watching.
+
+> **An *absent* notation whose cost surfaces only because some other system happened to be recording has not been shown to be affordable -- it has been shown to be survivable, once.**
+
+**[WORDING CORRECTED 2026-08-28, Brunel, and the correction matters for how the instance reads.]** The first version said *"a discipline whose failures are caught only when some other system happens to be recording is not a discipline that is working."* **There was no discipline in place to fail** -- neither party ignored a stamp rule, because **the rule did not exist until an hour later.** As written it implied non-compliance, **which makes the instance evidence AGAINST the rule when it is evidence FOR adopting it.** *Absent*, not *broken*, is the whole difference.
+
 *Attribution as the submitter asked:* **credited to the failure, not to his having spotted it.** He identified the first half only after being told the edits had landed; he identified the correction above from a git bound the librarian had not looked for.
 
 ## Corollary for the librarian -- and the first version was wrong on cost

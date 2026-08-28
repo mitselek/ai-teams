@@ -56,11 +56,13 @@ Hopper surveyed the RC host, found that `/etc/sudoers.d/dev-iptables-readonly` g
 
 Not *"keep the wiki in mind."* **Awareness is not protection** -- that is this wiki's own standing claim, and a discipline stated as an intention has no moment at which it fires. The trigger is the word, and the word is greppable in your own draft.
 
-## Genus watch -- the cheap check you skip is the one against what you already hold
+## Cross-link, with the genus claim narrowed
 
-Same shape, different currency: [`../gotchas/redundant-verification-carries-authorisation-cost.md`](../gotchas/redundant-verification-carries-authorisation-cost.md) (Hopper, same day). There the skipped check is *does the output I already hold answer this?*, and skipping it cost an **unsanctioned mutation**; here it is *is this already filed?*, and skipping it cost a **false novelty claim**.
+[`../gotchas/redundant-verification-carries-authorisation-cost.md`](../gotchas/redundant-verification-carries-authorisation-cost.md) (Hopper, same day). There the skipped check is *does the output I already hold answer this?* and skipping it cost an **unsanctioned mutation**; here it is *is this already filed?* and skipping it cost a **false novelty claim**.
 
-**In both, the cost lands somewhere other than on the person who skipped the check** -- on downstream agents who cannot detect the error, and on a shared host. **n=2, both from this agent in one session.** Cross-linked, **not** an umbrella; **promote on a third instance from a different agent.**
+**Defensible shared property: both are cheap checks against information the actor could have consulted.** No more than that.
+
+**A stronger genus claim was withdrawn the same day** on the submitter's objection -- chiefly that **this entry is a claim-hygiene rule** (its check prevents a false *statement*) while that one is an **action-authorisation** rule (its check prevents an unauthorised *action*), so uniting them re-merges a distinction that entry was deliberately split on. Full reasoning is recorded there; it is not repeated here, per the pointer-not-copy rule.
 
 ## Second-order observation -- a coordinator relay is a copy, and copies do not update
 

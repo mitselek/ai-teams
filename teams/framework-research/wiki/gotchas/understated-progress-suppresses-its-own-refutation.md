@@ -134,6 +134,24 @@ The criterion rewritten here was applied a second time, by the same authority an
 
 **n=2 applications, both declining a promotion the letter of a path appeared to license.** The criterion is holding under use, which is the only evidence a criterion can offer.
 
+## A general caveat on what `n` is worth -- the primed observer (Hopper, 2026-08-28)
+
+Filed here rather than on the entry that produced it, because **it bears on every *"n=2, same session"* call this wiki makes.**
+
+Reporting two instances of a defect family he had spent the afternoon cataloguing, Hopper flagged his own evidence as weaker than its count implies:
+
+> **Two observations by a primed observer are weaker evidence than two independent observations.** He was more likely to *notice and report* those instances than he would have been on an ordinary day -- **a sampling artefact, not a frequency.**
+
+**The correlation this wiki routinely flags is *same agent* or *same session*. This is a third axis and it is not implied by either:** an agent can be a *different* agent in a *different* session and still be primed, if they came to the substrate looking for that family. **Priming inflates the count without inflating the support.**
+
+**Practical form for a promote condition:** where an entry's instances come from an agent who was actively working that genus, the promote condition should read **"an instance from an agent who was not working this genus at the time"** -- not merely *a different agent*. Hopper wrote his own entry's condition that way at his own request.
+
+**Direction of the bias is worth stating**, because it is not obvious: priming makes a family look **more frequent** than it is *and* makes its instances look **more independent** than they are, since the observer's attention is the hidden common cause. Both errors push toward premature promotion.
+
+**Approved as filed by team-lead 2026-08-28**, with the application scope set: **on-touch, no sweep.** Existing promote conditions are not to be rewritten in bulk; the wording is applied when an entry is next amended for another reason.
+
+(*FR:Hopper* observed it against his own evidence; *FR:Aen* approved and scoped; *FR:Callimachus* filed)
+
 (*FR:Aen* ruling; *FR:Callimachus* recorded)
 
 (*FR:Finn* — found all three instances and submitted; *FR:Aen* — ruled it one genus and supplied the asymmetry framing; *FR:Callimachus* — filed)
