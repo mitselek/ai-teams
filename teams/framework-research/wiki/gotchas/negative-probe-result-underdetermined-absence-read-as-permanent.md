@@ -23,6 +23,7 @@ related:
   - ../patterns/detection-is-upstream-of-recovery.md
   - log-file-empty-by-construction-when-launcher-splits-streams.md
   - singular-convention-plural-instances-enumerate-from-the-registry.md
+  - ../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md
 ---
 
 # A Negative Probe Result Is Underdetermined -- "Nothing Here" Is Not "Gone"
@@ -51,11 +52,20 @@ Worse, the permanent reading is the **cheapest to hold**: choosing "gone" ends t
 
 *Second datapoint, same reader (S64/S65, 2026-08-26/27):* the 0-byte `fr-courier.log` read as a possible courier fault two sessions running -- the file is empty **by construction** (launcher splits streams, courier logs to stderr), filed as [`log-file-empty-by-construction-when-launcher-splits-streams.md`](log-file-empty-by-construction-when-launcher-splits-streams.md). The same file had earlier been read the *other* way (VNTIA instance 3, as healthy). Recorded, not counted: the reader is the same, so it does not move confidence.
 
+## Application note (2026-08-27 15:53 -- the rule fired BEFORE the error, same reader)
+
+Hours after this entry was filed and read back, the same signature recurred on the same reader: a watch on a *different* artifact (`c7b056d0`, the proposal, where team-lead had published the PO's banner at 15:35) ended with **"artifact not found"** -- byte-identical to instance 2. This time the rule ran instead of the conclusion: team-lead **re-probed via the artifact list** before recording anything. The list showed a **completely different 7-artifact gallery** than 25 minutes earlier -- the personal-side set (proposal, Passepartout, mvox...) replaced by the EVR-side set (VEO-169, RC Docker Relocation...), *including* `99523dce`, which the earlier list had lacked -- **both galleries labeled "mine."** Cause named: the session's credential context had flipped between the PO's two accounts after 15:35; the artifact is fine. Recorded as *"not seen by this credential at 15:53"*, never "gone."
+
+Two things this adds, per the submitter and adopted:
+
+- **Remedy-effectiveness evidence, NOT independence.** Same reader as instances 1-2, so it moves neither n nor confidence -- but it is the first observation of the rule, held, *preventing* a repeat within hours of filing. The entry's rule has now been exercised in anger once.
+- **A new named transient cause**: ***visible to a different credential of the same person.*** Sharper than the generic "not visible to this credential" because **nothing marks the flip** -- both galleries read as "mine," so the credential dimension is invisible from inside either view. And it rhymes with [`../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md`](../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md): **the artifact gallery is also two islands** -- two disjoint sets sharing one first-person label, exactly the singular-article shape one substrate over.
+
 ## Rule
 
 Before recording an absence as a **state**:
 
-1. **Name the cause you are asserting** -- deleted / not yet written / not visible to this credential / wrong path. "Not found" is a symptom, not a cause.
+1. **Name the cause you are asserting** -- deleted / not yet written / not visible to this credential (including: **visible to a different credential of the same person** -- two disjoint "mine" views, nothing marking the flip) / wrong path. "Not found" is a symptom, not a cause.
 2. **Rule out the transient causes from a position that can**: re-probe after the window closes, after re-authenticating, from a second credential or path. The next morning's `/login` was exactly this step, taken a day late.
 3. **If you cannot disambiguate, record the observation, not the state**: *"not seen by `<probe>` at `<time>`"* -- never *"gone"*, and never *"`<person>` removed it"*.
 
@@ -79,5 +89,6 @@ Both instances self-reported by team-lead: instance 1 in `startup.md` and the co
 
 - **2026-08-27 13:33 (team-lead read-back):** `stage-2` pending -> confirmed; `source-agents` label corrected `aen` -> `team-lead` on entry, card, and index row. No content corrections.
 - **2026-08-27 (afternoon):** second same-reader datapoint added (0-byte log read as fault; mechanism filed separately); cross-linked.
+- **2026-08-27 15:53 (team-lead, Protocol A):** application note added -- the rule fired BEFORE the error on the same signature (credential-context flip between the PO's two accounts; "not seen by this credential at 15:53" recorded, not "gone"). Remedy-effectiveness evidence, explicitly NOT counted toward independence; new transient cause named (*visible to a different credential of the same person*) and folded into the Rule's cause list; two-islands rhyme cross-linked. Gate and confidence unchanged.
 
 (*FR:Aen* source of both instances; *FR:Callimachus* filed)
