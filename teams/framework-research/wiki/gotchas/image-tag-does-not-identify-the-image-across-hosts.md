@@ -13,6 +13,7 @@ source-files:
 source-commits: []
 source-issues: []
 related:
+  - ../patterns/scope-bound-identifier-used-as-globally-unique.md
   - singular-convention-plural-instances-enumerate-from-the-registry.md
   - tcp-ports-are-a-per-host-namespace-no-fleet-uniqueness-invariant.md
   - file-state-claims-have-no-layer-dimension.md

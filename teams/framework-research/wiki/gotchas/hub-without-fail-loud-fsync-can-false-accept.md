@@ -48,6 +48,8 @@ Contrast the two neighbouring failure modes, which are both *loud*:
 
 > **Upgrading the running hub image is REQUIRED, not advisable, before any deployment treats `accepted` as a durability guarantee.**
 
+**Ownership, ruled by team-lead 2026-08-28: this is not a new work item.** The upgrade is already carried as part of the **S65 a1.2 EVR-island formation spec** -- [`evr-island-hub-formation-spec-2026-08-27.md`](../../docs/evr-island-hub-formation-spec-2026-08-27.md) -- and it is a **PO keyboard item** (host-side, outside FR's execution remit; FR specs, the operator executes). This entry is the knowledge record of *why* the upgrade is required, not a parallel request for it.
+
 Anything already relying on `accepted` on that hub has been relying on a guarantee the build does not implement -- see [`../patterns/artifact-claims-more-than-it-implements.md`](../patterns/artifact-claims-more-than-it-implements.md) for the genus.
 
 ## Evidence

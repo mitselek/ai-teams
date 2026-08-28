@@ -14,6 +14,7 @@ source-commits: []
 source-issues:
   - 109
 related:
+  - ../patterns/scope-bound-identifier-used-as-globally-unique.md
   - warp-dns-vs-routing-asymmetry-rc-host.md
   - warp-host-sshd-2222-collision-with-apex-live.md
   - reverse-forward-carries-originating-host-warp-identity.md

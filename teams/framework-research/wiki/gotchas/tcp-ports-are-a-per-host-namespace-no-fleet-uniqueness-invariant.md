@@ -14,6 +14,7 @@ source-files:
 source-commits: []
 source-issues: []
 related:
+  - ../patterns/scope-bound-identifier-used-as-globally-unique.md
   - image-tag-does-not-identify-the-image-across-hosts.md
   - singular-convention-plural-instances-enumerate-from-the-registry.md
   - warp-host-sshd-2222-collision-with-apex-live.md

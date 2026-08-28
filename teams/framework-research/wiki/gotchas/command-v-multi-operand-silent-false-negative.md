@@ -36,14 +36,18 @@ The reader sees one path and concludes *"curl, getent, nc and wget are all absen
 
 The distinction is worth stating, because a near-identical shell fact from the same incident was **declined**, and recording the line keeps either from being re-proposed.
 
-| | This entry | Declined: `cmd \| tail -20; echo rc=$?` |
+| | This entry | The `rc=$?` sibling |
 |---|---|---|
-| The fact | `command -v` takes one operand in dash | `$?` after a pipe is the *last* command's status |
+| The fact | `command -v` takes one operand in dash | `$?` after a pipe is the *last* stage's status |
 | What the record shows | **One path, and nothing else** -- reads as a true measurement | **`rc=0` printed directly beneath `curl: (28)`** |
-| Failure visibility | **Silent.** The output is well-formed and wrong. | **Visible.** The record contradicts itself on its face. |
-| Verdict | Filed | Not filed -- a shell fact, self-evident at the point of use |
+| Failure visibility **to a human reading the log** | **Silent.** The output is well-formed and wrong. | **Visible.** The record contradicts itself on its face. |
+| Verdict, 2026-08-28 morning | Filed | **Declined** -- a shell fact, self-evident at the point of use |
 
-**Silent-wrong earns an entry; visible-wrong is a shell fact.** The `rc=$?` defect was real and shipped in a sanctioned probe (Brunel, 2026-08-28) -- it is recorded in [`verification-step-goes-stale-invisibly-because-it-passed.md`](verification-step-goes-stale-invisibly-because-it-passed.md) as provenance, not as its own entry.
+**Silent-wrong earns an entry; visible-wrong is a shell fact.** That criterion still stands, and it is why this entry exists.
+
+> **[REVERSAL, same day -- recorded because it corrects the criterion, not just the verdict.]** The `rc=$?` sibling **was filed after all**, at [`trailing-pipe-reports-the-pipes-exit-status-not-the-commands.md`](trailing-pipe-reports-the-pipes-exit-status-not-the-commands.md), when a third instance showed the criterion had been applied **to the wrong consumer**. In a Dockerfile `RUN`, the same mechanism printed a TLS error and reported `DONE 0.6s` -- **the consumer is the build system, which reads only the exit status, and for it the failure is completely invisible.** A green build shipped an image with no `claude` in it.
+>
+> **The corrected criterion: visibility is relative to whoever CONSUMES the signal, not to whoever reads the log.** The row above is now scoped accordingly. Brunel, who had accepted the original decline without reservation, brought the instance that overturned it.
 
 ## Where it bit
 

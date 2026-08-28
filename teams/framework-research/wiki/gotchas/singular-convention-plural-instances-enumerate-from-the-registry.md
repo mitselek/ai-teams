@@ -17,6 +17,7 @@ source-commits: []
 source-issues:
   - 108
 related:
+  - ../patterns/scope-bound-identifier-used-as-globally-unique.md
   - ../decisions/stationmaster-post-office-model.md
   - at-least-once-without-age-alarm-hides-unbounded-latency.md
   - file-state-claims-have-no-layer-dimension.md
