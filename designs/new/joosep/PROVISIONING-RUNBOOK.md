@@ -60,23 +60,31 @@ fails with a bare `exec format error` or `no such file or directory` that names 
 line endings — this check exists because that message sends people down the wrong path. These files
 came from a Windows checkout, so the risk is real.
 
-## Step 3 -- Credentials (Tier M; PO supplies the values)
+## Step 3 -- `.env` (Tier M) -- **nothing to fill in**
 
 ```bash
 cp .env.example .env
-# edit .env -- fill GITHUB_TOKEN, ATLASSIAN_EMAIL, ATLASSIAN_API_TOKEN
 chmod 600 .env
 ls -l .env
 ```
 
-**EXPECT:** `-rw------- 1 dev dev` and a non-zero size.
+**EXPECT:** `-rw------- 1 dev dev`.
 
-**STOP** if any of the three required values is still a placeholder. The entrypoint degrades gracefully
-(it warns and skips clones rather than crash-looping) but you would be verifying a half-provisioned
-container and reading the warnings as failures.
+**Change nothing in it.** Per the PO decision of 2026-08-28 the container starts deliberately
+under-credentialled: **no GitHub token and no Atlassian credentials.** Provisioning those is the first
+real work for Joosep's own team (`FIRST-TASKS.md`, seeded into `~/` inside the container), so the
+things this team can reach are things *he* granted under *his* name.
 
-**Do not** put Cloudflare credentials, any `HES_`/`VJS_`/`PONY_` test-user secret, or any Elron/PONY
-endpoint URL in this file. The `.env.example` comments say why for each.
+`env_file` is marked `required: false`, so even a missing `.env` boots. Copying it is only so the file
+exists with the right mode when a token is added later.
+
+**Do NOT** add Cloudflare credentials, any `HES_`/`VJS_`/`PONY_` test-user secret, any `ATLASSIAN_*`
+variable, or any Elron/PONY endpoint URL. The `.env.example` comments give the reason for each.
+
+**Adding the PAT later needs no rebuild:** edit `.env`, then `./joosep.sh restart`. That is
+`up -d --force-recreate` — **compose re-reads `.env` only on a recreate, never on a plain
+`docker restart`**, which is the trap this note exists to prevent. The repos clone automatically on
+that boot.
 
 ## Step 4 -- Ingress key
 
@@ -149,9 +157,13 @@ cd /home/dev/joosep && ./joosep.sh build 2>&1 | tail -30
 - `OK: claude resolves on the sshd remote-command PATH (-Session will work)`
 - `[entrypoint] Ready.`
 
-**WARN but continue** on `WARN: HES-integration-tests absent` / `rumba absent` / `Jira MCP not built` —
-these are non-fatal by design and retry next boot; note them and carry on. They usually mean the PAT
-scope is narrower than the repo list.
+Also **EXPECT** these three, which are the correct first-boot state and **not** faults:
+- `[entrypoint] No GITHUB_TOKEN yet -- skipping clones. This is expected on first boot.`
+- `PENDING: repos not cloned (no PAT yet -- task 1 in ~/FIRST-TASKS.md)`
+- `[entrypoint] seeded ~/FIRST-TASKS.md (first boot).`
+
+**STOP** if you instead see `WARN: ... absent despite a token` — that wording only appears when a token
+*is* present, and means its scope is narrower than the two repos.
 
 **STOP** on:
 - `FAIL: Node.js < 20 -- aborting` (the container will restart-loop).
@@ -255,8 +267,24 @@ Nothing breaks if it is skipped; the host's only accurate port record just stays
 ## Step 13 -- Hand over
 
 Send Joosep: the host-key fingerprint (Step 8), `Connect-Joosep.ps1`, and the README's first-run
-section. His first `claude` run does the OAuth device flow in his own browser; credentials land in
-`joosep_home` and survive restarts and rebuilds.
+section. Point him at **`~/FIRST-TASKS.md` inside the container** — that is his onboarding backlog, not
+this runbook.
+
+His first `claude` run does the OAuth device flow in his own browser; credentials land in `joosep_home`
+and survive restarts and rebuilds.
+
+**One thing you owe him that this package cannot supply.** `FIRST-TASKS.md` task 2 is authenticating
+the EVR Atlassian connector, and **the exact install/enable step is marked as unverified in that file**
+— I have not confirmed how the EVR connector is distributed or enabled from inside a container, and I
+declined to guess, because a wrong guess leaves a half-configured MCP entry that fails confusingly.
+Supply the precise step, or tell him who to ask. The *verification* in that task is sound regardless:
+`atlassianUserInfo` returns his own account, `getVisibleJiraProjects` includes the six project keys,
+and `getConfluenceSpaces` includes `VJS2` — that last one being the check that proves the connector did
+something a Jira-only setup could not.
+
+**Expect to do one round trip after he finishes task 1:** he produces the PAT, sends it to you over a
+password-grade channel, you add `GITHUB_TOKEN=` to `.env` and run `./joosep.sh restart`. The repos
+clone on that boot. No rebuild.
 
 ---
 

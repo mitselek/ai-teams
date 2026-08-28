@@ -10,6 +10,11 @@ boundary"* verbatim; **`[PO-12]` reframed** -- key comments on this host are doc
 the decision is "identify all four keys by fingerprint, *then* decide", not "revoke Joosep's key";
 §2.4 corrects allerk's stated WARP mechanism and adopts Hopper's probe amendment; §2.2 pins the
 npm-vs-native collision rule; §3.3 gains the three-PATH-sources finding; new `[PO-14]`.
+**v3.3** (14:32) `[PO-3]`/`[PO-4]` **CLOSED -- credentials move to the team.** Container now starts
+under-credentialled by design; `.env` requires nothing. New `FIRST-TASKS.md` seeded into the container.
+Atlassian is the **EVR connector**, not an API token -- which **closes the Confluence gap** and removes
+the `dev-toolkit` clone and every `ATLASSIAN_*` var. New `[PO-18]`: the connector's exact install step
+is unknown to me and deliberately not guessed.
 **v3.2** (14:18) `[PO-2]` **CLOSED BY MEASUREMENT -- `network_mode: host`.** The probe found a *third*
 state neither of my discriminators named: a bridged container cannot resolve DNS at all, so the
 routing-vs-MASQUERADE question was never exercised. Verdict obtained; mechanism not. allerk's compose
@@ -578,10 +583,48 @@ Host side: `.env` beside the compose file, mode `600`, owned by `dev`, uncommitt
 
 | Credential | Proposal | Reason |
 |---|---|---|
-| `ATLASSIAN_EMAIL` / `ATLASSIAN_API_TOKEN` | **Joosep's own** account and token `[PO-4]` | actions attributed to him; his own permission scope applies. Corollary from the S65 negative-probe gotcha: his credential sees a *different* Jira/Confluence slice than the PO's -- an empty result from him is not evidence of absence. |
-| Atlassian MCP server | pin **`plugin_atlassian_atlassian`** | the `claude.ai Atlassian` connector 404s *"Server not found"* -- three independent sessions per the brief, and again in this session's own MCP startup. Not intermittent. |
-| `GITHUB_TOKEN` | fine-grained PAT scoped to **`HES-integration-tests` + `rumba`**, read-only elsewhere `[PO-3]` | the brief narrows this from "his access ceiling" to the two repos he has actually committed to; the whole `hes`-team grant is unexercised. Expand on demand. |
-| Anthropic auth | **reuse his existing licence** (ITSD-39589/39591) rather than re-requesting; OAuth at first run `[PO-5]` | the brief settles the "whose account funds it" question v2 left open |
+> **SUPERSEDED 2026-08-28 14:24 by PO decision -- see §2.6a.** The table below described credentials
+> supplied by the PO in `.env` at provisioning time. The PO has moved both to Joosep's team as its own
+> first tasks. Retained as the reasoning of record for *what scope* each credential should have, which
+> is unchanged; only *who creates it and when* has changed.
+
+| `ATLASSIAN_EMAIL` / `ATLASSIAN_API_TOKEN` | ~~Joosep's own account and token~~ **-> connector, §2.6a** | actions attributed to him; his own permission scope applies. Corollary from the S65 negative-probe gotcha: his credential sees a *different* Jira/Confluence slice than the PO's -- an empty result from him is not evidence of absence. **This corollary survives the change and is now written into `FIRST-TASKS.md` task 2.** |
+| `GITHUB_TOKEN` | fine-grained PAT scoped to **`HES-integration-tests` + `rumba`**, read-only elsewhere `[PO-3]` | scope unchanged; **creator changed** to Joosep's team (§2.6a). The brief narrows this from "his access ceiling" to the two repos he has actually committed to; the whole `hes`-team grant is unexercised. |
+| Anthropic auth | **reuse his existing licence** (ITSD-39589/39591); OAuth at first run `[PO-5]` | unchanged |
+
+### 2.6a Credential provisioning -- moved to the team `[PO-3]` / `[PO-4]` CLOSED
+
+**PO decision 2026-08-28 14:24: the container starts under-credentialled and provisions itself.**
+Nothing is required in `.env` at first start. `env_file` is `required: false`, so even a missing file
+boots.
+
+| Credential | Who, when | Mechanism |
+|---|---|---|
+| Claude | Joosep, first `claude` run | OAuth device flow |
+| GitHub PAT | **Joosep's team, task 1** | he creates it fine-grained at the scope above, hands it to the PO, who adds it to host `.env` + `./joosep.sh restart` -- **no rebuild**, repos clone on that boot |
+| Atlassian | **Joosep's team, task 2** | the **EVR connector**, authenticated interactively. **No API token anywhere in the container** |
+
+Three design consequences, all improvements:
+
+1. **The Confluence gap closes rather than persisting.** v3's `mcp.json` seeded a local Jira-only stdio
+   server and I flagged that Confluence was *not* covered. The connector covers both. That gap is gone,
+   not worked around -- and I would rather record that the PO's route was better than the one I
+   specified than quietly delete the flag.
+2. **`dev-toolkit` is no longer cloned.** It was pulled in solely as that MCP server's source. Dropping
+   it tightens the repo set to exactly the two the brief named.
+3. **There is no Atlassian secret in the container at all** -- not on disk, not in `.env`, not in the
+   `.bashrc` the container user can read. The §2.6 cleartext-in-`.bashrc` hazard now applies to exactly
+   one variable (`GITHUB_TOKEN`), and to a credential its own holder created.
+
+The deeper property: **everything this team can reach is something Joosep granted, under his name, at a
+scope he chose.** That is a stronger answer to §2.8's "not a security boundary" than any container
+control -- it moves the question from *what can the container reach* to *what did its principal
+authorise*, which is the question that actually has a good answer.
+
+**One thing I could not supply and did not invent:** the exact install/enable step for the EVR
+connector inside a container. `FIRST-TASKS.md` task 2 says so in those words and gives the shape plus
+three verifications instead; the PO supplies the precise step at hand-over. Guessing would leave a
+half-configured MCP entry that fails confusingly, which is worse than an honest gap.
 | Stationmaster team key | **none in v1** `[PO-7]` | §2.7 |
 
 **One inherited hazard to note.** The FR entrypoints persist compose env vars into the container user's
@@ -1006,8 +1049,9 @@ Acceptance checks for whoever executes the build (not me):
 | ~~**PO-1**~~ | ~~Base: `allerk` or `apex-research`~~ | **DECIDED 2026-08-28 13:58 (PO): allerk-base**, with apex contributing only the team env vars, MCP/settings seeding and config layout. §0's recommendation adopted as written. | ~~gate~~ **CLOSED** |
 | ~~**PO-2**~~ | ~~Network: bridge or host~~ | **CLOSED BY MEASUREMENT 2026-08-28: `network_mode: host`.** A bridged container on this host cannot resolve DNS at all. Hard constraint, not a preference (§2.4) | ~~gate~~ **CLOSED** |
 | **PO-17** | *(deferred, not open)* Is bridge networking recoverable via an explicit `dns:` setting? The probe's failure was resolver-scoped, and the routing question was never exercised | **Do not pursue now.** One cheap probe if isolation is ever wanted for a named reason; the exact command is in §2.4 | -- |
-| **PO-3** | GitHub token scope | dedicated fine-grained PAT, his repos only, read-only elsewhere | credentials |
-| **PO-4** | Atlassian credential owner | Joosep's own account + token | credentials |
+| ~~**PO-3**~~ | ~~GitHub token scope~~ | **DECIDED 14:24 (PO): scope as recommended, but CREATED BY Joosep's team as task 1**, not supplied by the PO (§2.6a) | ~~open~~ **CLOSED** |
+| ~~**PO-4**~~ | ~~Atlassian credential owner~~ | **DECIDED 14:24 (PO): EVR connector, no API token at all.** Closes the Confluence gap as a side effect (§2.6a) | ~~open~~ **CLOSED** |
+| **PO-18** | The EVR connector's exact install/enable step inside a container | **Unknown to me and deliberately not guessed** -- `FIRST-TASKS.md` task 2 says so and gives three verifications instead. PO supplies the step at hand-over | hand-over |
 | **PO-5** | Anthropic auth -- whose account funds it | OAuth at first run; confirm the account | first run |
 | **PO-6** | Python 3 in the image? | omit in v1; add if the brief shows a need | image |
 | **PO-7** | Join the stationmaster mail network? | **no** in v1; add later if a real correspondent exists. EVR island = prod-llm hub only | later |

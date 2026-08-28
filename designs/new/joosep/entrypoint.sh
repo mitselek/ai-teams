@@ -36,9 +36,9 @@ CLAUDE_DIR="${HOME_DIR}/.claude"
 WORK="${HOME_DIR}/work"
 HOSTKEY_DIR="/etc/ssh/keys"
 
-TOOLKIT_DIR="${WORK}/dev-toolkit"
-JIRA_MCP_DIR="${TOOLKIT_DIR}/jira-mcp-server"
-ATLASSIAN_BASE_URL="${ATLASSIAN_BASE_URL:-https://eestiraudtee.atlassian.net}"
+# No TOOLKIT_DIR / JIRA_MCP_DIR / ATLASSIAN_* here by design -- Atlassian access
+# is the EVR connector, authenticated at first run, not a local MCP server with
+# an API token. See the Step 7 comment.
 
 # ── Helper: clone or pull, never fatal ────────────────────────────────────────
 # Boot must never abort on a repo fetch. A GitHub SSO lapse or a network blip
@@ -134,12 +134,13 @@ declare -A SHELL_VARS=(
     [CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS]="${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-1}"
     [TEAM_NAME]="${TEAM_NAME:-joosep}"
     [CLAUDE_ENV_ID]="${CLAUDE_ENV_ID:-JOOSEP}"
-    [GITHUB_TOKEN]="${GITHUB_TOKEN}"
-    [ATLASSIAN_BASE_URL]="${ATLASSIAN_BASE_URL}"
-    [ATLASSIAN_EMAIL]="${ATLASSIAN_EMAIL}"
-    [ATLASSIAN_API_TOKEN]="${ATLASSIAN_API_TOKEN}"
+    [GITHUB_TOKEN]="${GITHUB_TOKEN:-}"
     [TERM]="xterm-256color"
 )
+# Note: the loop below skips EMPTY values, so an absent GITHUB_TOKEN simply
+# writes nothing rather than exporting an empty string that would make `gh`
+# fail in a confusing way (an empty token reads as "authenticated with nothing"
+# rather than "not authenticated").
 [ -n "${NODE_EXTRA_CA_CERTS:-}" ] && SHELL_VARS[NODE_EXTRA_CA_CERTS]="${NODE_EXTRA_CA_CERTS}"
 
 for var in "${!SHELL_VARS[@]}"; do
@@ -159,22 +160,23 @@ gosu "${CONTAINER_USER}" git config --global credential.helper store
 # ── Step 5: repos ─────────────────────────────────────────────────────────────
 # Narrowed per the research brief to the two repos he has actually committed to.
 # Do NOT mirror the 40+ repos his org grants reach; expand on demand.
+#
+# GITHUB_TOKEN IS EXPECTED TO BE ABSENT ON FIRST BOOT (PO decision 2026-08-28):
+# creating the fine-grained PAT is Joosep's team's OWN first task, not something
+# the PO hands over. So an unset token is the NORMAL first-boot state, not a
+# fault -- the message below is deliberately not a WARNING, because a warning
+# would train the operator to ignore real ones.
+#
+# Adding the token later needs NO REBUILD: edit .env, then `./joosep.sh restart`
+# (which is `up -d --force-recreate` -- compose only re-reads .env on recreate,
+# NOT on a plain `docker restart`). This block then clones on that next boot.
 if [ -z "${GITHUB_TOKEN:-}" ]; then
-    echo "[entrypoint] WARNING: GITHUB_TOKEN unset -- skipping all clones. Container still boots."
+    echo "[entrypoint] No GITHUB_TOKEN yet -- skipping clones. This is expected on first boot."
+    echo "[entrypoint]   The PAT is task 1 in ~/FIRST-TASKS.md. Once it exists:"
+    echo "[entrypoint]   add GITHUB_TOKEN to .env on the host, then ./joosep.sh restart"
 else
     clone_or_pull "${REPO_1_URL:-}"  "${WORK}/HES-integration-tests" "HES-integration-tests"
     clone_or_pull "${REPO_2_URL:-}"  "${WORK}/rumba"                 "rumba"
-    clone_or_pull "${TOOLKIT_URL:-}" "${TOOLKIT_DIR}"                "dev-toolkit"
-fi
-
-# ── Step 6: Jira MCP server ───────────────────────────────────────────────────
-# NON-FATAL: an npm/network failure must not stop boot before sshd.
-if [ -d "${JIRA_MCP_DIR}" ] && [ ! -d "${JIRA_MCP_DIR}/dist" ]; then
-    echo "[entrypoint] Building Jira MCP server..."
-    ( gosu "${CONTAINER_USER}" bash -c "cd '${JIRA_MCP_DIR}' && npm ci --silent && npm run build" 2>&1 | tail -3 ) || \
-        echo "[entrypoint] WARNING: Jira MCP build failed; Jira tools unavailable this boot. Retries next boot."
-elif [ -d "${JIRA_MCP_DIR}/dist" ]; then
-    echo "[entrypoint] Jira MCP server already built."
 fi
 
 # ── Step 7: Claude settings + MCP config (first run only) ─────────────────────
@@ -210,42 +212,24 @@ SETTINGS_EOF
     echo "[entrypoint] settings.json created."
 fi
 
-# mcp.json -- Jira via the dev-toolkit stdio server.
+# NO mcp.json IS SEEDED -- deliberately (PO decision 2026-08-28).
 #
-# DIVERGENCE FROM THE RESEARCH BRIEF, stated rather than silent: the brief says
-# to pin `plugin_atlassian_atlassian` because the `claude.ai Atlassian`
-# connector 404s. Both of those are claude.ai-SIDE integrations used by the
-# research sweeps; inside a container the proven in-fleet mechanism is this
-# local stdio server (apex-research and backlog-triage both run it) driven by
-# the ATLASSIAN_* env vars we already supply. They are different mechanisms, not
-# two spellings of one.
+# Earlier drafts seeded a local stdio Jira MCP server from dev-toolkit, driven
+# by ATLASSIAN_* env vars, and carried a known gap: it covered Jira only, not
+# Confluence. The PO's ruling replaces that whole path with the **EVR Atlassian
+# connector**, authenticated interactively by Joosep at first run (task 2 in
+# ~/FIRST-TASKS.md). The connector covers Jira AND Confluence, which closes the
+# gap rather than working around it.
 #
-# KNOWN GAP: this server covers JIRA ONLY. The brief also wants Confluence read
-# plus write-to-VJS2-space, which this does not provide. Closing that needs the
-# plugin/connector path, which is a first-run interactive step I cannot seed
-# from an entrypoint. Flagged as an open item -- do not assume Confluence works
-# because Jira does.
-MCP_FILE="${CLAUDE_DIR}/mcp.json"
-if [ ! -f "$MCP_FILE" ] && [ -d "${JIRA_MCP_DIR}/dist" ]; then
-    cat > "$MCP_FILE" << MCP_EOF
-{
-  "mcpServers": {
-    "jira": {
-      "command": "node",
-      "args": ["${JIRA_MCP_DIR}/dist/index.js"],
-      "env": {
-        "ATLASSIAN_BASE_URL": "${ATLASSIAN_BASE_URL}",
-        "ATLASSIAN_EMAIL": "${ATLASSIAN_EMAIL}",
-        "ATLASSIAN_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
-        "NODE_EXTRA_CA_CERTS": "/opt/warp-ca.pem"
-      }
-    }
-  }
-}
-MCP_EOF
-    chown "${CONTAINER_UID}:${CONTAINER_GID}" "$MCP_FILE"
-    echo "[entrypoint] mcp.json created (Jira only -- Confluence NOT covered, see comment)."
-fi
+# Three consequences, recorded so nobody "restores" the old path:
+#   1. No ATLASSIAN_* env vars anywhere. No API token on disk, in .env, or in
+#      this container's .bashrc. There is nothing here to leak.
+#   2. dev-toolkit is no longer cloned -- it was pulled in ONLY as the source of
+#      that MCP server. Dropping it also tightens the PAT scope to exactly the
+#      two repos the research brief named.
+#   3. mcp.json is left ABSENT rather than seeded empty, so the connector's own
+#      configuration is the only thing present and there is no stale entry to
+#      confuse it.
 
 # ── Step 8: ~/.claude.json backup/restore ─────────────────────────────────────
 # Under this layout the whole $HOME is a volume, so the home-root ~/.claude.json
@@ -302,6 +286,21 @@ exec tmux -u attach -t "$S"
 LAUNCHER_EOF
 chmod 0755 /usr/local/bin/joosep-session
 
+# ── Step 9b: seed FIRST-TASKS.md into the home ────────────────────────────────
+# The onboarding backlog for Joosep's own team: create the PAT, authenticate the
+# EVR Atlassian connector, verify both, then roster onboarding. Baked into the
+# image at /opt and copied out on first boot.
+#
+# GUARDED create, never overwrite: once Joosep or his agents start ticking items
+# off, this becomes THEIR working file. A rebuild must not silently revert their
+# progress. The pristine copy stays at /opt/FIRST-TASKS.md if they ever want to
+# diff against it.
+if [ -f /opt/FIRST-TASKS.md ] && [ ! -f "${HOME_DIR}/FIRST-TASKS.md" ]; then
+    install -m 644 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" \
+        /opt/FIRST-TASKS.md "${HOME_DIR}/FIRST-TASKS.md"
+    echo "[entrypoint] seeded ~/FIRST-TASKS.md (first boot)."
+fi
+
 # ── Step 10: sshd host keys + start ───────────────────────────────────────────
 # Keys live on the joosep_sshd volume so they survive image rebuilds. Without
 # this, every rebuild regenerates them and the client hits REMOTE HOST
@@ -353,9 +352,19 @@ else
 fi
 
 command -v gh >/dev/null 2>&1 && echo "  OK: gh $(gh --version 2>&1 | head -1)" || echo "  WARN: gh missing."
-[ -d "${WORK}/HES-integration-tests/.git" ] && echo "  OK: HES-integration-tests" || echo "  WARN: HES-integration-tests absent."
-[ -d "${WORK}/rumba/.git" ]                 && echo "  OK: rumba"                 || echo "  WARN: rumba absent."
-[ -d "${JIRA_MCP_DIR}/dist" ]               && echo "  OK: Jira MCP built"        || echo "  WARN: Jira MCP not built."
+
+# Repo presence is reported against the CREDENTIAL STATE, not absolutely.
+# Before the PAT exists, absent repos are the correct state and must not read as
+# a fault -- otherwise the first-boot log is a wall of warnings that are all
+# expected, which is how real warnings get ignored.
+if [ -z "${GITHUB_TOKEN:-}" ]; then
+    echo "  PENDING: repos not cloned (no PAT yet -- task 1 in ~/FIRST-TASKS.md)"
+else
+    [ -d "${WORK}/HES-integration-tests/.git" ] && echo "  OK: HES-integration-tests" || echo "  WARN: HES-integration-tests absent despite a token -- check PAT scope."
+    [ -d "${WORK}/rumba/.git" ]                 && echo "  OK: rumba"                 || echo "  WARN: rumba absent despite a token -- check PAT scope."
+fi
+
+echo "  INFO: Atlassian is the EVR connector (task 2 in ~/FIRST-TASKS.md), not a local MCP server."
 
 echo "[entrypoint] Ready. Shell: ssh -p 2231 joosep@<host> | Session: ssh -t -p 2231 joosep@<host> joosep-session"
 

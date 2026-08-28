@@ -109,22 +109,29 @@ services:
       # Repos. Narrowed per the research brief: the only two repos he has ever
       # committed to are HES-integration-tests (team vjs) and rumba (team vjs2).
       # The whole hes-team grant is unexercised. Expand on demand, not by default.
+      # dev-toolkit is deliberately NOT cloned -- it was only ever pulled in as
+      # the source of a local Jira MCP server, which the EVR connector replaces.
       - REPO_1_URL=${REPO_1_URL:-https://github.com/Eesti-Raudtee/HES-integration-tests.git}
       - REPO_2_URL=${REPO_2_URL:-https://github.com/Eesti-Raudtee/rumba.git}
-      - TOOLKIT_URL=${TOOLKIT_URL:-https://github.com/Eesti-Raudtee/dev-toolkit.git}
 
-      # Credentials -- all supplied from .env, none baked into the image.
-      # GITHUB_TOKEN must be a FINE-GRAINED PAT scoped to the two repos above,
-      # read-only elsewhere. NOT the PO's org-wide PAT: this container's user
-      # can read its own .bashrc, so the token must be one he is entitled to.
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      # Joosep's OWN Atlassian account and token, not the PO's -- so Jira and
-      # Confluence actions are attributed to him and scoped by his own
-      # permissions. Corollary: his credential sees a different slice than the
-      # PO's, so an empty result from him is not evidence of absence.
-      - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-https://eestiraudtee.atlassian.net}
-      - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL}
-      - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN}
+      # ── Credentials ──────────────────────────────────────────────────────
+      # NOTHING is required here for the container to boot (PO, 2026-08-28).
+      # It starts deliberately under-credentialled and Joosep's own team
+      # provisions what it needs -- see FIRST-TASKS.md.
+      #
+      # GITHUB_TOKEN: ABSENT ON FIRST BOOT BY DESIGN. Creating the fine-grained
+      # PAT (contents:read on the two repos above, nothing else) is task 1 for
+      # Joosep's team. The entrypoint skips clones cleanly without it and says
+      # so. To add it later: edit .env, then `./joosep.sh restart` -- NO rebuild.
+      # (`restart` is `up -d --force-recreate`; compose re-reads .env only on a
+      # recreate, never on a plain `docker restart`.)
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      #
+      # NO ATLASSIAN_* VARS -- deliberately. Atlassian access is the EVR
+      # connector, authenticated interactively at first run (task 2). It covers
+      # Jira AND Confluence, so there is no API token on disk here to leak, and
+      # no Jira-only gap to work around. Do not reintroduce them.
+      #
       # Leave blank to use OAuth at first run (recommended -- he already holds a
       # licence per ITSD-39589/39591; reuse rather than re-request).
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}

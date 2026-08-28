@@ -157,6 +157,12 @@ ENV DEBIAN_FRONTEND=
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Onboarding backlog for Joosep's team. Baked here as the pristine copy; the
+# entrypoint copies it to ~/FIRST-TASKS.md on first boot and never overwrites,
+# so their progress survives a rebuild while the original stays available to
+# diff against.
+COPY FIRST-TASKS.md /opt/FIRST-TASKS.md
+
 WORKDIR /home/joosep/work
 
 # SSH only. This team reads and reports; it does not serve.

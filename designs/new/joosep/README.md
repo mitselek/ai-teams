@@ -16,7 +16,8 @@ modified. Provisioning needs PO sanction; the steps are in `PROVISIONING-RUNBOOK
 | `docker-compose.yml` | service definition; carries the host port-allocation table |
 | `Dockerfile` | self-contained `debian:bookworm-slim` image |
 | `entrypoint.sh` | boot: CA, volumes, env, repos, MCP, sshd, session launcher, validation |
-| `.env.example` | credential template — **derived from the compose `environment:` block** |
+| `.env.example` | credential template — **nothing required at first start**; derived from the compose `environment:` block |
+| `FIRST-TASKS.md` | onboarding backlog for Joosep's team: PAT, connector, verify, roster |
 | `joosep.sh` | host-side launcher (`build`/`up`/`down`/`restart`/`logs`, bare = shell) |
 | `Connect-Joosep.ps1` | Joosep's Windows connection script, one file, `-Session` switch |
 | `registry-rows.md` | the four registry records to update, and why there are four |
@@ -108,12 +109,35 @@ Honest accounting of what has and has not been checked, since none of it has bee
 
 Nothing here has touched the host.
 
+## Credentials: the container starts under-credentialled, on purpose
+
+PO decision, 2026-08-28. **`.env` needs nothing filled in at first start** — no GitHub token, no
+Atlassian credentials. The container boots clean without them and says so rather than warning.
+
+Provisioning them is the **first real work for Joosep's own team**, listed in `FIRST-TASKS.md` (baked
+into the image, seeded to `~/FIRST-TASKS.md` on first boot, never overwritten afterwards so their
+progress survives a rebuild). The effect is that everything this team can reach is something *he*
+granted, under *his* name, at a scope he chose — rather than inherited from the PO.
+
+| Credential | How it arrives |
+|---|---|
+| Claude | OAuth device flow at his first `claude` run (task 0) |
+| GitHub PAT | he creates it, fine-grained, `contents:read` on two repos (task 1). Added to host `.env` + `./joosep.sh restart` — **no rebuild**; repos clone on that boot |
+| Atlassian | **EVR connector**, authenticated interactively (task 2). Covers Jira *and* Confluence. **No API token exists anywhere in this container** |
+
+An earlier draft seeded a local Jira-only MCP server driven by `ATLASSIAN_*` env vars, and carried a
+known Confluence gap. The connector replaced that path and **closed the gap rather than working around
+it**, so `dev-toolkit` is no longer cloned either — it had been pulled in solely as that server's
+source.
+
 ## Known gaps
 
-- **Confluence is not covered.** The seeded `mcp.json` uses dev-toolkit's stdio Jira MCP server — the
-  proven in-fleet mechanism, driven by the `ATLASSIAN_*` env vars. The research brief also wants
-  Confluence read plus write-to-VJS2, which needs the plugin/connector path and is a first-run
-  interactive step an entrypoint cannot seed. **Do not assume Confluence works because Jira does.**
+- **The connector's exact install step is unverified.** `FIRST-TASKS.md` task 2 says so explicitly and
+  declines to guess: I have not confirmed how the EVR Atlassian connector is distributed or enabled
+  from inside a container, and a wrong guess leaves a half-configured MCP entry that fails
+  confusingly. The PO supplies that step at hand-over. The *verification* is sound regardless —
+  `getConfluenceSpaces` including `VJS2` is the check that proves it did something a Jira-only setup
+  could not.
 - **Team roster not yet defined.** Seven candidate roles are proposed in the brief against a six-role
   reference shape; sizing is `[PO-16]`. The container does not depend on the answer.
 - **No backup.** No container on this host has one, and `joosep_home` would hold the OAuth credentials
