@@ -10,6 +10,12 @@ boundary"* verbatim; **`[PO-12]` reframed** -- key comments on this host are doc
 the decision is "identify all four keys by fingerprint, *then* decide", not "revoke Joosep's key";
 §2.4 corrects allerk's stated WARP mechanism and adopts Hopper's probe amendment; §2.2 pins the
 npm-vs-native collision rule; §3.3 gains the three-PATH-sources finding; new `[PO-14]`.
+**v3.2** (14:18) `[PO-2]` **CLOSED BY MEASUREMENT -- `network_mode: host`.** The probe found a *third*
+state neither of my discriminators named: a bridged container cannot resolve DNS at all, so the
+routing-vs-MASQUERADE question was never exercised. Verdict obtained; mechanism not. allerk's compose
+comment is now wrong on its intermediate observation as well as its mechanism. Two probe defects
+recorded, one mine (`rc=$?` after a pipe). New `[PO-17]`, deferred. **Build package finalised at
+`designs/new/joosep/`.**
 **v3.1** (14:02) `[PO-1]` **CLOSED -- allerk-base**, PO ruling 13:58. Terminology scrubbed to Cloudflare
 WARP per the PO standing rule (GH #109): 3 of 4 hits were this document's own v1 mislabel being
 corrected and are now stated positively; the 4th is a literal SSH key filename from the registry,
@@ -354,8 +360,60 @@ All nine containers on RC run `network_mode: host`. allerk's compose states the 
 > the tunnel, so bridge-sourced traffic is handed to WARP rather than kept off it.* Same conclusion,
 > opposite mechanism. Fixing the comment in allerk's file is Lerko's to make, not ours.
 
-**The theory does not settle it, which is why the probe is worth running.** Hopper argued both sides
-from the substrate and declined to pick:
+> ## `[PO-2]` CLOSED BY MEASUREMENT -- host networking is a hard constraint
+>
+> **Probe executed 2026-08-28, PO-sanctioned Tier M, by digest, post-conditions clean.** Verbatim:
+>
+> ```
+> sh: 1: ip: not found
+> * Resolving timed out after 8000 milliseconds
+> curl: (28) Resolving timed out after 8000 milliseconds
+> ```
+> `getent hosts api.anthropic.com` produced **no output at all** (the binary is present -- verified at
+> pre-flight -- so this is a silent resolution failure, not a missing tool).
+>
+> **A bridged container on this host cannot resolve DNS.** Bridge is unusable; `network_mode: host`
+> stands, and §2.8's honest posture carries the isolation argument as written.
+>
+> **The result is a THIRD state and both of my discriminators were wrong.** I predicted PASS = TLS/cert
+> error, FAIL = *"DNS resolves but the connection hangs"*. Neither happened. The failure is **upstream
+> of any TCP connection**: no name resolved, so no packet was ever sent, so **the routing-rule vs
+> MASQUERADE question was never exercised.** We got the verdict we needed and did not measure the thing
+> we set out to measure. Those are different outcomes and it is worth not conflating them.
+>
+> **Consequence for allerk's comment, which is now wrong twice.** It says the docker subnets are absent
+> from WARP's split-tunnel *include* list, so *"DNS resolves but connections hang."* WARP is in
+> **exclude** mode (mechanism wrong), and **DNS did not resolve** (intermediate observation wrong).
+> Only its conclusion survives. v2.1 recorded it as wrong-mechanism/right-conclusion; on this evidence
+> it is **wrong-mechanism, wrong-intermediate-observation, right-conclusion.** Anyone copying that
+> sentence forward would carry two errors and one truth.
+
+### Two defects in the probe itself, one of them mine
+
+**Mine -- the `rc=$?` lines could never have worked.** I wrote
+`curl ... 2>&1 | tail -20; echo rc=$?`, which captures the exit status of **`tail`**, not `curl`. Both
+lines duly printed `rc=0` immediately after a `curl: (28)` failure. Hopper spotted this *before*
+executing and **ran the command exactly as sanctioned anyway** rather than silently correcting it --
+the right call, since amending a sanctioned command on the executor's own judgment is precisely the
+broadening this role-split exists to prevent. It cost nothing here because `curl -v` puts the real
+signal in the verbose stream, but a reader of the raw log sees `rc=0` twice under a failed probe.
+**Correct form if re-run: `curl ...; rc=$?` before any pipe, or `set -o pipefail`.**
+
+**Hopper's -- the pre-flight went stale, and this is the more interesting failure.** `ip: not found`:
+the `ip` binary is absent from that image, so **the amendment did not execute** -- and the amendment
+was the whole mechanism for separating *"routed into WARP and blackholed"* from *"never got an
+address"*. He pre-flighted `getent`/`curl`/`sh`/`nc` against my **original** probe, and when the
+amendment introduced a new dependency he did not re-run the check against the changed command.
+
+His framing, which I think is the durable lesson: **a verification step can go stale, and staleness in
+a verification step is invisible precisely because the step previously passed.** That is the same
+defect class we had been trading all session, committed one level up -- not in the probe, but in the
+check that was supposed to guarantee the probe. Cheap fix for a re-run: use `cat /proc/net/route` and
+`cat /etc/resolv.conf`, which need no binary at all.
+
+### Why the theory mattered anyway, and what is now deferred rather than closed
+
+Before the probe, Hopper argued both sides from the substrate and declined to pick:
 
 - **For FAIL:** policy rule `32765: not from all fwmark 0x100cf lookup 65743` sends everything unmarked
   to the WARP table *before* `main`. A bridge-sourced packet is unmarked, so it enters the WARP tun
@@ -368,6 +426,30 @@ from the substrate and declined to pick:
 
 The MASQUERADE rule shows 34 packets / 2040 bytes, but counters distinguish neither success from
 attempt nor when, so that is not evidence either way.
+
+**Neither argument was tested**, because nothing got as far as sending a packet. Both remain live.
+
+**Deferred, not open -- one hypothesis worth recording precisely so it is cheap to pick up.** Hopper
+offers, explicitly as inference rather than assertion: a bridged container resolves via Docker's
+embedded DNS at `127.0.0.11`, which forwards to the host's resolvers -- and this host's resolvers are
+WARP's DoH listeners on `127.0.2.2`/`127.0.2.3`. From inside a bridged network namespace those are the
+**container's** loopback, not the host's, so the forward has nowhere to go. Coherent, untested.
+
+If that is right, the failure is **resolver scoping, not routing**, and an explicit `dns:` in the
+compose might make bridge viable -- which would buy the real network isolation that host mode cannot.
+That is a genuine upside, so I am recording the exact test rather than letting it evaporate:
+
+```
+docker run --rm --network bridge --entrypoint sh <image-by-digest> -c \
+  'cat /etc/resolv.conf; cat /proc/net/route; getent hosts api.anthropic.com'
+```
+
+**But I am not requesting it, and `[PO-2]` should close on host mode now.** Three reasons: the verdict
+the decision needed is in; a lone bridged container would be a fleet deviation with its own maintenance
+story, since all ten others are host-mode; and per §2.8 this container is not a security boundary
+anyway, so the isolation it would buy is blast-radius reduction rather than containment. Worth one
+cheap probe **only if** someone later wants that isolation for a specific reason. Filed as `[PO-17]`,
+deferred.
 
 **Consequence, which is the part that matters for a colleague-operated container.** Host networking
 means sharing the host's network namespace. The container reaches `127.0.0.1:<anything>` on RC --
@@ -784,18 +866,22 @@ Steps 1-3 involve the PO and happen once. Steps 4-6 are Joosep alone, roughly te
 Source: `teams/framework-research/docs/joosep-profile-brief-2026-08-28.md` (*FR:Aen*, REVISED second
 pass). This section takes only what the container must encode. Roster sizing stays a PO decision.
 
-### 4.1 The precondition that outranks every gate in this document
+### 4.1 The engagement question -- CLOSED
 
-**His contract record ends 31.08.2026 -- three days from now -- and a targeted ITSD re-query found no
-renewal, extension, or offboarding ticket** (brief §0.1, `[R2]`). That is *absence of evidence*, not
-confirmed non-renewal, and there is a live counter-signal: he committed code on **2026-08-28 08:46Z**,
-the day the brief was written `[R1]`.
+> **`[PO-15]` CLOSED 2026-08-28 14:06 (PO): Joosep continues as a permanent (stationary) colleague.**
+> This is no longer a mandate-contract question.
 
-Per Aen this does not block design work, and it has not. But it outranks `[PO-1]` and `[PO-2]` as a
-*build* gate: those two decide what to build, this one decides whether to build. **`[PO-15]`** --
-confirm with Ruth Türk or HR directly; the brief is explicit that this cannot be answered from Jira
-again. Provisioning a dedicated container, a fine-grained PAT, an Atlassian token and an SSH identity
-for someone whose engagement lapses this week is the kind of work that has to be undone by hand.
+The brief's headline #1 read his ITSD record as a *käsundusleping* valid 28.07-31.08.2026 with no
+renewal ticket found `[R2]`, and I escalated that to a gate outranking `[PO-1]`/`[PO-2]`. The PO has
+answered it directly, which is what the brief itself said was the only way to answer it -- **ask a
+person, not Jira.** The `[R2]` null was reading (a) or (b) of the four the brief listed, not (c) or
+(d): a permanent employment change would not file as the same *"Töötaja andmed"* contract-event
+routing ticket the query was shaped to match.
+
+Two things worth keeping from the episode rather than discarding with it: the brief's counter-signal
+(he committed code on 2026-08-28, the day it was written) pointed the right way, and **the query's
+shape, not its result, was the weak link** -- a negative from an instrument built for one document
+class says nothing about another. Provisioning now carries no undo risk.
 
 ### 4.2 What the container must encode
 
@@ -918,7 +1004,8 @@ Acceptance checks for whoever executes the build (not me):
 | # | Decision | Recommendation | Gates |
 |---|---|---|---|
 | ~~**PO-1**~~ | ~~Base: `allerk` or `apex-research`~~ | **DECIDED 2026-08-28 13:58 (PO): allerk-base**, with apex contributing only the team env vars, MCP/settings seeding and config layout. §0's recommendation adopted as written. | ~~gate~~ **CLOSED** |
-| **PO-2** | **Network: bridge or host** | run the §2.4 Tier-M probe; if bridge egress is dead (likely), host-net is a hard constraint and §2.8's honest posture applies | the build |
+| ~~**PO-2**~~ | ~~Network: bridge or host~~ | **CLOSED BY MEASUREMENT 2026-08-28: `network_mode: host`.** A bridged container on this host cannot resolve DNS at all. Hard constraint, not a preference (§2.4) | ~~gate~~ **CLOSED** |
+| **PO-17** | *(deferred, not open)* Is bridge networking recoverable via an explicit `dns:` setting? The probe's failure was resolver-scoped, and the routing question was never exercised | **Do not pursue now.** One cheap probe if isolation is ever wanted for a named reason; the exact command is in §2.4 | -- |
 | **PO-3** | GitHub token scope | dedicated fine-grained PAT, his repos only, read-only elsewhere | credentials |
 | **PO-4** | Atlassian credential owner | Joosep's own account + token | credentials |
 | **PO-5** | Anthropic auth -- whose account funds it | OAuth at first run; confirm the account | first run |
@@ -931,7 +1018,7 @@ Acceptance checks for whoever executes the build (not me):
 | **PO-11** | In-container `sudo`? | **grant it**, matching allerk; treat reproducibility as convention, not a lock (§2.8) | build |
 | **PO-12** | **Four keys on host `dev`** (docker group = root-equivalent), one labelled `joosep.madar@evr.ee` | **First identify all four by fingerprint** -- comments on this host are documented-unreliable, so the label is not an attribution (§2.8). *Then* revoke/container-only, conditional on the key not serving an active purpose; if it does, keep it and drop the isolation framing instead (§2.9) | posture |
 | **PO-14** | Does the PO want a *real* boundary between users? | Out of scope here, but allerk's README names the only two answers that work: **rootless Docker, or separate Linux accounts.** Nothing short of those is a boundary | -- |
-| **PO-15** | **Is Joosep's contract renewed past 31.08.2026?** Record ends in 3 days; no renewal ticket found `[R2]`; counter-signal is a commit on 2026-08-28 | **Ask Ruth Türk or HR directly** -- the brief is explicit this cannot be answered from Jira again. **Outranks PO-1/PO-2**: those decide what to build, this decides whether to (§4.1) | **whether to build at all** |
+| ~~**PO-15**~~ | ~~Is Joosep's contract renewed past 31.08.2026?~~ | **DECIDED 2026-08-28 14:06 (PO): permanent (stationary) colleague.** Not a mandate-contract question. No undo risk on provisioning (§4.1) | ~~gate~~ **CLOSED** |
 | **PO-16** | Roster size -- 7 candidate roles against a 6-role reference shape, sizing basis withdrawn | Not mine. Infra needs only the final count, for tmux geometry; does not gate the build (§4.4) | team design |
 
 ## 7. Open questions

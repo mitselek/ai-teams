@@ -338,3 +338,77 @@ Each host's container runs its own. **The tag does not identify the artifact.** 
 **outcome** -- success. 8 hits audited across both artifacts (4 per file, matching Aen's count): 4 corrected (3 scratchpad in place + 1 here by append), 4 deliberately retained as denials or as the historical record of the original correction. Zero substrate commands; nothing mutated on any host. Session totals stand at zero Tier M and zero Tier D. Probe, provisioning and the `[PO-12]` fingerprint check all remain HELD.
 
 (*FR:Hopper*)
+
+### 2026-08-28T14:06+03:00 -- PO-SANCTIONED Tier M bridge-egress probe (RC) + Tier R key fingerprints
+
+**timestamp** -- 2026-08-28T14:06+03:00 dispatch; executed 14:08-14:10.
+
+**tasker** -- Aen, relaying PO sanction. Two dispatches in one message.
+
+**dispatch summary** -- (1) Run Brunel's final bridge-egress probe on RC as written in design §2.4 (`curl -v` + `ip addr`/`ip route` version, pinned by digest to RC's `backlog-triage-claude` `b79a3f5c…`); report verbatim output plus a PASS/FAIL read to Brunel and Aen; stop and report if anything deviates. (2) Tier R: fingerprint the four `dev` authorized_keys entries, no edits. Also relayed: PO confirms Joosep continues as a permanent colleague -- `[PO-15]` CLOSED, build is a go once `[PO-2]` resolves.
+
+**tier classification / sanction status**
+- **Dispatch 1 -- Tier M. PO-sanctioned via Aen, quoted verbatim:** *"[SANCTIONED -- PO, Tier M] Bridge-egress probe ON RC (100.96.54.170). Run Brunel's final probe as written in the design §2.4 (the `curl -v` + `ip addr`/`ip route` version, pinned by digest to RC's `backlog-triage-claude` `b79a3f5c…`). Sanction explicitly covers: creating one ephemeral `--rm` bridged container, and the transient `docker0` carrier-up / route-live transition for its lifetime, self-reverting on exit. Nothing else. Expected: ≤ ~17 s, container gone, `docker0` back to NO-CARRIER. … If anything deviates from expected (container lingers, docker0 stays up, any other container affected), stop and report before touching anything."*
+- **Dispatch 2 -- Tier R.** Default-permitted.
+
+**PRE-EXECUTION GATE -- the dispatch named a command it did not contain.** Aen's dispatch referenced "the probe as written in the design §2.4" but did not quote it, and Brunel had only ever described his amendments to me in prose -- I had never been sent the final literal text. **Reconstructing it from his description would have been the silent-broadening failure this role exists to prevent.** Resolved without a round-trip: the design doc had landed on disk (`teams/framework-research/docs/joosep-container-design-2026-08-28.md`, 67844 B, written 13:48), so I read §2.4 (lines 341-449) and took the command byte-for-byte from the fenced block at lines 392-397. Digest in the doc matched the one I had independently verified on the host. Executed via base64 transit per the documented local-dev gotcha (the command carries nested single quotes).
+
+**deployed-artifacts-read declaration**
+- **Layer 1 (FR design-as-shipped):** `teams/framework-research/docs/joosep-container-design-2026-08-28.md:341-449` (§2.4 Network `[PO-2]`), command block at 392-397, discriminator at 408-410, side-effect declaration at 439-444. Section map read first to locate it.
+- **Layer 2:** not re-read; no compose file was involved in this dispatch.
+- **Layer 3:** before/after `ip -brief link show docker0`, `ip route | grep ^172.17`, `docker ps -aq | wc -l`, `docker ps -q | wc -l`, `docker ps -a --filter ancestor=<digest>`, full `docker ps -a` census both sides.
+- **Audit-trail:** my own 13:34 pre-flight (tool presence) and 13:28 digest verification, both relied on -- see the failure note below for where that reliance was misplaced.
+
+**commands executed** -- Dispatch 1, verbatim, wrapped in before/after captures:
+```
+docker run --rm --network bridge --entrypoint sh \
+  backlog-triage-claude@sha256:b79a3f5ce89496ad0cf18c007fd3ac23f53ed5aff17d83a7714a8c073883b93c -c \
+  'ip -4 addr show eth0; ip route; getent hosts api.anthropic.com; \
+   curl -v -m 8 -o /dev/null https://api.anthropic.com/ 2>&1 | tail -20; echo rc=$?; \
+   curl -kv -m 8 -o /dev/null https://api.anthropic.com/ 2>&1 | tail -5; echo rc_k=$?'
+```
+Dispatch 2: `ssh-keygen -lf ~/.ssh/authorized_keys`, plus a per-line stdin form (`printf '%s\n' "$l" | ssh-keygen -lf -`) chosen so **no temporary key files were written to the host** -- a read that leaves no artifact.
+
+**outputs -- Dispatch 1**
+```
+BEFORE: docker0 DOWN <NO-CARRIER,BROADCAST,MULTICAST,UP>; 172.17.0.0/16 ... linkdown; 11 containers / 10 running
+PROBE:
+  sh: 1: ip: not found
+  sh: 1: ip: not found
+  * Resolving timed out after 8000 milliseconds
+  curl: (28) Resolving timed out after 8000 milliseconds
+  rc=0
+  * Resolving timed out after 8000 milliseconds
+  curl: (28) Resolving timed out after 8000 milliseconds
+  rc_k=0
+  OUTER_EXIT=0
+AFTER:  docker0 DOWN <NO-CARRIER,BROADCAST,MULTICAST,UP>; 172.17.0.0/16 ... linkdown; 11 containers / 10 running
+```
+`getent hosts api.anthropic.com` produced **no output** -- silent resolution failure, not a missing tool (`getent` presence was verified at pre-flight).
+
+**POST-CONDITIONS -- all three of Aen's deviation conditions checked, all clear.** No lingering container (census byte-identical before/after; the `--filter ancestor=<digest>` hit `backlog-triage Up 27 hours`, the *pre-existing* container from the same image, not a leftover). `docker0` DOWN/NO-CARRIER with a `linkdown` route both sides -- **not claiming the transition never occurred, only that it did not persist**; the boundaries are the only two observations I have. No other container affected.
+
+**VERDICT: FAIL -- bridge egress does not work. `[PO-2]` closes; host networking is a hard constraint.**
+
+**THE FINDING -- it failed in a THIRD state that neither discriminator named.** Brunel's PASS was a TLS/cert error; his FAIL was *"DNS resolves but the connection hangs to timeout."* Neither occurred: **DNS resolution itself timed out**, so no packet was ever sent to the target and **the routing-rule-vs-MASQUERADE question this probe existed to settle was never exercised.** The conclusion is right and the believed mechanism is not. Consequence for §2.4: **allerk's compose comment is wrong on its intermediate observation too** ("DNS resolves but connections hang"), not only on include-vs-exclude mode -- wrong-mechanism, wrong-intermediate-observation, right-conclusion. Offered to Brunel as an explicitly UNTESTED hypothesis, not a claim: a default-bridge container resolves via Docker's embedded DNS at `127.0.0.11`, which forwards to the host's resolvers, and this host's resolvers are WARP's DoH listeners on `127.0.2.2`/`127.0.2.3` -- from inside a bridged netns those are the *container's* loopback, so the forward has nowhere to go.
+
+**OPERATOR ERROR -- MINE. The pre-flight went stale between probe versions.** `ip: not found` twice: **the `ip` binary is absent from that image, so the `ip -4 addr show eth0` / `ip route` amendment did not execute** -- and that amendment's entire purpose was to separate "routed into WARP and blackholed" from "never got an address." That distinction is still open. **At 13:34 I pre-flighted the tool set of Brunel's *original* probe (`getent`, `curl`, `sh`, `nc`) and did not re-run it when the amendment introduced a new dependency.** A verification step that passed against v1 was carried forward as though it covered v2. This is the session's own recurring genus committed one level up: **the check itself went stale, and stale verification is invisible precisely because it passed before.** Had I re-run it, the probe would have shipped `ip` from the image or a `cat /proc/net/route` fallback, and one sanctioned Tier M run would have bought the mechanism as well as the verdict. **Standing rule for future dispatches: when a probe is amended, the tool-presence pre-flight is re-run against the amended command, not inherited from the version that was checked.**
+
+**DEFECT IN THE SANCTIONED COMMAND -- spotted pre-execution, deliberately NOT corrected.** `curl ... 2>&1 | tail -20; echo rc=$?` reports the exit status of `tail`, not `curl`; both `rc=` and `rc_k=` printed `0` directly beneath a `curl: (28)` failure. **I ran the command exactly as sanctioned rather than fix it in flight** -- amending a sanctioned command on the operator's own judgment is the broadening failure this role exists to prevent, and the defect carried no substrate risk because `curl -v` puts the real signal in the verbose stream. Caveat recorded here so no future reader takes `rc=0` for success. Correct form if re-run: `curl ...; rc=$?` before any pipe, or `set -o pipefail`.
+
+**NOT DONE, deliberately** -- did not re-run with `ip` replaced, did not `cat /etc/resolv.conf` in a fresh container, did not test the DNS hypothesis. Each would be an additional container outside a sanction that covered **one ephemeral run of one exact command**. Surfaced to Brunel and Aen as a possible new dispatch, with my recommendation that it is only worth it if `[PO-2]` needs the mechanism rather than the verdict -- §2.8's posture argument does not depend on it.
+
+**outputs -- Dispatch 2.** `/home/dev/.ssh/authorized_keys`, mode 0600, 396 B, mtime 2026-08-27 15:17. Four entries, all ED25519/256:
+```
+[1] SHA256:t43NTA+mJ8BeJxYVRMQAU2eBkgIZz32tiiK/5/8I4dU  mihkel.putrinsh@evr.ee
+[2] SHA256:hzVlUN6G5sT53qTVs/r5lOlG9D6T97BSCfGv5bJiY+k  hr-platform
+[3] SHA256:g9kExnzOJyjyMGgqfGbecWDwZpGR2g/e5DoR49jKY70  joosep.madar@evr.ee
+[4] SHA256:CwmnFCBQ7GI1IlmGdBVyZfU/Y/Z/dbGwuonAuwcxJ08  claude-container
+```
+No edits. **The comment column is the untrusted field** -- allerk's README documents that comments on this host do not identify owners and names entry [2] (`hr-platform`) as in fact the PO's own Windows client key. Entry [3] is therefore *a key commented* `joosep.madar@evr.ee`; attribution requires the PO attesting his own and Joosep supplying his. The fingerprints above are the stable identifiers for that comparison.
+
+**HOST CHANGE, reported per Aen's standing instruction** -- `vjs-ords` (Up 15 minutes) now exists on RC; it did not at the 13:19 survey (10 containers then, 11 now). **It appears in the BEFORE capture, so it predates the probe and is not fallout from it** -- started by someone else during the session. Not touched, not investigated.
+
+**outcome** -- **success (both dispatches).** Dispatch 1: executed as sanctioned, post-conditions clean, `[PO-2]` answered FAIL, with one operator error (stale pre-flight) and one command defect (pipe-swallowed `$?`) both disclosed rather than absorbed. Dispatch 2: complete, four fingerprints delivered, nothing modified. **Session totals: 1 Tier M (sanctioned, executed, verified clean), 0 Tier D.**
+
+(*FR:Hopper*)

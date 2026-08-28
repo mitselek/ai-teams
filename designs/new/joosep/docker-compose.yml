@@ -1,0 +1,171 @@
+# docker-compose.yml -- joosep personal workbench (*FR:Brunel*)
+#
+# A per-colleague container for Joosep Madar (Eesti Raudtee), shaped on the
+# `allerk` precedent at /home/dev/allerk (PO ruling 2026-08-28: allerk-base,
+# with apex contributing only the agent-team env vars and MCP/settings seeding).
+#
+#   ./joosep.sh build      # build the image
+#   ./joosep.sh up         # start (detached)
+#   ./joosep.sh            # shell inside, from this host
+#   ./joosep.sh down       # stop, keep volumes
+#
+# Remote access (from a WARP-enrolled machine):
+#   ssh -p 2231 joosep@100.96.54.170            # plain shell
+#   ssh -t -p 2231 joosep@100.96.54.170 joosep-session   # inside the Claude session
+#   ...or Connect-Joosep.ps1 / Connect-Joosep.ps1 -Session on Windows.
+#
+# Host port allocation on this machine (network_mode: host, so these are the
+# real host ports -- check here before claiming a new one). Mirrors the table
+# maintained in /home/dev/allerk/docker-compose.yml, which is the record that
+# actually matches the host:
+#   2222 apex-research   2223 polyphony-dev   2224 entu-research
+#   2226 backlog-triage  2228 uikit-dev       2230 allerk
+#   2231 joosep  (this file)
+#
+# NOTE: ports are a PER-HOST namespace. A number in use on prod-llm or shipyard
+# does not disqualify it here, and there is no fleet-wide uniqueness invariant
+# (prod-llm and RC both already run something on 2226). 2231 is simply the next
+# unused number on RC.
+
+services:
+  joosep:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Build must be host-networked for the same reason the container is: on a
+      # WARP-protected host, bridge-sourced traffic is handed to the tunnel and
+      # apt/curl hang rather than fail. See the network_mode note below.
+      network: host
+    image: joosep:latest
+    container_name: joosep
+    hostname: joosep
+
+    # ── Network -- SETTLED BY MEASUREMENT [PO-2], 2026-08-28 ─────────────────
+    # Host networking is a HARD CONSTRAINT on this host, not a preference.
+    #
+    # Verified, not inherited: a PO-sanctioned probe ran a bridged container on
+    # this host and tried to reach api.anthropic.com. Result:
+    #   curl: (28) Resolving timed out after 8000 milliseconds
+    #   getent hosts api.anthropic.com  ->  no output at all
+    # A bridged container cannot even RESOLVE, let alone connect.
+    #
+    # NOTE for anyone reading allerk's compose comment, which says the docker
+    # subnets are missing from WARP's split-tunnel "include list" so "DNS
+    # resolves but connections hang": that sentence is wrong twice. WARP is in
+    # EXCLUDE mode (no docker subnet is excluded, so bridge traffic is handed
+    # TO the tunnel), and DNS does not resolve at all. Only its conclusion --
+    # bridge is unusable -- holds. Do not copy the phrasing forward.
+    #
+    # The exact mechanism is UNTESTED. Plausible but unverified: a bridged
+    # container resolves via Docker's embedded DNS at 127.0.0.11, which forwards
+    # to the host's resolvers -- and this host's resolvers are WARP's DoH
+    # listeners on 127.0.2.2/127.0.2.3, which from inside a bridged netns are
+    # the CONTAINER's loopback, not the host's. If that is right, an explicit
+    # `dns:` setting might make bridge viable and buy real network isolation.
+    # Recorded as a deferred experiment in the design doc, NOT as a gate.
+    # Diagnostic on this host: `warp-cli status`.
+    network_mode: host
+    # With host networking Docker writes no entry for the container's own
+    # hostname, so sudo and anything else resolving it warns on every call.
+    extra_hosts:
+      - "joosep:127.0.0.1"
+
+    # ── Resource ceilings ────────────────────────────────────────────────────
+    # Ceilings, not reservations -- idle capacity stays available to the host.
+    # Exists so a runaway build here cannot take the machine away from others.
+    # Matched to allerk for peer symmetry between two colleague workbenches.
+    # Host is 20 cores / 62 GiB, so two containers at 12/40G are deliberately
+    # overcommitted; a ceiling bounds ONE tenant's runaway, not the sum. See
+    # [PO-10] in the design doc for the three costed alternatives.
+    deploy:
+      resources:
+        limits:
+          cpus: '12'
+          memory: 40G
+    # Not in allerk. A fork-bomb hits the pid ceiling long before a 40G memory
+    # ceiling notices, and an agent-driven container is likelier to spawn
+    # pathologically than a hand-driven one.
+    pids_limit: 512
+
+    env_file:
+      - path: .env
+        required: false
+
+    environment:
+      - HOME=/home/joosep
+      - TZ=Europe/Tallinn
+      - LANG=en_US.UTF-8
+      - LC_ALL=en_US.UTF-8
+
+      # Agent-team support (the apex contribution to this otherwise-allerk shape)
+      - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+      - TEAM_NAME=${TEAM_NAME:-joosep}
+      - CLAUDE_ENV_ID=JOOSEP
+
+      # Git attribution inside the container
+      - GIT_USER_NAME=${GIT_USER_NAME:-Joosep Madar}
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-joosep.madar@evr.ee}
+
+      # Repos. Narrowed per the research brief: the only two repos he has ever
+      # committed to are HES-integration-tests (team vjs) and rumba (team vjs2).
+      # The whole hes-team grant is unexercised. Expand on demand, not by default.
+      - REPO_1_URL=${REPO_1_URL:-https://github.com/Eesti-Raudtee/HES-integration-tests.git}
+      - REPO_2_URL=${REPO_2_URL:-https://github.com/Eesti-Raudtee/rumba.git}
+      - TOOLKIT_URL=${TOOLKIT_URL:-https://github.com/Eesti-Raudtee/dev-toolkit.git}
+
+      # Credentials -- all supplied from .env, none baked into the image.
+      # GITHUB_TOKEN must be a FINE-GRAINED PAT scoped to the two repos above,
+      # read-only elsewhere. NOT the PO's org-wide PAT: this container's user
+      # can read its own .bashrc, so the token must be one he is entitled to.
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      # Joosep's OWN Atlassian account and token, not the PO's -- so Jira and
+      # Confluence actions are attributed to him and scoped by his own
+      # permissions. Corollary: his credential sees a different slice than the
+      # PO's, so an empty result from him is not evidence of absence.
+      - ATLASSIAN_BASE_URL=${ATLASSIAN_BASE_URL:-https://eestiraudtee.atlassian.net}
+      - ATLASSIAN_EMAIL=${ATLASSIAN_EMAIL}
+      - ATLASSIAN_API_TOKEN=${ATLASSIAN_API_TOKEN}
+      # Leave blank to use OAuth at first run (recommended -- he already holds a
+      # licence per ITSD-39589/39591; reuse rather than re-request).
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+
+      # Node does NOT use the system CA store; it needs this explicitly.
+      - NODE_EXTRA_CA_CERTS=/opt/warp-ca.pem
+
+    volumes:
+      # Whole $HOME: shell config, git identity, ~/.claude (auto-memory, OAuth
+      # credentials, settings.json, mcp.json), team dirs, scratchpads.
+      # Named for the PERSON, not the team -- so the AI team's name lives only in
+      # a directory inside this volume and renaming it is a `mv`, not a migration.
+      - joosep_home:/home/joosep
+      # Projects, mounted OVER $HOME so they can be wiped or backed up alone.
+      - joosep_work:/home/joosep/work
+      # sshd host keys -- survive image rebuilds, so the client never sees
+      # REMOTE HOST IDENTIFICATION HAS CHANGED. Without this, a rebuild trains
+      # the user to clear known_hosts, which makes pinning worthless.
+      - joosep_sshd:/etc/ssh/keys
+      # Ingress keys, re-read on every start: edit the file, restart, done.
+      # No rebuild and no recreate needed to add or remove a key.
+      - ./authorized_keys:/opt/authorized_keys:ro
+      # WARP TLS-interception CA, bind-mounted from the host [PO-13].
+      # Bind rather than a baked copy: a stale baked CA fails SILENTLY after a
+      # rotation and reads as a network fault; a moved host path fails loudly at
+      # boot, and the entrypoint warns on it.
+      - /usr/local/share/ca-certificates/managed-warp.pem:/opt/warp-ca.pem:ro
+
+    working_dir: /home/joosep/work
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+volumes:
+  # Bare names via explicit `name:` keys, per the allerk convention.
+  # Wipe deliberately: docker volume rm joosep_home
+  # WARNING: `docker compose down -v` destroys joosep_home, which holds the
+  # OAuth credentials and every agent scratchpad. It is the one-way door here.
+  joosep_home:
+    name: joosep_home
+  joosep_work:
+    name: joosep_work
+  joosep_sshd:
+    name: joosep_sshd
