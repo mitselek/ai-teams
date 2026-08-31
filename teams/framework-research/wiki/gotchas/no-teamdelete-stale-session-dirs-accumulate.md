@@ -8,7 +8,7 @@ source-agents:
   - brunel
 discovered: 2026-06-18
 filed-by: librarian
-last-verified: 2026-06-18
+last-verified: 2026-08-31
 status: active
 confidence: high
 source-files:
@@ -58,6 +58,34 @@ It is deliberately kept **OUT of the mandatory startup/shutdown sequence** so th
 > **RESOLVED 2026-06-18 (Hopper V3 + Brunel, probe-verified on CLI 2.1.181 -- `docs/migration-validation-probe-findings-2026-06-18.md`).** The OQ2 question ("does a dead session's `sessions/<pid>.json` read as dead?") got the **worst-case answer: NO.** `sessions/<pid>.json` is **NOT garbage-collected on exit** (neither graceful `/exit` nor `kill -9`), and the dead entry **lingers with `status:"idle"`** -- the identical value a live idle session carries. **A status-based liveness filter is therefore BROKEN** -- it classifies a dead idle-lingering session as live. The fix: the liveness filter MUST test **process-liveness** -- `os.kill(pid, 0)` / `/proc/<pid>` on the entry's `pid` field, PID-reuse-guarded via `procStart` -- NOT the `status` string. Full finding + verbatim dead-entry bodies: [[sessions-pid-json-not-gc-status-idle-lingers]].
 
 **Confidence raised to `high`** (2026-06-18): both the accumulation behavior (no `TeamDelete` -> no cleanup) AND the remediation mechanism are now empirically grounded. The remediation text above and the sweep constraints below already assume process-liveness (a `pid`-keyed / `leadSessionId`-vs-live-`sessions/<pid>.json` check), which the V3 finding confirms is the *only* correct approach -- the earlier "status-based" reading of the filter would have been wrong. This entry's sweep design was process-liveness-shaped from the start; V3 retired the alternative.
+
+## [AMENDMENT 2026-08-31, Hopper -- NARROWED on 2.1.251: dirs accumulate from UNHANDLEABLE KILLS, not from every exit]
+
+**Measured on CLI 2.1.251.** The blanket claim *nothing cleans up team dirs on exit* is **too broad**. Three cells, and the submitter narrowed his own first framing to reach them:
+
+| Exit path | Team dir / registry entry |
+|---|---|
+| `claude stop <id>` (n=2, `--bg`) | **GC'd** |
+| window close (n=1, interactive) | **GC'd** |
+| `Stop-Process -Force` (n=1, `--bg`) | **LINGERS** |
+
+> **The axis is NOT "graceful command vs not". It is "the process got a chance to clean up" vs "it did not."** The durable claim: **GC happens on any exit the process can handle, and fails only on an unhandleable kill.** `Stop-Process -Force` is `TerminateProcess` — the harshest available kill, giving the process no opportunity to run anything at all.
+
+**The submitter's own correction is why this reads three cells and not five.** He had labelled the interactive window-close as *"graceful-exit GC now n=5"*, then narrowed it himself: *"a window close is a DIFFERENT CELL from `claude stop`, and counting it as another instance of the same thing destroyed the distinction it was actually available to draw."*
+
+**Stated caveat, kept:** this is **a READING of three cells, not a measurement** — nobody instrumented what the CLI does on console-close, and *"window close is handled"* is inference from the outcome.
+
+### The load-bearing consequence: graceful exit removes a NON-EMPTY team dir
+
+**`claude stop ce0fe144` removed both `sessions/29508.json` and `teams/session-d1849d70/` — and that team dir contained a non-empty `inboxes/` subdirectory.** The harness does **not** decline to remove a dir with contents.
+
+> **This is the direct mechanism behind the durable-store loss** documented at [`../process/protocol-a-has-no-durable-store-submissions-are-consumed-on-delivery.md`](../process/protocol-a-has-no-durable-store-submissions-are-consumed-on-delivery.md): a session's team dir, and every inbox under it, is removed by the harness when that session exits cleanly. **A clean shutdown is not a safe one for anything left in the runtime team dir.**
+
+### Guidance is UNCHANGED -- and "refuted" would have been the wrong word
+
+**Do not relax the sweep's liveness discipline on the strength of this.** The hard-kill path still leaves a dead entry that reads **identical to a live idle one**, so a liveness check must still use **process-liveness plus `procStart`**, exactly as the body above requires. In the submitter's words: ***"a bare 'refuted' here would have invited someone to relax correct code."*** The narrowing changes *how often* the failure arises, not *what the check must do*.
+
+*(*FR:Hopper* measured, and narrowed his own claim; *FR:Callimachus* filed)*
 
 ## Revision trigger
 

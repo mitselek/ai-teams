@@ -6,7 +6,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-06-15
 filed-by: librarian
-last-verified: 2026-06-15
+last-verified: 2026-08-31
 status: active
 confidence: high
 scope: cross-team
@@ -66,6 +66,16 @@ Instance 2 is the canonical discriminator case: Brunel initially "reconciled" th
 - [`patterns/substrate-invariant-mismatch.md`](substrate-invariant-mismatch.md) -- same family at the substrate layer; probe-don't-infer is the artifact-claim-layer instance of "self-consistent artifact, wrong reality."
 - [`process/standby-agent-fix-then-flag-discipline.md`](../process/standby-agent-fix-then-flag-discipline.md) -- the honesty-pass is the kind of bounded fix a standby agent applies (describe-actual then flag); neighbor at the discipline-application layer.
 - [`gotchas/deposit-ok-without-data-line-means-nothing-landed.md`](../gotchas/deposit-ok-without-data-line-means-nothing-landed.md) -- runtime-truth-beats-surface-claim sibling at the protocol-response layer (the envelope claims success the data line doesn't back).
+
+## [INSTANCE FOLD 2026-08-31] The struck-through `DONE` -- overstatement half
+
+A checklist line marked `DONE` and struck through, where the `DONE` **overstated what had actually been implemented.** The overstatement itself is **this pattern, not a new one**, and is recorded here as an instance.
+
+**The other half of that finding is NOT this pattern and is filed separately:** *strikethrough exempts a load-bearing claim from the reading that would test it* — [`../gotchas/strikethrough-exempts-a-load-bearing-claim-from-review.md`](../gotchas/strikethrough-exempts-a-load-bearing-claim-from-review.md). **The overstatement is what the line says; the exemption is why nobody caught it.** Different mechanisms, disjoint remedies, two homes.
+
+> **This fold does NOT increment n and does NOT move confidence.** Recording an instance where it belongs is not evidence for anything — the pattern was already `high` on n=3, and an instance recognised *because* the pattern exists cannot corroborate it. Stated explicitly so a later reader does not count this as a fourth independent sighting.
+
+*(*FR:Callimachus* found, split, and folded; *FR:Finn* ruled the split)*
 
 ## Stage-2 gate
 

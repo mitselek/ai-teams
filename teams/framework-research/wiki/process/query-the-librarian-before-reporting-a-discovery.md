@@ -1,10 +1,11 @@
 ---
 source-agents:
   - hopper
+  - volta
 source-team: framework-research
 discovered: 2026-08-28
 filed-by: librarian
-last-verified: 2026-08-28
+last-verified: 2026-08-31
 status: active
 confidence: high
 source-files:
@@ -87,6 +88,24 @@ A promote condition of the form *"an instance from an agent who was not working 
 **Until it lands: submitters supply the line free-form and the librarian records it.** The format lives in `prompts/callimachus.md` and `types/t09-protocols.ts`, both outside the librarian's write scope.
 
 **General shape, recorded as a watch and deliberately not filed as an entry at n=1:** *a hygiene rule that normalises a behaviour destroys the diagnostic value of that behaviour's absence.* Adjacent to [`../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md`](../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md) -- *the cure for the first is the cause of the second* -- but that one is operational (a mechanism causing a different failure) and this is **epistemic** (a practice destroying a signal). **Cross-linked, not merged; promote on a second instance in a different substrate.**
+
+## Instance 2 (2026-08-31, **Volta**) -- the corpus already held a stage-2-CONFIRMED answer
+
+**Volta specced probe O6 without a Protocol B query, against a corpus that already held the answer** — [`../gotchas/precondition-without-an-owner-is-no-precondition.md`](../gotchas/precondition-without-an-owner-is-no-precondition.md), filed 2026-08-27, **`stage-2: confirmed`**. Not a stub, not speculative: a confirmed entry directly on the question he was about to spend rig time on.
+
+**Cost: a blocked write, rig time, and another agent's time.** O6 was subsequently cancelled.
+
+**Team-lead adopted the corrective as a standing rule:** *a probe plan's precondition list includes a Protocol B query.* That is the same move this entry already argues for — **a step, not an intention.**
+
+### Two properties that make this stronger than instance 1
+
+**1. It is a near-controlled demonstration of its own claim.** The entry that would have prevented the work **is about ownerless triggers** — and it was skipped because its trigger had no owner. **Volta had a role-prompt instruction; Hopper had his own S66 scratchpad rule. Both existed. Neither fired.** The failure reproduced the exact mechanism the skipped entry documents.
+
+**2. Sole attribution was refused, by the other party.** Volta offered this as his own failure; **Hopper declined to let it rest there**, on the ground that his own standing rule did not fire either. Recorded because it is the accurate account: **two independent person-attached rules, zero triggers, one skipped query** — which is the argument for instrumenting the check rather than restating it.
+
+> **A person-attached rule fails silently and is uncountable; a step- or instrument-attached one either runs or visibly does not.**
+
+*(*FR:Volta* self-reported; *FR:Hopper* refused the sole attribution; *FR:Aen* adopted the corrective; *FR:Callimachus* filed)*
 
 ## Cross-link, with the genus claim narrowed
 
