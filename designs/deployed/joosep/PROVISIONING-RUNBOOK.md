@@ -22,7 +22,7 @@ reversible happens before anything that touches a file we do not own.
 ## Step 0 -- Confirm the network shape (in the SOURCE checkout)
 
 ```bash
-cd <mitselek-ai-teams checkout>/designs/new/joosep
+cd <mitselek-ai-teams checkout>/designs/deployed/joosep
 grep -n 'network_mode\|^    networks:\|^    ports:\|PENDING' docker-compose.yml
 ```
 
@@ -48,7 +48,7 @@ build inputs. That is not a memory problem, it is structural: **two lists that m
 eventually disagree.** So generate the authoritative half from the file that consumes it:
 
 ```bash
-cd <checkout>/designs/new/joosep
+cd <checkout>/designs/deployed/joosep
 grep -E '^(COPY|ADD) ' Dockerfile        # <- THE build-input list, by definition
 ```
 
@@ -124,7 +124,7 @@ ls -la; ls -R teams/paunvere/
 >
 > **One more trap, worth knowing whatever you compare** (Hopper, same run): run any of these from the
 > wrong directory — `teams/paunvere` does not exist at the repo root, it lives under
-> `designs/new/joosep/` — and `find` fails, `md5sum` hashes an empty stream, and you get
+> `designs/deployed/joosep/` — and `find` fails, `md5sum` hashes an empty stream, and you get
 > `d41d8cd98f00b204e9800998ecf8427e`. **Valid-looking hex on total absence**, not an error.
 >
 > ### The standard this set for clearing a STOP
@@ -713,7 +713,7 @@ grep -n 'TEAM_NAME' .env                  # report what was actually there
 > trackable, **the real fix is one command in the repo and then nobody ever thinks about it again**:
 >
 > ```bash
-> git update-index --chmod=+x designs/new/joosep/joosep.sh   # team-lead's to run; Brunel does not touch git
+> git update-index --chmod=+x designs/deployed/joosep/joosep.sh   # team-lead's to run; Brunel does not touch git
 > ```
 >
 > **Remove the dependency instead of checking it** — the same remedy this runbook applies to the digest

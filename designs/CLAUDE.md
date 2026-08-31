@@ -17,6 +17,7 @@ Doc-index signpost (Tier 2 navigation). Per-team configuration designs, split by
 - apex-research/ -- Oracle APEX migration-research team (teams/, container/, librarian scaffold)
 - bigbook-dev/ -- BigBook bilingual-reader dev team config
 - esl-legal/ -- ESL Legal team config
+- joosep/ -- per-colleague personal workbench container (Joosep Madar) on RC:2231, live 2026-08-31; container package + `teams/paunvere/` (his 6-agent team) + 14-step provisioning runbook + Estonian hand-over
 - mvox_v4e_web/ -- mvox web team (cloned/refactored from polyphony-dev), deployment index
 - operator-role/ -- Hopper deployment-operator role design-spec
 - po-team/ -- product-owners team (Henry/Nunes/Gama live on sagres 2026-07-16; protocols, prompts, registry, wiki)

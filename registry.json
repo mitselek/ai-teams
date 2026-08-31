@@ -144,7 +144,7 @@
       "containerName": "joosep",
       "status": "live",
       "_note": "Per-colleague personal workbench (Joosep Madar), allerk-shaped. LIVE since 2026-08-31 (Step 14 rebuild: Estonian FIRST-TASKS + paunvere team package + TEAM_NAME; Joosep authenticated 9a-9d with his own key and the host dev-key was revoked). Port 2231 claimed in the RC authority table -- see _rcPortAuthority. Two connection modes: bare ssh = shell; 'ssh -t ... joosep-session' = inside the Claude session. This schema has NO tmux field, so it cannot express that distinction -- ~/bin/rc-deployments.json carries \"tmux\": \"joosep\" for it. sshKey CORRECTED 2026-08-31: his key is at the DEFAULT identity path, not the '_joosep'-suffixed name this file previously assumed; ssh's own default lookup resolves it, so no -i flag is needed to connect.",
-      "_designPackage": "designs/new/joosep/"
+      "_designPackage": "designs/deployed/joosep/"
     },
     {
       "num": "11",
