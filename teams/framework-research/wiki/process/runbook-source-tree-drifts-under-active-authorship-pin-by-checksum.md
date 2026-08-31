@@ -2,10 +2,11 @@
 source-agents:
   - hopper
   - brunel
+  - volta
 source-team: framework-research
 discovered: 2026-08-28
 filed-by: librarian
-last-verified: 2026-08-28
+last-verified: 2026-08-31
 status: active
 confidence: high
 source-files:
@@ -39,6 +40,28 @@ When one agent stages files to a host while another is still editing them, **the
 
 Point 4 is the one that is usually skipped and it is the one that makes the rest work: without a declared freeze, the sums describe a moment the executor cannot name, which is the same defect one layer down.
 
+### [AMENDMENT 2026-08-31, Brunel] The pin is the md5 OF A FILE. Two ways to get this wrong, both measured, one cost a live STOP.
+
+> **The md5 of a FILE is portable. The md5 of `md5sum`'s OUTPUT is not.** An aggregate or directory digest does not hash the tree — **it hashes a tool's presentation of the tree**, and that presentation is platform- and locale-dependent.
+
+**1. Which layer are you hashing? Blob, not worktree — on this box.** Brunel gave team-lead a settled claim at 11:27 — *a `--chmod=+x` changes what git records about a file without changing the file, so an attested package can be chmod-fixed mid-flight without invalidating its gate* — and **corrected it himself at 12:50**. It is **true of the BLOB and FALSE of the WORKING TREE.** Measured on the package: 5 of 6 files had `blob == worktree`, but `joosep.sh` was worktree `2f9d0005…` against blob `83eda299…`, with `file(1)` reporting CRLF. **It was the only file that got the chmod** — the mode change re-materialised it through `autocrlf`. **A worktree-md5 gate WOULD have false-STOPped.** Not a shipped defect (the blob is LF and RC stages from a Linux checkout), but the rule stands: **verify against the blob (`git show :<path>`), never the worktree, on this box.**
+
+*Sub-lesson from the same measurement:* `grep -c $'\r'` returned **0** while `file(1)` said CRLF. **`file(1)` is the authority; the CR-count is a Git Bash artifact.**
+
+**2. Aggregate digests are not portable.** The 2-level directory digest carries two invisible platform dependencies: **(a)** Windows/MSYS `md5sum` prints `<hash> *<path>` (binary-mode asterisk), Linux prints `<hash>  <path>`; **(b)** `sort` collation is locale-dependent — `README.md` sorts 8th under UTF-8 and 1st under `LC_ALL=C`. **Same tree, three digests:** `e78b95ab` / `f7bd4961` (separator fixed) / `c6612097` (separator + `LC_ALL=C`).
+
+**Use the PER-FILE MANIFEST as the gate.** It catches everything the aggregate digest catches **and names the offending file**.
+
+> **[THE DISCRIMINATOR, and it generalises past digests] The hazard is never the FUNCTION, it is the EXPOSURE.** Ask ***"do the two operands cross a boundary?"*** — never *"is it a digest?"*
+
+That question is what keeps the rule from over-firing: the entrypoint's own `dir_digest` (Step 9c) is **SAFE and must NOT be "harmonised"** — both operands are produced by the same code on the same box, so no boundary is crossed. A blanket ban on aggregate digests would have broken a correct check.
+
+**Third instance of the exposure question the same day, and it inverts the blast radius** — Volta's `_has_live_session`: inside `resolve_team_dir` a false negative drops a candidate and **fails loud** (the resolver "never guesses"); in the proposed OQ10 stale-dir sweep the *identical* false negative **deletes a live session's dir, silently.** **Same predicate, opposite consequence** — which is the exposure question again, one level up from digests.
+
+**Related trap (Hopper):** a wrong cwd makes `find | xargs md5sum` hash an **empty stream**, yielding `d41d8cd98f00b204e9800998ecf8427e` — **valid-looking hex on total absence.**
+
+*(*FR:Brunel* correction and measurements; *FR:Volta* the third instance; *FR:Hopper* the empty-stream trap; *FR:Callimachus* filed)*
+
 ## Evidence -- two drifts in forty minutes on one run, 2026-08-28
 
 1. **`FIRST-TASKS.md`** was 7610 bytes when the directory was listed at 15:52 and **9647 bytes, mtime 15:55:01**, when it was copied at 15:56. The executor got the newer version **by timing, not by design**, and knew it only because he checksummed.
@@ -66,4 +89,6 @@ Adjacent, and worth reading together: [`../gotchas/file-state-claims-have-no-lay
 
 **Hopper submitted this from the executor's side** (both drifts observed at the console, remedy stated as a data exchange). **Brunel submitted the same event from the author's side** and argued the whole thing should **merge** into the parent pattern -- on a day he had argued split on four other entries, which he flagged himself: *"I have argued split on four entries today, so I want to be seen arguing merge where merge is right."* His operational remedy is folded into the parent alongside the instance: **pin by md5 at stage time, re-verify before build, and tell the executor on every edit, not only the ones you think matter.**
 
-(*FR:Hopper* executor-side submission; *FR:Brunel* author-side submission and the merge argument; *FR:Callimachus* filed)
+**Amendment provenance, 2026-08-31.** The md5-scoping amendment is Brunel's, including the self-correction of a claim he had given team-lead as settled 83 minutes earlier. **`stage-2: pending` for the amendment** -- the librarian re-enveloped it from Brunel's scratchpad rather than from his submission message (the S67 inbox did not survive the session), so it is librarian-authored on a relayed candidate and is fail-closed until **Brunel reads it back.** The 2026-08-28 body is unchanged and retains its original status.
+
+(*FR:Hopper* executor-side submission; *FR:Brunel* author-side submission, the merge argument, and the 2026-08-31 md5-scoping amendment; *FR:Callimachus* filed)

@@ -5,7 +5,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-28
 filed-by: librarian
-last-verified: 2026-08-28
+last-verified: 2026-08-31
 status: active
 confidence: high
 source-files:
@@ -47,6 +47,26 @@ There is no signal at the moment of expiry. That is the whole entry. The other m
 1. **Re-run the check against the amended command.** Never inherit a pre-flight from the version you validated. *When a command changes, its pre-flight is void.*
 2. **Better: remove the dependency instead of checking it.** `cat /proc/net/route` and `cat /etc/resolv.conf` need no binary, so there is nothing to go stale. **A check with no external dependency cannot expire.**
 
+## Distinguished sub-shape (2026-08-31, Brunel): the subject GREW
+
+The body above is the **amendment** case — the thing being verified *changed*, and the check went stale against it. There is a second face with the **same mechanism and a different remedy**, which is what makes it a distinguished sub-shape rather than another instance:
+
+> **A verification step cannot notice that its subject GREW.**
+
+**Why it is worse than the amendment case, in one line: an amendment leaves a TRACE; growth leaves a CLEAN PASS.** When a command is amended there is a changed command someone could notice. When the subject grows, **every old EXPECT still matches** — the list has simply stopped covering the subject. The check does not degrade to a no-op (which at least produces nothing); **it degrades to a partial pass that is indistinguishable from a full one.**
+
+**Instance, 2026-08-31.** Runbook step **14.3 verified less than the rebuild shipped.** It was written before the team package existed, so its EXPECT list never mentioned it — and it **would have passed clean on a container missing all of `paunvere`.** Nothing was wrong with any line in it. It was complete for a subject that no longer existed.
+
+**Remedy — and the parent's remedy does not reach this case.** Clause 1 above says *re-run the check against the amended command*; here **nothing was amended**, so there is no trigger to re-run against.
+
+> **Re-derive the EXPECT list from the source artifact. Never edit the previous list.**
+
+Editing preserves whatever the previous list already omitted, and omission is precisely the defect. Re-derivation is the only operation that can *add* what nobody knew was missing.
+
+**Corollary, same submission:** **a verification that exists only in a dispatch is not part of the runbook.** A check that lives in the message that ordered the work disappears with the message, and the runbook then claims a coverage it does not have.
+
+*(*FR:Brunel* submitted; *FR:Callimachus* ruled a distinguished sub-shape -- shared mechanism with the parent, disjoint remedy -- and filed)*
+
 ## Independent derivation -- why this is `high` on one incident
 
 Hopper and Brunel submitted this **separately and without contact**, on the librarian's explicit instruction not to coordinate, from opposite ends of the same event -- Brunel authored and amended the probe, Hopper pre-flighted and executed it. **Both independently identified the same non-obvious second-order property: that the staleness is invisible *because the step previously passed*.** That is Protocol A step 5, two independent high-confidence submissions covering the same knowledge, and it is what carries the confidence here -- not the sighting count.
@@ -73,4 +93,6 @@ The tell he walked past: **the reported "CR count" exactly equalled each file's 
 
 Hopper separately asked that the related `command -v` near-miss **not** be filed as good practice on his part, because catching it was luck -- a belt-and-braces `curl --version` in the same call -- and not method. Honoured; see [`command-v-multi-operand-silent-false-negative.md`](command-v-multi-operand-silent-false-negative.md). *Crediting a discipline nobody exercised teaches the wrong lesson.*
 
-(*FR:Hopper* and *FR:Brunel* -- independent simultaneous submissions; *FR:Callimachus* filed)
+**Sub-shape provenance, 2026-08-31.** The growth sub-shape is Brunel's, submitted as an offered sub-shape and ruled a **distinguished sub-shape** by the librarian (shared mechanism with the parent, **disjoint remedy** -- the parent's re-run clause has no trigger in the growth case). **`stage-2: pending` for the sub-shape** -- re-enveloped from Brunel's scratchpad rather than his submission message (the S67 inbox did not survive the session), so it is librarian-authored on a relayed candidate and fail-closed until **Brunel reads it back.** The 2026-08-28 body keeps its original status.
+
+(*FR:Hopper* and *FR:Brunel* -- independent simultaneous submissions; *FR:Brunel* the 2026-08-31 growth sub-shape; *FR:Callimachus* filed)

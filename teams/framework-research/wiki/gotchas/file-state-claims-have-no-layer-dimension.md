@@ -5,7 +5,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-19
 filed-by: librarian
-last-verified: 2026-08-19
+last-verified: 2026-08-31
 status: active
 source-files:
   - teams/framework-research/wiki/gotchas/cards/fabricated-timestamps-destroy-ordering-not-just-accuracy.md
@@ -19,6 +19,7 @@ related:
   - ../patterns/three-layer-substrate-truth-discipline.md
   - singular-convention-plural-instances-enumerate-from-the-registry.md
   - session-wake-on-inbox-write-two-unstamped-claims-contradict.md
+  - authorization-has-no-slot-for-executability.md
 ---
 
 # "The File Says X" Has No Slot for Which Layer
@@ -92,11 +93,13 @@ Recorded rather than softened, because it is the ordinary way this gap opens. Th
 
 ## Family note -- the no-slot forms, and the standing ruling against an umbrella
 
-This entry is the hub of a recurring shape: **a claim whose noun silently lacks a dimension, which each writer fills with their own instance.** Six forms as of 2026-08-27, each with its own remedy: (1) a sentinel with no slot in the consumer schema ([`self-report-obligation-void-without-a-slot-in-the-consumer-schema.md`](self-report-obligation-void-without-a-slot-in-the-consumer-schema.md)); (2) one token carrying two meanings (`pending`, in [`../process/stage-2-confirms-filing-gate.md`](../process/stage-2-confirms-filing-gate.md)); (3) *"the file says X"* with no slot for which layer (this entry); (4) one field doing two axes' work (`confidence`, per the promotion-criterion rewrite); (5) *"the hub"* with no slot for which instance ([`singular-convention-plural-instances-enumerate-from-the-registry.md`](singular-convention-plural-instances-enumerate-from-the-registry.md)); (6) *"a session wakes"* with no slot for CLI version or cell ([`session-wake-on-inbox-write-two-unstamped-claims-contradict.md`](session-wake-on-inbox-write-two-unstamped-claims-contradict.md)).
+This entry is the hub of a recurring shape: **a claim whose noun silently lacks a dimension, which each writer fills with their own instance.** **Eleven forms as of 2026-08-31**; the first six, as of 2026-08-27, each with its own remedy: (1) a sentinel with no slot in the consumer schema ([`self-report-obligation-void-without-a-slot-in-the-consumer-schema.md`](self-report-obligation-void-without-a-slot-in-the-consumer-schema.md)); (2) one token carrying two meanings (`pending`, in [`../process/stage-2-confirms-filing-gate.md`](../process/stage-2-confirms-filing-gate.md)); (3) *"the file says X"* with no slot for which layer (this entry); (4) one field doing two axes' work (`confidence`, per the promotion-criterion rewrite); (5) *"the hub"* with no slot for which instance ([`singular-convention-plural-instances-enumerate-from-the-registry.md`](singular-convention-plural-instances-enumerate-from-the-registry.md)); (6) *"a session wakes"* with no slot for CLI version or cell ([`session-wake-on-inbox-write-two-unstamped-claims-contradict.md`](session-wake-on-inbox-write-two-unstamped-claims-contradict.md)).
 
 **Two forms added 2026-08-28:** (7) *"the `100.x` address"* with no slot for **which overlay** ([`warp-cgnat-address-misread-as-tailscale.md`](warp-cgnat-address-misread-as-tailscale.md)) -- **WITHDRAWN from the family the same day (Brunel): nothing collides.** `100.96.54.170` is unambiguous, one host, one overlay; **what fails is an inference from a property of the identifier**, not a missing dimension in it. Its real sibling is [`authorized-keys-comment-is-not-evidence-of-ownership.md`](authorized-keys-comment-is-not-evidence-of-ownership.md) -- *an attribute that correlates with the answer but does not determine it.* **Listing kept, annotated rather than deleted: this note records what was thought as well as what is true, and a silently removed form is a form someone re-proposes.**; (8) a record stating a conclusion **and** the mechanism offered for it, carrying **one truth-value slot for two claims** ([`right-conclusion-does-not-certify-its-mechanism.md`](right-conclusion-does-not-certify-its-mechanism.md)).
 
 **Two more forms added 2026-08-28 from the same batch:** (9) *"the image"* with no slot for **which host** -- one tag, two digests ([`image-tag-does-not-identify-the-image-across-hosts.md`](image-tag-does-not-identify-the-image-across-hosts.md)); (10) *"port 2230 is taken"* with no slot for **which host** ([`tcp-ports-are-a-per-host-namespace-no-fleet-uniqueness-invariant.md`](tcp-ports-are-a-per-host-namespace-no-fleet-uniqueness-invariant.md)).
+
+**Form 11 added 2026-08-31 (Volta):** *"the step is approved"* with no slot for **whether it is executable** ([`authorization-has-no-slot-for-executability.md`](authorization-has-no-slot-for-executability.md)). Authorization and executability are separate axes; an agent can be correctly authorized and still be blocked by the permission classifier. **Outside the 5/9/10 umbrella** -- nothing here is an identifier or a scope, so the umbrella's discriminating question (*does a scope-free identifier exist?*) does not apply, and folding it in would recreate the one-token-N-remedies defect. **Read its anti-friction foreclosure before citing it:** both instances are an agent authorized, blocked, and *correctly declining to route around*, and a friction reading inverts the entry into a manual for permission laundering.
 
 ## [REVISIT TRIGGER MET, AND RULED IN -- the umbrella is FILED. Team-lead, 2026-08-28.]
 
