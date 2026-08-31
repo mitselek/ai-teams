@@ -40,21 +40,61 @@ they have information this runbook does not; find out what before building.
 
 ## Step 1 -- Stage the directory (Tier M, reversible)
 
+### DERIVE the build-input list; do not read it from this runbook
+
+**This step no longer enumerates what to copy.** Twice now an item was added to the image and forgotten
+in staging (`FIRST-TASKS.md`, then `teams/paunvere/`), because both read as *content* rather than as
+build inputs. That is not a memory problem, it is structural: **two lists that must agree will
+eventually disagree.** So generate the authoritative half from the file that consumes it:
+
 ```bash
-mkdir -p /home/dev/joosep && cd /home/dev/joosep
-# Copy ALL FIVE build-context files from designs/new/joosep/ in the checkout:
-#   docker-compose.yml  Dockerfile  entrypoint.sh  FIRST-TASKS.md  .env.example
-# plus the launcher:
-#   joosep.sh
-# THEN take the WARP CA from the host into the build context (7th file):
-cp /usr/local/share/ca-certificates/managed-warp.pem ./warp-ca.pem
-chmod +x joosep.sh entrypoint.sh
-ls -la
+cd <checkout>/designs/new/joosep
+grep -E '^(COPY|ADD) ' Dockerfile        # <- THE build-input list, by definition
 ```
 
-**EXPECT** all seven present: `docker-compose.yml`, `Dockerfile`, `entrypoint.sh` (executable),
-**`FIRST-TASKS.md`**, **`warp-ca.pem`**, `joosep.sh` (executable), `.env.example`. No `.env` yet, no
+Everything named there must reach the build context. **Both items ever missed are in that set**, and
+the three that have never been forgotten (`docker-compose.yml`, `joosep.sh`, `.env.example`) are
+host-side operational files that obviously belong to "the deployment" — which is why they never went
+astray. *(Structural fix proposed and pre-verified by Hopper, 2026-08-31.)*
+
+```bash
+mkdir -p /home/dev/joosep && cd /home/dev/joosep
+# 1. Build inputs, per the grep above -- currently:
+#      entrypoint.sh   FIRST-TASKS.md   teams/paunvere/   warp-ca.pem
+#    (warp-ca.pem is NOT in the repo -- see the note below)
+# 2. Host-side operational files, not COPYed into the image:
+#      docker-compose.yml   joosep.sh   .env.example
+# 3. The CA, sourced from the HOST:
+cp /usr/local/share/ca-certificates/managed-warp.pem ./warp-ca.pem
+chmod +x joosep.sh entrypoint.sh
+ls -la; ls -R teams/paunvere/
+```
+
+**EXPECT** every path from the grep present, plus the three operational files. No `.env` yet, no
 `authorized_keys` yet.
+
+**STOP** if any grep-named path is missing — do not start the build and discover it at that layer.
+
+> **`warp-ca.pem` is NOT in the repo.** It exists only on the host, created from
+> `/usr/local/share/ca-certificates/managed-warp.pem`. That is correct by design and matches `allerk`,
+> but it means **a fresh checkout yields one fewer file than the manifest lists**, and anyone comparing
+> counts will be briefly convinced something is missing. Host md5 `7b4474e7dfcd55681a216ab64f5bbd33`;
+> verified 2026-08-28 as byte-identical to the host source and a genuine CA
+> (`CN=Gateway CA - Cloudflare Managed G1…`, valid to 2029).
+
+> **Verifying the team package needs a DIRECTORY check, not per-file md5s.** Everything else in this
+> runbook is verified by exchanging per-file md5s; `teams/paunvere/` is **10 files across two levels**,
+> and a single `scp -r` can land nine of ten with nothing reporting it. Verify local-vs-remote with a
+> digest **and** keep the per-file manifest, because a digest tells you *that* something differs and
+> never *what*:
+>
+> ```bash
+> find teams/paunvere -type f | sort | xargs md5sum | md5sum   # digest
+> find teams/paunvere -type f | sort | xargs md5sum            # manifest, names the offender
+> ```
+>
+> Recompute both at freeze time rather than trusting any value written here — this tree moved four
+> times on 2026-08-31 alone.
 
 > **`warp-ca.pem` added 2026-08-28** after the Claude-install layer failed on TLS. The entrypoint
 > installs this CA at *runtime*, which is too late for the build — the Claude installer is
@@ -523,11 +563,26 @@ the entrypoint seeded and **nobody has edited it**.
 English copy is now carrying his notes. Do not remove it; tell Brunel and the update becomes a
 side-by-side (`/opt/FIRST-TASKS.md` stays available for him to diff).
 
-If untouched:
+If untouched — **displace it, do not delete it** (Hopper's substitution, 2026-08-31):
 
 ```bash
-docker exec --user joosep joosep rm ~/FIRST-TASKS.md
+docker exec --user joosep joosep sh -c \
+  'md5sum ~/FIRST-TASKS.md; mv ~/FIRST-TASKS.md ~/FIRST-TASKS.md.superseded-$(date +%Y%m%d-%H%M%S)'
 ```
+
+> **Why `mv` and not `rm`.** Identical effect on the seed guard — the file is no longer at the guarded
+> path, so the fixed guard takes the install branch — but **reversible**, it leaves evidence of exactly
+> what was displaced, and it captures the md5 *before* the move rather than losing it with the file.
+>
+> An `rm` here would be an irreversible delete **on a persistent volume**, gated on a check about
+> someone else's possible work. The asymmetry is bad in one direction only: if the mtime gate is right,
+> `mv` costs one stale file that anyone can remove later; if the gate is somehow wrong — a path nobody
+> thought of, clock skew, an edit that did not move mtime — `rm` destroys work with no record and `mv`
+> costs nothing. **When a reversible form of an operation has the same effect, the irreversible one
+> needs a reason, and there is not one here.**
+>
+> This also lowers the operation's tier: a delete on a persistent volume argues for Tier D; a rename
+> that retains the file is plainly Tier M.
 
 **Why this step exists.** The entrypoint's seed guard deliberately never overwrites the user's copy, so
 his edits survive a rebuild. But the copy in place was created by **our own smoke test**, not by him —

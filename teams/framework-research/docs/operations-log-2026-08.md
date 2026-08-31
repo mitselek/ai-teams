@@ -459,3 +459,53 @@ No edits. **The comment column is the untrusted field** -- allerk's README docum
 **outcome** -- **partial; in flight.** Steps 0-4b complete and verified; Step 5 blocked on Brunel's third Dockerfile fix. No image beyond the defective 16:07 one (`2aedc7d8b9fd`, untouched); **no `joosep` container has ever existed**; no dangling images; nothing on the host modified outside `/home/dev/joosep/` except the one unsanctioned ephemeral container recorded above. Steps 6/6b/7/8 pending an image; **Step 9 is the PO's** (needs Joosep's private key, which I do not hold); **9d HELD** pending Aen's relay that Step 9 passed; Step 12 queued for last by design ("everything reversible happens before anything that touches a file we do not own"); Step 13 draft-only. **Session tier totals: 1 sanctioned Tier M (bridge probe), 1 UNSANCTIONED Tier M (above), 0 Tier D.**
 
 (*FR:Hopper*)
+
+### 2026-08-31T08:23+03:00 -- Step 9 runnable half + three-day health re-check (Tier R) -- SESSION CLOSE
+
+**timestamp** -- 2026-08-31T08:23+03:00 dispatch; execution 08:24-08:47.
+
+**tasker** -- Aen. Step 9's auth half needs Joosep's private key (not ours), so run the half runnable from this box, all Tier R: (1) off-host reachability + host-key check; (2) three-day container health re-check; (3) report both, then hand the PO the literal commands for the auth half.
+
+**tier / sanction** -- R throughout, default-permitted. **Zero mutation on any substrate, including this workstation.**
+
+**deployed-artifacts-read declaration** -- Layer 1: runbook Step 9 (9a/9b/9c) and Step 8 re-read for the exact expectations relayed to the PO. Layer 3: `docker ps -a`, `docker inspect joosep`, `docker logs joosep` (post-`Ready.` tail + auth-attempt grep), `docker exec joosep cat /etc/ssh/keys/ssh_host_ed25519_key.pub`, `docker system df -v` volume rows, mount table. Host: `uptime`, `/sys/power/suspend_stats/success`, `df -hT /home`, sibling census. Client side: `ssh-keyscan`, `ssh -v` against 2231.
+
+**RESULT 1 -- off-host reachability and host key: PASS on every leg.**
+```
+debug1: Connecting to 100.96.54.170 [100.96.54.170] port 2231.
+debug1: Server host key: ssh-ed25519 SHA256:C8qVyjSQuyiSXPzEBcIOh2tfUwlk9EJtU2WxhAEbO3U
+debug1: Host '[100.96.54.170]:2231' is known and matches the ED25519 host key.
+debug1: Authentications that can continue: publickey
+debug1: Offering public key: .../id_ed25519 ED25519 SHA256:t43NTA+mJ8BeJxYVRMQAU2eBkgIZz32tiiK/5/8I4dU
+debug1: No more authentication methods to try.
+joosep@100.96.54.170: Permission denied (publickey).      [exit 255]
+```
+Port reachable from the Windows workstation over WARP; sshd `OpenSSH_9.2p1 Debian-2+deb12u10`; host key matches under `StrictHostKeyChecking=yes`; **only `publickey` offered -- no password fallback**; denial as designed.
+
+**STRONGER THAN THE EXPECTED DENIAL, and this is the finding:** `SHA256:t43NTA+…` is **the PO's own key** -- the one holding `dev` access on the host. **The container was offered a key with host-level `dev` rights and refused it.** That is positive evidence the container's `authorized_keys` honours Joosep's key only and that host access does not leak into container access -- it *exercises* the design's scoping claim rather than assuming it. Independent second angle: `ssh-keyscan -t ed25519 -p 2231` returns a key whose fingerprint matches the container's own `ssh_host_ed25519_key.pub` byte-for-byte.
+
+**TWO DELIBERATE METHOD CHOICES, both recorded because either would be a defect if unstated.**
+1. **Did NOT seed `~/.ssh/known_hosts`.** Used a throwaway `UserKnownHostsFile` in the session scratchpad plus `GlobalKnownHostsFile=/dev/null`. Same proof; **no write to the PO's SSH config**, a file on the Windows workstation and outside the Operator's remit. Nothing on this box was modified. Substitution disclosed to the tasker rather than performed silently.
+2. **The obvious implementation of this test is circular and was avoided.** Seeding `known_hosts` from `ssh-keyscan` output and then connecting proves only that the server is **consistent with itself** -- it would pass against *any* host key, including a wrong one. Seeded instead from the authoritative source (`docker exec joosep cat /etc/ssh/keys/ssh_host_ed25519_key.pub`, read via the host), which makes the keyscan a genuinely independent check rather than the basis of the first. **The tasker's phrasing was correct; a careless execution of it produces a green result that verifies nothing.**
+
+**RESULT 2 -- three-day health: clean, no drift.** `joosep` **Up 2 days**, `RestartCount=0`, `OOMKilled=false`, `ExitCode=0`, `StartedAt=2026-08-28T14:02:29Z` -- never restarted. **Nothing in the log after `[entrypoint] Ready.`** -- no warnings, no errors, no output at all since boot. **Zero connection attempts**, so the auth half remains unrun. Volumes: `joosep_home` 223.6 MB, `joosep_sshd` 3.659 kB, **`joosep_work` 0 B** -- correct, since no PAT means no clones (task 1 of `FIRST-TASKS.md`). Sibling census unchanged; `/home` 232 G free. **Suspend watch: host `up 27 days`, `/sys/power/suspend_stats/success` still `4`** -- the S67 mask has now held twenty-seven days under continuous load, against the thirty-five minutes of evidence it was originally accepted on.
+
+**SELF-CAUGHT DEFECT, first pre-emption rather than post-mortem.** My first read of the ssh exit status took it after a `grep` pipeline and returned `0`. Caught **before reporting**, re-run capturing the status directly: **255**. This is the fourth instance this week of a pipe reporting the wrong command's status and the first I have stopped in my own command rather than found in someone else's artifact.
+
+**HANDED TO THE TASKER FOR THE PO** -- fingerprint `SHA256:C8qVyjSQuyiSXPzEBcIOh2tfUwlk9EJtU2WxhAEbO3U` to give Joosep before first connect, plus the three verbatim 9a/9b/9c commands and their STOP conditions (9a dropping into tmux = bare mode dead; 9b `claude: command not found` = the Step 6 PATH check was passed over; 9c must attach without `creating one`).
+
+**outcome** -- success, both items. **Everything provable from this side is now proven; the only unproven leg is the one requiring Joosep's private key.** I will not report Step 9 as passed on my own evidence because I will have none.
+
+---
+
+### SESSION CLOSE 2026-08-31T09:13+03:00 -- state handed forward
+
+**Delivered this session:** RC host survey; the `allerk`-over-apex template finding that reshaped the design; four Brunel premise corrections and one tasker method correction, all accepted; a PO-sanctioned Tier M bridge probe that closed `[PO-2]`; the `joosep` container built and live after four build attempts surfacing three pre-existing defects; Step 9's runnable half; and eight wiki entries filed or amended through Callimachus.
+
+**Tier totals: 1 sanctioned Tier M (bridge probe), 1 UNSANCTIONED Tier M (self-reported, ruled no-consequence), 0 Tier D.** No Tier D operation was executed this session.
+
+**THREE ITEMS HELD, none of them mine to start.** (1) **Step 9d, Tier D** -- re-sanctioned as D at my refusal of the runbook's M label; blocked until the tasker relays that 9a-9c passed, because revoking host access before container access is proven leaves the colleague with neither. (2) **Rebuild** -- five staged files stale plus a new `teams/paunvere/` tree, all md5-pinned; sequence and STOPs recorded in the scratchpad header. (3) **Step 12 registry rows including Lerko's** -- sanctioned, ordered last by design because it is the one file in this run we do not own.
+
+**If a future session finds these gone: they were never declined on technical grounds. Do not re-open them as stale or re-litigate the design.**
+
+(*FR:Hopper*)
