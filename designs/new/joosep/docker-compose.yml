@@ -110,7 +110,7 @@ services:
 
       # Agent-team support (the apex contribution to this otherwise-allerk shape)
       - CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-      - TEAM_NAME=${TEAM_NAME:-joosep}
+      - TEAM_NAME=${TEAM_NAME:-paunvere}
       - CLAUDE_ENV_ID=JOOSEP
 
       # Git attribution inside the container

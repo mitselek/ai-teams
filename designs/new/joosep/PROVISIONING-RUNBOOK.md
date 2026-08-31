@@ -505,6 +505,69 @@ clone on that boot. No rebuild.
 
 ---
 
+## Step 14 -- PENDING REBUILD: Estonian FIRST-TASKS + team rename to `paunvere` (Tier M)
+
+**Not part of initial provisioning. HELD until Joosep's Step 9a-9c auth test passes** — do not move the
+target under him mid-test. One operation delivers both changes.
+
+### 14.1 -- Re-seed check, and the reason it is not just a `cp`
+
+```bash
+docker exec --user joosep joosep ls -l --time-style=full-iso ~/FIRST-TASKS.md
+```
+
+**EXPECT:** an mtime equal to the container's first boot (2026-08-28 ~17:04) — i.e. the file is the one
+the entrypoint seeded and **nobody has edited it**.
+
+**STOP if the mtime is later than first boot.** That means Joosep has started working in it, and the
+English copy is now carrying his notes. Do not remove it; tell Brunel and the update becomes a
+side-by-side (`/opt/FIRST-TASKS.md` stays available for him to diff).
+
+If untouched:
+
+```bash
+docker exec --user joosep joosep rm ~/FIRST-TASKS.md
+```
+
+**Why this step exists.** The entrypoint's seed guard deliberately never overwrites the user's copy, so
+his edits survive a rebuild. But the copy in place was created by **our own smoke test**, not by him —
+the guard cannot tell those apart from the file's existence alone. Left as is, the rebuild would ship
+the Estonian version to `/opt`, refuse to install it, and Joosep would read the superseded English file
+indefinitely with nothing reporting a fault. (The entrypoint now records a seed-md5 stamp so future
+versions self-resolve; this container predates the stamp, which is why it needs the one manual removal.)
+
+### 14.2 -- Rebuild and recreate
+
+```bash
+cd /home/dev/joosep
+# re-stage entrypoint.sh + FIRST-TASKS.md from the checkout, verify md5s first
+./joosep.sh build
+# add to .env:   TEAM_NAME=paunvere
+./joosep.sh restart
+```
+
+`TEAM_NAME` needs **no rebuild** on its own — it is a compose default overridden by `.env` — but
+compose re-reads `.env` only on a **recreate**, which `./joosep.sh restart` performs and a plain
+`docker restart` does not. It rides along here to keep it to one operation.
+
+### 14.3 -- Verify
+
+```bash
+docker logs joosep 2>&1 | grep -i first-tasks
+docker exec --user joosep joosep head -3 ~/FIRST-TASKS.md
+docker exec --user joosep joosep bash -lc 'echo $TEAM_NAME'
+```
+
+**EXPECT:** `seeded ~/FIRST-TASKS.md (first boot).`; the file opens in Estonian
+(`# Esimesed ülesanded`); `paunvere`.
+
+**STOP** on the `NOTE: ~/FIRST-TASKS.md differs...` line — that means 14.1 did not run, and the English
+copy is still in place.
+
+**Unchanged by the rename, deliberately:** the container dir, the container name, **and the tmux session
+name** — all stay `joosep`. So `Connect-Joosep`, `Connect-Joosep -Session` and the registry `tmux` field
+do not move. The team name lives only inside the container.
+
 ## Rollback
 
 Fully reversible up to Step 11. Nothing here modifies another container, another volume, or any host

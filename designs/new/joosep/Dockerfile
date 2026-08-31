@@ -238,6 +238,15 @@ RUN chmod +x /entrypoint.sh
 # diff against.
 COPY FIRST-TASKS.md /opt/FIRST-TASKS.md
 
+# The team package (roster, common-prompt, startup, prompts) -- pristine copy.
+# The entrypoint copies it to ~/work/paunvere/ on first boot and re-seeds it
+# only while untouched, same discipline as FIRST-TASKS.md.
+#
+# Without this the container boots with an onboarding document and no team to
+# onboard: FIRST-TASKS task 4 tells Joosep to run `claude` in ~/work and let
+# Minot read paunvere/startup.md, and neither would exist.
+COPY teams/paunvere /opt/teams/paunvere
+
 WORKDIR /home/joosep/work
 
 # SSH only. This team reads and reports; it does not serve.

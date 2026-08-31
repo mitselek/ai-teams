@@ -10,13 +10,19 @@
 #   3  env vars into .bashrc (compose env does not reach SSH shells)
 #   4  git identity
 #   5  clone/pull repos -- ALL NON-FATAL
-#   6  Jira MCP server build -- NON-FATAL
-#   7  ~/.claude/settings.json + mcp.json (first run only)
+#   7  ~/.claude/settings.json (no mcp.json -- Atlassian is the EVR connector)
 #   8  ~/.claude.json durable backup/restore
 #   9  tmux config + the joosep-session launcher
+#   9b seed ~/FIRST-TASKS.md          (seed-stamp: re-seed only while untouched)
+#   9c seed ~/work/<team>/            (same discipline, directory digest) + local git
+#   9c2 generate ~/work/CLAUDE.md     (points the parent session at the team)
 #  10  sshd host keys (persistent volume) + sshd start
 #  11  validation gates
 #  12  drop privileges and exec
+#
+# Step 6 (Jira MCP server build) was REMOVED when the EVR Atlassian connector
+# replaced the local stdio server. Numbering is left with the gap rather than
+# renumbered, so existing references in the runbook stay valid.
 #
 # DESIGN NOTE -- what is deliberately ABSENT: the `.bashrc` auto-tmux hook used
 # by backlog-triage/hr-devs. That hook fires on `[ -z "$TMUX" ] && [ -n
@@ -132,7 +138,7 @@ declare -A SHELL_VARS=(
     [LANG]="en_US.UTF-8"
     [LC_ALL]="en_US.UTF-8"
     [CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS]="${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-1}"
-    [TEAM_NAME]="${TEAM_NAME:-joosep}"
+    [TEAM_NAME]="${TEAM_NAME:-paunvere}"
     [CLAUDE_ENV_ID]="${CLAUDE_ENV_ID:-JOOSEP}"
     [GITHUB_TOKEN]="${GITHUB_TOKEN:-}"
     [TERM]="xterm-256color"
@@ -362,6 +368,84 @@ else
             echo "[entrypoint]       takes the newer one; diff them first if unsure."
         fi
     fi
+fi
+
+# ── Step 9c: seed the team package into ~/work/ ───────────────────────────────
+# Same seed-stamp discipline as FIRST-TASKS.md, applied to a DIRECTORY: record a
+# digest of what we installed, re-seed only while the user's copy still matches
+# it, never clobber edits. The prompts and roster are theirs to tune once work
+# starts, and a rebuild must not revert that.
+#
+# The digest is a sorted md5 of every file, so it catches an edit to any prompt,
+# not just a changed file count.
+TEAM_SRC="/opt/teams/${TEAM_NAME:-paunvere}"
+TEAM_DST="${WORK}/${TEAM_NAME:-paunvere}"
+TEAM_STAMP="${CLAUDE_DIR}/.team-package.seeded.md5"
+
+dir_digest() {
+    find "$1" -type f -exec md5sum {} \; 2>/dev/null \
+        | sed "s| $1/| |" | sort | md5sum | cut -d' ' -f1
+}
+
+if [ ! -d "$TEAM_SRC" ]; then
+    echo "[entrypoint] ERROR: ${TEAM_SRC} is MISSING from the image."
+    echo "[entrypoint]        The Dockerfile should COPY the team package. Joosep has an"
+    echo "[entrypoint]        onboarding doc but no team to onboard until this is fixed."
+else
+    SRC_DIGEST=$(dir_digest "$TEAM_SRC")
+    if [ ! -d "$TEAM_DST" ]; then
+        install -d -m 755 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" "$TEAM_DST"
+        cp -r "${TEAM_SRC}/." "${TEAM_DST}/"
+        chown -R "${CONTAINER_UID}:${CONTAINER_GID}" "$TEAM_DST"
+        printf '%s\n' "$SRC_DIGEST" > "$TEAM_STAMP"
+        chown "${CONTAINER_UID}:${CONTAINER_GID}" "$TEAM_STAMP"
+        echo "[entrypoint] seeded ${TEAM_DST} (first boot)."
+    else
+        DST_DIGEST=$(dir_digest "$TEAM_DST")
+        SEEDED_DIGEST=$(cat "$TEAM_STAMP" 2>/dev/null || echo "")
+        if [ "$DST_DIGEST" = "$SRC_DIGEST" ]; then
+            :   # current
+        elif [ -n "$SEEDED_DIGEST" ] && [ "$DST_DIGEST" = "$SEEDED_DIGEST" ]; then
+            cp -r "${TEAM_SRC}/." "${TEAM_DST}/"
+            chown -R "${CONTAINER_UID}:${CONTAINER_GID}" "$TEAM_DST"
+            printf '%s\n' "$SRC_DIGEST" > "$TEAM_STAMP"
+            chown "${CONTAINER_UID}:${CONTAINER_GID}" "$TEAM_STAMP"
+            echo "[entrypoint] team package was untouched and a newer version shipped -- re-seeded."
+        else
+            echo "[entrypoint] NOTE: ${TEAM_DST} differs from the shipped ${TEAM_SRC} and is not the"
+            echo "[entrypoint]       version this container seeded -- leaving it alone. Compare with"
+            echo "[entrypoint]       'diff -r ${TEAM_SRC} ${TEAM_DST}' if you want the newer one."
+        fi
+    fi
+
+    # Local git, no remote: gives the team a history of its own prompt edits and
+    # makes 'what did we change' answerable without a server.
+    if [ ! -d "${TEAM_DST}/.git" ]; then
+        gosu "${CONTAINER_USER}" git -C "$TEAM_DST" init --quiet 2>/dev/null \
+            && gosu "${CONTAINER_USER}" git -C "$TEAM_DST" add -A 2>/dev/null \
+            && gosu "${CONTAINER_USER}" git -C "$TEAM_DST" -c commit.gpgsign=false \
+                 commit -q -m "seed: team package as shipped" 2>/dev/null \
+            && echo "[entrypoint] initialised local git in ${TEAM_DST} (no remote)."
+    fi
+fi
+
+# ── Step 9c2: ~/work/CLAUDE.md -- points the parent session at the team ────────
+# Generated, not COPYed, so it follows TEAM_NAME. Guarded-create: if Joosep has
+# written his own, leave it.
+WORK_CLAUDE="${WORK}/CLAUDE.md"
+if [ ! -f "$WORK_CLAUDE" ]; then
+    cat > "$WORK_CLAUDE" << CLAUDEMD_EOF
+# CLAUDE.md -- ${TEAM_NAME:-paunvere}
+
+**Sina oled Minot**, tiimi \`${TEAM_NAME:-paunvere}\` juht. Loe esimese asjana
+\`${TEAM_NAME:-paunvere}/startup.md\` -- seal on kogu käivitusprotseduur ja tiimi kirjeldus.
+
+Joosepi enda juhend on \`~/FIRST-TASKS.md\`.
+
+Ära spawni ühtegi agenti ilma ülesandeta.
+CLAUDEMD_EOF
+    chown "${CONTAINER_UID}:${CONTAINER_GID}" "$WORK_CLAUDE"
+    echo "[entrypoint] created ${WORK_CLAUDE}."
 fi
 
 # ── Step 10: sshd host keys + start ───────────────────────────────────────────
