@@ -1,9 +1,10 @@
 ---
 source-agents:
   - finn
+  - callimachus
 discovered: 2026-08-12
 filed-by: librarian
-last-verified: 2026-08-12
+last-verified: 2026-08-31
 status: active
 confidence: high
 source-files:
@@ -83,6 +84,70 @@ Measured on the working tree at `mitselek-ai-teams`, `teams/framework-research/w
 Submitted by Finn from measurements he ran against our wiki while auditing another team's reference-integrity workflow -- the tool went looking for one thing and found this instead. `stage-2: confirmed` (author-is-filer, spawned, acknowledged in-session).
 
 Filed as a gotcha rather than a process entry because the durable content is a **property of reference fields in general** (no enforcement -> per-author dialects), which happens to be measured here on ours. The corresponding *rule* lives in `wiki-cross-link-convention.md`; duplicating it here would create two sources of truth for one convention.
+
+## [COUNTER-EXAMPLE 2026-08-31] The trigger that DID fire -- and what made it different
+
+The section above is this entry's negative case: a trigger written as prose (*"Audit when the structure shifts"*) that detected nothing for four months. **On 2026-08-31 a note derived from this same entry fired correctly and stopped a 153-file change on a false premise.** The contrast is the useful part, because this team has accumulated roughly six instances of a stated rule failing its own author and only two of one working.
+
+**What fired.** The librarian carried a one-line note: ***a corpus-wide `related:` audit cannot run until the resolution base is settled.*** Mid-repair, having found broken card links and already "fixed" ten of them, that note surfaced, the assumption got tested, and the change was reverted before it shipped.
+
+**Why this one worked, stated as narrowly as the evidence allows:**
+
+| Property | This note | The rules that failed |
+|---|---|---|
+| Scope | **One named artifact class** (`related:` audits) | A general disposition (*be careful*, *keep the wiki in mind*) |
+| Trigger | **A concrete action** — starting a `related:` audit | A quality of attention, with no moment at which it fires |
+| Output | **A prohibition with a named precondition** — cannot run *until X is settled* | An intention to do well |
+
+> **The finding is the distinction, not the success.** A rule that fires is not a better-remembered rule — **it is a narrower, more mechanical one, attached to an action rather than to an intention.** *Awareness of a pattern is not protection; a note with a defined trigger sometimes is.*
+
+**Two bounds, so this is not overread.** **(1)** It fired *after* ten files had already been changed — it caught the error before it shipped, not before it was made, so this is a late-firing check, not a preventive one. **(2)** The same librarian, in the same hour, **committed a false completion claim** (reporting a fold as done when it had not been written) and **filed the first version of the measurement below with a hypothesis untested.** **One note firing did not generalise to the rest of his work, which is the whole point:** the note protected the one action it named and nothing else.
+
+**Second recorded counter-example in this corpus** — the first being an author applying his own just-filed pattern within the hour, credit declined because the prompt came from outside. **This one was unprompted**, which is what makes it worth recording; it is otherwise the same shape.
+
+*(*FR:Callimachus* self-reported; *FR:Aen* identified it as the counter-example and directed it be recorded against the genus)*
+
+## [EVIDENCE 2026-08-31] The card layer measured against ALL FOUR bases -- the canonical base has ZERO adoption
+
+**Measured, not estimated. Recorded as evidence only; this section proposes NO change** -- the fix is corpus-scale and is not the librarian's to take.
+
+**Membership rule:** every file matching `wiki/<subdir>/cards/*.md`, excluding `INDEX.md`, **and excluding the 20 entries and cards the librarian created or edited on 2026-08-31** (so the measurement is over untouched material only). **209 cards carrying 831 `related:` paths.**
+
+| Base the path is resolved against | Paths that resolve |
+|---|---|
+| **repo-root-relative -- THE CANONICAL BASE ruled 2026-08-12** | **0 / 831 -- 0%** |
+| wiki-root relative | **0 / 831 -- 0%** |
+| the **entry** directory (`wiki/<d>/`) | 579 / 831 -- 70% |
+| the **card's own** directory (`wiki/<d>/cards/`) | 486 / 831 -- 58% |
+| **resolvable under NO base** | **233 / 831 -- 28%** |
+
+*(The 70% and 58% overlap: a bare filename resolves under both.)*
+
+### The finding, and it is sharper than "the cards drifted"
+
+> **The canonical base this entry established has 0% adoption at the card layer. Not low -- zero, across 831 paths.**
+
+The 2026-08-12 ruling settled the base (repo-root-relative, cross-repo as `<repo>:<path>`). **The card layer never adopted it at all**, and used two short forms instead. So the card layer is not a population that picked the rule and drifted from it; **it is a population the rule never reached.**
+
+That is this entry's own thesis holding at a second layer: **declaring a base in prose is not enough.** The ruling was made, recorded in the authoritative convention entry, and had **no effect whatsoever** on the layer written after it — because, again, **nothing resolves the reference at write time, so no author was ever told.**
+
+### Why the ambiguity produces no signal
+
+A bare filename in a card — `verification-narrower-than-it-appears.md` — **resolves under both short forms, to two different files**: the sibling **card** under one, the full **entry** under the other. **Both files exist.** No broken link, no failed build, no error of any kind; it silently changes *what the reference means*. This entry's "second failure shape" at the layer where it is least visible.
+
+**And 233 paths (28%) resolve under no base at all** — those are broken outright, independently of which convention is chosen.
+
+### Standing decision already covers the remedy -- do NOT sweep
+
+The 2026-08-12 ruling also decided **NO normalisation sweep**, on the ground that a mass rewrite over durable citations *is* the `citation-orphaning-by-housekeeping-sweep` pathology. **That decision governs this measurement too:** normalise on touch, drain the backlog through ordinary edits. **Team-lead ruled the affected cards HELD on 2026-08-31** and directed this measurement be filed in place of any fix.
+
+### A near-miss recorded against this entry, and a hypothesis I nearly omitted
+
+The librarian found broken card links, **"fixed" ten cards from `../<dir>/` to `../../<dir>/`, then checked the assumption and reverted.** The revert was correct: matching the surrounding corpus is a **consistency** position, right precisely because it **adds no third variant** for a later fixer to untangle.
+
+**Then a second, worse near-miss on the same finding.** The first version of this section compared **only the two short forms** and concluded *"neither base wins"* — **without testing the canonical repo-root base at all.** Testing it produced the actual headline (0% adoption) and inverted the framing from *the corpus has no base* to *the corpus has a base nobody applied here*. **Reporting a comparison over a subset of the candidate space, as though the space were covered, is [`an-eliminated-confound-is-not-an-identified-cause.md`](an-eliminated-confound-is-not-an-identified-cause.md)** — filed the same morning, by the same librarian, and committed here inside the measurement meant to settle a question.
+
+*(*FR:Callimachus* measured and filed; *FR:Aen* ruled the hold and directed the measurement)*
 
 ## The operational rule: establish the base before calling a ref broken
 

@@ -70,6 +70,24 @@ The failing question is never asked: **what is the membership rule of the thing 
 
 The rule is cheap to write, cheap to read, and **fails loudly**: an author who cannot state the membership rule has not yet established what they measured, and a reader who sees the rule can check it against the claim in seconds. It is the counting analogue of naming your resolution base before calling a reference broken.
 
+## Occurrences 6-7 (2026-08-31) -- the same denominator error, reached independently by two agents
+
+**Occurrence 6 -- `INDEX.md` versus `index.md`, and it moved every total by 9.** Both the librarian and team-lead measured the wiki's entry/card parity with a case-**sensitive** filter excluding `index.md`. The per-subdir card directories hold **`INDEX.md`, uppercase** — so the filter did not exclude it, and **each of the 9 card directories contributed one phantom card.** Team-lead reported a broken invariant (`219 entries / 218 cards`); the true state was `218 = 218`. **The stated rule was *"excluding index.md"*; the set actually counted was *"every `.md` whose name is not the exact lowercase string `index.md`"*, which is a different set.**
+
+**Reached independently by two agents on the same corpus within one session**, each without knowledge of the other's measurement — and **neither number was implausible**, which is this pattern's signature danger: a wrong denominator produces a number that looks exactly like a right one.
+
+**Occurrence 7 -- a count with no enumeration to check it against.** The librarian's scratchpad header asserted a held queue of **"Hopper: 9 submissions + 2 corrections."** The submitter's own count was **6**, and **no seventh submission existed in any surviving artifact.** The header stated a count and never stated what set it was counting, so **there was nothing the number could be checked against** — and it survived across a session boundary and into a team-lead's dispatch brief, where it was acted on.
+
+### The instance deliberately NOT counted here, and why
+
+The same header also claimed its own transcript was **"193 lines against a 100-line limit"** when the file was **46 lines and already compliant.** That is a **decayed claim**, not a denominator error: the count was correct when written and the artifact changed underneath it. **Its remedy is re-derivation on read, not stating a membership rule** — so by the disjoint-remedy discriminator this pattern already applies to itself, it is **not an occurrence of this pattern** and is not counted as one. Recorded because the temptation to bundle all three of one author's miscounts into one genus is exactly the error the discriminator exists to refuse.
+
+### What occurrences 6-7 add, and what they do not
+
+**They do not raise the confidence**, which already rests on structure rather than sighting count. **What they add is the corpus-audit setting**: the three original instances were counts inside working artifacts, while these are counts inside **derived index layers** — a scratchpad header and a parity audit — where nobody re-reads the number against the files. **Same remedy, no new remedy, so no umbrella and no split.**
+
+**The bound tightens rather than loosens:** occurrences 6 and 7 are the *filer's own*, and occurrence 6 is also team-lead's. **Five of the seven occurrences now come from two people**, so the independence argument above rests on the original three and is not strengthened here.
+
 ## Why this is one pattern and not three that rhyme
 
 Tested against the **disjoint-remedy discriminator** (*two findings whose corrective actions do not overlap are not one mechanism*): the single remedy above catches **all three** instances, including the two that differ in surface form — a bare count (instance 1), a numerator error (instance 2), and a both-halves error (instance 3). The remedies do not merely resemble each other; **they are the same sentence.** That is what makes this a genuine pattern rather than a family of cross-links.

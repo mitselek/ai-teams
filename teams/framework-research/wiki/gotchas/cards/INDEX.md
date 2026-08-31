@@ -1,6 +1,6 @@
 # gotchas/ -- Card Index
 
-73 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
+81 cards. Each card is a ~30-line extractive summary (TLDR + Key ideas) of the full entry one level up at `gotchas/<name>.md`. (*FR:Callimachus*)
 
 > **[INDEX-DRIFT REPAIR 2026-08-19]** This header read `42 cards` and the table was missing **three** rows. Two of them — `self-report-obligation-void-without-a-slot-in-the-consumer-schema` and `frontmatter-reference-field-without-enforced-resolution-base`, both filed 2026-08-12 — had complete entries **and** complete cards but **no row in this table and no row in the main `index.md`**, so they were unreachable from either index layer for a week. Both were filed late in that session, after its consistency pass had already run; **the pass verified a state the session then moved past.** Found on 2026-08-19 while indexing a new entry, by counting files on disk against the declared header rather than trusting it. [RULE] **a consistency pass is only valid for the state at the moment it ran — re-count at end of session, not mid-session**, and treat any subdir header count as a claim to verify, not a fact to read. (*FR:Callimachus*)
 
@@ -105,3 +105,14 @@ Audit: `grep -rlE '^stage-2: pending' gotchas/cards/` returns **3** as of 2026-0
 | `pids_limit` and `deploy.resources.limits.pids` Are the Same Compose Setting -- Declaring Both Refuses the Project | [card](pids-limit-and-deploy-resources-limits-pids-are-one-setting.md) · [full](../pids-limit-and-deploy-resources-limits-pids-are-one-setting.md) |
 | A Trailing Pipe Reports the Pipe's Exit Status, Not the Command's -- and a Green Build Shipped an Image Missing Its Primary Tool | [card](trailing-pipe-reports-the-pipes-exit-status-not-the-commands.md) · [full](../trailing-pipe-reports-the-pipes-exit-status-not-the-commands.md) |
 | A Redundant Check Is Not Free -- and When It Mutates, the Redundancy Is the Whole Cost | [card](redundant-verification-carries-authorisation-cost.md) · [full](../redundant-verification-carries-authorisation-cost.md) |
+
+| "Approved" Has No Slot for "Executable" -- Authorization and Executability Are Separate Axes | [card](authorization-has-no-slot-for-executability.md) · [full](../authorization-has-no-slot-for-executability.md) |
+| An Eliminated Confound Is Not an Identified Cause | [card](an-eliminated-confound-is-not-an-identified-cause.md) · [full](../an-eliminated-confound-is-not-an-identified-cause.md) |
+| Six Artifacts Agreed, and the Agreement Is Why Nobody Checked | [card](agreement-across-copies-is-worthless-when-they-share-one-source.md) · [full](../agreement-across-copies-is-worthless-when-they-share-one-source.md) |
+| The Exec Bit IS Tracked by Git -- and Two Working Clusters Are Not a "Mixed Convention" | [card](exec-bit-is-tracked-by-git-use-update-index-chmod.md) · [full](../exec-bit-is-tracked-by-git-use-update-index-chmod.md) |
+| "Merged" and "Shipped" Are Different Claims -- and One Character Decided Which | [card](merged-and-shipped-are-different-claims-git-show-stat-is-the-check.md) · [full](../merged-and-shipped-are-different-claims-git-show-stat-is-the-check.md) |
+| For --bg Sessions the Registry sessionId Is the jobId -- and Does NOT Match the Team Dir Slug | [card](bg-session-registry-sessionid-is-the-jobid-not-the-team-dir-slug.md) · [full](../bg-session-registry-sessionid-is-the-jobid-not-the-team-dir-slug.md) |
+| The Lifecycle Bridge Reports Success on Payload It Never Moved | [card](lifecycle-bridge-reports-success-over-empty-payload.md) · [full](../lifecycle-bridge-reports-success-over-empty-payload.md) |
+| Strikethrough Exempts a Load-Bearing Claim From the Reading That Would Test It | [card](strikethrough-exempts-a-load-bearing-claim-from-review.md) · [full](../strikethrough-exempts-a-load-bearing-claim-from-review.md) |
+
+> **[INDEX ROWS ADDED 2026-08-31]** 8 row(s) added for entries filed this session, and the header count corrected 73 -> 81. **Discipline reinforced by this session's own drift: entry -> card -> INDEX row, then the next entry.** Writing entry and card together but batching index rows to the end reproduces exactly the 2026-08-19 defect repaired above -- the index is the leg that drifts *because nobody re-reads it*. Counted here against files on disk, not against the previous header. (*FR:Callimachus*)
