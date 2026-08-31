@@ -82,19 +82,60 @@ ls -la; ls -R teams/paunvere/
 > verified 2026-08-28 as byte-identical to the host source and a genuine CA
 > (`CN=Gateway CA - Cloudflare Managed G1…`, valid to 2029).
 
-> **Verifying the team package needs a DIRECTORY check, not per-file md5s.** Everything else in this
-> runbook is verified by exchanging per-file md5s; `teams/paunvere/` is **10 files across two levels**,
-> and a single `scp -r` can land nine of ten with nothing reporting it. Verify local-vs-remote with a
-> digest **and** keep the per-file manifest, because a digest tells you *that* something differs and
-> never *what*:
+> **Verifying the team package needs a per-file MANIFEST. Do NOT use a two-level digest across hosts.**
+> `teams/paunvere/` is **10 files across two levels**, and a single `scp -r` can land nine of ten with
+> nothing reporting it — so the tree does need a check the single-file md5s cannot give. **The manifest
+> is that check:**
 >
 > ```bash
-> find teams/paunvere -type f | sort | xargs md5sum | md5sum   # digest
-> find teams/paunvere -type f | sort | xargs md5sum            # manifest, names the offender
+> find teams/paunvere -type f | sort | xargs md5sum            # THE GATE -- names the offender
 > ```
 >
-> Recompute both at freeze time rather than trusting any value written here — this tree moved four
-> times on 2026-08-31 alone.
+> Recompute at freeze time rather than trusting any value written here — this tree moved four times on
+> 2026-08-31 alone.
+>
+> ### The digest was here until 2026-08-31 and it cost a live STOP. Do not reinstate it.
+>
+> An earlier version of this note also exchanged `… | xargs md5sum | md5sum` as a single-value digest.
+> **That value is not portable, and the mismatch it produces is indistinguishable from real drift.**
+> On 2026-08-31 it halted the Step 14 rebuild with Joosep held: attested `e78b95ab…` on the Windows
+> checkout, `f7bd4961…` on RC, **all ten files byte-identical on both sides.**
+>
+> **The md5 of a FILE is portable. The md5 of `md5sum`'s OUTPUT is not.** The digest hashes the tool's
+> *presentation* of the content, which carries two platform dependencies, neither visible in the hex:
+>
+> 1. **Separator.** Windows/MSYS `md5sum` prints `<hash> *<path>` (one space, binary-mode asterisk);
+>    Linux prints `<hash>  <path>` (two spaces, no asterisk).
+> 2. **Sort collation.** `sort` is locale-dependent — `README.md` sorts eighth under a UTF-8 locale and
+>    **first** under `LC_ALL=C`. One identical tree, three digests: `e78b95ab…` / `f7bd4961…`
+>    (separator normalised) / `c6612097…` (separator + `LC_ALL=C`).
+>
+> **The manifest strictly dominates it.** It catches everything the digest catches — a file that fails
+> to land shows as a missing line — *and* it names which one. The individual hashes are genuinely
+> portable because they hash content, not a tool's rendering of it. The digest bought one short value
+> to compare and cost a hard stop on a live chain. *(Diagnosed by Hopper from the manifest this note
+> requires; the manifest is why it took ten minutes instead of being an undiagnosable hex mismatch.)*
+>
+> **Do NOT "harmonise" the entrypoint's `dir_digest` (Step 9c) with this ruling — it is correct as it
+> stands.** It compares a seeded directory against a shipped one, both hashed by the same code on the
+> same box, so neither dependency can reach it. **The question is never *"is this a digest?"* but
+> *"do the two operands of this comparison cross a platform boundary?"*** Same function, opposite
+> verdicts, and the reflex to fix every digest after reading this would break the one that works.
+>
+> **One more trap, worth knowing whatever you compare** (Hopper, same run): run any of these from the
+> wrong directory — `teams/paunvere` does not exist at the repo root, it lives under
+> `designs/new/joosep/` — and `find` fails, `md5sum` hashes an empty stream, and you get
+> `d41d8cd98f00b204e9800998ecf8427e`. **Valid-looking hex on total absence**, not an error.
+>
+> ### The standard this set for clearing a STOP
+>
+> A STOP is cleared by **reproducing the cause, not by finding a story that fits it.** Here the fix was
+> confirmed by applying the proposed normalisation on the *Windows* box and getting RC's exact value
+> back — which isolates the cause to a single transformation instead of leaving it a plausible account
+> of asterisks. **Then check the fix itself before adopting it:** the proposed normalisation handled
+> the separator and left the sort-collation dependency untouched, and it worked only because both
+> boxes happened to share a collation. A fix that passes today for a reason nobody has stated is the
+> next false STOP. Reproduce, then re-derive the fix's own assumptions.
 
 > **`warp-ca.pem` added 2026-08-28** after the Claude-install layer failed on TLS. The entrypoint
 > installs this CA at *runtime*, which is too late for the build — the Claude installer is
@@ -172,7 +213,7 @@ ssh-keygen -lf authorized_keys
 sshd will silently refuse the key rather than tell you it is broken.
 
 **Read back the fingerprint to Joosep out of band and have him confirm it against
-`ssh-keygen -lf ~/.ssh/id_ed25519_joosep.pub` on his machine.** Key comments on this host are
+`ssh-keygen -lf <his own pubkey>` on his machine.** Key comments on this host are
 documented-unreliable — `allerk`'s README records that the key commented `hr-platform` in `dev`'s
 authorized_keys is in fact the PO's own Windows client key. **Match by fingerprint, never by comment.**
 
@@ -337,9 +378,20 @@ rebuilds — if it ever changes without a deliberate volume wipe, that is a sign
 
 ## Step 9 -- Both modes, from a WARP-enrolled machine (Tier R)
 
+> **No `-i` flag, and that is a correction, not an omission (2026-08-31).** These commands previously
+> named `~/.ssh/id_ed25519_joosep`. **The user's key was at the default identity path**, so the
+> suffixed file never existed on his machine — his 9d.5 check succeeded only because he ran raw `ssh`
+> and its own default lookup found the key.
+>
+> **Where a key file lives is the user's business, not ours to assume**, and every place we asserted a
+> filename was a place we could be wrong about a machine we cannot see. `ssh` already solves this. Pass
+> `-i` only when you have a reason to override, and if you do, pass `-o IdentitiesOnly=yes` with it.
+>
+> `Connect-Joosep.ps1` carried the same assumption in a worse form and has been fixed — see Step 13.
+
 ```bash
 # 9a -- bare mode must land in a SHELL
-ssh -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 'tmux ls; echo "shell-ok"'
+ssh -p 2231 joosep@100.96.54.170 'tmux ls; echo "shell-ok"'
 ```
 
 **EXPECT:** `no server running on ...` (or no session named joosep) followed by `shell-ok`.
@@ -350,7 +402,7 @@ if it appears, something else did.
 
 ```bash
 # 9b -- the -Session path, exactly as the PowerShell switch invokes it
-ssh -t -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 joosep-session
+ssh -t -p 2231 joosep@100.96.54.170 joosep-session
 ```
 
 **EXPECT:** a tmux session named `joosep` with Claude starting in it. Detach with `Ctrl-b d`.
@@ -360,7 +412,7 @@ the exact symptom that check exists to catch early.
 
 ```bash
 # 9c -- persistence: reattach and confirm it is the SAME session
-ssh -t -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 joosep-session
+ssh -t -p 2231 joosep@100.96.54.170 joosep-session
 ```
 
 **EXPECT:** attaches to the existing session; **no** `No session 'joosep' -- creating one` line.
@@ -468,7 +520,7 @@ does not, which is exactly why this check must use a new connection.
 ### 9d.5 — Confirm Joosep still reaches his container
 
 ```bash
-ssh -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 'echo container-ok'
+ssh -p 2231 joosep@100.96.54.170 'echo container-ok'
 ```
 
 **EXPECT:** `container-ok` — the same key, still working, on the path he is meant to use.
@@ -486,7 +538,7 @@ ssh -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 'echo container-ok'
 docker exec joosep ssh-keygen -lf /etc/ssh/keys/ssh_host_ed25519_key.pub   # note it
 ./joosep.sh build && ./joosep.sh restart && sleep 15
 docker exec joosep ssh-keygen -lf /etc/ssh/keys/ssh_host_ed25519_key.pub   # compare
-ssh -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 'echo still-ok'
+ssh -p 2231 joosep@100.96.54.170 'echo still-ok'
 ```
 
 **EXPECT:** identical fingerprints before and after, and `still-ok` with **no** host-key warning.
@@ -525,6 +577,15 @@ Send Joosep: the host-key fingerprint (Step 8), `Connect-Joosep.ps1`, and the RE
 section. Point him at **`~/FIRST-TASKS.md` inside the container** — that is his onboarding backlog, not
 this runbook.
 
+**Tell him his file was not touched, and that the English copy is still there.** The Step 14 rebuild
+replaced `~/FIRST-TASKS.md` with the Estonian version, and he should hear *why* that was safe rather
+than discover a changed file: the gate at 14.1 compared his copy against `/opt/FIRST-TASKS.md`, the
+image's own baked seed, and they were **byte-identical** — so nothing of his was overwritten, because
+there was nothing of his in it. The superseded English copy was **displaced, not deleted**, and sits
+beside the new one as `~/FIRST-TASKS.md.superseded-<timestamp>` if he wants to diff the two. Say this
+unprompted. A file that changed under you is unsettling in a way that a file that changed *and was
+explained* is not, and this is his first week in a container he cannot administer.
+
 His first `claude` run does the OAuth device flow in his own browser; credentials land in `joosep_home`
 and survive restarts and rebuilds.
 
@@ -553,15 +614,47 @@ target under him mid-test. One operation delivers both changes.
 ### 14.1 -- Re-seed check, and the reason it is not just a `cp`
 
 ```bash
-docker exec --user joosep joosep ls -l --time-style=full-iso ~/FIRST-TASKS.md
+docker exec --user joosep joosep sh -c \
+  'md5sum ~/FIRST-TASKS.md /opt/FIRST-TASKS.md; ls -l --time-style=full-iso ~/FIRST-TASKS.md'
 ```
 
-**EXPECT:** an mtime equal to the container's first boot (2026-08-28 ~17:04) — i.e. the file is the one
-the entrypoint seeded and **nobody has edited it**.
+**EXPECT:** the two md5s are **EQUAL**, and an mtime at the container's first boot (2026-08-28 ~17:04).
 
-**STOP if the mtime is later than first boot.** That means Joosep has started working in it, and the
-English copy is now carrying his notes. Do not remove it; tell Brunel and the update becomes a
-side-by-side (`/opt/FIRST-TASKS.md` stays available for him to diff).
+`/opt/FIRST-TASKS.md` is the image's own baked seed and the file `~/FIRST-TASKS.md` was installed from.
+**Equality therefore proves nobody has edited it** — which is exactly the question, and it stays true
+however much time has passed. The mtime is a corroborating second signal, not the gate.
+
+**This check MUST run before the rebuild.** The rebuild replaces `/opt/FIRST-TASKS.md` with the Estonian
+version and destroys the comparison.
+
+**STOP if the md5s DIFFER**, even if the mtime looks untouched. That means Joosep has started working in
+the file. Do not displace it; tell Brunel and the update becomes a side-by-side (`/opt/FIRST-TASKS.md`
+stays available for him to diff).
+
+> ## Do NOT gate this on a value recorded somewhere else. Corrected 2026-08-31, before it fired.
+>
+> This step originally gated on **mtime alone**. When the rebuild finally ran, 3 days after the freeze,
+> the instruction issued to the operator was to compare the container's copy against **Brunel's attested
+> md5** — sound-sounding, and **wrong: `530329c2…` is the ESTONIAN file being shipped**, while the
+> container holds the **English** seed. They differ by design. That check would have **STOPped a
+> perfectly healthy container mid-chain with a user held**, and the mismatch would have been read as
+> evidence that Joosep had edited the file.
+>
+> **The rule, which generalises past this step: derive the comparison from the artifact pair, never from
+> a value written down beside it.** Both operands were inside the container the whole time. A recorded
+> value cannot tell you the world moved under it; two live artifacts cannot be stale relative to each
+> other. A recorded value is legitimate to *carry a fact across a boundary* where the artifact is not
+> reachable — that is what the Step 1 manifest does — and wrong as a *substitute* for a comparison whose
+> operands are both present.
+>
+> **Note the failure direction, which is why this is hard to catch: it fails CLOSED.** A stale recorded
+> value does not wave anything through; it raises a STOP on a healthy system. And a STOP looks like the
+> check working. On a live operation with people waiting, nobody investigates a halt that reads as
+> diligence — they attribute it to the system under test.
+>
+> **RAN 2026-08-31 10:55 (Hopper), and it passed:** both copies `f61664b4526fc69d6a3652c392d5a7a9`,
+> mtime `2026-08-28 17:02:30 +0300`. Displaced to `FIRST-TASKS.md.superseded-20260831-105548`, 11269 B,
+> mtime preserved.
 
 If untouched — **displace it, do not delete it** (Hopper's substitution, 2026-08-31):
 
@@ -595,29 +688,146 @@ versions self-resolve; this container predates the stamp, which is why it needs 
 
 ```bash
 cd /home/dev/joosep
-# re-stage entrypoint.sh + FIRST-TASKS.md from the checkout, verify md5s first
+# 1. Re-stage EVERY build input -- derive the list, per Step 1. Do NOT abbreviate (see below).
+#    Do NOT touch warp-ca.pem (host-sourced, already correct) and do NOT delete .env or
+#    authorized_keys -- neither is in the checkout, both are live host state. No rsync --delete.
+chmod +x joosep.sh entrypoint.sh          # <-- the exec bit is NOT in the checkout. See below.
+# 2. Verify the staged copy: 6 single-file md5s + the teams/paunvere per-file MANIFEST (Step 1).
+# 3. READ the .env line before changing it, then REPLACE it -- never append:
+grep -n 'TEAM_NAME' .env                  # report what was actually there
 ./joosep.sh build
-# add to .env:   TEAM_NAME=paunvere
 ./joosep.sh restart
 ```
+
+> **`chmod +x` is not optional. The exec bit is missing from the REPO, and that is fixable once.**
+> The checkout carries `joosep.sh` and `entrypoint.sh` as `-rw-rw-r--`, so **any** staging method that
+> preserves source mode — `cp -p`, a `git pull` into the deploy dir, `scp -p` — yields a non-executable
+> launcher and the build dies at `./joosep.sh: Permission denied`. `entrypoint.sh` is harmless (the
+> Dockerfile chmods it inside the image); **only the host launcher matters.** Cost one failed build on
+> 2026-08-31.
+>
+> **Corrected 2026-08-31, same day I wrote the line above wrong.** My first version of this note said
+> the exec bit *"is not in git"*. **That is false — git records it**, as mode `100755` against `100644`
+> in the index, and these files are simply committed as `100644`. The difference is not pedantic: if the
+> bit were untrackable, a `chmod` after every staging would be the only possible fix; because it is
+> trackable, **the real fix is one command in the repo and then nobody ever thinks about it again**:
+>
+> ```bash
+> git update-index --chmod=+x designs/new/joosep/joosep.sh   # team-lead's to run; Brunel does not touch git
+> ```
+>
+> **Remove the dependency instead of checking it** — the same remedy this runbook applies to the digest
+> and the build-input list. Keep the `chmod +x` in the staging block as belt-and-braces for anyone
+> deploying from a tarball or an older checkout, but it should stop being load-bearing.
+>
+> **This is not scattered inconsistency — the correct practice exists here and did not propagate.**
+> Measured over *every path under `designs/` tracked by git whose name ends `.sh`, mode read from the
+> git index*: **24 at `100644`, 6 at `100755`.** And the six are not scattered — they are **two
+> directory clusters**, `esl-legal/` (2 files) and `po-team/operator/` (4). So somebody knew, twice, in
+> two places, and it stopped there. *(Full survey: Callimachus, 2026-08-31; membership rule stated
+> because a count is only as good as the set it was taken over.)*
+>
+> **That reading makes the trap worse, not better.** Scattered accidents look like accidents; two
+> deliberate clusters make the remaining 24 look like a considered choice rather than an omission —
+> **the working examples make the broken ones look deliberate.**
+>
+> **One of the 24 is armed right now.** `po-team/container/sagres/stationmaster/smoke-test.sh` is
+> `100644` and is invoked as `./smoke-test.sh` by the EVR-island hub-formation spec §7 — **the identical
+> trap in a second runbook**, caught there only because §4 happens to `chmod +x` the whole staged set
+> first. That is an accident, not a guard: remove §4's blanket chmod as redundant and §7 breaks.
+>
+> **Why it was missing here when Step 1 has it: this block is an ABBREVIATED Step 1.** It said
+> *"re-stage entrypoint.sh + FIRST-TASKS.md, verify md5s first"* — a summary of a procedure written out
+> in full 500 lines above, and what the summary dropped was the one line that is invisible in a checkout
+> and fatal at execution. **An abbreviated repeat of a procedure silently drops the steps it does not
+> restate**, and the dropped step is disproportionately the one that looked like housekeeping. Same
+> family as the two-lists problem in Step 1: the fix is to point at the full procedure rather than to
+> restate a shortened copy of it.
+
+> **`TEAM_NAME`: read it before you write it. The line already there may be STALE, and stale is worse
+> than absent.** Compose reads `TEAM_NAME=${TEAM_NAME:-paunvere}`, so a missing line is *correct* and a
+> wrong line silently overrides the right default while everything looks healthy.
+>
+> **FOUND 2026-08-31: `TEAM_NAME=joosep`** — not the expected stale `vedur` but something older still,
+> the pre-rename *container* name, in place since the `.env` was copied from `.env.example` on 08-28.
+> Replaced (`diff` against the backup showed solely `63c63`; exactly one `TEAM_NAME=` line; mode 0600
+> preserved). **An instruction to "add `TEAM_NAME=paunvere`" would have appended a second line beside a
+> silent override.** Report the value you find either way — it is the evidence, not a formality.
 
 `TEAM_NAME` needs **no rebuild** on its own — it is a compose default overridden by `.env` — but
 compose re-reads `.env` only on a **recreate**, which `./joosep.sh restart` performs and a plain
 `docker restart` does not. It rides along here to keep it to one operation.
 
+> **Expect the three build-time assertions NOT to re-run, and do not force them.** The WARP-CA,
+> `claude`-executable and `pnpm` assertions sit in layers *above* the changed `COPY` lines, so a rebuild
+> that changes only the copied content reuses them from cache. **Report that honestly — "cached, did not
+> re-run" is not the same claim as "passed"** (Hopper, 2026-08-31, who caught himself about to report
+> the stronger one).
+>
+> **But `--no-cache` is the wrong remedy.** A cached layer is byte-identical to the one whose assertions
+> did pass; `--no-cache` re-fetches the Claude installer, apt and pnpm **as they are today**, trading a
+> layer verified identical to the running image for an unverified new one and landing any upstream drift
+> in Joosep's container as a side effect of a verification step. **A verification that mutates its
+> subject is not a verification.** Those assertions exist to catch a *changed* build; if the layer did
+> not change, they have nothing to say.
+
 ### 14.3 -- Verify
 
 ```bash
-docker logs joosep 2>&1 | grep -i first-tasks
+docker logs joosep 2>&1 | grep -iE 'first-tasks|paunvere|CLAUDE.md|host key'
 docker exec --user joosep joosep head -3 ~/FIRST-TASKS.md
-docker exec --user joosep joosep bash -lc 'echo $TEAM_NAME'
+docker exec --user joosep joosep bash -lc 'echo $TEAM_NAME; ls ~/work/'
+docker exec joosep ssh-keygen -lf /etc/ssh/keys/ssh_host_ed25519_key.pub
 ```
 
-**EXPECT:** `seeded ~/FIRST-TASKS.md (first boot).`; the file opens in Estonian
-(`# Esimesed ülesanded`); `paunvere`.
+**EXPECT** — derived from the entrypoint source, not inherited from this runbook's earlier drafts:
 
-**STOP** on the `NOTE: ~/FIRST-TASKS.md differs...` line — that means 14.1 did not run, and the English
-copy is still in place.
+- `[entrypoint] seeded ~/FIRST-TASKS.md (first boot).`
+- `[entrypoint] seeded /home/joosep/work/paunvere (first boot).`
+- `[entrypoint] initialised local git in /home/joosep/work/paunvere (no remote).`
+- `[entrypoint] created /home/joosep/work/CLAUDE.md.`
+- `~/FIRST-TASKS.md` opens in Estonian, heading `# Esimesed ülesanded`. It is **14181 bytes** against the
+  English 11269, so the size alone is a second, independent confirmation of the swap.
+- `$TEAM_NAME` = `paunvere`
+- host key **unchanged**: `SHA256:C8qVyjSQuyiSXPzEBcIOh2tfUwlk9EJtU2WxhAEbO3U`
+
+**STOP** on any of:
+
+- `NOTE: ~/FIRST-TASKS.md differs...` → 14.1 did not run, and the English copy is still in place.
+- `ERROR: /opt/teams/<name> is MISSING from the image` → `TEAM_NAME` in `.env` names no directory
+  shipped in the image. This is the **loud** failure of a wrong `TEAM_NAME`, and it is why 14.2 insists
+  on reading that line first: the *quiet* failure is a valid-but-wrong name, which this never catches.
+- `generated persistent sshd ed25519 host key (first boot).`, or a host key differing from the value
+  above → the `joosep_sshd` volume was lost. **Report it; do not tell Joosep to clear `known_hosts`** —
+  that habit is what makes host-key pinning worthless, and the fingerprint was sent to him out of band
+  precisely so that he would never need to.
+
+> **The three seeding lines are new to this step, and their absence was a real hole.** 14.3 originally
+> verified only FIRST-TASKS and `TEAM_NAME`, because it was written before the team package and the
+> generated `~/work/CLAUDE.md` were added to the image. **It therefore verified less than the rebuild
+> had come to ship** — and would have reported a clean pass on a container missing the entire team
+> package. **A verification step does not notice that its subject has grown**; someone has to re-derive
+> it from the thing being verified, which is why these lines come from reading the entrypoint rather
+> than from editing the previous EXPECT.
+
+> ## RAN 2026-08-31 11:15 (Hopper) — all EXPECTs pass, neither STOP fired
+>
+> All four entrypoint lines verbatim; **host key `SHA256:C8qVyjSQuyiSXPzEBcIOh2tfUwlk9EJtU2WxhAEbO3U`
+> unchanged** (the `joosep_sshd` volume survived the recreate); `~/FIRST-TASKS.md` =
+> `530329c2a04adf1dd0c4411e2439b06d`, equal to `/opt/FIRST-TASKS.md`, opening `# Esimesed ülesanded`;
+> all 10 `paunvere` files in `~/work/paunvere/` matching the staged manifest; `TEAM_NAME=paunvere` live;
+> running image `sha256:95191f2ee20f`.
+>
+> **Both seed stamps written** — `.first-tasks.seeded.md5` and `.team-package.seeded.md5`. That is the
+> point of the whole step: **the hand-displacement in 14.1 was genuinely the last one anybody performs.**
+> Every future version now self-resolves through the entrypoint's own discriminator.
+>
+> **Note the ordering, because it is the honest record.** The fuller check-set above was written into
+> this step *after* the live run — but it was not absent from the run: it was carried in the dispatch to
+> the operator, who executed it and traced content end-to-end from the attestation through the checkout,
+> staging, image and seeded home. **What this text does is stop that fuller check-set living only in one
+> operator's message.** A verification that exists only in a dispatch is not part of the runbook, and the
+> next person to run Step 14 would have inherited the thinner version.
 
 **Unchanged by the rename, deliberately:** the container dir, the container name, **and the tmux session
 name** — all stay `joosep`. So `Connect-Joosep`, `Connect-Joosep -Session` and the registry `tmux` field

@@ -66,7 +66,7 @@ Two things make that work, and both are easy to break:
 
 1. Ensure **Cloudflare WARP** is connected (`warp-cli status`). RC is reachable only over the WARP
    overlay — not Tailscale; EVR does not use it.
-2. `ssh-keygen -t ed25519 -f $HOME\.ssh\id_ed25519_joosep -C "joosep@evr"`, then send the **`.pub`**
+2. `ssh-keygen -t ed25519 -C "joosep@evr"` (accept the default path), then send the **`.pub`**
    line to Mihkel. The private key never leaves your machine.
 3. Mihkel adds it and sends you the container's **host-key fingerprint** out of band.
 4. Run `Connect-Joosep`. Accept the host key **only after comparing it** to the fingerprint you were

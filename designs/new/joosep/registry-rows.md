@@ -81,7 +81,7 @@ For `deployments.md`, the same as a prose line under the RC section:
 Insert into the `deployments` array. Formatting matches the surrounding rows (aligned columns):
 
 ```json
-    { "num": "j", "name": "joosep",               "hostAlias": "rc",       "port": 2231, "user": "joosep",   "key": "~/.ssh/id_ed25519_joosep",    "tmux": "joosep", "status": "live" },
+    { "num": "j", "name": "joosep",               "hostAlias": "rc",       "port": 2231, "user": "joosep",   "key": "~/.ssh/id_ed25519",           "tmux": "joosep", "status": "live" },
 ```
 
 The `"tmux": "joosep"` key is what makes the fleet menu land **inside the session** rather than at a
@@ -100,7 +100,20 @@ Lerko or read `/home/dev/allerk/authorized_keys` before committing it. And the e
 `entrypoint-apex.sh:428-432`), so selecting apex from the menu can land in an empty second session.
 Both are separate tickets; listed here only because these are the files where they live.
 
-## 4. `mitselek-ai-teams/registry.json`
+> ## KEY PATH CORRECTED 2026-08-31 -- this row feeds `-i`, so the old value would have broken the menu
+>
+> Both rows above previously read `"key": "~/.ssh/id_ed25519_joosep"`. **That file does not exist on
+> Joosep's machine** — his key is at the default identity path, which is why his 9d.5 check passed
+> using raw `ssh` and its own lookup. **`rc-connect.ps1` builds `-i` from this field**, so shipping the
+> suffixed name would have pointed the fleet menu at a nonexistent file and produced
+> `Permission denied (publickey)` against a container that was working perfectly.
+>
+> The general form of the mistake, which is the part worth keeping: **we asserted a filename on a
+> machine we cannot see, in three artifacts, and none of the three had any way to be right.** `ssh`
+> resolves a default identity on its own. Name a key only when overriding, and pass
+> `-o IdentitiesOnly=yes` when you do.
+
+## 4. `mitselek-ai-teams/registry.json` -- **APPLIED 2026-08-31, this section is now a record**
 
 Shape differs from the personal registry -- this file uses `teamName`/`location`/`accessMethod`:
 
@@ -111,7 +124,7 @@ Shape differs from the personal registry -- this file uses `teamName`/`location`
       "host": "100.96.54.170",
       "port": 2231,
       "user": "joosep",
-      "sshKey": "~/.ssh/id_ed25519_joosep",
+      "sshKey": "~/.ssh/id_ed25519",
       "location": "RC",
       "accessMethod": "direct-ssh",
       "containerName": "joosep",
