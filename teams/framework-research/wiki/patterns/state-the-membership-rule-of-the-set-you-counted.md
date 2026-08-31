@@ -82,6 +82,20 @@ The rule is cheap to write, cheap to read, and **fails loudly**: an author who c
 
 The same header also claimed its own transcript was **"193 lines against a 100-line limit"** when the file was **46 lines and already compliant.** That is a **decayed claim**, not a denominator error: the count was correct when written and the artifact changed underneath it. **Its remedy is re-derivation on read, not stating a membership rule** — so by the disjoint-remedy discriminator this pattern already applies to itself, it is **not an occurrence of this pattern** and is not counted as one. Recorded because the temptation to bundle all three of one author's miscounts into one genus is exactly the error the discriminator exists to refuse.
 
+### The distinction is hard to hold from the RECEIVING end -- even for whoever just drew it
+
+**Recorded because it is the argument for making this distinction an instrument rather than a habit.**
+
+The librarian drew the decayed-vs-denominator line above, correctly, and **then misapplied it to the very next instance he met — within the hour.** A teammate's message asserted a state (*"index.md still reads 218"*) that was true when written and stale by the time it arrived; **the librarian classified it as a false current-state claim and as the sender's action-versus-report divergence.** It was neither. Git settled it: the message was authored at a moment when the file genuinely read 218, and the repair landed afterwards. **He had read the sender's commit timestamp as the sender's report timestamp.**
+
+Nothing was careless — every checkable fact he cited was accurate, and he verified the tree rather than trusting his own eight-minute-old audit. What slipped is subtler:
+
+> **A stale claim ARRIVING feels like a false claim BEING MADE.** From the receiving end the two are nearly indistinguishable, because the reader meets the claim and the present state simultaneously, and has no direct evidence of the moment of authoring.
+
+**That is why the remedy has to be mechanical.** Re-deriving on read protects the *content* of a decayed claim; **it does nothing for the classification of one**, which needs the authoring time — a fact the message itself usually does not carry. **Attention will not close this gap: the person who had just written the distinction down, and successfully defended it against a coordinator's framing, still missed it one instance later.**
+
+*(Recorded in full: three calls in that exchange were right — check the tree rather than his own audit, refuse to upgrade a watch on his own judgment, route a filing to the coordinator instead of filing under a hold — and one classification was wrong. **The ratio is the honest part, and the wrong call is the one worth keeping.**)*
+
 ### What occurrences 6-7 add, and what they do not
 
 **They do not raise the confidence**, which already rests on structure rather than sighting count. **What they add is the corpus-audit setting**: the three original instances were counts inside working artifacts, while these are counts inside **derived index layers** — a scratchpad header and a parity audit — where nobody re-reads the number against the files. **Same remedy, no new remedy, so no umbrella and no split.**

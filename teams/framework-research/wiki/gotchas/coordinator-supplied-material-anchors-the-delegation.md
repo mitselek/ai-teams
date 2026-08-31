@@ -6,7 +6,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-22
 filed-by: librarian
-last-verified: 2026-08-26
+last-verified: 2026-08-31
 status: active
 source-files:
   - teams/framework-research/memory/team-lead.md
@@ -41,6 +41,38 @@ The cost is not duplicated effort. It is **a defect the coordinator cannot see, 
 2. The PO's sharper point: **team-lead could have just asked.** The PO, or Brunel, might already have held the answer -- and asking is the move that leaves the specialist's own copy intact.
 
 The real demonstration arrived only after team-lead sent Brunel one more line: *the outline is a floor, not a ceiling.* Brunel then found, from his own build-knowledge, that **`docker port` returns empty for `network_mode: host` containers even when they are perfectly healthy** -- and three of the containers on that host run `network_mode: host`. The verification step the coordinator's outline specified would therefore have read a *fully successful* migration as a **failure**. Working inside the outline would have shipped that defect. The coordinator could not have seen it; only the specialist's knowledge of what he had built could, and only once he was licensed to step outside the outline. (Brunel's own account is filed as [`docker-port-empty-under-network-mode-host.md`](docker-port-empty-under-network-mode-host.md) -- the same event from the other side -- and the verification-design claim it demonstrates as [`../patterns/daemon-self-report-confirms-config-not-outcome.md`](../patterns/daemon-self-report-confirms-config-not-outcome.md).)
+
+## Instance (c) -- 2026-08-31 (team-lead / Callimachus): a SUB-SHAPE, because the material manufactured the work items
+
+**A distinct harm, and the distinction is the reason this is folded here rather than filed alone.** In (a) and (b) the coordinator's material anchored the specialist's **approach** to a real task. Here it **created tasks that did not exist.**
+
+Team-lead built the librarian's session brief from the librarian's own scratchpad header without opening a source. **Three of the items in that brief were false, and each cost real work before it could be dismissed:**
+
+| Briefed as a task | Reality |
+|---|---|
+| *"casualty 3 of submission 7 is wrong -- do not file as written"* | **No seventh submission and no "casualty 3" exist in any surviving artifact.** The submitter's own count was six. |
+| *"Hopper: 9 submissions + 2 corrections"* | **Six.** A count with no enumeration beside it to check against. |
+| *"his scratchpad prune -- 227+ lines vs 100, the largest debt"* | **46 lines, already compliant.** The largest carried debt did not exist. |
+
+**Anchoring an approach and fabricating the work item are different harms.** An anchored approach still points at something real, and the specialist's own knowledge can step outside it — that is what rescued instance (b). **A fabricated item cannot be stepped outside of, because there is nothing there to find.** The specialist can only discover it by exhausting the search and reasoning from absence, which is slower, and which produces a negative that is hard to distinguish from having looked badly.
+
+### What makes it this entry and not a new one
+
+Same mechanism throughout: **the brief carries the coordinator's authority, the coordinator's copy overwrites the specialist's own, and the specialist gets no signal that an overwrite happened.** Same remedy, both halves: *do not supply what the specialist can fetch*, and **ask rather than look up.** Only the harm differs, so it is a sub-shape, not a separate finding.
+
+### The relay is the mechanism, and it is what the coordinator owned
+
+**The header was already wrong; the relay is what gave it authority.** A stale summary sitting in its own file is inert — the librarian's header had been wrong for a session and harmed nobody. **Converting it into a brief is what turned three decayed claims into three instructions.**
+
+> **A summary decays on its own. A relay laundering it into an instruction is what makes it actionable.**
+
+Team-lead's own account, recorded because it is the sharpest part: he **read the warning block at the top of his scratchpad — *this file is a claim about sources, it is never a source* — and built the brief from an unverified header anyway**, then **told the librarian, in that same brief, to verify against the tree before acting on any current-state claim in it.** *The correct instruction was issued and violated in one message.*
+
+**Scope, deliberately bounded:** this instance covers **the relay only.** A later crossed message in the same session, initially read by the librarian as a false current-state claim, was **ruled not an instance of anything** — it was true when written and decayed in transit, and the librarian's own re-check caught it before harm. **It is not part of this entry.**
+
+**Confidence unmoved.** Same coordinator as (a) and (b) — the exact axis the note below holds this entry at `medium` on. Three instances, one coordinator, is not three independent sightings.
+
+*(*FR:Aen* self-reported the relay and owned it; *FR:Callimachus* the sub-shape distinction and filer)*
 
 ## Recorded withdrawal -- read before citing instance (b)
 

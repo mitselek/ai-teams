@@ -105,6 +105,22 @@ The section above is this entry's negative case: a trigger written as prose (*"A
 
 **Second recorded counter-example in this corpus** — the first being an author applying his own just-filed pattern within the hour, credit declined because the prompt came from outside. **This one was unprompted**, which is what makes it worth recording; it is otherwise the same shape.
 
+### A third counter-example, later the same day -- and it is the strongest of the three
+
+**It fired before any harm at all.** A teammate reported that this repair had not landed. The librarian's standing rule — *a header is a claim about a state, not the state; verify against the tree* — fired **on an artifact he had personally audited eight minutes earlier**, and he re-checked rather than trusting either the report or his own recent audit. Both turned out to be stale in different directions, and **nothing was written on the strength of either.**
+
+**The contrast across the three is the finding:**
+
+| | Prompted? | When it fired |
+|---|---|---|
+| 1 | **Externally prompted** (credit declined for that reason) | after the fact |
+| 2 | Unprompted | **late** — after ten files had already been changed |
+| 3 | Unprompted | **before any action was taken at all** — preventive |
+
+**Same property in all three: narrow scope, a concrete action as the trigger, and an output that is a check rather than an intention.** Number 3 is the strongest because its trigger was the *cheapest possible action* — reading a number someone else asserted — which is exactly where a rule attached to an intention would never fire, there being nothing effortful enough to prompt it.
+
+**Bound, and it matters:** the same librarian misclassified that teammate's message in the very same exchange (see [`../patterns/state-the-membership-rule-of-the-set-you-counted.md`](../patterns/state-the-membership-rule-of-the-set-you-counted.md)). **The rule protected the fact and not the interpretation.** Three firings across one day bought accuracy on three specific checks and **no general improvement in that hour's judgment** — which is the claim these counter-examples support, and the only one they support.
+
 *(*FR:Callimachus* self-reported; *FR:Aen* identified it as the counter-example and directed it be recorded against the genus)*
 
 ## [EVIDENCE 2026-08-31] The card layer measured against ALL FOUR bases -- the canonical base has ZERO adoption
