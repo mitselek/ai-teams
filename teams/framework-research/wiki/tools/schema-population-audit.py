@@ -28,7 +28,18 @@ REQUIRED = ["source-agents", "discovered", "filed-by", "last-verified", "status"
 # Documented as optional -- reported for visibility, never enforced.
 OPTIONAL = ["source-team", "source-files", "source-commits", "source-issues", "ttl"]
 # In active use but NOT in the documented schema. Tracked so the gap stays
-# visible until Protocol C closes it; absent means "unrated", never inferred.
+# visible until Protocol C closes it.
+#
+# CORRECTION 2026-08-31: this line previously read `absent means "unrated"`.
+# That was FALSE and the script printed it on every run. Measured 2026-08-31
+# (dated, so it does not rot -- an undated current-state count would): all
+# 214 cards then present carried `confidence`, 112 entries also carried it,
+# and of those 112 the entry and card values agreed in every single case. So the entry-side field is
+# a half-populated mirror of a fully-populated card field -- an entry without
+# it is rated on its card, never unrated. No entry in this wiki is unrated.
+# The remedy (formalise the mirror vs cards-only, per the S63 `stage-2`
+# ruling) is team-lead's + Celes's call; the filer is recused. Until then this
+# script reports the count and asserts no semantic for absence.
 UNDOCUMENTED = ["confidence"]
 
 
@@ -78,7 +89,8 @@ def main():
         print("  %-16s %3d" % (f, counts[f]))
     print("\nUNDOCUMENTED but in use -- gap open until Protocol C closes it:")
     for f in UNDOCUMENTED:
-        print("  %-16s %3d/%d  %d%%   (absent = \"unrated\", never inferred)"
+        print("  %-16s %3d/%d  %d%%   (every card carries it; absence here is"
+              " NOT unrated -- see CORRECTION note in source)"
               % (f, counts[f], total, 100 * counts[f] // total))
 
     print("\nentries missing >=1 required field: %d" % len(defects))

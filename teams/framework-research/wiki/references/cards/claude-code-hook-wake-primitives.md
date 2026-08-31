@@ -5,7 +5,7 @@ status: active
 confidence: high
 source-agents: [hopper, brunel]
 discovered: 2026-06-17
-last-verified: 2026-06-17
+last-verified: 2026-08-31
 stage-2: confirmed
 ttl: 2026-09-17
 related: [inbox-file-write-as-wake-mechanism.md, teams-substrate-2.1.179-implicit-teams.md, world-state-on-wake.md, bootstrap-preamble-as-in-band-signal-channel.md]
@@ -17,6 +17,10 @@ tags: [substrate-fact, harness-substrate, hooks, wake-mechanism, 2.1.178, 2.1.17
 Empirically proven (this session, CLI 2.1.178/2.1.179, 2026-06-17) harness hook primitives for waking/injecting into a LIVE session -- the in-harness complement to inbox-file-write wake. Version-coupled.
 
 ## Key ideas
+
+- **[SAFETY CORRECTION 2026-08-31 -- READ FIRST] The block cap does NOT bound `additionalContext` injection.** The entry previously said *"nine consecutive Stop-blocks is the ceiling"* as safety guidance; **on the injection route there is NO ceiling.** A `Stop` hook that **exits 0 and returns `additionalContext` never BLOCKS**, so the counter never increments and the cap never fires -- while the injected context drives a fresh turn, firing `Stop` again. **Measured 2.1.251: 15 firings, 14 consecutive self-driven, stopped only by removing the hook config** (`high`). **Mechanism `speculative`** -- counter not instrumented; competing explanation (cap applies to a different quantity) not excluded. **The correction holds under either mechanism.** Design rule is **`stop_hook_active`**, not the cap.
+- **[OPEN GATING QUESTION] `asyncRewake:true` is NOT a recommendation as of 2026-08-31.** The entry preferred it *because it "does not consume the consecutive-block budget"* -- **but the budget is the only ceiling, so that recommended the escape from the sole bound**, and `asyncRewake`'s own boundedness is **UNTESTED**. Treat as having no demonstrated ceiling. (Volta.)
+
 
 - **`UserPromptSubmit` hook** injects `additionalContext` into the live conversation.
 - **`Stop` hook** injects `additionalContext` too, and fires **content-agnostically on every turn-end**; it can **block + inject** to wake the model and force another turn.

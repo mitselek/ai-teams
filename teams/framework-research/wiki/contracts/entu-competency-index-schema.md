@@ -1,21 +1,22 @@
 ---
 source-agents:
   - callimachus
-  - finn  # S44 grounding digest reconciled §3 evidence-ref formats against real Entu artifacts
+  - finn  # S44 grounding digest reconciled §2 evidence-ref formats against real Entu artifacts
 discovered: 2026-06-06
 filed-by: librarian
-last-verified: 2026-06-06
+last-verified: 2026-08-31
 status: active
 source-files:
   - topics/10-guild-specialists.md
   - teams/framework-research/types/t09-protocols.ts (WikiProvenance interface)
   - teams/framework-research/docs/2026-06-06-entu-consultant-grounding-digest.md
+  - teams/framework-research/docs/2026-06-06-data-lifecycle-competency-harvest.md  # the ACTUAL source of the 32 §2 ref exemplars; omitted at filing -- see Amendments 2026-08-31
 source-commits: []
 source-issues:
   - "entu/api#42"
   - "entu/api#41"   # date wire-format discrepancy -- gap-loop worked example
   - "entu/www#12"   # _sharing non-inheritance -- gap-loop worked example
-ttl: 2026-09-06
+ttl: 2026-11-30   # extended 2026-08-31: the 09-06 TTL fired and the decay check came back CLEAN (external substrate stable over the full 3 months; the defects it surfaced were born-wrong, not drift). Guards §2 ref-format re-drift only -- see the TTL note below and Amendments.
 ---
 
 # Entu competency-index schema -- the claim→evidence spine
@@ -24,7 +25,7 @@ Schema for the **competency index** that backs Entu's product-native consultant 
 
 This is an **architectural-fact / contract** entry: it defines a schema, not an observed behaviour. Revision trigger is at the bottom.
 
-> **TTL note:** the *schema* is stable; the TTL fires re-verification of the **evidence-ref formats** (§3) against Entu's actual artifacts, because probe-derived claims and external doc anchors go stale. The schema shape does not expire on the TTL -- only the "do the real Entu refs still look like this" check does. **§3 was reconciled against the real corpus in S44 via Finn's grounding digest** (`docs/2026-06-06-entu-consultant-grounding-digest.md`); the TTL now guards *re-drift* of those refs (e.g. entu/api moving off Nitro file-routing), not the original first-draft uncertainty.
+> **TTL note:** the *schema* is stable; the TTL fires re-verification of the **evidence-ref formats** (§2) against Entu's actual artifacts, because probe-derived claims and external doc anchors go stale. The schema shape does not expire on the TTL -- only the "do the real Entu refs still look like this" check does. **§2 was reconciled against the real corpus in S44 via Finn's grounding digest** (`docs/2026-06-06-entu-consultant-grounding-digest.md`); the TTL now guards *re-drift* of those refs (e.g. entu/api moving off Nitro file-routing), not the original first-draft uncertainty.
 
 ## 1. The atomic unit -- a competency `claim`
 
@@ -43,11 +44,11 @@ evidence:
     stance: confirms                     # confirms | contradicts | supersedes (§3a)
     excerpt: "Token resolution caps at strParts.length === 3 (ref.type.property); no deeper chaining."
   - type: docs
-    ref: "entu/www: src/api/formulas#references"
+    ref: "entu/www: src/api/formulas#field-references"
     stance: confirms
-    excerpt: "Field kinds: same-entity, propertyName.*.prop, _child.*, _parent.*, _referrer.* -- single hop."
+    excerpt: "Field kinds: same-entity, referenced-entities, _child.*, _referrer.* -- single hop."
 verification:
-  method: spec-derived                   # doc-cited | spec-derived | live-probe | live-audit | maintainer-authoritative (§3 method ladder)
+  method: spec-derived                   # doc-cited | spec-derived | live-probe | live-audit | maintainer-authoritative (§2a method ladder)
   date: 2026-06-06
   verifier: finn                         # the agent/persona -- or "argo" for maintainer-authoritative
 confidence: backed                       # backed | partial | unverified -- two confirms, no contradicts → backed (§3a rule)
@@ -63,8 +64,8 @@ status: active                           # active | disputed | archived
 | `id` | yes | Stable kebab slug. On disk it is the **filename** (no separate `id:` key -- filename is the key, mirroring the wiki-card convention). The `id:` above is shown for the queryable shape only. |
 | `claim` | yes | A **verifiable assertion**, phrased so it can be true or false against a source. Never "I know about X." The grammar test: *could a reader confirm or refute this by reading one of the `evidence` refs?* If not, it is not a claim -- it is a topic. |
 | `domain` | yes | One of `data-lifecycle \| auth \| formula \| schema`. Maps the claim to exactly one agent persona (the roster in #42). One claim has one home domain; cross-domain claims are split, not tagged with two domains (see §5 synergy). |
-| `evidence` | yes, ≥1 | Array of evidence objects (§3). A claim with zero evidence cannot be filed -- that is the whole point of the spine. Zero-evidence "claims" are gaps (§6), not index entries. |
-| `verification` | yes | How the claim was confirmed: `method` + `date` + `verifier`. `method` is one of the **five-rung method ladder** (§3 -- doc-cited / spec-derived / live-probe / live-audit / maintainer-authoritative). Distinct from `confidence` (which is the *output label*); `verification` is the *act*, `confidence` is the *grade*. |
+| `evidence` | yes, ≥1 | Array of evidence objects (§2). A claim with zero evidence cannot be filed -- that is the whole point of the spine. Zero-evidence "claims" are gaps (§6), not index entries. |
+| `verification` | yes | How the claim was confirmed: `method` + `date` + `verifier`. `method` is one of the **five-rung method ladder** (§2a -- doc-cited / spec-derived / live-probe / live-audit / maintainer-authoritative). Distinct from `confidence` (which is the *output label*); `verification` is the *act*, `confidence` is the *grade*. |
 | `confidence` | yes | `backed \| partial \| unverified`. **Derived from the evidence set via the §3a stance rule** (a `contradicts` stance caps it; `maintainer-authoritative` apex evidence sets it to `backed`). Drives the runtime confidence label (§4). Fail-closed default on ambiguity: `unverified`. |
 | `last-verified` | yes | ISO date the claim was last checked against its evidence. Drives staleness. |
 | `ttl` | conditional | **Required for `probe`-only claims** (live-probe results go stale as the platform evolves). Optional for doc/spec-cited claims that track a versioned artifact. |
@@ -85,10 +86,10 @@ The four `type` values and their `ref` locator formats. **Reconciled against rea
 
 | `type` | Backs | `ref` locator format (grounded) | Staleness behaviour |
 |---|---|---|---|
-| `docs` | A documentation section in **entu/www** (VitePress site, bilingual `src/` EN + `src/et/` ET) | `entu/www: src/<path>#<anchor>` -- e.g. `entu/www: src/api/formulas#single-hop`; a docs-PR ref is also valid -- e.g. `entu/www: PR #13` | Tracked by source-file change; flag LOW on doc edit since `last-verified`. **Docs may lag or contradict code** -- a `docs` ref is weaker than a `src` ref where they conflict. |
+| `docs` | A documentation section in **entu/www** (VitePress site, bilingual `src/` EN + `src/et/` ET) | `entu/www: src/<path>#<anchor>` -- e.g. `entu/www: src/api/formulas#field-references`; a docs-PR ref is also valid -- e.g. `entu/www: PR #13` | Tracked by source-file change; flag LOW on doc edit since `last-verified`. **Docs may lag or contradict code** -- a `docs` ref is weaker than a `src` ref where they conflict. **PR-form refs have their own rule** (they have no source file to diff): a PR-form ref records the PR's **merge state at citation time**; its staleness trigger is **merge-state change or close-unmerged**, not source-file change. An **unmerged** PR means the cited text is **not yet authoritative** -- a claim resting on one is provisional and must be marked so. |
 | `openapi` | The published OpenAPI spec | Live at `https://api.entu.app/openapi` (assembled by `entu/api: routes/openapi.get.js`); pin a tag + operation -- e.g. `openapi: tag=Entity op=POST /{db}/entity/{_id}`. **Excludes** GraphQL + `_*` internal routes. | Tracked by spec version; flag HIGH if the path/tag no longer exists. |
 | `src` | Source code in **entu/api** (Nitro/h3 **file-router** -- endpoints under `routes/`, shared logic under `utils/`) | `entu/api: <path> (<symbol>)` -- e.g. `entu/api: utils/entity.js (inheritParentProperties)`, `entu/api: routes/[db]/property/[_id]/index.delete.js`. **NOT `src/api/...`** -- that is an entu/www *docs* path, not code. | Tracked by source-file change; flag HIGH if symbol/path gone. **Code is the authoritative tier** where docs and code disagree. |
-| `probe` | A **live probe** against a running Entu, captured in mvox-dev's native finding-note shape | `mvox-dev/mvox_v4e_web: docs/migration/findings/<note>` -- e.g. `mvox-dev: docs/migration/findings/org-rights-cascade-audit`. The note carries its own `**Probe:**` script + `**Result artifact:**` JSON + ratified-commit + a STEP\|OP\|RESULT table (maps 1:1 onto evidence/verification/excerpt). | **Always TTL'd.** A probe is a point-in-time observation; it has no source file to diff, so only the clock guards it. |
+| `probe` | A **live probe** against a running Entu, captured in mvox-dev's native finding-note shape | `mvox-dev: docs/migration/findings/<note>-YYYY-MM-DD` -- e.g. `mvox-dev: docs/migration/findings/org-rights-cascade-audit-2026-05-21`. **The date suffix is mandatory** (32/32 files in that directory carry a date) and the prefix is the short form `mvox-dev:` (13/13 S44 refs used it). The note carries its own `**Probe:**` script + `**Result artifact:**` JSON + ratified-commit + a STEP\|OP\|RESULT table (maps 1:1 onto evidence/verification/excerpt). | **Always TTL'd.** A probe is a point-in-time observation; it has no source file to diff, so only the clock guards it. |
 
 **The mvox finding-note shape maps 1:1 onto a competency claim** (confirmed by Finn against the real corpus -- "mirror, don't invent"): the note's `## Question` → the `claim`; `**Probe:**`/`**Result artifact:**`/ratified-commit → the `probe` `evidence.ref`; the `STEP|OP|RESULT` table row → the `excerpt`; `Live-Verified <date>` → `verification.date`; `(*MVOX:<author>*)` → `verification.verifier`. The three evidence-strength tiers Finn found in the corpus (live-probe-verified → live-audit-verified → handbook-asserted) align with the `confidence` grades: probe+result-JSON+truth-table = `backed`-eligible; audit-over-real-data = `backed`/`partial`; handbook-asserted-narrative alone = `partial` until a probe/code ref corroborates.
 
@@ -103,7 +104,7 @@ The four `type` values and their `ref` locator formats. **Reconciled against rea
 | Rung | `method` | What it is | Backing evidence `type` | Confidence ceiling |
 |---|---|---|---|---|
 | 1 | `doc-cited` | Read in the published docs | `docs` | `partial` alone; `backed` if a `src`/`openapi` ref corroborates |
-| 2 | `spec-derived` | Derived from the OpenAPI spec **or** read directly from code | `openapi`, `src` | `backed` (code is authoritative -- §3) |
+| 2 | `spec-derived` | Derived from the OpenAPI spec **or** read directly from code | `openapi`, `src` | `backed` (code is authoritative -- §2) |
 | 3 | `live-probe` | A controlled probe was run against live Entu, captured with a result artifact + truth table | `probe` | `backed`, but **TTL'd** (perishable) |
 | 4 | `live-audit` | A probe-script **audit over real production data** (not a throwaway fixture) with a per-row result table | `probe` | `backed`, TTL'd. Stronger than `live-probe` for *prevalence* claims ("how often does X happen in real data"), since it observes the live corpus, not a constructed case. |
 | 5 | `maintainer-authoritative` | **The maintainer (Argo) answered directly**, pinning the truth to a `file:line` or an authoritative statement | `src` (the `file:line` Argo designates) -- or `probe` (a captured statement, when he gives no locator). **No new `type`** -- apex authority lives in the *method*, not a type. | **APEX -- top-tier `backed`.** Outranks all other evidence on the same claim. |
@@ -176,7 +177,7 @@ Each `evidence[]` entry carries a `stance` -- its relation to the claim:
 1. **Apex override.** If any evidence has `verification.method: maintainer-authoritative` with `stance: confirms` or `supersedes` → `confidence: backed`, `status: active`. The maintainer's word ends the question. (A `maintainer-authoritative` `contradicts` → the claim as stated is wrong; rewrite the claim to match the maintainer, don't keep it disputed.)
 2. **Supersede first.** Drop any evidence marked superseded by a `supersedes` entry from the confidence computation (keep it on disk for history). Re-grade on what remains.
 3. **Contradiction among non-apex evidence.** If, after step 2, the set contains **both** a `confirms` and a `contradicts` of comparable rung (e.g. `openapi` says 48h, `src`/`docs` say 12h) → `confidence: unverified` and `status: disputed`. The claim fires `[GAP]` and is a gap-loop target (escalate to Argo, §2b, to resolve to apex).
-   - **Exception -- code beats docs (§3 precedence):** if the `confirms` is `src` (code) and the `contradicts` is `docs`/`openapi` (text), the contradiction does **not** force `disputed` -- code is authoritative; the claim holds at `confidence: partial` with the doc contradiction recorded as a **gap-loop target** (the docs need fixing, the claim is right). The S3-delete case is exactly this: route code contradicts the OpenAPI desc → claim ("DELETE does not remove from S3") is `backed` by `src`, and the OpenAPI text is the gap to fix.
+   - **Exception -- code beats docs (§2 precedence):** if the `confirms` is `src` (code) and the `contradicts` is `docs`/`openapi` (text), the contradiction does **not** force `disputed` -- code is authoritative; the claim holds at `confidence: partial` with the doc contradiction recorded as a **gap-loop target** (the docs need fixing, the claim is right). The S3-delete case is exactly this: route code contradicts the OpenAPI desc → claim ("DELETE does not remove from S3") is `backed` by `src`, and the OpenAPI text is the gap to fix.
 4. **No contradiction.** All surviving evidence `confirms` → grade by the highest method rung present (§2a ceilings): a `src`/`openapi` confirm → `backed`; `docs`-only → `partial`; `probe`-only → `backed` but TTL'd; nothing but a stale/handbook assertion → `partial`.
 5. **Fail-closed.** Any ambiguity the rules don't cover → `unverified`.
 
@@ -294,7 +295,7 @@ The Entu consultant agents are **citation-backed personas** (the guild's dispatc
 
 This is a schema contract, so n+1 "I used the schema" reports do **not** change it. It is revised only on a **substrate change**:
 
-- ~~The Entu evidence-ref formats (§3) turn out to differ from the draft → reconcile the `ref` format table.~~ **DONE (S44):** reconciled against Finn's grounding digest -- §3 now carries the verified shapes (entu/api Nitro file-router for `src`; entu/www `src/` for `docs`; mvox-dev finding-notes for `probe`). Next revision trigger here is a *layout change in those repos* (e.g. entu/api migrates off Nitro file-routing), not a first-draft mismatch.
+- ~~The Entu evidence-ref formats (§2) turn out to differ from the draft → reconcile the `ref` format table.~~ **DONE (S44):** reconciled against Finn's grounding digest -- §2 now carries the verified shapes (entu/api Nitro file-router for `src`; entu/www `src/` for `docs`; mvox-dev finding-notes for `probe`). Next revision trigger here is a *layout change in those repos* (e.g. entu/api migrates off Nitro file-routing), not a first-draft mismatch. **RE-VERIFIED 2026-08-31 (Finn, TTL Group 4): no layout change -- Nitro file-routing intact, `openapi` and `src` rows clean end-to-end.** The pass nonetheless corrected four exemplars that were wrong at filing, and the S44 attribution above is itself partly wrong: the grounding digest carries **zero** ref exemplars; the reconciliation source for §2 was the sibling **data-lifecycle competency harvest**, now added to `source-files`. See Amendments.
 - Entu adds an evidence source the four `type` values don't cover (e.g. a GraphQL schema, an event log) → extend the `type` enum. *(Note: GraphQL exists at `entu/api: routes/graphql/[db].*` but is excluded from the public OpenAPI -- if a claim needs to cite it, that is the trigger to add a fifth type or fold it under `src`.)*
 - The #42 roster's domain set changes from `data-lifecycle/auth/formula/schema` → update the `domain` enum and the on-disk shard dirs.
 - Topic 10's taxonomy is revised → re-check the §6 mapping.
@@ -312,7 +313,7 @@ Three corpus facts validate the schema's load-bearing mechanisms with real data:
 
 ## Confidence
 
-Medium-to-high -- the schema is **derived and now corpus-grounded**, though not yet **instantiated** as a populated index. Its spine (claim→evidence→verification→confidence) is a direct re-pointing of the proven WikiProvenance model (§3) and a faithful instantiation of topic-10's design (the four #42 components + the three-way taxonomy). The previously un-validated surface -- the **evidence-ref formats** (§3) -- was **reconciled against real Entu artifacts via Finn's grounding digest (S44)**; the mvox finding-note shape maps 1:1 onto a claim ("mirror, don't invent" confirmed against the corpus), and three real doc↔code discrepancies (JWT lifetime, date wire-format, S3 cleanup) validate the gap-loop and `src`-precedence mechanics as worked examples rather than hypotheticals. **PO-ratified extension (S44):** the five-rung method ladder (§2a, adding `live-audit` + apex `maintainer-authoritative`) and the per-evidence `stance` field with the derived-confidence rule (§3a) -- both kept as minimal augmentations of the WikiProvenance dispute model, not a rewrite. TTL 2026-09-06 now guards *re-drift* of those external refs, not first-draft uncertainty.
+Medium-to-high -- the schema is **derived and now corpus-grounded**, though not yet **instantiated** as a populated index. Its spine (claim→evidence→verification→confidence) is a direct re-pointing of the proven WikiProvenance model (§3) and a faithful instantiation of topic-10's design (the four #42 components + the three-way taxonomy). The previously un-validated surface -- the **evidence-ref formats** (§2) -- was **reconciled against real Entu artifacts via Finn's grounding digest (S44)**; the mvox finding-note shape maps 1:1 onto a claim ("mirror, don't invent" confirmed against the corpus), and three real doc↔code discrepancies (JWT lifetime, date wire-format, S3 cleanup) validate the gap-loop and `src`-precedence mechanics as worked examples rather than hypotheticals. **PO-ratified extension (S44):** the five-rung method ladder (§2a, adding `live-audit` + apex `maintainer-authoritative`) and the per-evidence `stance` field with the derived-confidence rule (§3a) -- both kept as minimal augmentations of the WikiProvenance dispute model, not a rewrite. TTL 2026-11-30 now guards *re-drift* of those external refs, not first-draft uncertainty.
 
 ## Pairs with
 
@@ -320,4 +321,37 @@ Medium-to-high -- the schema is **derived and now corpus-grounded**, though not 
 - `types/t09-protocols.ts` `WikiProvenance` -- the provenance model this schema re-points (§3).
 - entu/api#42 -- the productization brief; this schema is its "Competency index" component, made concrete.
 
-(*FR:Callimachus*)
+## Amendments
+
+### 2026-08-31 -- TTL re-verification (Finn, Group 4). Verdict: NO re-drift; four exemplars were **wrong at filing**.
+
+The TTL (2026-09-06) fired to guard *re-drift* of the §2 evidence-ref formats. **Re-drift did not happen** -- the external substrate is stable and every structural claim held. What the pass actually caught was four exemplars that were **born wrong in S44**. Verified against the live `entu/api` and `entu/www` trees, not against the frozen issues.
+
+**Verified clean, no change:** the `openapi` row end-to-end (`api.entu.app/openapi` → 200, `openapi: 3.1.0`, 12 paths; exemplar resolves; the "excludes GraphQL + `_*` internal routes" claim holds at 0 and 0); the `src` row (Nitro file-router intact, every pinned path and symbol resolves, and the "**NOT** `src/api/...`" warning is still correct -- entu/api has no `src/` at all); the `docs` row's path half (bilingual `src/` + `src/et/` confirmed); and all three worked examples (the unnumbered "Worked examples" section) on live code.
+
+**Corrected:**
+
+1. **`probe` row, both halves.** Format said `mvox-dev/mvox_v4e_web:` while its own example said `mvox-dev:` -- the row disagreed with itself, and S44 used the short form in 13/13 refs. The `<note>` token also omitted the mandatory date: 32/32 files in that directory carry one, and the dateless `org-rights-cascade-audit.md` **has zero commits ever** -- the real file is `org-rights-cascade-audit-2026-05-21.md` (`aa26032d`, committed 16 days *before* S44).
+2. **`docs` row anchor.** `#single-hop` and `#references` are not headings in `src/api/formulas/index.md`; the real anchor is `#field-references`. **Not a rename** -- the heading set is byte-identical at the S44 sha (`11cfe80f`) and today.
+3. **§1 excerpt was not verbatim.** It cited `_parent.*` as a formula field kind; `_parent.` appears zero times in that doc at S44 and today, and the doc explicitly states `_parent` is a system reference property *not* counted by `_referrer`. Corrected to the real kinds.
+4. **PR-form `docs` refs had no staleness rule** -- the row's "tracked by source-file change" cannot fire on an unmerged PR, making a PR-form ref unfalsifiable. **Ruling (filer, 2026-08-31): keep the form, give it its own rule** -- recorded above. Dropping it was the alternative and was rejected: our own gap-loop output *is* unmerged PRs (#11, #13), so removing the form would make our own contributions uncitable, defeating the mechanism the schema exists to serve. This changes §2's rules rather than correcting an exemplar, so it is flagged to team-lead as a contract-semantics change.
+
+**Root cause of Defect 1 — one of the four, not three (corrected on read-back).** Frontmatter named `docs/2026-06-06-entu-consultant-grounding-digest.md` as the reconciliation source. **That digest contains zero `ref:` lines** (178 lines, 0 matches). All 32 worked ref exemplars live in `docs/2026-06-06-data-lifecycle-competency-harvest.md` (485 lines, 32 matches) -- same author, same date, and **absent from `source-files`**. The filer cited a document with no exemplars to lift, so the exemplars were hand-made from the bare prose topic-list at digest line 135 -- which names `org-rights-cascade-audit` **undated**, because it is naming topics, not files. That is exactly the shape of defect 1. The harvest has now been added to `source-files`. Generalised at [`gotchas/citation-names-the-wrong-sibling-source.md`](../gotchas/citation-names-the-wrong-sibling-source.md).
+
+**Defects 2 and 3 do NOT share that root cause — verified on read-back, and each belongs elsewhere.**
+
+- **Defect 2 (the invented anchor) is the filer's, but is a different sub-shape.** Both S44 documents contain **zero** anchored `entu/www: src/...#...` refs; the harvest's entu/www refs are all bare. **Citing the correct sibling would not have supplied an anchor** — no source demonstrated that shape, so the exemplar was invented rather than misrouted.
+- **Defect 3 (`_parent.*`) is NOT the filer's.** Grounding digest **line 67** reads verbatim: *"Field kinds: same-entity, `propertyName.*.prop` / `propertyName.type.prop` (referenced entities), `_child.*`, **`_parent.*`**, `_referrer.*`. No deeper chaining."* The filer transcribed the cited document faithfully; **the document was wrong.** This is an error in the S44 digest, owned by its author, who identified it himself during read-back.
+
+**Residual overstatement, flagged by the submitter and not fully reached by the corrections above.** The TTL note and the struck-through revision trigger both say §2 was *"reconciled against real Entu artifacts"* in S44. **For the anchor half of the `docs` row that never happened** — with zero anchored refs in either S44 document there was nothing to reconcile it against. The anchor's *value* is now fixed; the claim that the row as a whole was corpus-grounded remains too strong for that half, and is recorded here rather than silently repaired, because the overstatement is the S44 author's to correct.
+
+**Watches opened, not acted on:**
+
+- **Entu shipped its own AI assistant** (`entu/api utils/ai/{llm,operations,prompt,tools}.js`; docs at `entu/www src/api/ai/`; `POST /api/{db}/ai/chat`, runs with the caller's rights; landed ~2026-07). Candidate 5th domain against revision trigger #3 -- **held as a watch, not an enum change**, because that trigger fires on *the #42 roster's domain set changing* and the roster has not changed: #42 still has zero replies and there is no `agents/` directory in either repo (404 both).
+- **§6a's "the timing is Entu's, not ours" now has a datapoint.** All 11 entu/www docs issues remain open (oldest 2026-05-17) and PRs #11 and #13 are unmerged after ~3 months, against #42's assertion that "PRs get merged consistently (13/14 of ours landed)". Recorded as evidence for the existing caveat; §6 itself untouched.
+
+*Amendment filed by the librarian on Finn's submission. **Authorship, corrected on read-back: Defects 1 and 2 are the filer's; Defect 3 is the S44 digest author's.** The first version of this section claimed all three as the filer's — the submitter corrected it in the opposite direction to his own interest, having noticed he had moved his own S44 error into the filer's column. Both parties had over-attributed toward the other; the record now matches the sources. Scope held to the ref-format table per the entry's own TTL note -- §3a, §4, §5, §6 and the revision trigger's other bullets are untouched. `last-verified` bumped: the §2 claim was genuinely re-checked against live sources.*
+
+**Section-numbering defect, corrected in the same pass (Finn).** The ref-format table lives under **`## 2. Evidence object`**, not §3 (§3 is the WikiProvenance parallel) — so **every reference to "the evidence-ref formats (§3)" pointed at the wrong section**, including the frontmatter comment, the TTL note, the revision trigger, and the Confidence section. Corrected to §2, and two references to the five-rung method ladder corrected to §2a. **Two bare `§3` references are genuinely correct and were deliberately left** (both name the WikiProvenance parallel, at the Confidence and Pairs-with sections), and **all 16 `§3a` references are correct** — the stance rule really is inside §3. This is why the fix was applied per-occurrence rather than by pattern: a blanket `§3`→`§2` corrupts the two true ones, and any pattern matching `§3` matches `§3a` first and would have corrupted all sixteen. The defect had already cost a reader a double-take — the Group-4 brief said "§3" and the table was in §2.
+
+(*FR:Callimachus*) (*FR:Finn* -- re-verification, defects 1-4, and root cause)

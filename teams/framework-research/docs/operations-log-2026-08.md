@@ -509,3 +509,812 @@ Port reachable from the Windows workstation over WARP; sshd `OpenSSH_9.2p1 Debia
 **If a future session finds these gone: they were never declined on technical grounds. Do not re-open them as stale or re-litigate the design.**
 
 (*FR:Hopper*)
+
+---
+
+## 2026-08-31T09:42+03:00 -- S67 TTL batch, GROUP 3 (records check, no probe): both courier gotchas' gate closed 74 days ago
+
+**timestamp** -- 2026-08-31T09:42+03:00
+
+**tasker** -- Aen (team-lead), S67 spawn dispatch.
+
+**dispatch summary** -- Group 3 of the PO-approved S67 TTL batch re-verification. Two wiki gotchas (`explicit-courier-config-hardcoded-path-stale-on-2.1.181`, `orphan-courier-holds-lock-across-sessions-wrapper-cannot-reclaim`) both hold `status: active` pending "task #7 end-to-end validation." Question: did our own fix validate, and should `status` move. Records check against the S58+ record; no probe dispatched.
+
+**tier classification + sanction status** -- **Tier R** throughout (git-history reads, file reads, read-only Windows process/task/lock inspection). Default-permitted; no per-task sanction required. Nothing mutated.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `poc/ghost-bridge/stop-fr-courier.ps1` in full (Bug-C `param($Config)` header lines 31-42; Bug-B Step 1b identity sweep lines 79-116); `poc/ghost-bridge/restart-fr-courier-with-pid.ps1` in full (stop-then-start composition lines 93-96). Both wiki entries in full. `types/t09-protocols.ts:414` for the status enum.
+- **Layer 2 (operational copy):** N/A -- this substrate is the local Windows dev workstation, not a remote consumer-team host; Layer 1 and Layer 2 are the same working tree. Declared, not skipped.
+- **Layer 3 (running state):** live `Win32_Process` identity match on `fr-courier-daemon`; `fr-courier.pid`; `~/.stationmaster/framework-research/courier.lock`; `Get-ScheduledTask FrameworkResearch-Courier`; `claude --version`.
+- **Audit-trail artifacts (this repo):** commit `ef96665` (S58 message + stat); `memory/task-list-snapshot.md` (S58 close, row 7); `memory/team-lead.md:39`; `docs/operations-log-2026-06.md`.
+
+**commands executed** (verbatim) --
+1. `git log --oneline --since=2026-06-18 -- teams/framework-research/poc/ghost-bridge/`
+2. `git show --stat ef96665`
+3. `git show ef96665 -- teams/framework-research/memory/task-list-snapshot.md`
+4. `grep -rh "^status:" --include=*.md .` (in `wiki/`) piped to `sort | uniq -c | sort -rn`
+5. `grep -rn "status" types/*.ts` filtered for the enum values
+6. PowerShell composite probe: `Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -match 'fr-courier-daemon' }`; `Get-Content fr-courier.pid`; `Get-Content ~/.stationmaster/framework-research/courier.lock`; `Get-ScheduledTask -TaskName 'FrameworkResearch-Courier' | Select TaskName,State`; `claude --version`
+
+**outputs** --
+- **The gate is closed and has been since S58.** `memory/task-list-snapshot.md` (S58 close, 2026-06-18) row 7: "Validate fixes + execute Task-disable; gate #86 closure | completed | hopper + team-lead"; row 8 cross-team round-trip likewise completed; issue #86 closed. Commit `ef96665` message: "Validated end-to-end by an apex-research courier round-trip (ACK S58-RT-1): auto-discovery -> live session dir -> hub deposit (accepted) -> inbound inject." Both entries therefore hold `status: active` on a gate that closed **74 days ago and was never harvested back into the wiki.** This is a records lag, not an open technical question.
+- **Live substrate (this session):** sole courier **pid 14456** on `fr-courier.config.auto.json`; `fr-courier.pid` = 14456; lock = `{"pid": 14456, "ts": "20260831T062336490734"}`. Pidfile, lock holder and live process **all agree** -- the singleton is coherent, no orphan present. `FrameworkResearch-Courier` Scheduled Task **State = Disabled**, i.e. the Bug-B orphan-spawn source has held closed for 74 days across many session and host restarts. CLI **2.1.251**.
+- **Per-bug validation is NOT uniform, and this is the load-bearing result.** Bug C (explicit-config entry) is fully validated: the drain now runs against the launched `-Config` and every session restart since S58 exercises it. Bug B splits: fix (2) Scheduled-Task disable is executed and now durably re-observed; fix (1) the Step-1b **identity stop-sweep has never fired against a live orphan.** The S58 close carry-forward says so in its own words -- "Bug-B orphan-sweep live test -- optional defense-in-depth (Task source disabled)."
+- **This session's wrapper run does not close that residue.** Pid 30616 was the S66 courier, recorded dead with its session (`memory/team-lead.md:39`). A dead recorded pid takes `stop-fr-courier.ps1`'s Step-1 "not alive" branch, Step 1b then finds no live match, and the lock is cleared because the recorded holder is dead. That path is the **dead-pid stale-lock reclaim** -- which belongs to the sibling entry `courier-scheduled-task-restart-vs-stale-pidfile`, not to the live-orphan ownership entry. Recorded as inference from the pid-30616-dead record plus the script's branch structure; I did not observe the wrapper's console output directly.
+- **Schema blocker found.** Both entries promise a `status` move, but the canonical WikiProvenance enum is `active | disputed | archived` (`types/t09-protocols.ts:414`), corroborated by the corpus: **426 `active`, 2 `disputed`, 0 `resolved`.** There is no `resolved` value to move to. The entries' own revision-trigger prose promises a transition the typed contract cannot express.
+
+**outcome** -- **SUCCESS (Tier R records check complete; no probe needed, none run).** Group 3's question is answered: the fixes did validate, at S58, and the wiki simply never recorded it. Neither entry should be archived -- both are the standing rationale for the current courier design and `courier-must-runtime-discover-team-name` depends on them; archiving would bury the why, the same reasoning Brunel used at S58 to keep the two orphan/stale-pidfile entries separate. Recommendation to Callimachus via Protocol A: hold `status: active`, bump `last-verified` to 2026-08-31, record the gate closure and the 2.1.251 re-observation in each Amendments log, and narrow the Bug-B entry's open residue to the one thing that is genuinely untested -- the identity sweep against a live orphan. The `resolved`-value gap goes to Cal as a separate Protocol C candidate, not patched here.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T10:00+03:00 -- S67 TTL batch, GROUPS 1 + 2: drain row HOLDS; GC gotcha SPLITS graceful/ungraceful; new bg-slug finding
+
+**timestamp** -- 2026-08-31T10:00+03:00
+
+**tasker** -- Aen (team-lead), S67 spawn dispatch.
+
+**dispatch summary** -- Group 1: re-run probe-1b against live CLI 2.1.251 to re-establish the Drain row (delivered message removed from the inbox file, or retained?). Group 2: throwaway-session probe pass over the `teams-substrate-2.1.179-implicit-teams` anchor's TTL questions plus four satellite substrate reads.
+
+**tier classification + sanction status** -- **Tier R** for all live-substrate observation (content-polling watchers are read-only; process/registry/config reads). **Throwaway-session creation and teardown** proceeded under the dispatch's explicit standing sanction ("probes run against throwaway sessions only"); two `claude --bg` throwaways were created and destroyed, and every artifact they produced was removed. No sanction sought or needed beyond the dispatch, and nothing outside the throwaways' own blast radius was mutated.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `poc/ghost-bridge/HOW-TO-REPRODUCE.md` (full), `poc/ghost-bridge/TRUTHS.md` (T1.b, T2.a-c, T3.a-b, T4.a-e, T6.a-b, OPEN, I-1), `evidence-probe-1b-watch.log` (the 2.1.170 baseline). Wiki: `references/teams-substrate-2.1.179-implicit-teams.md`, `gotchas/sessions-pid-json-not-gc-status-idle-lingers.md` (both full).
+- **Layer 2 (operational copy):** N/A -- local Windows dev workstation; Layer 1 and Layer 2 are the same tree. Declared, not skipped.
+- **Layer 3 (running state):** `~/.claude/teams/` and `~/.claude/sessions/` inventories; per-session `config.json` and `sessions/<pid>.json` bodies; Windows process liveness for pids 18180/19904/32168/35188/34168/5980; live inbox files under `session-b9269601`.
+- **Audit-trail artifacts (this repo + scratchpad):** `evidence-probe-1b-2.1.251-teamlead.log`, `-hopper.log`, `evidence-create-order-2.1.251.log`, `evidence-wake-2.1.251.log`.
+
+**commands executed** (verbatim, abridged to the load-bearing set) --
+1. `watch-drain.sh <inbox> <out> 300` -- 0.05s content-polling watcher (stat + grep only) on `session-b9269601/inboxes/team-lead.json` and `.../hopper.json`
+2. `watch-create-order.sh <out> 150` -- 0.03s creation-order watcher over `~/.claude/sessions/` and `~/.claude/teams/`
+3. `claude -p "Reply with exactly: THROWAWAY-PROBE-OK" --model haiku`
+4. `claude --bg --model haiku "<throwaway probe prompt>"` (x2)
+5. `mkdir -p <throwaway>/inboxes` + `cat > <throwaway>/inboxes/team-lead.json <<EOF ... EOF` (external-write wake test, both the `leadSessionId` slug and the registry-`sessionId` slug)
+6. `claude stop d9e036f4` (graceful) ; `Stop-Process -Id 5980 -Force` (ungraceful)
+7. `rm -rf ~/.claude/teams/session-d9e036f4 ~/.claude/teams/session-4282da57` ; `rm -f ~/.claude/sessions/5980.json` (baseline restore)
+
+**outputs** --
+
+**GROUP 1 -- Drain row HOLDS on 2.1.251. Delivered message is REMOVED, not retained.** Three complete enqueue-to-drain cycles on the live `team-lead.json`:
+```
+09:46:59.934 size=4516 read_false=1  ->  09:47:01.245 size=2   (1.31s)
+09:49:00.864 size=4186 read_false=1  ->  09:49:02.381 size=2   (1.52s)
+09:49:55.401 size=5119               ->  09:49:56.927 size=2   (1.53s)
+```
+`read_true` never left 0 in any sample. Control from the same window: my own `hopper.json` climbed read_false 5->6->7->8 with no drain, because the session stayed mid-turn and never reached a turn boundary. Pending accumulates; delivered is removed -- the pending-only-queue model of T1.b, unchanged 81 versions past the 2.1.170 probe.
+**Probe-instrument caveat, recorded rather than glossed:** the watcher's signature counted the literal `"read": false` (with space). Cycle 3 showed size=5119 with read_false=0, so at least one delivered entry used a different JSON spacing and was not counted. The size transition (2 -> content -> 2) is the load-bearing observable and is unaffected; the read-flag counter under-counts some shapes and should not be quoted as a census.
+**Seven live inbox files DO contain `"read": true` and are NOT counterexamples:** all seven have mtime 09:22-09:23 (this session's Step-3 restore), carry March/April 2026 traffic, and lack the `type:"message"` field that 2.1.179+ delivery writes. Archival residue and dead ghost inboxes with no live consumer -- never delivered by the current harness.
+
+**GROUP 2 -- results by question.**
+- **Team dir still `session-<id>`?** YES, unchanged. `session-b9269601` <- `b9269601-ec67-...` (pid 35188) and `session-2aedf13c` <- `2aedf13c-e5cd-...` (pid 32168), plus both throwaways. n=4.
+- **`config.json` eager / `inboxes/` lazy?** BOTH CONFIRMED. At throwaway creation the watcher logged `NEW teams/session-32e8785f/ (config=yes inboxes=no)`. Corroborated at rest: 8 of the 11 pre-existing session team dirs hold `config.json` and no `inboxes/` at all.
+- **config.json before sessions/<pid>.json?** CONFIRMED, and the window is wide:
+```
+09:50:38.435 NEW teams/session-32e8785f/ (config=yes inboxes=no)
+09:50:39.269 NEW teams/session-32e8785f/config.json
+09:50:41.424 NEW sessions/34168.<hash>.key
+09:50:41.681 NEW sessions/34168.json
+```
+Team dir and its config precede the session-registry entry by **~3.2s**. A discovery routine that globs team dirs then filters on `sessions/<pid>.json` gets a false negative for that whole window. `cold-start-discovery-false-negative-config-before-sessions-json` HOLDS.
+- **`sessions/<pid>.json` GC'd on exit?** **THE GOTCHA SPLITS -- half refuted, half intact, guidance unchanged.** Graceful `claude stop d9e036f4`: pid 34168 alive -> dead, and `sessions/34168.json` was **REMOVED**. The graceful-exit half of the 2.1.181 claim is **REFUTED on 2.1.251**. Ungraceful `Stop-Process -Force` on pid 5980: entry **LINGERED with `status:"idle"`**, exactly as documented. **The operational guidance therefore stands unchanged** -- a liveness check must still use process-liveness plus `procStart`, because the hard-kill path still leaves a dead entry that reads identical to a live idle one. The courier's process-liveness resolver stays load-bearing; nothing to undo.
+- **Same graceful/ungraceful split governs stale team dirs.** The gracefully-stopped throwaway's team dir `session-32e8785f` was **removed by the harness**; the hard-killed throwaway's `session-4282da57` **lingered**. Bears directly on `no-teamdelete-stale-session-dirs-accumulate`: on 2.1.251 dirs accumulate from ungraceful exits, not from every exit.
+- **NEW FINDING (n=2) -- for `--bg` sessions the registry `sessionId` is the jobId and does NOT match the team dir slug.** Throwaway #1: dir `session-32e8785f`, `leadSessionId 32e8785f-...`, registry `sessionId d9e036f4-...` (= jobId `d9e036f4`). Throwaway #2: dir `session-4282da57`, `leadSessionId 4282da57-...`, registry `sessionId 2488c58a-...` (= jobId `2488c58a`). For **interactive** sessions the two agree (n=2: b9269601, 2aedf13c). The 2.1.179 sheet's rule "derive the `session-<id>` slug from the first 8 hex of `sessionId`" is therefore **correct for interactive sessions and wrong for `--bg` sessions**. Directly relevant to the courier resolver's `discover_by_session_pid`, which derives the slug that way; binding it to a bg session's pid would resolve a dir that does not exist.
+- **External inbox-write wakes a bare session?** **INCONCLUSIVE -- explicitly NOT reported as a refutation.** A well-formed entry written into the throwaway's `inboxes/team-lead.json` sat undelivered with `read:false` for 70s+ while the session showed `status:"idle"`. A discriminating second write to the registry-`sessionId` slug path (`session-d9e036f4/inboxes/team-lead.json`) also went undelivered, which rules the slug mismatch OUT as the explanation. Two uncontrolled confounders remain: the session was `kind:"bg"` rather than the interactive lone session the 2.1.179 P5/P6 probe used, and its UI reported **"manual mode on"**. The 2.1.179 row is not refuted by this; it needs an interactive throwaway. Handed to Volta.
+- **TeamDelete still absent?** Absent from **my** tool surface, but I am a subagent and team-management tools may not be exposed at this level. Not a substrate claim; needs confirmation on the main session's surface.
+
+**outcome** -- **SUCCESS (partial on one question, explicitly flagged).** Group 1 fully answered: the Drain row holds, all three G1 entries stand, the courier's inbound verify-empty -> exclusive-create design rests on solid ground. Group 2: five questions answered, one new finding surfaced, one question (external-write wake) left INCONCLUSIVE with the confounders named and routed to Volta, one (TeamDelete) out of my scope to confirm. **Substrate restored to exact baseline** -- 11 session team dirs and 4 session-registry files, both matching the pre-probe inventory; FR courier pid 14456 alive and untouched; live team dir `session-b9269601` intact with 45 inbox files. Protocol A submissions to Callimachus: one consolidated 2.1.251 datapoint per lineage (G1 inbox/drain, G2 implicit-teams) per his branch-1 ruling, plus a branch-2 narrowing for the GC gotcha and a new entry for the bg-slug finding.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T10:20+03:00 -- S67: interactive-rig dispatch ABORTED (no viable rig); G1 born-wrong read; G2 cost estimate
+
+**timestamp** -- 2026-08-31T10:20+03:00
+
+**tasker** -- Aen (team-lead), 11:10 dispatch (interactive throwaway for the wake row + O6 + O5c) and 10:48 dispatch (G1 born-wrong read + G2 cost estimate).
+
+**dispatch summary** -- Build one `kind:"interactive"` throwaway session; run O5a/O5b/O5c (external-write wake and six-field surfacing) and O6 (members[] injection routing) against it. Separately, an in-tree born-wrong read of the three Group 1 entries and a cost estimate for the same over the six Group 2 entries.
+
+**tier classification + sanction status** -- Rig work: throwaway-session creation/teardown under the dispatch's standing sanction. Born-wrong read: **Tier R** (in-tree file and git-history reads only). **No Tier M or D executed.** The one operation that would have completed O6 -- injecting a ghost member into the LIVE `session-b9269601/config.json` -- was NOT performed; it mutates the live team dir the dispatch put off-limits, and was surfaced to the tasker as an option rather than taken.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** the three G1 wiki entries in full; the six G2 entries (structural measurement); `poc/ghost-bridge/TRUTHS.md` (T-heading census at two revisions).
+- **Layer 2:** N/A -- local Windows dev workstation; L1 and L2 are the same tree. Declared, not skipped.
+- **Layer 3 (running state):** `~/.claude/sessions/`, `~/.claude/teams/`, `claude agents --json`, per-session process liveness, `claude logs <id>`.
+- **Audit-trail artifacts:** `evidence-interactive-create-order.log`, `evidence-wake2-2.1.251.log`, `evidence-bg2-create-order.log`; git history of `TRUTHS.md` and `inbox-substrate-properties-2.1.170.md`.
+
+**commands executed** (verbatim, load-bearing set) --
+1. `winpty <claude.exe> --model haiku < in.fifo` -- rig attempt 1
+2. `Start-Process <claude.exe> -ArgumentList '--model','haiku' -WorkingDirectory <scratchpad|repo-root> -WindowStyle Minimized` -- rig attempts 2 and 3
+3. `claude --bg --model haiku "<probe prompt>"` ; `claude logs ce0fe144` ; `claude stop ce0fe144` ; `claude agents --json`
+4. `cat > <throwaway>/inboxes/team-lead.json <<EOF` -- six-field O5c entry
+5. `git show <commit>:teams/framework-research/poc/ghost-bridge/TRUTHS.md | grep -cE '^#+ *T[0-9]'` at each revision
+6. `git log -S'23 atomic' -- teams/framework-research/wiki/references/inbox-substrate-properties-2.1.170.md`
+
+**outputs** --
+
+**RIG: ABORTED. No viable interactive rig exists on this box.** Three shapes, three distinct failures. (a) `winpty` + FIFO dies `stdin is not a tty` -- the FIFO needed to drive the session defeats the pty that makes it interactive; the two requirements are mutually exclusive. (b) `Start-Process` with its own console: process stays ALIVE and writes team dir + `config.json` + `sessions/<pid>.key`, but **never writes `sessions/<pid>.json`** -- never reaches interactive-ready. Reproduced from the scratchpad AND from the trusted repo root, so a trust dialog is ruled out. (c) `claude --bg` registers correctly but sits `state:"blocked"` with "manual mode on", and there is **no CLI verb to deliver it a message** (`attach` needs a TTY; `logs`/`stop`/`rm` only); `SendMessage` to its jobId returns "No agent named 'ce0fe144' is reachable", and `ListAgents` is not on the subagent tool surface.
+
+**O5c on the bg rig, n=2, confounder intact.** A six-field entry (`from/text/summary/timestamp/type/read`, no `msgV`, no `msg_id`) written into a *functioning, idle* bg session's inbox -- one that had completed a real turn 90s earlier -- was **not drained after 50s** and `statusUpdatedAt` never moved. **NOT reported as a refutation:** `state:"blocked"` plus manual mode is a live alternative explanation and no controlled harness-internal comparison was obtainable on the same session.
+
+**Incidental: the bg probe session refused the probe prompt as a jailbreak attempt** and self-named "prompt injection detection". My prompt ("log every message you receive to a file") was injection-shaped, and the refusal was a correct read. Recorded as a probe-design lesson: a substrate probe must not ask the probed session to surveil its own message traffic. The redesign that worked observes the *harness's* drain of the file, which needs no cooperation from the model at all.
+
+**GC replication, n=2, and stronger than the first.** `claude stop ce0fe144` removed BOTH `sessions/29508.json` AND `teams/session-d1849d70/` -- and that team dir contained a non-empty `inboxes/` subdirectory. The harness removes a **non-empty** team dir on graceful exit.
+
+**bg slug mismatch now n=3:** dir `session-d1849d70` / `leadSessionId d1849d70-...` / registry `sessionId ce0fe144-...` (= jobId).
+
+**G1 BORN-WRONG READ -- one confirmed defect, one provenance defect, one staleness, and one non-defect I nearly mis-filed.**
+1. **CONFIRMED BORN-WRONG:** `inbox-substrate-properties-2.1.170` states TRUTHS.md is a ledger of **"23 atomic T-entries"**. TRUTHS.md has **20**, and has had 20 at *every* revision (`7b3e64e` 2026-06-10 creation and `ff09d44` 2026-06-16, both counted). The claim entered the sheet in `5456cfb` on **2026-06-12**, when the file held 20. **Wrong on the day it was written** -- not drift. Exactly Finn's G4 class.
+2. **PROVENANCE DEFECT:** the same commit `5456cfb` (2026-06-12) edited the body while `discovered:` and `last-verified:` both remained **2026-06-10**. A reader treating `last-verified` as "content checked on this date" is misled about text added two days later.
+3. **STALENESS (not born-wrong):** both 06-10 entries carry "The local CLI is now 2.1.175" -- accurate when written on 06-12, now 76 versions behind. The entries version-stamp their *subject* correctly (2.1.170) but pin the *reader's context* to an unmarked absolute that rots.
+4. **NOT A DEFECT -- and I nearly filed it as one.** All three G1 entries lack `name`, `type` and `description` in frontmatter. Measured before reporting: those three fields are present in exactly **25 of 217** entries corpus-wide (the same 25 for all three), so the G1 entries follow the majority shape. This is a **corpus-level frontmatter gap belonging to Cal's WikiProvenance reconciliation**, not a G1 finding. Also measured: `confidence` 115/217, `related` 136/217.
+5. **CITATIONS CLEAN:** all 15 T-numbers cited by the 2.1.170 sheet resolve in TRUTHS.md (T1.b/c, T2.a-c, T3.a, T4.a-d, T5.a-c, T6.a-b). `designs/deployed/stationmaster/stationmaster-onboarding.md`, cited by the 2.1.173 entry, resolves at its post-relocation path.
+
+**G2 COST ESTIMATE (measurement, not execution).** Six entries, 487 lines; 18 source-file/commit/issue refs; 42 relative `.md` links; 15 wikilinks; **0 file:line references** (the line-ref hazard both team-lead.md and my own scratchpad warn about does not apply to this set). Split: the ~75 link/path/citation resolutions are **mechanical and scriptable** (~15 min). The expensive half is claim-versus-source reading -- roughly 8-12 min per entry, **1 to 1.5 hours** for six -- and it is the half that finds defects, since the "23 atomic" error was only visible by counting the source. **Instrument caveat, stated rather than glossed:** my numeric-claim regex returned 0 across all six, yet it would also have missed the "23 atomic T-entries" defect (the word "atomic" sits between the number and the noun). The numeric-claim surface therefore cannot be grepped, and the estimate assumes a read. **Higher-leverage recommendation:** build the mechanical half as a link/citation resolver alongside Cal's `schema-population-audit.py` -- it then covers all 217 entries rather than these six, at the same build cost.
+
+**outcome** -- **PARTIAL / ABORTED-PRE-EXECUTION on the probe half; SUCCESS on the records half.** O6 and O5a/O5b/O5c remain unrun, blocked on a single shared missing capability (a drivable interactive-ready session), surfaced to the tasker with two concrete unblock options rather than worked around. Finn's DIALOG sentinel declined on the same blocker plus two independent disqualifiers. G1 born-wrong read complete with one confirmed born-wrong defect; G2 estimate delivered as measurement. **Substrate restored to exact baseline** -- 11 session team dirs, 4 registry `.json`, 4 `.key`; FR courier pid 14456 alive; `session-b9269601` intact at 45 inbox files.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T10:47+03:00 -- S67: WAKE ROW resolved (scoped refutation); O6 blocked by permission system; O10 d/e/f discharged
+
+**timestamp** -- 2026-08-31T10:47+03:00
+
+**tasker** -- Aen (team-lead): Option B dispatch (PO-launched interactive session, wake row + O5a/O5b), Option A authorization (O6 ghost-member vs live team, safeguards specified), O5c-on-team-lead variant, and Volta's conditional promotion of O10.
+
+**dispatch summary** -- Run the external-inbox-write wake row against a genuine `kind:"interactive"` session; run O5c (six-field surfacing) against the live team-lead inbox; run O6 (members[] injection routing) against the live team with rollback safeguards; O10 promoted if the wake row came back refuted.
+
+**tier classification + sanction status** --
+- Wake row against the PO's session: **Tier M** by shape (writes into another session's inbox dir). Sanction: Aen's Option-B dispatch, verbatim -- *"run the wake row properly: external six-field write into ITS inbox while bare -- does it WAKE and SURFACE... probe messages only, distinctive markers, nothing that would start real work in it."* Honored: both entries carry `O5C-PROBE-S67-SIX-FIELD-MARKER` / `O5B-PROBE-S67-SECOND-WRITE`, both state in their own body that they are automated probes requiring no action.
+- O5c into team-lead's inbox: **Tier M**, sanctioned verbatim by Aen -- *"Write your six-field entry (no msgV, no msg_id) externally into inboxes/team-lead.json... from field = probe-ghost-s67, text = the distinctive marker."*
+- O6 against live `config.json`: **Tier M**, fully sanctioned by Aen with five safeguards. **NOT EXECUTED -- denied by the auto-mode permission classifier at the write step.** See outcome.
+- O10 binary inspection: **Tier R**.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `references/teams-substrate-2.1.179-implicit-teams.md` (External-write wake row + its bare-session caveat, verbatim); `references/claude-code-hook-wake-primitives.md` (cap/`stop_hook_active`/`asyncRewake` rows); `poc/ghost-bridge/HOW-TO-REPRODUCE.md` Steps 1/4-6 (the bare-session bring-up path this bears on).
+- **Layer 2:** N/A -- local Windows dev workstation; L1 and L2 are the same tree. Declared, not skipped.
+- **Layer 3 (running state):** `sessions/19796.json` (identity verified BEFORE probing: `kind:"interactive"`, `procStart` 134326349150306845, slug `session-94ba34bc` matching `sessionId`); `teams/session-94ba34bc/` bare state; `teams/session-b9269601/config.json` + `inboxes/`; the shipped `claude.exe` (2.1.251) string/constant inspection.
+- **Audit-trail artifacts:** `evidence-O5a-po-interactive.log`, `evidence-O5c-aen.log`, `config.json.bak.s67-o6` (md5 `64ae82a32a7dcf89aff29c1246d6a691`).
+
+**commands executed** (verbatim, load-bearing set) --
+1. `cat ~/.claude/sessions/19796.json` + `Get-Process -Id 19796` -- identity/liveness verification before probing the PO's terminal
+2. `watch-wake-po.sh` -- 0.05s dual poll of the target inbox file AND `sessions/19796.json` `status`/`statusUpdatedAt`
+3. `mkdir -p <po-team-dir>/inboxes && cat > .../team-lead.json <<EOF` (O5a) ; second write to the now-existing file (O5b)
+4. python append of the six-field entry into `teams/session-b9269601/inboxes/team-lead.json` (O5c)
+5. `cp config.json <scratchpad>/config.json.bak.s67-o6` + `md5sum` both ; collision check on `probe-ghost-s67` (O6 safeguards 1-2)
+6. python append of the ghost member to live `config.json` (O6 step 3) -- **DENIED by classifier, not executed**
+7. `grep -c <term> claude.exe` for hook primitives with `TodoWrite`/`SendMessage` as positive controls; python byte-context extraction around `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP` and `asyncRewake`
+
+**outputs** --
+
+**WAKE ROW -- REFUTED, BUT SCOPED. The scope is the finding.**
+| Session | Shape | Result |
+|---|---|---|
+| PO's, pid 19796 | **bare** lone interactive, idle, members[] = self only, no prior message traffic | **O5a (create+write): NOT delivered, 190s+. O5b (write to existing file): NOT delivered, 60s+** against a documented ~15s proactive wake. `status` never left `idle`; `statusUpdatedAt` never moved off session-start. Two entries remain at `read:false`. |
+| `session-b9269601` | **active** interactive, 6 members, live traffic | **DRAINED in under 50ms** -- the 0.05s watcher never caught an intermediate state. |
+
+The anchor sheet's row -- *"An external process writing well-formed JSON into `inboxes/team-lead.json` wakes the idle lone session AND delivers"* and *"subsequent external writes proactively wake the idle session in real time (~15s, no nudge)"* -- **fails on a bare lone session on 2.1.251**, while the same mechanism is alive and faster than ever on an active one. **Hypothesis, labelled as one:** the harness runs an inbox watcher for sessions with an active team context and not for a bare lone one. **Operational consequence:** courier inbound targets an active multi-agent session and is verified working; what breaks is the **fresh-team first-contact path** that `HOW-TO-REPRODUCE.md` Steps 4-6 and the sheet's own "the courier must create the file itself on a brand-fresh bare session" caveat rest on.
+
+**O5c -- POSITIVE at the drain layer.** A six-field entry (`from/text/summary/timestamp/type/read`, **no `msgV`, no `msg_id`**) was accepted and drained by the active session. Volta's courier-entry-builder must-fix does NOT fire. **Held open honestly:** drain proves the harness took it; only team-lead's sighting proves it SURFACED to the model. Surfacing was requested and has NOT been inferred from the drain.
+
+**THREE G2 ROWS CONFIRMED FREE on the PO's genuine interactive session.** O1: slug still `sessionId[:8]` (`session-94ba34bc` <- `94ba34bc-b7a0-...`), n=3 interactive. O2: `config.json` eager, lone member carrying `backendType:"in-process"` and `tmuxPaneId:"leader"` exactly as documented. **O4: `inboxes/` ABSENT on a session live and idle for 7 minutes** -- this satisfies Volta's R2 absence discipline properly (a running session well past interactive-ready, not a cold-start artifact), which the dead-dir evidence could not.
+
+**O6 -- NOT EXECUTED. Blocked by the PERMISSION SYSTEM, not by the rig, not by the tasker.** Safeguards 1-2 completed cleanly (backup byte-identical at md5 `64ae82a32a7dcf89aff29c1246d6a691`; no `probe-ghost-s67` collision among the 6 members; no pre-existing ghost inbox). The write to the live `config.json` was denied by the auto-mode classifier. **I did not retry via the Write tool or any other path**: the denial is about the *action* (mutating a live harness config), not the *mechanism*, so a tool swap would circumvent its intent. **A teammate's authorization is not the permission system's authorization** -- Aen can sanction the work; only the PO can grant the capability. State verified after: config md5 unchanged and identical to backup, members still the same six, no ghost inbox created. **Nothing was modified.**
+
+**This block is itself a substrate finding.** The harness permission-gates the `members[]`-injection primitive that the ghost-courier registration design assumes an agent can perform. The 2.1.179 sheet records members-injection as a surviving primitive and treats it as freely available; on 2.1.251 an in-session agent is denied by default. Whether it still *works* is now a separate question from whether an agent may *perform* it -- and the design assumed the second. **Combined with the wake result, the fresh-team bring-up path degrades at both ends: registration AND first delivery.** Steady-state traffic into an active team is unaffected.
+
+**O10 -- d, e, f DISCHARGED from the shipped binary (Tier R, no session needed).** Counts against positive controls `TodoWrite`=16 / `SendMessage`=70: `additionalContext` 47, `UserPromptSubmit` 51, `stop_hook_active` 5, `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP` 4, `asyncRewake` 8, `SessionStart` 59, `PreToolUse` 97 -- all far above the noise floor the controls establish.
+- **O10e CONFIRMED:** `stop_hook_active` survives, including in the shipped guidance string *"For Stop/SubagentStop hooks, check stop_hook_active in the input and return success while it's true."*
+- **O10f CONFIRMED, schema intact:** `asyncRewake` is a live config field -- *"If true, hook runs in background and wakes the model on exit code 2 (blocking error). Implies async."* -- shipping alongside `rewakeMessage`, `rewakeSummary`, `cloud`. The entry's description matches the shipped schema.
+- **O10d -- NAME confirmed, VALUE wrong. Volta's value-restamp case, not a mechanism change.** Shipped default is **8, not 9**: `let vi = a.CLAUDE_CODE_STOP_HOOK_BLOCK_CAP ?? 8; if (vi > 0 && Li > vi) return ...`. The comparison is strict `>`, so **8 consecutive blocks are permitted and the override fires on the 9th.** The entry's "caps consecutive Stop-hook blocks at 9" and its line-49 "Nine consecutive Stop-blocks is the ceiling" take **different sides of that ambiguity**, and the second is off by one against the shipped constant. **NOT called born-wrong** -- equally consistent with the default having been 9 when measured on 2.1.178/179, i.e. drift; separating the two needs version archaeology not done here. Restamp should read *default 8, override on exceeding it*, with the comparison spelled out.
+- **HARD LIMIT:** the above settles **names, constants and schema**, NOT runtime behavior. **O10a/O10b/O10c (does a Stop hook actually fire every turn-end; does `additionalContext` actually inject; does `asyncRewake` actually wake on exit-2) remain OPEN** and need a live session. A binary grep must not stand in for a behavioral test on the three sub-checks that decide whether a fallback delivery route exists at all.
+
+**outcome** -- **SUCCESS on the wake row (the batch's most load-bearing question, now answered with a scope that changes the operational reading), SUCCESS on O5c at the drain layer with surfacing pending, ABORTED-PRE-EXECUTION on O6 (permission-denied, nothing mutated, surfaced to tasker with three unblock options for the PO), PARTIAL on O10 (3 of 6 discharged, 3 behavioral sub-checks explicitly left open).** The PO's session was probed only with self-describing no-action markers and left otherwise untouched; team-lead's `config.json` verified byte-identical to its pre-flight backup.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T10:53+03:00 -- S67: G2 content read (3 defects, one a new class) + CORRECTION to the 10:20 entry
+
+**timestamp** -- 2026-08-31T10:53+03:00
+
+**tasker** -- Aen (team-lead), ruling 4 of his 10:33 message: do the READING half over the six Group 2 entries, using Finn's enumerate-every-integer instrument in place of my regex.
+
+**dispatch summary** -- Content-accuracy read of the six G2 entries: do their claims hold against the sources they cite, independent of whether the substrate moved.
+
+**tier classification + sanction status** -- **Tier R** throughout (in-tree file reads, git history, read-only inspection of the shipped binary). Default-permitted. Nothing mutated.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** all six G2 entries in full plus the card for `courier-restart-...`; `startup.md` (step-order verification); `poc/ghost-bridge/TRUTHS.md`.
+- **Layer 2:** N/A -- local Windows dev workstation; L1 and L2 are the same tree. Declared, not skipped.
+- **Layer 3 (running state):** the shipped `claude.exe` (2.1.251) for the hook-cap constant.
+- **Audit-trail artifacts:** git history for commit `b37b938`; this repo's `docs/operations-log-2026-08.md` entries at T09:42, T10:00, T10:20, T10:47.
+
+**commands executed** (verbatim, load-bearing set) --
+1. `grep -oE '[0-9]+' <entry> | sort -n -u` -- Finn's integer enumeration, per entry
+2. `grep -n "field 22\|field-22" ...` ; `grep -nE '\b9\b' ...` ; `grep -nE '15s|first 8' ...` -- claim-context extraction
+3. `git log -1 --format=... b37b938` ; `git show --stat b37b938`
+4. per-entry `source-files` frontmatter extraction + `test -f` on each of 13 paths
+5. `grep -nE '^#+ *Step (2\.5|3|3\.5)' startup.md` -- ordering claim vs file reality
+6. python `json.loads` of the verbatim dead-entry JSON block in `sessions-pid-json-not-gc-status-idle-lingers`
+
+**outputs** --
+
+**THREE DEFECTS across six entries.**
+
+**Defect 1 -- a THIRD class, distinct from born-wrong and from drift.** `courier-restart-needs-inboxes-dir-step25-before-step3` carries a `description` asserting in the **present tense**: *"The startup runbook currently runs Step 2.5 BEFORE Step 3, so the courier restart hits a missing inboxes_dir."* **False since S58.** Verified: `startup.md:142` = Step 3, `startup.md:162` = Step 3.5, carrying the explicit note *"renumbered from Step 2.5 in S58"*. The body records BOTH fixes as LANDED from line 44; **the card repeats the stale present-tense claim in its opening line.**
+**Class: self-inflicted staleness.** Not born-wrong (true when written); not drift (the substrate did not move -- *we* did). The body and amendments log were updated; the summary was left describing the world the fix had just changed. **Consequence is disproportionate to the wording**, because `description` and the card are what a Protocol B query surfaces first: the reader's headline is a defect fixed two and a half months ago, with the correction forty lines down, and acting on the headline means reordering an already-reordered runbook. **Structurally invisible to substrate re-verification** -- a TTL probe returns "still true, nothing moved" while the summary stays wrong. Likely wherever an entry has both a summary field and an amendments log, i.e. most of the corpus.
+
+**Defect 2 -- provenance, and partly my own.** `claude-code-hook-wake-primitives` carries **`source-files: []` and `source-commits: []`** (explicitly empty) while asserting `confidence: high` over six specific technical claims. I am a listed `source-agent` on it with Brunel.
+
+**Defect 3 -- same entry, which is the structural point.** Its cap claim fails against the shipped 2.1.251 binary: `let vi = a.CLAUDE_CODE_STOP_HOOK_BLOCK_CAP ?? 8; if (vi > 0 && Li > vi) ...` -- default **8**, strict `>`, so **8 consecutive blocks permitted, override on the 9th**. The entry says "caps at 9" and its line 49 says "Nine consecutive Stop-blocks is the ceiling"; the two sentences take opposite sides of that ambiguity and the second is off by one. **Filed as a value-restamp, NOT born-wrong** -- equally consistent with the default having been 9 when measured on 2.1.178/179. **The one entry citing no sources is the one carrying a wrong value.** n=1, no causal claim -- but nothing in it *could* be checked against a source, because it names none.
+
+**VERIFIED CLEAN.** All **13** `source-files` paths across the six entries resolve. Commit `b37b938` exists (2026-06-17, *"docs(fr): 2.1.178 teams-migration probe findings (P1-P6)"*) and does contain the cited `teams-migration-probe-findings-2026-06-17.md`. The verbatim dead-entry JSON in `sessions-pid-json-not-gc-status-idle-lingers` **parses cleanly**, 12 keys, internally consistent (pid 344 / version 2.1.181 / `status:"idle"` / `kind:"interactive"` / `procStart` present). `/proc/<pid>/stat` **field 22 = starttime** is correct per the standard proc layout (verified against documented field order, not measured -- there is no `/proc` on this host). "Derive the slug from the first 8 hex of `sessionId`" is correct, confirmed on three interactive sessions today -- and separately shown WRONG for `--bg` sessions, already filed as a new gotcha.
+
+**INSTRUMENT NOTE -- Finn's enumeration versus my regex, measured.** My numeric-claim regex returned **0 across all six entries and would have caught 0 of the 3 defects**. Integer enumeration surfaced both numeric ones. Its predicted noise profile held exactly: `507` looked like a counted claim and is part of the example dir name `session-b2ad507b`, cleared at a glance, as were the date and version fragments. **The no-false-negatives-by-construction property is the value** -- every counted claim contains an integer, so enumerating integers cannot miss one, whereas a pattern written before knowing the noun can and did.
+
+**CORRECTION to the 2026-08-31T10:20 entry (append-only; the original stands unedited).** That entry called the "23 atomic T-entries" claim a **miscount**. Finn verified it independently and the diagnosis is sharper: **it is a wrong denominator, not a miscount.** TRUTHS.md holds 20 settled T-entries + 2 OPEN subsections + 1 invalidated assumption (`I-1`) = **23 total `###` sections**. So 23 correctly counts the file's third-level sections and mislabels them "atomic T-entries". **The remedy differs and that is why the correction matters:** a miscount is fixed by recounting to 20, which loses the reason; a wrong denominator is fixed by restating the claim to name what was actually counted. `I-1` is an *invalidated* assumption -- close to the opposite of a settled truth -- so the two categories should never have been summed. Credit to Finn; my original framing was accurate about the number and wrong about the cause.
+
+**outcome** -- **SUCCESS.** Six entries read, three defects found, one of them a class not previously named in this team's vocabulary and structurally invisible to the TTL/decay checking the whole batch was built around. Score comparable to Finn's four-in-G4; born-wrong and its cousins are not rare. **None of the three would have been caught by asking "has the substrate moved."** All three routed to Callimachus via Protocol A; the correction above also relayed to Finn.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:01+03:00 -- Joosep chain Phase 1 PASSED + displaced; Phase 2 HELD on digest artifact; O6 control finds a LIVE outbound defect
+
+**timestamp** -- 2026-08-31T11:01+03:00
+
+**tasker** -- Brunel (Step 14 rebuild dispatch, 5 phases) via Aen's 10:36 priority change (Joosep's 9a PASSED, held chain unfrozen); Aen additionally authorized Volta's non-member control send.
+
+**dispatch summary** -- Execute the paunvere rebuild on the `joosep` container: FIRST-TASKS md5 gate + displacement, re-stage the frozen tree, `.env` TEAM_NAME, build, restart, verify. Separately, run Volta's non-member control for O6.
+
+**tier classification + sanction status** -- **Tier M throughout**, sanctioned by Brunel's dispatch package (all five phases with explicit EXPECT and STOP conditions) plus Aen's 10:43 release of the restart gate ("the PO confirms Joosep is logged out and clear"). The `git pull` transport was explicitly delegated by Brunel ("You choose the transport"). O6 control send = **Tier M**, Aen 10:43 "GO -- plus Volta's non-member control send". **No Tier D executed. The live-config injection remains NOT executed (permission-denied, see the T10:47 entry).**
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `designs/new/joosep/` at frozen HEAD `5336c2e` -- Dockerfile, entrypoint.sh, docker-compose.yml, .env.example, FIRST-TASKS.md, joosep.sh, plus `teams/paunvere/` (10 files); `poc/ghost-bridge/stationmaster-courier.py` (`ghost_outboxes` handling :62-72, :123, :405-424; team-dir discovery :1095-1160); `poc/ghost-bridge/fr-courier.config.auto.json`.
+- **Layer 2 (consumer-team operational copy on the substrate host):** `/home/dev/joosep/` staging dir (full inventory + md5s); `/home/dev/github/mitselek-ai-teams` checkout (branch/status/HEAD before and after the fast-forward).
+- **Layer 3 (running container state):** `docker exec --user joosep joosep` for the FIRST-TASKS md5 pair and mtime, and for the post-displacement listing; live `session-b9269601/config.json` `members[]` and `inboxes/` for the control.
+- **Audit-trail artifacts:** Brunel's attestation table (his dispatch, quoted verbatim below); `evidence-O6-control.log`; `config.json.bak.s67-o6`.
+
+**commands executed** (verbatim) --
+1. `ssh -T dev@100.96.54.170 "docker exec --user joosep joosep sh -c 'md5sum /home/joosep/FIRST-TASKS.md /opt/FIRST-TASKS.md; ls -l --time-style=full-iso /home/joosep/FIRST-TASKS.md'"`
+2. `docker exec --user joosep joosep sh -c "mv /home/joosep/FIRST-TASKS.md /home/joosep/FIRST-TASKS.md.superseded-$(date +%Y%m%d-%H%M%S)"`
+3. `cd /home/dev/github/mitselek-ai-teams && git fetch origin && git pull --ff-only origin main`
+4. `cd designs/new/joosep && md5sum Dockerfile entrypoint.sh docker-compose.yml .env.example FIRST-TASKS.md joosep.sh`
+5. `find teams/paunvere -type f | sort | xargs md5sum | md5sum` and the same without the outer `md5sum` (manifest), on BOTH the RC checkout and the local Windows checkout
+6. `SendMessage(to="probe-nonmember-s67")` ; `printf '[]' > inboxes/probe-filetest-s67.json` then `SendMessage(to="probe-filetest-s67")`
+
+**outputs** --
+
+**PHASE 1 -- PASSED, and it was the one gate that could only run once.**
+```
+f61664b4526fc69d6a3652c392d5a7a9  /home/joosep/FIRST-TASKS.md
+f61664b4526fc69d6a3652c392d5a7a9  /opt/FIRST-TASKS.md
+-rw-r--r-- 1 joosep joosep 11269 2026-08-28 17:02:30.208425519 +0300
+```
+**md5s EQUAL** -> nobody had edited the seeded file, so Joosep had not started work in it. mtime 17:02:30 against Brunel's predicted ~17:04. **Displaced, not deleted:** `FIRST-TASKS.md.superseded-20260831-105548`, 11269 bytes, original mtime preserved; `/home/joosep/FIRST-TASKS.md` now absent, so the post-rebuild boot takes the `[ ! -f ]` branch, seeds Estonian and writes the seed stamp. **Brunel's correction to the tasker's instruction was load-bearing:** Aen relayed "check against Brunel's attested md5", but `530329c2…` is the *Estonian* file being shipped while the container held the *English* seed -- that comparison mismatches by design and would have fired a **false STOP** on a healthy container. Brunel's in-container pair needs no remembered value.
+
+**TRANSPORT.** RC checkout was clean on `main` at `03985fb`; `5336c2e` absent locally but present on `origin/main`; `git fetch` + `git pull --ff-only` advanced it with no merge. Nothing else touched.
+
+**CHECKOUT VERIFICATION -- 6 of 6 single files match Brunel's attestation exactly** (`186781db` Dockerfile, `cb8405a0` entrypoint.sh, `5375d9b8` docker-compose.yml, `2c80186c` .env.example, `530329c2` FIRST-TASKS.md, `83eda299` joosep.sh).
+
+**PHASE 2 -- HELD. Digest mismatch DIAGNOSED as a cross-platform instrument artifact, not drift.** Attested dir digest `e78b95ab74a7a233854ba097a909c9b2`; RC returns `f7bd4961e16aca974e91c14783ac8285` from the same cwd. **All 10 per-file md5s are byte-identical between the Windows checkout and RC**, and Brunel's command reproduces his exact value on the local box -- so his value and cwd were both right. **Cause: `md5sum` output format differs by platform and the digest hashes that output, not the files.** Windows/MSYS emits `<hash> *path` (binary-mode asterisk); Linux emits `<hash>  path`. The second-level `md5sum` hashes those lines. **The attested digest is a Windows value and cannot be reproduced on Linux by construction.** Portable form offered to Brunel: `... | sed 's/ \*/  /' | md5sum`. **Not staged pending his one-word clear** -- his Phase 2 said stop on any mismatch and do not re-copy silently; the discipline is worth the round-trip even when the diagnosis is confident.
+**Brunel's belt-and-braces instruction is what made this diagnosable.** He required the per-file manifest *in addition to* the digest because "a digest says THAT, never WHAT" -- and here the digest said *different* when nothing was different. Without the manifest this is a bare hex mismatch with no way to separate it from real corruption.
+**Second trap, recorded because it is nastier than a plain error:** running that digest from the repo root -- where `teams/paunvere` does not exist, the package living under `designs/new/joosep/` -- makes `find` fail and `md5sum` hash an empty stream, returning `d41d8cd98f00b204e9800998ecf8427e`, the md5 of nothing. **A wrong cwd yields valid-looking hex rather than an error.** It fails safe here (it will not match), but a gate that returns plausible output on total absence is the same genus as the masked-exit-status family.
+
+**O6 CONTROL (Volta) -- non-member send FAILS at dispatch, and it exposes a LIVE defect.**
+```
+SendMessage(to="probe-nonmember-s67") -> success:false "No agent named ... is reachable."
+```
+Watcher logged `ABSENT` throughout; **no inbox file written.** Volta's row 1 (membership irrelevant) is **eliminated**.
+**The obvious confound was tested and eliminated too.** Reachability might key on the inbox *file* existing rather than on membership -- plausible because `apex-lead-ghost.json` sits in our inboxes as restore residue. Created an empty `probe-filetest-s67.json` for a non-member and sent to that name: **same failure.** So **reachability is gated on `members[]`, not on inbox-file existence.** Probe file removed; inboxes back to 45; live `config.json` md5 `64ae82a32a7dcf89aff29c1246d6a691`, identical to backup.
+**LIVE DEFECT -- the cross-team OUTBOUND leg is down today.** The courier's real ghost outbox is **`apex-research-courier`** (`fr-courier.config.auto.json`); our `members[]` holds only the six real agents; and the courier source only ever *reads* the outbox (poll-by-content then atomic rename, `:413-424`) and reads `config.json` solely to discover the team dir name (`:1104-1106`) -- **it never registers its own ghost.** So the chain breaks at step one: an agent must SendMessage to `apex-research-courier` to fill the outbox, that send fails on non-membership, nothing adds it. **Inbound is verified working (<50ms, T10:47 entry); it is the send leg that cannot start.** This is the branch Volta predicted as "worth more than the wiki row you are probing for."
+**Two limits held deliberately.** (a) **I did NOT send to `apex-research-courier` itself** -- that could deliver real mail to another team, an outward-facing action not mine to take unasked; the claim rests on the synthetic control plus the identical not-in-members condition, a strong inference from a same-shaped case rather than direct observation of the production name. (b) **Volta's 2x2 remains unresolved:** the control settles the left column, the right column needs the permission-blocked injection, so we are in row 2 or row 3 and cannot yet tell which. **The defect holds under either row**, which is why it was reported without waiting.
+**Earlier O6 claim NARROWED per Volta.** My T10:47 wording said the harness gates "the primitive the ghost-courier design assumes an agent can perform"; the design assumes no such thing -- the 2.1.179 sheet has injection happening out-of-band via `docker exec`, and the courier is a detached external process. Accurate form: **an in-harness agent may no longer edit the live `config.json`**, while the courier's own out-of-band path is **still untested at 2.1.251**.
+
+**CORRECTION to a tasker premise (Aen 10:40).** He read O5c as proving "the ghost-member path end-to-end -- a non-live-session name in members[] routed to my inbox AND surfaced." It proves neither half: **no SendMessage was involved** (the entry was written directly into `inboxes/team-lead.json`, so no routing was exercised) and **`probe-ghost-s67` was never in `members[]`** (that injection is the permission-denied step). O5c proves what he witnessed -- an externally written six-field entry surfaces to a live consumer. Surfaced to him at 11:01.
+
+**outcome** -- **PARTIAL, chain in flight.** Phase 1 complete and irreversible-half done correctly (gate passed, displacement reversible). Phase 2 held on a one-word clear with the mismatch fully diagnosed and a portable replacement offered. Phases 3-5 unstarted. O6 control complete and productive: one hypothesis eliminated, one confound eliminated, and a live cross-team outbound defect surfaced that outranks the wiki row that prompted it. Substrate clean throughout -- live `config.json` byte-identical to its pre-flight backup, inboxes at baseline 45, courier pid 14456 untouched.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:11+03:00 -- Joosep chain Phases 2-4 COMPLETE (build green); Phase 5 BLOCKED by permission classifier + CORRECTION to the T11:01 entry
+
+**timestamp** -- 2026-08-31T11:11+03:00
+
+**tasker** -- Brunel (Step 14 rebuild, Phases 2-5), cleared to PROCEED at 11:01 after he reproduced the digest diagnosis on his own box. Restart gate released by Aen 10:43 and re-confirmed 10:59 (PO confirms Joosep logged out).
+
+**dispatch summary** -- Stage the frozen tree, verify, fix `.env` TEAM_NAME, build the image, recreate the container, verify the boot.
+
+**tier classification + sanction status** -- **Tier M throughout.** Brunel's dispatch is the sanction for Phases 2-5; his 11:01 "PROCEED" cleared the Phase-2 hold explicitly ("the tree is verified. Stage it."). Restart gate: Aen 10:43 verbatim -- *"RESTART GATE RELEASED: the PO confirms Joosep is logged out and clear."* **No Tier D executed.**
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `designs/new/joosep/` at `5336c2e` (6 singles + `teams/paunvere/`); `Dockerfile:232-233` (COPY entrypoint + `RUN chmod +x`), `Dockerfile` COPY layers for FIRST-TASKS and teams/paunvere.
+- **Layer 2 (operational copy on the substrate host):** `/home/dev/joosep/` before and after staging; `.env` (pre-edit, post-edit, and backup); `docker-compose.yml:113` (`TEAM_NAME=${TEAM_NAME:-paunvere}`).
+- **Layer 3 (running container state):** `docker ps`, `docker inspect joosep --format {{.Image}}`, `docker image inspect joosep:latest`, `docker exec --user joosep` for the home-dir listing.
+- **Audit-trail artifacts:** Brunel's attestation table; `.env.bak.s67-20260831-110635`; the T11:01 ops-log entry this one corrects.
+
+**commands executed** (verbatim, load-bearing set) --
+1. `cp -p $SRC/{Dockerfile,entrypoint.sh,docker-compose.yml,.env.example,FIRST-TASKS.md,joosep.sh} $DST/` ; `mkdir -p $DST/teams && cp -a $SRC/teams/paunvere $DST/teams/`
+2. `cd $DST && md5sum Dockerfile entrypoint.sh docker-compose.yml .env.example FIRST-TASKS.md joosep.sh warp-ca.pem` ; `find teams/paunvere -type f | sort | xargs md5sum`
+3. `cp -p .env .env.bak.s67-$(date +%Y%m%d-%H%M%S)` ; `diff <(grep -oE "^[A-Z_]+=" .env | sort -u) <(grep -oE "^[A-Z_]+=" .env.example | sort -u)`
+4. `sed -i "s/^TEAM_NAME=.*/TEAM_NAME=paunvere/" .env` ; `diff .env.bak.s67-* .env` ; `docker compose config --quiet`
+5. `chmod +x joosep.sh entrypoint.sh` (exec-bit restore after the first build attempt failed)
+6. `cd /home/dev/joosep && ./joosep.sh build 2>&1 | tail -45`
+7. `./joosep.sh restart ...` -- **DENIED by the auto-mode permission classifier, not executed**
+
+**outputs** --
+
+**PHASE 2 -- staged and verified, all gates green.** 7 of 7 singles match Brunel's attestation exactly, including `warp-ca.pem` at `7b4474e7dfcd55681a216ab64f5bbd33` **untouched and never re-fetched** per his hard constraint. 10 of 10 `teams/paunvere` files match the manifest exactly (the manifest, not the digest, being the authority per his 11:01 ruling). **Protected files intact**: `.env` (0600) and `authorized_keys` both still at their Aug-28 15:58 timestamps; no `--delete` used anywhere.
+
+**PHASE 3 -- the stale `.env` line was `TEAM_NAME=joosep`, NOT the predicted `vedur`.** `joosep` is the pre-rename container name, older than `vedur`; the prediction was directionally right and wrong on the literal. Since `docker-compose.yml:113` reads `TEAM_NAME=${TEAM_NAME:-paunvere}`, that line would have **silently overridden the compose default and shipped the wrong team name** -- exactly the trap Brunel flagged. Backed up first; replaced in place (never appended); `diff` against the backup shows **solely `63c63`**; exactly one `TEAM_NAME=` line remains; 0600 preserved.
+**One check outside the dispatch spec:** the live `.env` was derived from the OLD `.env.example` (`0200299c`) three days before the new one (`2c80186c`) was staged, so it could have been missing newly-added variables. **Key-set diff: identical.** No variables missed. `docker compose config --quiet` -> **COMPOSE OK** (the Step-4b gate Brunel added after the S66 `pids_limit` defect).
+
+**PHASE 4 -- BUILD SUCCEEDED.** `joosep:latest` = `sha256:95191f2ee20f`. `COPY FIRST-TASKS.md /opt/FIRST-TASKS.md` and `COPY teams/paunvere /opt/teams/paunvere` both landed. **Zero TLS errors, no EBADENGINE, no apt hang** across the whole log.
+**PRECISION on the three build-time EXPECTs -- the honest statement is narrower than "passed".** All three (`[build] WARP CA installed…`, `[build] claude installed and executable.`, `pnpm --version`) sit in **CACHED** layers this build; only the late COPY layers rebuilt, correctly, since only those inputs changed. **The assertions held when those layers were first built and the cache is validly reused, but they did NOT re-run in this build.** Re-asserting them needs `--no-cache` on those stages, not done and not requested.
+
+**SELF-REPORTED ERROR -- exec bit clobbered by my own staging.** The first build attempt died `./joosep.sh: Permission denied`. `cp -p` faithfully carried the source mode, and **the checkout itself has `joosep.sh` and `entrypoint.sh` as `-rw-rw-r--`** -- the exec bit is not in the checkout. Restored with `chmod +x`; md5s unchanged (`83eda299`, `cb8405a0`), content untouched. **Not specific to `cp -p`: any staging from that source hits it.** `entrypoint.sh` is harmless because `Dockerfile:233` runs `chmod +x /entrypoint.sh` inside the image; only the host launcher matters. **It failed loudly and immediately**, which is the good failure mode -- a silent version of this would have shipped a non-executable launcher. Runbook line proposed to Brunel.
+
+**PHASE 5 -- NOT RUN. `./joosep.sh restart` DENIED by the auto-mode permission classifier.** Second such denial today (the first being the O6 live-config write). **Not retried through any other tool**: the denial is about the *action* -- recreating a live container -- not the mechanism, so a tool swap would circumvent its intent. Brunel's dispatch and Aen's gate release are both in hand; **neither is the permission system**, and only the PO can grant the capability.
+
+**STATE AFTER THE BLOCK, with a user-visible consequence.** Container still runs the OLD image (`42e17b65793b`; new is `95191f2ee20f`), so nothing has taken effect. **Joosep's home currently holds only `FIRST-TASKS.md.superseded-20260831-105548` -- he has no `FIRST-TASKS.md` right now**, because Phase 1's displacement already ran. That is correct mid-chain state and resolves the instant the container recreates, but it is user-visible, so a one-command restore (`mv` back, re-displacing later is safe since the md5 gate already passed) was offered to Aen rather than taken unilaterally.
+
+**CORRECTION to the 2026-08-31T11:01 entry (append-only; the original stands unedited).** That entry reported, under the O6 control, that **"reachability is gated on `members[]`"** and that **"the cross-team OUTBOUND leg is down today"**. **Both claims are WRONG and are withdrawn.** Volta supplied the disproof: in his 2026-08-27 measurement `apex-research-courier` **was in `members[]` and the send was still refused** -- so the gate is the **live agent registry**, and a members-only ghost is no more reachable than a non-member. Both of my probe cases failed for that one reason, which is precisely why the control could not separate them: **the variable I was varying was not the operative one.** And outbound is **not down** -- `wiki/gotchas/precondition-without-an-owner-is-no-precondition` (discovered 2026-08-27, stage-2 confirmed) already records this refusal on 2.1.247 with a version bracket and a live-proven fallback (hand-written six-field outbox entry, temp-file + atomic replace, consumed by the courier and deposited by the hub), with the docs repaired at the time. No incident, no new defect.
+**What survives:** the control independently eliminates **inbox-file existence** as the gate (an empty inbox created for a non-member; send still refused), which the 08-27 entry never tested. Re-attributed to the live registry and sent to Callimachus as a correction before he filed.
+**The methodological failure is mine and is recorded deliberately.** I filed a pattern this same morning arguing that an absence check without a positive control cannot distinguish "absent" from "mis-aimed". **This is that defect one level up, in a presence check** -- I eliminated one alternative and named the remaining candidate as the cause without testing whether anything else produced the identical failure. **An eliminated confound is not an identified cause.** I also failed my own standing rule (adopted S66 after withdrawing an `ss`-grant "find") to query the librarian before reporting anything as a discovery -- on a claim I escalated as a live defect.
+
+**outcome** -- **PARTIAL / ABORTED-PRE-EXECUTION at Phase 5.** Phases 2, 3 and 4 complete and fully verified; the image is built and correct; every gate Brunel specified passed, with the `.env` trap caught and the one self-inflicted error found and fixed loudly. The chain stands one command from done, blocked on a capability only the PO can grant, surfaced with two options rather than worked around. Substrate coherent: staging verified against attestation, protected files untouched, backups in place.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:15+03:00 -- Joosep chain Phase 5 COMPLETE: container recreated, all EXPECTs pass, host key intact
+
+**timestamp** -- 2026-08-31T11:15+03:00
+
+**tasker** -- Brunel (Step 14 dispatch, Phase 5). **Retry authorized by the PO directly, relayed by Aen 11:10 verbatim:** *"PO's direct instruction: RETRY the restart. They have switched the session's permission mode (manual) so the denial path has changed -- the same exact command, one retry... If it is denied again, STOP and report -- do not try a third time or another mechanism."*
+
+**dispatch summary** -- Recreate the `joosep` container onto the newly built image and verify the boot against Brunel's Phase-5 EXPECT list.
+
+**tier classification + sanction status** -- **Tier M.** The container's entrypoint owns first-boot seeding by design, and `./joosep.sh restart` is the substrate's own designed lifecycle verb. Sanction chain complete: Brunel's dispatch (operation), Aen 10:43 (restart gate released, PO confirms Joosep logged out), PO 11:10 (permission regime changed + explicit one-retry order). **The earlier denial was a permission-system refusal, not a tasker refusal; this retry is the PO-decision branch that the T11:11 stop was waiting for, not a route-around.** One attempt, as instructed.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** Brunel's Phase-5 EXPECT and STOP list; entrypoint seeding branches (`[ ! -f ]` first-boot path, seed-stamp discriminator at Step 9b/9c).
+- **Layer 2 (operational copy):** `/home/dev/joosep/` staged tree verified at T11:11 (7/7 singles + 10/10 manifest).
+- **Layer 3 (running container state):** `docker ps`; `docker inspect joosep --format {{.Image}}`; full `docker logs joosep`; `docker exec --user joosep` for FIRST-TASKS head + md5s, `$TEAM_NAME`, `~/work/` listing, package manifest, seed stamps; `docker exec joosep ssh-keygen -lf` for the host key.
+- **Audit-trail artifacts:** ops-log entries T11:01 and T11:11 (Phases 1-4); Brunel's attestation table.
+
+**commands executed** (verbatim) --
+1. `cd /home/dev/joosep && ./joosep.sh restart 2>&1 | tail -15`
+2. `docker logs joosep 2>&1 | grep -iE "first-tasks|paunvere|CLAUDE.md|host key|NOTE:"`
+3. `docker exec joosep ssh-keygen -lf /etc/ssh/keys/ssh_host_ed25519_key.pub`
+4. `docker exec --user joosep joosep head -3 /home/joosep/FIRST-TASKS.md`
+5. `docker exec --user joosep joosep bash -lc "echo TEAM_NAME=\$TEAM_NAME; ls -la ~/work/"`
+6. `docker exec --user joosep joosep sh -c "cd /home/joosep/work/paunvere && find . -type f -not -path './.git/*' | sort | xargs md5sum"`
+7. `docker exec --user joosep joosep md5sum /home/joosep/FIRST-TASKS.md /opt/FIRST-TASKS.md`
+8. `docker exec --user joosep joosep sh -c "ls -l /home/joosep/.claude/.first-tasks.seeded.md5 /home/joosep/.claude/.team-package.seeded.md5"`
+
+**outputs** --
+
+**RESTART: `Container joosep Recreate / Recreated / Starting / Started`.** Running image now `sha256:95191f2ee20f` (was `42e17b65793b`).
+
+**ALL FOUR ENTRYPOINT EXPECTS PRESENT, verbatim:**
+```
+[entrypoint] seeded ~/FIRST-TASKS.md (first boot).
+[entrypoint] seeded /home/joosep/work/paunvere (first boot).
+[entrypoint] initialised local git in /home/joosep/work/paunvere (no remote).
+[entrypoint] created /home/joosep/work/CLAUDE.md.
+```
+**NEITHER STOP CONDITION FIRED.** No `NOTE: ~/FIRST-TASKS.md differs…` -- Phase 1's displacement took effect exactly as designed, and the boot took the `[ ! -f ]` first-boot branch. No `generated persistent sshd ed25519 host key (first boot).` -- the `joosep_sshd` volume survived the recreate.
+
+**HARD STOP CHECK -- HOST KEY UNCHANGED:**
+```
+256 SHA256:C8qVyjSQuyiSXPzEBcIOh2tfUwlk9EJtU2WxhAEbO3U root@joosep (ED25519)
+```
+Byte-identical to the fingerprint Joosep holds. **He will not meet a host-key warning on reconnect** -- the one failure mode that would have reached him as a security alarm about a machine we told him to trust.
+
+**CONTENT TRACED END TO END, not merely present.** Brunel's attestation -> checkout -> staging -> image -> seeded home:
+- All **10** paunvere payload files under `~/work/paunvere/` match the staged manifest md5s **exactly** (`f0969ce1` common-prompt.md, the six prompts, `56bd792c` README.md, `64366be6` roster.json, `e29fe123` startup.md). The 45-file count includes 35 `.git/` objects from the entrypoint's local `git init`, which is designed behaviour.
+- `~/FIRST-TASKS.md` md5 = **`530329c2a04adf1dd0c4411e2439b06d`** = Brunel's attested Estonian value, and equal to `/opt/FIRST-TASKS.md`.
+- It opens `# Esimesed ülesanded -- konteiner joosep`.
+- `TEAM_NAME=paunvere` in the live environment -- the stale `joosep` line is gone from the running config.
+- `~/work/` holds `CLAUDE.md` (256 B) and `paunvere/` with a local git repo initialised, no remote.
+
+**BOTH SEED STAMPS WRITTEN** -- `.first-tasks.seeded.md5` and `.team-package.seeded.md5`, 33 bytes each. **This was the whole point of doing the displacement by hand once: no future version needs it.** Brunel predicted this precisely; every subsequent version now self-resolves through the discriminator.
+
+**The English original is preserved, not destroyed:** `FIRST-TASKS.md.superseded-20260831-105548`, 11269 B, Aug-28 mtime intact, sitting beside the new Estonian file. Whether it is eventually cleaned up is a separate decision and was not taken here.
+
+**outcome** -- **SUCCESS. Step 14 rebuild COMPLETE.** Every Phase-5 EXPECT passed, neither STOP condition fired, the host key survived, and the payload was verified by md5 at every hop rather than assumed from a green build. The chain that was held all session on Joosep's 9a is discharged. Remaining and still held: PO's 9b/9c green-light (Aen requesting), then Step 12 registry rows and the 9d dev-key revoke (**stays Tier D**, exact-command discipline, PO's own fresh-connection check before the revoke completes).
+
+**Two runbook items confirmed by this run**, both relayed to Brunel: (1) the stale `.env` value was `TEAM_NAME=joosep`, **not** the predicted `vedur` -- the check must **read-and-report** rather than match a literal, or it silently passes a wrong value that merely is not the predicted one; (2) the **exec bit is absent from the checkout itself**, so `chmod +x joosep.sh` belongs in Step 1 regardless of who stages or by what method.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:24+03:00 -- Probe-rig v2: wake row REPLICATED (n=2 bare), O10 hooks armed, GC finding independently confirmed
+
+**timestamp** -- 2026-08-31T11:24+03:00
+
+**tasker** -- Aen 11:08: wake-row re-run on the PO's replacement rig, keystroke discriminator, and **O10a/b/c hooks GO in this rig** ("place the throwaway hook in `~/probe-rig/.claude/settings.json` (project scope, NOT user scope), observe, remove, verify removed").
+
+**dispatch summary** -- Re-run the external-write wake test on a properly isolated bare interactive session; install a throwaway hook to answer Volta's three behavioural sub-checks; verify and tear down.
+
+**tier classification + sanction status** -- **Tier M** (writes into another session's inbox dir; writes a hook config into the rig's project scope). Sanctioned verbatim by Aen 11:08. **Scope honoured exactly: project scope only.** `~/.claude/settings.json` (user scope) verified untouched at md5 `349501f43ddc3ea7845bae4c49ff3d63`, recorded so it can be proven at teardown.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** the 2.1.179 anchor's External-write wake row; `references/claude-code-hook-wake-primitives` (the six claims under test).
+- **Layer 2 (operational, this host):** `~/.claude/settings.json` -- **read for the working hook SHAPE before writing my own** (existing `SessionStart` hook uses `"command": "bash $HOME/.claude/hooks/<script>.sh"`, `"shell": "bash"`, `timeout`). Guessing hook syntax on Windows would have produced a null result that means nothing.
+- **Layer 3 (running state):** `sessions/25164.json` (identity verified before probing: `kind:"interactive"`, cwd `~/probe-rig`, 2.1.251, idle); `teams/session-800e3750/` bare state; the deleted `session-94ba34bc` and `sessions/19796.json`.
+- **Audit-trail artifacts:** `evidence-wake-rig2.log`; `~/probe-rig/hook-fired.log` (pending a turn).
+
+**commands executed** (verbatim, load-bearing set) --
+1. `cat ~/.claude/sessions/25164.json` + `Get-Process -Id 25164` -- identity/liveness before probing
+2. Wrote `~/probe-rig/.claude/hooks/probe-hook.sh` and `~/probe-rig/.claude/settings.json` (`UserPromptSubmit` + `Stop`); `chmod +x` the script
+3. `md5sum ~/.claude/settings.json` -- user-scope untouched proof
+4. `watch-drain.sh <rig inbox> ... 400` ; `mkdir -p <rig>/inboxes && cat > <rig>/inboxes/team-lead.json <<EOF` (six-field marker)
+5. `test -d ~/.claude/teams/session-94ba34bc` ; `test -f ~/.claude/sessions/19796.json`
+
+**outputs** --
+
+**WAKE ROW REPLICATED -- n=2 on independent bare interactive sessions.** Written 11:19:30.209 into `session-800e3750/inboxes/team-lead.json`; at 11:24 still `size=476 read_false=1`, and `statusUpdatedAt` never moved off session-start `1788163645982`. **This rig is a clean cell**: an empty `~/probe-rig` cwd with no project context and its own isolated settings scope, so the first session's null result was **not** an artifact of the PO's home directory or of anything particular to that session. The bare-session half of the anchor's External-write wake row is refuted on two independent sessions.
+
+**O10 HOOKS ARMED, project scope, non-blocking by design.** `UserPromptSubmit` and `Stop` both call one script that **always exits 0** -- it cannot trap the PO's session in a block loop. The exit-2 `asyncRewake` path was **deliberately not armed yet**; it is a separate step to run once the safe two have reported.
+**The probe separates two things a single observation would conflate:** the script writes a timestamped line to `~/probe-rig/hook-fired.log` **before** emitting anything, so **firing is provable from the log even if injection fails** -- O10c independent of O10a/b. And it emits `additionalContext` in **both** documented shapes (top-level, and nested under `hookSpecificOutput`) inside one well-formed object, because which shape 2.1.251 honours is exactly what is being measured; a probe that guessed one shape would return a false negative indistinguishable from a real one.
+**Status: no turn has occurred, so the hook has correctly not fired.** Awaiting one PO keystroke, which discharges three questions in a single action -- the wake discriminator (flush-on-activity vs no-watcher-for-bare-sessions), O10c (does `Stop` fire), and O10a/b (does `additionalContext` inject).
+
+**AEN'S GRACEFUL-EXIT GC FINDING -- INDEPENDENTLY CONFIRMED, and it is now the strongest cell.** Checked directly rather than relaying: `teams/session-94ba34bc/` **GONE** and `sessions/19796.json` **GONE** after the PO's first rig exited normally. **n=3, and the first on a real hand-launched interactive session** -- the two earlier instances were `--bg`. This also pre-confirms the S68 boot-note prediction (this session's own pid 35188), so that carried check can be retired rather than re-run.
+
+**Rig substrate rows re-confirmed for free:** `session-800e3750` team dir holds `config.json` only, no `inboxes/` -- eager config, lazy inboxes, on a third independent live session.
+
+**outcome** -- **PARTIAL, awaiting one human keystroke.** Wake row replicated and strengthened to n=2 on an isolated cell; hooks armed correctly against this host's proven hook shape with firing and injection separable; Aen's GC finding independently confirmed and upgraded to the strongest cell. **Teardown pending**: remove `~/probe-rig/.claude/`, verify removed, and re-prove user-scope settings untouched against the recorded md5.
+
+**Separately, non-operational: the Defect-4 read-back owed to Callimachus is DISCHARGED** (see the message trail, not an ops matter). Verdict ADOPT with one correction -- his claims 1 and 3 verify against the schema text (claim 1 by exhaustion: the unmerged PR fails rung 1's "published docs" wording *and* is inadmissible at rungs 2-5), but his claim 2 is imprecise: §3a rule 5 emits **only** `unverified`, and `[GAP]` arrives via §4's runtime-label table at line 263. Conclusion holds, mechanism skips a step, and a reader checking rule 5 alone would find it false and doubt the resolution.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:36+03:00 -- O10 ALL ANSWERED + SELF-INFLICTED INCIDENT: my Stop hook drove an unbounded self-wake loop in the PO's rig
+
+**timestamp** -- 2026-08-31T11:36+03:00
+
+**tasker** -- Aen 11:08 ("O10a/b/c hooks: GO in this rig -- place the throwaway hook in `~/probe-rig/.claude/settings.json` (project scope, NOT user scope), observe, remove, verify removed") and 11:27 (relaunch discriminator, GO given at 11:30).
+
+**dispatch summary** -- Answer Volta's three hook sub-checks on a hooks-loaded interactive session; re-run the wake row on the same rig.
+
+**tier classification + sanction status** -- **Tier M**, sanctioned verbatim by Aen 11:08, scope explicitly bounded to project scope. **Scope honoured: `~/.claude/settings.json` (user scope) verified untouched at md5 `349501f43ddc3ea7845bae4c49ff3d63` before, during and after -- byte-identical to the pre-install value.** All artifacts confined to `~/probe-rig/`.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `references/claude-code-hook-wake-primitives` (the six claims under test, incl. the consecutive-block-cap row and its "budget your wakes against this cap" guidance); the 2.1.179 anchor's External-write wake row.
+- **Layer 2 (operational, this host):** `~/.claude/settings.json` read for the **working hook shape** before authoring (existing `SessionStart` hook: `"command": "bash $HOME/.claude/hooks/<script>.sh"`, `"shell": "bash"`, timeout).
+- **Layer 3 (running state):** `sessions/20668.json` (rig identity verified before probing); `teams/session-6958b4fc/`; the shipped `claude.exe` constant `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP ?? 8` read at T10:47.
+- **Audit-trail artifacts:** `evidence-O10-hook-fired-FINAL.log` (32 lines, 8389 B); `evidence-wake-rig3.log`.
+
+**commands executed** (verbatim, load-bearing set) --
+1. Wrote `~/probe-rig/.claude/hooks/probe-hook.sh` + `settings.json` (`UserPromptSubmit`, `Stop`; `SessionStart` added at 11:31 as a positive control)
+2. `echo '{"test":true}' | bash <hook> SELFTEST` -- script self-test
+3. `mkdir -p <rig team dir>/inboxes && cat > .../team-lead.json <<EOF` -- wake marker
+4. `watch-drain.sh <rig inbox> ... 500`
+5. `rm -rf ~/probe-rig/.claude` -- loop kill + teardown
+6. `md5sum ~/.claude/settings.json` -- user-scope untouched proof
+
+**outputs** --
+
+**INCIDENT -- I CAUSED AN UNBOUNDED SELF-WAKE LOOP IN THE PO'S SESSION.** The PO typed `a` at 11:33:00. My `Stop` hook fired, returned `additionalContext`, and **the injection drove a new turn**, which fired `Stop` again, which injected again. **15 Stop firings, 14 of them consecutive self-driven, 11:33:00 -> 11:33:51 -- each a real model call in the PO's session.** I removed the hook config at ~11:33:35; firings continued to 11:33:51 (**config is evidently read per-turn, so removal is not instantaneous**) and then stopped. Session returned to `idle`.
+
+**MY DESIGN ERROR, precisely stated.** I reported to Aen that the hook was *"non-blocking by design -- always exits 0, cannot trap the session in a loop."* **That guarded the wrong axis.** I defended against **blocking** and never considered **injection-driven continuation**, which produces an identical runaway by a different mechanism. Compounding it, the marker I injected read *"no action needed"* -- delivered at every turn-end indefinitely, which is exactly why the model kept emitting "Ready." / "Standing by." / "Listening." **The model behaved correctly throughout; the perpetual-motion machine was mine.**
+
+**AND I HAD ALREADY READ THE GUARD.** At T10:47 I extracted the shipped guidance string from the binary -- *"For Stop/SubagentStop hooks, check stop_hook_active in the input and return success while it's true"* -- and **quoted it to Volta in that same message**. I then wrote a hook that ignores it. **Third instance today of the same shape** (absence-check pattern filed 10:28 then violated; members[] mechanism 11:01; this). **Knowing the rule is not protection.**
+
+**THE FINDING THE INCIDENT PRODUCED -- our own entry's safety guidance is WRONG.** The 14 consecutive continuations ran with **no cap override and no self-termination**. The binary's `?? 8` counter counts **blocks**; my hook exited 0, never blocked, so the counter never incremented. **`additionalContext` injection from a `Stop` hook drives unbounded self-wake and is NOT bounded by `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP`.**
+`references/claude-code-hook-wake-primitives` says *"The cap is a safety rail, not a budget to spend... Budget your wakes against this cap."* **There is no cap to budget against on the injection route.** Anyone designing hook-based courier inbound on that sentence would build something with no ceiling. **The cap governs BLOCKING Stop hooks only** -- a second clause the O10d restamp now needs.
+**Claim separation, deliberate:** I **OBSERVED** 14 consecutive continuations with no override. The **MECHANISM** (block counter never incremented because exit 0 is not a block) is my reading of that observation against the constant, not an independent measurement. Different strengths; file separately.
+
+**ALL O10 SUB-CHECKS ANSWERED.**
+- **O10a CONFIRMED** -- `UserPromptSubmit` fires; payload `{session_id, transcript_path, cwd, prompt_id, permission_mode, hook_event_name, prompt}` with `prompt:"a"`.
+- **O10b CONFIRMED** -- `additionalContext` injects AND wakes the model; 14 demonstrations.
+- **O10c CONFIRMED** -- `Stop` fires at every turn-end, content-agnostically.
+- **O10e CONFIRMED, live values** -- `stop_hook_active` `false` on the first Stop, `true` on all 14 subsequent: exactly the documented semantics.
+- **SessionStart CONFIRMED** -- fires at startup; payload `{session_id, transcript_path, cwd, hook_event_name, source:"startup", model}`.
+- **Hooks in PROJECT scope are loaded and executed on 2.1.251.** The earlier null was **null-by-rig** (config written 11:19:11 into a session started 11:07:20), exactly as Aen diagnosed.
+
+**THE POSITIVE CONTROL IS WHAT MADE THE SECOND RUN INTERPRETABLE.** I added a `SessionStart` hook before the relaunch precisely so an empty log could be distinguished from an unloaded config. It fired, proving the path live, and turned a would-be second uninterpretable null into a measurement. **This is the T10:28 pattern applied correctly one hour after violating it.**
+
+**WAKE ROW -- DEFINITIVE.** Watcher spanned the entire episode:
+```
+11:32:14.960 | size=455 read_false=1   <- external write
+11:34:23.758 | ABSENT                  <- team dir GC'd at session exit
+```
+**Nothing in between. The pending entry survived 15 COMPLETED TURNS untouched** -- not delivered, not read-flagged, not rewritten -- and disappeared only when the dir was garbage-collected on exit. Combined with no proactive wake across **three** independent bare sessions: **on 2.1.251 a bare session's inbox is neither watched nor flushed on activity.** As strong as this substrate permits.
+
+**CONTAINMENT AND TEARDOWN VERIFIED.** `~/probe-rig/.claude/` removed; hook log preserved to the scratchpad first. **User-scope `~/.claude/settings.json` md5 `349501f43ddc3ea7845bae4c49ff3d63` -- byte-identical to the pre-install value.** FR courier pid 14456 and `session-b9269601` unaffected throughout. The rig session has since exited; its team dir and registry entry were both GC'd -- **graceful-exit GC now n=5**.
+
+**Two lesser self-reported errors in the same stretch:** (1) I cleared `hook-fired.log` "so the real run starts clean" **immediately after reading a real SessionStart firing out of it** -- content survives verbatim in the transcript, but I deleted evidence I had just been handed. (2) A self-test appeared to show the script broken (`No such file or directory`); that was **my own shell quoting** -- the argument was inside the quotes, so bash sought a file literally named `probe-hook.sh SELFTEST`. I nearly concluded the instrument was defective.
+
+**outcome** -- **SUCCESS on the measurements, INCIDENT on the method.** Every O10 sub-check answered, the wake row settled definitively, and a materially wrong piece of safety guidance in our own corpus exposed -- all obtained by tripping the failure the guidance exists to prevent. **The cost was ~15 unintended model calls in the PO's throwaway rig**, contained, stopped, and torn down with scope verified. **Recommendation for any repeat: a Stop hook used as a probe must return no `additionalContext`, or carry a guard keyed on `stop_hook_active`** -- which is what the shipped guidance says, and what I had quoted four hours earlier.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:42+03:00 -- CORRECTIONS: window-close GC cell refines my graceful/ungraceful split; loop never hit the cap; one tension filed unresolved
+
+**timestamp** -- 2026-08-31T11:42+03:00
+
+**tasker** -- Aen 11:34 (check whether the window-closed rig's artifacts linger -- "a free graceful-vs-ungraceful discriminator on the window-close path, a cell we don't have"; read the final hook log count before deleting) and 11:36 ruling 2 (file the config-read-timing tension hypothesis-free).
+
+**tier classification + sanction status** -- **Tier R** (filesystem inventory reads only). Default-permitted. Nothing mutated; teardown had already completed at T11:36.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1:** `references/claude-code-hook-wake-primitives` re-read post-amendment to verify Cal's filing landed (lines 34, 49, 50).
+- **Layer 2:** N/A -- local Windows dev workstation.
+- **Layer 3:** `~/.claude/sessions/`, `~/.claude/teams/` inventories; `evidence-O10-hook-fired-FINAL.log` firing census.
+- **Audit-trail artifacts:** ops-log entries T11:24 and T11:36, both corrected below.
+
+**commands executed** -- `test -f ~/.claude/sessions/20668.json`; `test -d ~/.claude/teams/session-6958b4fc`; `ls -d ~/.claude/teams/session-* | wc -l`; `ls ~/.claude/sessions/*.json | wc -l`; `grep -c 'event=Stop' <evidence>`; `grep -n -i 'asyncrewake|cap|budget' claude-code-hook-wake-primitives.md`.
+
+**outputs** --
+
+**CORRECTION 1 -- to the T11:36 entry's "graceful-exit GC now n=5" (append-only; the original stands).** That label was **sloppy and I am narrowing it.** The rig session (pid 20668) ended by a **window close**, not `claude stop`. Both artifacts were GC'd -- `sessions/20668.json` gone, `teams/session-6958b4fc/` gone, substrate back to baseline (11 team dirs, 4 registry files). **But a window close is a DIFFERENT CELL from `claude stop`, and counting it as another instance of the same thing destroyed the distinction it was actually available to draw.**
+
+**The correction refines the axis rather than confirming it.** My ungraceful comparison at T10:00 used `Stop-Process -Force` -- **TerminateProcess, the harshest available kill, which gives the process no opportunity to run anything at all.** A window close is far gentler and the CLI evidently handles it cleanly. Three cells now stand:
+
+| exit path | artifacts |
+|---|---|
+| `claude stop <id>` (n=2, `--bg`) | GC'd |
+| window close (n=1, interactive) | GC'd |
+| `Stop-Process -Force` (n=1, `--bg`) | **LINGER** |
+
+**Better description of the axis: "the process got a chance to clean up" vs "it did not"** -- NOT "graceful command vs not". So the durable claim is **GC happens on any exit the process can handle, and fails only on an unhandleable kill.** **Flagged as a READING of three cells, not a measurement** -- I did not instrument what the CLI does on console-close, and "window close is handled" is inference from the outcome.
+
+**CORRECTION 2 -- the loop did NOT hit the cap, answering Aen's direct question.** **15 `Stop` firings, 14 consecutive self-driven**, 11:33:10 -> 11:33:51 at ~2.5s intervals. **No self-termination at 8, at 9, or anywhere.** It ran until intervention (the PO's Esc and my config removal landed in the same window). **Had the cap governed this route it would have fired on the 9th and did not.** That is the measurement behind the urgent correction; **Cal has filed it** -- the entry now reads *"It governs the BLOCKING path ONLY... NOT a hard stop against infinite self-wake"* (line 34) with the n=14 measurement at line 49.
+
+**ADDITION from the PO's terminal, which the log could not show.** The marker was **rendered visibly** as `Stop hook feedback: S67-HOOK-INJECT-MARKER…` at each firing. **So O10b is confirmed at the RENDER layer, not merely the injection layer** -- the model received it *and* the user saw it. My log proved only that the hook ran and emitted; the visible-render half is the PO's observation, not mine, and is attributed accordingly.
+
+**TENSION FILED UNRESOLVED, per Aen's ruling 2 -- two observations that sit badly together, no hypothesis offered.**
+1. Removing the hook config took effect only after ~2-3 further turns, which reads as config being consulted **per-turn**.
+2. Session 25164's hooks, written 12 minutes into its life, **did not fire on its subsequent 11:24 turn** -- which a per-turn reading predicts they should have.
+
+**No reconciliation is offered.** The obvious candidate (the two sessions differ in whether hooks were present at startup) is a hypothesis and was not asked for. **Consequence worth stating plainly: my "null-by-rig" diagnosis of the first session is therefore WELL-SUPPORTED, NOT PROVEN.** It explains the null; so would other things.
+
+**MY ERROR RE-FRAMED (Volta, and his account is better than mine).** I reported the hook as *"non-blocking by design -- always exits 0, cannot trap the session in a loop."* His read: **that was a claim about the MECHANISM offered as a claim about the CONSEQUENCE.** *"Does not use the blocking path"* and *"cannot run away"* are different assertions and the first does not carry the second. **I derived the second from the first without noticing I had changed the question -- a substitution that felt like a derivation.** This is the same two-questions-answered-as-one shape as his no-slot form 11 (authorized vs executable), and it files better under that shape than under my own *knowing-the-rule-is-not-protection* framing, which makes it sound like forgetfulness. It was not forgetfulness.
+
+**SECOND DEFECT IN THE SAME ENTRY, Volta's, worse than mine, and NOT covered by my measurement.** The entry also recommended **preferring `asyncRewake` BECAUSE it "does not consume the consecutive-block budget"** -- a safety recommendation whose stated reason is the route's escape from the only bound. **`asyncRewake` wakes on exit code 2 (the blocking-error path), so my exit-0 result does NOT transfer to it** and its boundedness is untested. Filed by Cal at line 50 as an OPEN GATING QUESTION.
+**I will not test it without an explicit dispatch, and the reason is on the record:** it is the one remaining route that could produce a second runaway in a live session, and my own judgement about whether a hook design can loop is precisely what this morning devalued. If dispatched, the conditions I would want are a dedicated throwaway, a hard iteration counter inside the hook itself, and a pre-agreed kill.
+
+**outcome** -- **SUCCESS (Tier R corrections).** One earlier claim of mine narrowed (the GC axis, now three cells and a better-stated boundary), one direct question answered (the loop never reached a cap), one tension recorded without resolution as instructed, and one open question explicitly declined pending dispatch. Substrate verified at baseline throughout; teardown from T11:36 still holds with user-scope settings byte-identical.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T11:58+03:00 -- Step 9d (TIER D) ABORTED PRE-EXECUTION at 9d.0: the safety net cannot be built on this machine
+
+**timestamp** -- 2026-08-31T11:58+03:00
+
+**tasker** -- Aen (team-lead), 11:56: *"Joosep replied to the PO: 9b/9c DONE. 9d is RELEASED. Execute verbatim per your pre-read: your portion 9d.0-9d.3, mtime gate run at the moment of use, Tier D discipline as sanctioned... STOP at the 9d.4 boundary and tell me."*
+
+**dispatch summary** -- Revoke Joosep's key from the host `dev` account's `authorized_keys` (runbook Step 9d), executing 9d.0 through 9d.3 and stopping at the PO's fresh-connection check.
+
+**tier classification + sanction status** -- **TIER D**, sanctioned. Re-tiered M->D by Aen 2026-08-28 at my refusal of the runbook's original M label; the runbook records the reasoning verbatim (*"a non-designed mutation of access control on the shared account through which the entire RC fleet is administered, and its failure mode is locking `dev` out of the host"*). All three Tier-D components present in the runbook and quoted in my pre-read:
+- **exact command:** `sed -i "${line}d" ~/.ssh/authorized_keys`, preceded by the 9d.1 backup and the 9d.2 fingerprint locate.
+- **stated reason:** PO decision 2026-08-28 15:27 -- Joosep will not manage containers, needs no host access; until this runs, `dev` + the `docker` group is root-equivalent on the whole box and the container's scoping is decorative.
+- **expected outcome:** 3 non-empty lines; target fingerprint absent; PO's own key still present; PO's fresh connection still works (9d.4); Joosep still reaches his container on the same key (9d.5).
+
+**OUTCOME: ABORTED PRE-EXECUTION. Nothing mutated. Only Tier R reads performed.**
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `designs/new/joosep/PROVISIONING-RUNBOOK.md` Step 9d in full (lines 409-520) -- the M->D retier note, the ordering rationale, 9d.0 through 9d.5 with every EXPECT and STOP.
+- **Layer 2 (operational, substrate host):** `~/.ssh/` inventory on RC; `~/.ssh/authorized_keys` stat.
+- **Layer 3 (running state):** SSH ControlMaster behaviour from this workstation; timing measurements against the live host.
+- **Audit-trail artifacts:** this entry; scratchpad HELD #1.
+
+**commands executed** (verbatim; all Tier R or self-directed teardown) --
+1. `ssh -M -S /tmp/9d-master-$$ -o ControlPersist=3600 -o BatchMode=yes -fN dev@100.96.54.170`
+2. `ssh -S "$SOCK" -O check dev@100.96.54.170` ; `ssh -S "$SOCK" ... 'echo held-channel-ok...'`
+3. 5x `ssh -S "$SOCK" ... "echo probe-N-ok"` -- reliability test
+4. Timing loop: 3x `ssh -S "$SOCK" ... 'true'` against 3x `ssh ... 'true'` with no socket
+5. `ssh -S "$SOCK" -O exit dev@100.96.54.170` -- teardown of the non-functional master
+6. `ssh -T dev@100.96.54.170 'ls -l --time-style=full-iso ~/.ssh/authorized_keys; awk NF ... | wc -l; ls ~/.ssh/authorized_keys.bak.* | wc -l'` -- untouched confirmation
+
+**outputs** --
+
+**THE BLOCKER: 9d.0 cannot be satisfied from this workstation.** My Bash invocations do not persist an interactive session, so I realised the runbook's *"open a second `dev` session and leave it open"* as an SSH **ControlMaster** -- an already-authenticated channel that survives a broken `authorized_keys` and through which recovery could be run. That is the correct technical substitute for a human's held terminal.
+
+**It does not work here, and it fails in the most dangerous available way: it looks like it works.** Every command through the control socket emitted `mux_client_request_session: read from master failed` (variously *Connection reset by peer* / *Software caused connection abort*) and **then returned correct output -- 8 attempts, 8 correct results.** A check of the form "did the command succeed?" passes cleanly while the load-bearing property is entirely absent.
+
+**Timing is decisive:**
+```
+via the "held" channel:  724 ms / 619 ms / 742 ms
+deliberately fresh:      649 ms / 620 ms / 638 ms
+```
+**Statistically indistinguishable.** A genuine multiplexed channel is tens of milliseconds; these are full TCP + auth handshakes. **Every command was silently falling back to a NEW authenticated connection** -- precisely the thing that would fail the moment `authorized_keys` broke. Cause: MSYS/Git-Bash Unix-domain-socket semantics do not support OpenSSH connection multiplexing. **Same family as the Windows-local frictions already recorded** (Win32-vs-POSIX pid mismatch, heredoc re-parsing, CRLF in `.pub`).
+
+**WHY THIS IS A STOP RATHER THAN A CAVEAT.** The runbook calls 9d.0 *"the whole safety net"*, and correctly: without a held session, a mistake at 9d.3 means **every subsequent connection -- mine and the PO's -- authenticates against the file just broken**, on the shared account administering the entire RC fleet. **Recoverability via the 9d.1 backup is worthless when the plausible error removes the path you would use to restore it** -- which is the runbook's own stated reason for the M->D retier. Proceeding without the net would hollow out the tier rather than merely accept a risk.
+
+**GATE STATUS, checked at the moment of use and NOT pre-run** (per my own standing note that a pre-run gate goes stale silently): `authorized_keys` mtime **`2026-08-27 15:17:34.016232551 +0300`** -- **matches the runbook's EXPECT exactly** -- with **4** non-empty lines and **0** existing `.bak.*` files. **So nothing has edited the file since it was last read, the line-3 assumption is intact, and the 9d.1 gate would PASS.** The blocker is 9d.0 alone.
+
+**THREE ROUTES SURFACED TO THE TASKER; NONE TAKEN UNILATERALLY.**
+- **(A) RECOMMENDED -- the PO holds 9d.0 himself**, which is what the runbook literally specifies (*"In a SEPARATE terminal, and DO NOT CLOSE IT until 9d.4 passes"*). It was written for a human with a terminal; he is at the keyboard and is already required for 9d.4. **This restores the sanctioned procedure rather than substituting for it.**
+- **(B) Restructure 9d.3 so lockout is impossible rather than recoverable** -- build the candidate file at a temp path, verify there (line count, all four fingerprints, PO's key present, target absent), then one atomic `mv`. No intermediate broken state, so no recovery needed. **Proposed, NOT done:** it deviates from the sanctioned exact command, and Tier D means verbatim execution, not improvement. Would require re-sanctioning as a changed command.
+- **(C) Establish whether any other admin path to the host exists** (console, the `rolandk` account, physical) if `dev`'s `authorized_keys` breaks. My scratchpad records no per-colleague accounts on that host, so I doubt one exists -- **but I have not verified it**, and it would change the risk picture if it did.
+
+**outcome** -- **ABORTED PRE-EXECUTION.** `authorized_keys` untouched and verified so after the abort (mtime unchanged, 4 lines, no backup file created). The non-functional control master was torn down. **Holding; nothing further on 9d until the tasker routes one of the three options.** Step 12 (registry rows incl. Lerko's header) and Brunel's Step 13 hand-over remain queued behind it.
+
+**Transferable lesson, same genus as this session's others:** *a substitute for a safety mechanism must be verified to provide the property, not merely to run without error.* The control channel returned correct output on every attempt while supplying none of the persistence it existed for -- and the only thing that exposed it was measuring a property (latency) that the success/failure of the command could never reveal.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T12:02+03:00 -- Step 9d (TIER D) EXECUTED 9d.1-9d.3: Joosep's key revoked from host `dev`; STOPPED at the 9d.4 boundary
+
+**timestamp** -- 2026-08-31T12:02+03:00
+
+**tasker** -- Aen (team-lead), 12:00: *"Option A is LIVE: the PO has `ssh dev@100.96.54.170` open in a separate terminal and is holding it until 9d.4 passes... Proceed: 9d.1 -> 9d.2 -> 9d.3 verbatim, then STOP at the 9d.4 boundary and report."* Supersedes the T11:58 abort, whose sole blocker (9d.0 unsatisfiable from this workstation) is now resolved by the PO holding the session himself.
+
+**dispatch summary** -- Revoke Joosep's key from the host `dev` account's `authorized_keys`, executing runbook Step 9d.1 through 9d.3 and stopping at the PO's fresh-connection check.
+
+**tier classification + sanction status** -- **TIER D**, fully sanctioned. Re-tiered M->D by Aen 2026-08-28 at my own refusal of the runbook's original M label. All three components present and verbatim:
+- **exact command:** `sed -i "${line}d" ~/.ssh/authorized_keys`, preceded by the 9d.1 backup and the 9d.2 fingerprint locate.
+- **stated reason:** PO decision 2026-08-28 15:27 -- Joosep will not manage containers and needs no host access; until this runs, `dev` + the `docker` group is root-equivalent on the whole box and the container's scoping is decorative.
+- **expected outcome:** 3 non-empty lines; target fingerprint absent; PO's key present; PO's fresh connection still works (9d.4); Joosep still reaches his container on the same key (9d.5).
+**9d.0 satisfied by the PO in person**, per the runbook's literal text (*"In a SEPARATE terminal, and DO NOT CLOSE IT until 9d.4 passes"*) -- the safety net restored as specified rather than substituted.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `designs/new/joosep/PROVISIONING-RUNBOOK.md` Step 9d in full (lines 409-520), pre-read at T11:39; every EXPECT and STOP executed against that text.
+- **Layer 2 (operational, substrate host):** `~/.ssh/authorized_keys` stat, line census and full fingerprint inventory before and after; backup file stat.
+- **Layer 3 (running state):** live `ssh` authentication behaviour after the edit; local `~/.ssh/id_ed25519` fingerprint.
+- **Audit-trail artifacts:** this entry; the T11:58 abort entry it supersedes; scratchpad HELD #1.
+
+**commands executed** (verbatim; all sent by **base64 transit** -- the runbook blocks contain `awk 'NF'`, `$(...)` and `while` loops, exactly the metacharacter shape my scratchpad records as mangled through `ssh "..."`; transit preserved the runbook text byte-for-byte) --
+1. **9d.1** -- `ls -l --time-style=full-iso ~/.ssh/authorized_keys` ; `cp -a ~/.ssh/authorized_keys ~/.ssh/authorized_keys.bak.$(date +%Y%m%d-%H%M%S)` ; `awk 'NF' ~/.ssh/authorized_keys | wc -l` ; per-line `ssh-keygen -lf -` fingerprint loop
+2. **9d.2** -- the runbook's `n/match/line` fingerprint-locate loop against `SHA256:g9kExnzOJyjyMGgqfGbecWDwZpGR2g/e5DoR49jKY70`
+3. **9d.3** -- re-derived locate **in the same shell**, an abort guard on `match -ne 1`, then `sed -i "${line}d" ~/.ssh/authorized_keys`, then the post-checks and three assertions
+4. `ssh-keygen -lf ~/.ssh/id_ed25519.pub` ; `ssh -o ControlMaster=no dev@... 'echo fresh-connection-ok'`
+
+**outputs** --
+
+**9d.1 -- PASSED, all EXPECTs.** mtime **`2026-08-27 15:17:34.016232551 +0300`**, matching the runbook EXPECT exactly -> **no drift since the file was last read, the line-3 assumption intact.** Gate run **at the moment of use, not pre-run**, per my own standing note that a pre-run gate goes stale invisibly. **Backup created: `~/.ssh/authorized_keys.bak.20260831-120122`, 396 B, `cp -a` preserving the original mtime.** 4 non-empty lines; 4 fingerprints; target present.
+
+**9d.2 -- PASSED: `matches=1 line=3`**, exactly the EXPECT. **Matched by FINGERPRINT, never by comment** -- load-bearing here, because the surviving key commented `hr-platform` is the PO's own Windows client key, precisely the trap the runbook warns about (*"Comments on this host are documented-unreliable"*).
+
+**9d.3 -- EXECUTED.** `sed -i "3d" ~/.ssh/authorized_keys`.
+**Two deliberate strengthenings, both of which can only prevent action, never cause it:** (a) the line number was **re-derived inside the same shell as the `sed`** rather than carried across a separate SSH invocation -- it re-derived identically (`matches=1 line=3`), eliminating any stale-value risk the runbook's two-block layout invites when the blocks are not one session; (b) the runbook's own 9d.2 STOP was **encoded as a guard** (`if [ "$match" -ne 1 ]; then abort`), converting a human check into a mechanical one.
+
+**POST-STATE -- every assertion green:**
+```
+non-empty lines : 3                              (EXPECT 3)
+TARGET ABSENT   : yes   SHA256:g9kEx...jKY70  joosep.madar@evr.ee  -- REVOKED
+PO KEY PRESENT  : yes   SHA256:t43NTA...I4dU  mihkel.putrinsh@evr.ee -- intact
+surviving keys  : PO's own, hr-platform (also the PO's), claude-container
+perms           : -rw------- (0600) preserved ; 396 -> 295 bytes
+```
+
+**AN HONEST LIMIT ON MY OWN EVIDENCE, flagged rather than left to be inferred.** A fresh connection of mine authenticated cleanly after the edit (`fresh-connection-ok as dev`, `ControlMaster=no`, so genuinely new). **But `~/.ssh/id_ed25519` fingerprints to `SHA256:t43NTA+mJ8BeJxYVRMQAU2eBkgIZz32tiiK/5/8I4dU` -- the PO's own key.** So **my continued access is NOT independent evidence that the PO's access works; it is the same credential.** It is real evidence the file is not structurally broken, and it is **not** 9d.4 and cannot substitute for it.
+
+**outcome** -- **SUCCESS on 9d.1-9d.3; STOPPED at the 9d.4 boundary as instructed.** The revoke is **not complete** until the PO runs `ssh dev@100.96.54.170 'echo dev-access-ok'` **from his own machine on a NEW connection**, and he **must not close the 9d.0 terminal until it returns**. Rollback remains one command -- `cp -a ~/.ssh/authorized_keys.bak.20260831-120122 ~/.ssh/authorized_keys` -- with the backup verified in place at 396 B / 4 lines against the live 295 B / 3 lines.
+**9d.5 remains outstanding and is Joosep's, not mine:** `ssh -i ~/.ssh/id_ed25519_joosep -p 2231 joosep@100.96.54.170 'echo container-ok'`. It needs his private key. **Its failure mode is the serious one** -- if 9d.5 fails he has access by neither path, and the response is restore-from-backup and report, not troubleshooting.
+Step 12 (registry rows incl. Lerko's header) and Brunel's Step 13 hand-over stay queued behind the PO's check.
+
+**Method note worth carrying:** the T11:58 abort and this success are the same discipline, one session apart. The blocker was never the operation -- it was that **a substitute for a safety mechanism must be verified to provide the property, not merely to run without error.** Restoring the runbook's literal 9d.0 (a human holding a real terminal) resolved it in two minutes, where accepting a control channel that "worked" 8-for-8 would have proceeded with no net at all.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T12:17+03:00 -- 9d.4 PASSED (tasker-relayed); Step 12 pre-read, and a scope correction to my own record
+
+**timestamp** -- 2026-08-31T12:17+03:00
+
+**tasker** -- Aen (team-lead) 12:15 relaying the PO's 9d.4 result, and 12:00 releasing Step 12 on Joosep's 9d.5.
+
+**dispatch summary** -- Record the 9d.4 outcome; pre-read Step 12 so it can run verbatim when released.
+
+**tier classification + sanction status** -- **Tier R** this entry (runbook and remote file reads only). Step 12 item 1 remains **Tier M, sanctioned by the PO 2026-08-28 16:00**, not yet executed.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1 (FR design-as-shipped):** `designs/new/joosep/PROVISIONING-RUNBOOK.md` Step 12 (lines 555-561); `designs/new/joosep/registry-rows.md` in full (142 lines) -- the PO's ground-truth ruling, the five-item ownership table, the exact payloads, and Brunel's port-namespace caveat.
+- **Layer 2 (operational, substrate host):** `/home/dev/allerk/docker-compose.yml` header lines 1-22, file stat, and a `grep` for `2231`.
+- **Layer 3:** n/a this entry.
+- **Audit-trail artifacts:** this entry; the T12:02 9d execution entry; scratchpad HELD #3 (corrected below).
+
+**commands executed** -- `sed -n '555,565p' PROVISIONING-RUNBOOK.md`; `sed -n '1,142p' registry-rows.md`; `ssh dev@... 'sed -n "1,22p" /home/dev/allerk/docker-compose.yml; ls -l --time-style=full-iso ...; grep -n "2231" ...'`
+
+**outputs** --
+
+**9d.4 PASSED (tasker-relayed, not my observation).** PO ran `ssh dev@100.96.54.170 'echo dev-access-ok'` from PowerShell on his own machine at 12:15:26 against the post-edit file -> `dev-access-ok`. **A fresh connection, his machine, his credential.** The revoke is confirmed non-breaking for PO access. Recorded as **relayed**, since I did not witness it -- and my own working connection could never have substituted for it, because `~/.ssh/id_ed25519` fingerprints to the PO's own key (noted at T12:02). **9d.5 (Joosep's container check) remains the only open half; it needs his private key and is his to run.**
+
+**SCOPE CORRECTION TO MY OWN SCRATCHPAD -- caught during the pre-read, before any file was touched.** My HELD #3 read *"our three rows + Lerko's `allerk/docker-compose.yml` header row"*. **That conflates the work-item inventory with my assignment, and acting on it would have had me editing the PO's and Brunel's files.** `registry-rows.md` assigns ownership explicitly:
+
+| # | File | Who applies |
+|---|---|---|
+| **1** | **`/home/dev/allerk/docker-compose.yml` header table** | **Hopper (sanctioned)** |
+| 2 | `~/bin/rc-deployments.json` | PO |
+| 3 | `dev-toolkit/tools/rc-deployments.json` | PO |
+| 4 | `mitselek-ai-teams/registry.json` | Brunel (Aen granted the edit) |
+| 5 | `deployments.md` | PO |
+
+**My entire Step 12 is ONE comment line in a file we do not own** -- precisely the item the runbook flags: *"Item 1 edits `/home/dev/allerk/docker-compose.yml`, which is Lerko's file... Route separately."* Items 2-5 are not blocked on me and I will not touch them.
+
+**TARGET VERIFIED.** Header table at lines 12-15 currently reads `2222 apex-research / 2223 polyphony-dev / 2224 entu-research / 2226 backlog-triage / 2228 uikit-dev / 2230 allerk (this file)`. **`grep -n 2231` returns nothing** -- the claim is genuinely absent, so under the PO's ruling designating this table RC's port ground truth, **2231 is currently unclaimed for anyone checking correctly.** File `-rw-rw-r-- dev dev`, 3562 B, mtime `2026-08-27 15:36:32`; writable.
+
+**Planned edit, minimal:** append `#   2231 joosep` after the 2230 row. **Safeguards per the sanction: backup first, comment-only, then `docker compose config --quiet` on allerk's file to prove the YAML still parses.** **Style note: the file uses an em-dash in "real host ports — check here"; I will match his conventions rather than normalise to ours.**
+
+**SCOPE QUESTION RAISED, NOT ASSUMED.** `registry-rows.md` additionally suggests rewriting the table's header line to declare it AUTHORITATIVE for RC. **I am NOT treating that as sanctioned.** The doc marks it *"(Lerko's wording to adjust as he sees fit)"* -- a proposal **for Lerko**, not an instruction to me -- and the PO's 16:00 sanction covered the port row. **Rewriting three lines of another person's explanatory prose is a materially larger act than adding a row to his table, even though both are comment-only.** Default is row-only; asked the tasker, and recommended that if the header change is wanted it goes to Lerko as a proposal rather than us rewording his file for him.
+
+**outcome** -- **SUCCESS (Tier R pre-read).** Step 12 is ready to execute verbatim on release: one line, one backup, one parse check. **A scope conflation in my own carry-forward was caught and corrected before it could act** -- the second time today an error of mine was caught pre-artifact rather than post (the other being the GC `n=5` mislabel). Nothing executed; Step 12 remains queued behind Joosep's 9d.5.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-08-31T12:21+03:00 -- 9d COMPLETE; Step 12 item 1 EXECUTED (after a self-inflicted double-insert, caught by my own assertion and fully recovered)
+
+**timestamp** -- 2026-08-31T12:21+03:00
+
+**tasker** -- Aen (team-lead) 12:19: *"9d.5 PASSED... 9d is COMPLETE. Step 12 GO: your `#   2231 joosep` line with the listed safeguards."* Scope ruled at 12:18: *"add `#   2231 joosep` and NOTHING else"* -- header-authority rewording routes to Lerko as a proposal, not our edit.
+
+**dispatch summary** -- Add the `2231 joosep` port claim to the RC ground-truth table in `/home/dev/allerk/docker-compose.yml` (Lerko's file), comment-only, with backup and a YAML parse check.
+
+**tier classification + sanction status** -- **Tier M.** PO-sanctioned 2026-08-28 16:00, designating that header table authoritative for RC ports and sanctioning Hopper to add `2231 joosep`. Scope re-confirmed by Aen 12:18 as **row-only**.
+
+**deployed-artifacts-read declaration** --
+- **Layer 1:** `designs/new/joosep/registry-rows.md` (ownership table + exact payload); runbook Step 12 (lines 555-561).
+- **Layer 2:** `/home/dev/allerk/docker-compose.yml` -- header lines 1-22, stat, `grep` for the anchor and for `2231`, before and after.
+- **Layer 3:** `docker compose config --quiet` in `/home/dev/allerk`; `docker ps` for both containers.
+- **Audit-trail artifacts:** this entry; the T12:17 pre-read entry; backup `docker-compose.yml.bak.s67-20260831-122019`.
+
+**commands executed** (verbatim, base64-transit) --
+1. `cp -a $F $F.bak.s67-$(date +%Y%m%d-%H%M%S)` + `cmp -s` verification
+2. `sed -i '/2230 allerk/a #   2231 joosep' $F` **<- DEFECTIVE, see below**
+3. `cp -a $B $F` (restore) + `cmp -s` verification
+4. `grep -n '2230 allerk' $F` ; `grep -c '(this file)' $F` -- **anchor uniqueness MEASURED before reuse**
+5. `sed -i '/(this file)/a #   2231 joosep' $F`
+6. `diff $B $F` ; `grep -c 2231 $F` ; `cd /home/dev/allerk && docker compose config --quiet`
+
+**outputs** --
+
+**9d COMPLETE (tasker-relayed).** 9d.5: Joosep ran the container check from his own PowerShell and got `container-ok`. **Aen's reading, which I am recording as his and endorse:** the `-i` path failed (`Identity file C:\Users\Joosep.Madar/.ssh/id_ed25519_joosep not accessible: No such file or directory`), ssh fell back to default identities, and one authenticated. **Since the container's `authorized_keys` holds only his enrolled key, the authenticating key is necessarily his -- so the 9d.5 PROPERTY holds (Joosep, own machine, own key, container reachable) while the MECHANISM differs from the spec's literal command.** Property-not-mechanism, recorded as such.
+
+**SELF-INFLICTED DEFECT ON THE FIRST ATTEMPT -- double-insert into another person's file.** I anchored on `/2230 allerk/` **assuming that string was unique to the table row. It was not:**
+```
+10: #   ssh -p 2230 allerk@100.96.54.170        <- Remote access section
+15: #   2226 backlog-triage  2228 uikit-dev       2230 allerk  (this file)
+```
+`#   2231 joosep` was inserted **twice**, one of them a nonsense line inside his remote-access block. **I anchored a filter on a string whose uniqueness I ASSUMED rather than MEASURED** -- my own catalogued `discriminator-anchored-on-sub-canonical-source` family, committed in a file we do not own.
+
+**WHAT CAUGHT IT: the assertion written into the script.** `2231 lines now: $(grep -c ...)   (EXPECT 1)` returned **2**, and the diff showed two insertion points (`10a11`, `15a17`). **Had I run the `sed` and reported "done", the stray line would still be there and nothing downstream would ever have flagged it.**
+**THE PARSE CHECK WAS NOT SUFFICIENT AND THIS IS THE LESSON: `COMPOSE OK` was true for the BROKEN version too.** A comment-only edit cannot break YAML, so the sanctioned safeguard could never have detected a wrong-but-well-formed comment. **The safeguard proved the file still parses; only the count assertion proved the edit was the intended one.** Same distinction as the day's other instrument findings -- a check that cannot fail on the error class it is aimed at is not a check.
+
+**RECOVERY.** Restored from backup (`cmp` byte-identical, `2231` count back to 0). Then **measured the replacement anchor before using it**: `grep -c '(this file)'` = **1**. Re-inserted against it.
+
+**FINAL STATE, re-verified by a fresh independent read rather than the mutating script's own output:**
+```
+2231 occurrences : 1
+15: #   2226 backlog-triage  2228 uikit-dev       2230 allerk  (this file)
+16: #   2231 joosep
+diff vs backup   : 15a16  -- exactly one added line
+perms            : -rw-rw-r-- dev dev preserved ; 3562 -> 3578 B
+docker compose config --quiet : COMPOSE OK
+containers       : allerk Up 4 days, joosep Up ~1 hour -- neither disturbed
+```
+**Row only, no header rewording, per Aen's 12:18 ruling. Lerko's em-dash convention left untouched.**
+
+**NOT DONE, deliberately:** the backup `docker-compose.yml.bak.s67-20260831-122019` remains **in Lerko's directory**. Stray files in another person's workspace are untidy, but **deleting my own safety artifact on my own judgment is precisely what the tasker forbade for the 9d backup**, and the same reasoning applies. Surfaced for the tasker/PO/Lerko to decide.
+
+**FINDING FOR STEP 13 (Brunel's), out of 9d.5:** **our assumed key filename does not exist on Joosep's machine** -- his key lives under a default name. The hand-over must not instruct `-i ~/.ssh/id_ed25519_joosep`, and `Connect-Joosep.ps1` should be checked for the same assumption. **It worked by fallback this time and would NOT work if he ever held multiple keys.** Registry items 2/3 also specify that path, though those are the PO's files and refer to his own copy.
+
+**outcome** -- **SUCCESS, with a self-reported defect and full recovery.** Step 12 item 1 complete and independently verified; the RC ground-truth table now claims 2231 for a confirmed-working deployment. **Items 2, 3 and 5 are the PO's and item 4 is Brunel's -- none blocked on me.** Only Brunel's Step 13 hand-over remains to close the arc.
+
+(*FR:Hopper*)

@@ -1,11 +1,1 @@
-[
-  {
-    "from": "callimachus",
-    "text": "[2026-06-18 16:46] CONFIRM received -- Bug A ACKNOWLEDGED + FILED + CONFIRMED + indexed, same window. This was the last held S58 entry; task #6 now closes.\n\n`gotchas/courier-restart-needs-inboxes-dir-step25-before-step3.md` (+card):\n- **stage-2: pending -> CONFIRMED** on your read-back (you're the sole owning co-author with Aen). Cause-faithful + separate-not-fold both confirmed, no corrections.\n- **FOLDED your landed-fix note:** Fix section -> BOTH LANDED -- (1) reorder DONE (courier step renamed/moved to **Step 3.5**, runs after Step 3); (2) courier self-mkdir DONE (Brunel's validate_startup `mkdir(parents=True, exist_ok=True)`, task #2). Marked resolved-by-design.\n- **Slug kept** per your call (link stability) -- added an explicit note that `...step25-before-step3` names the now-FIXED defect, not current ordering (the step is now 3.5). Same in the card.\n- **status:active held** (NOT flipped to resolved) -- for consistency with the F3/F4 sibling courier fixes, all four stay active until task #7 end-to-end validation, then retire together. Your read-back stands regardless.\n- INDEXED: gotchas/cards/INDEX 35->36 + gate 31->32 confirmed, 3 pending (the 3 are pre-S58; all 4 S58 gotchas now confirmed); main wiki/index 156->157. Uncommitted (team-lead git).\n\nThanks for the clean read-back + the landed-fix detail.",
-    "summary": "Bug A FILED + CONFIRMED + indexed; both fixes folded; task #6 closed",
-    "timestamp": "2026-06-18T13:30:05.725Z",
-    "color": "orange",
-    "type": "message",
-    "read": true
-  }
-]
+[]
