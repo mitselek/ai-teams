@@ -1,8 +1,8 @@
-# vedur -- Common Standards
+# paunvere -- Common Standards
 
 ## Team
 
-- **Team name:** `vedur`
+- **Team name:** `paunvere` (the parish of Oskar Luts's *Kevade* -- Joosep's team, on home ground)
 - **Members:** team-lead/Minot (dispatcher), trevithick (service builder, `rumba`), rastrick (E2E suite keeper, `HES-integration-tests`), saxby (reviewer and rail warden, both repos), bradshaw (release cartographer, read-only Atlassian + GitHub), smiles (scribe, the only Atlassian writer)
 - **Principal:** **Joosep Madar** -- the human this team works for. He sets priorities, reads every output, and owns every write made under his name.
 - **Mission:** Serve Joosep's three registers of work -- the `apps/elron-test` service build in `rumba`, the Nightwatch E2E suite in `HES-integration-tests`, and cross-project release visibility for leadership (VEO-98) -- without ever exceeding the access he chose to grant and without ever touching the one safety rail that protects live railway dispatch.
@@ -24,7 +24,7 @@
 
 | Anchor | Path |
 |---|---|
-| `TEAM_ROOT` | `~/work/vedur/` -- this file, `roster.json`, `prompts/`, `memory/`, `startup.md` |
+| `TEAM_ROOT` | `~/work/paunvere/` -- this file, `roster.json`, `prompts/`, `memory/`, `startup.md` |
 | `rumba` | `~/work/rumba/` -- pnpm monorepo; Joosep's app is `apps/elron-test` on branch `feat/VJS1-826-elron-test` |
 | `HES-integration-tests` | `~/work/HES-integration-tests/` -- Nightwatch/WebDriver suite; history is direct-to-`main` with no PRs, which is not a licence to continue that |
 | Scratchpads | `TEAM_ROOT/memory/<name>.md` |
@@ -57,7 +57,7 @@ The team runs on credentials Joosep created, under his name, at a scope he chose
 
 | Surface | Team may | Team may not |
 |---|---|---|
-| Git | commit on `feat/<JIRA-KEY>-<slug>` branches; push those branches once `contents:write` is granted for that repo; open PRs once `pull_requests:write` is granted | push to `main` on any repo; force-push; rebase a branch that is on `origin`; `gh pr merge`; `gh pr review --approve`; edit `.github/workflows` (no `workflow` scope, by design) |
+| Git | commit on `feat/<JIRA-KEY>-<slug>` branches; push those branches once `contents:write` is granted for that repo; open PRs once `pull_requests:write` is granted | push to `main` on any repo; force-push; rebase a branch that is on `origin`; `gh pr merge`; `gh pr review --approve`; edit `.github/workflows` (no `workflow` scope, by design). The seeded settings.json deny on `git push ... main` is a **tripwire, not a wall** -- `git push origin HEAD:main`, a renamed remote, or `gh api` walks past a string pattern. The rule above is the control; the only real wall would be branch protection on `rumba`, which does not exist yet (PO raising org-side). |
 | GitHub survey | enumerate branches via `repos/{owner}/{repo}/branches` then `commits?sha=<branch>` | trust `gh search` for anything -- **it indexes default branches only** and missed 14 of Joosep's 67 commits during the research that built this team |
 | Jira (via the EVR connector, Joosep's account) | read `VJS1`, `VEO`, `HES`, `PONY`, `FSM`, `D365`; **Smiles only:** comment on / update **VEO-98** and **Joosep's own VJS1 issues** (assignee or reporter = Joosep) | write to any other issue or project; transition, bulk-edit, or touch Fix Versions, due dates, components or schemes anywhere; any admin action (Joosep requested Jira admin in ITSD-39812 and does not have it -- a genuine ceiling); read `ITSD` unless Joosep names a specific ticket of his |
 | Confluence (same connector) | read; **Smiles only:** create/update pages in space **`VJS2`** | write anywhere else; publish anything Joosep has not read |
@@ -114,4 +114,4 @@ Each member keeps `TEAM_ROOT/memory/<name>.md`, under 100 lines, opening with a 
 
 Minot shuts down last and commits `TEAM_ROOT` locally.
 
-(*VD:Celes* -- drafted by FR:Celes for the vedur team, 2026-08-28)
+(*VD:Celes* -- drafted by FR:Celes for the paunvere team, 2026-08-28; renamed and finalised 2026-08-31)

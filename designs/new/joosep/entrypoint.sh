@@ -314,14 +314,54 @@ chmod 0755 /usr/local/bin/joosep-session
 # that COPY line and the failure would otherwise move from build-time to
 # invisible. Loud, but still non-fatal: a missing onboarding doc must not stop
 # sshd from coming up.
+#
+# RE-SEED ON A NEW VERSION IF UNTOUCHED (added 2026-08-31). The plain
+# `[ ! -f ~/... ]` guard was correct about intent and wrong in practice: the
+# FIRST boot that created ~/FIRST-TASKS.md was OUR smoke test, not Joosep. So
+# the file it "protected" was an artifact of our own testing, and a rebuild
+# shipping a corrected /opt version -- the Estonian translation, say -- would
+# never have reached him. He would have read the superseded English copy
+# indefinitely, with nothing anywhere reporting a problem.
+#
+# Discriminator: record the md5 of what we seeded, at seed time. On a later
+# boot, if the user's copy still matches what we seeded, he has not touched it
+# and a newer /opt version is safe to install. If it differs, he has edited it
+# -- leave it alone and say a newer version exists. This distinguishes
+# "seeded and untouched" from "seeded and edited", which the file's mere
+# existence cannot.
+SEED_STAMP="${CLAUDE_DIR}/.first-tasks.seeded.md5"
 if [ ! -f /opt/FIRST-TASKS.md ]; then
     echo "[entrypoint] ERROR: /opt/FIRST-TASKS.md is MISSING from the image."
     echo "[entrypoint]        The Dockerfile should COPY it. Joosep has no onboarding path"
     echo "[entrypoint]        until this is fixed and the image rebuilt."
-elif [ ! -f "${HOME_DIR}/FIRST-TASKS.md" ]; then
-    install -m 644 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" \
-        /opt/FIRST-TASKS.md "${HOME_DIR}/FIRST-TASKS.md"
-    echo "[entrypoint] seeded ~/FIRST-TASKS.md (first boot)."
+else
+    OPT_MD5=$(md5sum /opt/FIRST-TASKS.md | cut -d' ' -f1)
+    if [ ! -f "${HOME_DIR}/FIRST-TASKS.md" ]; then
+        install -m 644 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" \
+            /opt/FIRST-TASKS.md "${HOME_DIR}/FIRST-TASKS.md"
+        printf '%s\n' "$OPT_MD5" > "$SEED_STAMP"
+        chown "${CONTAINER_UID}:${CONTAINER_GID}" "$SEED_STAMP"
+        echo "[entrypoint] seeded ~/FIRST-TASKS.md (first boot)."
+    else
+        HOME_MD5=$(md5sum "${HOME_DIR}/FIRST-TASKS.md" | cut -d' ' -f1)
+        SEEDED_MD5=$(cat "$SEED_STAMP" 2>/dev/null || echo "")
+        if [ "$HOME_MD5" = "$OPT_MD5" ]; then
+            :   # already current, nothing to say
+        elif [ -n "$SEEDED_MD5" ] && [ "$HOME_MD5" = "$SEEDED_MD5" ]; then
+            install -m 644 -o "${CONTAINER_UID}" -g "${CONTAINER_GID}" \
+                /opt/FIRST-TASKS.md "${HOME_DIR}/FIRST-TASKS.md"
+            printf '%s\n' "$OPT_MD5" > "$SEED_STAMP"
+            chown "${CONTAINER_UID}:${CONTAINER_GID}" "$SEED_STAMP"
+            echo "[entrypoint] ~/FIRST-TASKS.md was untouched and a newer version shipped -- re-seeded."
+        else
+            # Edited by the user, OR seeded before this stamp existed and we
+            # cannot tell. Both resolve the same way: never overwrite, say so.
+            echo "[entrypoint] NOTE: ~/FIRST-TASKS.md differs from the shipped /opt/FIRST-TASKS.md"
+            echo "[entrypoint]       and is not the version this container seeded, so it is being"
+            echo "[entrypoint]       left alone. If you have not edited it, 'cp /opt/FIRST-TASKS.md ~/'"
+            echo "[entrypoint]       takes the newer one; diff them first if unsure."
+        fi
+    fi
 fi
 
 # ── Step 10: sshd host keys + start ───────────────────────────────────────────

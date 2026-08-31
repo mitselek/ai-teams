@@ -1,6 +1,6 @@
-# `vedur` -- Joosep Madar's AI team: design of record
+# `paunvere` -- Joosep Madar's AI team: design of record
 
-**Date:** 2026-08-28 (FR S66). **Author:** (*FR:Celes*). **Status:** DRAFT for Aen's review; nothing deployed.
+**Date:** 2026-08-28 (FR S66); finalised 2026-08-31 (S67) -- renamed `vedur` -> `paunvere` (PO), §8 decided, three review fixes applied (implicit-team startup, tripwire-not-backstop, model-pin reality). **Author:** (*FR:Celes*). **Status:** FINAL, accepted by Aen; hand-over to the PO pending.
 **Commissioned by:** Aen, on PO decisions of 2026-08-28. **Inputs:** profile brief (Aen, rev 2), apex-research response `34f2f310` (Schliemann), container design v3.5 (Brunel), `FIRST-TASKS.md` v3.5, apex-research deployed shape, and **the live `rumba` branch `feat/VJS1-826-elron-test` read at source** (`send-request.ts`, `soap.ts`, `.dev.vars.example`, `wrangler.jsonc`, README, commits `39f16a8` and `faa287e`).
 
 ## Contents
@@ -55,7 +55,7 @@ Domain-named tradition (railway engineering, safety and publishing) over a langu
 - **Saxby** -- interlocking: refuses the conflicting move by construction. The rail warden.
 - **Bradshaw** -- compiled every company's timetable into one guide, monthly, without commanding any company. Read-only cartographer.
 - **Smiles** -- railway secretary who wrote engineering as narrative for the public. The Estonian-facing writer.
-- **`vedur`** -- Estonian for locomotive: one short word, Estonian because the principal is. Runners-up: `depoo`, `paunvere` (Luts's *Kevade* -- warm for an Estonian reader but a second tradition, and Joosep Toots as a namesake would be too cute by half).
+- **Team name `paunvere`** -- PO-chosen 2026-08-31 from my runners-up: the parish of Luts's *Kevade*, whose best-known son is a Joosep ("plays so well with Joosep" -- the PO). My original pick was `vedur` (locomotive), with the worry that the *Kevade* echo was too cute; the PO overruled the worry -- the warmth is the point. What stands from the original reasoning: **member names stay out of the Kevade cast** (a Toots agent beside a real Joosep would confuse address and attribution), so the warmth lives in the team name and the precision in the railway-pioneer member names.
 
 ## 4. Model tiers
 
@@ -72,21 +72,22 @@ Both belong in Aen's report to the PO: the rail is thinner than the decisions as
 
 ## 6. A defect in the credential ladder, and how the first tasks resolve it
 
-Task 1's PAT is **Contents: Read-only**. "Branch + PR only" needs `contents:write` (to push a branch) and `pull_requests:write` (to open one). As specified, the team cannot push anything. This is not a contradiction to fix in task 1 -- the read-only start is right -- it is the first *named need* the PAT text promises to honour. The first-tasks sequence (handed to Brunel) is built around it: **task 5 is entirely read-only** (Saxby reviews the live branch; Bradshaw's first roll-up via the connector), **task 6 is the first write** and names the widening precisely: `contents:write` + `pull_requests:write` on `rumba` only, to push `feat/VJS1-826-elron-test` and open its PR. Note for the PO: a fine-grained PAT with `contents:write` on an unprotected `rumba` *can* push to `main`; the `settings.json` deny on `git push ... main` and the prompts are the backstop, and `rumba` has no branch protection.
+Task 1's PAT is **Contents: Read-only**. "Branch + PR only" needs `contents:write` (to push a branch) and `pull_requests:write` (to open one). As specified, the team cannot push anything. This is not a contradiction to fix in task 1 -- the read-only start is right -- it is the first *named need* the PAT text promises to honour. The first-tasks sequence (handed to Brunel) is built around it: **task 5 is entirely read-only** (Saxby reviews the live branch; Bradshaw's first roll-up via the connector), **task 6 is the first write** and names the widening precisely: `contents:write` + `pull_requests:write` on `rumba` only, to push `feat/VJS1-826-elron-test` and open its PR. Note for the PO: a fine-grained PAT with `contents:write` on an unprotected `rumba` *can* push to `main`. The `settings.json` deny on `git push ... main` is a **tripwire, not a backstop** -- a string pattern that `git push origin HEAD:main`, a renamed remote, or `gh api` walks past; the prompts are the actual control, and the only real wall would be branch protection on `rumba` (org-side, PO raising).
 
 ## 7. Items for Brunel (package layout -- his file, his call)
 
-1. **Seed the team dir.** Nothing in `entrypoint.sh` places roster/prompts. Proposal: `COPY teams/vedur /opt/teams/vedur` and a guarded first-boot copy to `~/work/vedur/` (same never-overwrite pattern as `FIRST-TASKS.md`), then `git init` it so scratchpads have history. No remote yet.
-2. **`~/work/CLAUDE.md`** pointing the parent session at `vedur/startup.md` ("you are Minot; read this first").
-3. **`TEAM_NAME=vedur`** if the name is accepted: compose default (`docker-compose.yml:113`), `.env.example:63`, `entrypoint.sh:135` and `:278`, runbook expectation "session named `joosep`", `registry-rows.md` `tmux` field. Pass-1/Pass-2: if he prefers zero churn now, `TEAM_NAME=joosep` works unchanged and the roster `name` follows -- the prompts never hardcode the team name except in `startup.md`'s `TeamCreate` line.
+1. **Seed the team dir.** Nothing in `entrypoint.sh` places roster/prompts. Proposal: `COPY teams/paunvere /opt/teams/paunvere` and a guarded first-boot copy to `~/work/paunvere/` (same never-overwrite pattern as `FIRST-TASKS.md`), then `git init` it so scratchpads have history. No remote yet. *(Accepted by Brunel 08-28, with fail-loud on missing source.)*
+2. **`~/work/CLAUDE.md`** pointing the parent session at `paunvere/startup.md` ("you are Minot; read this first"). *(Accepted.)*
+3. **`TEAM_NAME=paunvere`** (name ruled by PO 08-31): compose default (`docker-compose.yml:113`), `.env.example:63`, `entrypoint.sh:135` (the `:278` launcher touchpoint is gone -- Brunel decoupled the tmux session name, hard-coded `joosep`, on 08-28, so the rename touches nothing he owns except the env value). On this CLI the team name never appears in the runtime dir (`session-<id>`), so TEAM_NAME is labeling only -- but keep it aligned with the roster name so the label tells the truth.
 4. **pnpm.** `rumba` is a pnpm monorepo with `catalog:` deps; the Dockerfile installs npm only. `corepack enable && corepack prepare pnpm@latest --activate` (or pin the version from `rumba/package.json` `packageManager`) is needed for Trevithick's `pnpm --filter elron-test test`.
 5. **`FIRST-TASKS.md` language** -- Joosep-facing, so Estonian per the user-facing rule; tasks 4-6 supplied in Estonian in the handoff message; tasks 0-3 and the safety section are his to translate (or keep bilingual with the code blocks unchanged).
 
-## 8. Open for Aen / PO
+## 8. Decided (Aen review, 2026-08-31)
 
-- Accept `vedur` as roster name, or keep `joosep` (zero-churn).
-- §5 items 1-2: relay to the PO as rail-health findings for Ruth Türk.
-- §6: confirm the two-step credential ladder (read-only task 5, widen for task 6) is the intended reading of "branch + PR only".
-- Whether Bradshaw's initial read set should include the four non-`vjs2` repos' GitHub side now (needs PAT widening) or Jira-only first (needs nothing). Designed as Jira-only first.
+- Roster name: **`paunvere`** (PO; see §3). Container dir stays `joosep`.
+- §5 rail findings: relayed to Ruth Türk via the PO -- closed for this package.
+- Credential ladder: **confirmed as designed** (task 5 read-only, task 6 first write, `rumba` only).
+- Bradshaw: **Jira-only first**, as designed.
+- Review fixes applied 08-31: startup rewritten on the implicit-team model (no TeamCreate -- CLI 2.1.178+); settings.json deny restated as tripwire (§6, common-prompt git row); model-pin reality check added (roster `_model_note`, startup Step 2).
 
 (*FR:Celes*)
