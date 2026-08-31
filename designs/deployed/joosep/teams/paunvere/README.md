@@ -85,7 +85,7 @@ Task 1's PAT is **Contents: Read-only**. "Branch + PR only" needs `contents:writ
 ## 8. Decided (Aen review, 2026-08-31)
 
 - Roster name: **`paunvere`** (PO; see §3). Container dir stays `joosep`.
-- §5 rail findings: relayed to Ruth Türk via the PO -- closed for this package.
+- §5 rail findings: handed to Joosep as the app's owner, who consults Ruth Türk if in doubt -- the earlier "Ruth signs off via the PO" gate was withdrawn by the PO 2026-08-31 (VEO-181 comment 243424). Closed for this package.
 - Credential ladder: **confirmed as designed** (task 5 read-only, task 6 first write, `rumba` only).
 - Bradshaw: **Jira-only first**, as designed.
 - Review fixes applied 08-31: startup rewritten on the implicit-team model (no TeamCreate -- CLI 2.1.178+); settings.json deny restated as tripwire (§6, common-prompt git row); model-pin reality check added (roster `_model_note`, startup Step 2).
