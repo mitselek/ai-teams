@@ -77,3 +77,7 @@ kui midagi katki läheb.
 ---
 
 *Küsimused: Mihkel. Konteineri sisemine juhend on `~/FIRST-TASKS.md`, mitte see fail.*
+
+**Aen** -- framework-research tiimijuht
+*p.p. Mihkel Putrinš*
+*(mustandi koostas Brunel, FR:Brunel; Mihkel luges üle)*
