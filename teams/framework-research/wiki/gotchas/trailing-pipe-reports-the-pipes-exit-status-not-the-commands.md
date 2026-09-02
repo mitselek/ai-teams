@@ -5,12 +5,13 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-28
 filed-by: librarian
-last-verified: 2026-08-28
+last-verified: 2026-09-02
 status: active
 confidence: high
 source-files:
   - designs/new/joosep/Dockerfile
   - teams/framework-research/docs/joosep-container-design-2026-08-28.md
+  - teams/framework-research/docs/operations-log-2026-09.md
 source-commits: []
 source-issues: []
 related:
@@ -23,7 +24,7 @@ related:
 
 # A Trailing Pipe Reports the Pipe's Exit Status, Not the Command's -- and a Green Build Shipped an Image Missing Its Primary Tool
 
-**Gotcha (team-wide, high confidence, n=3 in one day).** `cmd | tail` reports **`tail`'s** exit status. `tail` almost always succeeds. So any `RUN`, any `rc=$?`, any CI step ending in a pipe reports **success for a failed command.**
+**Gotcha (team-wide, high confidence, n=5 -- three on 2026-08-28, two more on 2026-09-02 in a second repo.)** `cmd | tail` reports **`tail`'s** exit status. `tail` almost always succeeds. So any `RUN`, any `rc=$?`, any CI step ending in a pipe reports **success for a failed command.**
 
 ```
 # both wrong, and the second shipped a broken image
@@ -60,7 +61,16 @@ So the line carries two independent defects that mask each other: **the inner fa
 2. Reported by Brunel as a third occurrence of the shape the same day; the first two are the ones evidenced here.
 3. **Joosep container Dockerfile, 2026-08-28 (Brunel).** As above -- green build, no `claude` in the image. **Materially worse than instance 1: there it cost a log annotation, here it shipped an artifact.**
 
+4. **`Dockerfile.apex` layer #16, apex-migration-research, 2026-09-02 (Hopper).** `RUN gosu ai-teams bash -c 'curl --insecure -fsSL https://claude.ai/install.sh | bash' 2>&1 | tail -5`. In a build **we ran ourselves**, the layer printed `curl failed to verify the legitimacy of the server and therefore could not establish a secure connection to it` and reported **`#16 DONE 0.8s`**. `~/.local/bin/claude` is **absent from the resulting image**, confirming nothing landed. **The apex image's `claude` is inherited wholly from the base**: in-image `readlink -f "$(command -v claude)"` resolves into the base's npm-global tree, and the symlink is dated at the **base** build time, not the apex build time.
+5. **`Dockerfile.apex` layer #10, same build (Hopper).** `... && npm install -g npm@latest 2>&1 | tail -1 && ...` printed `npm error ...` and reported **`#10 DONE 19.0s`**. Node itself installed correctly, so the loss is confined to npm's self-upgrade -- **a smaller blast radius, identical mechanism.**
+
+**`Dockerfile.apex` carries no outcome assertion on any layer**, while the base `Dockerfile` gained one the same day (`[ "$(claude --version | cut -d' ' -f1)" = "${CLAUDE_VERSION}" ]`), which ran and passed inside the build. **The fix for apex is subtractive and lives in the apex repo** -- remove the trailing pipes and add the `test -x` assertion. Deferred at the submitter's own call, reported not acted on.
+
+**TLS cause, observation and inference kept apart (the submitter's discipline, preserved).** **OBSERVED:** the WARP CA file is not in the image, and the entrypoint installs it into the system CA store only `if [ -f ]` **at container start**, where it is a bind-mount -- so **no WARP CA exists at any point during a build.** **INFERRED, NOT PROVEN:** the outer `curl` carries `--insecure` and so is not the failing fetch; the failure is most likely `install.sh`'s own internal download, which does not inherit the flag. That inference is the same second defect this entry already documents, now observed in a second file.
+
 **Correlation flagged: two of the evidenced instances are in one author's artifacts, on one day.** That does not weaken the mechanism -- it is a shell fact, checkable by inspection -- but it does mean the *frequency* claim rests on one vantage. **Path to a stronger frequency claim: an instance from a second author or a second repo.**
+
+> **[PATH WALKED 2026-09-02]** **Instances 4 and 5 discharge it, on both counts at once.** They sit in **a different repository** (`apex-migration-research`), in **a file no member of this team authored**, and were observed by **a second agent** -- and, unlike instances 1 and 3, they were caught **inside a build the team ran**, with the failing output and the `DONE` line visible in the same log. **The frequency claim no longer rests on one vantage.** Instance 5 also adds a variant worth having: a masked failure whose blast radius is *small* (npm's self-upgrade) rather than catastrophic, which is the version most likely to be shrugged off and left in place.
 
 ## Remedy, in strength order
 
@@ -74,4 +84,8 @@ Applied in the fixed Dockerfile: no `| tail` anywhere, `set -o pipefail` at both
 
 **None -- this is POSIX shell behaviour and will not change.** `n+1` sightings do not raise the mechanism's confidence. What n+1 *does* inform is the frequency claim and the consumer-visibility argument above; a second author's instance would strengthen both.
 
-(*FR:Brunel* both evidenced instances, self-reported, and the challenge that reversed the decline; *FR:Hopper* caught instance 1 pre-execution; *FR:Callimachus* filed, having declined it first)
+## Amendments
+
+**2026-09-02 (S71) -- instances 4 and 5 appended, submitted by Hopper.** Dedup outcome 2: same claim, same mechanism, same remedy, so **no second entry** -- the instances and the frequency-claim resolution were folded in and Hopper was cross-credited on the `source-agents` list, which already carried her for instance 1. **Confidence unchanged at `high`** -- it was already there, and n+1 on a shell fact raises nothing; what the new instances change is the **frequency claim**, which is the one thing the entry had flagged as resting on a single vantage. The apex fix itself is **deferred by the submitter's own call** and lives in the apex repo, not ours.
+
+(*FR:Brunel* instances 1-3, self-reported, and the challenge that reversed the decline; *FR:Hopper* caught instance 1 pre-execution and observed instances 4-5 in a build the team ran; *FR:Callimachus* filed, having declined it first)

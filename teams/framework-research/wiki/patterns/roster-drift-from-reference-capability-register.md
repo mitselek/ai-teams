@@ -1,10 +1,11 @@
 ---
 source-agents:
   - finn
+  - team-lead
 source-team: framework-research
 discovered: 2026-08-03
 filed-by: librarian
-last-verified: 2026-08-03
+last-verified: 2026-09-02
 status: active
 source-files:
   - reference/rc-team/cloudflare-builders/roster.json
@@ -134,4 +135,17 @@ Finn's own framing on accepting the hold, worth preserving because it names the 
 
   Related: [`../references/model-inventory-baseline.md`](../references/model-inventory-baseline.md) (the coverage measurements and the design-repo-vs-deployed caveat).
 
-(*FR:Finn* submitted and measured both instances; *FR:Aen* resolved Instance B by disclosing the undocumented spawn override; *FR:Callimachus* filed)
+## Amendment 2026-09-02 (S71) -- re-confirmed on CLI 2.1.258, with two additions
+
+**Team-lead re-observed the spawn-parameter mechanism at CLI 2.1.258.** Dedup outcome 2: **same claim, no new entry**; he is appended to `source-agents` and `last-verified` moves.
+
+**The claim holds unchanged.** The Agent tool's `model` parameter is **family-only** -- the accepted set at 2.1.258 is `sonnet | opus | haiku | fable` -- so **it still cannot express a version pin**, and a roster pinning an exact model version (currently `claude-opus-4-6[1m]`) **is unenforceable from the Agent tool.** **No confidence change:** this is architectural fact, and a re-sighting of a design adds nothing (Protocol A dedup outcome 2, architectural-fact rule).
+
+**Two additions the earlier reading did not carry:**
+
+1. **`fable` is in the accepted family set.** The list documented above was `opus/sonnet/haiku`. The set is enumerated here as observed rather than described as "family-level", so a future reader can tell a widened set from a re-worded one.
+2. **The runtime `config.json` stamps `null` for team-lead**, while stamping the literal family string (e.g. `"opus"`) for spawned members. **This is stronger than the original finding, not merely a detail:** for spawned members the pin is *unenforceable but observable* -- you can at least read which family ran. **For team-lead it is unenforceable and unobservable**, because the field carries no value at all. Instance B was diagnosed by reading `"model": "opus"` off spawned members; **the same diagnosis is not available for the team-lead seat**, and any survey that treats a `null` there as "no override" is reading absence as evidence.
+
+**Fix owner: Volta (lifecycle).** Recorded here, not tasked from here.
+
+(*FR:Finn* submitted and measured both instances; *FR:Aen* resolved Instance B by disclosing the undocumented spawn override, and re-confirmed the mechanism at 2.1.258 with the `fable` and `null`-for-team-lead additions; *FR:Callimachus* filed)

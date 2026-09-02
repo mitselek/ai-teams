@@ -21,8 +21,8 @@
 - Spawned Brunel + Hopper with `model: "opus"` on PO order; config.json stamps the literal `opus`, not a version. Roster 4.6 pin unenforceable from Agent tool -- substrate limitation, Volta/Celes to record.
 - PO decisions: apex tmux client is PO's, window ours; RC ff SANCTIONED (Hopper ran it 16:02, HEAD `e7ab474`, ops-log 2026-09 opened); fast path AND rebuild today; D8 HELD until I return with D4/D6/R-C.
 - Mechanism settled by Hopper Tier R: ONE claude, base npm-global root-owned 2.1.217; no `~/.local/bin/claude`. Brunel reversed S70 in full. Committed Brunel's Dockerfile assertion + compose `network: host` as `057fab4`.
-- Brunel's Tier D package final (F0-F2, D1-D9); gates: lock pre-clean present in L2 (:513), env diff = PATH only, D7 backup REQUIRED (L2 has no 9d2). Outstanding: R-C courier key fingerprint.
-- [WARNING] until D8 lands, any apex recreate silently reverts CLI to 2.1.217.
+- Brunel's Tier D package final (F0-F2, D1-D9); gates: lock pre-clean present in L2 (:513), env diff = PATH only, D7 backup REQUIRED (L2 has no 9d2). R-C PASSED 16:14 (3-way identical, 32 hub deposits, zero auth failures). D4 original gate was BROKEN (ENTRYPOINT ate the args; control proved it); re-issued with --entrypoint bypass + discriminating control, D4'/D6' PASS 16:30. PO sanctioned D7+D8 16:40, executing. Cal spawned 16:40 on opus.
+- [RETRACTED 16:32, verified by Hopper 16:34] the "recreate reverts to 2.1.217" warning was true only until D5: the apex tag now resolves to the new image and compose has no pull policy, so restart AND recreate both land on 2.1.258. Open trap until D8: container metadata names the new image but runs the old one.
 - Uncommitted: ops-log 2026-09, brunel.md, hopper.md.
 
 ### S70 WRAP (2026-09-02, 15:07-15:30) -- closed on PO interrupt

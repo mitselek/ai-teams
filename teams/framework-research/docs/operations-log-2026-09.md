@@ -339,3 +339,190 @@ The conclusion survives on the first leg plus the tag's current resolution, whic
 (*FR:Hopper*)
 
 ---
+
+## 2026-09-02T16:43+03:00 -- S71 D7 (Tier M) + **D8 (TIER D, force-recreate) EXECUTED** + D9 (Tier R): apex-research now RUNS the new image
+
+**timestamp** -- 2026-09-02T16:43+03:00 (moment-of-use re-validation) through 2026-09-02T16:46+03:00 (D9 investigation complete).
+
+**tasker** -- Aen (team-lead), relaying PO sanction of 16:40 and Brunel's package verbatim at 16:46, after I refused at 16:41 with `[SANCTION-INCOMPLETE]`.
+
+**dispatch summary** -- Complete the upgrade: back up `.claude.json` to the persistent volume, force-recreate the container so it adopts the image built at D5, then verify post-recreate.
+
+**tier classification + sanction status** --
+
+- **Re-validation, D9 -- Tier R**, default-permitted.
+- **D7 -- Tier M.** Tasker-ack quoted verbatim: *"D7 Tier M, REQUIRED -- `docker exec apex-research bash -c 'mkdir -p /home/ai-teams/.claude/backups && cp -a /home/ai-teams/.claude.json /home/ai-teams/.claude/backups/.claude.json.backup.$(date +%Y%m%d-%H%M%S) && ls -l /home/ai-teams/.claude/backups/'` The destination is on the `~/.claude` VOLUME, which is what makes it survive the recreate."*
+- **D8 -- TIER D. Sanction VALIDATED COMPLETE before execution; all three components present verbatim.** (a) EXACT COMMAND: *"`cd /home/dev/github/apex-migration-research && docker compose up -d --force-recreate`"*. (b) REASON: *"a rebuilt image under an unchanged compose is NOT adopted by plain `up -d`. Without `--force-recreate` the container keeps running the old image and the entire rebuild delivers nothing."* (c) EXPECTED OUTCOME: *"the container is recreated on the new image and reaches a running state; `docker ps` shows apex-research up; the entrypoint log reports KEY_COUNT=3; the courier and dashboard are running again within the supervisor's relaunch interval; the CLI reports 2.1.258 to the ai-teams user."* ROLLBACK: *"`docker tag apex-research-claude:rollback-pre-2.1.258 apex-research-claude:latest && docker compose up -d --force-recreate`"*. DESTROYS/PRESERVES lists supplied and quoted in the 16:46 relay. **PO sanction 16:40, relayed by Aen.**
+- **PRIOR REFUSAL, recorded because it is the audit point.** At 16:41 I issued `[SANCTION-INCOMPLETE]` and did not execute: I held only the exact command; the reason, expected outcome, rollback and Brunel's revised blast radius had never transited to me (his 16:13 dispatch states D8 "is NOT sanctioned and is not in this dispatch"), and D9 had never reached me in any message. Both gaps were filled at 16:43 and 16:46 and execution followed. Justification for refusing rather than inferring: **in this same package four steps earlier, Brunel's pre-written D4 failure path asserted a gate failure meant a bad image and instructed a restore; that premise was false and following it mechanically would have destroyed a correct build.** A pre-written Tier D expected-outcome and rollback can be wrong, which is why the text must be read rather than assumed.
+- **Aen's amendments to Brunel's text, applied:** the "failure mode avoided" clause predates Brunel's 16:32 retraction and the downgrade hazard is closed, so D8 was sanctioned as completing rather than protective; D9 gains a check that the running digest equals the tag's; **and the D8 rollback is conditioned on the container being BAD after recreate, not on any single gate line -- on an unexpected D9 result, STOP and surface BEFORE rolling back.** That third amendment is the correction I asked for at 16:41 and it governed my handling of the KEY_COUNT miss below.
+
+**deployed-artifacts-read declaration** --
+
+- **Layer 1** -- not re-read; the L1/L2 entrypoint drift recorded at S70 is cited below as the explanation for the KEY_COUNT miss.
+- **Layer 2** -- `/home/dev/github/apex-migration-research` compose used by D8; the running `/entrypoint-apex.sh` grepped in-container for `claude.json` handling.
+- **Layer 3** -- pre- and post-recreate `docker inspect` (state, `.Image`, `.Config.Image`, mount table), entrypoint logs, in-container process table, `~/.ssh` contents and fingerprints, `~/.claude` volume contents.
+- **Audit-trail artifacts (this repo)** -- entries `T16:02`, `T16:06`, `T16:11`, `T16:16`, `T16:26`, `T16:33` in this file.
+
+**commands executed** (verbatim, RC host as `dev`) -- moment-of-use re-validation (tag resolution, running digest, container state, quiescence via `pgrep -x` and a `/proc/*/exe` scan, service inventory, tmux clients, `.claude.json` existence) with hard abort branches on tag drift, non-running state, or a missing backup source; then D7 verbatim; then a verification of D7 (see outputs); then D8 verbatim with rc captured directly and output to `/tmp/d8.log`; then D9's three dispatched probes plus Aen's digest-equality amendment, plus my own cross-checks and the follow-up investigation.
+
+**outputs** (key lines) --
+
+**Re-validation, 16:43:41.** Tag `apex-research-claude:latest` -> `sha256:ca42f778...` (the D5 image, unchanged since the build); running digest `sha256:fb99aee1...`; state `running`; tag ships `2.1.258`. Quiescence confirmed: `pgrep -x claude` rc=1 and the exe-scan found nothing. Services present as the blast radius predicts. **GATES PASS.**
+
+**D7 -- rc=0, but its own verification step could not show its own result.** The sanctioned command ends `ls -l /home/ai-teams/.claude/backups/`, which printed `total 0`. **The backup filename begins with a dot, so plain `ls -l` cannot list it.** I did not accept rc=0 as proof of a backup that is the entire safety net for a Tier D recreate. `ls -la` shows `.claude.json.backup.20260902-164341`, 55734 bytes, and `md5sum` makes it byte-identical to the source: both `6f3c1370749377d0f2494019172025f0`. **Backup verified real.** (Five older CLI-generated backups with epoch-ms names were already present.)
+
+**D8 -- SUCCESS, rc=0.** `Container apex-research Recreate / Recreated / Starting / Started`. Pre-state image `sha256:fb99aee1...` started 2026-08-27; post-state image **`sha256:ca42f7787444...`** started 2026-09-02T13:44:30Z, state `running`. **The container now runs the image D5 built.**
+
+**D9 -- PASS on every substantive check; ONE expected-outcome line did not appear.**
+
+- CLI: `2.1.258 (Claude Code)`; two identical `claude is /usr/local/bin/claude` lines; `.local/bin` mentions **0**. Same pass condition as F2, met.
+- `~/.ssh` re-seeded by entrypoint Step 7b: `authorized_keys`, `stationmaster_apex`, `stationmaster_known_hosts`, all dated 16:44.
+- **Courier key survived and is unchanged:** `256 SHA256:NBq5a/r3GsTuIGME1BzsklC9Sr+6VrltsxoSfW4QsaE apex-research (ED25519)` -- identical to R-C. Hub authentication is preserved.
+- Courier and dashboard relaunched by the supervisor within ~3s (pids 1441/1448/1475/1476).
+- **Aen's amendment satisfied -- the metadata divergence is CLOSED:** running digest `sha256:ca42f778...` now equals the tag's resolution, and `Config.Image` agrees.
+- Stale-lock handling worked: the boot cleared the prior lock and the new courier wrote a fresh one at 16:44.
+- Volume preservation confirmed: `.credentials.json` (OAuth) intact, `teams/apex-research` intact, and the D7 backup intact on the volume.
+
+**THE MISS, and why it is NOT a rollback trigger.** Brunel's expected outcome says *"the entrypoint log reports KEY_COUNT=3"*. **No such line exists.** The whole log is 40 lines, so `--tail 80` covered it entirely and the window was not the problem; a case-insensitive search for `key_count`, `key count`, `keys installed`, `SSH_PUBLIC_KEY` and `authorized` returns nothing.
+
+**Ground truth was then measured directly rather than inferred, and the underlying condition IS met.** `authorized_keys` holds **3 non-blank lines**, and `ssh-keygen -lf` identifies them: `mihkel.putrinsh@evr.ee apex-research`, `ghost-bridge@aleksandr-2026-05-15`, and `rc-connect` -- exactly the three keys recorded for this substrate. `sshd` is listening on 2222. So the state KEY_COUNT=3 was a proxy for is verified true by a better instrument than the log line.
+
+Explanation, labelled as inference: the running entrypoint is the **Layer 2** copy (25805 bytes, Jun 16) and the **Layer 1** copy is 32823 bytes (Jul 23) -- the 7 KB L1/L2 drift recorded at S70. Brunel's expected outcome was almost certainly written against the L1 text, which emits the line. Well-supported, not measured.
+
+Per Aen's amendment 3 I did **not** roll back. Rolling back on a failed check whose underlying reality is verified sound would repeat the D4 error exactly.
+
+**TWO FINDINGS SURFACED, NEITHER ACTED ON.**
+
+1. **`/home/ai-teams/.claude.json` no longer exists.** The mount table confirms only three volumes -- `~/.claude`, `~/workspace`, `~/source-data` -- so this file lived on the container overlay and the recreate destroyed it, precisely the loss D7 was required to cover. A grep of the running entrypoint for `claude.json` returns nothing, confirming it neither creates nor restores it. **My D7 backup on the volume is now the only copy.** No step in D1-D9 restores it, and restoring is a mutation outside this dispatch, so the decision belongs to Brunel and the PO. OAuth is unaffected -- `.credentials.json` lives on the volume and is intact.
+2. **The source-data pull failed with HTTP 403** during boot: `fatal: unable to access 'https://github.com/Eesti-Raudtee/vjs_apex_apps.git/': The requested URL returned error: 403`, followed by `[entrypoint] WARNING: git pull failed for source-data. Using existing state.` The entrypoint degraded gracefully and its later gate reports `OK: vjs_apex_apps source data` from the preserved volume, so the data is present but not refreshed. A 403 points at token scope or expiry. Pre-existing in character and not caused by the recreate, but it is now visible on a fresh boot. The `WARN: DB tunnel down` line is expected -- those are reverse-forwards from the Windows workstation.
+
+Entrypoint reached `[entrypoint] All gates passed. Starting...` and both supervisors launched.
+
+**A defect of my own, recorded so the number is not trusted.** In my investigation script I wrote `echo "(rc=$?)"` after a `grep ... | head` pipeline, which reports `head`'s status and printed `rc=0` under a grep that matched nothing. I did not rely on it -- the empty output carried the conclusion -- but it is my own documented trailing-pipe gotcha committed again inside a diagnostic, and the printed `rc=0` is meaningless.
+
+**outcome** -- **success. The apex CLI upgrade is COMPLETE end to end.** The container runs the newly built image, serves 2.1.258, has its three SSH keys and its unchanged courier key, and its courier and dashboard are supervised and running. All three named volumes survived. The metadata divergence is closed. Nothing was rolled back and nothing was pruned. Two items are open for Brunel and the PO: whether to restore `.claude.json` from the D7 backup, and the 403 on the source-data pull.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-02T16:50+03:00 -- S71 addendum to `T16:43`: D9 reconciled against Brunel's SUPERSEDING rewritten D9; one uncovered check run and PASSED (Tier R)
+
+**timestamp** -- 2026-09-02T16:50+03:00. Addendum to `2026-09-02T16:43+03:00`; that entry stands unedited.
+
+**tasker** -- Brunel's 16:43 message (rewritten D9), which Aen's 16:49 message declares supersedes his own 16:46 forward wherever they differ. Both arrived AFTER D7/D8/D9 had already run against the 16:46 forward.
+
+**dispatch summary** -- Reconcile what I actually executed against the superseding D9 and close any gap. Brunel rewrote D9 after finding, while writing it out, that his original contained `pgrep -af "courier|vite"` -- the same self-matching defect I caught in F0. His rewrite asserts OUTCOMES rather than process names, so no self-match can defeat it.
+
+**tier classification + sanction status** -- **Tier R throughout, default-permitted.** No mutation. No rollback (Brunel: rollback is not free -- it returns apex to 2.1.217 and, since D8 already destroyed F1's overlay copy, loses the whole day's upgrade; Aen: rollback comes only through him).
+
+**deployed-artifacts-read declaration** -- Layer 3 only: in-container HTTP probe of the dashboard, courier lock mtime with full ISO precision, courier log, container status and restart counters, host clock. Layers 1 and 2 not re-read; nothing in this addendum depends on them.
+
+**commands executed** -- `docker exec apex-research bash -c 'curl -s -o /dev/null -w "http_%{http_code}\n" http://127.0.0.1:5173/ || echo CURL_FAILED'`; `ls -l --time-style=full-iso .../stationmaster-state/courier.lock`; `docker inspect apex-research --format '{{.State.StartedAt}}'`; `ls -l` and `tail` of both candidate courier-log paths; `docker ps --filter name=apex-research --format '{{.Status}}'`; `docker inspect apex-research --format 'RestartCount={{.RestartCount}} Restarting={{.State.Restarting}} OOMKilled={{.State.OOMKilled}}'`; `date` on both hosts.
+
+**outputs** --
+
+**Reconciliation. Five of Brunel's six rewritten checks were already covered by what I ran at 16:45, with equal or stronger evidence. ONE was not: D9d.**
+
+- **D9d, dashboard alive by outcome -- NOT PREVIOUSLY RUN, now PASS: `http_200`.** I had confirmed the vite processes were up but never confirmed the dashboard actually serves. That distinction is precisely why Brunel wrote the check as an outcome, and he was right that a running process is not a serving service. This was a real gap in my D9 and it is now closed.
+- **D9c, courier alive by outcome (his failure-mode #1, "the one to check first") -- PASS.** Lock mtime `2026-09-02 16:44:39.502763324 +0300`; container `StartedAt` `2026-09-02T13:44:30.960494033Z`, i.e. 16:44:30 EEST. **The lock is 9 seconds AFTER the recreate**, so the entrypoint cleared the prior lock and the new courier claimed a fresh one. Stronger evidence than the lock alone also exists in the courier log: `2026-09-02T13:44:39Z INFO courier up: team=apex-research target=sm@10.100.136.162 interval=30.0s outboxes=['framework-research-courier'] inject->team-lead` -- the courier logging its own clean start after the recreate, naming hub target and outbox.
+- **Path discrepancy in D9c, minor, reported not fixed:** his command reads `.../stationmaster-state/courier.log`, which **does not exist**. The courier log is at `/home/ai-teams/.claude/logs/courier.log`, where entrypoint Step 9e's `supervise()` redirects it. The lock half of D9c is at the path he gives; the log half is not.
+- D9a version, D9b digest equality, D9e keys, D9f status: already covered at 16:45 and recorded in `T16:43`.
+- **D9f restart counters, added here:** `Up 5 minutes`, `RestartCount=0`, `Restarting=false`, `OOMKilled=false`. Failure mode 3 (restart-looping) negative.
+
+**AUDIT NOTE ON TIMESTAMP ORDERING, recorded because it would otherwise read as a sanction violation.** Teammate message timestamps are self-reported and the agents' clocks are not synchronised: Brunel's superseding package is stamped 16:43 and Aen's forward 16:46, while my host-side execution stamps read 16:43:41 (re-validation) and 16:44:20 (D8). **Execution followed receipt in my own conversation order** -- I received Aen's complete verbatim package, validated all three Tier D components present, and only then executed. The RC host and my workstation clocks agree exactly (both `16:50:27`), so the host-side stamps in `T16:43` are sound; it is the inter-agent message stamps that cannot be used to order events against them.
+
+**outcome** -- **success; D9 complete under the superseding dispatch.** All six checks pass. The one check my execution had not covered was found by reconciling rather than by assuming equivalence, and it passed. No rollback, no mutation, nothing pruned. The two open items from `T16:43` are unchanged and still belong to Brunel and the PO: whether to restore `.claude.json` from the D7 backup, and the HTTP 403 on the source-data pull.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-02T16:55+03:00 -- S71 **CORRECTION to `T16:43`: my KEY_COUNT explanation was WRONG** (Tier R); and restore Step 1 STOPS on Brunel's own stop condition
+
+**timestamp** -- 2026-09-02T16:55+03:00. Correction to the `2026-09-02T16:43+03:00` entry, which stands unedited per append-only discipline. The correction is to my **explanation**, not to that entry's outcome.
+
+**tasker** -- Brunel, his 16:50 message: a correction of my KEY_COUNT inference plus a two-step `.claude.json` restore dispatch, the Tier M half sanctioned by team-lead.
+
+### PART 1 -- WITHDRAWING MY OWN INFERENCE
+
+**In `T16:43` I explained the absent `KEY_COUNT=3` line as L1/L2 entrypoint drift, labelled inference. THAT EXPLANATION IS FALSE AND IS WITHDRAWN.**
+
+`KEY_COUNT` is a **shell variable, never a logged literal**. Confirmed by me against the **running L2 entrypoint** rather than accepted on Brunel's L1 grep: `223:KEY_COUNT=0`, `229: KEY_COUNT=$((KEY_COUNT + 1))`, `233:if [ "$KEY_COUNT" -gt 0 ]; then`, and the emitting line `243: echo "[entrypoint] ${KEY_COUNT} SSH public key(s) installed for michelek + ai-teams."`. **The string `KEY_COUNT` cannot appear in log output from any version**, so the grep returned a true negative and no read of L2 was ever needed to settle it.
+
+**Why the false explanation is worse than the miss it explained.** It would have entered the L1/L2 drift record as a supporting instance. It is exactly the kind of inference that gets adopted because it fits the observation, and the observation is equally consistent with the string never existing. **An explanation that fits is not an explanation that is sourced.** I labelled it as inference, which was right, and it was still wrong; labelling limits the damage but does not substitute for reading the source.
+
+**Provenance of the error, per Brunel:** my own May-2026 scratchpad line *"KEY_COUNT=3 confirmed in entrypoint logs"* was shorthand for *the count was 3*. He read it as a log literal and built a grep string from it six months later. **A variable name in a note became an expected output.** The note was mine; the expectation was his.
+
+**POSITIVE CLOSE RUN, so this ends as a confirmation rather than an explained absence.** `docker logs apex-research 2>&1 | grep -i 'SSH public key'` returns:
+`[entrypoint] 3 SSH public key(s) installed for michelek + ai-teams.`
+**The count is 3.** The `T16:43` conclusion is unchanged and now rests on the entrypoint's own log line as well as on the three fingerprints measured there. (`PIPESTATUS[1]` used for the exit status, not `$?` after the pipe -- the trailing-pipe trap I recorded against myself in `T16:43`.)
+
+### PART 2 -- RESTORE STEP 1 (Tier R): STOPPED
+
+**tier / sanction** -- Step 1 Tier R, default-permitted. Step 2 is Tier M, sanctioned by team-lead, and requires a single literal filename carried from Step 1. **Step 2 NOT executed.**
+
+**dispatched command** -- `docker exec apex-research bash -c 'ls -l /home/ai-teams/.claude.json 2>&1; echo ---BACKUPS---; ls -l /home/ai-teams/.claude/backups/; echo ---CLAUDE-PROCS---; ls -l /proc/[0-9]*/exe 2>/dev/null | grep -c claude.exe; echo ---PS---; ps -eo pid,etimes,args --no-headers'`
+
+**outputs** --
+
+- `.claude.json` **absent**, as expected. Read at the moment of use, not inherited.
+- claude-process count **0**; the full process table confirms it independently (bash, sshd, two entrypoint shells, courier 1448, vite 1441/1475/1476, esbuild 1487).
+- **`ls -l` on the backups directory printed `total 0`.** Same dotfile-hiding defect as D7's verification step, which I reported to Brunel at 16:51; the dispatched command repeats it. **Run verbatim and stopped there, Step 1 reports NO BACKUP AT ALL** -- a false negative that would read as "the only copy is gone" and make the restore look impossible.
+- `ls -la` shows **SIX** backups, not one:
+
+| file | bytes | mtime |
+|---|---|---|
+| `.claude.json.backup.1788349916567` | 56062 | Sep 2 14:51 |
+| `.claude.json.backup.1788350028870` | 56062 | Sep 2 14:53 |
+| `.claude.json.backup.1788350334115` | 56062 | Sep 2 14:58 |
+| `.claude.json.backup.1788350492391` | 56065 | Sep 2 15:01 |
+| `.claude.json.backup.1788350805653` | 56065 | Sep 2 15:06 |
+| **`.claude.json.backup.20260902-164341`** | **55734** | **Sep 2 15:07** |
+
+**STOP CONDITION FIRED.** Brunel's Step 1 says *"STOP AND SURFACE if: the backup count is anything other than 1"*. It is 6. The five epoch-ms files are CLI-generated and predate today's work; they were recorded in `T16:43` but were not pushed to him directly, so he wrote the expectation without them.
+
+**Not executing Step 2, and the reason is structural rather than formal.** Step 2 requires substituting *"the ONE literal filename from step 1"*. There is no one filename. **The two-step shape exists precisely so the executor does not choose the file, and choosing is what proceeding would require.** I hold the evidence that identifies the right one -- `.claude.json.backup.20260902-164341` is the D7 backup, verified byte-identical to the pre-recreate original at `T16:43` (both md5 `6f3c1370749377d0f2494019172025f0`), while the five others differ in size and content and represent older states -- but supplying it from my own judgement is the substitution the split was designed to prevent. **Brunel names the literal in a re-issued Step 2 and I execute it.**
+
+**outcome** -- **partial. Part 1 closed: my inference withdrawn, the corrected positive check run and passed at 3 keys. Part 2 stopped at Step 1 on the dispatcher's own stop condition; Step 2 not run, nothing mutated, `.claude.json` still absent and all six backups untouched.** Restoring remains available and costs one line from Brunel.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-02T16:59+03:00 -- S71 `.claude.json` restore Step 2 (Tier M): **VERIFIED BYTE-IDENTICAL**; last open item between Brunel and me CLOSED
+
+**timestamp** -- 2026-09-02T16:59+03:00.
+
+**tasker** -- Brunel, his 16:58 re-issue of Step 2 carrying the literal filename, after my 16:56 STOP on his own stop condition (six backups, not one). Tier M sanctioned by team-lead.
+
+**dispatch summary** -- Restore `/home/ai-teams/.claude.json`, destroyed by the D8 recreate because it lives on the container overlay rather than on a volume, from the D7 backup on the `~/.claude` volume.
+
+**tier classification + sanction status** -- **Tier M.** Tasker text quoted verbatim: *"cp -a /home/ai-teams/.claude/backups/.claude.json.backup.20260902-164341 /home/ai-teams/.claude.json; md5sum ...; ls -la ..."* with **EXPECTED OUTCOME** *"two md5 lines, both `6f3c1370749377d0f2494019172025f0` ... `ls -la` shows the file owned `ai-teams:ai-teams`, 55734 bytes, mtime Sep 2 15:07"*, **STOP** *"if: the hashes differ from each other or from `6f3c1370...`, or the size is not 55734"*, **ROLLBACK** *"`rm /home/ai-teams/.claude.json`, returning the container to its current state. Do not delete any backup, including the five CLI ones."* The literal filename removes the selection I refused to make at 16:56; no variable and no glob transits the SSH-to-docker-exec-to-bash chain, which is the A.2 transit hazard Brunel deliberately designed around.
+
+**deployed-artifacts-read declaration** -- Layer 3 only: pre-check of process state and both file paths at the moment of use; post-write verification of hash, size, ownership, mtime and the backup directory. No Layer 1 or Layer 2 read is implicated by a file copy inside the container.
+
+**commands executed** -- Pre-check, my own Tier R initiative with three abort branches (claude-process count non-zero; target already existing, which would make overwriting a different decision; source missing or zero bytes). Then the sanctioned command verbatim. Then verification with `--time-style=full-iso` and a full `ls -la` of the backups directory.
+
+**outputs** --
+
+Pre-check at 16:59:21: claude processes **0**; target absent; source present at 55734 bytes. **PASS.** The ordering matters and is the point of the check -- a running CLI would rewrite the target, so the restore must precede any CLI start.
+
+**Sanctioned command, rc=0:**
+`6f3c1370749377d0f2494019172025f0  /home/ai-teams/.claude/backups/.claude.json.backup.20260902-164341`
+`6f3c1370749377d0f2494019172025f0  /home/ai-teams/.claude.json`
+`-rw------- 1 ai-teams ai-teams 55734 Sep  2 15:07 /home/ai-teams/.claude.json`
+
+**Every stop condition cleared.** The two hashes are identical to each other AND to the expected `6f3c1370...`, which is the same hash recorded at `T16:43` against the pre-recreate original. Size 55734. Owner `ai-teams:ai-teams`, so running as `-u ai-teams` avoided any ownership repair. Full-ISO mtime `2026-09-02 15:07:06.512087824 +0300`, exactly as predicted.
+
+**All six backups present and untouched**, including the five CLI-generated ones. Nothing deleted.
+
+**SUBSTRATE FACT worth carrying, from Brunel's reading of my 16:56 listing.** The five epoch-ms files are written by Claude Code itself into `~/.claude/backups/`, which is **on the volume**, so they survived the recreate and `.claude.json` was never strictly unrecoverable. **But the D7 copy was still the right one to restore, for a better reason than authorship:** the CLI writes its backup *before* each write, so its newest copy is the state *preceding* the last write, and **D7's is the only copy of the final state.** The size step from 56065 down to 55734 is that last write. Consequence for future dispatches: **the CLI's own backups are a real safety net but always trail by one write, so a pre-recreate capture is still required.** Brunel is revising his entrypoint recommendation to team-lead on this.
+
+**The name-versus-mtime disagreement is correct behaviour, not a fault.** The D7 file's name encodes 16:43:41 (when the copy ran) while its mtime is 15:07 (when the CLI last wrote the source), because `cp -a` implies `--preserve=all`. The five CLI names decode to their own mtimes because those were written, not copied. **The disagreement is evidence the copy is faithful.** Recorded so a later reader does not chase it as a clock fault.
+
+**outcome** -- **success.** `/home/ai-teams/.claude.json` restored byte-identical to its pre-recreate state, with per-project trust decisions and MCP approvals intact, so the next session in this container meets no prompts it should not. Nothing else mutated; no backup deleted. **This closes the first of the two items left open at `T16:43`.** The remaining item is the HTTP 403 on the source-data pull, which is the PO's.
+
+(*FR:Hopper*)
+
+---
