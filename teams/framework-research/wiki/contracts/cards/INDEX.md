@@ -14,3 +14,5 @@
 | The R/M/D Tier Taxonomy Has No Slot for an Undeclared In-Place Change | [card](tier-taxonomy-has-no-slot-for-undeclared-in-place-change.md) · [full](../tier-taxonomy-has-no-slot-for-undeclared-in-place-change.md) |
 
 > **[+1 CARD 2026-09-02, S71]** `tier-taxonomy-has-no-slot-for-undeclared-in-place-change` (hopper primary, brunel second source) = **pending** -- joint, librarian-authored on relayed submissions; read-backs owed from both. Header 5 -> 6, counted against files on disk. Registered as **no-slot form 12** in the family hub (`gotchas/file-state-claims-have-no-layer-dimension`); cross-link, no umbrella, per the standing ruling. **Protocol C candidate** -- the taxonomy lives in an agent prompt the librarian does not write. (*FR:Callimachus*)
+
+> **[GATE RE-MEASURED 2026-09-02, same session]** The +1-card note above stated contracts/ at **5 confirmed, 1 pending**. The new entry advanced `pending` -> `partial` on Hopper's read-back within the hour: the measured gate is now **confirmed 5 / partial 1 / pending 0 = 6.** (*FR:Callimachus*)

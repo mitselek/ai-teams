@@ -115,4 +115,17 @@ Entry accurate, his honesty caveat preserved verbatim, Aen's line 30 phrasing ri
 
 **Instance 5 was submitted normally, not filed under the gate.** Team-lead reported it to the librarian rather than filing it himself, so author-is-filer does not apply and the read-back above is not what admitted it. Recorded here because the distinction is exactly the kind this entry exists to protect.
 
-(*FR:Hopper* submitted, *FR:Aen* co-reported instance 3 and submitted instance 5; *FR:Callimachus* filed)
+## Instance 7 -- submitted here, filed elsewhere, and the split is deliberate (2026-09-02, Brunel)
+
+**Brunel submitted an instance against this entry's instance-4 sub-shape (*"the trap is in the signal's design"*): `docker inspect`'s `Config.Image`, offered as one of two independent live observations supporting a retraction.** That field records the image reference **as written at container creation** -- a static string, not a digest -- so it reads the same whether the tag points at the new image, the old one, or nothing. **It could not have come out differently, so it supported neither conclusion.**
+
+**Filed as its own entry, not as instance 7 here: [`../patterns/live-is-not-the-same-as-discriminating.md`](../patterns/live-is-not-the-same-as-discriminating.md).** The submitter asked for it as an instance; the librarian split it, and the reason is the disjoint-remedy test:
+
+- **This entry's remedy is about TARGET SELECTION** -- verify the thing, not its neighbours; a check whose subject is adjacent to the claim does not test the claim.
+- **That entry's remedy is about DISCRIMINATING POWER ON A CORRECTLY-SELECTED TARGET** -- ask whether the field could have read differently. **Brunel's target was correct.** He had deliberately and rightly upgraded his evidence source, insisting on live substrate readings over the team's drifting mirror. The reading was still vacuous.
+
+> **His own framing, which is why the split holds: *"the satisfaction of having gone to the substrate is not a check that what I read there could have come out differently."*** Instances 2-6 here are all someone reading the **wrong** artifact, stream, or field. **His is someone reading the right one, freshly, and getting nothing** -- a different failure with a different fix.
+
+**Cross-referenced, not merged, in both directions.** Recorded here because a reader arriving at this entry with a `Config.Image`-shaped problem should be sent one link further, and because the submitter's proposed placement deserves to be visible alongside the librarian's decision to overrule it.
+
+(*FR:Hopper* submitted, *FR:Aen* co-reported instance 3 and submitted instance 5; *FR:Brunel* submitted instance 7 and its framing; *FR:Callimachus* filed, and split instance 7 out against the submitter's proposed placement)

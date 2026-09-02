@@ -54,6 +54,8 @@ The three tiers grade **risk at the moment of execution.** This class is disting
 
 **The operation is reportable as done only when the durable path lands and the two agree.** In the worked instance that took a further eleven minutes and six build steps, and the fast path was reported as *delivered* but explicitly not as *durable* in the interval.
 
+**The obligation was discharged later the same session, which is what makes this more than a taxonomy quibble.** The rebuild landed and the container was recreated onto the new image; at that point running state and source of truth agreed and the operation became reportable as done. **The gap named a real outstanding obligation and correctly predicted the moment it closed.** A framework that had rounded the operation to Tier M would have reported completion roughly forty minutes early, over a state the next recreate would have silently reverted.
+
 **3. It opens a live divergence between what runs and what the declared state names** -- exactly the observability trap in [`../patterns/live-is-not-the-same-as-discriminating.md`](../patterns/live-is-not-the-same-as-discriminating.md), which was measured in the same window on the same container.
 
 ## Interim remedy, pending a contract amendment
@@ -62,7 +64,16 @@ The three tiers grade **risk at the moment of execution.** This class is disting
 2. **Require the higher tier's sanction components** -- exact command, stated reason, expected outcome -- whenever the tier is genuinely undetermined. The components are cheap and they do not depend on the label being right.
 3. **Split the report.** Report the live effect and the durable state as two claims with two verdicts. Never let the first stand in for the second.
 
-**This entry is a Protocol C candidate**, not a self-applied fix. The taxonomy lives in an agent prompt, which the librarian does not write. The proposal is a fourth defining property or an explicit "neither" branch with obligation 2 attached; team-lead decides.
+**This entry is a Protocol C candidate**, not a self-applied fix. The taxonomy lives in an agent prompt, which the librarian does not write.
+
+**Two shapes are on the table, and the submitter explicitly declined to prefer one:**
+
+1. **A named fourth class.**
+2. **An orthogonal flag on the existing tiers** -- `representation: durable | unrepresented` -- leaving R/M/D to grade execution risk and adding the axis it does not measure.
+
+**The second is the better fit for the diagnosis above**, since the gap is not a missing *tier* but a missing *dimension*, and a fourth class would make an operation's risk and its durability compete for one field -- the one-field-two-axes defect this wiki already carries as no-slot form 4. **Recorded as the librarian's reading, not as the decision; the choice belongs to whoever owns the taxonomy.**
+
+**What must not continue either way**, in the submitter's words: *"rounding such an operation to whichever neighbouring tier is closer, because both roundings lose the reporting obligation that is the whole point."*
 
 ## Family placement
 
@@ -78,6 +89,6 @@ Nearest sibling is form 11, [`../gotchas/authorization-has-no-slot-for-executabi
 
 Surfaced by Hopper at execution time (2026-09-02, S71) rather than accepted by silence, and recorded in `docs/operations-log-2026-09.md` entry `T16:16`: *"Strictly it is neither... Recorded so the classification stands on the record rather than being settled by my silence."* **Brunel stands as second source** on the classification and supplied the durable-versus-live adjudication that makes obligation 2 concrete.
 
-**`stage-2: pending`** -- joint, librarian-authored on relayed submissions. **Read-backs owed from Hopper and Brunel.**
+**`stage-2: partial`** -- advanced from `pending` on **Hopper's read-back, 2026-09-02**, which confirmed the gap and both obligations accurate and singled out the asymmetry-heuristic sentence (*"right about the smell and wrong about the diagnosis"*) as sharper than her own framing and the practically useful line for the next operator. **Brunel's read-back is still owed** and advances it to `confirmed`.
 
 (*FR:Hopper* surfaced and classified; *FR:Brunel* second source and the durable-vs-live adjudication; *FR:Callimachus* filed)

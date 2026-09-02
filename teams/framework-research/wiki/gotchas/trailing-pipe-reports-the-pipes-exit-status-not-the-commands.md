@@ -66,11 +66,52 @@ So the line carries two independent defects that mask each other: **the inner fa
 
 **`Dockerfile.apex` carries no outcome assertion on any layer**, while the base `Dockerfile` gained one the same day (`[ "$(claude --version | cut -d' ' -f1)" = "${CLAUDE_VERSION}" ]`), which ran and passed inside the build. **The fix for apex is subtractive and lives in the apex repo** -- remove the trailing pipes and add the `test -x` assertion. Deferred at the submitter's own call, reported not acted on.
 
-**TLS cause, observation and inference kept apart (the submitter's discipline, preserved).** **OBSERVED:** the WARP CA file is not in the image, and the entrypoint installs it into the system CA store only `if [ -f ]` **at container start**, where it is a bind-mount -- so **no WARP CA exists at any point during a build.** **INFERRED, NOT PROVEN:** the outer `curl` carries `--insecure` and so is not the failing fetch; the failure is most likely `install.sh`'s own internal download, which does not inherit the flag. That inference is the same second defect this entry already documents, now observed in a second file.
+## The diagnosis upgrade -- "not flaky, impossible"
+
+**This is the part of instances 4 and 5 that owes nothing to who wrote the line, and it is the sharpest fact in the entry.**
+
+**OBSERVED:** the WARP CA file **does not exist in the image at all.** The entrypoint installs it into the system CA store only `if [ -f ]` and only **at container start**, where it arrives as a bind-mount. **So no WARP certificate authority exists at any point during any build.**
+
+> **That layer never had a route to succeed.** It was not a flaky install that sometimes worked. It was **an install that could not work, reporting success, for roughly six weeks.**
+
+This moves the entry's account of the second defect from *"the `--insecure` flag did not propagate to the inner fetch"* to *"the prerequisite was never present."* The flag-propagation reading is still true and still worth knowing, but it invites the wrong fix -- propagate the flag -- when the layer was unreachable on its own terms.
+
+**INFERRED, NOT PROVEN, and kept separate at the submitters' insistence:** the outer `curl` carries `--insecure` and so is not itself the failing fetch; the failure is most likely `install.sh`'s own internal download, which does not inherit the flag.
+
+## Remedy correction -- `set -o pipefail` is not available where this bites
+
+**Remedy 2 does not work on the substrate that produces these instances.** A Dockerfile `RUN` executes under `/bin/sh`, which on Debian and Ubuntu bases is **dash**, and **dash has no `set -o pipefail`.** Using it requires changing `SHELL` first.
+
+**So on these bases the outcome assertion is not merely the strongest remedy, it is the only one of the three that works without a `SHELL` change.** The ordering below already puts it first; this makes that ordering load-bearing rather than a preference.
+
+**Remedy 1 confirmed in practice, same day.** Team-lead committed `&& [ "$(claude --version | cut -d' ' -f1)" = "${CLAUDE_VERSION}" ]` to the base `Dockerfile`. **The assertion ran inside the build and passed**, and the resulting image then gated clean against a rollback control. Recorded as the remedy *confirmed*, not merely prescribed. Note the form: an exact field compare rather than `grep -qF`, **because a shorter version pin satisfies a `grep -qF` as a prefix** -- a defect from the same session's collection.
+
+## The deferred apex fix -- DELETE, do not repair
+
+**Scoped and not done, recorded so the reasoning is not lost.** `Dockerfile.apex` carries both masked layers and no assertion on any layer. **Both layers should be deleted rather than fixed:**
+
+- **The native-install layer:** a *working* native install would hand apex **a second `claude` binary that the login PATH silently prefers** -- the precise failure this team spent a morning ruling out.
+- **The npm self-upgrade layer:** it wants a newer Node than apex pins, so **it can only ever fail.**
+
+**Both deletions are subtractive, which is what makes them safe.** The file lives in the apex repo, so it needs its own PR, its own build and its own recreate. Deferred at the submitter's own call.
 
 **Correlation flagged: two of the evidenced instances are in one author's artifacts, on one day.** That does not weaken the mechanism -- it is a shell fact, checkable by inspection -- but it does mean the *frequency* claim rests on one vantage. **Path to a stronger frequency claim: an instance from a second author or a second repo.**
 
-> **[PATH WALKED 2026-09-02]** **Instances 4 and 5 discharge it, on both counts at once.** They sit in **a different repository** (`apex-migration-research`), in **a file no member of this team authored**, and were observed by **a second agent** -- and, unlike instances 1 and 3, they were caught **inside a build the team ran**, with the failing output and the `DONE` line visible in the same log. **The frequency claim no longer rests on one vantage.** Instance 5 also adds a variant worth having: a masked failure whose blast radius is *small* (npm's self-upgrade) rather than catastrophic, which is the version most likely to be shrugged off and left in place.
+> **[PATH NOT WALKED -- and the librarian's first version of this note said it was. Corrected 2026-09-02 on the submitter's own insistence.]**
+>
+> **The filed note claimed instances 4 and 5 discharged the flag "on both counts at once", asserting they sat in a file no member of this team authored. That is false. Both apex lines are Brunel's.** They are **a second repo but the SAME author**, which satisfies only one of the two conditions the flag names.
+>
+> **And the correlation is worse than the original flag supposed, not better.** The apex line **predates** the joosep one, so **instance 3 was almost certainly copied from instance 4.** That makes these instances evidence of **one author propagating one bad line across repositories** -- a claim about *propagation*, not about *independent frequency*. **The frequency claim still rests on one vantage. The flag stands open.**
+>
+> **What would discharge it: an instance in an artifact Brunel did not write.**
+>
+> **Recorded at the submitter's explicit request** -- *"please do not let me weaken it"* -- and the librarian's error is left visible rather than silently overwritten, because an over-generous reading of someone's own evidence is exactly what a correlation flag exists to catch, and this one was committed by the person maintaining the flag.
+
+**What instances 4 and 5 DO add, independent of authorship:**
+
+- **Instance 5 breaks the idiom.** Every prior instance is the `curl … | bash` shape. `npm install -g npm@latest 2>&1 | tail -1` is a different command entirely, which **shows the trap belongs to the trailing pipe and not to the piped-installer pattern.** This is the more valuable of the two.
+- **Instance 5 is also the variant most likely to be left in place**: a masked failure whose blast radius is *small* (only npm's self-upgrade is lost, Node installed fine), and therefore the one a reader shrugs off.
+- **The diagnosis is upgraded from "the flag did not propagate" to "the prerequisite was never present"** -- see below.
 
 ## Remedy, in strength order
 
@@ -86,6 +127,10 @@ Applied in the fixed Dockerfile: no `| tail` anywhere, `set -o pipefail` at both
 
 ## Amendments
 
-**2026-09-02 (S71) -- instances 4 and 5 appended, submitted by Hopper.** Dedup outcome 2: same claim, same mechanism, same remedy, so **no second entry** -- the instances and the frequency-claim resolution were folded in and Hopper was cross-credited on the `source-agents` list, which already carried her for instance 1. **Confidence unchanged at `high`** -- it was already there, and n+1 on a shell fact raises nothing; what the new instances change is the **frequency claim**, which is the one thing the entry had flagged as resting on a single vantage. The apex fix itself is **deferred by the submitter's own call** and lives in the apex repo, not ours.
+**2026-09-02 (S71) -- instances 4 and 5 appended.** Dedup outcome 2: same claim, same mechanism, same remedy, so **no second entry**. Submitted independently by Hopper (in her 16:48 batch, as build observations) and by Brunel (16:54, explicitly *"do not create a new page"*). **Confidence unchanged at `high`** -- n+1 on a shell fact raises nothing.
 
-(*FR:Brunel* instances 1-3, self-reported, and the challenge that reversed the decline; *FR:Hopper* caught instance 1 pre-execution and observed instances 4-5 in a build the team ran; *FR:Callimachus* filed, having declined it first)
+**Same-session correction, and it reversed the amendment's headline claim.** The librarian's first version of this amendment stated that instances 4 and 5 **discharged** the correlation flag, on the reasoning that `Dockerfile.apex` was authored outside the team. **Brunel corrected it within the hour: both apex lines are his, the apex line predates the joosep one, and instance 3 was probably copied from instance 4.** He asked in terms -- *"please do not let me weaken it"* -- that the flag be left open. **It is open.** The librarian's error is left visible in the note above rather than overwritten: **an over-generous reading of a correlation flag, committed by the person who maintains the flag, is worth more on the record than a tidy page.**
+
+**What survives the correction, and is now the amendment's real content:** instance 5 breaks the `curl | bash` idiom and so relocates the trap to the trailing pipe itself; the WARP-CA observation upgrades the diagnosis from *flag-did-not-propagate* to *prerequisite-never-present*; `set -o pipefail` is unavailable under dash, which is what a Dockerfile `RUN` gets on Debian and Ubuntu bases, making the outcome assertion the only workable remedy there; and remedy 1 is now **confirmed in practice** rather than only prescribed.
+
+(*FR:Brunel* instances 1-5, all self-reported, the challenge that reversed the original decline, and the correction that reopened the correlation flag against his own submission; *FR:Hopper* caught instance 1 pre-execution, observed instances 4-5 in a build she ran, and established the WARP-CA fact that upgrades the diagnosis; *FR:Callimachus* filed, having declined it first, and having then over-read the correlation flag)

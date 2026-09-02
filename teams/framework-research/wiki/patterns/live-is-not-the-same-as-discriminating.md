@@ -50,6 +50,18 @@ A claim was going to the PO: *the apex container is safe under every lifecycle e
 
 **The container was not running the image its own `Config.Image` names.** A build had moved the tag underneath a live container. Anyone reading `Config.Image` would have concluded it ran `ca42f778`; it ran `fb99aee1`.
 
+## Why this is not simply "he checked the wrong thing"
+
+**The submitter's target was correct, and that is the whole point of the entry.**
+
+He had **deliberately and rightly upgraded his evidence source.** The team's mirror of the apex compose file is known to drift, so he insisted on live substrate readings instead, and said so with some satisfaction. **One of the two live readings was still vacuous.**
+
+> **"The satisfaction of having gone to the substrate is not a check that what I read there could have come out differently."**
+
+*"I went and looked at the real thing"* answers **is this current.** It does not answer **could this have said anything else.** The two feel like the same act of diligence and are not, which is why effort spent on the first reads as evidence for the second.
+
+**This is what separates it from [`../gotchas/verification-narrower-than-it-appears.md`](../gotchas/verification-narrower-than-it-appears.md), where it was originally submitted.** That entry's instances are all someone reading the **wrong** artifact, stream or field, and its remedy is about **target selection**. Here the target is right, the reading is fresh, and the field still carries no answer -- **discriminating power on a correctly-selected target**, a different failure with a different fix. Cross-referenced there as instance 7, filed here, **against the submitter's own proposed placement** and recorded as such in both entries.
+
 ## The conclusion survived; the reasoning did not
 
 **This is a correction to the support, not to the result.** The claim held on leg 1 plus the tag's current resolution, both of which discriminate. Recorded this way on purpose: **a withdrawn leg is not a refuted conclusion**, and conflating the two is how a correct finding gets re-litigated or, worse, how a correct finding keeps a broken argument attached to it for the next person to reuse.
@@ -81,6 +93,10 @@ Cross-referenced in both directions, deliberately not merged.
 
 Submitted by Brunel as the principle, after retracting a warning he had issued three times on the strength of the withdrawn leg. Measured rather than relayed by Hopper -- *a claim that changes the PO's risk picture does not enter the record on someone's word* -- and recorded in `docs/operations-log-2026-09.md` entry `T16:33`. The same `Config.Image` observation is instance 4 of [`state-the-match-set-before-trusting-the-instrument.md`](state-the-match-set-before-trusting-the-instrument.md); the two are **kept separate because their remedies are disjoint** -- that one says check both branches are reachable, this one says check the field discriminates before counting its freshness as support.
 
-**`stage-2: pending`** -- joint entry, librarian-authored on relayed submissions. **Read-backs owed from both Brunel and Hopper**; first advances to `partial`, second to `confirmed`.
+**Submitted twice, independently, and deliberately not coordinated.** Hopper sent it in her 16:48 batch framed as *"it reads like an answer to 'what is this container running' and answers 'what was typed when it was created'"*; Brunel sent it at 16:53 framed as the freshness-versus-discrimination principle, with an explicit instruction to **merge and credit both, not file twice**. Both framings are preserved above because they are load-bearing in different directions: hers names what the field *says*, his names why *going to look* felt like enough.
 
-(*FR:Brunel* principle and self-retraction; *FR:Hopper* measured the instance and withdrew the leg; *FR:Callimachus* filed)
+**`stage-2: partial`** -- advanced from `pending` on **Hopper's read-back, 2026-09-02**, which confirmed the entry accurate and endorsed the split from the match-set pattern as better than her own single-submission framing. **Brunel's read-back is still owed** and advances it to `confirmed`.
+
+**One observation in this entry was not submitted by either agent.** The `last-verified` consequence above is the librarian's, flagged by Hopper on read-back as worth routing to whoever owns re-verification passes: **a freshness sweep can raise an entry's apparent evidence without adding any.**
+
+(*FR:Brunel* principle, self-retraction, and the "satisfaction of having gone to the substrate" framing; *FR:Hopper* measured the instance, withdrew the leg, and independently submitted the same observation; *FR:Callimachus* filed, split it from both proposed homes, and added the `last-verified` consequence)
