@@ -1,14 +1,14 @@
 {
   "name": "framework-research",
   "description": "Research team designing the multi-team AI agent framework for Eesti Raudtee. Studies existing team patterns, identifies risks, and evolves the framework design.",
-  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only -- TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-fable-5[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
+  "_substrate_note": "On Agent-tool team architecture, the per-member `model` field is documentation-only -- TeamCreate stamps the parent CLI session model into runtime config.json regardless. To enforce the team-lead.model pin below, switch the parent CLI via `/model claude-fable-5-1[1m]` BEFORE TeamCreate; specialists then inherit. The Agent tool's spawn `model` param accepts only family-level overrides (opus/sonnet/haiku) and cannot pin a specific version. See startup.md Step 0.5. (Substrate-truth catch S38 2026-05-28.)",
   "commonPromptFile": "common-prompt.md",
   "workDir": "$HOME/Documents/github/mitselek/ai-teams",
   "members": [
     {
       "name": "team-lead",
       "agentType": "team-lead",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-fable-5-1[1m]",
       "prompt": "prompts/aeneas.md",
       "lore": {
         "fullName": "Aeneas",
@@ -20,7 +20,7 @@
     {
       "name": "finn",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "black",
       "prompt": "prompts/finn.md",
       "lore": {
@@ -32,7 +32,7 @@
     {
       "name": "medici",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "magenta",
       "prompt": "prompts/medici.md",
       "lore": {
@@ -44,7 +44,7 @@
     {
       "name": "celes",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "cyan",
       "prompt": "prompts/celes.md",
       "lore": {
@@ -56,7 +56,7 @@
     {
       "name": "volta",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "blue",
       "prompt": "prompts/volta.md",
       "lore": {
@@ -68,7 +68,7 @@
     {
       "name": "herald",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "green",
       "prompt": "prompts/herald.md",
       "lore": {
@@ -80,7 +80,7 @@
     {
       "name": "brunel",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "yellow",
       "prompt": "prompts/brunel.md",
       "lore": {
@@ -92,7 +92,7 @@
     {
       "name": "hopper",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "navy",
       "prompt": "prompts/hopper.md",
       "lore": {
@@ -105,7 +105,7 @@
     {
       "name": "monte",
       "agentType": "general-purpose",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "white",
       "prompt": "prompts/montesquieu.md",
       "lore": {
@@ -118,7 +118,7 @@
     {
       "name": "callimachus",
       "agentType": "librarian",
-      "model": "claude-fable-5[1m]",
+      "model": "claude-opus-4-6[1m]",
       "color": "gold",
       "prompt": "prompts/callimachus.md",
       "lore": {
