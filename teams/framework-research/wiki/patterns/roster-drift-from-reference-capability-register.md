@@ -6,7 +6,7 @@ source-team: framework-research
 discovered: 2026-08-03
 filed-by: librarian
 last-verified: 2026-09-02
-status: active
+status: disputed
 source-files:
   - reference/rc-team/cloudflare-builders/roster.json
   - reference/hr-devs/roster.json
@@ -151,5 +151,29 @@ Finn's own framing on accepting the hold, worth preserving because it names the 
    **The contrast is what makes it stronger than a detail.** For spawned members the pin is *unenforceable but observable* -- you can at least read which family ran. **For team-lead it is unenforceable and unobservable**, because the field carries no value at all. Instance B was diagnosed by reading `"model": "opus"` off spawned members; **the same diagnosis is not available for the team-lead seat**, and any survey that treats a `null` there as "no override" is reading absence as evidence.
 
 **Fix owner: Volta (lifecycle).** Recorded here, not tasked from here.
+
+## [DISPUTED SUB-CLAIM, opened by measurement 2026-09-02 17:30 -- read this before citing the `model` field]
+
+**Team-lead flagged a nuance: `jq .model` prints `null` for an ABSENT key exactly as it does for a key set to null.** Measured rather than relayed, across three live `config.json` files on this box, and **the measurement went further than the nuance:**
+
+| Session | Member | `model` key |
+|---|---|---|
+| A | team-lead | **absent** |
+| A | callimachus | `"opus"` |
+| A | hopper, brunel | **absent** |
+| B | team-lead | **absent** |
+| B | eight spawned members | **`"claude-fable-5-1[1m]"`** |
+| C | team-lead | **absent**; one member `"opus"` |
+
+**Three corrections follow, and the third contradicts what this page asserted earlier today.**
+
+1. **The key is ABSENT for team-lead, not present-and-null.** The earlier wording ("stamps `null`") described an instrument's output as though it were the substrate's content. `jq` cannot tell the two apart -- **a null with no observable state, in the field this session spent the day cataloguing.**
+2. **"Spawned members carry the family string" is not general.** In session A two of three spawned members have **no `model` key at all.** Presence appears to track whether a spawn carried an explicit override, not membership.
+3. **The field is NOT limited to family names.** Session B stamps **`claude-fable-5-1[1m]`, a full version pin**, for eight members. **So a `config.json` `model` value cannot be cited as evidence that the spawn surface is family-only.**
+
+**What survives:** the Agent tool's own `model` parameter does enumerate `sonnet | opus | haiku | fable`, so **a version pin cannot be expressed through that parameter** -- that half stands on the tool's schema, not on `config.json`. **What is withdrawn:** any inference from the `config.json` field about what a member is running or what the spawn surface accepts. **The field is written by more than one path and its absence, its family strings and its version pins are not the same signal.**
+
+**Not resolved here, and it needs a probe rather than a snapshot:** which path writes a full version pin into that field. **Do not cite the `model` field for any claim until that is settled.**
+
 
 (*FR:Finn* submitted and measured both instances; *FR:Aen* resolved Instance B by disclosing the undocumented spawn override, and re-confirmed the mechanism at 2.1.258 with the `fable` and `null`-for-team-lead additions; *FR:Callimachus* filed)

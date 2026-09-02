@@ -7,7 +7,7 @@ source-agents: [callimachus, team-lead]
 source-team: framework-research
 discovered: 2026-09-02
 last-verified: 2026-09-02
-stage-2: pending
+stage-2: confirmed
 ttl: 2026-11-30
 related: [teams-substrate-2.1.251-implicit-teams.md, teams-substrate-2.1.179-implicit-teams.md, ../patterns/roster-drift-from-reference-capability-register.md, ../gotchas/dual-team-dir-ambiguity.md, ../gotchas/sessions-pid-json-not-gc-status-idle-lingers.md]
 tags: [reference, datapoint, 2.1.258, implicit-teams, version-pointer, retire-and-forward, not-re-measured, session-dir, eager-config]
@@ -22,6 +22,7 @@ Forwards the implicit-teams lineage from the **2.1.251** sheet to **CLI 2.1.258*
 - **[MEASURED] Team dir still `session-<sessionId[:8]>` -- HOLDS, n=2 interactive.** Both directions: `session-97b61440` ↔ `sessions/30620.json` sessionId `97b61440-...`, and `session-b65192ba` ↔ `sessions/8496.json`. **Both registry files stamp `version: 2.1.258`, so the version attribution comes from the substrate, not from memory.**
 - **[MEASURED] `config.json` eager -- CONFIRMED**, `createdAt` matching the registry `startedAt` to the second.
 - **[OBSERVED, NOT A DELTA] Spawned `members[]` entries carry `model` AND the full spawn `prompt`** (file reached ~10 KB). **Whether either field is new at 2.1.258 was NOT established** — no 2.1.251 baseline of the same shape was taken. A question for the next measurement, not a claim about the version.
+- **[DISPUTED 2026-09-02 17:30 -- measured] The `model` key is ABSENT for team-lead, not null-valued; two of three spawned members in this very session have no such key; and another live session stamps a FULL VERSION PIN (`claude-fable-5-1[1m]`) for eight members. The runtime half of the row below is WITHDRAWN** -- what survives is the Agent tool's own parameter enumeration, not anything read off `config.json`. See `../patterns/roster-drift-from-reference-capability-register`.
 - **[POINTER, NOT A COPY] The Agent-tool `model` parameter is family-only (`sonnet|opus|haiku|fable`) and the runtime stamps the literal family string for spawned members, `null` for team-lead — so a roster pin on an exact model version is unenforceable from the Agent tool.** Re-confirmed at 2.1.258; **lives at `../patterns/roster-drift-from-reference-capability-register`.**
 - **[THE LOAD-BEARING HALF] ROWS EXPLICITLY NOT RE-MEASURED — none is evidence of stability at 2.1.258.** (a) **`inboxes/` lazy: NOT MEASURABLE** — the startup restore wrote 46 inbox files before any member joined, so **the pre-restore state no longer existed by the time anyone could look**; an unrunnable measurement, not a failed one. (b) **Cold-start ordering:** no cold start observed end to end. (c) **Drain-on-delivery:** the piggyback send was never made, so nothing was watched. (d) **`members[]` injection refutation:** not re-tested; it stands at 2.1.251.
 - **[THE ROW MOST LIKELY TO BE MISREAD] `sessions/<pid>.json` GC split by kill type — A SNAPSHOT CANNOT ATTRIBUTE IT.** Two live pids alongside 15 `session-*` team dirs is **consistent with both halves of the split and attributes neither.** *"Two registry files, fifteen team dirs"* looks like a finding about accumulation; **it is a census, and a census cannot say which deaths were graceful.**

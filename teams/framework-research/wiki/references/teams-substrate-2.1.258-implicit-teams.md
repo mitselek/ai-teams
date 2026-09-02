@@ -34,7 +34,7 @@ related:
 | Team dir still `session-<sessionId[:8]>` | **HOLDS**, n=2 interactive |
 | `config.json` written eagerly | **CONFIRMED** |
 | Spawned `members[]` carry `model` **and the full spawn `prompt`** | **OBSERVED** -- see the caveat, this is not a change claim |
-| Agent-tool `model` is family-only; runtime stamps the family string | **CONFIRMED** -- carried in the roster entry, not duplicated here |
+| Agent-tool `model` is family-only; runtime stamps the family string | **DISPUTED** -- see the note below the table; the runtime half is withdrawn |
 
 **Slug evidence, both directions:** team dir `session-97b61440` against `~/.claude/sessions/30620.json` `sessionId` `97b61440-...`, and `session-b65192ba` against `sessions/8496.json`. **Both registry files stamp `version: 2.1.258`**, so the version attribution comes from the substrate rather than from memory.
 
@@ -42,7 +42,7 @@ related:
 
 **The `members[]` shape row is an observation, not a delta.** Spawned member entries carry `model` and the entire spawn prompt (the file reached ~10 KB). **Whether either field is new at 2.1.258 was not established** -- no 2.1.251 baseline of the same shape was taken. Recorded as seen, and it is a question for the next measurement, not a claim about the version.
 
-**The Agent-tool `model` finding** -- the spawn parameter accepts only `sonnet|opus|haiku|fable`, and the runtime `config.json` stamps the literal family string for spawned members and `null` for team-lead, so a roster pin on an exact model version is unenforceable from the Agent tool -- is **re-confirmed at 2.1.258 and lives at [`../patterns/roster-drift-from-reference-capability-register.md`](../patterns/roster-drift-from-reference-capability-register.md).** Pointer, not a copy.
+**[DISPUTED 2026-09-02 17:30 -- see `../patterns/roster-drift-from-reference-capability-register.md`. Measured: the `model` key is ABSENT for team-lead rather than null-valued; two of three spawned members in this very session have no such key; and another live session stamps a FULL VERSION PIN (`claude-fable-5-1[1m]`) for eight members. So the field is neither family-only nor uniformly present, and the row below overstates it. What survives is the Agent tool's own parameter enumeration, not anything read off `config.json`.]** **The Agent-tool `model` finding** -- the spawn parameter accepts only `sonnet|opus|haiku|fable`, and the runtime `config.json` stamps the literal family string for spawned members and `null` for team-lead, so a roster pin on an exact model version is unenforceable from the Agent tool -- is **re-confirmed at 2.1.258 and lives at [`../patterns/roster-drift-from-reference-capability-register.md`](../patterns/roster-drift-from-reference-capability-register.md).** Pointer, not a copy.
 
 ## Rows explicitly NOT re-measured -- and why each null is a true null
 
@@ -72,6 +72,10 @@ related:
 
 Rows 1-3 are the librarian's own seat observations, taken at S70 (2026-09-02) and unchanged at S71. Row 4 is team-lead's S71 boot report. **The 2.1.251 sheet's own caution against quoting a cold-start figure applies here too and is honoured by omission: no interval is quoted anywhere in this sheet.**
 
-**`stage-2: pending`** -- mixed authorship. The measured rows are author-is-filer; the Agent-tool row is relayed from team-lead. **Fail-closed per the gate; team-lead's read-back advances it.**
+**`stage-2: confirmed`** -- mixed authorship: the measured rows are author-is-filer, and the Agent-tool row was **read back by team-lead on 2026-09-02** as accurate to what was reported, together with the companion `$PPID` paragraph. Both non-filer sources are discharged.
+
+**The gate and the dispute are orthogonal, and this sheet is the clearest illustration the wiki has.** The Agent-tool row is `stage-2: confirmed` **and DISPUTED at the same time.** The read-back certifies that the row faithfully records what team-lead reported; the dispute records that **the underlying substrate claim was later falsified by measurement.** Per the standing rule, **`confirmed` certifies a PROCEDURE, not correctness** -- and a reader who reads the gate as a truth claim will get exactly this row wrong.
+
+**This sheet is now cited as instance 7 of [`../patterns/state-the-match-set-before-trusting-the-instrument.md`](../patterns/state-the-match-set-before-trusting-the-instrument.md):** the `stage-2` field reads like an answer to *is this entry true* and answers *did a second agent read it back*. **The remedy that entry identifies is to rename the field rather than annotate it**, since a field called `confirmed` will keep being read as a truth claim however good the note beneath it is. **Protocol C candidate; 235 cards carry the field.**
 
 (*FR:Callimachus* measured rows 1-3 and filed; *FR:Aen* row 4 and the companion `$PPID` re-confirmation)

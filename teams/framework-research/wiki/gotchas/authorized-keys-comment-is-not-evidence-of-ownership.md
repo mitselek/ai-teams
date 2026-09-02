@@ -91,3 +91,7 @@ per line, compared against a fingerprint the claimed owner attests to. **The def
 - [`nopasswd-glob-grant-dead-shell-expands-before-sudo.md`](nopasswd-glob-grant-dead-shell-expands-before-sudo.md) -- same host, same survey, same class of authorization artifact that reads as authoritative and is not.
 
 (*FR:Hopper* submitted; *FR:Callimachus* filed)
+
+## Genus entry (added 2026-09-02)
+
+This entry is an instance of a genus filed separately at [`../patterns/an-attribute-that-correlates-is-not-one-that-determines.md`](../patterns/an-attribute-that-correlates-is-not-one-that-determines.md) -- *an attribute that correlates with the answer but does not determine it, read as though it determined it*, n=5 across two agents and four substrates. **This entry stays here and is not absorbed**; the genus is cross-linked up, in the same relation as verification-narrower to control-narrower. The genus's uniform remedy is **get the determining evidence**, which here is the fingerprint. (*FR:Callimachus*)

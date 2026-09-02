@@ -10,6 +10,7 @@ status: active
 confidence: high
 source-files:
   - teams/framework-research/docs/operations-log-2026-09.md
+  - apex-migration-research/docker-compose.yml
 source-commits: []
 source-issues: []
 related:
@@ -50,11 +51,11 @@ A claim was going to the PO: *the apex container is safe under every lifecycle e
 
 **The container was not running the image its own `Config.Image` names.** A build had moved the tag underneath a live container. Anyone reading `Config.Image` would have concluded it ran `ca42f778`; it ran `fb99aee1`.
 
-## Why this is not simply "he checked the wrong thing"
+## Why this is not simply "the wrong thing was checked"
 
 **The submitter's target was correct, and that is the whole point of the entry.**
 
-He had **deliberately and rightly upgraded his evidence source.** The team's mirror of the apex compose file is known to drift, so he insisted on live substrate readings instead, and said so with some satisfaction. **One of the two live readings was still vacuous.**
+Brunel had **deliberately and rightly upgraded their evidence source.** The team's mirror of the apex compose file is known to drift, so they insisted on live substrate readings instead, and said so with some satisfaction. **One of the two live readings was still vacuous.**
 
 > **"The satisfaction of having gone to the substrate is not a check that what I read there could have come out differently."**
 
@@ -91,11 +92,13 @@ Cross-referenced in both directions, deliberately not merged.
 
 ## Provenance
 
-Submitted by Brunel as the principle, after retracting a warning he had issued three times on the strength of the withdrawn leg. Measured rather than relayed by Hopper -- *a claim that changes the PO's risk picture does not enter the record on someone's word* -- and recorded in `docs/operations-log-2026-09.md` entry `T16:33`. The same `Config.Image` observation is instance 4 of [`state-the-match-set-before-trusting-the-instrument.md`](state-the-match-set-before-trusting-the-instrument.md); the two are **kept separate because their remedies are disjoint** -- that one says check both branches are reachable, this one says check the field discriminates before counting its freshness as support.
+Submitted by Brunel as the principle, after retracting a warning issued three times on the strength of the withdrawn leg. Measured rather than relayed by Hopper -- *a claim that changes the PO's risk picture does not enter the record on someone's word* -- and recorded in `docs/operations-log-2026-09.md` entry `T16:33`. The same `Config.Image` observation is instance 4 of [`state-the-match-set-before-trusting-the-instrument.md`](state-the-match-set-before-trusting-the-instrument.md); the two are **kept separate because their remedies are disjoint** -- that one says check both branches are reachable, this one says check the field discriminates before counting its freshness as support.
 
-**Submitted twice, independently, and deliberately not coordinated.** Hopper sent it in her 16:48 batch framed as *"it reads like an answer to 'what is this container running' and answers 'what was typed when it was created'"*; Brunel sent it at 16:53 framed as the freshness-versus-discrimination principle, with an explicit instruction to **merge and credit both, not file twice**. Both framings are preserved above because they are load-bearing in different directions: hers names what the field *says*, his names why *going to look* felt like enough.
+**Submitted twice, independently, and deliberately not coordinated.** Hopper sent it in the 16:48 batch framed as *"it reads like an answer to 'what is this container running' and answers 'what was typed when it was created'"*; Brunel sent it at 16:53 framed as the freshness-versus-discrimination principle, with an explicit instruction to **merge and credit both, not file twice**. Both framings are preserved above because they are load-bearing in different directions: Hopper's names what the field *says*, Brunel's names why *going to look* felt like enough.
 
-**`stage-2: partial`** -- advanced from `pending` on **Hopper's read-back, 2026-09-02**, which confirmed the entry accurate and endorsed the split from the match-set pattern as better than her own single-submission framing. **Brunel's read-back is still owed** and advances it to `confirmed`.
+**`stage-2: confirmed`** -- **Hopper's read-back 2026-09-02** (accurate; endorsed the split from the match-set pattern as better than their own single-submission framing), then **Brunel's read-back the same day**, which verified every `related:` target on disk and the back-reference at instance 7, and **endorsed the overrule against their own submitted placement.** Both co-authors have read it back.
+
+**Provenance gap closed on that read-back.** `source-files` originally named only the operations log. **The surviving conclusion rests on the operational compose file -- the leg that does discriminate -- so it is now cited**, which matters more here than in most entries because the entry's whole subject is *which piece of evidence carried the claim*.
 
 **One observation in this entry was not submitted by either agent.** The `last-verified` consequence above is the librarian's, flagged by Hopper on read-back as worth routing to whoever owns re-verification passes: **a freshness sweep can raise an entry's apparent evidence without adding any.**
 

@@ -52,9 +52,23 @@ The three tiers grade **risk at the moment of execution.** This class is disting
 - *"apex is on 2.1.258"* is **a different claim**, and it is **false** until the source of truth carries the change.
 - The gap between them is invisible from inside the container, closes on nobody's schedule, and is erased without a message the next time anyone recreates.
 
-**The operation is reportable as done only when the durable path lands and the two agree.** In the worked instance that took a further eleven minutes and six build steps, and the fast path was reported as *delivered* but explicitly not as *durable* in the interval.
+**The operation is reportable as done only when the durable path lands and the running state adopts it.** **Those are two different moments, and conflating them is the same error the entry is about.** Timings from `docs/operations-log-2026-09.md`:
 
-**The obligation was discharged later the same session, which is what makes this more than a taxonomy quibble.** The rebuild landed and the container was recreated onto the new image; at that point running state and source of truth agreed and the operation became reportable as done. **The gap named a real outstanding obligation and correctly predicted the moment it closed.** A framework that had rounded the operation to Tier M would have reported completion roughly forty minutes early, over a state the next recreate would have silently reverted.
+| State | Moment | What is true |
+|---|---|---|
+| 1. Undeclared in-place change | **16:17** | it runs; nothing in the source of truth describes it |
+| 2. Declared, not adopted | **16:28** (+11 min) | the build now *produces* it; the running container is still on the old image plus the overlay |
+| 3. Adopted | **16:44** (+27 min) | running state and source of truth agree |
+
+**"Reportable as done" is state 3, not state 2.** An earlier draft of this entry quoted eleven minutes in one sentence and about forty in another; **Brunel caught the inconsistency on read-back and would not confirm the entry until it was resolved.** Neither figure was right for the claim being made: **eleven minutes is the distance to state 2, twenty-seven to state 3, and forty was loose.** Corrected against the operations log rather than by picking one.
+
+**The correction sharpens the entry rather than merely tidying it.** The gap between states 2 and 3 is sixteen minutes in which the durable artifact exists and the running container still does not use it -- **a window in which every reasonable summary of the situation is wrong in a different way.**
+
+**A definitional point sits under the arithmetic and matters more than either figure, and it is Brunel's.** The earlier draft measured the interval in *"six build steps"*. **That is the wrong unit.** This entry's own obligation says the operation is reportable when the durable path lands **and the running state adopts it** -- and adoption happens at the **recreate**, which is not a build step. **A unit drawn from the build pipeline cannot measure an interval that ends outside it**, whichever minute figure is attached. The unit is gone from the entry along with the figures.
+
+**Where "forty" came from, since it was not simply invented:** roughly 16:17 to 17:00 is the full close *including* the post-recreate config restore. That is a real interval, it is just not the one obligation 2 defines.
+
+**The obligation was discharged later the same session, which is what makes this more than a taxonomy quibble.** The gap named a real outstanding obligation and **correctly predicted the moment it closed.** A framework that had rounded the operation to Tier M would have reported completion at 16:17, **twenty-seven minutes early, over a state the next recreate would have silently reverted.**
 
 **3. It opens a live divergence between what runs and what the declared state names** -- exactly the observability trap in [`../patterns/live-is-not-the-same-as-discriminating.md`](../patterns/live-is-not-the-same-as-discriminating.md), which was measured in the same window on the same container.
 
@@ -89,6 +103,8 @@ Nearest sibling is form 11, [`../gotchas/authorization-has-no-slot-for-executabi
 
 Surfaced by Hopper at execution time (2026-09-02, S71) rather than accepted by silence, and recorded in `docs/operations-log-2026-09.md` entry `T16:16`: *"Strictly it is neither... Recorded so the classification stands on the record rather than being settled by my silence."* **Brunel stands as second source** on the classification and supplied the durable-versus-live adjudication that makes obligation 2 concrete.
 
-**`stage-2: partial`** -- advanced from `pending` on **Hopper's read-back, 2026-09-02**, which confirmed the gap and both obligations accurate and singled out the asymmetry-heuristic sentence (*"right about the smell and wrong about the diagnosis"*) as sharper than her own framing and the practically useful line for the next operator. **Brunel's read-back is still owed** and advances it to `confirmed`.
+**`stage-2: confirmed`** -- **Hopper's read-back 2026-09-02** (gap and both obligations accurate; singled out the asymmetry-heuristic sentence, *"right about the smell and wrong about the diagnosis"*, as sharper than their own framing), then **Brunel's the same day**, which **held the entry on a numeric inconsistency rather than confirming around it** and released it only after the figures were recomputed and verified in the file against independent timestamps. Two sources, same numbers.
+
+**Brunel's own assessment of the resolution is recorded because it corrects a common reading of what a read-back is for:** Brunel reported two figures that could not both be true and expected one to be wrong. **Neither was.** There were three states, and the two sentences were measuring different milestones -- so both figures were right about something and neither was right about the claim. **A read-back that finds a contradiction has not necessarily found an error; it may have found a missing distinction.**
 
 (*FR:Hopper* surfaced and classified; *FR:Brunel* second source and the durable-vs-live adjudication; *FR:Callimachus* filed)
