@@ -49,8 +49,24 @@ RUN \
     chown 1000:1000 /home/ai-teams
 
 # Install Claude Code globally (Node.js version from npm)
+#
+# This binary IS the one derived team images run: /usr/local/bin/claude, root-owned.
+# Derived images that try to add a native ~/.local/bin/claude on top have failed
+# silently in the past (apex Dockerfile.apex), so this layer is the single source
+# of the CLI version for every team that FROMs this image.
+#
+# The `| tail -5` keeps build logs short but makes the RUN exit status tail's, not
+# npm's -- a failed install would otherwise produce a GREEN layer with no claude
+# (or a stale one) and the failure would only surface after a team is recreated
+# onto the new image. dash (/bin/sh) has no `set -o pipefail`, so instead of
+# changing SHELL we assert the postcondition directly: the pipeline below fails if
+# claude is absent (empty substitution, string compare fails) or the version differs.
+# The compare is exact on the first field, not a substring match: a pin of "2.1.25"
+# would otherwise be satisfied by an installed "2.1.258". It deliberately ignores
+# the " (Claude Code)" suffix, which is cosmetic and upstream's to change.
 ARG CLAUDE_VERSION=2.1.258
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} 2>&1 | tail -5
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} 2>&1 | tail -5 \
+ && [ "$(claude --version | cut -d' ' -f1)" = "${CLAUDE_VERSION}" ]
 
 ENV HOME=/home/ai-teams
 ENV PATH="/usr/local/bin:${PATH}"

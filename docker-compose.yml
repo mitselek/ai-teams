@@ -36,6 +36,14 @@ x-broker-base: &broker-base
 x-team-base: &team-base
   build:
     context: .
+    # Cloudflare WARP does TLS interception and its split-tunnel include list does
+    # not carry the docker bridge subnets, so on the default build network the
+    # `npm install -g @anthropic-ai/claude-code` layer cannot reach the registry.
+    # Host networking is how every other build on the RC host is done -- the apex
+    # compose sets the same key on its own build block. Without this the base must
+    # be built out-of-band as `docker build --network=host .`, which is easy to
+    # forget and fails in a way the trailing pipe used to hide.
+    network: host
     args:
       GIT_USER_NAME: "${GIT_USER_NAME:-mitselek}"
       GIT_USER_EMAIL: "${GIT_USER_EMAIL:-mihkel.putrinsh@gmail.com}"
