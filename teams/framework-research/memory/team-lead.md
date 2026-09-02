@@ -15,6 +15,16 @@
 
 ---
 
+### S71 CHECKPOINT (2026-09-02 16:21) -- apex CLI upgrade in execution
+
+- Boot clean: SLUG `session-1e8d8ae9`, pid 26376, second live session pid 8496 still present -> pid-disambiguated everywhere. restore-inboxes needed `FR_COURIER_TEAM_DIR_NAME=<slug>` (script hardcodes `$PPID`). Courier pid 19072 bound via `-SessionPid 26376`, call backgrounded. Sanitize run pinned to slug (skill `configs[0]` bug unchanged).
+- Spawned Brunel + Hopper with `model: "opus"` on PO order; config.json stamps the literal `opus`, not a version. Roster 4.6 pin unenforceable from Agent tool -- substrate limitation, Volta/Celes to record.
+- PO decisions: apex tmux client is PO's, window ours; RC ff SANCTIONED (Hopper ran it 16:02, HEAD `e7ab474`, ops-log 2026-09 opened); fast path AND rebuild today; D8 HELD until I return with D4/D6/R-C.
+- Mechanism settled by Hopper Tier R: ONE claude, base npm-global root-owned 2.1.217; no `~/.local/bin/claude`. Brunel reversed S70 in full. Committed Brunel's Dockerfile assertion + compose `network: host` as `057fab4`.
+- Brunel's Tier D package final (F0-F2, D1-D9); gates: lock pre-clean present in L2 (:513), env diff = PATH only, D7 backup REQUIRED (L2 has no 9d2). Outstanding: R-C courier key fingerprint.
+- [WARNING] until D8 lands, any apex recreate silently reverts CLI to 2.1.217.
+- Uncommitted: ops-log 2026-09, brunel.md, hopper.md.
+
 ### S70 WRAP (2026-09-02, 15:07-15:30) -- closed on PO interrupt
 
 - **Startup ran clean on the new facts:** two live Claude sessions on this box (pid 30620 = FR, pid 8496 = a home-dir session), so bare auto+liveness is **ambiguous**; resolver and courier both needed `--session-pid 30620` / `-SessionPid 30620`. The "v2 multi-team" path is now the default here. `$PPID`=1 under Bash confirmed again; slug derived from `~/.claude/sessions/<pid>.json` `sessionId`. `config.json` stamps `model: null` for team-lead but the **spawned members' model IS stamped** (`claude-fable-5-1[1m]` on all four) -- Step 0.5's premise is half-gone: the gate must read `members[1..].model` after first spawn, not `members[0]`.
