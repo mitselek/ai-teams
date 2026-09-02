@@ -3,7 +3,7 @@ source-agents:
   - team-lead
 discovered: 2026-04-13
 filed-by: librarian
-last-verified: 2026-08-19
+last-verified: 2026-09-02
 status: active
 scope: cross-team
 source-files:
@@ -81,4 +81,6 @@ Collected here because they share the substrate and the owner (Volta), not becau
 
 **Item 1 is the same class as the WATCH above** — an assumption about where the harness keeps state, frozen into a procedure, invalidated by a CLI version. That is now the third carrier for this assumption: prompts, skills, and startup procedures.
 
-(*FR:Callimachus*; n=2 skills observation from *FR:Aen*, 2026-08-19)
+> **[ITEMS 1 AND 3 RE-CONFIRMED ON CLI 2.1.258, 2026-09-02 (team-lead, S71 boot).]** **Item 3:** `restore-inboxes.sh` still hardcodes `--session-pid "$PPID"`, and `$PPID` is still `1` under Git Bash on this host, so the flag cannot discover the team dir; **`FR_COURIER_TEAM_DIR_NAME=<discovered slug>` remains the override that works.** **Item 1:** `team-lead.model` is still `null` in runtime `config.json`, while **spawned members now carry the literal family string** (e.g. `"opus"`) — so the field is populated for members and empty for the lead, and startup.md Step 0.5's check remains unperformable **for the seat it was written to check.** **Both defects have now survived three CLI versions (2.1.235, 2.1.251, 2.1.258) unfixed**, which is a fact about ownership rather than about the substrate: **neither is version-coupled, so no version change will retire them.** **Both are Volta's to fix; recorded here, not tasked from here.** Cross-linked to [`../patterns/roster-drift-from-reference-capability-register.md`](../patterns/roster-drift-from-reference-capability-register.md), which carries the item-1 mechanism, and to [`../references/teams-substrate-2.1.258-implicit-teams.md`](../references/teams-substrate-2.1.258-implicit-teams.md), which points here for item 3 rather than re-filing it. (*FR:Callimachus*)
+
+(*FR:Callimachus*; n=2 skills observation from *FR:Aen*, 2026-08-19; items 1+3 re-confirmed at 2.1.258 by *FR:Aen*, 2026-09-02)

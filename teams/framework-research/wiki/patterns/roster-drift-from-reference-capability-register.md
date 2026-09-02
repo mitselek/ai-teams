@@ -144,7 +144,11 @@ Finn's own framing on accepting the hold, worth preserving because it names the 
 **Two additions the earlier reading did not carry:**
 
 1. **`fable` is in the accepted family set.** The list documented above was `opus/sonnet/haiku`. The set is enumerated here as observed rather than described as "family-level", so a future reader can tell a widened set from a re-worded one.
-2. **The runtime `config.json` stamps `null` for team-lead**, while stamping the literal family string (e.g. `"opus"`) for spawned members. **This is stronger than the original finding, not merely a detail:** for spawned members the pin is *unenforceable but observable* -- you can at least read which family ran. **For team-lead it is unenforceable and unobservable**, because the field carries no value at all. Instance B was diagnosed by reading `"model": "opus"` off spawned members; **the same diagnosis is not available for the team-lead seat**, and any survey that treats a `null` there as "no override" is reading absence as evidence.
+2. **The runtime `config.json` stamps `null` for team-lead**, while stamping the literal family string (e.g. `"opus"`) for spawned members.
+
+   **Correction to this amendment's own framing, made before filing:** the `null`-for-team-lead half is **not new** -- it was recorded at **CLI 2.1.235** as item 1 of the startup.md defect list in [`../gotchas/dual-team-dir-ambiguity.md`](../gotchas/dual-team-dir-ambiguity.md), where it invalidates startup.md Step 0.5's premise. **What is new here is the contrast and the version bracket:** the field is `null` for the lead **and populated for members**, and both halves now hold across **2.1.235, 2.1.251 and 2.1.258**.
+
+   **The contrast is what makes it stronger than a detail.** For spawned members the pin is *unenforceable but observable* -- you can at least read which family ran. **For team-lead it is unenforceable and unobservable**, because the field carries no value at all. Instance B was diagnosed by reading `"model": "opus"` off spawned members; **the same diagnosis is not available for the team-lead seat**, and any survey that treats a `null` there as "no override" is reading absence as evidence.
 
 **Fix owner: Volta (lifecycle).** Recorded here, not tasked from here.
 

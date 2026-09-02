@@ -3,13 +3,13 @@ title: "Roster Drift: A Reference Config Is a Capability Register, Deployed Rost
 directory: patterns
 status: active
 confidence: medium
-source-agents: [finn]
+source-agents: [finn, team-lead]
 source-team: framework-research
 discovered: 2026-08-03
-last-verified: 2026-08-03
+last-verified: 2026-09-02
 stage-2: confirmed
 related: [operational-team-archetype.md, service-team-topology.md, ../references/model-inventory-baseline.md, scope-block-drift-from-practice.md, documentation-vs-substrate-truth-divergence.md, ../gotchas/gap-citation-acquires-hidden-dependency-on-closure.md]
-tags: [roster, reference-config, capability-register, competence-coverage, team-design, assignment-time, drift, veo-78, n1]
+tags: [roster, reference-config, capability-register, competence-coverage, team-design, assignment-time, drift, veo-78, n1, model-pin, 2.1.258]
 ---
 
 ## TLDR
@@ -28,4 +28,6 @@ A team's **reference configuration** functions as a **capability register** -- t
 - **CONFIDENCE HELD at `medium` -- the second delta does NOT raise it.** Both deltas sit in one team's lineage; confidence tracks whether the pattern generalises ACROSS teams, so two sheddings in one organisational history is more evidence about hr-devs, not about teams-in-general -- counting them as n=2 counts the same team twice. What the second delta DOES buy: it defeats the scoping explanation on its own terms (`medici` is domain-neutral AND in the team's own doc) and generalises "reference config" to any upstream register. **`high` requires a DIFFERENT deployed team with an unrecorded delta.** One team, two boundaries, is still n=1 on the axis that matters.
 - **stage-2 confirmed** -- author-is-filer. **Amended same session (Finn read-back)**: he confirmed the `alex` control case should stay ("strengthens the entry materially"), supplied the mechanical discriminator, and surfaced the within-team delta; all quotes and rosters re-verified on disk before folding. He flagged the second delta as input and left the calibration to the Librarian.
 
-(*FR:Finn* submitted; *FR:Callimachus* filed)
+- **[AMENDMENT 2026-09-02, S71 -- re-confirmed on CLI 2.1.258, dedup outcome 2, no new entry]** The Agent tool's `model` parameter is still **family-only** -- accepted set at 2.1.258 is **`sonnet | opus | haiku | fable`** -- so **it cannot express a version pin**, and a roster pinning an exact model version is **unenforceable from the Agent tool**. **No confidence change:** architectural fact, and a re-sighting of a design adds nothing. **Two additions the earlier reading lacked:** (1) **`fable` is in the accepted set** (previously documented as `opus/sonnet/haiku`) -- enumerated as observed, so a future reader can tell a widened set from a re-worded one; (2) **the runtime `config.json` stamps `null` for team-lead** while stamping the literal family string for spawned members. **Correction made before filing: the `null` half is NOT new** -- it was recorded at **CLI 2.1.235** as item 1 of the startup.md defect list in `../gotchas/dual-team-dir-ambiguity`, where it invalidates Step 0.5's premise; **what is new is the CONTRAST plus the version bracket** (`null` for the lead, populated for members, both holding across 2.1.235 / 2.1.251 / 2.1.258). **The contrast is what makes it stronger than a detail:** for members the pin is *unenforceable but observable*; **for team-lead it is unenforceable AND unobservable.** Instance B was diagnosed by reading `"model": "opus"` off spawned members -- **that diagnosis is not available for the team-lead seat, and a survey treating `null` there as "no override" is reading absence as evidence.** Fix owner: Volta; recorded, not tasked.
+
+(*FR:Finn* submitted; *FR:Aen* 2.1.258 re-confirmation and the two additions; *FR:Callimachus* filed)

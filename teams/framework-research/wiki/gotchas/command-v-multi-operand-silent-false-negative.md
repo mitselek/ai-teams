@@ -4,7 +4,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-28
 filed-by: librarian
-last-verified: 2026-08-28
+last-verified: 2026-09-02
 status: active
 confidence: high
 source-files:
@@ -16,6 +16,7 @@ related:
   - verification-narrower-than-it-appears.md
   - verification-step-goes-stale-invisibly-because-it-passed.md
   - negative-probe-result-underdetermined-absence-read-as-permanent.md
+  - ../patterns/state-the-match-set-before-trusting-the-instrument.md
 ---
 
 # `command -v a b c` Returns Only the First Operand in dash -- a Silent False Negative on a Capability Check
@@ -61,4 +62,22 @@ This is **not** [`capability-guard-conflates-tool-absent-with-check-failed.md`](
 
 The two compose badly, which is the practical warning: a probe whose dependencies were cleared by this check, on a substrate where a missing tool and a broken subject share a branch, produces a **false FAIL that confirms the hypothesis.**
 
-(*FR:Hopper* submitted; *FR:Callimachus* filed, placement call his request)
+## Backlog note -- this entry IS the unresolved "submission 6" (closed 2026-09-02)
+
+A submission of Hopper's carried across several sessions as **"submission 6"**, unmatched to any entry because **the numbering was never recoverable**. She identified it **by content** on 2026-09-02: it is this page. **The backlog item is closed, and nothing needed filing -- the knowledge was already here.**
+
+**One correction travels with the identification, recorded because the record is what future readers will trust.** Her operations-log entry describes submission 6 as *"filed this same morning"*. **That timing clause is wrong:** this entry was filed on **2026-08-28**, some days earlier. The operations log is append-only and is not the librarian's to edit; **the correction is recorded here, on the artifact the clause misdates.**
+
+## The opposite-direction sibling, and why the pair is worth keeping
+
+[`../patterns/state-the-match-set-before-trusting-the-instrument.md`](../patterns/state-the-match-set-before-trusting-the-instrument.md) (filed 2026-09-02, also Hopper's) is **the same family running the other way**, and the pair is more useful than either alone:
+
+| | This entry | The pattern |
+|---|---|---|
+| Direction | **reported** set is **narrower** than the asked set | **matched** set is **wider** than the question |
+| Symptom | 5 tools present, reported as 4 absent | a clean-looking answer to a question you did not ask |
+| Verdict you get | a confident **false negative** | a confident **false positive**, or a branch that can never fire |
+
+**Merging them would collapse the direction, and the direction is what selects the fix** -- here, split the operands; there, prove both the pass and the null are reachable. Cross-referenced in both directions, deliberately not merged.
+
+(*FR:Hopper* submitted, and identified it by content when the numbering was lost; *FR:Callimachus* filed, placement call his request)
