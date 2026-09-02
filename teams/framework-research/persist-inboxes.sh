@@ -27,25 +27,25 @@ fi
 
 # Runtime-discover the team dir name via the shared WS1 resolver.
 # Disambiguation (Brunel WS1 finding 2026-06-18: a real box has many team dirs):
-#   - --session-pid $PPID : post-unpin (2.1.178+) norm. $PPID is the Claude SESSION pid
-#       (this script's parent); the live dir is session-<sessionId[:8]>, so the pid maps
-#       to it unambiguously. Harmless on 2.1.177 (no sessions/<pid>.json -> path no-ops).
-#       WINDOWS cutover caveat: on Git Bash $PPID may NOT be the Claude process. Non-fatal --
-#       a wrong pid degrades to the resolver's process-liveness filter, which resolves FR's
-#       sole live session-<id> while FR is the only migrated team. Validate at the flip.
-#   - FR_COURIER_TEAM_DIR_NAME : 2.1.177 BRIDGE override (shared FR_COURIER_* env family, Aen
-#       2026-06-18; the courier reads the same name). On the pinned CLI dirs are TeamCreate-NAMED
-#       (framework-research), not session-<id>, so neither glob nor pid disambiguates a multi-dir
-#       box -> the resolver's explicit-override (step 1) is required. Set
-#       FR_COURIER_TEAM_DIR_NAME=framework-research during the bridge period.
+#   - --session-pid "${FR_COURIER_SESSION_PID:-$PPID}" : the Claude SESSION pid maps to the
+#       live dir (session-<sessionId[:8]>). MEASURED 2026-09-02 on CLI 2.1.258: under the
+#       Claude Bash tool $PPID is 1, NOT the session pid -- so the caller must supply the real
+#       pid via FR_COURIER_SESSION_PID. An explicit flag beats the resolver's own env fallback,
+#       which is why this expression honours the env var instead of hardcoding $PPID.
+#       Read the pid from ~/.claude/sessions/*.json, matching .cwd to the repo (startup.md Step 2').
+#   - FR_COURIER_TEAM_DIR_NAME : explicit team-dir override (shared FR_COURIER_* env family, Aen
+#       2026-06-18; the courier reads the same name). This is the PRIMARY disambiguator today:
+#       it is version-independent and needs no working pid. Set it to the DISCOVERED slug
+#       (session-<id>), not the literal framework-research -- that name was the 2.1.177-bridge
+#       value and the bridge is retired. See startup.md Step 3 / docs/startup-rationale.md.
 # Fail-closed on no-resolve / ambiguity (resolver exits non-zero + stderr).
-RESOLVE_ARGS=(--resolve-team-dir --name --claude-home "$CLAUDE_HOME" --session-pid "$PPID")
+RESOLVE_ARGS=(--resolve-team-dir --name --claude-home "$CLAUDE_HOME" --session-pid "${FR_COURIER_SESSION_PID:-$PPID}")
 if [ -n "${FR_COURIER_TEAM_DIR_NAME:-}" ]; then
   RESOLVE_ARGS+=(--team-dir-name "$FR_COURIER_TEAM_DIR_NAME")
 fi
 if ! TEAM_NAME="$(python3 "$RESOLVER" "${RESOLVE_ARGS[@]}")"; then
   echo "ERROR: Could not resolve the live team dir name via $RESOLVER --resolve-team-dir." >&2
-  echo "Resolver failed (no dir / ambiguous). On the 2.1.177 bridge set FR_COURIER_TEAM_DIR_NAME=framework-research." >&2
+  echo "Resolver failed (no dir / ambiguous). Set FR_COURIER_TEAM_DIR_NAME=<discovered session-<id> slug> (startup.md Step 2'/3)." >&2
   echo "Refusing to write into an empty team-dir path." >&2
   exit 1
 fi
