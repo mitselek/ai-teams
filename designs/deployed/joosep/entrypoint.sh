@@ -383,7 +383,19 @@ TEAM_DST="${WORK}/${TEAM_NAME:-paunvere}"
 TEAM_STAMP="${CLAUDE_DIR}/.team-package.seeded.md5"
 
 dir_digest() {
-    find "$1" -type f -exec md5sum {} \; 2>/dev/null \
+    # `.git` is EXCLUDED and the exclusion is load-bearing. Step 9c itself runs
+    # `git init` + a seed commit inside TEAM_DST below, so from the SECOND boot
+    # onward DST carries a `.git` tree that SRC never has. Without this prune,
+    # DST_DIGEST equals neither SRC_DIGEST nor SEEDED_DIGEST, BOTH the "current"
+    # and the "untouched -- re-seed" branches are unreachable by construction,
+    # and the NOTE branch fires on every boot -- so it stops being a signal.
+    # Measured on the `joosep` container 2026-09-03.
+    #
+    # This does NOT contradict the runbook's Step 1 ruling that dir_digest is
+    # "correct as it stands". That ruling is about CROSS-HOST portability of a
+    # digest, and it is right: both operands here are still hashed by this same
+    # code on this same box. The defect is the TREE being hashed, not the hash.
+    find "$1" -name .git -prune -o -type f -exec md5sum {} \; 2>/dev/null \
         | sed "s| $1/| |" | sort | md5sum | cut -d' ' -f1
 }
 
