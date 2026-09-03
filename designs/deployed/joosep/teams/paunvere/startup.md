@@ -2,6 +2,8 @@
 
 **Read this file FIRST every session.** It replaces exploration. Do not run an Explore agent or a broad search.
 
+**Amendment level: `A1` -- applied 2026-09-03 -- source `929ba8a` (VEO-181 c.243424). If this level differs from the one in your scratchpad summary header, read `AMENDMENTS.md` before anything else, then record the new level there.**
+
 ## Anchors
 
 | Anchor | Path |
@@ -13,15 +15,16 @@
 
 ## Implicit teams -- how this CLI works
 
-This container installs CLI 2.1.250 (2.1.178+): **there is no `TeamCreate` and no `TeamDelete`.** A lone session is already a 1-member team with itself as team-lead; its `config.json` is written **eagerly on session start** into a runtime dir named `session-<id>` (random, per session -- the team name `paunvere` never appears on disk there). The team is **discovered, not created**, and leadership evaporates on process exit -- there is nothing to clean and nothing to release.
+This container runs CLI 2.1.178 or later: **there is no `TeamCreate` and no `TeamDelete`.** A lone session is already a 1-member team with itself as team-lead; its `config.json` is written **eagerly on session start** into a runtime dir named `session-<id>` (random, per session -- the team name `paunvere` never appears on disk there). The team is **discovered, not created**, and leadership evaporates on process exit -- there is nothing to clean and nothing to release.
 
 ## Read order
 
 1. this file
-2. `TEAM_ROOT/roster.json`
-3. `TEAM_ROOT/common-prompt.md` -- the hard safety rule is there
-4. `TEAM_ROOT/prompts/minot.md`
-5. `TEAM_ROOT/memory/minot.md` -- summary header
+2. `TEAM_ROOT/AMENDMENTS.md` -- what changed in the prompt set, and why
+3. `TEAM_ROOT/roster.json`
+4. `TEAM_ROOT/common-prompt.md` -- the hard safety rule is there
+5. `TEAM_ROOT/prompts/minot.md`
+6. `TEAM_ROOT/memory/minot.md` -- summary header
 
 ## Procedure
 

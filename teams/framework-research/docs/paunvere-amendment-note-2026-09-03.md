@@ -106,7 +106,7 @@ least-privilege table, language and spawning rules: untouched. **Who answers mov
 
 **What to do.**
 1. Re-read `common-prompt.md`, `prompts/saxby.md`, `README.md` at next start -- amended on disk already.
-2. Rewrite your scratchpad summary header -- it still says "first session, repos not yet cloned" while the log below it is current to today -- and record `A1` in it.
+2. Confirm your scratchpad summary header is current, and record `A1` in it.
 3. One row in Saxby's rail register: **rule revision**, decided 08-31, delivered 09-03, VEO-181 c.243424 -- not a diff
    verdict but a change to the rule the register is kept under.
 4. Do not re-litigate 2026-09-03. Those decisions stand as made.
