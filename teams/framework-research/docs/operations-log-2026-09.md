@@ -645,3 +645,73 @@ Two independent reasons the amended text cannot arrive on its own. **First, `SRC
 (*FR:Hopper*)
 
 ---
+
+## 2026-09-03T13:58+03:00 -- Tier R liveness re-reads of the `joosep` container (2 of them), state DID change
+
+**timestamp** -- reads at 13:54:48 and 13:58:35 +03:00 (host clock, both). Follow-on to the 13:24 site visit logged above.
+
+**tasker** -- Aen (team-lead), two quick dispatches: 13:40 *"is the paunvere team actually DOWN right now?"*, then 14:05 *"Joosep says he is exiting right now"* with the same liveness set plus two specific questions -- did the shutdown path run, and was Minot's header rewritten.
+
+**dispatch summary** -- Same liveness set both times: container status/StartedAt/RestartCount, claude pids, tmux sessions and clients on the container user's socket, newest `~/.claude/sessions/*.json` status and `statusUpdatedAt`, TEAM_ROOT git and newest `memory/` mtime.
+
+**tier classification** -- **R** both times, sanction status: default-permitted. Every command a read; no tmux attach, no message to any agent, nothing mutated.
+
+**deployed-artifacts-read declaration** -- Layers 1 and 2 unchanged from the 13:24 entry above and not re-read; per first-dispatch-vs-subsequent-dispatch asymmetry, the substrate facts were already recorded and nothing in either dispatch contradicted them. **Layer 3 re-read in full** via `docker ps`/`inspect`, `docker exec joosep ps -eo pid,user,etime,lstart,tty,args`, per-pid `test -d /proc/<pid>`, `docker exec -u joosep joosep tmux list-sessions|list-clients|list-panes`, `cat` of both session JSONs, `git log|status` on TEAM_ROOT, and `ls`/`find` mtimes under `memory/`.
+
+**commands executed** -- `p6.sh` and `p7.sh`, transited as `ssh -T -o BatchMode=yes dev@100.96.54.170 'bash -s' < <script>`, plus one three-line `readlink` diagnostic between them.
+
+**outputs -- 13:54:48 read: no change from 13:24.** Container `Up 3 days`, `RestartCount=0`, same host pid 1337922. Both claude pids alive (`28543` 2d00:42, `286345` 1d00:06), confirmed by `ps` and by per-pid `/proc` test. tmux session `joosep` present, **`list-clients` empty** -- nobody attached. Both session records `status: "idle"`; `28543.json` `statusUpdatedAt` 13:13:30, stale by 41 minutes. TEAM_ROOT at `28da42a`, porcelain 0, newest `memory/` mtime `minot.md` 12:58:07. **Verdict reported: idle, not down.**
+
+**outputs -- 13:58:35 read: state CHANGED, and the shutdown path ran.**
+
+**A third commit exists**, authored 9 seconds before I read it:
+
+```
+834d55e|2026-09-03 13:58:26 +0300|Joosep Madar|chore(paunvere): session state 2026-09-03 (shutdown)
+28da42a|2026-09-03 13:11:46 +0300|Joosep Madar|chore(paunvere): session state 2026-09-03
+b61807f|2026-08-31 11:14:38 +0300|Joosep Madar|seed: team package as shipped
+```
+
+Porcelain count 0. `memory/minot.md` rewritten at 13:58:22, **8209 -> 10792 bytes, still 24 lines**, so this was a header rewrite plus log append, not growth.
+
+**Minot's summary header IS rewritten**, and correctly -- the stale *"First session … Repos not yet cloned"* text I flagged at 13:24 is gone, replaced by a dated end-of-session block with `Current state` / `Rail status` / `Git state` / `Test results` / `Housekeeping` lines. **The single hygiene defect found at the site visit is closed by the team itself, unprompted.**
+
+**But the session was still running at read time.** `28543.json` `status: "busy"`, `statusUpdatedAt` = **13:57:41**, and `tmux list-sessions` now reports `(attached)` with `list-clients` showing `/dev/pts/1: joosep [120x30 xterm-256color] (attached,focused,UTF-8)`. Both claude pids still alive, `ps` count for user `joosep` = 2. `286345.json` untouched, still `idle` since 09-02. So at 13:58:35 the shape is **a human attached, the session busy, and its shutdown commit already written** -- mid-exit, not exited.
+
+**Three carry-forwards surfaced by the rewritten header, none of them mine to act on and none previously visible.** **(1)** The elron rail is cleared for the four named tests but **has not been run**: Minot reports the tunnel-reachable `localhost:5173/elron-test/` is serving *"APEX Migratsioon / VJS Veeremi Haldussüsteem"*, not `rumba`, and says it resembles the explicitly out-of-scope `vjs_apex_apps`. It asked Joosep what the service is, got no answer, and **stopped rather than proceeding** -- the same posture as the 09-03 rail entries. **(2)** Two pushes landed this session: `rumba` `4edd5dc` on the feature branch, and **`HES-integration-tests` `d7906a6` direct to `main`**, on Joosep's stated word that direct-to-main is that repo's real convention; Minot logged the override explicitly and distinguished it from the hard rail. **(3)** Minot has asked the PO, Joosep copied, to decide where a `paunvere` remote should live and **recommends private given the RAIL-log sensitivity** -- no reply yet. It also reports ~15 `core.*` crash dumps up to 321 MB each across both repos, deletion offered and not confirmed.
+
+**outcome** -- **success, both reads.** 13:54: idle, not down. 13:58: up and busy, shutdown commit landed, Minot's header rewritten. Nothing mutated by me at any point. **The state change is why this entry exists** -- the 13:40 dispatch waived the log on a no-change finding, and the 14:05 read found change.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-03T13:59+03:00 -- ADDENDUM to the T13:58 entry: the exit completed; it is now DOWN, cleanly
+
+**timestamp** -- 13:59:35 and 13:59:48 +03:00 (host clock).
+
+**tasker** -- Aen, same 14:05 dispatch. This is a within-dispatch re-probe, not a new tasking: the T13:58 read caught the session **mid-exit** (`status: "busy"`, client attached), and *"is it down"* cannot be answered from a transitional state. **Re-probe-to-confirm is explicitly inside within-dispatch agency.** Logged as an addendum because the log is append-only and the T13:58 entry's *"mid-exit, not exited"* is now superseded by observation -- it was accurate when written, and it is no longer the state.
+
+**tier classification** -- **R**, default-permitted. Reads only.
+
+**deployed-artifacts-read declaration** -- Layer 3 only, as with the T13:58 entry; Layers 1 and 2 unchanged and not re-read.
+
+**commands executed** -- `p7.sh` re-run verbatim, then one `docker exec -u joosep joosep` listing of `~/.claude/teams/`, `/tmp/cc-socks/`, `/tmp/tmux-1000/` and line 4 of `memory/minot.md`.
+
+**outputs -- the paunvere session is DOWN, and the exit was graceful.**
+
+**Gone:** claude pid 28543 (`test -d /proc/28543` now **rc=1**, was rc=0 sixty seconds earlier; `ps` count for user `joosep` down 2 -> 1). The **entire tmux server** -- `list-sessions`, `list-clients` and `list-panes` all return `no server running on /tmp/tmux-1000/default`, rc=1. Its session record `28543.json` **and** its sibling `.key` removed from `~/.claude/sessions/`. Its socket `/tmp/cc-socks/28543.sock` removed. Its team dir **`~/.claude/teams/session-83668316` removed** at 13:59:19.
+
+**Still standing:** the container itself, `Up 3 days`, `RestartCount=0`, same host pid 1337922 -- **the container did not restart and was never at risk.** claude pid 286345 alive and `idle`, with its session JSON, key, socket and team dir `session-f385dde3` all intact. That is the WebStorm-terminal session in `HES-integration-tests`, untouched by the paunvere exit and not part of it.
+
+**Work is preserved.** TEAM_ROOT still at `834d55e`, porcelain 0, `memory/minot.md` 10792 B with the rewritten end-of-session header intact at 13:58:22. **The shutdown commit landed before the process left, which is the ordering the design wants.**
+
+**[LEARNED -- harness, n+1 datapoint for `sessions/<pid>.json` GC]** This is a clean confirmation of the S67 G2 finding at a new version: **graceful exit removes `sessions/<pid>.json` AND the team dir**, and here it also removed the `.key` and the `cc-socks` socket. Version observed: **2.1.252** (the session's own recorded version; the on-disk binary is 2.1.259). Hard-kill leaving a `status:"idle"` record behind is the other branch and was not exercised today. The guidance is unchanged -- process-liveness plus `procStart` is still required, because the hard-kill path still reads identical to live.
+
+**[GOTCHA -- substrate, joosep container, and it is a liveness false-positive]** **The tmux socket FILE survives its server.** `/tmp/tmux-1000/default` is still present, mode `srw-rw----`, dated `Sep 1 13:12` -- the original creation time -- while the server behind it is gone and every tmux subcommand returns `no server running`. **Anyone testing for a live session with `test -S /tmp/tmux-1000/default` or an `ls` gets a stale yes.** The load-bearing check is a tmux subcommand's exit status, not the socket's existence. Sibling to the `readlink /proc/<pid>/exe` gotcha recorded against this same substrate an hour earlier: both are checks whose null or positive reads the opposite of the truth.
+
+**outcome** -- **success.** Verdict corrected from the T13:58 reading by direct observation, not inference: **the paunvere team session is DOWN, cleanly, with its state committed and its harness records reaped.** The container is up; one unrelated session remains idle. Nothing mutated by me. The three carry-forwards named in the T13:58 entry stand unchanged and are the PO's and Joosep's, not mine.
+
+(*FR:Hopper*)
+
+---
