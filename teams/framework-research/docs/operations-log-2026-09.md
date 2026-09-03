@@ -715,3 +715,203 @@ Porcelain count 0. `memory/minot.md` rewritten at 13:58:22, **8209 -> 10792 byte
 (*FR:Hopper*)
 
 ---
+
+## 2026-09-03T14:18+03:00 -- Tier M, paunvere amendment A1 live transit -- ABORTED PRE-EXECUTION at the gates
+
+**timestamp** -- 2026-09-03T14:18:17+03:00, RC host clock. **Brunel's dispatch is stamped 14:15 and he flagged his own box as ~15 minutes behind Aen's stamps, instructing me to use the RC clock for this entry. Done.** Inter-agent stamps do not order events here; the RC clock does. Same caveat as the S71 T16:50 entry.
+
+**tasker** -- Brunel. Diagnostic-driven dispatch, the pairing's common case.
+
+**dispatch summary** -- Deliver amendment A1 into the live `paunvere` TEAM_ROOT on the `joosep` container: four tracked files replaced in place and one new file created, staged in `/tmp/fr-a1` first, md5-gated on both sides, applied with `cat >` to preserve inode/mode/owner, left uncommitted, verified after. Rebuild, recreate, restart, `docker tag`, pruning, any message to a paunvere agent, and any commit inside TEAM_ROOT all explicitly excluded.
+
+**tier classification** -- dispatched **M**. **I validated it and I agree it is M, which is the unusual shape and therefore worth writing down.** My own prompt warns that a container-side mutation dispatched as Tier M is often a mis-classified Tier D, so I cross-checked against the substrate rather than against habit:
+
+- **The substrate designs for this exact state.** `entrypoint.sh:373-380` says in its own words that the prompts and roster are *"theirs to tune once work starts, and a rebuild must not revert that"*, and Step 9c's third branch handles an edited TEAM_ROOT by leaving it alone. An amended TEAM_ROOT is a state the entrypoint has logic for, not one it will fight.
+- **There is no irreversible-data-loss surface.** All four replaced files are tracked at `834d55e` and recoverable from that repo's own object store; the fifth does not exist yet. Brunel's rollback (`git checkout --` on the four, `rm -f` on the fifth) is a true restore with no residue, and I confirmed the tracked-ness independently at G3.
+- **Nothing in the dispatch touches persisted state the entrypoint owns** -- no `.env`, no `authorized_keys`, no volume, no image, no lifecycle verb.
+
+Tier M sanction is a tasker acknowledgment, and I hold far more: Brunel quotes Aen's 14:26 instruction verbatim and names the PO sanction relayed at 14:20 for items 1-4. **Sanction is complete. The abort below is not a sanction problem.**
+
+**deployed-artifacts-read declaration**
+
+- **Layer 1 (FR design-as-shipped)** -- read in full earlier this session for the T13:24 site visit and **not re-read**, per the subsequent-dispatch asymmetry: `designs/deployed/joosep/README.md`, `registry-rows.md`, `docker-compose.yml`, `Connect-Joosep.ps1`, and `entrypoint.sh` including `373-435` (Step 9c seed-stamp logic), which is the section that carries this dispatch's tier justification. Nothing in the dispatch contradicted a recorded layer-finding, so no re-probe was triggered.
+- **Layer 2 (consumer-team operational)** -- compose dir `/home/dev/joosep` known from the label probe at T13:24; not read again, nothing here depends on it. **The RC build/transit checkout `/home/dev/github/mitselek-ai-teams` was read but NOT written:** `HEAD=057fab4`, branch `main`, porcelain **0**, and `git cat-file -t 8424088` returns *"Not a valid object name"* -- the manifest's pinned commit is **not yet on this host**. `git ls-remote origin refs/heads/main` -> `8424088babe78d647b12c187997b54070188e866`, so the commit exists on origin and the pull would be a clean fast-forward `057fab4 -> 8424088`. **`ls-remote` used deliberately in place of `fetch`, because fetch writes refs and this was a pre-flight read.**
+- **Layer 3 (running container state)** -- G1/G2/G3 as dispatched, plus corroborating instruments of my own; full outputs below.
+- **Audit-trail artifacts (this repo)** -- my three prior entries today (`T13:24`, `T13:58`, `T13:59`), the last of which records the stale-socket observation that one of these gates now trips on.
+
+**commands executed** -- one script, `a1_gates.sh`, transited as `ssh -T -o BatchMode=yes dev@100.96.54.170 'bash -s' < a1_gates.sh`. It runs G1, G2 and G3 **verbatim as dispatched**, each followed by a corroborating instrument of my own, then the RC checkout pre-flight. **No mutation of any kind was executed: no pull, no staging, no `cat >`, no `chmod`, no cleanup.** `/tmp/fr-a1` was never created.
+
+**outputs**
+
+**G3 -- PASS, exactly as specified.** `git status --porcelain` zero lines, branch `master`, log head `834d55e chore(paunvere): session state 2026-09-03 (shutdown)`. Nothing is writing into TEAM_ROOT.
+
+**G1 -- the underlying condition is TRUE, but the gate as written cannot report it.** Verbatim output: `pgrep -x tmux` -> `NO-TMUX-PROC`; `tmux list-sessions` -> `no server running on /tmp/tmux-1000/default`, `rc=1`; **but `ls -la /tmp/tmux-1000` shows the directory present and the socket `default` still in it**, `srw-rw---- joosep joosep`, dated `Sep 1 13:12`.
+
+The gate requires all three of: no tmux process, **no socket under `/tmp/tmux-1000` (or the directory absent)**, and `list-sessions` reporting no server. **Clause two does not hold, so the triple does not agree and the gate does not return its PASS.**
+
+**The reason is a substrate fact I measured myself at 13:59 and logged in the `T13:59` addendum above, before this dispatch existed: the tmux socket file survives its server.** Its mtime is still the server's original creation time from Sep 1, not the shutdown. Brunel allowed for the directory being absent; on this substrate it is not absent, and cannot be expected to become so.
+
+I measured the condition the gate is proxying for with three instruments independent of the socket: `pgrep -x tmux` count **0**, an exact-word `ps` match with the checker excluded **0**, and a case-insensitive `ps` sweep for any `tmux` string anywhere in the process table **empty**. **Zero tmux processes by three independent means.** Brunel names the failure mode this gate defends against precisely -- *"a live tmux process together with a `list-sessions` error = the wrong-socket case = STOP"* -- and **that case is affirmatively excluded, not merely unobserved.**
+
+**G2 -- the underlying condition is TRUE, and the gate as written manufactures a false STOP.** Verbatim output, in full:
+
+```
+PID 523608 exe=/usr/bin/bash cwd=/home/joosep/work
+```
+
+**That PID is the gate's own wrapper.** `pgrep -f claude` matches against full command lines, and the command line of the enclosing `bash -lc` **contains the string `claude`** because the pattern is written inside it. I confirmed the mechanism rather than asserting it: my adjacent probe's own wrapper reported `self=523619`, also `/usr/bin/bash`, also `cwd=/home/joosep/work`, eleven PIDs away in the same exec. Both are wrappers; neither is a session.
+
+Run verbatim and stopped there, G2 reports **a live claude with no session record**, which the dispatch classifies as *"a STOP, not a shrug"*. **It is not a live claude at all.** This is my own S71 instrument lesson repeating in someone else's gate: *the pattern matches its own wrapper, so the null branch is unreachable*.
+
+Corrected instruments, both excluding the checker: `pgrep -x claude` (exact process name, structurally incapable of matching a `bash` wrapper) returns **nothing**; `ps -eo pid,user,etime,args | grep -E '(^|[[:space:]])claude([[:space:]]|$)' | grep -v grep` returns **nothing**. **There are zero claude processes in the container.**
+
+**A material state change since my T13:59 reading, which the dispatch could not have known.** `~/.claude/sessions/` and `~/.claude/teams/` are **both empty** -- listing timestamps `14:16` on both. Joosep's unrelated WebStorm session (pid 286345, `HES-integration-tests`) has **also** exited since 13:59, and its session JSON, its `.key` and its team dir `session-f385dde3` were all reaped with it. **So Brunel's instruction to record the orphaned session-record and team-dir filenames has no subject: there are no orphans.** The concern he raised -- a stale record named by a pid a later container reuses -- does not arise. This is a second clean confirmation of the graceful-reap behaviour, now n=2 in one afternoon.
+
+**outcome** -- **aborted-pre-execution.** Nothing was pulled, staged, written or cleaned up; the container and the RC checkout are byte-for-byte as I found them.
+
+**Why I stopped, stated plainly, because the case for proceeding was real.** Both gates' underlying conditions are measurably satisfied by better instruments than the gates use, G3 passes outright, the substrate is quiet with zero processes of any kind, and there is no race to lose by waiting. I could have proceeded and been right. **I stopped because being right is not the standard: the standard is that the sanctioned gate is the tasker's instrument, and substituting my own corrected version of it for his -- however better mine is -- is exactly the silent-broadening this role exists to prevent.** Brunel wrote *"any failure is STOP-and-surface"* and two of his four gates did not return their PASS.
+
+**The stronger reason is ownership of the correction.** The stale-socket fact behind G1 is one I discovered ninety minutes ago; the wrapper self-match behind G2 is a defect that will recur in the next gate written the same way. **Both belong to him to absorb, not to me to route around silently.** Absorbing them myself would leave the defects live in his next dispatch and leave him believing his gates measured something they did not. That is the producer-versus-consumer lesson from S71 running in the other direction, and it is why the round-trip is cheap at the price.
+
+Surfaced to Brunel with the evidence at both gates, CC Aen for role-of-record. **Awaiting a re-issue of G1 and G2, or his confirmation that the corrected instruments stand as substitutes.** No part of the operation is started; a re-issue can execute from a clean substrate.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-03T14:24+03:00 -- Tier M, paunvere amendment A1 -- gates PASS, Step 0 done, staged and verified, APPLY BLOCKED by permission classifier
+
+**timestamp** -- 14:24:00 through 14:27:03 +03:00, RC host clock throughout, per Brunel's instruction that his own box runs ~15 minutes behind Aen's stamps.
+
+**tasker** -- Brunel, re-issue of the 14:15 package after my T14:18 abort. **He accepted both gate defects as his, re-issued G1 and G2 using the corrected instruments I supplied, and made them the sanctioned gate.** Aen confirmed at 14:35 (his clock): accept the corrected instruments, run it straight through, do not re-derive the package.
+
+**dispatch summary** -- Deliver amendment A1 into the live `paunvere` TEAM_ROOT: four tracked files replaced in place, one new file created, staged in `/tmp/fr-a1` first, md5-gated both sides, applied with `cat >` to preserve inode/mode/owner, left uncommitted, verified after.
+
+**tier classification** -- **M**, validated and agreed at T14:18 above; the re-issue changed only the two gate instruments, not the operation, so the tier reasoning stands unchanged. Sanction complete: Brunel quotes Aen verbatim and names the PO's 14:20 relay for items 1-4.
+
+**deployed-artifacts-read declaration** -- Layer 1 read in full earlier this session and not re-read (subsequent-dispatch asymmetry); `entrypoint.sh:373-435` remains the section carrying the tier justification, and **the pull changed that very section on the build host -- see the deviations below.** Layer 2: RC transit checkout `/home/dev/github/mitselek-ai-teams`, read and then written by the sanctioned Step 0 pull. Layer 3: gates G1-G4 plus staging verification, all below. Audit trail: my four prior entries today, the T14:18 abort being the direct predecessor.
+
+**commands executed** -- four scripts over `ssh -T -o BatchMode=yes dev@100.96.54.170 'bash -s' < <script>`: `a1_g12.sh` (re-issued G1, G2, G3, pre-pull state), `a1_step0.sh` (moment-of-use gate, pull, manifest md5, `AMENDMENTS.md` read in full, diffs), `a1_stage.sh` (G4 with assertions, staging, staging verification), plus one read-only state confirmation and one read-only characterization of the extra commit. **`a1_apply.sh` was written but NEVER EXECUTED -- see outcome.**
+
+**outputs**
+
+**G1 re-issued -- PASS.** `tmux -S /tmp/tmux-1000/default has-session -t joosep` -> `no server running on /tmp/tmux-1000/default`, `rc=1`; `TMUX-PROC-NONE`. The socket file is not consulted, which is the whole point of the re-issue.
+
+**G2 re-issued -- PASS.** `NO-CLAUDE-PROC` and `PS-SWEEP-EMPTY`, both legs. `~/.claude/sessions/` and `~/.claude/teams/` both empty. Zero claude processes, so the "live claude with no session record" rule is **vacuous, not satisfied by accident** -- Brunel asked for that distinction on the record and it is here.
+
+**G3 -- PASS**, re-run at moment of use: porcelain 0, branch `master`, head `834d55e`.
+
+**G4 -- PASS**, run in the same sequence as the staging, with per-value assertions and an abort branch on each. All four PRE md5s matched (`f0969ce1`, `56bd792c`, `94cba7a3`, `e29fe123`) and `AMENDMENTS.md` reported absent. **I asserted the absence explicitly rather than eyeballing the listing**, because "someone else has been here" is the condition that gate exists to catch.
+
+**Step 0 -- executed, with a moment-of-use gate in the same shell sequence as the pull**, asserting HEAD `057fab4`, branch `main`, porcelain 0, each with its own abort branch. All three held; `pull_rc=0`.
+
+**DEVIATION 1 -- the commit pin was stale. The pull landed on `2fde59b`, not the dispatched EXPECT of `8424088`.** Origin advanced between Brunel pinning the manifest and my executing it; my own `ls-remote` at 14:18 still showed `8424088`, so it moved inside the six minutes between my abort report and this run.
+
+**I characterized it rather than judging it, and the characterization is decisive.** `git merge-base --is-ancestor 8424088 HEAD` -> **YES**. `git log --oneline 8424088..HEAD` -> **exactly one commit**, `2fde59b fix(joosep): exclude .git from entrypoint dir_digest so Step 9c branches are reachable (#115)`. And the load-bearing check: **`git diff --stat 8424088..HEAD -- designs/deployed/joosep/teams/paunvere/` returns EMPTY.** The manifest directory is byte-for-byte identical between the pinned commit and what I pulled, proven structurally rather than only by hash.
+
+The hash evidence agrees independently: all five POST md5s reproduce exactly on the RC checkout (`5adad74f`, `36455e70`, `01114426`, `97583e36`, `4360afc2`), all five byte sizes match the manifest (11540 / 12294 / 5797 / 4132 / 2703), and the four-path `929ba8a^..HEAD` shortstat is **`4 files changed, 14 insertions(+), 11 deletions(-)`** with the per-file split **README 1/1, common-prompt 2/2, saxby 3/3, startup 8/5** -- exactly as Brunel predicted, to the line.
+
+**I proceeded past this EXPECT, and the reason is that Brunel named his own STOP condition for this step and it is not the pin.** His words: *"If any POST value differs on the RC checkout, STOP … it is not a discrepancy to reconcile by judgement."* None differs. The commit pin is a pointer to the payload; the md5 manifest is the payload's identity. The pointer moved, the identity did not, and the identity is what the gate he wrote tests. **Recording the reasoning because this is the one place today I did not stop on a failed EXPECT, and a later reader is entitled to see why.**
+
+**DEVIATION 2 -- Brunel's "provably payload-only" property is FALSIFIED for the range I actually pulled, and it was his stated reason I could pull without re-reading the build inputs.** He wrote that the range touches `designs/deployed/joosep/` in exactly two files and therefore *"cannot alter `entrypoint.sh`, the Dockerfile, the compose file"*, and separately that PR #115 was *"unmerged"* and *"not on this transit's path"*. **#115 merged as `2fde59b` and the pull changed `designs/deployed/joosep/entrypoint.sh` by 14 lines on the build host** -- the `.git` prune in `dir_digest`, carrying my own measurement as its justification comment.
+
+**Effect on this transit: none, and I checked rather than assumed.** `entrypoint.sh` is not in the manifest, nothing in this operation copies it, the container's running entrypoint lives in the image rather than in this checkout, and no rebuild, recreate or restart is sanctioned. **Effect on the build host: real.** The RC build source's entrypoint now differs from the image the container is running, so **the next rebuild off this checkout produces a different entrypoint than the one this container booted.** That is a good change and it is his own fix, but it is a build-input change on the build host, which is precisely what my standing S52 pre-flight gate exists to catch. Reported, not acted on.
+
+**`AMENDMENTS.md` read in full before staging.** I am installing a new file into another team's root, so I read it rather than trusting its hash. It is what it claims: an amendment register, newest-first, whose A1 entry tells Minot the rule it enforced this morning was withdrawn on 08-31 and never reached it, states plainly that **"That is our failure, not yours"**, affirms that its conduct on 09-03 was correct against the text it held and that **Ruth Türk's 09:56 clearance stands**, names what changed (who decides) and what did not (what the team may do), and asks for four concrete follow-ups plus one line to Joosep in Estonian. `startup.md` gains an amendment-level marker `A1` and puts `AMENDMENTS.md` second in the read order. **Nothing in either file weakens the rail, touches the `SK_*` values, or expands what an agent may do.** That is the check the dispatch asked for and it passes on reading, not only on hashing.
+
+**Staging -- complete and exact.** `/tmp/fr-a1` created fresh, five files transited by `docker exec -i -u joosep … 'cat > …' < file`. All five POST md5s reproduce in the staging dir, `find . -type f | wc -l` = **5**, every file `joosep joosep` mode `-rw-r--r--`, sizes matching the manifest. Per-file manifest, deliberately, not a tree digest.
+
+**APPLY -- BLOCKED. The permission classifier denied the `a1_apply.sh` invocation. It never ran; no byte of TEAM_ROOT was written.**
+
+**I did not retry it in another form, and that is the discipline, not an obstacle.** My scratchpad carries the rule from S67, where two classifier denials landed on this same container: **a denial is about the ACTION, not the transport; a tool swap is a workaround, and only the PO changing the regime clears it.** Re-issuing the identical mutation through a different shell shape would be evading a control the PO put there, and it is exactly the silent-broadening this role exists to prevent. **I cannot tell from the refusal which element triggered it** -- the five `cat >` redirects into a container, the `chmod`, or the script as a whole -- and I am not going to probe the classifier to find out.
+
+**State confirmed after the denial, by read-only probe at 14:27:03.** TEAM_ROOT is **exactly as found**: `common-prompt.md f0969ce1`, `README.md 56bd792c`, `prompts/saxby.md 94cba7a3`, `startup.md e29fe123`, `AMENDMENTS.md` **absent**, porcelain **0**, head `834d55e`. Staging is **intact and correct**, all five POST md5s, still `joosep:joosep`.
+
+**outcome** -- **partial.** Everything up to and including verified staging is complete: four gates passed, Step 0 pulled cleanly under its own moment-of-use gate, the payload is verified by md5, by byte size, by structural diff and by reading it, and the five files sit staged inside the container owned by the right user. **The single remaining action is the apply, and it is blocked by a permission control I may not work around.**
+
+**Nothing is in a half-applied state and there is nothing to roll back.** The staging dir is inert, outside TEAM_ROOT, invisible to `git status`, and removable by the dispatch's own one-line cleanup whenever the operation is resolved either way. **A cleared regime resumes at the apply step with G4 re-run at moment of use** -- I would not reuse this run's G4, since a passed gate goes stale silently, which is my own standing rule.
+
+Surfaced to Brunel and to Aen, with the explicit note that clearing this needs the PO, not a re-dispatch from either of them.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-03T14:30+03:00 -- ADDENDUM to the T14:24 entry: Brunel's Step 0 correction (crossed my execution), and his entrypoint-drift claim MEASURED
+
+**timestamp** -- 14:30:28 +03:00, RC host clock.
+
+**tasker** -- Brunel. **His correction is stamped 14:24 and CROSSED my execution** -- Step 0 ran at 14:24:34, staging completed 14:26:01, the apply was denied and confirmed by 14:27:03, and my block report went at 14:29. **So the run was executed without it.** Recording the crossing explicitly, as with the S71 T16:50 reconciliation: inter-agent stamps do not order events against RC host stamps, and a later reader must not read this addendum as guidance I had in hand.
+
+**tier classification** -- **R** (verification reads only). No mutation.
+
+**what he corrected, and how it lands against what I did**
+
+1. **"Do not treat a HEAD of `2fde59b` as a failure; gate on the five md5s, not on HEAD."** This is what I did, and my T14:24 entry above records the reasoning independently: the pin is a pointer, the md5 manifest is the payload's identity. **Neither of us relied on the other.** He adds a framing worth keeping: the HEAD equality was *"a recorded value sitting beside the artifact"* while the md5s are *"the artifact-derived comparison, which cannot go stale"* -- and it **would have failed closed, halting a healthy operation while reading as diligence.** That is the more dangerous direction and it is the second of his gates today that would have stopped me on nothing.
+2. **He withdraws "the pull is provably payload-only"** and the licence attached to it (pull without re-reading the build inputs). Already reported by me as DEVIATION 2 above, from direct observation of the pull's own file list.
+
+**his new claim, and I measured it rather than logging it on his word.** He states that after Step 0 the FR checkout carries the fixed `dir_digest` while `/home/dev/joosep/entrypoint.sh`, the staged deploy copy, still carries the defective one, and that **the next rebuild dispatch must re-stage `entrypoint.sh` or it will build the old function into the image.**
+
+**Confirmed, and the measured shape is narrower and more useful than the claim.**
+
+| layer | path | md5 | bytes | mtime | `.git` prune present |
+|---|---|---|---|---|---|
+| L1 -- FR checkout | `/home/dev/github/mitselek-ai-teams/designs/deployed/joosep/entrypoint.sh` | `4379dcf2` | 28352 | 2026-09-03 14:24:35 | **yes** (the `2fde59b` diff I read at Step 0 adds it to this path) |
+| L2 -- deploy copy | `/home/dev/joosep/entrypoint.sh` | `cb8405a0` | 27479 | 2026-08-31 10:57:01 | **no** -- `grep -c 'name .git -prune'` = **0**; the defective `find "$1" -type f` sits at **line 386** |
+| L3 -- in-image | `/entrypoint.sh` inside the running container | `cb8405a0` | -- | -- | **no**, `grep -c` = **0** |
+
+**The refinement that matters: L2 and L3 are BYTE-IDENTICAL (`cb8405a0` both).** The image was built from exactly the deploy copy that is on disk now, so **there is no L2 <-> L3 drift at all.** The drift is a single boundary, **L1 <-> (L2 == L3)**, not the two-way divergence "fresh drift between the two" could be read as. Consequence for a future rebuild dispatch, stated the way an operator needs it: **one re-stage step (L1 -> L2) is required, and L2 and L3 then diverge until a recreate lands the new image.** Harmless today -- no build, recreate or restart is sanctioned, and the file is not in the A1 manifest.
+
+**Instrument note on my own probe.** The command returned **exit code 1**, which is `grep -c` reporting **zero matches** on the final in-image check, not a failure. The last command in the chain sets the status, so a zero-match `grep` at the end makes a wholly successful probe look failed. **Same family as my trailing-pipe gotcha**: the exit status belongs to the last thing that ran, not to the question I asked. The four md5/stat readings above are unaffected and each printed its own value.
+
+**outcome** -- **success** (verification only). Brunel's correction is absorbed, both of its points had already been reached independently during execution, and his third item is now **measured rather than relayed**, with a narrower shape than stated. **Nothing changed about the A1 operation: it remains staged, verified, and blocked at the apply by the permission classifier, awaiting the PO.** His closing *"Everything else stands. Run it."* predates my block report and is not an instruction I can act on.
+
+(*FR:Hopper*)
+
+---
+
+## 2026-09-03T14:34+03:00 -- A1 COMPLETE. Apply executed by team-lead on PO instruction; post-verification and cleanup by me
+
+**timestamp** -- 14:34:58 (verification) and 14:35:11 (cleanup), +03:00, RC host clock.
+
+**tasker** -- Aen (team-lead). Follow-on to the T14:24 partial and its T14:30 addendum.
+
+**ROLE-OF-RECORD, recorded because Aen asked for it explicitly and because it is the load-bearing provenance fact of this entry: THE APPLY WAS NOT EXECUTED BY ME.** After the permission classifier denied it in my session, **the PO switched the permission regime and authorised team-lead directly to run my verbatim command. Team-lead ran it once, unchanged.** I supplied the command text at 14:33 for the PO's own keyboard, and it went to the human decision-maker, not around him: **routing blocked work back to the user is the sanctioned path; routing it to another agent to run on my behalf would have been the same evasion with an extra step.** Brunel independently refused to hand me a narrower variant for the same reason. **What happened here is the PO changing the regime in the open, which is the only thing that clears a classifier denial.** My own scope from 14:50 was narrowed by Aen to the pre-write gate and the post-verification only, and I did not re-run the apply in any form.
+
+**dispatch summary** -- Run the dispatched post-verification against the applied state, remove the staging directory, log, report once.
+
+**tier classification** -- **R** for the verification; the `rm -rf /tmp/fr-a1` cleanup is the dispatch's own final step, on an inert path outside TEAM_ROOT that I created, sanctioned in Brunel's package and instructed again by Aen.
+
+**deployed-artifacts-read declaration** -- Layers 1 and 2 unchanged and not re-read (subsequent-dispatch asymmetry); the L1/L2/L3 `entrypoint.sh` drift recorded at T14:30 is unaffected by this operation and still stands for the next rebuild dispatch. Layer 3 read in full below.
+
+**commands executed** -- `a1_verify.sh` (the dispatched verification block verbatim, plus porcelain decomposition, per-file numstat, owner/mode/size, the full diff, and a liveness re-check), then one cleanup-and-confirm invocation. Both over `ssh -T -o BatchMode=yes dev@100.96.54.170`.
+
+**outputs -- every dispatched expectation met, none by inference.**
+
+**The five POST md5s, exact:** `common-prompt.md 5adad74f`, `README.md 36455e70`, `prompts/saxby.md 01114426`, `startup.md 97583e36`, `AMENDMENTS.md 4360afc2`.
+
+**Owner and mode on all five:** `644 joosep:joosep`, sizes 11540 / 12294 / 4132 / 5797 / 2703 -- each matching the manifest. **`AMENDMENTS.md` carries 644 like its siblings**, so the explicit `chmod` on the one created file did its job.
+
+**Porcelain decomposed rather than eyeballed:** modified **4**, untracked **1**, total **5**, and the check that matters -- `git status --porcelain | grep -vE '^( M|\?\?)'` returns **NONE**. Nothing beyond this dispatch moved.
+
+**`git diff --shortstat` = `4 files changed, 14 insertions(+), 11 deletions(-)`**, and the per-file numstat is **README 1/1, common-prompt 2/2, saxby 3/3, startup 8/5** -- Brunel's prediction to the line, on all four files.
+
+**`git log --oneline -1` still `834d55e`. No commit was created**, which is the designed outcome: the change stays a working-tree change so paunvere's own startup `git status -sb` shows it and Minot's shutdown-commit step absorbs it on their terms, under Joosep's authorship rather than ours.
+
+**I read the diff rather than resting on the hashes, which is the check the dispatch asked for.** It is the routing-authority amendment and nothing else. In `common-prompt.md` the decision-rights row and hard-rule 1 both move from *"Ruth Türk signs off, mediated by Mihkel … Do not proceed on anyone else's word, including Joosep's"* to *"Joosep decides as the app's owner, consulting Ruth Türk when in doubt (amended by PO 2026-08-31, VEO-181 comment 243424)"*. `prompts/saxby.md` makes the same move in three places. `README.md` §8 records the withdrawal. `startup.md` gains the `A1` level marker and inserts `AMENDMENTS.md` at position 2 in the read order.
+
+**What did NOT change, verified by reading the surrounding context in the same diff:** hard rules 2, 3 and 4 are untouched -- no agent may set, read or echo the `SK_*` values, none may invoke the send path on any host, and the reserved train-number ranges remain non-bypassable. **Who answers moved; what this team may do did not.** That is the property the amendment claims for itself, and it holds on inspection.
+
+**Staging removed.** `rm -rf /tmp/fr-a1`, `rm_rc=0`, confirmed by a positive test rather than by the absence of an error: `test -e /tmp/fr-a1 && echo STILL-PRESENT || echo REMOVED` -> **REMOVED**. TEAM_ROOT re-read immediately after the cleanup and unaffected: same five md5s, porcelain 5, head `834d55e`.
+
+**The honest limit, and Brunel asked for it in these words.** The transit landed the **file**; it did not land the **behaviour**. **The container is still quiet** -- `NO-CLAUDE-PROC`, and `tmux has-session` returns `no server running`, `rc=1` -- so nothing has read the amended text yet. What will carry it is `AMENDMENTS.md` plus the amendment-level line at `startup.md:5`, read at the team's next start. **This entry does not claim the team is on the amended rule; it claims the artifact is in place and the level marker is armed.**
+
+**One verification I could NOT perform, stated rather than quietly dropped.** My apply script had a `stat` of inode, mode and owner **before** the writes, to prove `cat >` preserved them -- but that script is the one the classifier denied, so the before-reading never happened. **I can show the after-state is correct (`644 joosep:joosep` on all five) but I cannot demonstrate inode preservation by before-and-after comparison.** The property is a consequence of `cat >` truncating rather than replacing, and Brunel's design rests on it; it is simply not something I measured on this substrate today. Recording the gap because the audit surface is worth more than a tidy entry.
+
+**outcome** -- **success.** Amendment A1 is on disk in the live `paunvere` TEAM_ROOT, byte-exact against the manifest, correctly owned and moded, uncommitted by design, with the working tree showing exactly the four modifications and one addition intended and nothing else. Staging removed. **The apply itself was executed by team-lead under explicit PO authorisation after the classifier denial in my session, not by me.**
+
+Two items stand open and neither is mine: the `entrypoint.sh` L1-versus-(L2=L3) drift, which the next rebuild dispatch must re-stage into `/home/dev/joosep` or it builds the old `dir_digest` into the image; and the three carry-forwards from Minot's own shutdown header recorded at T13:58, which belong to the PO and Joosep.
+
+(*FR:Hopper*)
+
+---
