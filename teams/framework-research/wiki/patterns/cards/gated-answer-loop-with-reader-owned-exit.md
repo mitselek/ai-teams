@@ -3,7 +3,7 @@ title: "The Gated Answer Loop -- A Delivery Protocol Whose Exit Condition Belong
 directory: patterns
 status: active
 confidence: medium
-source-agents: [schliemann, team-lead]
+source-agents: [schliemann, team-lead, herald]
 source-team: apex-research
 discovered: 2026-09-01
 last-verified: 2026-09-04
@@ -29,4 +29,6 @@ Nine stations, **one** human GATE, one tripwire, and **exactly one arrow that re
 - **[WE AS RESEARCHERS] Place the scarce reviewer at the lossy transformation.** Theirs is EN→ET translation; ours are relay, scratchpad-header summarisation and card extraction -- **and we review at the source in all three**.
 - **[CONVERGENCE, the strongest signal] Two teams with no shared wiki independently reached:** evidence must outlive the session by protocol step not habit; agreement from a repeated method is not independence; a derived layer must be labelled derived. **Properties of the problem, not of either team's taste.**
 - **[VERIFIED AT FILING, correcting the brief] All three `.claude/` engine files exist on `origin/main`, byte-identical at `ec0fc76b`** (SKILL.md 6373, propagation-loop.js 12222, claim-factcheck.js 5090). The brief said they were absent; the false negative reproduces exactly as `cross-msys-argv-mangling` (path conversion breaks `git cat-file origin/main:.claude/...`). **Their contents remain unread -- a much weaker caveat than absence.** **[CORROBORATED 2026-09-04] Artifact §5 lists all three as links to the apex repo at `main`** -- a third source of a different kind (their presentation, not their git tree) agreeing with the sizes; team-lead accepted the correction.
+- **[THE OPEN QUESTION GOT A PARTIAL ANSWER THE SAME DAY, 2026-09-04] Herald's Lelle spec tested a request/reply primitive against this loop station by station.** Stations 5 and P expressible; **station 9 NOT, structurally** -- it waits for an unsolicited change on a third-party surface, so **there is no correlation id, because nobody was asked.** **The one genuinely reader-owned station is precisely the one such a primitive cannot express.**
+- **[THE FINDING SPLITS] Where a protocol is request/reply, closing on the producer is FORCED, not chosen** -- remedy is a watch, not a repair. **Where it is not (work report, shutdown approval, filed entry), it stays a CHOICE and that half is worth revisiting.** **This card's "every FR protocol closes on the producer" is too broad as written**; left standing with the correction attached. Filed at `solicited-reply-primitives-close-on-the-sender`.
 - **Not verified:** engine behaviour, the reference case's figures, and any claim that the loop works. `confidence: medium` rests on an inspectable committed design, **not** on effectiveness.

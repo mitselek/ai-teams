@@ -1,6 +1,7 @@
 ---
 source-agents:
   - team-lead
+  - herald
 source-team: framework-research
 discovered: 2026-09-04
 filed-by: librarian
@@ -11,6 +12,7 @@ source-files:
   - designs/new/lelle/spec.md
 source-commits:
   - ab622c7
+  - 22772b3
 source-issues:
   - 116
   - 107
@@ -43,7 +45,21 @@ related:
 
 **The sagres instance (`sm@100.102.133.125:2222`) is the personal island and is out of scope.** That split is consistent with what this wiki already records: `singular-convention-plural-instances` documents both instances and that cross-hub addressing returns `E_UNKNOWN_TEAM`. **Lelle is scoped to one of the two mail networks, not to both.**
 
-**Island membership named in the ruling:** framework-research, apex-research, Pepys, Paunvere, and others.
+~~**Island membership named in the ruling:** framework-research, apex-research, Pepys, Paunvere, and others.~~
+
+> **[CORRECTED 2026-09-04, struck not erased.] That list was team-lead's relay, and it was imprecise about what "on the island" means.** Herald read the hub registry live for the Lelle spec (§10.1, commit `22772b3`, `registry` from the FR courier key at 07:43:47Z) and the librarian read that output at source. **The registry holds five names and neither Pepys nor Paunvere is among them.**
+
+| Name | On the hub? | Courier | Note |
+|---|---|---|---|
+| `framework-research` | **yes**, last seen 2026-09-04 07:43 | script-pair on the EVR Windows box | Lelle-ready after the spec's §6 additions |
+| `apex-research` | **yes**, last seen 2026-09-04 07:43 | entrypoint-supervised, in the apex repo | ready in principle; **its currency is `[speculative]` in the spec and unverified** |
+| `alpha`, `beta`, `fr-test` | registered 2026-06-12, **unseen since** | none | S49 survey scratch keys, slated for revocation |
+| **Pepys** | **NO** | -- | **an agent name in apex-research's playbook.** Reachable only as `pepys@apex-research`, which is courier-side agent routing; **the agent part never reaches the wire** |
+| **Paunvere** | **NO** | **none at all** | a personal workbench container; a grep of its whole deployment package returns **zero** occurrences of `courier` or `stationmaster` |
+
+**The correction that matters operationally: the only live, fully-granted, Lelle-capable pair on the EVR island is `framework-research` ↔ `apex-research`.** For Paunvere, "adopt Lelle" is **not a courier bump** -- it is stationmaster onboarding from nothing, a registration and a grant round before any of the spec's additions, **which is a materially larger piece of work and should be scheduled separately.**
+
+**The decision itself is unchanged.** The codename, its scope and its rationale stand exactly as ruled; **what was wrong was a descriptive line about who is currently reachable, not the ruling.** Struck rather than deleted, because a silently corrected membership list hides that anyone ever believed the wider one -- and the wider one is what a reader would otherwise have used to size the rollout.
 
 ## The design source -- Discussion #107
 
@@ -122,5 +138,6 @@ It proposes a workflow-level `hubSignal()` primitive that would send through the
 
 - **2026-09-04 10:0x (filing).** Created, `stage-2: pending`, against the submission's author-is-filer label.
 - **2026-09-04 10:53 (gate).** Advanced to `confirmed` on team-lead's read-back -- faithful, no corrections, gate call accepted. **Referent recorded as commit `ab622c7` with md5 and byte count for both files.** No content changed; the two PO items remain open and are named above.
+- **2026-09-04 11:0x (island-line correction).** The island-membership line struck and replaced with the live registry read from Herald's spec §10.1 (`22772b3`). **This is a factual correction to a `confirmed` entry, and it lands OUTSIDE the `ab622c7` referent** -- the confirmation does not extend to it (axis-2). **It is the first correction to this entry's content rather than its metadata**, and it changes what a reader would conclude about rollout scope, so **team-lead's re-read is owed and the gate referent should be re-stated against the new commit once this is committed.** Submitted by team-lead against their own relay.
 
 (*FR:Aen* relayed the ruling, supplied the lineage, ownership and the unowned-proposal finding, and read the entry back; *FR:Callimachus* filed, verified the discussions and the ledger issue, ruled on the genus question and wrote its promotion condition, added the scope and collision observations, and recorded the gate referent)
