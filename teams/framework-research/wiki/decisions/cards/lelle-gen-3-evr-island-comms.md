@@ -7,7 +7,7 @@ source-agents: [team-lead]
 source-team: framework-research
 discovered: 2026-09-04
 last-verified: 2026-09-04
-stage-2: pending
+stage-2: confirmed
 related: [two-islands-by-design-hub-topology-follows-network-boundary.md, stationmaster-post-office-model.md, ../../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md, ../../gotchas/precondition-without-an-owner-is-no-precondition.md, ../../gotchas/v2-ghost-bridge-restart-redelivery-dupe-motivates-hub-ledger.md, ../../patterns/named-concepts-beat-descriptive-phrases.md]
 tags: [decision, codename, lelle, inter-team-comms, gen-3, evr-island, stationmaster, hubsignal, gh-116, gh-107, po-ruling, naming]
 ---
@@ -27,4 +27,6 @@ tags: [decision, codename, lelle, inter-team-comms, gen-3, evr-island, stationma
 - **[COLLISION FOUND AT FILING, offered without inference] *Koidula*, a rejected alternative, is ALREADY an agent persona name** in 11 repo files (`designs/deployed/esl-legal/`, `designs/new/esl-suvekool/` -- a prompt, a roster entry, common-prompt references). **Whether the PO knew is not established and is not guessed.** Narrow relevance: the codename exists to remove an ambiguity, and that alternative was already bound to something else in the same repo. **Tapa and Lelle appear nowhere but today's records.**
 - **Name origin:** a historic Estonian railway junction where the Pärnu and Viljandi lines split, station closed, chosen knowing that -- **recorded as the PO's stated rationale, not as verified railway history.**
 - **Authoritative for the naming decision and rationale ONLY.** Contract, mechanism and the four questions belong to the spec and #116 -- **a pointer, not a copy**, per the Decisions Boundary.
-- **stage-2 PENDING -- NOT author-is-filer**, though submitted as such: **the decision's author is the PO, the filer is the librarian, and team-lead is a witness relaying it.** Filed-on-behalf, fail-closed. **Read-back owed from team-lead; a PO confirmation would be stronger** and is what would settle the one-token and collision items.
+- **stage-2 CONFIRMED 2026-09-04 10:53** -- **filed `pending` against the submission's own author-is-filer label** (the decision's author is the PO, the filer is the librarian, team-lead is a witness relaying it -- filed-on-behalf, fail-closed). **Team-lead accepted that call, then read it back: *"faithful, no corrections."*** Sole `source-agent`, so the gate closes.
+- **[REFERENT, so the confirmation is not silently inherited] The confirmed text is the entry as committed at `ab622c7`** -- md5 `c58e6fe2da70f9fc4a1878ab5b5c11ce`, 11341 B (card `06f478e47f747498c6a0c249d1a97403`, 5632 B), **verified against the commit, not a working-tree hash. Anything added after `ab622c7` is outside what was confirmed.** Axis-2 remedy: the `stage-2` field carries no version.
+- **[WHAT THE GATE DOES NOT CLOSE] It measures whether a second agent read the entry back, NOT whether the questions it raises are settled.** **The Koidula collision and the one-token scope point are both still open with the PO**; the latter is also with Herald as a spec question (sent 10:50). **A PO confirmation is expected, would settle them, is not required for the gate, and does not reopen it.** A scope change from the PO is an amendment against the referent, not a re-run of this read-back.

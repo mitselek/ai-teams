@@ -9,7 +9,8 @@ status: active
 confidence: high
 source-files:
   - designs/new/lelle/spec.md
-source-commits: []
+source-commits:
+  - ab622c7
 source-issues:
   - 116
   - 107
@@ -109,6 +110,17 @@ It proposes a workflow-level `hubSignal()` primitive that would send through the
 
 **PO ruling, 2026-09-04 (S73), relayed by team-lead (Aen), who was present.** The lineage, island membership, ownership table and the #107/#111 finding are the submission's. **The independent verification of the discussion counts and repo mentions, the ledger-issue confirmation, the near-instance ruling against the precondition gotcha with its promotion condition, the one-token-two-things observation and the Koidula collision are the librarian's.**
 
-**`stage-2: pending`** -- **not** author-is-filer. The submission is labelled so, but **the author of the decision is the PO and the filer is the librarian; team-lead is a witness relaying it**, which makes this filed-on-behalf and fail-closed by the three-bucket rule. **Read-back owed from team-lead**, who can confirm the relay was carried faithfully. **A PO confirmation would be stronger and is what would settle the two items raised above.**
+**`stage-2: confirmed`** (advanced 2026-09-04 10:53 on team-lead's read-back; **filed `pending` at 10:0x**).
 
-(*FR:Aen* relayed the ruling and supplied the lineage, ownership and the unowned-proposal finding; *FR:Callimachus* filed, verified the discussions and the ledger issue, ruled on the genus question and wrote its promotion condition, and added the scope and collision observations)
+**Why it was filed `pending` against the submission's own label, kept here because the reasoning is the durable part.** The submission was sent as *author-is-filer*, but **the author of the decision is the PO and the filer is the librarian; team-lead is a witness relaying it** -- filed-on-behalf, fail-closed by the three-bucket rule. **Team-lead reviewed that call and accepted it**, then read the entry back: *"faithful, no corrections."* Team-lead is the sole `source-agent`, so their read-back is the last one owed and the gate closes.
+
+> **Referent, stated so the confirmation cannot be silently inherited by a later version.** The confirmed text is the entry as committed at **`ab622c7`** -- md5 `c58e6fe2da70f9fc4a1878ab5b5c11ce`, 11341 bytes (card: `06f478e47f747498c6a0c249d1a97403`, 5632 bytes), verified against the commit rather than against a working-tree hash. **Anything added after `ab622c7` is outside what was confirmed.** This is the axis-2 remedy from `../process/stage-2-confirms-filing-gate.md`: the `stage-2` field carries no version, so an amendment inherits a confirmation it never received unless the referent is written down.
+
+**Two things the gate does NOT close, and it is worth being exact about the difference.** The gate measures whether a second agent read the entry back, **not whether every question it raises is settled.** Still open, both with the PO as of 2026-09-04: **the Koidula collision** and **the one-token-two-things scope point** (the latter also with Herald as a spec question, sent 10:50). **A PO confirmation is expected and would settle them; it is not required for the gate and does not reopen it.** If the PO's answer changes the decision's scope, that is an amendment against the referent above, not a re-run of this read-back.
+
+## Amendments
+
+- **2026-09-04 10:0x (filing).** Created, `stage-2: pending`, against the submission's author-is-filer label.
+- **2026-09-04 10:53 (gate).** Advanced to `confirmed` on team-lead's read-back -- faithful, no corrections, gate call accepted. **Referent recorded as commit `ab622c7` with md5 and byte count for both files.** No content changed; the two PO items remain open and are named above.
+
+(*FR:Aen* relayed the ruling, supplied the lineage, ownership and the unowned-proposal finding, and read the entry back; *FR:Callimachus* filed, verified the discussions and the ledger issue, ruled on the genus question and wrote its promotion condition, added the scope and collision observations, and recorded the gate referent)
