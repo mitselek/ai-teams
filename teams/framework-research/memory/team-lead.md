@@ -15,6 +15,15 @@
 
 ---
 
+### S73 CHECKPOINT (2026-09-04, 10:05, live)
+
+- **Session:** `session-8bce3d41`, pid 14144, CLI **2.1.260** (startup.md stamp says 2.1.258 -- update at S4). Startup ran clean; courier restart pre-flight named my slug. Cell: Callimachus + Herald (both `opus`).
+- **DELIVERED:** truth loop (apex S78 artifact + playbook `ec0fc76b`) filed in wiki by Cal, commit `487285c`, 235->239 entries. My two brief errors caught by Cal: MSYS argv path-conversion made `git cat-file origin/main:.claude/...` a false "missing"; and I cited apex's wiki entry as ours. Use `MSYS_NO_PATHCONV=1`.
+- **[DECISION, PO] Codename "Lelle"** = gen-3 EVR-island comms method + its hub instance (over Tapa, Koidula). Ledger **#116**. Seed = Discussion **#107** (hubSignal workflow primitive, 2026-08-13) -- had ZERO comments/ZERO repo mentions until today; Discussion #111 (Passepartout->Volta, gauge-gated retirement) same fate. Both filed while #108 held the lane; no owner, no issue. Pointer comment left on #107.
+- **[WIP]** Herald drafting `designs/new/lelle/spec.md` v0.1 (contract, #107's 4 questions, SemVer classification, island rule, fleet inventory via `registry`, truth-loop consumer check, PO gate list). Cal filing Lelle decision entry (Protocol A sent 09:58).
+- **Comms clumsiness (PO's standing complaint):** today's specimens all Windows-substrate -- contested-inbox inject (50 rounds), hub replayed 3 stale June messages (ledger had 1 entry), Bash cwd drift broke the restart wrapper once, MSYS mangling. Not wiki-grade per policy. Lelle is the structural answer the PO wants.
+- **Next after Herald reports:** route Protocol A candidates to Cal; post gate list on #116; PO decides gates; then Brunel/Hopper/Volta implementation brief. #111 still unowned -- offer Volta to PO.
+
 ### S72 WRAP (2026-09-03)
 
 - **paunvere on site (Hopper, Tier R):** healthy, 3 of 6 agents ever spawned, memory accumulating well, zero NEED/BLOCKED. Container ran PRE-amendment text: PO's `929ba8a` (08-31 13:22) postdated image build (11:07) + seed (11:14) by 2 h; nothing failed in transit. Consequence on disk: Minot spent 09-03 morning enforcing the withdrawn Ruth gate, refused Joosep 3x, refused the PO's reply as probable social engineering (footer contradicted the claim), emailed Ruth, cleared 4 tests narrowly. Correct against the text it held. Joosep took broad `gh auth login` instead of the narrow PAT; Minot ran the negative control and logged his decision. Joosep uses the container as a WebStorm workbench; native claude 2.1.259 autoupdating on the `joosep_home` VOLUME (opposite of apex).

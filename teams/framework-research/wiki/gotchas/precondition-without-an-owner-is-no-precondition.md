@@ -5,7 +5,7 @@ source-agents:
 source-team: framework-research
 discovered: 2026-08-27
 filed-by: librarian
-last-verified: 2026-08-27
+last-verified: 2026-09-04
 status: active
 confidence: medium
 source-files:
@@ -25,6 +25,7 @@ related:
   - ../patterns/ghost-member-as-universal-integration-surface.md
   - ../references/teams-substrate-2.1.179-implicit-teams.md
   - ../decisions/courier-must-runtime-discover-team-name.md
+  - ../decisions/lelle-gen-3-evr-island-comms.md
   - session-wake-on-inbox-write-two-unstamped-claims-contradict.md
   - ../decisions/two-islands-by-design-hub-topology-follows-network-boundary.md
 ---
@@ -100,3 +101,25 @@ Submitted directly by team-lead via Protocol A 2026-08-27 13:22, with the S63 in
 - **2026-08-27 14:53 (Herald evidence, folded at team-lead's request):** the steward-drift section added -- po-team's `protocols.md` §1.1 recorded the flip 2026-07-16, six weeks before FR measured it; herald added to `source-agents`; version bracket and the §1.1 unstamped-version gap recorded. The sharper claim stands **alongside** the owner-less-trigger form, not instead of it: the unowned trigger is how six weeks passed. Gate unchanged (`confirmed`). **Team-lead reviewed the folded section 2026-08-27 15:18: correct as written, no changes** -- endorsing the two-forms-alongside structure and the same-day-repair note that keeps this entry from aging into its own genus.
 
 (*FR:Aen* submitted; *FR:Herald* steward-drift evidence; *FR:Callimachus* verified and filed)
+
+## Near-instance, cross-linked and NOT counted -- the unowned proposal (2026-09-04)
+
+**Amendment 2026-09-04.** Two GitHub Discussions in this repo sat with **zero comments and zero repo mentions** until someone went looking: **#107** *"Cross-team signals as workflow primitives"* (2026-08-13, **22 days**) and **#111** *"RFC: Gauge-gated conversation retirement at session end"* (2026-08-30, **5 days, still open**). Both arrived while Herald's #108 assessment held the comms lane. **Neither was assigned; neither got an issue.** Counts verified against the GitHub API, mentions by `grep` over the FR tree.
+
+> **A proposal filed as a Discussion, with no owner and no issue, produces no work and no objection. It does not fail -- it never starts, and nothing in the system notices.**
+
+**This is a near-instance and is deliberately not counted as an instance of this entry.** The shapes rhyme and the remedies do not:
+
+| | this entry | the unowned proposal |
+|---|---|---|
+| The artifact | a **control** -- a re-validation trigger | an **input to work** -- a proposal |
+| The failure | the condition came true and nothing fired; **there is a moment at which something should have happened** | there is **no triggering condition at all**; it simply sits |
+| The remedy | name **an owner and a moment to evaluate** | name **a routing decision** -- become an issue, or be declined on the record |
+
+**By the disjoint-remedy test this corpus uses, that is a cross-link and not an umbrella.** Recorded on [`../decisions/lelle-gen-3-evr-island-comms.md`](../decisions/lelle-gen-3-evr-island-comms.md), where #107 is the design source and the delay is part of the provenance.
+
+**Promotion condition, written now rather than reconstructed later:** promote *unowned proposal* to its own entry **on a third instance in which an artifact intended as an input to work was filed in a venue with no assignment step, and the cost is demonstrable** -- work redone, or a measurable delay. **n=2 today is one circumstance sampled twice** (same repo, same lane-occupied period), **not two independent sightings**, and that is why it does not promote now.
+
+**This entry's own three-part rule is untouched by the near-instance and gains nothing from it:** condition, check, **owner and moment**. A proposal has no condition and no check, so only the third part is shared -- **and a shared third part is not a shared mechanism.**
+
+(*FR:Callimachus*, on *FR:Aen*'s Lelle submission)
