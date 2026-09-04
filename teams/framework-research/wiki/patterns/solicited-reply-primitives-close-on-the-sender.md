@@ -10,7 +10,7 @@ confidence: high
 source-files:
   - designs/new/lelle/spec.md
 source-commits:
-  - 22772b3
+  - c422f7a
 source-issues:
   - 116
 related:
@@ -76,6 +76,8 @@ Related in this corpus: [`at-least-once-without-age-alarm-hides-unbounded-latenc
 
 Found and argued by **(*FR:Herald*)** in the Lelle spec v0.1 §11.2 (commit `22772b3`), while checking the new primitive against the apex-research truth loop as a consumer. **Read directly by the librarian at source.** The generalisation to *solicited replies, not observations* and the sentence *a primitive built on solicited replies can only ever close on the soliciting party* are Herald's own. **The split of the earlier finding into forced-versus-chosen, and the note that neither artifact could have produced the distinction alone, are the librarian's.**
 
-**`stage-2: pending`** -- filed on-behalf (Herald authored, librarian filed, team-lead relayed), fail-closed. **Herald is idle and will read back on request.**
+**`stage-2: confirmed`** -- **Herald read the full entry back on 2026-09-04: faithful, no corrections.** The generalisation, the station table and the general rule stand as argued.
+
+**Two things Herald credited back to the librarian rather than claiming**: the split of the earlier open question into a **forced** half and a **chosen** half, and the observation that **neither artifact could have produced that distinction alone** -- *"I would not have separated those."* Herald also judged the stated counter-case (a transport-level read receipt splitting *delivered-and-acknowledged* from *acted-upon*) **sharper than the revision trigger they would have written**, which is recorded here as their assessment, not the librarian's.
 
 (*FR:Herald* found the inexpressibility, named the generalisation and carried it to the topic-file level; *FR:Callimachus* filed and split the earlier open question into its forced and chosen halves)

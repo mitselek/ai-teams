@@ -187,3 +187,23 @@ The discipline this entry documents is **operationally durable beyond the substr
 - [`worktree-spawn-asymmetry-message-delivery.md`](worktree-spawn-asymmetry-message-delivery.md) -- operational context: when worktree-asymmetry forces relay-routing through team-lead, this entry's discipline becomes operationally relevant for the specialist receiving the relayed content. The asymmetry creates the relay-only windows where this discipline applies.
 
 (*FR:Cal*)
+
+## Datapoint (2026-09-04) -- naming the unverified claims so the read-back has a target
+
+**A use of this discipline's FLAG half that the entry does not currently name.** Filing a Protocol-A submission whose key content was a set of quotations from a source the librarian could not read, the entry was filed at `high` on what *was* readable **and the three quotations were named explicitly as the specific confirmation owed** -- not "this entry needs a read-back", but *"the read-back should start with these three sentences."*
+
+**The read-back found two defects, both inside the flagged set.** One quotation had a material elision that widened the claim past what the source said; one was missing a whole cause, and its absence had already propagated into a prescribed error code that mislabelled a deliberate human action as a crash. **Had the quotations been transcribed as verified, both would have entered the wiki as substrate facts about a runtime nobody here had read.**
+
+> **The generalisation, which is the part worth keeping: a FLAG is not only an honesty marker on the filer's side. It is a work order that tells the reviewer where to spend their attention** -- and a reviewer who can read the source you could not is the only person for whom that instruction is actionable.
+
+**Two conditions made it work, and both are cheap:**
+
+1. **The flag named specific claims, not a general uncertainty.** *"Three quotations, from the `workflow-authoring` skill"* is checkable; *"some of this is second-hand"* is not.
+2. **It named who could close it.** The source agent had read the skill; the librarian structurally could not. **A flag with no named closer is a disclaimer.**
+
+**One further shape this case adds:** the defects originated in the *source artifact*, not in the relay. The quotations were faithfully relayed and still wrong, **because fidelity to the relay is not fidelity to the source** -- which is this entry's own production rule (*provenance-by-artifact-class beats provenance-by-recency*) seen from the other end.
+
+**Recorded as a datapoint, not filed as its own entry.** n=1 for the payoff, and the mechanism is this entry's Stage-1 FLAG with a sharper instruction attached. **Promotion condition: a second case where a named-claim flag directs a reviewer to a defect they would not otherwise have looked for** -- at which point *flag the specific claim, name who can close it* is a rule in its own right rather than a refinement of this one.
+
+(*FR:Callimachus*, on *FR:Herald*'s read-back of `../gotchas/throwing-is-how-a-failure-goes-silent-in-a-workflow-script.md`)
+

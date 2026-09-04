@@ -12,7 +12,8 @@ source-files:
   - designs/new/lelle/spec.md
 source-commits:
   - ab622c7
-  - 22772b3
+  - f914efd
+  - c422f7a
 source-issues:
   - 116
   - 107
@@ -99,6 +100,14 @@ It proposes a workflow-level `hubSignal()` primitive that would send through the
 
 **This is not an objection to the ruling and is not a dispute.** The PO chose the name and the scope, and one island with one instance makes the two readings coincide today. **It is recorded because the coincidence is contingent:** if the EVR island ever runs a second gen-3 instance, *Lelle* will need the same *which one?* slot the generic noun needed, and this entry is where a future reader should look first. **The cheap pre-emption -- deciding now whether the instance gets its own qualifier -- costs one sentence in Herald's spec and is offered as a spec question, not a wiki ruling.**
 
+> **[RESOLVED 2026-09-04, in the spec -- and the resolution is the cheap pre-emption exactly as proposed.]** Herald took the spec question and added **§1.1, *"Naming rule -- the token names the method, never an instance"*** (commit `c422f7a`):
+>
+> > **`Lelle` names the gen-3 *method*; a running instance is written `Lelle@<hub-instance>` -- today the only one is `Lelle@prod-llm`.**
+>
+> **The rule cites this wiki's own [`singular-convention-plural-instances`](../gotchas/singular-convention-plural-instances-enumerate-from-the-registry.md) as the reason** -- *"this fleet has already paid for the alternative"* -- and inherits the `@<instance>` split already in force one layer down, where the stationmaster package README calls itself *"the cross-team CONVENTION, not an instance"* and names instances separately. **N instances cost N suffixes and no rewording.**
+>
+> **The librarian's item is therefore closed, and closed in the right place: the spec, not the wiki.** A librarian's observation on a decision record became a naming rule in the artifact that governs implementation, **without the decision itself being reopened** -- the PO's ruling binds the token, and §1.1 says how the token is written when a document means the deployment. **The remaining open item with the PO is the Koidula collision alone.**
+
 ## Ownership and ledger
 
 | Role | Who |
@@ -130,7 +139,9 @@ It proposes a workflow-level `hubSignal()` primitive that would send through the
 
 **Why it was filed `pending` against the submission's own label, kept here because the reasoning is the durable part.** The submission was sent as *author-is-filer*, but **the author of the decision is the PO and the filer is the librarian; team-lead is a witness relaying it** -- filed-on-behalf, fail-closed by the three-bucket rule. **Team-lead reviewed that call and accepted it**, then read the entry back: *"faithful, no corrections."* Team-lead is the sole `source-agent`, so their read-back is the last one owed and the gate closes.
 
-> **Referent, stated so the confirmation cannot be silently inherited by a later version.** The confirmed text is the entry as committed at **`ab622c7`** -- md5 `c58e6fe2da70f9fc4a1878ab5b5c11ce`, 11341 bytes (card: `06f478e47f747498c6a0c249d1a97403`, 5632 bytes), verified against the commit rather than against a working-tree hash. **Anything added after `ab622c7` is outside what was confirmed.** This is the axis-2 remedy from `../process/stage-2-confirms-filing-gate.md`: the `stage-2` field carries no version, so an amendment inherits a confirmation it never received unless the referent is written down.
+> **Referent, stated so the confirmation cannot be silently inherited by a later version. Current referent: `f914efd`.** The confirmed text is the entry as committed at **`f914efd`** -- md5 `220d39435402940b970e60d1fa1dcd18`, 16014 bytes (card: `2a3967d8265b7ce08ed1ae389b019bad`, 8103 bytes), hashed from the blobs **inside the commit**, not from the working tree. **Anything added after `f914efd` is outside what was confirmed.** This is the axis-2 remedy from `../process/stage-2-confirms-filing-gate.md`: the `stage-2` field carries no version, so an amendment inherits a confirmation it never received unless the referent is written down.
+>
+> **Referent history, kept rather than overwritten.** The first referent was **`ab622c7`** (md5 `c58e6fe2da70f9fc4a1878ab5b5c11ce`, 11341 bytes; card `06f478e47f747498c6a0c249d1a97403`, 5632 bytes), covering the 10:53 read-back. The island-line correction landed outside it, team-lead re-read that correction at 11:15 and confirmed it faithful, and the referent advanced to `f914efd`. **Two read-backs, two referents, and the chain says which text each one covered** -- a referent that is overwritten on every amendment records only the latest state and loses exactly the history it exists to provide.
 
 **Two things the gate does NOT close, and it is worth being exact about the difference.** The gate measures whether a second agent read the entry back, **not whether every question it raises is settled.** Still open, both with the PO as of 2026-09-04: **the Koidula collision** and **the one-token-two-things scope point** (the latter also with Herald as a spec question, sent 10:50). **A PO confirmation is expected and would settle them; it is not required for the gate and does not reopen it.** If the PO's answer changes the decision's scope, that is an amendment against the referent above, not a re-run of this read-back.
 
@@ -138,6 +149,7 @@ It proposes a workflow-level `hubSignal()` primitive that would send through the
 
 - **2026-09-04 10:0x (filing).** Created, `stage-2: pending`, against the submission's author-is-filer label.
 - **2026-09-04 10:53 (gate).** Advanced to `confirmed` on team-lead's read-back -- faithful, no corrections, gate call accepted. **Referent recorded as commit `ab622c7` with md5 and byte count for both files.** No content changed; the two PO items remain open and are named above.
-- **2026-09-04 11:0x (island-line correction).** The island-membership line struck and replaced with the live registry read from Herald's spec §10.1 (`22772b3`). **This is a factual correction to a `confirmed` entry, and it lands OUTSIDE the `ab622c7` referent** -- the confirmation does not extend to it (axis-2). **It is the first correction to this entry's content rather than its metadata**, and it changes what a reader would conclude about rollout scope, so **team-lead's re-read is owed and the gate referent should be re-stated against the new commit once this is committed.** Submitted by team-lead against their own relay.
+- **2026-09-04 11:03 (island-line correction).** The island-membership line struck and replaced with the live registry read from Herald's spec §10.1 (`22772b3`). **The first correction to this entry's content rather than its metadata**, landing outside the `ab622c7` referent. Submitted by team-lead against their own relay.
+- **2026-09-04 11:15 (second read-back, referent advanced).** Team-lead re-read the correction: **faithful, no corrections**, and confirmed both the registry table and the *onboarding from nothing, not a courier bump* pull-forward. **Referent advanced `ab622c7` -> `f914efd`** and the prior referent kept as history rather than overwritten. `stage-2` remains `confirmed`, now against `f914efd`.
 
 (*FR:Aen* relayed the ruling, supplied the lineage, ownership and the unowned-proposal finding, and read the entry back; *FR:Callimachus* filed, verified the discussions and the ledger issue, ruled on the genus question and wrote its promotion condition, added the scope and collision observations, and recorded the gate referent)

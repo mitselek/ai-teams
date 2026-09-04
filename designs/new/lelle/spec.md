@@ -133,8 +133,12 @@ A different clock means **do not park on it**.
 `hubSignal()` **returns** for every protocol-level outcome and **throws only on programmer error**
 (missing required argument, malformed `to`). This is not stylistic. The Workflow runtime documents
 that a stage which throws inside `pipeline()` *"drops that item to `null` and skips its remaining
-stages"*, and that a `parallel()` thunk which throws *"resolves to `null` -- the call itself never
-rejects"*. **In this runtime, throwing is how a failure becomes silent.** The contract's standing rule
+stages"*, and that *"a thunk that throws **(or whose agent errors)** resolves to `null` in the result
+array — the call itself never rejects"*. **In this runtime, throwing is how a failure becomes silent —
+and the parenthetical widens it past throwing: a thunk that never throws still nulls if its agent
+errors.** *(The parenthetical was elided in v0.1 as first committed; restored at read-back
+2026-09-04 11:15, because it makes the null channel wider than the rule was written to cover.)*
+The contract's standing rule
 (§3, "no envelope = transport failure; nothing is assumed to have happened") generalises here as:
 *nothing silent, ever* -- so Lelle returns a status the author is forced to branch on.
 
@@ -174,6 +178,14 @@ rejects"*. **In this runtime, throwing is how a failure becomes silent.** The co
 | `rejected` | The hub refused the deposit **in-hand**, in the response envelope: `E_NOGRANT`, `E_UNKNOWN_TEAM`, `E_TOOBIG`, `E_MALFORMED`. | yes | never deposited |
 | `unsent` | No response envelope after the courier's retry budget, or no island determined (§9). Per contract §3, nothing is assumed to have happened. | yes | unknown; retry is safe |
 | `abandoned` | `hubSignalAny()` resolved on a sibling first. | yes | **still live.** Not cancelled (§8.3). |
+
+**Seven states, six statuses, five reachable by one call — and the three numbers are all different on
+purpose.** The table above has **seven states**. §3.3's returned union has **six statuses**, because
+`pending` is the only non-terminal row and `hubSignal()` does not return while it holds. A **single**
+signal can reach only **five** of those six, because `abandoned` arises solely from `hubSignalAny()`
+losing a race. So a single-signal `switch` needs five cases, and both `case 'pending'` and
+`case 'abandoned'` are branches that can never run. *(Added at read-back, 2026-09-04 11:15; the
+six-versus-seven half is Callimachus's correction, the five is the refinement it exposed.)*
 
 **Three of the seven states leave a live consignment at the hub** (`expired`, `abandoned`, and
 `unsent`-where-it-actually-landed). That is deliberate and it is the point of §8.2: Lelle has **no
@@ -234,9 +246,16 @@ Consequences, all of them good for the programme:
 - **The `schema` option does the validation.** The runtime forces the subagent to call
   `StructuredOutput` and returns a validated object, so `hubSignal()`'s return shape (§3.3) is
   enforced by the tool layer, not by hand-parsing.
-- **`agent()` returns `null` if the subagent dies on a terminal API error after retries.** The helper
-  MUST convert that `null` into `{status:'unsent', error:{code:'E_AGENT_DIED'}}` before returning.
-  A bare `null` reaching the author is the silent failure this design forbids.
+- **`agent()` returns `null` for two different reasons, and the helper must not collapse them.** The
+  runtime returns `null` *"if the user skips the agent mid-run **or** the subagent dies on a terminal
+  API error after retries"*. Only the second is a death. The helper MUST convert `null` into an
+  explicit status before returning — a bare `null` reaching the author is the silent failure this
+  design forbids — but a single `E_AGENT_DIED` would **mislabel a deliberate human skip as a crash**,
+  which is a fresh instance of the same silent-failure family this rule exists to close.
+  **Rule: `{status:'unsent', error:{code:'E_AGENT_NULL', detail:'skipped-or-died — the runtime does
+  not distinguish'}}`.** The detail string is load-bearing: the runtime genuinely does not tell the
+  two apart, so the honest report is that the cause is unknown, never a guess at which one it was.
+  *(Corrected at read-back, 2026-09-04 11:15 — v0.1 as first committed named only the death cause.)*
 - **The park costs one concurrency slot.** That is §7.1, and it is the single most important
   operational constraint in this spec.
 
@@ -698,8 +717,14 @@ switch (gate.status) {
 }
 ```
 
-The three-way fork maps cleanly onto `verdict=`, and the `switch` is exhaustive over §3.4 — which is
-the whole reason `hubSignal()` returns instead of throwing.
+The three-way fork maps cleanly onto `verdict=`, and the `switch` is exhaustive over **the five
+statuses a single `hubSignal()` can return** — which is the whole reason `hubSignal()` returns instead
+of throwing. *(Corrected at read-back, 2026-09-04 11:15: v0.1 said "exhaustive over §3.4", which is
+wrong. §3.4 holds seven **states**; §3.3 returns six **statuses**, because `pending` is the only
+non-terminal row and the call does not return while it holds; and a **single** signal can reach only
+five of those six, because `abandoned` arises solely from `hubSignalAny()` losing a race. So a
+single-signal `switch` needs five cases, and both `case 'pending'` and `case 'abandoned'` are branches
+that can never run.)*
 
 **But the gate's actor is a *human*, and the hub has no humans.** Lelle can express station 5 only if
 a registered *team* stands in for the human, receiving the signal and relaying the ruling. On the EVR

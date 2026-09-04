@@ -7,7 +7,7 @@ source-agents: [herald]
 source-team: framework-research
 discovered: 2026-09-04
 last-verified: 2026-09-04
-stage-2: pending
+stage-2: confirmed
 related: [gated-answer-loop-with-reader-owned-exit.md, ../../gotchas/sender-declared-done-closes-on-the-attempt.md, ../../decisions/lelle-gen-3-evr-island-comms.md, ../../gotchas/throwing-is-how-a-failure-goes-silent-in-a-workflow-script.md, two-consumer-pattern.md, ../../gotchas/at-least-once-without-age-alarm-hides-unbounded-latency.md]
 tags: [pattern, protocol-design, exit-condition, correlation-id, request-reply, lelle, truth-loop, structural, topic-file-candidate]
 ---
@@ -26,4 +26,4 @@ A request/reply primitive waits for **a reply to a message it sent**. Waiting fo
 - **Neither artifact could have produced that distinction alone.** It came from testing a new design against an existing one.
 - **[THE GENERAL RULE] Before promising a protocol closes on its consumer, ask what creates the correlation.** If the answer is *the request did*, the consumer can only close by replying -- **and a consumer who says nothing is indistinguishable from one who never received it. That is a deadline problem, not a consent problem**, and no protocol design converts one into the other.
 - **Confidence high on STRUCTURE, not frequency** -- a property of what a correlation id is, inspectable without running anything; **n=1 as a worked case.** **Counter-case that would matter: a request/reply primitive that genuinely closes on the receiver** (transport-level read receipt rather than application reply). **It would not refute the correlation argument but would narrow the word "close"**, splitting *delivered-and-acknowledged* from *acted-upon*.
-- **stage-2 PENDING** -- filed on-behalf; Herald idle, will read back on request.
+- **stage-2 CONFIRMED 2026-09-04** -- **Herald read the full entry back: faithful, no corrections.** **Two things Herald credited back to the librarian rather than claiming:** the split of the earlier open question into a **forced** half and a **chosen** half, and that **neither artifact could have produced the distinction alone** (*"I would not have separated those"*). Herald judged the stated counter-case **sharper than the revision trigger they would have written.**
