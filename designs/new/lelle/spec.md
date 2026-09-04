@@ -57,6 +57,25 @@ Lineage: gen 1 ghost-bridge → gen 2 stationmaster contract v1.0.0 → **gen 3 
 **Assumed capability, unchanged from contract §1:** outbound `ssh` only. Lelle adds no transport
 requirement.
 
+### 1.1 Naming rule -- the token names the method, never an instance
+
+> **`Lelle` names the gen-3 *method*; a running instance is written `Lelle@<hub-instance>` -- today the
+> only one is `Lelle@prod-llm`.**
+
+The PO's ruling binds the single token to both the method and its EVR instance, which is harmless
+while one island runs one instance and reproduces the exact "which one?" ambiguity the codename was
+chosen to remove the moment a second appears. The rule above is proposed now rather than after the
+fact, because this fleet has already paid for the alternative: `singular-convention-plural-instances-enumerate-from-the-registry`
+was filed when two stationmaster hubs were live and every per-instance document read true, and
+erratum E2 struck a hardcoded instance name out of the contract for the same reason.
+
+The `@<instance>` suffix is not a new convention, it is the one already in force one layer down:
+the stationmaster package README opens by saying it is *"the cross-team CONVENTION, not an
+instance"*, and instances are named separately (`prod-llm`, `sagres`). Lelle inherits that split
+rather than inventing a second style for it. **A document that means the running deployment writes
+`Lelle@prod-llm`; a document that means the method writes `Lelle`.** N instances cost N suffixes and
+no rewording, which is the same scaling property the dual-homing spec §7 gives the island table.
+
 **Island scope.** Lelle is EVR-island only. It inherits the `island-local-everything` discipline
 verbatim: the signal machinery is island-local, and the only artifact that crosses islands is the git
 repo. §9 states what happens when a signal names a team on the other island.
@@ -724,7 +743,8 @@ The existence of the second verb is what stops an author from parking on it out 
 
 ## 12. PO gate list
 
-Each item is one sentence, with a recommendation. Items 1–5 gate v0.1 → v1.0; 6–8 are scheduling.
+Each item is one sentence, with a recommendation. Items 1–5 gate v0.1 → v1.0; 6–8 are scheduling;
+9 is naming.
 
 1. **Adopt Lelle as an extension of the stationmaster post-office with no hub or wire change, shipping
    as a courier rule plus a workflow-side library?** — *Recommend YES; the whole spec is built so this
@@ -753,6 +773,10 @@ Each item is one sentence, with a recommendation. Items 1–5 gate v0.1 → v1.0
 8. **Schedule Paunvere separately from the Lelle rollout**, since it is not registered on the hub and
    runs no courier at all? — *Recommend YES; for Paunvere this is stationmaster onboarding from
    nothing, not a courier bump, and bundling it would hide the real cost.*
+9. **Adopt the §1.1 naming rule — `Lelle` is the method, `Lelle@<hub-instance>` is a deployment —
+   so the codename cannot re-acquire the ambiguity it was chosen to remove?** — *Recommend YES; it
+   costs one suffix today, reuses the convention-versus-instance split the stationmaster package
+   already enforces, and the alternative has a filed gotcha and a contract erratum behind it.*
 
 ---
 
