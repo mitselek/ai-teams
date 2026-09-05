@@ -221,6 +221,14 @@ if [ -f "$wake_file" ]; then
     prompt="$wake"
 fi
 
+# --- session name ------------------------------------------------------------
+# Name the conversation after team + launch moment ("po-team 06.09 11:32"),
+# the same practice as Passepartout's resident loop: relaunches become
+# distinguishable in session pickers and /resume lists instead of a wall of
+# identical untitled sessions. Expanded here (launch time == creation time);
+# single-quote-free by construction (team is [A-Za-z0-9_-], date is digits).
+session_name="$team $(date '+%d.%m %H:%M')"
+
 # --- create-or-attach --------------------------------------------------------
 # The env var is set inline in the session command so it is scoped to the
 # claude process (no reliance on tmux server environment inheritance or the
@@ -230,4 +238,4 @@ fi
 # single-quoted (both are single-quote-free by construction: the prompt text
 # above, and workspace is $HOME/workspace in fleet homes).
 exec tmux new-session -A -s "$team" \
-    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 CLAUDE_ENV_ID='$env_id' '$claude_bin' '$prompt'"
+    "cd '$workspace' && exec env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 CLAUDE_ENV_ID='$env_id' '$claude_bin' --name '$session_name' '$prompt'"
